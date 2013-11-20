@@ -146,7 +146,13 @@ public class Configuration
 		
 		JIRA_USER("jira_user", "default_jira_user"),
 		
-		JIRA_PASSWORD("jira_password", "default_jira_password");
+		JIRA_PASSWORD("jira_password", "default_jira_password"),
+
+        JIRA_PROJECT("jira_project", "default_jira_project"),
+
+        JIRA_PROJECT_SHORT("jira_project_short", "default_jira_project_short"),
+        
+        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket", "default_jira_create_new_ticket");
 
 		private final String key;
 

@@ -151,18 +151,24 @@ public class EmailReportGenerator
 			}
 			passCount++;
 		}
-		if (testResultItem.getDescription() != null && testResultItem.getDescription().contains("JIRA#"))
-		{
-			String id = testResultItem.getDescription().split("#")[1];
-			String url = Configuration.get(Parameter.JIRA_URL) + id;
-			result = result.replace(BUG_ID_PLACEHOLDER, id);
-			result = result.replace(BUG_URL_PLACEHOLDER, url);
-		}
-		else
-		{
-			result = result.replace(BUG_ID_PLACEHOLDER, "N/A");
-			result = result.replace(BUG_URL_PLACEHOLDER, "#");
-		}
+//		if (testResultItem.getDescription() != null && testResultItem.getDescription().contains("JIRA#"))
+//		{
+//			String id = testResultItem.getDescription().split("#")[1];
+//			String url = Configuration.get(Parameter.JIRA_URL) + id;
+//			result = result.replace(BUG_ID_PLACEHOLDER, id);
+//			result = result.replace(BUG_URL_PLACEHOLDER, url);
+//		}
+		 if (testResultItem.getJiraTicket() != null)
+         {
+             String url = Configuration.get(Parameter.JIRA_URL) + "/browse/" + testResultItem.getJiraTicket();
+             result = result.replace(BUG_ID_PLACEHOLDER, testResultItem.getJiraTicket());
+             result = result.replace(BUG_URL_PLACEHOLDER, url);
+         }
+         else
+         {
+             result = result.replace(BUG_ID_PLACEHOLDER, "N/A");
+             result = result.replace(BUG_URL_PLACEHOLDER, "#");
+         }
 		return result;
 	}
 
