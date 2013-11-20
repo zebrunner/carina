@@ -25,6 +25,7 @@ public class TestResultItem
 	private String linkToScreenshots = null;
 	private String failReason = null;
 	private String description = null;
+	private String jiraTicket = null;
 	private TestResultType result = null;
 
 	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog)
@@ -122,6 +123,16 @@ public class TestResultItem
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+	
+	public String getJiraTicket()
+	{
+		return jiraTicket;
+	}
+
+	public void setJiraTicket(String jiraTicket)
+	{
+		this.jiraTicket = jiraTicket;
 	}
 
 	public String hash()

@@ -49,6 +49,16 @@ public abstract class AbstractTestListener extends TestArgsListener
 		super.onTestStart(result);
 		
 		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
+		
+		// Populate JIRA ID
+		 if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET))
+		 {
+		   result.setAttribute(SpecialKeywords.JIRA_TICKET, result.getMethod().getDescription().split("#")[1]);
+		 }
+		 else if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null)
+		 {
+		   result.setAttribute(SpecialKeywords.JIRA_TICKET, result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
+		 }
 
 		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_ARGS))
 		{
@@ -170,6 +180,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, failReason);
 		testResultItem.setDescription(description);
+		testResultItem.setJiraTicket((String)test.getAttribute(SpecialKeywords.JIRA_TICKET));
 		return testResultItem;
 	}
 }
