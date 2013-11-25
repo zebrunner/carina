@@ -49,6 +49,7 @@ public class DriverFactory
 	public static final String HTML_UNIT = "htmlunit";
 	public static final String IOS = "iOS";
 	public static final String ANDROID = "Android";
+	public static final String SAFARI = "safari";
 
 	/**
 	 * Creates diver instance for specified test.
@@ -159,7 +160,7 @@ public class DriverFactory
 		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE));
 		capabilities.setCapability(CapabilityType.VERSION, Configuration.get(Parameter.MOBILE_VERSION));
 		capabilities.setCapability(CapabilityType.PLATFORM, Configuration.get(Parameter.MOBILE_PLATFORM));
-		if(!new File(Configuration.get(Parameter.MOBILE_APP)).exists())
+		if(!SAFARI.equals(Configuration.get(Parameter.MOBILE_APP)) && !new File(Configuration.get(Parameter.MOBILE_APP)).exists())
 		{
 			throw new InvalidArgsException("No application found: " + Configuration.get(Parameter.MOBILE_APP));
 		}
