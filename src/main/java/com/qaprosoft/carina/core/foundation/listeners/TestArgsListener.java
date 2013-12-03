@@ -56,7 +56,10 @@ public class TestArgsListener extends TestListenerAdapter
 		{
 			for (int i = 0; i < result.getParameters().length; i++)
 			{
-				result.getParameters()[i] = processParameter((String) result.getParameters()[i]);
+				if (result.getParameters()[i] instanceof String)
+				{
+					result.getParameters()[i] = processParameter(result.getParameters()[i].toString());
+				}
 			}
 		}
 	}

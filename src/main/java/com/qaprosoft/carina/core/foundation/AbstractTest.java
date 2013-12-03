@@ -297,6 +297,33 @@ public abstract class AbstractTest extends DriverHelper
 	}
     }
 
+
+    public Object[][] createTestArgSets2(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
+    {
+		XLSDSBean dsBean = new XLSDSBean(context);
+		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
+
+		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
+		int rowIndex = 0;
+		for (Map<String, String> xlsRow : dsData.getDataRows())
+		{
+			args[rowIndex][0] = xlsRow;
+
+		    for (int i=0; i<staticArgs.length; i++){
+		    	args[rowIndex][i + 1] = dsBean.getTestParams().get(staticArgs[i]); //zero element is a hashmap 
+		    }
+		    rowIndex++;
+		}
+
+		return args;
+    }
+
+    @DataProvider(name = "excel_ds2")
+    public Object[][] readDataFromXLS2(ITestContext context)
+    {
+	return createTestArgSets2(context, "Execute", "Y");
+    }
+    
     public Object[][] createTestArgSets(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
 	String[] argNames = ArrayUtils.addAll(context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_ARGS).split(";"), staticArgs);
