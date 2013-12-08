@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,7 @@ public class TestArgsListener extends TestListenerAdapter
 	private static final Logger LOGGER = Logger.getLogger(TestArgsListener.class);
 
 	private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
+	private static Pattern GENERATEAN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEAN);
 	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
 	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
 	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
@@ -59,6 +61,15 @@ public class TestArgsListener extends TestListenerAdapter
 				if (result.getParameters()[i] instanceof String)
 				{
 					result.getParameters()[i] = processParameter(result.getParameters()[i].toString());
+				}
+				
+				if (result.getParameters()[i] instanceof Map)
+				{
+					@SuppressWarnings("unchecked")
+					Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
+					for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
+						dynamicAgrs.put(entry.getKey(), processParameter(entry.getValue()).toString());
+					}
 				}
 			}
 		}
@@ -80,6 +91,15 @@ public class TestArgsListener extends TestListenerAdapter
 				int end = param.indexOf("}");
 				int size = Integer.valueOf(param.substring(start, end));
 				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWord(size));
+			}
+			
+			matcher = GENERATEAN_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				int size = Integer.valueOf(param.substring(start, end));
+				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWordAN(size));
 			}
 			
 			matcher = ENV_PATTERN.matcher(param);

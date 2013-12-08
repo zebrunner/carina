@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.utils;
 
 import java.util.Random;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 public class StringGenerator
 {
 
@@ -53,6 +55,10 @@ public class StringGenerator
 		return result.toString();
 	}
 
+	public static String generateWordAN(int keySize)
+	{
+		return RandomStringUtils.randomAlphanumeric(keySize);
+	}
 	private static String generateBase(int keySize)
 	{
 
