@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qaprosoft</groupId>
 	<artifactId>carina-core</artifactId>
-	<version>2.1.4</version>
+	<version>2.1.6</version>
 	<packaging>jar</packaging>
 	<name>Carina Test Core</name>
 	<description>Test core for multi-purpose testing of web-applications.</description>
