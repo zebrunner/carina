@@ -68,7 +68,11 @@ public class TestArgsListener extends TestListenerAdapter
 					@SuppressWarnings("unchecked")
 					Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
 					for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
-						dynamicAgrs.put(entry.getKey(), processParameter(entry.getValue()).toString());
+						Object param = processParameter(entry.getValue());
+						if (param != null)
+							dynamicAgrs.put(entry.getKey(), param.toString());
+						else
+							dynamicAgrs.put(entry.getKey(), null);
 					}
 				}
 			}
@@ -79,7 +83,7 @@ public class TestArgsListener extends TestListenerAdapter
 	{
 		try
 		{
-			if (param == null || NULL.equalsIgnoreCase(param))
+			if (param == null || param.toLowerCase().equals("nil"))
 			{
 				return null;
 			}

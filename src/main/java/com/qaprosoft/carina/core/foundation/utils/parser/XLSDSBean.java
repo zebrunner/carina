@@ -76,6 +76,10 @@ public class XLSDSBean
 		this.xlsSheet = xlsSheet;
 	}
 
+	public List<String> getUidArgs()
+	{
+		return uidArgs;
+	}
 	public List<String> getArgs()
 	{
 		return args;
@@ -98,6 +102,8 @@ public class XLSDSBean
 
 	public String argsToString()
 	{
+		return argsToString(testParams);
+/*		
 		if(uidArgs.size() == 0)
 		{
 			return null;
@@ -109,5 +115,22 @@ public class XLSDSBean
 			sb.append(String.format("%s=%s; ", arg, testParams.get(arg)));
 		}
 		return StringUtils.removeEnd(sb.toString(), "; ");
+*/		
 	}
+
+	public String argsToString(Map<String, String> params)
+	{
+		if(uidArgs.size() == 0)
+		{
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		for(String arg : uidArgs)
+		{
+			if(SpecialKeywords.EXCEL_TUID.equals(arg)) continue;
+			sb.append(String.format("%s=%s; ", arg, params.get(arg)));
+		}
+		return StringUtils.removeEnd(sb.toString(), "; ");
+	}
+	
 }

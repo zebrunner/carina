@@ -43,6 +43,7 @@ public class XMLNameStrategy implements INamingStrategy
 		{
 			String testName = result.getTestContext().getCurrentXmlTest().getName();
 			XLSDSBean ds = new XLSDSBean(result.getTestContext());
+		
 			if(!ds.getArgs().isEmpty())
 			{
 				if(ds.getArgs().contains(SpecialKeywords.EXCEL_TUID))
@@ -53,7 +54,28 @@ public class XMLNameStrategy implements INamingStrategy
 				{
 					testName = testName + " [" + ds.argsToString() + "]";
 				}
+			} 
+			
+			if(ds.getArgs().isEmpty() && !ds.getUidArgs().isEmpty())
+			{
+				// retrieve {excel_ds_uid} fields from results->parameters->dynamicArgs Map
+				// 0th element should be Map<String, String> as we generate such structure in AbstractTest::createTestArgSets2 for XLS Data provider
+				if (result.getParameters()[0] instanceof Map)
+				{
+					@SuppressWarnings("unchecked")
+					Map<String, String> testParams = (Map<String, String>) result.getParameters()[0];	
+					String sTUID = testParams.get(SpecialKeywords.EXCEL_TUID);
+					if (!sTUID.isEmpty())
+					{
+						testName = sTUID + " - " + testName + " [" + ds.argsToString(testParams) + "]";
+					}
+					else
+					{
+						testName = testName + " [" + ds.argsToString(testParams) + "]";						
+					}
+				}
 			}
+		
 			if(testNameMappedToID.values().contains(testName))
 			{
 				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
