@@ -46,6 +46,8 @@ public class XLSDSBean
 		this.xlsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
 		this.xlsSheet = testParams.get(SpecialKeywords.EXCEL_DS_SHEET);
 		this.args = new ArrayList<String>();
+		this.uidArgs = new ArrayList<String>();
+
 		if(testParams.get(SpecialKeywords.EXCEL_DS_ARGS) != null)
 		{
 			args = Arrays.asList(testParams.get(SpecialKeywords.EXCEL_DS_ARGS).replace(",", ";").replace(" ", "").split(";"));
