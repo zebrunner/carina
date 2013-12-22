@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -29,6 +30,7 @@ import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 public class XLSParser
 {
 	private static DataFormatter df;
+	private static FormulaEvaluator evaluator;
 	
 	static 
 	{
@@ -140,6 +142,7 @@ public class XLSParser
 		}
 		
 		Workbook wb = XLSCache.getWorkbook(xls);
+		evaluator = wb.getCreationHelper().createFormulaEvaluator();		
 		
 		Sheet sheet = wb.getSheet(sheetName);
 		if(sheet == null)
@@ -174,7 +177,7 @@ public class XLSParser
 		case Cell.CELL_TYPE_BOOLEAN:
 			return df.formatCellValue(cell).trim();
 		case Cell.CELL_TYPE_FORMULA:
-			return df.formatCellValue(cell).trim();
+			return df.formatCellValue(cell, evaluator).trim();
 		case Cell.CELL_TYPE_BLANK:
 			return "";
 		default:
