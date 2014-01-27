@@ -76,6 +76,11 @@ public class XMLNameStrategy implements INamingStrategy
 				}
 			}
 		
+			//LC - AUTO-249 email report - 1st method name should present in emailable report.
+			//VD - method name should present in each test report line.
+			testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
+			
+			/*
 			if(testNameMappedToID.values().contains(testName))
 			{
 				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
@@ -84,6 +89,7 @@ public class XMLNameStrategy implements INamingStrategy
 			{
 				testNameMappedToID.put(logID, testName);
 			}
+			*/
 		}
 		return testNameMappedToID.get(logID);
 	}

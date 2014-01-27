@@ -36,7 +36,8 @@ import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.exception.NotSupportedOperationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
+
+import org.openqa.selenium.Capabilities;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -97,7 +98,6 @@ public class DriverFactory
 			}
 			driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
 			driver = new Augmenter().augment(driver);
-
 		}
 		catch (MalformedURLException e)
 		{
@@ -106,11 +106,18 @@ public class DriverFactory
 		return driver;
 	}
 
+	public static String getBrowserVersion(WebDriver driver)
+	{
+		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
+		return cap.getVersion().toString();	
+		
+	}
+
 	private static DesiredCapabilities getFirefoxCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER),
-				R.CONFIG.get("firefox_version"), "name", testName);
+		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), "name", testName);		
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setEnableNativeEvents(false);
@@ -126,8 +133,7 @@ public class DriverFactory
 	private static DesiredCapabilities getInternetExplorerCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER),
-				R.CONFIG.get("ie_version"), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), "name", testName);
 		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -137,8 +143,7 @@ public class DriverFactory
 	private static DesiredCapabilities getChromeCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER),
-				R.CONFIG.get("chrome_version"), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), "name", testName);
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-certificate-errors"));
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -173,8 +178,7 @@ public class DriverFactory
 	{
 		capabilities.setPlatform(platform);
 		capabilities.setBrowserName(args[0]);
-		capabilities.setVersion(args[1]);
-		capabilities.setCapability("name", args[2]);
+		capabilities.setCapability("name", args[1]);
 		return capabilities;
 	}
 }
