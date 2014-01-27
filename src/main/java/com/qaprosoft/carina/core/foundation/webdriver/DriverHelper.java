@@ -576,6 +576,8 @@ public class DriverHelper
 		{
 			driver.switchTo().alert().accept();
 		}
+		//AUTO-250 tweak core to start browser in maximized mode - to prevent stability issues
+		driver.manage().window().maximize();
 		String msg = Messager.OPEN_URL.info(url);
 		summary.log(msg);
 		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);

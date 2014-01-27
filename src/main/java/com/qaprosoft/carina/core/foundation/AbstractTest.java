@@ -90,12 +90,16 @@ public abstract class AbstractTest extends DriverHelper
     protected TestDetailsBean TEST_EXECUTER_LOG;
 
     protected APIMethodBuilder apiMethodBuilder;
+    private String browserVersion;
 
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeSuite(ITestContext context)
     {
 	try
 	{
+		
+		browserVersion = "";
+		
 	    // Set log4j properties
 	    PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
 	    // Set SoapUI log4j properties
@@ -109,29 +113,29 @@ public abstract class AbstractTest extends DriverHelper
 
 	    if (!Configuration.isNull(Parameter.URL))
 	    {
-		RestAssured.baseURI = Configuration.get(Parameter.URL);
+	    	RestAssured.baseURI = Configuration.get(Parameter.URL);
 	    }
 
 	    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
 	    {
-		Assert.assertTrue(Configuration.getLong(Parameter.TEST_ID) > 0, "Parameter 'test_id' not specified");
-		ITestExecuterClient client = new TestExecuterClient(Configuration.get(Parameter.TESTEXECUTER_URL));
-		executionContext = ExecutionContext.INSTANCE.initBeforeSuite(Configuration.getLong(Parameter.TEST_ID), client);
+			Assert.assertTrue(Configuration.getLong(Parameter.TEST_ID) > 0, "Parameter 'test_id' not specified");
+			ITestExecuterClient client = new TestExecuterClient(Configuration.get(Parameter.TESTEXECUTER_URL));
+			executionContext = ExecutionContext.INSTANCE.initBeforeSuite(Configuration.getLong(Parameter.TEST_ID), client);
 	    }
 	    else
 	    {
-		executionContext = ExecutionContext.INSTANCE.initBeforeSuite();
+	    	executionContext = ExecutionContext.INSTANCE.initBeforeSuite();
 	    }
 
 	    try
 	    {
-		String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
-		String country = Configuration.get(Parameter.LOCALE).split("_")[1];
-		L18n.init("l18n.messages", new Locale(lang, country));
+			String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
+			String country = Configuration.get(Parameter.LOCALE).split("_")[1];
+			L18n.init("l18n.messages", new Locale(lang, country));
 	    }
 	    catch (Exception e)
 	    {
-		LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+	    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 	    }
 	}
 	catch (Exception e)
@@ -150,9 +154,10 @@ public abstract class AbstractTest extends DriverHelper
 	    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
 	    if (isUITest())
 	    {
-		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
-		xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
-		initSummary(driver);
+			driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+			xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
+			initSummary(driver);
+			browserVersion = DriverFactory.getBrowserVersion(driver);
 	    }
 	    TEST_EXECUTER_LOG = executionContext.initBeforeTest(xmlTest.getName());
 	    apiMethodBuilder = new APIMethodBuilder();
@@ -180,65 +185,65 @@ public abstract class AbstractTest extends DriverHelper
 
 	    if (isUITest() && driver != null)
 	    {
-		fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
-		fw.append(TestLogHelper.getSessionLogs(test));
-		try
-		{
-		    driver.quit();
-		}
-		catch (Exception e)
-		{
-		    LOG.error(e.getMessage());
-		}
+			fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
+			fw.append(TestLogHelper.getSessionLogs(test));
+			try
+			{
+			    driver.quit();
+			}
+			catch (Exception e)
+			{
+			    LOG.error(e.getMessage());
+			}
 	    }
 
 	    if (!StringUtils.isEmpty(glblLog.readLog(Type.SOAP)))
 	    {
-		fw.append("\r\n************************** SoapUI logs **************************\r\n\r\n");
-		fw.append(glblLog.readLog(Type.SOAP));
+			fw.append("\r\n************************** SoapUI logs **************************\r\n\r\n");
+			fw.append(glblLog.readLog(Type.SOAP));
 	    }
 
 	    if (apiMethodBuilder != null)
 	    {
-		String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
-		if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
-		{
-		    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
-		    fw.append(tempLog);
-		    fw.append(glblLog.readLog(Type.REST));
-		}
+			String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
+			if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
+			{
+			    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
+			    fw.append(tempLog);
+			    fw.append(glblLog.readLog(Type.REST));
+			}
 	    }
 
 	    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
 	    {
-		fw.append("\r\n************************** Common logs **************************\r\n\r\n");
-		fw.append(glblLog.readLog(Type.COMMON));
+			fw.append("\r\n************************** Common logs **************************\r\n\r\n");
+			fw.append(glblLog.readLog(Type.COMMON));
 	    }
 
 	    try
 	    {
-		fw.close();
-		apiMethodBuilder.close();
+			fw.close();
+			apiMethodBuilder.close();
 	    }
 	    catch (Exception e)
 	    {
-		LOG.error(e.getMessage());
+	    	LOG.error(e.getMessage());
 	    }
 
 	    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
 	    {
-		TestResultItem testResult = EmailReportItemCollector.pull(result);
-		if (TestResultType.PASS.equals(testResult.getResult()))
-		{
-		    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
-		}
-		else
-		{
-		    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
-		    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
-		}
-		TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
-		TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
+		    TestResultItem testResult = EmailReportItemCollector.pull(result);
+			if (TestResultType.PASS.equals(testResult.getResult()))
+			{
+			    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
+			}
+			else
+			{
+			    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
+			    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
+			}
+			TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
+			TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
 	    }
 	}
 	catch (Exception e)
@@ -261,18 +266,22 @@ public abstract class AbstractTest extends DriverHelper
 	    String eTitle = null;
 	    if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName()))
 	    {
-		String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? context.getSuite().getXmlSuite().getName() : Configuration
-			.get(Parameter.SUITE_NAME);
-		String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
-			.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
-		eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-			xmlFile, env, Configuration.get(Parameter.BROWSER));
+			String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? context.getSuite().getXmlSuite().getName() : Configuration
+				.get(Parameter.SUITE_NAME);
+			String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
+				.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
+//			eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+//				xmlFile, env, Configuration.get(Parameter.BROWSER));
+			eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+					xmlFile, env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
 	    }
 	    else
 	    {
-		String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
-		eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-			env, Configuration.get(Parameter.BROWSER));
+			String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
+//			eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+//				env, Configuration.get(Parameter.BROWSER));
+			eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+					env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
 	    }
 	    ReportContext.getTempDir().delete();
 
@@ -280,9 +289,13 @@ public abstract class AbstractTest extends DriverHelper
 	    Jira.updateAfterSuite(EmailReportItemCollector.getTestResults());
 
 	    // Generate email report
+//	    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),
+//		    Configuration.get(Parameter.BROWSER), DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
+//		    EmailReportItemCollector.getCreatedItems());
+	    
 	    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),
-		    Configuration.get(Parameter.BROWSER), DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
-		    EmailReportItemCollector.getCreatedItems());
+			    Configuration.get(Parameter.BROWSER) + " " + browserVersion, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
+			    EmailReportItemCollector.getCreatedItems());	    
 
 	    // Send report for specified emails
 	    EmailManager.send(eTitle, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL),
@@ -335,14 +348,14 @@ public abstract class AbstractTest extends DriverHelper
 	{
 	    for (int i = 0; i < argNames.length; i++)
 	    {
-		if (dsBean.getArgs().contains(argNames[i]))
-		{
-		    args[rowIndex][i] = xlsRow.get(argNames[i]);
-		}
-		else
-		{
-		    args[rowIndex][i] = dsBean.getTestParams().get(argNames[i]);
-		}
+			if (dsBean.getArgs().contains(argNames[i]))
+			{
+			    args[rowIndex][i] = xlsRow.get(argNames[i]);
+			}
+			else
+			{
+			    args[rowIndex][i] = dsBean.getTestParams().get(argNames[i]);
+			}
 	    }
 	    rowIndex++;
 	}
@@ -352,38 +365,38 @@ public abstract class AbstractTest extends DriverHelper
     @DataProvider(name = "excel_ds")
     public Object[][] readDataFromXLS(ITestContext context)
     {
-	return createTestArgSets(context, "Execute", "Y");
+    	return createTestArgSets(context, "Execute", "Y");
     }
 
     private void printExecutionSummary(List<TestResultItem> tris)
     {
-	Messager.INROMATION.info("**************** Test execution summary ****************");
-	int num = 1;
-	for (TestResultItem tri : tris)
-	{
-	    String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
-	    reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
-	    Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
-	}
+		Messager.INROMATION.info("**************** Test execution summary ****************");
+		int num = 1;
+		for (TestResultItem tri : tris)
+		{
+		    String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
+		    reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
+		    Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
+		}
     }
 
     private String getCIJobReference()
     {
-	String ciTestJob = null;
-	if (!Configuration.isNull(Parameter.JENKINS_URL) && !Configuration.isNull(Parameter.JENKINS_JOB))
-	{
-	    JenkinsClient jc = new JenkinsClient(Configuration.get(Parameter.JENKINS_URL));
-	    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
-	    if (StringUtils.isEmpty(ciTestJob))
-	    {
-		LOG.info("Could not connect to Jenkins!");
-	    }
-	}
-	else
-	{
-	    LOG.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
-	}
-	return ciTestJob;
+		String ciTestJob = null;
+		if (!Configuration.isNull(Parameter.JENKINS_URL) && !Configuration.isNull(Parameter.JENKINS_JOB))
+		{
+		    JenkinsClient jc = new JenkinsClient(Configuration.get(Parameter.JENKINS_URL));
+		    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
+		    if (StringUtils.isEmpty(ciTestJob))
+		    {
+			LOG.info("Could not connect to Jenkins!");
+		    }
+		}
+		else
+		{
+		    LOG.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
+		}
+		return ciTestJob;
     }
 
     protected abstract boolean isUITest();
