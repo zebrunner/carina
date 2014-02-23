@@ -36,6 +36,7 @@ import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.exception.NotSupportedOperationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.android.AndroidNativeDriver;
 
 import org.openqa.selenium.Capabilities;
 
@@ -90,7 +91,18 @@ public class DriverFactory
 			}
 			else if (ANDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
-				throw new NotSupportedOperationException();
+				
+				if (Configuration.isNull(Parameter.MOBILE_DEVICE) 
+						|| Configuration.isNull(Parameter.MOBILE_VERSION)
+						|| Configuration.isNull(Parameter.MOBILE_PLATFORM) 
+						|| Configuration.isNull(Parameter.MOBILE_APP)
+						|| Configuration.isNull(Parameter.MOBILE_APP_PACKAGE)
+						|| Configuration.isNull(Parameter.MOBILE_APP_ACTIVITY)) throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP' should be set!");
+				
+				capabilities = getAndriodCapabilities(testName);
+				driver = new AndroidNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
+				driver = new Augmenter().augment(driver);
+				return driver;
 			}
 			else
 			{
@@ -106,6 +118,12 @@ public class DriverFactory
 		return driver;
 	}
 
+	public static String getBrowserName(WebDriver driver)
+	{
+		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
+		return cap.getBrowserName().toString();	
+	}
+	
 	public static String getBrowserVersion(WebDriver driver)
 	{
 		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
@@ -170,6 +188,23 @@ public class DriverFactory
 			throw new InvalidArgsException("No application found: " + Configuration.get(Parameter.MOBILE_APP));
 		}
 		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
+		capabilities.setCapability("name", testName);
+		return capabilities;
+	}
+	
+	private static DesiredCapabilities getAndriodCapabilities(String testName) throws MalformedURLException
+	{
+		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
+		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE));
+		capabilities.setCapability(CapabilityType.VERSION, Configuration.get(Parameter.MOBILE_VERSION));
+		capabilities.setCapability(CapabilityType.PLATFORM, Configuration.get(Parameter.MOBILE_PLATFORM));
+		
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_BROWSER));
+		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
+		capabilities.setCapability("app-package", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
+		capabilities.setCapability("app-activity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
+		capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));
+
 		capabilities.setCapability("name", testName);
 		return capabilities;
 	}

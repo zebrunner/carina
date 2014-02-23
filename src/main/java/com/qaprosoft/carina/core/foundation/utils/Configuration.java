@@ -136,7 +136,15 @@ public class Configuration
 		
 		MOBILE_PLATFORM("mobile_platform", "default_mobile_platform"),
 		
-		MOBILE_APP("mobile_app", "default_mobile_app"),
+		MOBILE_BROWSER("mobile_browser", "default_mobile_browser"), //Android capability
+		
+		MOBILE_APP("mobile_app", "default_mobile_app"),		
+		
+		MOBILE_APP_PACKAGE("mobile_app_package", "default_mobile_app_package"), //Android capability
+		
+		MOBILE_APP_ACTIVITY("mobile_app_activity", "default_mobile_app_activity"), //Android capability
+		
+		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout", "default_mobile_new_command_timeout"), //Appium capability iOS + Android
 		
 		MOBILE_DEVICE("mobile_device", "default_mobile_device"),
 		
