@@ -97,7 +97,6 @@ public abstract class AbstractTest extends DriverHelper
     {
 	try
 	{
-		
 		browserVersion = "";
 		
 	    // Set log4j properties

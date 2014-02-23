@@ -84,7 +84,7 @@ public class DriverHelper
 	protected CryptoTool cryptoTool;
 
 	protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-
+	
 	public DriverHelper()
 	{
 		try
@@ -578,6 +578,7 @@ public class DriverHelper
 		}
 		//AUTO-250 tweak core to start browser in maximized mode - to prevent stability issues
 		driver.manage().window().maximize();
+		
 		String msg = Messager.OPEN_URL.info(url);
 		summary.log(msg);
 		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
