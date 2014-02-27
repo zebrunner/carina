@@ -61,6 +61,8 @@ public class Configuration
 		ENV_ARG_RESOLVER("env_arg_resolver", "default_env_arg_resolver"),
 
 		BROWSER("browser", "default_browser"),
+		
+		BROWSER_VERSION("browser_version", "default_browser_version"),
 
 		SELENIUM_HOST("selenium_host", "default_selenium_host"),
 

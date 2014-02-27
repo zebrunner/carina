@@ -33,7 +33,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
-import com.qaprosoft.carina.core.foundation.exception.NotSupportedOperationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.android.AndroidNativeDriver;
@@ -97,7 +96,7 @@ public class DriverFactory
 						|| Configuration.isNull(Parameter.MOBILE_PLATFORM) 
 						|| Configuration.isNull(Parameter.MOBILE_APP)
 						|| Configuration.isNull(Parameter.MOBILE_APP_PACKAGE)
-						|| Configuration.isNull(Parameter.MOBILE_APP_ACTIVITY)) throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP' should be set!");
+						|| Configuration.isNull(Parameter.MOBILE_APP_ACTIVITY)) throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP', 'MOBILE_APP_PACKAGE', 'MOBILE_APP_ACTIVITY' should be set!");
 				
 				capabilities = getAndriodCapabilities(testName);
 				driver = new AndroidNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
@@ -135,7 +134,7 @@ public class DriverFactory
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), "name", testName);		
+		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);		
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setEnableNativeEvents(false);
@@ -151,7 +150,7 @@ public class DriverFactory
 	private static DesiredCapabilities getInternetExplorerCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
 		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -161,7 +160,7 @@ public class DriverFactory
 	private static DesiredCapabilities getChromeCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-certificate-errors"));
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -213,7 +212,8 @@ public class DriverFactory
 	{
 		capabilities.setPlatform(platform);
 		capabilities.setBrowserName(args[0]);
-		capabilities.setCapability("name", args[1]);
+		capabilities.setVersion(args[1]);
+		capabilities.setCapability("name", args[2]);
 		return capabilities;
 	}
 }
