@@ -67,19 +67,36 @@ public class UITestListener extends AbstractTestListener
 		}
 		else
 		{
-			LOGGER.error("Retry limit exceeded for " + result.getName());
+			if (MAX_COUNT != 0)
+				LOGGER.error("Retry limit exceeded for " + result.getName());
+			
 			String screenId = "";
 			try
 			{
 				WebDriver driver = DriverPool.getDriverByTestName(TestNamingUtil.getCanonicalTestName(result));
-				screenId = Screenshot.capture(driver, true);
+				if (driver != null)
+					screenId = Screenshot.capture(driver, true);
 			}
 			catch (Exception e)
 			{
 				LOGGER.error(e.getMessage());
 			}
-			String errorMessage = result.getThrowable().getMessage();
-			errorMessage = errorMessage != null ? StringEscapeUtils.escapeHtml4(errorMessage) : errorMessage;
+			
+			Throwable exp = result.getThrowable();
+			String errorMessage = "";
+			
+		    if (exp != null) {
+		    	errorMessage = exp.getMessage();
+		    	errorMessage = errorMessage != null ? errorMessage : "Test RuntimeException: contact qa engineer!";
+		    	
+	            StackTraceElement[] elems = exp.getStackTrace();
+		        for (StackTraceElement elem : elems) {
+		        	errorMessage = errorMessage + "\n" + elem.toString();
+	            }
+		    }
+		        
+			//String errorMessage = result.getThrowable().getMessage();
+			errorMessage = StringEscapeUtils.escapeHtml4(errorMessage);
 //			TestLogCollector.logToSession(DriverPool.getSessionIdByTestName(TestNamingUtil.getCanonicalTestName(result)), "TEST FAILED - " + errorMessage);
 			TestLogCollector.addScreenshotComment(screenId, "TEST FAILED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
