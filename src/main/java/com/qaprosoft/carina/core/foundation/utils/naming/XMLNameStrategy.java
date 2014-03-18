@@ -39,6 +39,7 @@ public class XMLNameStrategy implements INamingStrategy
 	public String getCanonicalTestName(ITestResult result)
 	{
 		String logID = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.TEST_LOG_ID);
+		String methodUID = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.TUID);
 		if(!testNameMappedToID.containsKey(logID))
 		{
 			String testName = result.getTestContext().getCurrentXmlTest().getName();
@@ -46,9 +47,9 @@ public class XMLNameStrategy implements INamingStrategy
 		
 			if(!ds.getArgs().isEmpty())
 			{
-				if(ds.getArgs().contains(SpecialKeywords.EXCEL_TUID))
+				if(ds.getArgs().contains(SpecialKeywords.TUID))
 				{
-					testName = ds.getTestParams().get(SpecialKeywords.EXCEL_TUID) + " - " + testName + " [" + ds.argsToString() + "]";
+					testName = ds.getTestParams().get(SpecialKeywords.TUID) + " - " + testName + " [" + ds.argsToString() + "]";
 				}
 				else
 				{
@@ -64,7 +65,7 @@ public class XMLNameStrategy implements INamingStrategy
 				{
 					@SuppressWarnings("unchecked")
 					Map<String, String> testParams = (Map<String, String>) result.getParameters()[0];	
-					String sTUID = testParams.get(SpecialKeywords.EXCEL_TUID);
+					String sTUID = testParams.get(SpecialKeywords.TUID);
 					if (!sTUID.isEmpty())
 					{
 						testName = sTUID + " - " + testName + " [" + ds.argsToString(testParams) + "]";
@@ -78,18 +79,13 @@ public class XMLNameStrategy implements INamingStrategy
 		
 			//LC - AUTO-249 email report - 1st method name should present in emailable report.
 			//VD - method name should present in each test report line.
-			testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
-			
-			/*
-			if(testNameMappedToID.values().contains(testName))
+			if (!methodUID.isEmpty()){
+				testNameMappedToID.put(logID, methodUID + " - " + testName + " - " +  result.getMethod().getMethodName());
+			} else
 			{
 				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
 			}
-			else
-			{
-				testNameMappedToID.put(logID, testName);
-			}
-			*/
+			
 		}
 		return testNameMappedToID.get(logID);
 	}

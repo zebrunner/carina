@@ -36,7 +36,7 @@ public class SpecialKeywords
 	public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
 	public static final String EXCEL_DS_FILE = "{excel_ds_file}";
 	public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
-	public static final String EXCEL_TUID = "TUID";
+	public static final String TUID = "TUID";
 	
 	public static final String TEST_LOG_ID = "{test_log_id}";
 	

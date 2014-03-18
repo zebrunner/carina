@@ -113,7 +113,7 @@ public class XLSDSBean
 		StringBuilder sb = new StringBuilder();
 		for(String arg : uidArgs)
 		{
-			if(SpecialKeywords.EXCEL_TUID.equals(arg)) continue;
+			if(SpecialKeywords.TUID.equals(arg)) continue;
 			sb.append(String.format("%s=%s; ", arg, testParams.get(arg)));
 		}
 		return StringUtils.removeEnd(sb.toString(), "; ");
@@ -129,7 +129,7 @@ public class XLSDSBean
 		StringBuilder sb = new StringBuilder();
 		for(String arg : uidArgs)
 		{
-			if(SpecialKeywords.EXCEL_TUID.equals(arg)) continue;
+			if(SpecialKeywords.TUID.equals(arg)) continue;
 			sb.append(String.format("%s=%s; ", arg, params.get(arg)));
 		}
 		return StringUtils.removeEnd(sb.toString(), "; ");

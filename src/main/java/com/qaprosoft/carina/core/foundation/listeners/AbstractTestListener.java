@@ -94,7 +94,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestFailure(ITestResult result)
 	{
 		int count = RetryCounter.getRunCount(TestNamingUtil.getCanonicalTestName(result));
-		if (count >= MAX_COUNT)
+		if (count >= MAX_COUNT && result.getThrowable().getMessage() != null)
 		{
 			((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON,
 					Messager.TEST_FAILED.error(TestNamingUtil.getCanonicalTestName(result), DateUtils.now(), result.getThrowable().getMessage()));

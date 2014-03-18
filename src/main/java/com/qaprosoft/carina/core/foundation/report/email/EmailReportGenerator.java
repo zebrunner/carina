@@ -62,6 +62,7 @@ public class EmailReportGenerator
 	private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
+	private static final int MESSAGE_LIMIT = 1024;
 
 	private String emailBody = CONTAINER;
 	private StringBuilder testResults = null;
@@ -122,7 +123,7 @@ public class EmailReportGenerator
 			if (!StringUtils.isEmpty(failReason))
 			{
 				// Make description more compact for email report																																																											
-				failReason = failReason.length() > 500 ? (failReason.substring(0, 500) + "...") : failReason;
+				failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
 				result = result.replace(FAIL_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
 			}
 			else

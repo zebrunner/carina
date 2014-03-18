@@ -134,7 +134,7 @@ public class DriverFactory
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);		
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);		
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setEnableNativeEvents(false);
@@ -150,7 +150,7 @@ public class DriverFactory
 	private static DesiredCapabilities getInternetExplorerCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
 		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -160,7 +160,7 @@ public class DriverFactory
 	private static DesiredCapabilities getChromeCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-certificate-errors"));
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -208,9 +208,23 @@ public class DriverFactory
 		return capabilities;
 	}
 
+	/*
 	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, Platform platform, String... args)
 	{
 		capabilities.setPlatform(platform);
+		capabilities.setBrowserName(args[0]);
+		capabilities.setVersion(args[1]);
+		capabilities.setCapability("name", args[2]);
+		return capabilities;
+	}
+	*/
+	
+	
+	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String... args)
+	{	
+		//platform should be detected and provided into capabilities automatically
+		capabilities.setPlatform(Platform.extractFromSysProperty(System.getProperty("os.name")));
+		//capabilities.setPlatform(platform);
 		capabilities.setBrowserName(args[0]);
 		capabilities.setVersion(args[1]);
 		capabilities.setCapability("name", args[2]);

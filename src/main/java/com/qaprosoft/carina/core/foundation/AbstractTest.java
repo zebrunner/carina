@@ -90,15 +90,14 @@ public abstract class AbstractTest extends DriverHelper
     protected TestDetailsBean TEST_EXECUTER_LOG;
 
     protected APIMethodBuilder apiMethodBuilder;
-    private String browserVersion;
+    private String browserVersion = "";
+    private String initializationFailure = "";
 
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeSuite(ITestContext context)
     {
 	try
 	{
-		browserVersion = "";
-		
 	    // Set log4j properties
 	    PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
 	    // Set SoapUI log4j properties
@@ -140,32 +139,47 @@ public abstract class AbstractTest extends DriverHelper
 	catch (Exception e)
 	{
 	    LOG.error("Exception in executeBeforeSuite");
+	    initializationFailure = e.getMessage();
 	    e.printStackTrace();
 	}
 
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context)
+    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Exception
     {
-	try
-	{
-	    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
-	    if (isUITest())
-	    {
-			driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
-			xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
-			initSummary(driver);
-			browserVersion = DriverFactory.getBrowserVersion(driver);
-	    }
-	    TEST_EXECUTER_LOG = executionContext.initBeforeTest(xmlTest.getName());
-	    apiMethodBuilder = new APIMethodBuilder();
-	}
-	catch (Exception e)
-	{
-	    LOG.error("Exception in executeBeforeTestMethod");
-	    e.printStackTrace();
-	}
+		try
+		{
+			// [VD] AUTO-274 "Pass"ing status set on emailable report when a test step fails
+			//remember TUID parameter if it is provided and insert it into the result report
+			String methodUID = xmlTest.getParameter(SpecialKeywords.TUID);
+			if (methodUID == null)
+				methodUID = "";
+				
+		    xmlTest.addParameter(SpecialKeywords.TUID, methodUID);
+		    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
+		    if (isUITest())
+		    {
+				driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+				xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
+				initSummary(driver);
+				browserVersion = DriverFactory.getBrowserVersion(driver);
+		    }
+		    TEST_EXECUTER_LOG = executionContext.initBeforeTest(xmlTest.getName());
+		    apiMethodBuilder = new APIMethodBuilder();
+		}
+		catch (Exception e)
+		{
+		    LOG.error("Exception in executeBeforeTestMethod");
+		    initializationFailure = e.getMessage();
+			
+            StackTraceElement[] elems = e.getStackTrace();
+	        for (StackTraceElement elem : elems) {
+	        	initializationFailure = initializationFailure + "\n" + elem.toString();
+            }
+		    
+		    e.printStackTrace();
+		}
     }
 
     @AfterMethod(alwaysRun = true)
@@ -182,6 +196,10 @@ public abstract class AbstractTest extends DriverHelper
 	    if (!testLogFile.exists()) testLogFile.createNewFile();
 	    FileWriter fw = new FileWriter(testLogFile);
 
+	    if (driver == null && !initializationFailure.isEmpty()) {
+			fw.append("\r\n************************** Initialization logs **************************\r\n\r\n");
+			fw.append(initializationFailure);	    	
+	    }
 	    if (isUITest() && driver != null)
 	    {
 			fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
@@ -255,58 +273,50 @@ public abstract class AbstractTest extends DriverHelper
     @AfterSuite(alwaysRun = true)
     public void executeAfterSuite(ITestContext context)
     {
-	try
-	{
-	    executionContext.finilizeAfterSuite();
-	    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
-
-	    String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
-
-	    String eTitle = null;
-	    if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName()))
-	    {
-			String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? context.getSuite().getXmlSuite().getName() : Configuration
-				.get(Parameter.SUITE_NAME);
-			String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
-				.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
-//			eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-//				xmlFile, env, Configuration.get(Parameter.BROWSER));
-			eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-					xmlFile, env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
-	    }
-	    else
-	    {
-			String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
-//			eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-//				env, Configuration.get(Parameter.BROWSER));
-			eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-					env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
-	    }
-	    ReportContext.getTempDir().delete();
-
-	    // Update JIRA
-	    Jira.updateAfterSuite(EmailReportItemCollector.getTestResults());
-
-	    // Generate email report
-//	    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),
-//		    Configuration.get(Parameter.BROWSER), DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
-//		    EmailReportItemCollector.getCreatedItems());
-	    
-	    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),
-			    Configuration.get(Parameter.BROWSER) + " " + browserVersion, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
-			    EmailReportItemCollector.getCreatedItems());	    
-
-	    // Send report for specified emails
-	    EmailManager.send(eTitle, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL),
-		    Configuration.get(Parameter.SENDER_PASSWORD));
-
-	    printExecutionSummary(EmailReportItemCollector.getTestResults());
-	}
-	catch (Exception e)
-	{
-	    LOG.error("Exception in executeAfterSuite");
-	    e.printStackTrace();
-	}
+		try
+		{
+		    executionContext.finilizeAfterSuite();
+		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
+	
+		    String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
+	
+		    String eTitle = null;
+		    if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName()))
+		    {
+				String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? context.getSuite().getXmlSuite().getName() : Configuration
+					.get(Parameter.SUITE_NAME);
+				String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
+					.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
+				eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+						xmlFile, env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
+		    }
+		    else
+		    {
+				String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
+				eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+						env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
+		    }
+		    ReportContext.getTempDir().delete();
+	
+		    // Update JIRA
+		    Jira.updateAfterSuite(EmailReportItemCollector.getTestResults());
+	
+		    // Generate email report
+		    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),
+				    Configuration.get(Parameter.BROWSER) + " " + browserVersion, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
+				    EmailReportItemCollector.getCreatedItems());	    
+	
+		    // Send report for specified emails
+		    EmailManager.send(eTitle, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
+			    Configuration.get(Parameter.SENDER_PASSWORD));
+	
+		    printExecutionSummary(EmailReportItemCollector.getTestResults());
+		}
+		catch (Exception e)
+		{
+		    LOG.error("Exception in executeAfterSuite");
+		    e.printStackTrace();
+		}
     }
 
 
@@ -388,12 +398,12 @@ public abstract class AbstractTest extends DriverHelper
 		    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
 		    if (StringUtils.isEmpty(ciTestJob))
 		    {
-			LOG.info("Could not connect to Jenkins!");
+		    	LOG.info("Could not connect to Jenkins!");
 		    }
 		}
 		else
 		{
-		    LOG.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
+		    	LOG.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
 		}
 		return ciTestJob;
     }
