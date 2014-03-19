@@ -102,6 +102,10 @@ public class DriverHelper
 	{
 		this();
 		this.driver = driver;
+		if (driver == null)
+		{
+			throw new RuntimeException("WebDriver not initialized, check log files for details!");
+		}
 		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		initSummary(driver);
 	}
