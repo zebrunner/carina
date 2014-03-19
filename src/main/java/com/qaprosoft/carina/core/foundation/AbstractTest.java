@@ -240,7 +240,8 @@ public abstract class AbstractTest extends DriverHelper
 	    try
 	    {
 			fw.close();
-			apiMethodBuilder.close();
+			if (apiMethodBuilder != null)
+				apiMethodBuilder.close();
 	    }
 	    catch (Exception e)
 	    {
