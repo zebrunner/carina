@@ -39,7 +39,6 @@ public class XMLNameStrategy implements INamingStrategy
 	public String getCanonicalTestName(ITestResult result)
 	{
 		String logID = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.TEST_LOG_ID);
-		String methodUID = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.TUID);
 		if(!testNameMappedToID.containsKey(logID))
 		{
 			String testName = result.getTestContext().getCurrentXmlTest().getName();
@@ -77,15 +76,25 @@ public class XMLNameStrategy implements INamingStrategy
 				}
 			}
 		
-			//LC - AUTO-249 email report - 1st method name should present in emailable report.
-			//VD - method name should present in each test report line.
+			//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
+			String methodUID = "";
+			for (int i = 0; i < result.getParameters().length; i++)
+			{
+				if (result.getParameters()[i] instanceof String)
+				{
+					if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":"))
+					{
+						methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+					}
+				}
+			}
+
 			if (!methodUID.isEmpty()){
 				testNameMappedToID.put(logID, methodUID + " - " + testName + " - " +  result.getMethod().getMethodName());
 			} else
 			{
 				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
 			}
-			
 		}
 		return testNameMappedToID.get(logID);
 	}

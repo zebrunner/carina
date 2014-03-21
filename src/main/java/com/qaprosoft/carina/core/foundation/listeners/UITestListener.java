@@ -96,7 +96,7 @@ public class UITestListener extends AbstractTestListener
 		    }
 		        
 			//String errorMessage = result.getThrowable().getMessage();
-			errorMessage = StringEscapeUtils.escapeHtml4(errorMessage);
+//			errorMessage = StringEscapeUtils.escapeHtml4(errorMessage);
 //			TestLogCollector.logToSession(DriverPool.getSessionIdByTestName(TestNamingUtil.getCanonicalTestName(result)), "TEST FAILED - " + errorMessage);
 			TestLogCollector.addScreenshotComment(screenId, "TEST FAILED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));

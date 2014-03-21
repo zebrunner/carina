@@ -150,13 +150,6 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{
-			// [VD] AUTO-274 "Pass"ing status set on emailable report when a test step fails
-			//remember TUID parameter if it is provided and insert it into the result report
-			String methodUID = xmlTest.getParameter(SpecialKeywords.TUID);
-			if (methodUID == null)
-				methodUID = "";
-				
-		    xmlTest.addParameter(SpecialKeywords.TUID, methodUID);
 		    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
 		    if (isUITest())
 		    {
