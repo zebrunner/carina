@@ -65,7 +65,7 @@ public class Configuration
 		BROWSER_VERSION("browser_version", "default_browser_version"),
 
 		SELENIUM_HOST("selenium_host", "default_selenium_host"),
-
+		
 		APP_VERSION("app_version", "default_app_version"),
 
 		REPORT_URL("report_url", "default_report_url"),

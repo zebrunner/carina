@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jfree.util.Log;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -39,6 +40,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.android.AndroidNativeDrive
 
 import org.openqa.selenium.Capabilities;
 
+import sun.util.logging.resources.logging;
+
 /**
  * DriverFactory produces driver instance with desired capabilities according to
  * configuration.
@@ -51,6 +54,7 @@ public class DriverFactory
 	public static final String IOS = "iOS";
 	public static final String ANDROID = "Android";
 	public static final String SAFARI = "safari";
+	public static final String SELENDROID = "Selendroid";
 
 	/**
 	 * Creates diver instance for specified test.
@@ -88,20 +92,30 @@ public class DriverFactory
 				
 				capabilities = getIOSCapabilities(testName);
 			}
+			else if (SELENDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			{
+				capabilities = getSelendroidCapabilities(testName);
+			}			
 			else if (ANDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
 				
-				if (Configuration.isNull(Parameter.MOBILE_DEVICE) 
+				if (Configuration.isNull(Parameter.MOBILE_DEVICE)
 						|| Configuration.isNull(Parameter.MOBILE_VERSION)
 						|| Configuration.isNull(Parameter.MOBILE_PLATFORM) 
 						|| Configuration.isNull(Parameter.MOBILE_APP)
 						|| Configuration.isNull(Parameter.MOBILE_APP_PACKAGE)
-						|| Configuration.isNull(Parameter.MOBILE_APP_ACTIVITY)) throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP', 'MOBILE_APP_PACKAGE', 'MOBILE_APP_ACTIVITY' should be set!");
+						|| Configuration.isNull(Parameter.MOBILE_APP_ACTIVITY)) {
 				
-				capabilities = getAndriodCapabilities(testName);
-				driver = new AndroidNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
-				driver = new Augmenter().augment(driver);
-				return driver;
+					//try to initialize Android Web capabilities
+					Log.info("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP', 'MOBILE_APP_PACKAGE', 'MOBILE_APP_ACTIVITY' should be set to test Android applications!");
+					capabilities = getAndroidWebCapabilities(testName);
+					//throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP', 'MOBILE_APP_PACKAGE', 'MOBILE_APP_ACTIVITY' should be set!");
+				} else {
+					capabilities = getAndroidCapabilities(testName);
+					driver = new AndroidNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
+					driver = new Augmenter().augment(driver);
+					return driver;
+				}
 			}
 			else
 			{
@@ -134,7 +148,7 @@ public class DriverFactory
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);		
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);		
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setEnableNativeEvents(false);
@@ -150,7 +164,7 @@ public class DriverFactory
 	private static DesiredCapabilities getInternetExplorerCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
 		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -160,7 +174,7 @@ public class DriverFactory
 	private static DesiredCapabilities getChromeCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), "name", testName);
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-certificate-errors"));
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
@@ -191,40 +205,51 @@ public class DriverFactory
 		return capabilities;
 	}
 	
-	private static DesiredCapabilities getAndriodCapabilities(String testName) throws MalformedURLException
+	private static DesiredCapabilities getAndroidCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
+		
 		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE));
 		capabilities.setCapability(CapabilityType.VERSION, Configuration.get(Parameter.MOBILE_VERSION));
 		capabilities.setCapability(CapabilityType.PLATFORM, Configuration.get(Parameter.MOBILE_PLATFORM));
-		
-		capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_BROWSER));
+
 		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
 		capabilities.setCapability("app-package", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 		capabilities.setCapability("app-activity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
-		capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));
+
+		
+		if (!Configuration.isNull(Parameter.MOBILE_BROWSER))
+			capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_BROWSER));
+
+		
+		if (!Configuration.isNull(Parameter.MOBILE_NEW_COMMAND_TIMEOUT))
+			capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));
 
 		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
 
-	/*
-	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, Platform platform, String... args)
+	
+	private static DesiredCapabilities getSelendroidCapabilities(String testName) throws MalformedURLException
 	{
-		capabilities.setPlatform(platform);
-		capabilities.setBrowserName(args[0]);
-		capabilities.setVersion(args[1]);
-		capabilities.setCapability("name", args[2]);
+		DesiredCapabilities capabilities = DesiredCapabilities.android();
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		//capabilities.setCapability("name", testName);
 		return capabilities;
 	}
-	*/
 	
+	private static DesiredCapabilities getAndroidWebCapabilities(String testName) throws MalformedURLException
+	{
+		DesiredCapabilities capabilities = DesiredCapabilities.android();
+		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		//capabilities.setCapability("name", testName);
+		return capabilities;
+	}	
 	
 	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String... args)
 	{	
 		//platform should be detected and provided into capabilities automatically
 		capabilities.setPlatform(Platform.extractFromSysProperty(System.getProperty("os.name")));
-		//capabilities.setPlatform(platform);
 		capabilities.setBrowserName(args[0]);
 		capabilities.setVersion(args[1]);
 		capabilities.setCapability("name", args[2]);

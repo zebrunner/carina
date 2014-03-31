@@ -38,6 +38,10 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  */
 public class EmailManager
 {
+	public static final String HTTP_PROXY_HOSTNAME = "http.proxyHost";
+	public static final String HTTP_PROXY_PORT = "http.proxyPort";
+	public static final Integer DEFAULT_HTTP_PORT = 80;
+
 	protected static final Logger LOGGER = Logger.getLogger(EmailManager.class);
 
 	public static void send(String subject, String emailContent, String adresses, String senderEmail, String senderPswd)
@@ -74,6 +78,17 @@ public class EmailManager
 		props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
 		props.put("mail.smtp.auth", R.EMAIL.get("mail.smtp.auth"));
 		props.put("mail.smtp.port", R.EMAIL.get("mail.smtp.port"));
+		
+		String hostname = R.CONFIG.get(HTTP_PROXY_HOSTNAME);
+		if (hostname != null && !"NULL".equalsIgnoreCase(hostname)) {
+			Integer port = R.CONFIG.getInt(HTTP_PROXY_PORT);
+			port = port == null ? DEFAULT_HTTP_PORT : port;
+		
+			props.setProperty("proxySet", "true");
+			props.setProperty("socksProxyHost", hostname);
+			props.setProperty("socksProxyPort", port.toString());
+		}
+		
 		return props;
 	}
 }
