@@ -40,8 +40,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.android.AndroidNativeDrive
 
 import org.openqa.selenium.Capabilities;
 
-import sun.util.logging.resources.logging;
-
 /**
  * DriverFactory produces driver instance with desired capabilities according to
  * configuration.
@@ -233,16 +231,16 @@ public class DriverFactory
 	private static DesiredCapabilities getSelendroidCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.android();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
-		//capabilities.setCapability("name", testName);
+		//capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
 	
 	private static DesiredCapabilities getAndroidWebCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.android();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
-		//capabilities.setCapability("name", testName);
+		//capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		capabilities.setCapability("name", testName);
 		return capabilities;
 	}	
 	

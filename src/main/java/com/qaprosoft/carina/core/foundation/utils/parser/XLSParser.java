@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.jfree.util.Log;
 
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
@@ -150,18 +151,23 @@ public class XLSParser
 			throw new InvalidArgsException(String.format("No sheet: '%s' in excel file: '%s'!", sheetName, xls));
 		}
 		
-		for(int i = 0; i <= sheet.getLastRowNum(); i++)
-		{
-			if(i == 0)
+		try{
+			for(int i = 0; i <= sheet.getLastRowNum(); i++)
 			{
-				dataTable.setHeaders(sheet.getRow(i));
-			}
-			else
-			{
-				dataTable.addDataRow(sheet.getRow(i));
+				if(i == 0)
+				{
+					dataTable.setHeaders(sheet.getRow(i));
+				}
+				else
+				{
+					dataTable.addDataRow(sheet.getRow(i));
+				}
 			}
 		}
-		
+		catch (Exception e) {
+			Log.error(e.getMessage());
+		    e.printStackTrace();			
+		}
 		return dataTable;
 	}
 	
