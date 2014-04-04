@@ -60,15 +60,19 @@ public abstract class AbstractTestListener extends TestArgsListener
 		   result.setAttribute(SpecialKeywords.JIRA_TICKET, result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
 		 }
 
-		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_ARGS))
+		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER))
 		{
-			XLSDSBean dsBean = new XLSDSBean(result.getTestContext());
-			int index = 0;
-			for (String arg : dsBean.getArgs())
-			{
-				dsBean.getTestParams().put(arg, (String) result.getParameters()[index++]);
+			if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_ARGS))
+			{				
+				XLSDSBean dsBean = new XLSDSBean(result.getTestContext());
+				int index = 0;
+				for (String arg : dsBean.getArgs())
+				{
+					dsBean.getTestParams().put(arg, (String) result.getParameters()[index++]);
+				}
+				result.getTestContext().getCurrentXmlTest().setParameters(dsBean.getTestParams());
+
 			}
-			result.getTestContext().getCurrentXmlTest().setParameters(dsBean.getTestParams());
 		}
 
 		String test = TestNamingUtil.getCanonicalTestName(result);
