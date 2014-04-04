@@ -52,7 +52,8 @@ public class XMLNameStrategy implements INamingStrategy
 				}
 				else
 				{
-					testName = testName + " [" + ds.argsToString() + "]";
+					if (ds.argsToString()!= null && !ds.argsToString().isEmpty())
+						testName = testName + " [" + ds.argsToString() + "]";
 				}
 			} 
 			

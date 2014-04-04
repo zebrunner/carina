@@ -124,7 +124,7 @@ public class XLSDSBean
 	{
 		if(uidArgs.size() == 0)
 		{
-			return null;
+			return "";
 		}
 		StringBuilder sb = new StringBuilder();
 		for(String arg : uidArgs)

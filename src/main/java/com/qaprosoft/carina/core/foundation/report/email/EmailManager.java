@@ -67,6 +67,7 @@ public class EmailManager
 		catch (MessagingException e)
 		{
 			LOGGER.info("Email with reports was NOT send: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -79,6 +80,7 @@ public class EmailManager
 		props.put("mail.smtp.auth", R.EMAIL.get("mail.smtp.auth"));
 		props.put("mail.smtp.port", R.EMAIL.get("mail.smtp.port"));
 		
+		/*
 		String hostname = R.CONFIG.get(HTTP_PROXY_HOSTNAME);
 		if (hostname != null && !"NULL".equalsIgnoreCase(hostname)) {
 			Integer port = R.CONFIG.getInt(HTTP_PROXY_PORT);
@@ -88,6 +90,7 @@ public class EmailManager
 			props.setProperty("socksProxyHost", hostname);
 			props.setProperty("socksProxyPort", port.toString());
 		}
+		*/
 		
 		return props;
 	}
