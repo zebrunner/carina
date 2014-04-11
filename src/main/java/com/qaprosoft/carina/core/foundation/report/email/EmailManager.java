@@ -47,18 +47,13 @@ public class EmailManager
 	public static void send(String subject, String emailContent, String adresses, String senderEmail, String senderPswd)
 	{
 		Properties props = initProps();
-		Session session = Session.getDefaultInstance(props, null);
-		
-		if (R.EMAIL.get("mail.smtp.auth").equalsIgnoreCase("true")) {
-			session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
+		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
+		{
+			protected PasswordAuthentication getPasswordAuthentication()
 			{
-				protected PasswordAuthentication getPasswordAuthentication()
-				{
-					return new PasswordAuthentication(Configuration.get(Parameter.SENDER_EMAIL), Configuration.get(Parameter.SENDER_PASSWORD));
-				}
-			});
-		}
-				
+				return new PasswordAuthentication(Configuration.get(Parameter.SENDER_EMAIL), Configuration.get(Parameter.SENDER_PASSWORD));
+			}
+		});
 		try
 		{
 			Message message = new MimeMessage(session);

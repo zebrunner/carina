@@ -127,7 +127,7 @@ public class ReportContext
 			
 			int maxHistory = Configuration.getInt(Parameter.MAX_SCREENSHOOT_HISTORY);
 
-			if (screenshotFolders.size() > maxHistory)
+			if (screenshotFolders.size() > maxHistory && maxHistory != 0)
 			{
 				Comparator<File> comp = new Comparator<File>()
 				{

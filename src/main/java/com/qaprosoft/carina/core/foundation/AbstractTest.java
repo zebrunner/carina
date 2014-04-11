@@ -138,7 +138,7 @@ public abstract class AbstractTest extends DriverHelper
 		    
 		    if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE))
 		    {
-		    	LOG.info("Driver in single mode is initializing.");
+		    	LOG.info("Driver is initializing in single mode.");
 		    	driver = DriverFactory.create(context.getSuite().getName());
 		    }
 		    
