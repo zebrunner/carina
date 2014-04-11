@@ -47,13 +47,18 @@ public class EmailManager
 	public static void send(String subject, String emailContent, String adresses, String senderEmail, String senderPswd)
 	{
 		Properties props = initProps();
-		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
-		{
-			protected PasswordAuthentication getPasswordAuthentication()
+		Session session = Session.getDefaultInstance(props, null);
+		
+		if (R.EMAIL.get("mail.smtp.auth").equalsIgnoreCase("true")) {
+			session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
 			{
-				return new PasswordAuthentication(Configuration.get(Parameter.SENDER_EMAIL), Configuration.get(Parameter.SENDER_PASSWORD));
-			}
-		});
+				protected PasswordAuthentication getPasswordAuthentication()
+				{
+					return new PasswordAuthentication(Configuration.get(Parameter.SENDER_EMAIL), Configuration.get(Parameter.SENDER_PASSWORD));
+				}
+			});
+		}
+				
 		try
 		{
 			Message message = new MimeMessage(session);
@@ -75,10 +80,15 @@ public class EmailManager
 	{
 		Properties props = new Properties();
 		props.put("mail.smtp.host", R.EMAIL.get("mail.smtp.host"));
-		props.put("mail.smtp.socketFactory.port", R.EMAIL.get("mail.smtp.socketFactory.port"));
-		props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
 		props.put("mail.smtp.auth", R.EMAIL.get("mail.smtp.auth"));
 		props.put("mail.smtp.port", R.EMAIL.get("mail.smtp.port"));
+
+		if (!R.EMAIL.get("mail.smtp.socketFactory.port").isEmpty()){
+			props.put("mail.smtp.socketFactory.port", R.EMAIL.get("mail.smtp.socketFactory.port"));
+		}
+		if (!R.EMAIL.get("mail.smtp.socketFactory.class").isEmpty()){
+			props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
+		}
 		
 		/*
 		String hostname = R.CONFIG.get(HTTP_PROXY_HOSTNAME);
