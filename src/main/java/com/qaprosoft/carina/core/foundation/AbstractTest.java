@@ -96,52 +96,59 @@ public abstract class AbstractTest extends DriverHelper
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeSuite(ITestContext context)
     {
-	try
-	{
-	    // Set log4j properties
-	    PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
-	    // Set SoapUI log4j properties
-	    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
-
-	    LOG.info(Configuration.asString());
-	    Configuration.validateConfiguration();
-
-	    ReportContext.removeOldReports();
-	    context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-
-	    if (!Configuration.isNull(Parameter.URL))
-	    {
-	    	RestAssured.baseURI = Configuration.get(Parameter.URL);
-	    }
-
-	    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
-	    {
-			Assert.assertTrue(Configuration.getLong(Parameter.TEST_ID) > 0, "Parameter 'test_id' not specified");
-			ITestExecuterClient client = new TestExecuterClient(Configuration.get(Parameter.TESTEXECUTER_URL));
-			executionContext = ExecutionContext.INSTANCE.initBeforeSuite(Configuration.getLong(Parameter.TEST_ID), client);
-	    }
-	    else
-	    {
-	    	executionContext = ExecutionContext.INSTANCE.initBeforeSuite();
-	    }
-
-	    try
-	    {
-			String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
-			String country = Configuration.get(Parameter.LOCALE).split("_")[1];
-			L18n.init("l18n.messages", new Locale(lang, country));
-	    }
-	    catch (Exception e)
-	    {
-	    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
-	    }
-	}
-	catch (Exception e)
-	{
-	    LOG.error("Exception in executeBeforeSuite");
-	    initializationFailure = e.getMessage();
-	    e.printStackTrace();
-	}
+		try
+		{
+		    // Set log4j properties
+		    PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
+		    // Set SoapUI log4j properties
+		    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
+	
+		    LOG.info(Configuration.asString());
+		    Configuration.validateConfiguration();
+	
+		    ReportContext.removeOldReports();
+		    context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+	
+		    if (!Configuration.isNull(Parameter.URL))
+		    {
+		    	RestAssured.baseURI = Configuration.get(Parameter.URL);
+		    }
+	
+		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
+		    {
+				Assert.assertTrue(Configuration.getLong(Parameter.TEST_ID) > 0, "Parameter 'test_id' not specified");
+				ITestExecuterClient client = new TestExecuterClient(Configuration.get(Parameter.TESTEXECUTER_URL));
+				executionContext = ExecutionContext.INSTANCE.initBeforeSuite(Configuration.getLong(Parameter.TEST_ID), client);
+		    }
+		    else
+		    {
+		    	executionContext = ExecutionContext.INSTANCE.initBeforeSuite();
+		    }
+	
+		    try
+		    {
+				String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
+				String country = Configuration.get(Parameter.LOCALE).split("_")[1];
+				L18n.init("l18n.messages", new Locale(lang, country));
+		    }
+		    catch (Exception e)
+		    {
+		    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+		    }
+		    
+		    if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE))
+		    {
+		    	LOG.info("Driver in single mode is initializing.");
+		    	driver = DriverFactory.create(context.getSuite().getName());
+		    }
+		    
+		}
+		catch (Exception e)
+		{
+		    LOG.error("Exception in executeBeforeSuite");
+		    initializationFailure = e.getMessage();
+		    e.printStackTrace();
+		}
 
     }
 
@@ -153,7 +160,9 @@ public abstract class AbstractTest extends DriverHelper
 		    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
 		    if (isUITest())
 		    {
-				driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+		    	if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
+		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+		    	}
 				xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
 				initSummary(driver);
 				browserVersion = DriverFactory.getBrowserVersion(driver);
@@ -199,7 +208,9 @@ public abstract class AbstractTest extends DriverHelper
 			fw.append(TestLogHelper.getSessionLogs(test));
 			try
 			{
-			    driver.quit();
+				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
+					driver.quit();
+				}
 			}
 			catch (Exception e)
 			{
@@ -269,6 +280,16 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{
+			if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE) && isUITest() && driver != null) {
+				try
+				{
+					driver.quit();
+				}
+				catch (Exception e)
+				{
+				    LOG.error(e.getMessage());
+				}
+			}
 		    executionContext.finilizeAfterSuite();
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 	
