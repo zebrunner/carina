@@ -46,14 +46,34 @@ public class EmailManager
 
 	public static void send(String subject, String emailContent, String adresses, String senderEmail, String senderPswd)
 	{
-		Properties props = initProps();
-		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
-		{
-			protected PasswordAuthentication getPasswordAuthentication()
-			{
-				return new PasswordAuthentication(Configuration.get(Parameter.SENDER_EMAIL), Configuration.get(Parameter.SENDER_PASSWORD));
+		Properties props = new Properties();
+		props.put("mail.smtp.host", R.EMAIL.get("mail.smtp.host"));
+		props.put("mail.smtp.auth", R.EMAIL.get("mail.smtp.auth"));
+		props.put("mail.smtp.port", R.EMAIL.get("mail.smtp.port"));
+		
+		Session session = null;
+		
+		if (R.EMAIL.get("mail.smtp.auth").equalsIgnoreCase("true")){
+
+			if (!R.EMAIL.get("mail.smtp.socketFactory.port").isEmpty()){
+				props.put("mail.smtp.socketFactory.port", R.EMAIL.get("mail.smtp.socketFactory.port"));
 			}
-		});
+			if (!R.EMAIL.get("mail.smtp.socketFactory.class").isEmpty()){
+				props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
+			}
+			
+			session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
+			{
+				protected PasswordAuthentication getPasswordAuthentication()
+				{
+					return new PasswordAuthentication(Configuration.get(Parameter.SENDER_EMAIL), Configuration.get(Parameter.SENDER_PASSWORD));
+				}
+			});
+		}
+		else {
+			
+		}
+		
 		try
 		{
 			Message message = new MimeMessage(session);
@@ -71,32 +91,5 @@ public class EmailManager
 		}
 	}
 
-	private static Properties initProps()
-	{
-		Properties props = new Properties();
-		props.put("mail.smtp.host", R.EMAIL.get("mail.smtp.host"));
-		props.put("mail.smtp.auth", R.EMAIL.get("mail.smtp.auth"));
-		props.put("mail.smtp.port", R.EMAIL.get("mail.smtp.port"));
 
-		if (!R.EMAIL.get("mail.smtp.socketFactory.port").isEmpty()){
-			props.put("mail.smtp.socketFactory.port", R.EMAIL.get("mail.smtp.socketFactory.port"));
-		}
-		if (!R.EMAIL.get("mail.smtp.socketFactory.class").isEmpty()){
-			props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
-		}
-		
-		/*
-		String hostname = R.CONFIG.get(HTTP_PROXY_HOSTNAME);
-		if (hostname != null && !"NULL".equalsIgnoreCase(hostname)) {
-			Integer port = R.CONFIG.getInt(HTTP_PROXY_PORT);
-			port = port == null ? DEFAULT_HTTP_PORT : port;
-		
-			props.setProperty("proxySet", "true");
-			props.setProperty("socksProxyHost", hostname);
-			props.setProperty("socksProxyPort", port.toString());
-		}
-		*/
-		
-		return props;
-	}
 }

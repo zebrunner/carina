@@ -205,7 +205,16 @@ public abstract class AbstractTest extends DriverHelper
 	    if (isUITest() && driver != null)
 	    {
 			fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
-			fw.append(TestLogHelper.getSessionLogs(test));
+			
+			try
+			{
+				fw.append(TestLogHelper.getSessionLogs(test));
+			}
+			catch (Exception e)
+			{
+			    LOG.error(e.getMessage());
+			}
+
 			try
 			{
 				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
