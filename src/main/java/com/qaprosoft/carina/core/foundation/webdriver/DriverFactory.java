@@ -247,7 +247,10 @@ public class DriverFactory
 	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String... args)
 	{	
 		//platform should be detected and provided into capabilities automatically
-		capabilities.setPlatform(Platform.extractFromSysProperty(System.getProperty("os.name")));
+		String platform = Configuration.get(Parameter.PLATFORM);
+		if (!platform.equals("*"))
+			capabilities.setPlatform(Platform.extractFromSysProperty(platform));
+
 		capabilities.setBrowserName(args[0]);
 		capabilities.setVersion(args[1]);
 		capabilities.setCapability("name", args[2]);

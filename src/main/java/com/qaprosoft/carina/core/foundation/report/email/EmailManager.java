@@ -71,7 +71,7 @@ public class EmailManager
 			});
 		}
 		else {
-			
+			session = Session.getDefaultInstance(props);
 		}
 		
 		try
