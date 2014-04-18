@@ -90,12 +90,18 @@ public class XMLNameStrategy implements INamingStrategy
 				}
 			}
 
+			if (result.getMethod().getInvocationCount() > 1){
+				methodUID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
+			}
+			
 			if (!methodUID.isEmpty()){
 				testNameMappedToID.put(logID, methodUID + " - " + testName + " - " +  result.getMethod().getMethodName());
 			} else
 			{
 				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
 			}
+			
+			
 		}
 		return testNameMappedToID.get(logID);
 	}
