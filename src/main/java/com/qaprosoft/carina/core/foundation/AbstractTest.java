@@ -235,13 +235,16 @@ public abstract class AbstractTest extends DriverHelper
 
 	    if (apiMethodBuilder != null)
 	    {
-			String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
-			if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
-			{
-			    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
-			    fw.append(tempLog);
-			    fw.append(glblLog.readLog(Type.REST));
-			}
+	    	if (apiMethodBuilder.getTempFile().exists())
+	    	{
+				String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
+				if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
+				{
+				    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
+				    fw.append(tempLog);
+				    fw.append(glblLog.readLog(Type.REST));
+				}
+	    	}
 	    }
 
 	    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
