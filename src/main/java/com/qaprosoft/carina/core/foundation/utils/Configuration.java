@@ -59,6 +59,8 @@ public class Configuration
 		ENV("env", "default_env"),
 		
 		ENV_ARG_RESOLVER("env_arg_resolver", "default_env_arg_resolver"),
+		
+		PLATFORM("platform", "default_platform"),
 
 		BROWSER("browser", "default_browser"),
 		
