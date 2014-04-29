@@ -22,6 +22,7 @@ import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.JiraClient;
 
 import org.apache.log4j.Logger;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
@@ -77,13 +78,13 @@ public class Jira
 		}
 	}
 
-	public synchronized static void updateAfterSuite(List<TestResultItem> results)
+	public synchronized static void updateAfterSuite(ITestContext context, List<TestResultItem> results)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				 updater.updateAfterSuite(jira, results);
+				 updater.updateAfterSuite(jira, context, results);
 			}
 			catch(Exception e)
 			{

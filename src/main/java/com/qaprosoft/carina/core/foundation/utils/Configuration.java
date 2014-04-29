@@ -161,6 +161,8 @@ public class Configuration
 		JIRA_USER("jira_user", "default_jira_user"),
 		
 		JIRA_PASSWORD("jira_password", "default_jira_password"),
+		
+		JIRA_SUITE_ID("jira_suite_id", "default_jira_suite_id"),
 
         JIRA_PROJECT("jira_project", "default_jira_project"),
 
