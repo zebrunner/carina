@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.rcarz.jiraclient.JiraClient;
 
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -37,7 +38,7 @@ public class DefaultJiraUpdater implements IJiraUpdater
 	}
 
 	@Override
-	public void updateAfterSuite(JiraClient jira, List<TestResultItem> results)
+	public void updateAfterSuite(JiraClient jira, ITestContext context, List<TestResultItem> results)
 	{
 		// DO nothing by default
 	}

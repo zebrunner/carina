@@ -326,7 +326,7 @@ public abstract class AbstractTest extends DriverHelper
 		    ReportContext.getTempDir().delete();
 	
 		    // Update JIRA
-		    Jira.updateAfterSuite(EmailReportItemCollector.getTestResults());
+		    Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 	
 		    // Generate email report
 		    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),

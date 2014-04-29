@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.rcarz.jiraclient.JiraClient;
 
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -31,5 +32,5 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 public interface IJiraUpdater
 {
 	public void updateAfterTest(JiraClient jira, ITestResult result) throws Exception;
-	public void updateAfterSuite(JiraClient jira, List<TestResultItem> results)  throws Exception;
+	public void updateAfterSuite(JiraClient jira, ITestContext context, List<TestResultItem> results)  throws Exception;
 }
