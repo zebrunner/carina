@@ -198,7 +198,16 @@ public class EmailReportGenerator
 				failed++;
 			}
 		}
-		return (failed == 0 && passed > 0) ? TestResultType.PASS : TestResultType.FAIL;
+		TestResultType result;
+		if (failed == 0 && passed == 0){
+			result = TestResultType.SKIP;
+		}else if (failed == 0 && passed > 0){
+			result = TestResultType.PASS;
+		}else{
+			result = TestResultType.FAIL;
+		}
+		return result;
+		
 	}
 
 	public String getCreatedItemsList(List<String> createdItems)

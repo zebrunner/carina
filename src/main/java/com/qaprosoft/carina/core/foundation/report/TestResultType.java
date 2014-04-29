@@ -23,7 +23,8 @@ package com.qaprosoft.carina.core.foundation.report;
 public enum TestResultType
 {
 	PASS("PASS"),
-	FAIL("FAIL");
+	FAIL("FAIL"),
+	SKIP("SKIP");
 
 	private String result;
 
