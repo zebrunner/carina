@@ -75,7 +75,10 @@ public class Screenshot
 				screenName = fileID + ".png";
 				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 				File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-				resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
+				
+				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1 && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1){
+					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
+				}
 				FileUtils.copyFile(fullScreen, new File(fullScreenPath));
 
 				// Create screenshot thumbnail
