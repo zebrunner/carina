@@ -15,7 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
