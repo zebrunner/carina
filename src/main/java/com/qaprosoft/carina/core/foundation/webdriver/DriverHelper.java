@@ -80,7 +80,7 @@ public class DriverHelper
 	protected TestLogHelper summary;
 
 	protected WebDriver driver;
-
+	
 	protected CryptoTool cryptoTool;
 
 	protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
@@ -102,6 +102,7 @@ public class DriverHelper
 	{
 		this();
 		this.driver = driver;
+		
 		if (driver == null)
 		{
 			throw new RuntimeException("WebDriver not initialized, check log files for details!");
@@ -109,6 +110,7 @@ public class DriverHelper
 		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		initSummary(driver);
 	}
+	
 
 	// --------------------------------------------------------------------------
 	// Base UI interaction operations
