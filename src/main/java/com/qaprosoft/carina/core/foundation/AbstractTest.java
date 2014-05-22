@@ -29,6 +29,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -73,6 +74,7 @@ import com.qaprosoft.testexecuter.client.TestDetailsBean;
 import com.qaprosoft.testexecuter.client.TestDetailsBean.TestStatus;
 import com.qaprosoft.testexecuter.client.TestExecuterClient;
 
+
 /*
  * AbstractTest - base test for UI and API tests.
  * 
@@ -85,6 +87,8 @@ public abstract class AbstractTest extends DriverHelper
     protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
 
+	private static ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>();
+	
     // Test-Executer integration items
     private static ExecutionContext executionContext;
     protected TestDetailsBean TEST_EXECUTER_LOG;
@@ -92,6 +96,8 @@ public abstract class AbstractTest extends DriverHelper
     protected APIMethodBuilder apiMethodBuilder;
     private String browserVersion = "";
     private String initializationFailure = "";
+    
+	
 
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeSuite(ITestContext context)
@@ -140,6 +146,7 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	LOG.info("Driver is initializing in single mode.");
 		    	driver = DriverFactory.create(context.getSuite().getName());
+	    		setDriver(driver);
 		    }
 		    
 		}
@@ -158,10 +165,12 @@ public abstract class AbstractTest extends DriverHelper
 		try
 		{
 		    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
+
 		    if (isUITest())
 		    {
 		    	if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
 		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+		    		setDriver(driver);
 		    	}
 				xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
 				initSummary(driver);
@@ -191,6 +200,7 @@ public abstract class AbstractTest extends DriverHelper
 	{
 	    GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
 
+	    
 	    String test = TestNamingUtil.getCanonicalTestName(result);
 	    File testLogFile = new File(ReportContext.getTestDir(test) + "/test.log");
 	    // File soapuiLogFile = new File(ReportContext.getTestDir(test) +
@@ -218,7 +228,8 @@ public abstract class AbstractTest extends DriverHelper
 			try
 			{
 				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
-					driver.quit();
+					quitDriver();
+					//driver.quit();
 				}
 			}
 			catch (Exception e)
@@ -295,7 +306,8 @@ public abstract class AbstractTest extends DriverHelper
 			if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE) && isUITest() && driver != null) {
 				try
 				{
-					driver.quit();
+					//er.quit();
+					quitDriver();
 				}
 				catch (Exception e)
 				{
@@ -436,4 +448,17 @@ public abstract class AbstractTest extends DriverHelper
     }
 
     protected abstract boolean isUITest();
+    
+	public static WebDriver getDriver() {
+		return webDriver.get();
+	}
+	 
+	static void setDriver(WebDriver driver) {
+		webDriver.set(driver);
+	}
+
+    public static void quitDriver() {
+    	webDriver.remove();
+    }
+
 }
