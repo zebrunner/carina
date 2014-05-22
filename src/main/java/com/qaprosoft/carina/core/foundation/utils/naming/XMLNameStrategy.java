@@ -28,6 +28,7 @@ import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 public class XMLNameStrategy implements INamingStrategy
 {
 	private Map<String, String> testNameMappedToID = new HashMap<String, String>();
+    private static final ThreadLocal<String> testLogId = new ThreadLocal<String>();
 	
 	@Override
 	public String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
@@ -39,6 +40,15 @@ public class XMLNameStrategy implements INamingStrategy
 	public String getCanonicalTestName(ITestResult result)
 	{
 		String logID = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.TEST_LOG_ID);
+		
+		Thread thread = Thread.currentThread();
+		if (thread.getName().contains("PoolService"))
+		{
+			logID = thread.getId() + "-" + logID;
+		}
+		
+		startThread(logID);
+		
 		if(!testNameMappedToID.containsKey(logID))
 		{
 			String testName = result.getTestContext().getCurrentXmlTest().getName();
@@ -61,18 +71,20 @@ public class XMLNameStrategy implements INamingStrategy
 			{
 				// retrieve {excel_ds_uid} fields from results->parameters->dynamicArgs Map
 				// 0th element should be Map<String, String> as we generate such structure in AbstractTest::createTestArgSets2 for XLS Data provider
-				if (result.getParameters()[0] instanceof Map)
-				{
-					@SuppressWarnings("unchecked")
-					Map<String, String> testParams = (Map<String, String>) result.getParameters()[0];	
-					String sTUID = testParams.get(SpecialKeywords.TUID);
-					if (!sTUID.isEmpty())
+				if (result.getParameters().length > 0){
+					if (result.getParameters()[0] instanceof Map)
 					{
-						testName = sTUID + " - " + testName + " [" + ds.argsToString(testParams) + "]";
-					}
-					else
-					{
-						testName = testName + " [" + ds.argsToString(testParams) + "]";						
+						@SuppressWarnings("unchecked")
+						Map<String, String> testParams = (Map<String, String>) result.getParameters()[0];	
+						String sTUID = testParams.get(SpecialKeywords.TUID);
+						if (!sTUID.isEmpty())
+						{
+							testName = sTUID + " - " + testName + " [" + ds.argsToString(testParams) + "]";
+						}
+						else
+						{
+							testName = testName + " [" + ds.argsToString(testParams) + "]";						
+						}
 					}
 				}
 			}
@@ -94,13 +106,13 @@ public class XMLNameStrategy implements INamingStrategy
 				methodUID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
 			}
 			
+
 			if (!methodUID.isEmpty()){
 				testNameMappedToID.put(logID, methodUID + " - " + testName + " - " +  result.getMethod().getMethodName());
 			} else
 			{
 				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
 			}
-			
 			
 		}
 		return testNameMappedToID.get(logID);
@@ -111,4 +123,16 @@ public class XMLNameStrategy implements INamingStrategy
 	{
 		return result.getMethod().getRealClass().getPackage().getName();
 	}
+	
+    public static void startThread(String id) {
+        testLogId.set(id);
+    }
+ 
+    public static String getThreadId() {
+        return testLogId.get();
+    }
+ 
+    public static void endThread() {
+    	testLogId.remove();
+    }
 }
