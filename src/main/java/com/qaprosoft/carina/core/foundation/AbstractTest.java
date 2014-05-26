@@ -29,6 +29,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -458,7 +459,17 @@ public abstract class AbstractTest extends DriverHelper
 	}
 
     public static void quitDriver() {
+    	WebDriver drv = getDriver();
+    	
+		if (drv != null) {
+			try {
+				drv.quit();
+			} catch (UnhandledAlertException e) {
+				drv.switchTo().alert().accept();
+				drv.close();
+			}
+		}
+		
     	webDriver.remove();
     }
-
 }
