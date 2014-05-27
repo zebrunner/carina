@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -89,6 +91,8 @@ public abstract class AbstractTest extends DriverHelper
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
 
 	private static ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>();
+	private static List<WebDriver> createdDrivers = Collections.synchronizedList(new ArrayList<WebDriver>());
+
 	
     // Test-Executer integration items
     private static ExecutionContext executionContext;
@@ -148,6 +152,8 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOG.info("Driver is initializing in single mode.");
 		    	driver = DriverFactory.create(context.getSuite().getName());
 	    		setDriver(driver);
+	    		createdDrivers.add(driver);
+
 		    }
 		    
 		}
@@ -229,7 +235,7 @@ public abstract class AbstractTest extends DriverHelper
 			try
 			{
 				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
-					quitDriver();
+					closeDriver();
 					//driver.quit();
 				}
 			}
@@ -308,7 +314,8 @@ public abstract class AbstractTest extends DriverHelper
 				try
 				{
 					//er.quit();
-					quitDriver();
+					closeDriver();
+					quitDrivers();
 				}
 				catch (Exception e)
 				{
@@ -458,18 +465,25 @@ public abstract class AbstractTest extends DriverHelper
 		webDriver.set(driver);
 	}
 
-    public static void quitDriver() {
-    	WebDriver drv = getDriver();
-    	
-		if (drv != null) {
-			try {
-				drv.quit();
-			} catch (UnhandledAlertException e) {
-				drv.switchTo().alert().accept();
-				drv.close();
-			}
-		}
-		
+    public static void closeDriver() {
+    	webDriver.get().close();
     	webDriver.remove();
     }
+    
+	public static synchronized void quitDrivers() {
+
+		LOGGER.info("Drivers are: " + createdDrivers);
+		if (!createdDrivers.isEmpty()) {
+			for (WebDriver driverItem : createdDrivers) {
+				try {
+					driverItem.quit();
+				} catch (Exception e) {
+					// Do nothing
+				}
+
+			}
+		}
+
+	}
+    
 }
