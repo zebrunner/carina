@@ -91,7 +91,7 @@ public abstract class AbstractTest extends DriverHelper
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
 
 	private static ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>();
-	private static List<WebDriver> createdDrivers = Collections.synchronizedList(new ArrayList<WebDriver>());
+	//private static List<WebDriver> createdDrivers = Collections.synchronizedList(new ArrayList<WebDriver>());
 
 	
     // Test-Executer integration items
@@ -152,7 +152,7 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOG.info("Driver is initializing in single mode.");
 		    	driver = DriverFactory.create(context.getSuite().getName());
 	    		setDriver(driver);
-	    		createdDrivers.add(driver);
+	    		//createdDrivers.add(driver);
 
 		    }
 		    
@@ -235,7 +235,7 @@ public abstract class AbstractTest extends DriverHelper
 			try
 			{
 				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
-					closeDriver();
+					quitDriver();
 					//driver.quit();
 				}
 			}
@@ -313,9 +313,8 @@ public abstract class AbstractTest extends DriverHelper
 			if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE) && isUITest() && driver != null) {
 				try
 				{
-					//er.quit();
-					closeDriver();
-					quitDrivers();
+					quitDriver();
+					//quitDrivers();
 				}
 				catch (Exception e)
 				{
@@ -470,6 +469,12 @@ public abstract class AbstractTest extends DriverHelper
     	webDriver.remove();
     }
     
+    public static void quitDriver() {
+    	webDriver.get().quit();
+    	webDriver.remove();
+    }    
+    
+    /*
 	public static synchronized void quitDrivers() {
 
 		LOGGER.info("Drivers are: " + createdDrivers);
@@ -485,5 +490,6 @@ public abstract class AbstractTest extends DriverHelper
 		}
 
 	}
+	*/
     
 }

@@ -15,8 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation.log;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * GlobalTestLog
@@ -26,7 +27,8 @@ import java.util.Map;
 public class GlobalTestLog
 {
 	public static final String KEY = "GLOBAL_TEST_LOG";
-	private Map<String, StringBuilder> log = new HashMap<String, StringBuilder>();
+	//private ConcurrentHashMap<String, StringBuilder> log = new ConcurrentHashMap<String, StringBuilder>();
+	private Map<String,StringBuilder> log = Collections.synchronizedMap(new HashMap<String,StringBuilder>());
 	
 	public GlobalTestLog()
 	{
