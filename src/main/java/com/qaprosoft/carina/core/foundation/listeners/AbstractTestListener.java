@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.jfree.util.Log;
 import org.testng.IResultMap;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -88,8 +89,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON,
-				Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
+		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
 		Jira.updateAfterTest(result);
 		super.onTestSuccess(result);
 	}
@@ -100,8 +100,16 @@ public abstract class AbstractTestListener extends TestArgsListener
 		int count = RetryCounter.getRunCount(TestNamingUtil.getCanonicalTestName(result));
 		if (count >= MAX_COUNT && result.getThrowable().getMessage() != null)
 		{
-			((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON,
-					Messager.TEST_FAILED.error(TestNamingUtil.getCanonicalTestName(result), DateUtils.now(), result.getThrowable().getMessage()));
+			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
+			if (globalLog != null) {
+				String msg = Messager.TEST_FAILED.error(TestNamingUtil.getCanonicalTestName(result), DateUtils.now(), result.getThrowable().getMessage());
+				globalLog.log(Type.COMMON, msg);
+			}
+			else{
+				Log.error("GlobalTestLog is NULL! for " + result.toString());
+			}
+				
+			//((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_FAILED.error(TestNamingUtil.getCanonicalTestName(result), DateUtils.now(), result.getThrowable().getMessage()));
 		}
 		Jira.updateAfterTest(result);
 		super.onTestFailure(result);

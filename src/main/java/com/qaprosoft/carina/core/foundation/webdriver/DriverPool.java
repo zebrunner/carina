@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,11 +24,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class DriverPool
 {
-	private static Map<String, WebDriver> testDriverMap = new HashMap<String, WebDriver>();
+	private static Map<String, WebDriver> testDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
 
-	private static Map<WebDriver, String> driverTestMap = new HashMap<WebDriver, String>();
+	private static Map<WebDriver, String> driverTestMap = Collections.synchronizedMap(new HashMap<WebDriver, String>());
 
-	private static Map<String, WebDriver> sessionIdDriverMap = new HashMap<String, WebDriver>();
+	private static Map<String, WebDriver> sessionIdDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
 
 	public static synchronized String registerDriverSession(WebDriver driver)
 	{
