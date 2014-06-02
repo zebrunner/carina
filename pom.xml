@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qaprosoft</groupId>
 	<artifactId>carina-core</artifactId>
-	<version>2.1.17</version>
+	<version>2.1.18</version>
 	<packaging>jar</packaging>
 	<name>Carina Test Core</name>
 	<description>Test core for multi-purpose testing of web-applications.</description>
@@ -72,12 +72,12 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>2.41.0</version>
+			<version>2.42.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.jayway.restassured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>1.8.1</version>
+			<version>2.3.0</version>
 		</dependency>
 		<!-- Logging -->
 		<dependency>
@@ -96,11 +96,6 @@
 			<version>1.0.6</version>
 		</dependency>
 		<!-- HTTP utilities -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.2.2</version>
-		</dependency>
 		<dependency>
 			<groupId>com.googlecode.jinahya</groupId>
 			<artifactId>ocap-api</artifactId>
@@ -132,9 +127,29 @@
 			<version>1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore-nio</artifactId>
+			<version>4.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient-cache</artifactId>
+			<version>4.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -237,10 +252,10 @@
 		</dependency>
 		<!-- Jira -->
 		<dependency>
-	      <groupId>net.rcarz</groupId>
-	      <artifactId>jira-client</artifactId>
-	      <version>0.4</version>
-	    </dependency>
+			<groupId>net.rcarz</groupId>
+			<artifactId>jira-client</artifactId>
+			<version>0.4</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
