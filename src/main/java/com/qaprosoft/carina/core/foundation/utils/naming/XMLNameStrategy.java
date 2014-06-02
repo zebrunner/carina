@@ -16,18 +16,19 @@
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Arrays;
+//import java.util.Collections;
+//import java.util.HashMap;
 import java.util.Map;
-
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
+//import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+//import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 
 public class XMLNameStrategy implements INamingStrategy
 {
-	private Map<String, String> testNameMappedToID = new HashMap<String, String>();
+//	private Map<String, String> testNameMappedToID = Collections.synchronizedMap(new HashMap<String, String>());
     private static final ThreadLocal<String> testLogId = new ThreadLocal<String>();
 	
 	@Override
@@ -37,21 +38,55 @@ public class XMLNameStrategy implements INamingStrategy
 	}
 
 	@Override
-	public String getCanonicalTestName(ITestResult result)
-	{
-		String logID = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.TEST_LOG_ID);
+	public String getCanonicalTestName(ITestResult result) {
 		
-		Thread thread = Thread.currentThread();
-		if (thread.getName().contains("PoolService"))
-		{
-			logID = thread.getId() + "-" + logID;
+		@SuppressWarnings("unchecked")
+		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute("testNameMappedToArgs");
+		
+		String testName = "";
+		
+		String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));		
+		if (testnameMap != null) {
+			if (testnameMap.containsKey(testHash)) {
+				testName = testnameMap.get(testHash);
+			}
 		}
 		
+		if (testName.isEmpty())
+			testName = result.getTestContext().getCurrentXmlTest().getName();
+		
+		
+		String invocationID = ""; 
+		if (result.getMethod().getInvocationCount() > 1){
+			invocationID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
+		}
+		
+		if (!invocationID.isEmpty()) {
+			testName = testName + " - " +  result.getMethod().getMethodName() + " (InvCount=" + invocationID + ")";
+		}
+		else {
+			testName = testName + " - " +  result.getMethod().getMethodName();
+		}
+
+		
+		return testName;
+		
+/*		XmlTest xmlTest = result.getTestContext().getCurrentXmlTest();
+		
+		String logID = xmlTest.getParameter(SpecialKeywords.TEST_LOG_ID);
+		
+		
+		//String sessionID = xmlTest.getParameter("SpecialKeywords.SESSION_ID");
+		
+		Thread thread = Thread.currentThread();
+		logID = thread.getId() + "-" + logID;
+
 		startThread(logID);
 		
 		if(!testNameMappedToID.containsKey(logID))
 		{
-			String testName = result.getTestContext().getCurrentXmlTest().getName();
+			//testNameMappedToID.put(logID, "temp_id");
+			String testName = xmlTest.getName();
 			XLSDSBean ds = new XLSDSBean(result.getTestContext());
 		
 			if(!ds.getArgs().isEmpty())
@@ -101,21 +136,27 @@ public class XMLNameStrategy implements INamingStrategy
 					}
 				}
 			}
-
+	
 			if (result.getMethod().getInvocationCount() > 1){
 				methodUID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
 			}
 			
-
+			
 			if (!methodUID.isEmpty()){
-				testNameMappedToID.put(logID, methodUID + " - " + testName + " - " +  result.getMethod().getMethodName());
+				testName = methodUID + " - " + testName + " - " +  result.getMethod().getMethodName();
 			} else
 			{
-				testNameMappedToID.put(logID, testName + " - " +  result.getMethod().getMethodName());
+				testName = testName + " - " +  result.getMethod().getMethodName();
 			}
 			
+//			System.out.println("testName: " + testName);
+//			System.out.println("testNameMappedToID size:" + testNameMappedToID.size());
+//			testNameMappedToID.put(logID, testName);
+//			System.out.println("testNameMappedToID size 2:" + testNameMappedToID.size());
+			//return value as is to minimize HashMap read/write operations
+			return testName;			
 		}
-		return testNameMappedToID.get(logID);
+		return testNameMappedToID.get(logID);*/
 	}
 
 	@Override

@@ -56,7 +56,7 @@ public class HtmlReportGenerator
 	private static final String PERF_TITLE_ROW = R.REPORT.get("perf_title_row");
 	private static final String PERF_DATA_ROW = R.REPORT.get("perf_data_row");
 	
-	public static String generatePerformanceReport(String rootDir, List<TestStatistics> testStatistics)
+	public synchronized static String generatePerformanceReport(String rootDir, List<TestStatistics> testStatistics)
 	{
 		String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 		String perfTable = PERF_TABLE.replace(PERF_TITLE, "Performance report")
@@ -125,7 +125,7 @@ public class HtmlReportGenerator
 		}
 	}
 
-	private static void createReportAsHTML(File testFolder, List<File> images)
+	private static synchronized void createReportAsHTML(File testFolder, List<File> images)
 	{
 		try
 		{
@@ -143,19 +143,23 @@ public class HtmlReportGenerator
 			StringBuilder report = new StringBuilder();
 			for (int i = 0; i < imgNames.size(); i++)
 			{
-				String image = R.REPORT.get("image");
-				image = image.replace("${image}", imgNames.get(i));
-				image = image.replace("${thumbnail}", imgNames.get(i));
-				image = image.replace("${alt}", imgNames.get(i));
-				image = image.replace("${title}", TestLogCollector.getScreenshotComment(imgNames.get(i)));
+				// convert toString 
+				String image = R.REPORT.get("image").toString();
+				image = image.replace("${image}", imgNames.get(i).toString());
+				image = image.replace("${thumbnail}", imgNames.get(i).toString());
+				image = image.replace("${alt}", imgNames.get(i).toString());
+				String title = TestLogCollector.getScreenshotComment(imgNames.get(i));
+				image = image.replace("${title}", title.toString());
 				report.append(image);
 			}
 			String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
 			wholeReport = wholeReport.replace("${title}", TITLE);
-			FileManager.createFileWithContent(testFolder.getAbsolutePath() + REPORT_NAME, wholeReport);
+			String folder = testFolder.getAbsolutePath();
+			FileManager.createFileWithContent(folder + REPORT_NAME, wholeReport);
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			LOGGER.error(e.getStackTrace().toString());
 		}

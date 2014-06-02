@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.parser;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class XLSTable
 	public XLSTable()
 	{
 		headers = new LinkedList<String>();
-		dataRows = new LinkedList<Map<String, String>>();
+		dataRows = Collections.synchronizedList(new LinkedList<Map<String, String>>());
 	}
 	
 	public XLSTable(String executeColumn, String executeValue)
@@ -64,7 +65,9 @@ public class XLSTable
 		Map<String, String> dataMap = new HashMap<String, String>();
 		for (int i = 1; i < headers.size(); i++)
 		{
-			dataMap.put(headers.get(i), XLSParser.getCellValue(row.getCell(i)));
+			synchronized (dataMap){ 
+				dataMap.put(headers.get(i), XLSParser.getCellValue(row.getCell(i)));
+			}
 		}
 		dataRows.add(dataMap);
 	}

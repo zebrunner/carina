@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jfree.util.Log;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -40,20 +39,13 @@ public class EmailReportItemCollector
 
 	public static synchronized void push(TestResultItem emailItem)
 	{
-//		if (!emailResultsMap.containsKey(emailItem.hash()))
-//		{
 		emailResultsMap.put(emailItem.hash(), emailItem);
 		testResultsMap.put(emailItem.getTest(), emailItem);
-//		}
 	}
 
 	public static synchronized void push(String itemToDelete)
 	{
 		createdItems.add(itemToDelete);		
-//		if (!createdItems.contains(itemToDelete))
-//		{
-//			createdItems.add(itemToDelete);
-//		}
 	}
 	
 	public static synchronized TestResultItem pull(ITestResult result)

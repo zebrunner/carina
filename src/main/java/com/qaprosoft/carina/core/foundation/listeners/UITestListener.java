@@ -26,6 +26,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -43,13 +44,14 @@ public class UITestListener extends AbstractTestListener
 
 	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onTestStart(ITestResult result)
 	{
 		super.onTestStart(result);
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		DriverPool.associateTestNameWithDriver(test, DriverPool.getDriverBySessionId(result.getTestContext().getCurrentXmlTest().getParameters().get("sessionId")));
+		String testName = TestNamingUtil.getCanonicalTestName(result);
+		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
+		WebDriver drv = DriverPool.getDriverBySessionId(sessionId);
+		DriverPool.associateTestNameWithDriver(testName, drv);
 	}
 	
 	@Override
@@ -69,17 +71,6 @@ public class UITestListener extends AbstractTestListener
 			if (MAX_COUNT != 0)
 				LOGGER.error("Retry limit exceeded for " + result.getName());
 			
-			String screenId = "";
-			try
-			{
-				WebDriver driver = DriverPool.getDriverByTestName(TestNamingUtil.getCanonicalTestName(result));
-				if (driver != null)
-					screenId = Screenshot.capture(driver, true);
-			}
-			catch (Exception e)
-			{
-				LOGGER.error(e.getMessage());
-			}
 			
 			Throwable exp = result.getThrowable();
 			String errorMessage = "";
@@ -93,12 +84,25 @@ public class UITestListener extends AbstractTestListener
 		        	errorMessage = errorMessage + "\n" + elem.toString();
 	            }
 		    }
-		        
-			//String errorMessage = result.getThrowable().getMessage();
-//			errorMessage = StringEscapeUtils.escapeHtml4(errorMessage);
-//			TestLogCollector.logToSession(DriverPool.getSessionIdByTestName(TestNamingUtil.getCanonicalTestName(result)), "TEST FAILED - " + errorMessage);
+		    
+			
+			String screenId = "";
+			String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
+			
+			try
+			{
+				WebDriver driver = DriverPool.getDriverBySessionId(sessionId);
+				
+				if (driver != null)
+					screenId = Screenshot.capture(driver, true);
+			}
+			catch (Exception e)
+			{
+				LOGGER.error(e.getMessage());
+			}
 			TestLogCollector.addScreenshotComment(screenId, "TEST FAILED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
+			
 			super.onTestFailure(result);
 		}
 		Reporter.setCurrentTestResult(result);
@@ -108,13 +112,17 @@ public class UITestListener extends AbstractTestListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		String screenId = Screenshot.capture(DriverPool.getDriverByTestName(TestNamingUtil.getCanonicalTestName(result)));
-//		TestLogCollector.logToSession(DriverPool.getSessionIdByTestName(TestNamingUtil.getCanonicalTestName(result)), "TEST PASSED!");
-		TestLogCollector.addScreenshotComment(screenId, "TEST PASSED!");
+		String test = TestNamingUtil.getCanonicalTestName(result);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
+
+		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
+		
+		String screenId = Screenshot.capture(DriverPool.getDriverBySessionId(sessionId));
+		TestLogCollector.addScreenshotComment(screenId, "TEST PASSED!");
+
 		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS))
 		{
-			ReportContext.removeTestReport(TestNamingUtil.getCanonicalTestName(result));
+			ReportContext.removeTestReport(test);
 		}
 		super.onTestSuccess(result);
 	}
