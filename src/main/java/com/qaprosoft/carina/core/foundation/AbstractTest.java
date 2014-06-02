@@ -19,20 +19,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -64,6 +67,7 @@ import com.qaprosoft.carina.core.foundation.utils.L18n;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
@@ -85,6 +89,7 @@ import com.qaprosoft.testexecuter.client.TestExecuterClient;
  */
 public abstract class AbstractTest extends DriverHelper
 {
+	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
     protected static final Logger LOG = Logger.getLogger(AbstractTest.class);
 
     protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
@@ -102,6 +107,13 @@ public abstract class AbstractTest extends DriverHelper
     private String browserVersion = "";
     private String initializationFailure = "";
     
+	private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
+	private static Pattern GENERATEAN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEAN);
+	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
+	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
+	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
+	//private static Pattern EXCEL_PATTERN = Pattern.compile(SpecialKeywords.EXCEL);    
+	private static Matcher matcher;
 	
 
     @BeforeSuite(alwaysRun = true)
@@ -177,9 +189,12 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
 		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+		    		//driver = DriverFactory.create(xmlTest.getName());
 		    		setDriver(driver);
 		    	}
-				xmlTest.addParameter("sessionId", DriverPool.registerDriverSession(driver));
+				xmlTest.addParameter(SpecialKeywords.SESSION_ID, DriverPool.registerDriverSession(driver));
+		    	
+		    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, ((RemoteWebDriver) driver).getSessionId().toString());
 				initSummary(driver);
 				browserVersion = DriverFactory.getBrowserVersion(driver);
 		    }
@@ -205,27 +220,30 @@ public abstract class AbstractTest extends DriverHelper
     {
 	try
 	{
-	    GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
+		
+		String testName = TestNamingUtil.getCanonicalTestName(result);
 
-	    
-	    String test = TestNamingUtil.getCanonicalTestName(result);
-	    File testLogFile = new File(ReportContext.getTestDir(test) + "/test.log");
+		GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
+    
+	    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
 	    // File soapuiLogFile = new File(ReportContext.getTestDir(test) +
 	    // "/soapui.log");
 	    if (!testLogFile.exists()) testLogFile.createNewFile();
 	    FileWriter fw = new FileWriter(testLogFile);
-
-	    if (driver == null && !initializationFailure.isEmpty()) {
+	    
+	    WebDriver drv = getDriver();
+	    if (drv == null && !initializationFailure.isEmpty()) {
 			fw.append("\r\n************************** Initialization logs **************************\r\n\r\n");
 			fw.append(initializationFailure);	    	
 	    }
-	    if (isUITest() && driver != null)
+	    if (isUITest() && drv != null)
 	    {
 			fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
 			
 			try
 			{
-				fw.append(TestLogHelper.getSessionLogs(test));
+				//fw.append(TestLogHelper.getSessionLogs(testName));
+				fw.append(TestLogHelper.getSessionLogs(drv));
 			}
 			catch (Exception e)
 			{
@@ -236,7 +254,6 @@ public abstract class AbstractTest extends DriverHelper
 			{
 				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
 					quitDriver();
-					//driver.quit();
 				}
 			}
 			catch (Exception e)
@@ -310,7 +327,7 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{
-			if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE) && isUITest() && driver != null) {
+			if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE) && isUITest() && getDriver() != null) {
 				try
 				{
 					quitDriver();
@@ -342,6 +359,7 @@ public abstract class AbstractTest extends DriverHelper
 				eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
 						env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
 		    }
+		    
 		    ReportContext.getTempDir().delete();
 	
 		    // Update JIRA
@@ -375,17 +393,24 @@ public abstract class AbstractTest extends DriverHelper
 		int rowIndex = 0;
 		for (Map<String, String> xlsRow : dsData.getDataRows())
 		{
+			String testName = context.getName();
 			args[rowIndex][0] = xlsRow;
 
 		    for (int i=0; i<staticArgs.length; i++){
-		    	args[rowIndex][i + 1] = dsBean.getTestParams().get(staticArgs[i]); //zero element is a hashmap 
+		    	args[rowIndex][i + 1] = processParameter(dsBean.getTestParams().get(staticArgs[i])); //zero element is a hashmap 
 		    }
+		    //update testName adding UID values from DataSource arguments if any
+			testName = dsBean.setDataSorceUUID(testName, xlsRow);
+
+			testNameMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
 		    rowIndex++;
 		}
 
+		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
+		
 		return args;
     }
-
+    
     @DataProvider(name = "excel_ds2")
     public Object[][] readDataFromXLS2(ITestContext context)
     {
@@ -394,27 +419,40 @@ public abstract class AbstractTest extends DriverHelper
     
     public Object[][] createTestArgSets(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
-	String[] argNames = ArrayUtils.addAll(context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_ARGS).split(";"), staticArgs);
-	XLSDSBean dsBean = new XLSDSBean(context);
-	XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
-	Object[][] args = new Object[dsData.getDataRows().size()][argNames.length];
-	int rowIndex = 0;
-	for (Map<String, String> xlsRow : dsData.getDataRows())
-	{
-	    for (int i = 0; i < argNames.length; i++)
-	    {
-			if (dsBean.getArgs().contains(argNames[i]))
-			{
-			    args[rowIndex][i] = xlsRow.get(argNames[i]);
-			}
-			else
-			{
-			    args[rowIndex][i] = dsBean.getTestParams().get(argNames[i]);
-			}
-	    }
-	    rowIndex++;
-	}
-	return args;
+		String[] argNames = ArrayUtils.addAll(context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_ARGS).split(";"), staticArgs);
+		XLSDSBean dsBean = new XLSDSBean(context);
+		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
+		Object[][] args = new Object[dsData.getDataRows().size()][argNames.length];
+		
+		
+		
+		int rowIndex = 0;
+		for (Map<String, String> xlsRow : dsData.getDataRows())
+		{
+			String testName = context.getName();			
+		    for (int i = 0; i < argNames.length; i++)
+		    {
+		    	//read one line from xls and set to arguments from DataSource
+				if (dsBean.getArgs().contains(argNames[i]))
+				{
+				    args[rowIndex][i] = processParameter(xlsRow.get(argNames[i]));
+				}
+				else
+				{
+				    args[rowIndex][i] = processParameter(dsBean.getTestParams().get(argNames[i]));
+				}
+		    }
+		    //update testName adding UID values from DataSource arguments if any
+			testName = dsBean.setDataSorceUUID(testName, xlsRow);
+			
+			testNameMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);			
+		    rowIndex++;
+		}
+		
+		
+		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
+
+		return args;
     }
 
     @DataProvider(name = "excel_ds")
@@ -491,5 +529,74 @@ public abstract class AbstractTest extends DriverHelper
 
 	}
 	*/
-    
+
+	public static Object processParameter(String param)
+	{
+		try
+		{
+			if (param == null || param.toLowerCase().equals("nil"))
+			{
+				return null;
+			}
+
+			matcher = GENERATE_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				int size = Integer.valueOf(param.substring(start, end));
+				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWord(size));
+			}
+			
+			matcher = GENERATEAN_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				int size = Integer.valueOf(param.substring(start, end));
+				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWordAN(size));
+			}
+			
+			matcher = ENV_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				String key = param.substring(start, end);
+				return StringUtils.replace(param, matcher.group(), Configuration.getEnvArg(key));
+			}
+
+			matcher = TESTDATA_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				String key = param.substring(start, end);
+				return StringUtils.replace(param, matcher.group(), R.TESTDATA.get(key));
+			}
+
+/*			matcher = EXCEL_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				String key = param.substring(start, end);
+				return StringUtils.replace(param, matcher.group(), getValueFromXLS(key));
+			}*/
+			
+			matcher = L18N_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				String key = param.substring(start, end);
+				return StringUtils.replace(param, matcher.group(), L18n.getText(key));
+			}
+		}
+		catch (Exception e)
+		{
+			LOGGER.error(e.getMessage());
+		}
+		return param;
+	}    
 }

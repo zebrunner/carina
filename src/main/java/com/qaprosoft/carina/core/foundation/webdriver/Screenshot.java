@@ -56,7 +56,7 @@ public class Screenshot
 	 *            instance used for capturing.
 	 * @return screenshot name.
 	 */
-	public static String capture(WebDriver driver, boolean isTakeScreenshot)
+	public static synchronized String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
 		String screenName = "";
 		
@@ -95,7 +95,7 @@ public class Screenshot
 		}
 		return screenName;
 	}
-
+	
 	/**
 	 * Resizes image according to specified dimensions.
 	 * 

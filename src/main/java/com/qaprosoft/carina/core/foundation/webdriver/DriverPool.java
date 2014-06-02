@@ -24,8 +24,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class DriverPool
 {
-	private static Map<String, WebDriver> testDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
-
 	private static Map<WebDriver, String> driverTestMap = Collections.synchronizedMap(new HashMap<WebDriver, String>());
 
 	private static Map<String, WebDriver> sessionIdDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
@@ -37,23 +35,23 @@ public class DriverPool
 		return sessionId;
 	}
 	
-	public static synchronized void associateTestNameWithDriver(String testInClass, WebDriver driver)
+	public static synchronized void associateTestNameWithDriver(String test, WebDriver driver)
 	{
-		testDriverMap.put(testInClass, driver);
-		driverTestMap.put(driver, testInClass);
+		//testDriverMap.put(testInClass, driver);
+		driverTestMap.put(driver, test);
 	}
 
-	public static synchronized WebDriver getDriverByTestName(String test)
+/*	public static synchronized WebDriver getDriverByTestName(String test)
 	{
 		return testDriverMap.get(test);
-	}
+	}*/
 
-	public static synchronized WebDriver getDriverBySessionId(String sessionId)
+	public static WebDriver getDriverBySessionId(String sessionId)
 	{
 		return sessionIdDriverMap.get(sessionId);
 	}
 
-	public static String getSessionIdByTestName(String test)
+	/*public static String getSessionIdByTestName(String test)
 	{
 		if (testDriverMap.containsKey(test))
 		{
@@ -63,7 +61,7 @@ public class DriverPool
 		{
 			return null;
 		}
-	}
+	}*/
 
 	public static String getTestNameByDriver(WebDriver driver)
 	{

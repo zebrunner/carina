@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.log;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +29,12 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class TestLogCollector
 {
-	private static Map<String, StringBuilder> collector = new HashMap<String, StringBuilder>();
-	private static Map<String, String> screenSteps = new HashMap<String, String>();
+	private static Map<String, StringBuilder> collector = Collections.synchronizedMap(new HashMap<String, StringBuilder>());
+	private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 
 	/**
 	 * Clears messages in driver session context.
-	 * @param sessionId
+	 * @param SpecialKeywords.SESSION_ID
 	 */
 	public static void clearSessionLogs(String sessionId)
 	{
@@ -46,7 +47,7 @@ public class TestLogCollector
 	/**
 	 * Adds message to test logs.
 	 * 
-	 * @param sessionId
+	 * @param SpecialKeywords.SESSION_ID
 	 *            
 	 * @param msg
 	 *            
@@ -67,7 +68,7 @@ public class TestLogCollector
 	/**
 	 * Returns test log by webdriver session ID.
 	 * 
-	 * @param sessionId
+	 * @param SpecialKeywords.SESSION_ID
 	 *            
 	 * @return test logs
 	 */
@@ -84,7 +85,7 @@ public class TestLogCollector
 	 * @param msg
 	 *            
 	 */
-	public static synchronized void addScreenshotComment(String screenId, String msg)
+	public static void addScreenshotComment(String screenId, String msg)
 	{
 		if (!StringUtils.isEmpty(screenId))
 		{
@@ -99,8 +100,11 @@ public class TestLogCollector
 	 *            
 	 * @return screenshot comment
 	 */
-	public static synchronized String getScreenshotComment(String screenId)
+	public static String getScreenshotComment(String screenId)
 	{
-		return screenSteps.get(screenId);
+		String comment = "";
+		if (screenSteps.containsKey(screenId))
+			comment = screenSteps.get(screenId);
+		return comment;
 	}
 }

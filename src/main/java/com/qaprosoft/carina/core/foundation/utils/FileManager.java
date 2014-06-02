@@ -47,7 +47,7 @@ public class FileManager
 		}
 	}
 
-	public static List<File> getFilesInDir(File directory)
+	public synchronized static List<File> getFilesInDir(File directory)
 	{
 		List<File> files = new ArrayList<File>();
 		try

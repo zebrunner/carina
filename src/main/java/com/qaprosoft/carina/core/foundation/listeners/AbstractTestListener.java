@@ -76,14 +76,14 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}
 		}
 
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String testName = TestNamingUtil.getCanonicalTestName(result);
 
-		if (RetryCounter.getRunCount(test) == null)
+		if (RetryCounter.getRunCount(testName) == null)
 		{
-			RetryCounter.initCounter(test);
+			RetryCounter.initCounter(testName);
 		}
 
-		Messager.TEST_STARTED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now());
+		Messager.TEST_STARTED.info(testName, DateUtils.now());
 	}
 
 	@Override
@@ -97,19 +97,20 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		int count = RetryCounter.getRunCount(TestNamingUtil.getCanonicalTestName(result));
+		String testName = TestNamingUtil.getCanonicalTestName(result);
+		int count = RetryCounter.getRunCount(testName);
 		if (count >= MAX_COUNT && result.getThrowable().getMessage() != null)
 		{
 			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
 			if (globalLog != null) {
-				String msg = Messager.TEST_FAILED.error(TestNamingUtil.getCanonicalTestName(result), DateUtils.now(), result.getThrowable().getMessage());
+				String msg = Messager.TEST_FAILED.error(testName, DateUtils.now(), result.getThrowable().getMessage());
 				globalLog.log(Type.COMMON, msg);
 			}
 			else{
 				Log.error("GlobalTestLog is NULL! for " + result.toString());
 			}
 				
-			//((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_FAILED.error(TestNamingUtil.getCanonicalTestName(result), DateUtils.now(), result.getThrowable().getMessage()));
+			//((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_FAILED.error(testName, DateUtils.now(), result.getThrowable().getMessage()));
 		}
 		Jira.updateAfterTest(result);
 		super.onTestFailure(result);
@@ -182,13 +183,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String group = TestNamingUtil.getPackageName(test);
 		String testName = TestNamingUtil.getCanonicalTestName(test);
-		String linkToLog = ReportContext.getTestLogLink(TestNamingUtil.getCanonicalTestName(test));
+		String linkToLog = ReportContext.getTestLogLink(testName);
 		String linkToScreenshots = null;
-		if(!FileUtils.listFiles(ReportContext.getTestDir(TestNamingUtil.getCanonicalTestName(test)), new String[]{"png"}, false).isEmpty()
+		if(!FileUtils.listFiles(ReportContext.getTestDir(testName), new String[]{"png"}, false).isEmpty()
 			&& Configuration.getBoolean(Parameter.AUTO_SCREENSHOT)
 			&& (TestResultType.FAIL.equals(result) || Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)))
 		{
-			linkToScreenshots = ReportContext.getTestScreenshotsLink(TestNamingUtil.getCanonicalTestName(test));
+			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
 		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, failReason);
 		testResultItem.setDescription(description);
