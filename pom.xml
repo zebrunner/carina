@@ -237,10 +237,10 @@
 		</dependency>
 		<!-- Jira -->
 		<dependency>
-	      <groupId>net.rcarz</groupId>
-	      <artifactId>jira-client</artifactId>
-	      <version>0.4</version>
-	    </dependency>
+			<groupId>net.rcarz</groupId>
+			<artifactId>jira-client</artifactId>
+			<version>0.4</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>

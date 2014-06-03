@@ -78,10 +78,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 		String testName = TestNamingUtil.getCanonicalTestName(result);
 
-		if (RetryCounter.getRunCount(testName) == null)
-		{
-			RetryCounter.initCounter(testName);
-		}
+		RetryCounter.initCounter(testName);
 
 		Messager.TEST_STARTED.info(testName, DateUtils.now());
 	}
