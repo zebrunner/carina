@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.log;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+//import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 /**
  * Helps to collect session logs.
@@ -58,10 +58,15 @@ public class TestLogHelper
 		return TestLogCollector.getSessionLogs(sessionID);
 	}
 
-	public static String getSessionLogs(String test)
+/*	public static String getSessionLogs(String test)
 	{
 		return TestLogCollector.getSessionLogs(DriverPool.getSessionIdByTestName(test));
-	}
+	}*/
+	
+	public static String getSessionLogs(WebDriver driver)
+	{
+		return TestLogCollector.getSessionLogs(((RemoteWebDriver) driver).getSessionId().toString());
+	}	
 
 	public void setPrefix(String prefix)
 	{

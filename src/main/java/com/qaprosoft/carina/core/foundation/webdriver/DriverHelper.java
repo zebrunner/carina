@@ -627,6 +627,7 @@ public class DriverHelper
 	 * @param timeout
 	 *            in seconds.
 	 */
+
 	public void pause(long timeout)
 	{
 		try
@@ -637,7 +638,21 @@ public class DriverHelper
 		{
 			e.printStackTrace();
 		}
-	}
+	}	
+	
+	public void pause(Double timeout)
+	{
+		try
+		{
+			timeout = timeout * 1000;
+			long miliSec = timeout.longValue();
+			Thread.sleep(miliSec);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}	
 
 	/**
 	 * Checks that page title is as expected.

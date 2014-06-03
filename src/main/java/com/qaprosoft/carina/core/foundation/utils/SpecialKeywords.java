@@ -42,4 +42,6 @@ public class SpecialKeywords
 	public static final String TEST_LOG_ID = "{test_log_id}";
 	
 	public static final String JIRA_TICKET = "JIRA#";
+	public static final String SESSION_ID = "sessionId";
+	
 }

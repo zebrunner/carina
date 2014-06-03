@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.report.email;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,25 +33,19 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
  */
 public class EmailReportItemCollector
 {
-	private static Map<String, TestResultItem> emailResultsMap = new HashMap<String, TestResultItem>();
-	private static Map<String, TestResultItem> testResultsMap = new HashMap<String, TestResultItem>();
+	private static Map<String, TestResultItem> emailResultsMap = Collections.synchronizedMap(new HashMap<String, TestResultItem>());
+	private static Map<String, TestResultItem> testResultsMap = Collections.synchronizedMap(new HashMap<String, TestResultItem>());
 	private static List<String> createdItems = new ArrayList<String>();
 
 	public static synchronized void push(TestResultItem emailItem)
 	{
-		if (!emailResultsMap.containsKey(emailItem.hash()))
-		{
-			emailResultsMap.put(emailItem.hash(), emailItem);
-			testResultsMap.put(emailItem.getTest(), emailItem);
-		}
+		emailResultsMap.put(emailItem.hash(), emailItem);
+		testResultsMap.put(emailItem.getTest(), emailItem);
 	}
 
 	public static synchronized void push(String itemToDelete)
 	{
-		if (!createdItems.contains(itemToDelete))
-		{
-			createdItems.add(itemToDelete);
-		}
+		createdItems.add(itemToDelete);		
 	}
 	
 	public static synchronized TestResultItem pull(ITestResult result)

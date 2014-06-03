@@ -86,9 +86,17 @@ public class DriverFactory
 						|| Configuration.isNull(Parameter.MOBILE_VERSION)
 						|| Configuration.isNull(Parameter.MOBILE_PLATFORM) 
 						|| Configuration.isNull(Parameter.MOBILE_APP)
-						|| Configuration.isNull(Parameter.MOBILE_DEVICE)) throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP' should be set!");
-				
-				capabilities = getIOSCapabilities(testName);
+						|| Configuration.isNull(Parameter.MOBILE_DEVICE)) {
+					
+					//try to initialize iOS Web capabilities
+					Log.info("'MOBILE_OS', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP', 'MOBILE_DEVICE' should be set to test iOS applications!");
+					capabilities = getIOSWebCapabilities(testName);
+					
+					//throw new InvalidArgsException("'MOBILE_OS', 'MOBILE_DEVICE', 'MOBILE_VERSION', 'MOBILE_PLATFORM', 'MOBILE_APP' should be set!");
+				}
+				else {
+					capabilities = getIOSCapabilities(testName);
+				}
 			}
 			else if (SELENDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
@@ -173,7 +181,7 @@ public class DriverFactory
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
-		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-certificate-errors"));
+		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized"/*, "--ignore-certificate-errors"*/));
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		return capabilities;
@@ -182,6 +190,7 @@ public class DriverFactory
 	private static DesiredCapabilities getHtmlUnitCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
+		//capabilities.setBrowserName(BrowserType.CHROME);
 		capabilities.setPlatform(Platform.WINDOWS);
 		capabilities.setJavascriptEnabled(true);
 		return capabilities;
@@ -202,6 +211,18 @@ public class DriverFactory
 		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
+	
+	private static DesiredCapabilities getIOSWebCapabilities(String testName) throws MalformedURLException
+	{
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		
+		//capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_OS));
+		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE)); //iPhone Simulator
+		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP)); //Safari
+		capabilities.setCapability("name", testName);
+		return capabilities;
+	}
+	
 	
 	private static DesiredCapabilities getAndroidCapabilities(String testName) throws MalformedURLException
 	{
