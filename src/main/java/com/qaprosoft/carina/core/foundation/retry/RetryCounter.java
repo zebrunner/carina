@@ -41,7 +41,7 @@ public class RetryCounter
 	
 	public static Integer getRunCount(String test)
 	{
-		return runCountMap.containsKey(test) ? runCountMap.get(test) : null;
+		return runCountMap.containsKey(test) ? runCountMap.get(test) : 0;
 	}
 	
 	public static void incrementRunCount(String test)
