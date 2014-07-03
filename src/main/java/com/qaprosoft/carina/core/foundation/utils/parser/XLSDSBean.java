@@ -17,10 +17,8 @@ package com.qaprosoft.carina.core.foundation.utils.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
@@ -150,7 +148,7 @@ public class XLSDSBean
 			}
 		}		
 		
-		//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
+/*		//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
 		String methodUID = "";
 		Iterator<Entry<String, String>> entries = params.entrySet().iterator();
 		while (entries.hasNext()) {
@@ -163,7 +161,7 @@ public class XLSDSBean
 		}
 		
 		if (!methodUID.isEmpty())
-			testName = methodUID + " - " + testName;				
+			testName = methodUID + " - " + testName;	*/			
 
 	
 		return testName;
