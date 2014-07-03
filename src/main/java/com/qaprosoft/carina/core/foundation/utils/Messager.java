@@ -78,6 +78,10 @@ public enum Messager
 	ELEMENT_CLICKED("PASS: element '%s' is clicked."),
 
 	ELEMENT_NOT_CLICKED("FAIL: element '%s' is not clicked!"),
+	
+	ELEMENT_DOUBLE_CLICKED("PASS: element '%s' is double clicked."),
+
+	ELEMENT_NOT_DOUBLE_CLICKED("FAIL: element '%s' is not double clicked!"),
 
 	ELEMENT_HOVERED("PASS: element '%s' is hovered."),
 
@@ -228,6 +232,7 @@ public enum Messager
 		catch (Exception e)
 		{
 			LOGGER.error("Report message creation error!");
+			e.printStackTrace();
 		}
 		return message;
 	}
