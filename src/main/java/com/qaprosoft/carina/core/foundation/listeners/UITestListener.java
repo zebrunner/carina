@@ -48,10 +48,10 @@ public class UITestListener extends AbstractTestListener
 	public void onTestStart(ITestResult result)
 	{
 		super.onTestStart(result);
-		String testName = TestNamingUtil.getCanonicalTestName(result);
 		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
 		WebDriver drv = DriverPool.getDriverBySessionId(sessionId);
-		DriverPool.associateTestNameWithDriver(testName, drv);
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		DriverPool.associateTestNameWithDriver(test, drv);
 	}
 	
 	@Override
@@ -98,7 +98,8 @@ public class UITestListener extends AbstractTestListener
 			}
 			catch (Exception e)
 			{
-				LOGGER.error(e.getMessage());
+				LOGGER.warn("Unable to capture screenshot. Driver already quit.");
+				//e.printStackTrace();
 			}
 			TestLogCollector.addScreenshotComment(screenId, "TEST FAILED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
@@ -115,9 +116,24 @@ public class UITestListener extends AbstractTestListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 
+
+		String screenId = "";
 		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
 		
-		String screenId = Screenshot.capture(DriverPool.getDriverBySessionId(sessionId));
+		try
+		{
+			WebDriver driver = DriverPool.getDriverBySessionId(sessionId);
+			
+			if (driver != null)
+				screenId = Screenshot.capture(driver, true);
+		}
+		catch (Exception e)
+		{
+			LOGGER.warn("Unable to capture screenshot. Driver already quit.");
+			//e.printStackTrace();
+		}
+
+
 		TestLogCollector.addScreenshotComment(screenId, "TEST PASSED!");
 
 		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS))
