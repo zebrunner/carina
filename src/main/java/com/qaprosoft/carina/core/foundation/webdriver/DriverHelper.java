@@ -116,6 +116,13 @@ public class DriverHelper
 	// Base UI interaction operations
 	// --------------------------------------------------------------------------
 
+	public void setImplicitTimeout(long implicit_wait){
+		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);		
+	}
+	
+	public long getImplicitTimeout(){
+		return Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+	}	
 	/**
 	 * Initializes test log container dedicated to WebDriver instance.
 	 * 
@@ -124,6 +131,11 @@ public class DriverHelper
 	protected void initSummary(WebDriver driver)
 	{
 		summary = new TestLogHelper(driver);
+	}
+
+	protected void initSummary(String sessionId)
+	{
+		summary = new TestLogHelper(sessionId);
 	}
 
 	/**
@@ -405,7 +417,40 @@ public class DriverHelper
 	{
 		click(new ExtendedWebElement(control, controlInfo));
 	}
+	
+	public boolean clickIfPresent(final ExtendedWebElement extWebElement)
+	{
+		return clickIfPresent(extWebElement, EXPLICIT_TIMEOUT);
+	}	
 
+	public boolean clickIfPresent(final ExtendedWebElement extWebElement, long maxWait)
+	{
+		boolean result;
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(driver, maxWait, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					if (extWebElement.getElement().isDisplayed()){
+						String msg = Messager.ELEMENT_CLICKED.info(extWebElement.getName());
+						summary.log(msg);
+						extWebElement.getElement().click();
+					}
+					return true;
+				}
+			});
+			result = true;
+		}
+		catch (Exception e)
+		{
+			result = false;
+		}
+		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return result;
+	}	
 	/**
 	 * Safe click on element, used to reduce any problems with that action.
 	 * 
@@ -445,6 +490,76 @@ public class DriverHelper
 			}
 		}
 	}
+	
+	
+	/**
+	 * Double Clicks on element.
+	 * 
+	 * @param element
+	 *            to click.
+	 */
+	public void doubleClick(final ExtendedWebElement extendedWebElement)
+	{
+		isElementPresent(extendedWebElement);
+		doubleClickSafe(extendedWebElement, true);
+		String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(extendedWebElement.getName());
+		summary.log(msg);
+		try
+		{
+			TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		}
+		catch (Exception e)
+		{
+			LOGGER.info(e.getMessage());
+		}
+	}
+
+	public void doubleClick(String controlInfo, WebElement control)
+	{
+		doubleClick(new ExtendedWebElement(control, controlInfo));
+	}
+	
+	/**
+	 * Safe doubleClick on element, used to reduce any problems with that action.
+	 * 
+	 * @param elementName
+	 * @param element
+	 * @param startTimer
+	 */
+	private void doubleClickSafe(final ExtendedWebElement extendedWebElement, boolean startTimer)
+	{
+		Actions action = new Actions(driver);
+
+		if (startTimer)
+		{
+			timer = System.currentTimeMillis();
+		}
+		try
+		{
+			Thread.sleep(RETRY_TIME);
+			action.moveToElement(extendedWebElement.getElement()).doubleClick().build().perform();
+		}
+		catch (UnhandledAlertException e)
+		{
+			driver.switchTo().alert().accept();
+		}
+		catch (Exception e)
+		{
+			if (e.getMessage().contains("Element is not clickable"))
+			{
+				scrollTo(extendedWebElement);
+			}
+
+			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
+			{
+				doubleClickSafe(extendedWebElement, false);
+			}
+			else
+			{
+				Assert.fail(Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator()));
+			}
+		}
+	}	
 
 	/**
 	 * Sends enter to element.
