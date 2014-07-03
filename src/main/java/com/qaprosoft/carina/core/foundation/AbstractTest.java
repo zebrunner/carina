@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -159,14 +157,17 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
 		    
-		    if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE))
+/*		    if (Configuration.getBoolean(Parameter.DEPENDENT_MODE))
 		    {
 		    	LOG.info("Driver is initializing in single mode.");
 		    	driver = DriverFactory.create(context.getSuite().getName());
 	    		setDriver(driver);
-	    		//createdDrivers.add(driver);
-
-		    }
+	    		
+		    	String sessionId = DriverPool.registerDriverSession(driver);
+		    	context.setAttribute(SpecialKeywords.SESSION_ID, sessionId);
+	    		//context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
+				initSummary(sessionId);
+		    }*/
 		    
 		}
 		catch (Exception e)
@@ -183,20 +184,73 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{
-		    xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
+		    //xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
+		    String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
 
 		    if (isUITest())
 		    {
-		    	if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
-		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
-		    		//driver = DriverFactory.create(xmlTest.getName());
+		    	if (getDriver() == null) {
+			    	if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {	
+				    	LOG.warn("Driver is initializing in scenario tests mode.");
+			    	}
+			    	driver = DriverFactory.create(test);
 		    		setDriver(driver);
+		    		
+			    	String sessionId = DriverPool.registerDriverSession(driver);
+			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
+					initSummary(driver);			    	
+		    	} else {
+		    		if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+		    			LOG.error("Driver still exists in atomic test mode!");
+		    		}
 		    	}
-				xmlTest.addParameter(SpecialKeywords.SESSION_ID, DriverPool.registerDriverSession(driver));
+		    	if (browserVersion.isEmpty())
+		    		browserVersion = DriverFactory.getBrowserVersion(getDriver());		    	
+/*		    	
 		    	
-		    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, ((RemoteWebDriver) driver).getSessionId().toString());
-				initSummary(driver);
-				browserVersion = DriverFactory.getBrowserVersion(driver);
+		    	
+		    	if (Configuration.getBoolean(Parameter.DEPENDENT_MODE)) {
+		    		//initialize driver during first @Before<ethod execution
+		    		if (getDriver() == null) {
+				    	LOG.info("Driver is initializing in scenario based mode.");
+				    	driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+			    		setDriver(driver);
+			    		
+				    	String sessionId = DriverPool.registerDriverSession(driver);
+				    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
+						initSummary(sessionId);
+		    		}
+		    		else {
+			    		String sessionId = xmlTest.getParameter(SpecialKeywords.SESSION_ID);
+			    		driver = DriverPool.getDriverBySessionId(sessionId);
+			    		//setDriver(driver);		    			
+		    		}
+			    } else {
+		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+		    		setDriver(driver);
+		    		String sessionId = DriverPool.registerDriverSession(driver);
+			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
+					initSummary(sessionId);
+		    	
+			    }*/
+		    	
+	    	
+		    	
+/*		    	if (!Configuration.getBoolean(Parameter.DEPENDENT_MODE)) {
+		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
+		    		setDriver(driver);
+		    		String sessionId = DriverPool.registerDriverSession(driver);
+			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
+					initSummary(sessionId);
+					browserVersion = DriverFactory.getBrowserVersion(driver);
+		    	}
+		    	else {
+		    		//String sessionId = context.getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
+		    		String sessionId = (String) context.getAttribute(SpecialKeywords.SESSION_ID);
+		    		driver = DriverPool.getDriverBySessionId(sessionId);
+		    		//setDriver(driver);
+		    	}*/
+		    	
 		    }
 		    TEST_EXECUTER_LOG = executionContext.initBeforeTest(xmlTest.getName());
 		    apiMethodBuilder = new APIMethodBuilder();
@@ -252,7 +306,7 @@ public abstract class AbstractTest extends DriverHelper
 
 			try
 			{
-				if (!Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE)) {
+				if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
 					quitDriver();
 				}
 			}
@@ -327,7 +381,7 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{
-			if (Configuration.getBoolean(Parameter.DRIVER_SINGLE_MODE) && isUITest() && getDriver() != null) {
+			if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE) && isUITest() && getDriver() != null) {
 				try
 				{
 					quitDriver();
@@ -340,24 +394,43 @@ public abstract class AbstractTest extends DriverHelper
 			}
 		    executionContext.finilizeAfterSuite();
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
-	
+
+		    String deviceName = "Desktop";
+		    String browser = Configuration.get(Parameter.BROWSER);
+		    if (!browserVersion.isEmpty()) {
+		    	browser = browser + " " + browserVersion;
+		    }
+		    
+		    String driverTitle = browser;
+		    
+		    if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile") || Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile_grid")) {
+		    	deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
+		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null")) {
+		    			browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
+		    			driverTitle = driverTitle + "/" + browser;
+		    	}
+		    	else {
+		    		browser = "";
+		    	}		    		
+		    }
+		    
 		    String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 	
-		    String eTitle = null;
+		    String title = null;
 		    if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName()))
 		    {
 				String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? context.getSuite().getXmlSuite().getName() : Configuration
 					.get(Parameter.SUITE_NAME);
 				String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
 					.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
-				eTitle = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-						xmlFile, env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
+				title = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+						xmlFile, env, driverTitle);			
 		    }
 		    else
 		    {
 				String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
-				eTitle = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-						env, Configuration.get(Parameter.BROWSER) + " " + browserVersion);			
+				title = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
+						env, driverTitle);			
 		    }
 		    
 		    ReportContext.getTempDir().delete();
@@ -366,12 +439,12 @@ public abstract class AbstractTest extends DriverHelper
 		    Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 	
 		    // Generate email report
-		    EmailReportGenerator report = new EmailReportGenerator(eTitle, env, Configuration.get(Parameter.APP_VERSION),
-				    Configuration.get(Parameter.BROWSER) + " " + browserVersion, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
+		    EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),
+		    		deviceName, browser, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
 				    EmailReportItemCollector.getCreatedItems());	    
 	
 		    // Send report for specified emails
-		    EmailManager.send(eTitle, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
+		    EmailManager.send(title, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
 			    Configuration.get(Parameter.SENDER_PASSWORD));
 	
 		    printExecutionSummary(EmailReportItemCollector.getTestResults());
