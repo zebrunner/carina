@@ -54,7 +54,7 @@ public class ExtendedWebElement
 
 	public String getName()
 	{
-		return name;
+		return name !=null ? name : String.format(" (%s)", by);
 	}
 	
 	public String getNameWithLocator()
