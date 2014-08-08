@@ -24,6 +24,7 @@ public class SpecialKeywords
 {
 	public static final String IGNORE = "$ignore";
 	public static final String GENERATE = "\\{generate:\\d*\\}";
+	public static final String GENERATE_UUID = "\\{generate_uuid\\}";
 	public static final String GENERATEAN = "\\{generatean:\\d*\\}";
 	public static final String TESTDATA = "\\{testdata:.*\\}";
 	public static final String ENV = "\\{env:.*\\}";
@@ -33,15 +34,19 @@ public class SpecialKeywords
 	
 	public static final String EXCEL_DS_ARGS = "{excel_ds_args}";
 	public static final String EXCEL_DS_UID = "{excel_ds_uid}";
+	public static final String EXCEL_DS_JIRA = "{excel_ds_jira}";
 	public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
 	public static final String EXCEL_DS_FILE = "{excel_ds_file}";
 	public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
 	public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
+	public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
 	public static final String TUID = "TUID";
 	
 	public static final String TEST_LOG_ID = "{test_log_id}";
 	
 	public static final String JIRA_TICKET = "JIRA#";
 	public static final String SESSION_ID = "sessionId";
+	public static final String INITIALIZATION_FAILURE = "initializeFailure";
+	public static final String UUID = "UUID";
 	
 }
