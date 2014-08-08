@@ -32,6 +32,7 @@ import org.openqa.selenium.WebDriver;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -74,7 +75,10 @@ public class Screenshot
 				String fileID = test.replaceAll(" ", "_") + "-" + System.currentTimeMillis();
 				screenName = fileID + ".png";
 				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
-				File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+				WebDriver augmentedDriver = new DriverAugmenter().augment(driver);
+				
+				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
+				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1 && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1){
 					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
@@ -90,7 +94,13 @@ public class Screenshot
 			}
 			catch (IOException e)
 			{
-				LOGGER.error("Problems with screenshot capturing!");
+				LOGGER.error("Unable to capture screenshot due to the I/O issues!");
+				//e.printStackTrace();
+			}
+			catch (Exception e)
+			{
+				LOGGER.error("Unable to capture screenshot!");
+				//e.printStackTrace();
 			}
 		}
 		return screenName;
