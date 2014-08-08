@@ -46,6 +46,13 @@ public class EmailManager
 
 	public static void send(String subject, String emailContent, String adresses, String senderEmail, String senderPswd)
 	{
+		//verify that provided list of addresses is valid and don't send email if
+		//<5 char long and does NOT contain "@"
+		if (!adresses.contains("@") || adresses.length() <5) {
+			LOGGER.warn("Invalid email address(es) are specified: '" + adresses + "'. Email report can't be sent!");
+			return;
+		}
+		
 		Properties props = new Properties();
 		props.put("mail.smtp.host", R.EMAIL.get("mail.smtp.host"));
 		props.put("mail.smtp.auth", R.EMAIL.get("mail.smtp.auth"));
@@ -87,7 +94,6 @@ public class EmailManager
 		catch (MessagingException e)
 		{
 			LOGGER.info("Email with reports was NOT send: " + e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
