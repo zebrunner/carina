@@ -105,7 +105,7 @@ public class Configuration
 		SENDER_EMAIL("sender_email", "default_sender_email"),
 
 		SENDER_PASSWORD("sender_pswd", "default_sender_pswd"),
-
+		
 		RETRY_COUNT("retry_count", "default_retry_count"),
 
 		LOCALE("locale", "default_locale"),
