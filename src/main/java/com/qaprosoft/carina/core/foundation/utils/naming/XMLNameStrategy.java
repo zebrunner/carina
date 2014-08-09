@@ -43,8 +43,8 @@ public class XMLNameStrategy implements INamingStrategy
 		
 		String testName = "";
 		
-		String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));		
 		if (testnameMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
 			if (testnameMap.containsKey(testHash)) {
 				testName = testnameMap.get(testHash);
 			}
@@ -54,13 +54,14 @@ public class XMLNameStrategy implements INamingStrategy
 			testName = result.getTestContext().getCurrentXmlTest().getName();
 		
 		
-		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER)) {
+		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
+				result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
 			//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
 			String methodUID = "";
 			for (int i=0; i<result.getParameters().length; i++) {
 				  if (result.getParameters()[i] != null) {
 					  if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
-					  methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+						  methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
 					  }
 				  }
 			}
