@@ -117,21 +117,6 @@ public class XLSDSBean
 		return StringUtils.removeEnd(sb.toString(), "; ");
 	}
 	
-/*	public String uidArgsToString(Map<String, String> params)
-	{
-		if(uidArgs.size() == 0)
-		{
-			return "";
-		}
-		StringBuilder sb = new StringBuilder();
-		for(String arg : uidArgs)
-		{
-			if(SpecialKeywords.TUID.equals(arg)) continue;
-			sb.append(String.format("%s=%s; ", arg, params.get(arg)));
-		}
-		return StringUtils.removeEnd(sb.toString(), "; ");
-	}	*/
-	
 	public String setDataSorceUUID(String testName, Map<String, String> params)
 	{
 		
@@ -148,28 +133,6 @@ public class XLSDSBean
 			}
 		}		
 		
-/*		//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
-		String methodUID = "";
-		Iterator<Entry<String, String>> entries = params.entrySet().iterator();
-		while (entries.hasNext()) {
-		  Entry<String, String> thisEntry = (Entry<String, String>) entries.next();
-		  
-		  //Object key = thisEntry.getKey();
-		  if (thisEntry.getValue().toString().contains(SpecialKeywords.TUID + ":")) {
-			  methodUID = thisEntry.getValue().toString().replace(SpecialKeywords.TUID + ":", "");
-		  }
-		}
-		
-		if (!methodUID.isEmpty())
-			testName = methodUID + " - " + testName;	*/			
-
-	
 		return testName;
 	}	
-	
-
-	
-
-
-
 }
