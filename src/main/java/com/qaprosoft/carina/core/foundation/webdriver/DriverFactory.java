@@ -17,11 +17,11 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jfree.util.Log;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -29,17 +29,15 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.android.AndroidNativeDriver;
-
-import org.openqa.selenium.Capabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.appium.AppiumNativeDriver;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -56,18 +54,20 @@ public class DriverFactory
 	public static final String SELENDROID = "Selendroid";
 	public static final String MOBILE_GRID = "mobile_grid";
 	public static final String MOBILE = "mobile";
+	
+	private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
 	/**
-	 * Creates diver instance for specified test.
+	 * Creates driver instance for specified test.
 	 * 
 	 * @param testName
 	 *            in which driver will be used
-	 * @return WebDriver instance
+	 * @return RemoteWebDriver instance
 	 * @throws MalformedURLException 
 	 */
 	public static synchronized WebDriver create(String testName)
 	{
-		WebDriver driver = null;
+		RemoteWebDriver driver = null;
 		DesiredCapabilities capabilities = null;
 		try
 		{
@@ -140,6 +140,28 @@ public class DriverFactory
 			        
 			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
 				}
+				else
+				{
+					//Mobile Web App
+					capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME)); //iOS
+					if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase("iOS")) {
+						capabilities.setCapability("platform", "MAC");
+					}
+					else {
+						capabilities.setCapability("platform", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
+					}
+			        
+			        capabilities.setCapability("version", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
+			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
+			        
+			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null")) {
+				        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
+				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
+			        }
+			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
+			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
+				}					
+					
 			}
 			else if (SELENDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
@@ -150,19 +172,23 @@ public class DriverFactory
 				capabilities = getChromeCapabilities(testName);
 			}
 
-			if (ANDROID.equalsIgnoreCase(Configuration.get(Parameter.MOBILE_PLATFORM_NAME)))
+			if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(MOBILE.toLowerCase()))
 			{
-				driver = new AndroidNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
-				driver = new Augmenter().augment(driver);
+				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
+				driver = new AppiumNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
 				return driver;
 			} else {		
 				driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
-				driver = new Augmenter().augment(driver);
 			}
 		}
 		catch (MalformedURLException e)
 		{
-			throw new RuntimeException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST));
+			//throw new RuntimeException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST));
+	    	throw new SkipException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST) + "\r\nTest will be SKIPPED due to the\r\n" + e.getMessage());			
+		}
+		catch (Exception e)
+		{
+	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
 		}
 		
 		return driver;
@@ -181,7 +207,7 @@ public class DriverFactory
 		
 	}
 
-	private static DesiredCapabilities getFirefoxCapabilities(String testName) throws MalformedURLException
+	private static synchronized DesiredCapabilities getFirefoxCapabilities(String testName) throws MalformedURLException
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
@@ -190,11 +216,26 @@ public class DriverFactory
 		FirefoxProfile profile = new FirefoxProfile();
 		
 		//AUTO-411 eTAF randomly fails a test with 'Unable to bind to locking port 7054 within 45000 ms' error 
-		//trying to workaround generating random port for each session 
-		int newPort=PortProber.findFreePort();
+		//trying to workaround generating random port for each session
+		//also exclude already bind ports for current execution in firefoxPorts array
+		boolean generated = false;
+		int newPort = 7055;
+		int i = 100;
+		while (!generated && (--i > 0)) {
+			newPort = PortProber.findFreePort();
+			generated = firefoxPorts.add(newPort);
+		}
+		if (!generated) {
+			newPort = 7055;
+		}
+		//limitation not to use last 20 ports for FF binding
+		if (firefoxPorts.size() > 20) {
+			firefoxPorts.remove(0);
+		}
+		System.out.println(firefoxPorts);
+		
 		profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
-		Log.info("FireFox profile will use '" + newPort + "' port numer.");
-        
+		System.out.println("FireFox profile will use '" + newPort + "' port numer.");
         
 		profile.setPreference("dom.max_chrome_script_run_time", 0);
 		profile.setPreference("dom.max_script_run_time", 0);
@@ -241,68 +282,6 @@ public class DriverFactory
 		capabilities.setJavascriptEnabled(true);
 		return capabilities;
 	}
-/*
-	private static DesiredCapabilities getIOSCapabilities(String testName) throws MalformedURLException
-	{
-		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
-		capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_OS));
-		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE));
-		capabilities.setCapability(CapabilityType.VERSION, Configuration.get(Parameter.MOBILE_VERSION));
-		capabilities.setCapability(CapabilityType.PLATFORM, Configuration.get(Parameter.MOBILE_PLATFORM));
-		if(!SAFARI.equals(Configuration.get(Parameter.MOBILE_APP)) && !new File(Configuration.get(Parameter.MOBILE_APP)).exists())
-		{
-			throw new InvalidArgsException("No application found: " + Configuration.get(Parameter.MOBILE_APP));
-		}
-		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
-		capabilities.setCapability("name", testName);
-		return capabilities;
-	}
-	
-	private static DesiredCapabilities getIOSWebCapabilities(String testName) throws MalformedURLException
-	{
-		DesiredCapabilities capabilities = new DesiredCapabilities();
-		
-		//capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_OS));
-		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE)); //iPhone Simulator
-		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP)); //Safari
-		capabilities.setCapability("name", testName);
-		return capabilities;
-	}
-	
-	
-	private static DesiredCapabilities getAndroidCapabilities(String testName) throws MalformedURLException
-	{
-		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
-		
-		capabilities.setCapability("device", Configuration.get(Parameter.MOBILE_DEVICE));
-		capabilities.setCapability(CapabilityType.VERSION, Configuration.get(Parameter.MOBILE_VERSION));
-		capabilities.setCapability(CapabilityType.PLATFORM, Configuration.get(Parameter.MOBILE_PLATFORM));
-
-		capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
-		capabilities.setCapability("app-package", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-		capabilities.setCapability("app-activity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
-
-		
-		if (!Configuration.isNull(Parameter.MOBILE_BROWSER))
-			capabilities.setCapability(CapabilityType.BROWSER_NAME, Configuration.get(Parameter.MOBILE_BROWSER));
-
-		
-		if (!Configuration.isNull(Parameter.MOBILE_NEW_COMMAND_TIMEOUT))
-			capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));
-
-		capabilities.setCapability("name", testName);
-		return capabilities;
-	}
-
-	
-	private static DesiredCapabilities getAndroidWebCapabilities(String testName) throws MalformedURLException
-	{
-		DesiredCapabilities capabilities = DesiredCapabilities.android();
-		//capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
-		capabilities.setCapability("name", testName);
-		return capabilities;
-	}	
-	*/
 	
 	private static DesiredCapabilities getSelendroidCapabilities(String testName) throws MalformedURLException
 	{
