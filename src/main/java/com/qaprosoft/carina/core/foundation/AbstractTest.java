@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -63,9 +61,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.L18n;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
@@ -88,13 +86,11 @@ import com.qaprosoft.testexecuter.client.TestExecuterClient;
 public abstract class AbstractTest extends DriverHelper
 {
 	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
+	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
     protected static final Logger LOG = Logger.getLogger(AbstractTest.class);
 
     protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
-
-	private static ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>();
-	//private static List<WebDriver> createdDrivers = Collections.synchronizedList(new ArrayList<WebDriver>());
 
 	
     // Test-Executer integration items
@@ -103,19 +99,18 @@ public abstract class AbstractTest extends DriverHelper
 
     protected APIMethodBuilder apiMethodBuilder;
     private String browserVersion = "";
-    private String initializationFailure = "";
     
-	private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
+	/*private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
 	private static Pattern GENERATEAN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEAN);
 	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
 	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
 	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
 	//private static Pattern EXCEL_PATTERN = Pattern.compile(SpecialKeywords.EXCEL);    
-	private static Matcher matcher;
+	private static Matcher matcher;*/
 	
 
     @BeforeSuite(alwaysRun = true)
-    public void executeBeforeSuite(ITestContext context)
+    public void executeBeforeSuite(ITestContext context) throws Throwable
     {
 		try
 		{
@@ -156,45 +151,34 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
-		    
-/*		    if (Configuration.getBoolean(Parameter.DEPENDENT_MODE))
-		    {
-		    	LOG.info("Driver is initializing in single mode.");
-		    	driver = DriverFactory.create(context.getSuite().getName());
-	    		setDriver(driver);
-	    		
-		    	String sessionId = DriverPool.registerDriverSession(driver);
-		    	context.setAttribute(SpecialKeywords.SESSION_ID, sessionId);
-	    		//context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
-				initSummary(sessionId);
-		    }*/
-		    
 		}
-		catch (Exception e)
+		catch (Throwable thr)
 		{
-		    LOG.error("Exception in executeBeforeSuite");
-		    initializationFailure = e.getMessage();
-		    e.printStackTrace();
+			context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
+			throw thr;
 		}
 
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Exception
+    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
 		try
 		{
-		    //xmlTest.addParameter(SpecialKeywords.TEST_LOG_ID, UUID.randomUUID().toString());
 		    String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
 
 		    if (isUITest())
 		    {
 		    	if (getDriver() == null) {
 			    	if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {	
+			    		// TODO Implement logic to Skip Test if secondary etc test hasn't driver 
 				    	LOG.warn("Driver is initializing in scenario tests mode.");
 			    	}
+			    	LOGGER.info("-------------------------------------- Driver Factory start ----------------------------------");
 			    	driver = DriverFactory.create(test);
-		    		setDriver(driver);
+		    		setDriver(driver);		    		
+			    	LOGGER.info("-------------------------------------- Driver Factory finish ---------------------------------");		    		
+		    		
 		    		
 			    	String sessionId = DriverPool.registerDriverSession(driver);
 			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
@@ -206,66 +190,16 @@ public abstract class AbstractTest extends DriverHelper
 		    	}
 		    	if (browserVersion.isEmpty())
 		    		browserVersion = DriverFactory.getBrowserVersion(getDriver());		    	
-/*		    	
-		    	
-		    	
-		    	if (Configuration.getBoolean(Parameter.DEPENDENT_MODE)) {
-		    		//initialize driver during first @Before<ethod execution
-		    		if (getDriver() == null) {
-				    	LOG.info("Driver is initializing in scenario based mode.");
-				    	driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
-			    		setDriver(driver);
-			    		
-				    	String sessionId = DriverPool.registerDriverSession(driver);
-				    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-						initSummary(sessionId);
-		    		}
-		    		else {
-			    		String sessionId = xmlTest.getParameter(SpecialKeywords.SESSION_ID);
-			    		driver = DriverPool.getDriverBySessionId(sessionId);
-			    		//setDriver(driver);		    			
-		    		}
-			    } else {
-		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
-		    		setDriver(driver);
-		    		String sessionId = DriverPool.registerDriverSession(driver);
-			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-					initSummary(sessionId);
-		    	
-			    }*/
-		    	
-	    	
-		    	
-/*		    	if (!Configuration.getBoolean(Parameter.DEPENDENT_MODE)) {
-		    		driver = DriverFactory.create(TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
-		    		setDriver(driver);
-		    		String sessionId = DriverPool.registerDriverSession(driver);
-			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-					initSummary(sessionId);
-					browserVersion = DriverFactory.getBrowserVersion(driver);
-		    	}
-		    	else {
-		    		//String sessionId = context.getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
-		    		String sessionId = (String) context.getAttribute(SpecialKeywords.SESSION_ID);
-		    		driver = DriverPool.getDriverBySessionId(sessionId);
-		    		//setDriver(driver);
-		    	}*/
-		    	
 		    }
 		    TEST_EXECUTER_LOG = executionContext.initBeforeTest(xmlTest.getName());
 		    apiMethodBuilder = new APIMethodBuilder();
 		}
-		catch (Exception e)
+		catch (Throwable thr)
 		{
-		    LOG.error("Exception in executeBeforeTestMethod");
-		    initializationFailure = e.getMessage();
-			
-            StackTraceElement[] elems = e.getStackTrace();
-	        for (StackTraceElement elem : elems) {
-	        	initializationFailure = initializationFailure + "\n" + elem.toString();
-            }
-		    
-		    e.printStackTrace();
+			LOGGER.error(thr.getMessage());
+			thr.printStackTrace();
+		    context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
+		    throw thr;
 		}
     }
 
@@ -274,7 +208,6 @@ public abstract class AbstractTest extends DriverHelper
     {
 	try
 	{
-		
 		String testName = TestNamingUtil.getCanonicalTestName(result);
 
 		GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
@@ -286,10 +219,7 @@ public abstract class AbstractTest extends DriverHelper
 	    FileWriter fw = new FileWriter(testLogFile);
 	    
 	    WebDriver drv = getDriver();
-	    if (drv == null && !initializationFailure.isEmpty()) {
-			fw.append("\r\n************************** Initialization logs **************************\r\n\r\n");
-			fw.append(initializationFailure);	    	
-	    }
+
 	    if (isUITest() && drv != null)
 	    {
 			fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
@@ -301,18 +231,11 @@ public abstract class AbstractTest extends DriverHelper
 			}
 			catch (Exception e)
 			{
-			    LOG.error(e.getMessage());
+			    LOG.error("AfterTest - unable to get test logs. " + e.getMessage());
 			}
 
-			try
-			{
-				if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
-					quitDriver();
-				}
-			}
-			catch (Exception e)
-			{
-			    LOG.error(e.getMessage());
+			if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+				quitDriver();
 			}
 	    }
 
@@ -350,7 +273,8 @@ public abstract class AbstractTest extends DriverHelper
 	    }
 	    catch (Exception e)
 	    {
-	    	LOG.error(e.getMessage());
+	    	LOG.error("Error during FileWriter close. " + e.getMessage());
+	    	e.printStackTrace();
 	    }
 
 	    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
@@ -382,16 +306,9 @@ public abstract class AbstractTest extends DriverHelper
 		try
 		{
 			if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE) && isUITest() && getDriver() != null) {
-				try
-				{
-					quitDriver();
-					//quitDrivers();
-				}
-				catch (Exception e)
-				{
-				    LOG.error(e.getMessage());
-				}
+				quitDriver();
 			}
+			
 		    executionContext.finilizeAfterSuite();
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
@@ -461,25 +378,37 @@ public abstract class AbstractTest extends DriverHelper
     {
 		XLSDSBean dsBean = new XLSDSBean(context);
 		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
-
 		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
+		
+		String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
+		
 		int rowIndex = 0;
 		for (Map<String, String> xlsRow : dsData.getDataRows())
 		{
 			String testName = context.getName();
+			
 			args[rowIndex][0] = xlsRow;
 
 		    for (int i=0; i<staticArgs.length; i++){
-		    	args[rowIndex][i + 1] = processParameter(dsBean.getTestParams().get(staticArgs[i])); //zero element is a hashmap 
+		    	args[rowIndex][i + 1] = ParameterGenerator.process(dsBean.getTestParams().get(staticArgs[i]), context.getAttribute(SpecialKeywords.UUID).toString()); //zero element is a hashmap 
 		    }
 		    //update testName adding UID values from DataSource arguments if any
 			testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
 			testNameMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+			
+			//add jira ticket from xls datasource to special hashMap
+			if (jiraColumnName != null) {
+				if (!jiraColumnName.isEmpty()) {
+					jiraTicketsMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow.get(jiraColumnName));
+				}
+			}
+			
 		    rowIndex++;
 		}
 
 		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
+		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
 		
 		return args;
     }
@@ -497,33 +426,43 @@ public abstract class AbstractTest extends DriverHelper
 		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
 		Object[][] args = new Object[dsData.getDataRows().size()][argNames.length];
 		
-		
+		String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
 		
 		int rowIndex = 0;
 		for (Map<String, String> xlsRow : dsData.getDataRows())
 		{
-			String testName = context.getName();			
+			String testName = context.getName();
+			
 		    for (int i = 0; i < argNames.length; i++)
 		    {
 		    	//read one line from xls and set to arguments from DataSource
 				if (dsBean.getArgs().contains(argNames[i]))
 				{
-				    args[rowIndex][i] = processParameter(xlsRow.get(argNames[i]));
+				    args[rowIndex][i] = ParameterGenerator.process(xlsRow.get(argNames[i]), context.getAttribute(SpecialKeywords.UUID).toString());
 				}
 				else
 				{
-				    args[rowIndex][i] = processParameter(dsBean.getTestParams().get(argNames[i]));
+				    args[rowIndex][i] = ParameterGenerator.process(dsBean.getTestParams().get(argNames[i]), context.getAttribute(SpecialKeywords.UUID).toString());
 				}
 		    }
 		    //update testName adding UID values from DataSource arguments if any
 			testName = dsBean.setDataSorceUUID(testName, xlsRow);
+			testNameMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
 			
-			testNameMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);			
+			//add jira ticket from xls datasource to special hashMap
+			if (jiraColumnName != null) {
+				if (!jiraColumnName.isEmpty()) {			
+					jiraTicketsMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow.get(jiraColumnName));
+				}
+			}
+
+			
 		    rowIndex++;
 		}
 		
 		
 		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
+		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
 
 		return args;
     }
@@ -567,24 +506,7 @@ public abstract class AbstractTest extends DriverHelper
 
     protected abstract boolean isUITest();
     
-	public static WebDriver getDriver() {
-		return webDriver.get();
-	}
-	 
-	static void setDriver(WebDriver driver) {
-		webDriver.set(driver);
-	}
 
-    public static void closeDriver() {
-    	webDriver.get().close();
-    	webDriver.remove();
-    }
-    
-    public static void quitDriver() {
-    	webDriver.get().quit();
-    	webDriver.remove();
-    }    
-    
     /*
 	public static synchronized void quitDrivers() {
 
@@ -603,7 +525,7 @@ public abstract class AbstractTest extends DriverHelper
 	}
 	*/
 
-	public static Object processParameter(String param)
+/*	public static Object processParameter(String param)
 	{
 		try
 		{
@@ -648,14 +570,14 @@ public abstract class AbstractTest extends DriverHelper
 				return StringUtils.replace(param, matcher.group(), R.TESTDATA.get(key));
 			}
 
-/*			matcher = EXCEL_PATTERN.matcher(param);
+			matcher = EXCEL_PATTERN.matcher(param);
 			if (matcher.find())
 			{
 				int start = param.indexOf(":") + 1;
 				int end = param.indexOf("}");
 				String key = param.substring(start, end);
 				return StringUtils.replace(param, matcher.group(), getValueFromXLS(key));
-			}*/
+			}
 			
 			matcher = L18N_PATTERN.matcher(param);
 			if (matcher.find())
@@ -671,5 +593,5 @@ public abstract class AbstractTest extends DriverHelper
 			LOGGER.error(e.getMessage());
 		}
 		return param;
-	}    
+	}*/    
 }
