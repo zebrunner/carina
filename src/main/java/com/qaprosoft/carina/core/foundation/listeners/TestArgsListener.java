@@ -16,21 +16,12 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.L18n;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
 
 /*
  * Test arguments listener is responsible for processing test parameters with wildcards.
@@ -39,8 +30,9 @@ import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
  */
 public class TestArgsListener extends TestListenerAdapter
 {
-	private static final Logger LOGGER = Logger.getLogger(TestArgsListener.class);
+/*	private static final Logger LOGGER = Logger.getLogger(TestArgsListener.class);
 
+	private static Pattern GENERATE_UUID_PATTERN = Pattern.compile(SpecialKeywords.GENERATE_UUID);
 	private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
 	private static Pattern GENERATEAN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEAN);
 	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
@@ -50,7 +42,7 @@ public class TestArgsListener extends TestListenerAdapter
 	//private static String NULL = "NULL";
 
 	private static Matcher matcher;
-
+*/
 	@Override
 	public void onTestStart(ITestResult result)
 	{
@@ -60,7 +52,7 @@ public class TestArgsListener extends TestListenerAdapter
 			{
 				if (result.getParameters()[i] instanceof String)
 				{
-					result.getParameters()[i] = processParameter(result.getParameters()[i].toString());
+					result.getParameters()[i] = ParameterGenerator.process(result.getParameters()[i].toString(), result.getTestContext().getAttribute(SpecialKeywords.UUID).toString());
 				}
 				
 				if (result.getParameters()[i] instanceof Map)
@@ -68,7 +60,7 @@ public class TestArgsListener extends TestListenerAdapter
 					@SuppressWarnings("unchecked")
 					Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
 					for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
-						Object param = processParameter(entry.getValue());
+						Object param = ParameterGenerator.process(entry.getValue(), result.getTestContext().getAttribute(SpecialKeywords.UUID).toString());
 						if (param != null)
 							dynamicAgrs.put(entry.getKey(), param.toString());
 						else
@@ -79,7 +71,7 @@ public class TestArgsListener extends TestListenerAdapter
 		}
 	}
 
-	public static Object processParameter(String param)
+/*	public static Object processParameter(String param, String UUID)
 	{
 		try
 		{
@@ -88,6 +80,11 @@ public class TestArgsListener extends TestListenerAdapter
 				return null;
 			}
 
+			matcher = GENERATE_UUID_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				return StringUtils.replace(param, matcher.group(), UUID);
+			}
 			matcher = GENERATE_PATTERN.matcher(param);
 			if (matcher.find())
 			{
@@ -161,5 +158,5 @@ public class TestArgsListener extends TestListenerAdapter
 		String key = xlsSheetKey.split("#")[2];
 
 		return XLSParser.parseValue(xls, sheet, key);
-	}
+	}*/
 }
