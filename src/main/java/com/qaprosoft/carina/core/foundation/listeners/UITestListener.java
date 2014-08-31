@@ -17,9 +17,11 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -38,12 +40,25 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  * 
  * @author Alex Khursevich
  */
+
 public class UITestListener extends AbstractTestListener
 {
 	private static final Logger LOGGER = Logger.getLogger(UITestListener.class);
-
 	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
+	
+    // Dropbox client
+    DropboxClient dropboxClient;	
 
+	@Override
+	public void onStart(ITestContext testContext)
+	{
+		super.onStart(testContext);
+	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
+	    {
+	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
+	    }		
+	}
+	
 	@Override
 	public void onTestStart(ITestResult result)
 	{
@@ -142,7 +157,7 @@ public class UITestListener extends AbstractTestListener
 		}
 		super.onTestSuccess(result);
 	}
-	
+
 	private String takeScreenshot(ITestResult result) 
 	{
 		String screenId = "";
@@ -157,4 +172,5 @@ public class UITestListener extends AbstractTestListener
 		
 		return screenId;
 	}
+		
 }

@@ -239,7 +239,9 @@ public class DriverFactory
         
 		profile.setPreference("dom.max_chrome_script_run_time", 0);
 		profile.setPreference("dom.max_script_run_time", 0);
-		profile.setEnableNativeEvents(false);
+		//profile.setEnableNativeEvents(false);
+		//VD enable native events to support drag&drop using javascript
+		profile.setEnableNativeEvents(true);
 		if (!StringUtils.isEmpty(Configuration.get(Parameter.USER_AGENT)) && !"n/a".equals(Configuration.get(Parameter.USER_AGENT)))
 		{
 			profile.setPreference("general.useragent.override", Configuration.get(Parameter.USER_AGENT));
@@ -265,10 +267,13 @@ public class DriverFactory
 		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
 		
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized"/*, "--ignore-certificate-errors"*/));
+		
+		//capabilities.setCapability(CapabilityType.HAS_NATIVE_EVENTS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
 		ChromeOptions options = new ChromeOptions();
+		
 		options.addArguments("test-type");
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		return capabilities;
