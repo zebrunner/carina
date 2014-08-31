@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -97,6 +98,9 @@ public abstract class AbstractTest extends DriverHelper
     // Test-Executer integration items
     private static ExecutionContext executionContext;
     protected TestDetailsBean TEST_EXECUTER_LOG;
+    
+    //Jira ticket(s)
+    protected List<String> jiraTickets = new ArrayList<String>();
 
     protected APIMethodBuilder apiMethodBuilder;
     private String browserVersion = "";
@@ -218,6 +222,27 @@ public abstract class AbstractTest extends DriverHelper
 	    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
 	    if (!testLogFile.exists()) testLogFile.createNewFile();
 	    FileWriter fw = new FileWriter(testLogFile);
+	    
+	    // Populate JIRA ID
+	    if (jiraTickets.size() == 0) { //it was not redefined in the test
+			if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
+				jiraTickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
+			}
+			if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
+				jiraTickets.add(result.getMethod().getDescription().split("#")[1]); 
+			}
+
+			@SuppressWarnings("unchecked")
+			Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute("jiraTicketsMappedToArgs");		
+			if (testnameJiraMap != null) {
+				String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
+				if (testnameJiraMap.containsKey(testHash)) {
+					jiraTickets.add(testnameJiraMap.get(testHash));
+				}
+			}	    	
+	    }
+		result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
+	    Jira.updateAfterTest(result);
 	    
 	    WebDriver drv = getDriver();
 
@@ -524,4 +549,14 @@ public abstract class AbstractTest extends DriverHelper
 
     protected abstract boolean isUITest();
     
+	protected void setJiraTicket(String ticket) {
+		jiraTickets = new ArrayList<String>();
+		jiraTickets.add(ticket);
+	}
+	protected void setJiraTicket(String[] tickets) {
+		jiraTickets = new ArrayList<String>();
+		for (String ticket : tickets) {
+			jiraTickets.add(ticket);
+		}
+	}
 }
