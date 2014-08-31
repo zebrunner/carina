@@ -64,6 +64,7 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
@@ -100,15 +101,9 @@ public abstract class AbstractTest extends DriverHelper
     protected APIMethodBuilder apiMethodBuilder;
     private String browserVersion = "";
     
-	/*private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
-	private static Pattern GENERATEAN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEAN);
-	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
-	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
-	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
-	//private static Pattern EXCEL_PATTERN = Pattern.compile(SpecialKeywords.EXCEL);    
-	private static Matcher matcher;*/
-	
-
+    private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
+    private int adb_pid;
+    
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeSuite(ITestContext context) throws Throwable
     {
@@ -140,7 +135,7 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	executionContext = ExecutionContext.INSTANCE.initBeforeSuite();
 		    }
-	
+
 		    try
 		    {
 				String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
@@ -173,6 +168,7 @@ public abstract class AbstractTest extends DriverHelper
 			    	if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {	
 			    		// TODO Implement logic to Skip Test if secondary etc test hasn't driver 
 				    	LOG.warn("Driver is initializing in scenario tests mode.");
+				    	
 			    	}
 			    	LOGGER.info("-------------------------------------- Driver Factory start ----------------------------------");
 			    	driver = DriverFactory.create(test);
@@ -182,7 +178,14 @@ public abstract class AbstractTest extends DriverHelper
 		    		
 			    	String sessionId = DriverPool.registerDriverSession(driver);
 			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-					initSummary(driver);			    	
+					initSummary(driver);
+					
+			    	//enable recording if needed
+					if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+						executor.dropFile(SpecialKeywords.VIDEO_FILE_NAME);
+						adb_pid = executor.startRecording(SpecialKeywords.VIDEO_FILE_NAME);
+					}
+					
 		    	} else {
 		    		if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
 		    			LOG.error("Driver still exists in atomic test mode!");
@@ -213,8 +216,6 @@ public abstract class AbstractTest extends DriverHelper
 		GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
     
 	    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
-	    // File soapuiLogFile = new File(ReportContext.getTestDir(test) +
-	    // "/soapui.log");
 	    if (!testLogFile.exists()) testLogFile.createNewFile();
 	    FileWriter fw = new FileWriter(testLogFile);
 	    
@@ -236,6 +237,12 @@ public abstract class AbstractTest extends DriverHelper
 
 			if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
 				quitDriver();
+
+				if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+					executor.stopRecording(adb_pid); //stop recording
+					pause(3); //very often video from device is black. trying to wait before pulling the file
+					executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, ReportContext.getTestDir(testName) + "/video.mp4");
+				}
 			}
 	    }
 
@@ -307,6 +314,12 @@ public abstract class AbstractTest extends DriverHelper
 		{
 			if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE) && isUITest() && getDriver() != null) {
 				quitDriver();
+
+				if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+					executor.stopRecording(adb_pid); //stop recording
+					pause(3); //very often video from device is black. trying to wait before pulling the file
+					executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, ReportContext.getBaseDir() + "/video.mp4");
+				}				
 			}
 			
 		    executionContext.finilizeAfterSuite();
@@ -365,6 +378,11 @@ public abstract class AbstractTest extends DriverHelper
 			    Configuration.get(Parameter.SENDER_PASSWORD));
 	
 		    printExecutionSummary(EmailReportItemCollector.getTestResults());
+		    
+		    if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP)) {
+		    	Assert.fail("Skipped tests detected! Analyze logs to determine possible configuration issues.");
+		    }
+		    	
 		}
 		catch (Exception e)
 		{
@@ -506,92 +524,4 @@ public abstract class AbstractTest extends DriverHelper
 
     protected abstract boolean isUITest();
     
-
-    /*
-	public static synchronized void quitDrivers() {
-
-		LOGGER.info("Drivers are: " + createdDrivers);
-		if (!createdDrivers.isEmpty()) {
-			for (WebDriver driverItem : createdDrivers) {
-				try {
-					driverItem.quit();
-				} catch (Exception e) {
-					// Do nothing
-				}
-
-			}
-		}
-
-	}
-	*/
-
-/*	public static Object processParameter(String param)
-	{
-		try
-		{
-			if (param == null || param.toLowerCase().equals("nil"))
-			{
-				return null;
-			}
-
-			matcher = GENERATE_PATTERN.matcher(param);
-			if (matcher.find())
-			{
-				int start = param.indexOf(":") + 1;
-				int end = param.indexOf("}");
-				int size = Integer.valueOf(param.substring(start, end));
-				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWord(size));
-			}
-			
-			matcher = GENERATEAN_PATTERN.matcher(param);
-			if (matcher.find())
-			{
-				int start = param.indexOf(":") + 1;
-				int end = param.indexOf("}");
-				int size = Integer.valueOf(param.substring(start, end));
-				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWordAN(size));
-			}
-			
-			matcher = ENV_PATTERN.matcher(param);
-			if (matcher.find())
-			{
-				int start = param.indexOf(":") + 1;
-				int end = param.indexOf("}");
-				String key = param.substring(start, end);
-				return StringUtils.replace(param, matcher.group(), Configuration.getEnvArg(key));
-			}
-
-			matcher = TESTDATA_PATTERN.matcher(param);
-			if (matcher.find())
-			{
-				int start = param.indexOf(":") + 1;
-				int end = param.indexOf("}");
-				String key = param.substring(start, end);
-				return StringUtils.replace(param, matcher.group(), R.TESTDATA.get(key));
-			}
-
-			matcher = EXCEL_PATTERN.matcher(param);
-			if (matcher.find())
-			{
-				int start = param.indexOf(":") + 1;
-				int end = param.indexOf("}");
-				String key = param.substring(start, end);
-				return StringUtils.replace(param, matcher.group(), getValueFromXLS(key));
-			}
-			
-			matcher = L18N_PATTERN.matcher(param);
-			if (matcher.find())
-			{
-				int start = param.indexOf(":") + 1;
-				int end = param.indexOf("}");
-				String key = param.substring(start, end);
-				return StringUtils.replace(param, matcher.group(), L18n.getText(key));
-			}
-		}
-		catch (Exception e)
-		{
-			LOGGER.error(e.getMessage());
-		}
-		return param;
-	}*/    
 }

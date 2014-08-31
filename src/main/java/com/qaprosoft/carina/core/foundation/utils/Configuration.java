@@ -169,7 +169,18 @@ public class Configuration
         
 		MOBILE_APP_PACKAGE("mobile_app_package", "default_mobile_app_package"), 
 		
-		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout", "default_mobile_new_command_timeout");
+		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout", "default_mobile_new_command_timeout"),
+		
+		// video recording and uploading to Dropbox
+		MOBILE_DEVICE_UDID("mobile_device_udid", "default_mobile_device_udid"),
+		
+		DROPBOX_ACCESS_TOKEN("dropbox_access_token", "default_dropbox_access_token"), 
+		
+		VIDEO_RECORDING("video_recording", "default_video_recording"),
+		
+		ADB_HOST("adb_host", "default_adb_host"),
+		
+		ADB_PORT("adb_port", "default_adb_port");
 
 		
 		private final String key;

@@ -31,7 +31,7 @@ public class ZipManager
 	public static void unzip(String zip, String extractTo)
 	{
 		Enumeration entries;
-		ZipFile zipFile;
+		ZipFile zipFile = null;
 
 		try
 		{
@@ -53,11 +53,17 @@ public class ZipManager
 						new BufferedOutputStream(new FileOutputStream(extractTo + "/" + entry.getName())));
 			}
 
-			zipFile.close();
-		} catch (IOException ioe)
+		} catch (IOException e)
 		{
-			ioe.printStackTrace();
-			return;
+			e.printStackTrace();
+		} 
+		finally {
+			try {
+				zipFile.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
 		}
 	}
 

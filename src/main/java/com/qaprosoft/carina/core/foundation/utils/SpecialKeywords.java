@@ -48,5 +48,6 @@ public class SpecialKeywords
 	public static final String SESSION_ID = "sessionId";
 	public static final String INITIALIZATION_FAILURE = "initializeFailure";
 	public static final String UUID = "UUID";
+	public static final String VIDEO_FILE_NAME = "/sdcard/test_record.mp4";
 	
 }
