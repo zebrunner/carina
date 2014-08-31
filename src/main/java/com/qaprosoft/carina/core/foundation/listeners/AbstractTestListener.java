@@ -16,9 +16,7 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.jfree.util.Log;
@@ -27,7 +25,6 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -76,26 +73,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
 		
-		
-		// Populate JIRA ID
-		String jiraTicket = "";
-		if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
-			jiraTicket = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET);
-		}
-		if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
-			jiraTicket = result.getMethod().getDescription().split("#")[1]; 
-		}
-
-		@SuppressWarnings("unchecked")
-		Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute("jiraTicketsMappedToArgs");		
-		if (testnameJiraMap != null) {
-			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
-			if (testnameJiraMap.containsKey(testHash)) {
-				jiraTicket = testnameJiraMap.get(testHash);
-			}
-		}
-		
-		result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTicket);
 		String test = TestNamingUtil.getCanonicalTestName(result);
 
 		RetryCounter.initCounter(test);
@@ -107,7 +84,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestSuccess(ITestResult result)
 	{
 		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
-		Jira.updateAfterTest(result);
 		super.onTestSuccess(result);
 	}
 
@@ -137,7 +113,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 				Log.error("GlobalTestLog is NULL! for " + result.toString());
 			}
 		}
-		Jira.updateAfterTest(result);
 		super.onTestFailure(result);
 	}
 	
@@ -239,6 +214,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String group = TestNamingUtil.getPackageName(test);
 		String testName = TestNamingUtil.getCanonicalTestName(test);
 		String linkToLog = ReportContext.getTestLogLink(testName);
+		String linkToVideo = ReportContext.getTestVideoLink(testName);
+		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
 		if(!FileUtils.listFiles(ReportContext.getTestDir(testName), new String[]{"png"}, false).isEmpty()
 			&& Configuration.getBoolean(Parameter.AUTO_SCREENSHOT)
@@ -246,7 +223,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		{
 			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, failReason);
+		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, linkToVideo, failReason);
 		testResultItem.setDescription(description);
 		testResultItem.setJiraTicket((String)test.getAttribute(SpecialKeywords.JIRA_TICKET));
 		return testResultItem;
