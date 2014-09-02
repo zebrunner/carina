@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
@@ -55,8 +56,50 @@ public class DriverFactory
 	public static final String MOBILE_GRID = "mobile_grid";
 	public static final String MOBILE = "mobile";
 	
+	protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
+	
 	private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
+
+/*	public static Object createObject(String className, Object[] args) {
+		Class<?> clazz;
+		Object object = null;
+		try {
+			clazz = Class.forName(className);
+
+			Constructor<?> ctor = clazz.getConstructor(URL.class, Capabilities.class);
+			object = ctor.newInstance(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		return object;
+	}
+*/
+/*	public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host, String driverClass)
+	{
+		RemoteWebDriver driver = null;
+		try {
+			if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(MOBILE.toLowerCase()))
+			{
+				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
+				driver = new AppiumNativeDriver(new URL(selenium_host), capabilities);
+				return driver;
+			} else {		
+				driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
+			}
+		}
+		catch (MalformedURLException e)
+		{
+			//throw new RuntimeException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST));
+	    	throw new SkipException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST) + "\r\nTest will be SKIPPED due to the\r\n" + e.getMessage());			
+		}
+		catch (Exception e)
+		{
+	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
+		}		
+			
+		return driver;
+	}*/
 	/**
 	 * Creates driver instance for specified test.
 	 * 
@@ -73,11 +116,11 @@ public class DriverFactory
 		{
 			if (BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
-				capabilities = getFirefoxCapabilities(testName);
+				capabilities = getFirefoxCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION), Configuration.get(Parameter.USER_AGENT));
 			}
 			else if (BrowserType.IEXPLORE.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
-				capabilities = getInternetExplorerCapabilities(testName);
+				capabilities = getInternetExplorerCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 			else if (HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 			{
@@ -169,7 +212,7 @@ public class DriverFactory
 			}			
 			else
 			{
-				capabilities = getChromeCapabilities(testName);
+				capabilities = getChromeCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 
 			if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(MOBILE.toLowerCase()))
@@ -207,11 +250,13 @@ public class DriverFactory
 		
 	}
 
-	private static synchronized DesiredCapabilities getFirefoxCapabilities(String testName) throws MalformedURLException
-	{
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName) {
+		return getFirefoxCapabilities(testName, "*", Configuration.get(Parameter.USER_AGENT));
+	}
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName, String browserVersion, String userAgent) {
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);		
+		//capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);		
+		capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, browserVersion, testName);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		FirefoxProfile profile = new FirefoxProfile();
 		
@@ -232,39 +277,46 @@ public class DriverFactory
 		if (firefoxPorts.size() > 20) {
 			firefoxPorts.remove(0);
 		}
-		System.out.println(firefoxPorts);
+		LOGGER.info(firefoxPorts);
 		
 		profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
-		System.out.println("FireFox profile will use '" + newPort + "' port numer.");
+		LOGGER.info("FireFox profile will use '" + newPort + "' port number.");
         
 		profile.setPreference("dom.max_chrome_script_run_time", 0);
 		profile.setPreference("dom.max_script_run_time", 0);
 		//profile.setEnableNativeEvents(false);
 		//VD enable native events to support drag&drop using javascript
 		profile.setEnableNativeEvents(true);
-		if (!StringUtils.isEmpty(Configuration.get(Parameter.USER_AGENT)) && !"n/a".equals(Configuration.get(Parameter.USER_AGENT)))
+		if (!StringUtils.isEmpty(userAgent) && !"n/a".equals(userAgent))
 		{
-			profile.setPreference("general.useragent.override", Configuration.get(Parameter.USER_AGENT));
+			profile.setPreference("general.useragent.override", userAgent);
 		}
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 		return capabilities;
 
 	}
 
-	private static DesiredCapabilities getInternetExplorerCapabilities(String testName) throws MalformedURLException
+	public static DesiredCapabilities getInternetExplorerCapabilities(String testName)
+	{
+		return getInternetExplorerCapabilities(testName, "*");
+	}
+	public static DesiredCapabilities getInternetExplorerCapabilities(String testName, String browserVersion)
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		capabilities = initBaseCapabilities(capabilities, BrowserType.IEXPLORE, browserVersion, testName);
 		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		return capabilities;
 	}
 
-	private static DesiredCapabilities getChromeCapabilities(String testName) throws MalformedURLException
+	public static DesiredCapabilities getChromeCapabilities(String testName) {
+		return getChromeCapabilities(testName, "*");
+	}
+	public static DesiredCapabilities getChromeCapabilities(String testName, String browserVersion)
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		capabilities = initBaseCapabilities(capabilities, BrowserType.CHROME, browserVersion, testName);
 		
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized"/*, "--ignore-certificate-errors"*/));
 		
@@ -273,13 +325,12 @@ public class DriverFactory
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
 		ChromeOptions options = new ChromeOptions();
-		
 		options.addArguments("test-type");
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		return capabilities;
 	}
 
-	private static DesiredCapabilities getHtmlUnitCapabilities(String testName) throws MalformedURLException
+	private static DesiredCapabilities getHtmlUnitCapabilities(String testName)
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
 		//capabilities.setBrowserName(BrowserType.CHROME);
@@ -288,23 +339,24 @@ public class DriverFactory
 		return capabilities;
 	}
 	
-	private static DesiredCapabilities getSelendroidCapabilities(String testName) throws MalformedURLException
+	private static DesiredCapabilities getSelendroidCapabilities(String testName)
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.android();
 		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
 	
-	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String... args)
+	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String browserVersion, String testName)
 	{	
 		//platform should be detected and provided into capabilities automatically
 		String platform = Configuration.get(Parameter.PLATFORM);
-		if (!platform.equals("*"))
+		if (!platform.equals("*")) {
 			capabilities.setPlatform(Platform.extractFromSysProperty(platform));
+		}
 
-		capabilities.setBrowserName(args[0]);
-		capabilities.setVersion(args[1]);
-		capabilities.setCapability("name", args[2]);
+		capabilities.setBrowserName(browser);
+		capabilities.setVersion(browserVersion);
+		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
 }

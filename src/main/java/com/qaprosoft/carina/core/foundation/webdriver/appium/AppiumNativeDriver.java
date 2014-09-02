@@ -23,10 +23,10 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 
     private RemoteTouchScreen touch;
 
-    // for resolving IllegalArgumentException during using Augmenter for taking screenshots
+/*    // for resolving IllegalArgumentException during using Augmenter for taking screenshots
     public AppiumNativeDriver() {
     }
-
+*/
     public AppiumNativeDriver(URL remoteAddress, Capabilities desiredCapabilities) {
         super(remoteAddress, desiredCapabilities);
         touch = new RemoteTouchScreen(getExecuteMethod());

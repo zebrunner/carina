@@ -38,6 +38,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
@@ -57,6 +58,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -89,7 +91,7 @@ public abstract class AbstractTest extends DriverHelper
 {
 	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
 	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
-    protected static final Logger LOG = Logger.getLogger(AbstractTest.class);
+    protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
     protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
@@ -108,6 +110,13 @@ public abstract class AbstractTest extends DriverHelper
     private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
     private int adb_pid;
     
+    @BeforeClass(alwaysRun = true)
+    public void executeBeforeClass(ITestContext context) throws Throwable
+    {
+	    //spira logging
+    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
+    }    
+    
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeSuite(ITestContext context) throws Throwable
     {
@@ -118,7 +127,7 @@ public abstract class AbstractTest extends DriverHelper
 		    // Set SoapUI log4j properties
 		    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 	
-		    LOG.info(Configuration.asString());
+		    LOGGER.info(Configuration.asString());
 		    Configuration.validateConfiguration();
 	
 		    ReportContext.removeOldReports();
@@ -148,7 +157,7 @@ public abstract class AbstractTest extends DriverHelper
 		    }
 		    catch (Exception e)
 		    {
-		    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
 		}
 		catch (Throwable thr)
@@ -171,10 +180,14 @@ public abstract class AbstractTest extends DriverHelper
 		    	if (getDriver() == null) {
 			    	if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {	
 			    		// TODO Implement logic to Skip Test if secondary etc test hasn't driver 
-				    	LOG.warn("Driver is initializing in scenario tests mode.");
+				    	LOGGER.warn("Driver is initializing in scenario tests mode.");
 				    	
 			    	}
 			    	LOGGER.info("-------------------------------------- Driver Factory start ----------------------------------");
+/*			    	Object[] arguments = new Object[2];
+			    	arguments[0] = new URL(Configuration.get(Parameter.SELENIUM_HOST));
+			    	arguments[1] = DriverFactory.getFirefoxCapabilities(test);
+					DriverFactory.createObject("org.openqa.selenium.remote.RemoteWebDriver", arguments);*/
 			    	driver = DriverFactory.create(test);
 		    		setDriver(driver);		    		
 			    	LOGGER.info("-------------------------------------- Driver Factory finish ---------------------------------");		    		
@@ -192,7 +205,7 @@ public abstract class AbstractTest extends DriverHelper
 					
 		    	} else {
 		    		if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
-		    			LOG.error("Driver still exists in atomic test mode!");
+		    			LOGGER.error("Driver still exists in atomic test mode!");
 		    		}
 		    	}
 		    	if (browserVersion.isEmpty())
@@ -223,7 +236,10 @@ public abstract class AbstractTest extends DriverHelper
 	    if (!testLogFile.exists()) testLogFile.createNewFile();
 	    FileWriter fw = new FileWriter(testLogFile);
 	    
-	    // Populate JIRA ID
+/*	    //Spira test steps integration
+	    SpiraTestIntegrator.logTestStepsInfo(this.getClass().getName(), result);
+		
+*/	    // Populate JIRA ID
 	    if (jiraTickets.size() == 0) { //it was not redefined in the test
 			if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
 				jiraTickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
@@ -257,7 +273,7 @@ public abstract class AbstractTest extends DriverHelper
 			}
 			catch (Exception e)
 			{
-			    LOG.error("AfterTest - unable to get test logs. " + e.getMessage());
+			    LOGGER.error("AfterTest - unable to get test logs. " + e.getMessage());
 			}
 
 			if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
@@ -305,7 +321,7 @@ public abstract class AbstractTest extends DriverHelper
 	    }
 	    catch (Exception e)
 	    {
-	    	LOG.error("Error during FileWriter close. " + e.getMessage());
+	    	LOGGER.error("Error during FileWriter close. " + e.getMessage());
 	    	e.printStackTrace();
 	    }
 
@@ -327,7 +343,7 @@ public abstract class AbstractTest extends DriverHelper
 	}
 	catch (Exception e)
 	{
-	    LOG.error("Exception in executeAfterTestMethod");
+	    LOGGER.error("Exception in executeAfterTestMethod");
 	    e.printStackTrace();
 	}
     }
@@ -411,7 +427,7 @@ public abstract class AbstractTest extends DriverHelper
 		}
 		catch (Exception e)
 		{
-		    LOG.error("Exception in executeAfterSuite");
+		    LOGGER.error("Exception in executeAfterSuite");
 		    e.printStackTrace();
 		}
     }
@@ -537,12 +553,12 @@ public abstract class AbstractTest extends DriverHelper
 		    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
 		    if (StringUtils.isEmpty(ciTestJob))
 		    {
-		    	LOG.info("Could not connect to Jenkins!");
+		    	LOGGER.info("Could not connect to Jenkins!");
 		    }
 		}
 		else
 		{
-		    	LOG.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
+		    	LOGGER.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
 		}
 		return ciTestJob;
     }

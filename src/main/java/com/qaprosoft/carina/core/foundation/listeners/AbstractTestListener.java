@@ -31,6 +31,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -84,6 +85,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestSuccess(ITestResult result)
 	{
 		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
+		
+	    //Spira test steps integration
+	    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result);		
 		super.onTestSuccess(result);
 	}
 
@@ -104,8 +108,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 			if (globalLog != null) {
 				if (result.getThrowable() != null) {
 					//errorMessage = result.getThrowable().getMessage();
-					errorMessage = getFullStackTrace(result.getThrowable());
-				}				
+					thr = result.getThrowable();
+					errorMessage = getFullStackTrace(thr);
+				}
+				
+			    //Spira test steps integration
+			    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
+			    
 				String msg = Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 				globalLog.log(Type.COMMON, msg);
 			}

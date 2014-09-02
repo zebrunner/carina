@@ -180,7 +180,12 @@ public class Configuration
 		
 		ADB_HOST("adb_host", "default_adb_host"),
 		
-		ADB_PORT("adb_port", "default_adb_port");
+		ADB_PORT("adb_port", "default_adb_port"),
+		
+		// spira
+		SPIRA_RELEASE_ID("spira_release_id", "default_spira_release_id"),
+		
+		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id");
 
 		
 		private final String key;
@@ -302,6 +307,11 @@ public class Configuration
 	{
 		return envArgResolver.get(get(Parameter.ENV), key);
 	}
+	
+/*	public static String getEnvArg(String profile, Parameter param)
+	{
+		return envArgResolver.get(profile, param);
+	}*/
 
 	public static IEnvArgResolver getEnvArgResolver()
 	{
