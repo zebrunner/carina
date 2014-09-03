@@ -1655,7 +1655,7 @@ public class DriverHelper
 	// --------------------------------------------------------------------------
 	// Web Drivers
 	// --------------------------------------------------------------------------
-	public static WebDriver getDriver() {
+	public WebDriver getDriver() {
 		return webDrivers.get();
 	}
 	 
