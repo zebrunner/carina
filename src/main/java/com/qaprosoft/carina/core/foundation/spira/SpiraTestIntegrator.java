@@ -83,7 +83,7 @@ public class SpiraTestIntegrator {
 						}
 						if (!foundFailureStep) {
 							for (String step : steps) {
-								LOGGER.info(SpecialKeywords.SPIRA_TESTSTEP_ID + "::" + step.trim() + "::Failed::" + errorMessage);
+								LOGGER.info(SpecialKeywords.SPIRA_TESTSTEP_ID + "::" + step.trim() + "::N/A::" + errorMessage);
 							}							
 						} else
 						{

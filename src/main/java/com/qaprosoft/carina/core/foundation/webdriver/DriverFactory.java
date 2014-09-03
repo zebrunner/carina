@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class DriverFactory
 	private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
 
-/*	public static Object createObject(String className, Object[] args) {
+	public static Object createObject(String className, Object[] args) {
 		Class<?> clazz;
 		Object object = null;
 		try {
@@ -74,32 +75,23 @@ public class DriverFactory
 		}	
 		return object;
 	}
-*/
-/*	public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host, String driverClass)
+
+	public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host)
 	{
 		RemoteWebDriver driver = null;
 		try {
-			if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(MOBILE.toLowerCase()))
-			{
-				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
-				driver = new AppiumNativeDriver(new URL(selenium_host), capabilities);
-				return driver;
-			} else {		
+			if (capabilities.getCapability("automationName") == null)
 				driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
-			}
-		}
-		catch (MalformedURLException e)
-		{
-			//throw new RuntimeException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST));
-	    	throw new SkipException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST) + "\r\nTest will be SKIPPED due to the\r\n" + e.getMessage());			
+			else		
+				driver = new AppiumNativeDriver(new URL(selenium_host), capabilities);
 		}
 		catch (Exception e)
 		{
-	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
+			LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
 		}		
 			
 		return driver;
-	}*/
+	}
 	/**
 	 * Creates driver instance for specified test.
 	 * 
@@ -114,99 +106,51 @@ public class DriverFactory
 		DesiredCapabilities capabilities = null;
 		try
 		{
-			if (BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			String browser = Configuration.get(Parameter.BROWSER);
+			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
-				capabilities = getFirefoxCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION), Configuration.get(Parameter.USER_AGENT));
+				capabilities = getFirefoxCapabilities(testName, browser, Configuration.get(Parameter.USER_AGENT));
 			}
-			else if (BrowserType.IEXPLORE.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
 				capabilities = getInternetExplorerCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
-			else if (HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (HTML_UNIT.equalsIgnoreCase(browser))
 			{
 				capabilities = getHtmlUnitCapabilities(testName);
 			}
-			else if (MOBILE.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (MOBILE.equalsIgnoreCase(browser))
 			{
-				capabilities = new DesiredCapabilities();				
 				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
 				{
-					//Mobile Web
-			        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_BROWSER_NAME));
-			        capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));
+					capabilities = getMobileWebCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
 				}
 				else {
-					//Mobile App
-			        capabilities.setCapability("browserName", "");
-			        capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null"))
-				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
-			        if (!Configuration.get(Parameter.MOBILE_APP_ACTIVITY).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appActivity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
-			        
-			        if (!Configuration.get(Parameter.MOBILE_APP_PACKAGE).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appPackage", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-			        
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
-			        
+					capabilities = getMobileAppCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
+							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 				}
 			}
-			else if (MOBILE_GRID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (MOBILE_GRID.equalsIgnoreCase(browser))
 			{
-				capabilities = new DesiredCapabilities();				
-				if (Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
+				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
 				{
-					//Mobile App
-			        capabilities.setCapability("platform", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-			        capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-
-			        capabilities.setCapability("version", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null")) {
-				        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        }
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
-			        if (!Configuration.get(Parameter.MOBILE_APP_ACTIVITY).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appActivity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
-			        
-			        if (!Configuration.get(Parameter.MOBILE_APP_PACKAGE).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appPackage", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-			        
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
+					capabilities = getMobileWebCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
 				}
 				else
 				{
-					//Mobile Web App
-					capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME)); //iOS
-					if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase("iOS")) {
-						capabilities.setCapability("platform", "MAC");
-					}
-					else {
-						capabilities.setCapability("platform", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-					}
-			        
-			        capabilities.setCapability("version", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        
-			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null")) {
-				        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        }
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
+					capabilities = getMobileAppCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
+							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 				}					
-					
 			}
-			else if (SELENDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (SELENDROID.equalsIgnoreCase(browser))
 			{
 				capabilities = getSelendroidCapabilities(testName);
 			}			
@@ -215,7 +159,7 @@ public class DriverFactory
 				capabilities = getChromeCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 
-			if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(MOBILE.toLowerCase()))
+			if (browser.toLowerCase().contains(MOBILE.toLowerCase()))
 			{
 				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
 				driver = new AppiumNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
@@ -224,11 +168,6 @@ public class DriverFactory
 				driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
 			}
 		}
-		catch (MalformedURLException e)
-		{
-			//throw new RuntimeException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST));
-	    	throw new SkipException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST) + "\r\nTest will be SKIPPED due to the\r\n" + e.getMessage());			
-		}
 		catch (Exception e)
 		{
 	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
@@ -236,13 +175,59 @@ public class DriverFactory
 		
 		return driver;
 	}
+	
+	public static DesiredCapabilities getMobileAppCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName, 
+			String automationName, String commandTimeout, String app, String appActivity, String appPackage) {
+		return getMobileCapabilities(gridMode, testName, platform, platformVersion, deviceName, automationName, commandTimeout, null, app, appActivity, appPackage);
+	}
+	public static DesiredCapabilities getMobileWebCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName, 
+			String automationName, String commandTimeout, String browserName) {
+		return getMobileCapabilities(gridMode, testName, platform, platformVersion, deviceName, automationName, commandTimeout, browserName, null, null, null);
+	}
+	
+	private static DesiredCapabilities getMobileCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName, 
+			String automationName, String commandTimeout, String browserName, String app, String appActivity, String appPackage) 
+	{
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("platformName", platform); //Parameter.MOBILE_PLATFORM_NAME
+        capabilities.setCapability("platformVersion", platformVersion); //Parameter.MOBILE_PLATFORM_VERSION
+        if (deviceName != null) 
+        	capabilities.setCapability("deviceName", deviceName); //Parameter.MOBILE_DEVICE_NAME
 
+        capabilities.setCapability("automationName", automationName); //Parameter.MOBILE_AUTOMATION_NAME
+        capabilities.setCapability("newCommandTimeout", commandTimeout); //Parameter.MOBILE_NEW_COMMAND_TIMEOUT
+        
+
+        if (gridMode) {
+	        capabilities.setCapability("platform", platform);
+	        capabilities.setCapability("version", platformVersion);
+	        capabilities.setCapability("browserName", deviceName);
+        }
+
+		if (browserName != null) //Mobile Web
+		{
+	        capabilities.setCapability("browserName", browserName);
+	        if (gridMode && platform.equalsIgnoreCase("iOS")) {
+	        	capabilities.setCapability("platform", "MAC");
+	        }
+		}
+		else { //Mobile App
+	        capabilities.setCapability("browserName", "");
+	        capabilities.setCapability("app", app); //Parameter.MOBILE_APP
+	        if (appActivity != null)
+	        	capabilities.setCapability("appActivity", appActivity); //Parameter.MOBILE_APP_ACTIVITY
+	        
+	        if (appPackage != null)
+	        	capabilities.setCapability("appPackage", appPackage); //Parameter.MOBILE_APP_PACKAGE
+		}
+		
+        return capabilities;
+	}
 	public static String getBrowserName(WebDriver driver)
 	{
 		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
 		return cap.getBrowserName().toString();	
 	}
-	
 	public static String getBrowserVersion(WebDriver driver)
 	{
 		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
