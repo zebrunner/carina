@@ -136,6 +136,8 @@ public class Configuration
 		
 		JENKINS_JOB("jenkins_job", "default_jenkins_job"),
 		
+		JENKINS_JOB_URL("jenkins_job_url", "default_jenkins_job_url"),
+		
 		JIRA_UPDATER("jira_updater", "default_jira_updater"),
 		
 		JIRA_URL("jira_url", "default_jira_url"),
