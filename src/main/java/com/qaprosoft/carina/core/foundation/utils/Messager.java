@@ -22,21 +22,36 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.Reporter;
 
-
 /**
  * ReportMessage is used for reporting informational and error messages both
  * using logger and testsNG Reporter.
  * 
  * @author akhursevich
  */
-public enum Messager
-{
-	TEST_STARTED("INFO: TEST [%s] STARTED at [%s]"),
 
-	TEST_PASSED("INFO: TEST [%s] PASSED at [%s]"),
+//TODO: redesign logging and messager too
 
-	TEST_FAILED("INFO: TEST [%s] FAILED at [%s] - %s"),
-	
+public enum Messager {
+	TEST_STARTED(
+			"\r\n" +
+			"======================================================================================================================================\r\n" +
+			"INFO: TEST [%s] STARTED at [%s]"),
+
+	TEST_PASSED(
+			"\r\n" +
+			"INFO: TEST [%s] PASSED at [%s] \r\n" +
+			"======================================================================================================================================"),			
+
+	TEST_SKIPPED(
+			"\r\n" +
+			"INFO: TEST [%s] SKIPPED at [%s] - %s\r\n" +
+			"======================================================================================================================================"),
+			
+	TEST_FAILED(
+			"\r\n" +
+			"INFO: TEST [%s] FAILED at [%s] - %s\r\n" +
+			"======================================================================================================================================"),
+			
 	TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
 	OPEN_URL("INFO: url '%s' is opened."),
@@ -78,6 +93,14 @@ public enum Messager
 	ELEMENT_CLICKED("PASS: element '%s' is clicked."),
 
 	ELEMENT_NOT_CLICKED("FAIL: element '%s' is not clicked!"),
+	
+	ELEMENT_FOUND("PASS: element '%s' is found."),
+
+	ELEMENT_NOT_FOUND("FAIL: element '%s' is not found!"),
+
+	ELEMENT_DOUBLE_CLICKED("PASS: element '%s' is double clicked."),
+
+	ELEMENT_NOT_DOUBLE_CLICKED("FAIL: element '%s' is not double clicked!"),
 
 	ELEMENT_HOVERED("PASS: element '%s' is hovered."),
 
@@ -124,7 +147,7 @@ public enum Messager
 	SELECT_BY_TEXT_PERFORMED("PASS: text '%s' was selected in '%s'."),
 
 	SELECT_BY_TEXT_NOT_PERFORMED("FAIL: text '%s' was NOT selected in '%s'."),
-	
+
 	SELECT_BY_MATCHER_TEXT_PERFORMED("PASS: value by matcher '%s' was selected in '%s'."),
 
 	SELECT_BY_MATCHER_TEXT_NOT_PERFORMED("FAIL: value by matcher '%s' was NOT selected in '%s'."),
@@ -132,28 +155,26 @@ public enum Messager
 	SELECT_BY_INDEX_PERFORMED("PASS: index '%s' was selected in '%s'."),
 
 	SELECT_BY_INDEX_NOT_PERFORMED("FAIL: index '%s' was NOT selected in '%s'."),
-	
+
 	CHECKBOX_CHECKED("PASS: checkbox '%s' was checked."),
 
 	CHECKBOX_UNCHECKED("PASS: index '%s' was unchecked."),
-	
+
 	SLIDER_MOVED("PASS: silder '%s' was moved by offset X:'%s' Y:'%s'."),
 
 	SLIDER_NOT_MOVED("FAIL: silder '%s' was moved by offset X:'%s' Y:'%s'!");
 
 	private static final Logger LOGGER = Logger.getLogger(Messager.class);
-	
+
 	private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
 	private String pattern;
 
-	Messager(String pattern)
-	{
+	Messager(String pattern) {
 		this.pattern = pattern;
 	}
 
-	public String getMessage(String... args)
-	{
+	public String getMessage(String... args) {
 		return create(args);
 	}
 
@@ -164,8 +185,7 @@ public enum Messager
 	 *            for insert into patterns
 	 * @return generated message
 	 */
-	public String info(String... args)
-	{
+	public String info(String... args) {
 		String message = create(args);
 		LOGGER.info(message);
 		return message;
@@ -178,8 +198,7 @@ public enum Messager
 	 *            for insert into patterns
 	 * @return generated message
 	 */
-	public String error(String... args)
-	{
+	public String error(String... args) {
 		String message = create(args);
 		Reporter.log(message);
 		LOGGER.error(message);
@@ -193,8 +212,7 @@ public enum Messager
 	 *            for insert into patterns
 	 * @return generated message
 	 */
-	public String report(String... args)
-	{
+	public String report(String... args) {
 		String message = create(args);
 		Reporter.log(message);
 		return message;
@@ -207,27 +225,22 @@ public enum Messager
 	 *            for insert into pattern
 	 * @return generated message
 	 */
-	private String create(String... args)
-	{
+	private String create(String... args) {
 		String message = "";
-		try
-		{
+		try {
 			// Changes symbols to '*' if starts with 'crypto_'
-			for(int i = 0; i < args.length; i++)
-			{
+			for (int i = 0; i < args.length; i++) {
 				Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
-				if(args[i] != null && matcher.find())
-				{
+				if (args[i] != null && matcher.find()) {
 					int start = args[i].indexOf(":") + 1;
 					int end = args[i].indexOf("}");
 					args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
 				}
 			}
 			message = String.format(pattern, (Object[]) args);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOGGER.error("Report message creation error!");
+			e.printStackTrace();
 		}
 		return message;
 	}

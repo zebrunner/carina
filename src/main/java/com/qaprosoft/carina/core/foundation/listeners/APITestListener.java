@@ -19,6 +19,7 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /*
  * API test listener is responsible for log initialization/finalization and test result generation.
@@ -35,16 +36,43 @@ public class APITestListener extends AbstractTestListener
 	}
 
 	@Override
-	public void onTestSuccess(ITestResult test)
+	public void onTestSuccess(ITestResult result)
 	{
-		EmailReportItemCollector.push(createTestResult(test, TestResultType.PASS, null, test.getMethod().getDescription()));
-		super.onTestSuccess(test);
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
+		super.onTestSuccess(result);
 	}
 
 	@Override
-	public void onTestFailure(ITestResult test)
+	public void onTestFailure(ITestResult result)
 	{
-		EmailReportItemCollector.push(createTestResult(test, TestResultType.FAIL, test.getThrowable().getMessage(), test.getMethod().getDescription()));
-		super.onTestFailure(test);
+		String errorMessage = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
+		}
+		
+		if (result.getThrowable() != null) {
+			errorMessage = getFullStackTrace(result.getThrowable());
+		}
+		
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
+		super.onTestFailure(result);
+	}
+	
+	@Override
+	public void onTestSkipped(ITestResult result)
+	{
+		String errorMessage = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
+		}
+		
+		if (result.getThrowable() != null) {
+			errorMessage = getFullStackTrace(result.getThrowable());
+		}
+		
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));		
+		super.onTestSkipped(result);
 	}
 }

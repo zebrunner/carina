@@ -73,7 +73,6 @@ public class Jira
 			catch(Exception e)
 			{
 				LOG.error("Jira 'updateAfterTest' not performed: " + e.getMessage());
-				e.printStackTrace();
 			}
 		}
 	}
@@ -89,7 +88,6 @@ public class Jira
 			catch(Exception e)
 			{
 				LOG.error("Jira 'updateAfterSuite' not performed: " + e.getMessage());
-				e.printStackTrace();
 			}
 		}
 	}

@@ -22,9 +22,14 @@ import java.util.Map;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
 public class DriverPool
 {
+	static WebDriver single_driver;
 	private static Map<WebDriver, String> driverTestMap = Collections.synchronizedMap(new HashMap<WebDriver, String>());
+//	private static Map<String, WebDriver> testDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
 
 	private static Map<String, WebDriver> sessionIdDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
 
@@ -32,23 +37,36 @@ public class DriverPool
 	{
 		String sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
 		sessionIdDriverMap.put(sessionId, driver);
+		if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+			//init our single driver variable
+			single_driver = driver;
+		}
 		return sessionId;
 	}
 	
 	public static synchronized void associateTestNameWithDriver(String test, WebDriver driver)
 	{
-		//testDriverMap.put(testInClass, driver);
+//		testDriverMap.put(test, driver);
 		driverTestMap.put(driver, test);
 	}
 
 /*	public static synchronized WebDriver getDriverByTestName(String test)
 	{
 		return testDriverMap.get(test);
-	}*/
-
+	}
+*/
 	public static WebDriver getDriverBySessionId(String sessionId)
 	{
-		return sessionIdDriverMap.get(sessionId);
+		WebDriver drv = null;
+		if (sessionIdDriverMap.containsKey(sessionId)) {
+			drv = sessionIdDriverMap.get(sessionId);
+		}
+		else if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+			//init our single driver variable
+			drv = single_driver;
+		}
+		return drv;
+
 	}
 
 	/*public static String getSessionIdByTestName(String test)

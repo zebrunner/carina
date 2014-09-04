@@ -68,7 +68,7 @@ public class Configuration
 
 		SELENIUM_HOST("selenium_host", "default_selenium_host"),
 		
-		DRIVER_SINGLE_MODE("driver_single_mode", "default_driver_single_mode"),
+		TESTS_DEPENDENT_MODE("test_dependent_mode", "default_tests_dependent_mode"),
 		
 		APP_VERSION("app_version", "default_app_version"),
 
@@ -105,7 +105,7 @@ public class Configuration
 		SENDER_EMAIL("sender_email", "default_sender_email"),
 
 		SENDER_PASSWORD("sender_pswd", "default_sender_pswd"),
-
+		
 		RETRY_COUNT("retry_count", "default_retry_count"),
 
 		LOCALE("locale", "default_locale"),
@@ -136,23 +136,7 @@ public class Configuration
 		
 		JENKINS_JOB("jenkins_job", "default_jenkins_job"),
 		
-		MOBILE_OS("mobile_os", "default_mobile_os"),
-		
-		MOBILE_VERSION("mobile_version", "default_mobile_version"),
-		
-		MOBILE_PLATFORM("mobile_platform", "default_mobile_platform"),
-		
-		MOBILE_BROWSER("mobile_browser", "default_mobile_browser"), //Android capability
-		
-		MOBILE_APP("mobile_app", "default_mobile_app"),		
-		
-		MOBILE_APP_PACKAGE("mobile_app_package", "default_mobile_app_package"), //Android capability
-		
-		MOBILE_APP_ACTIVITY("mobile_app_activity", "default_mobile_app_activity"), //Android capability
-		
-		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout", "default_mobile_new_command_timeout"), //Appium capability iOS + Android
-		
-		MOBILE_DEVICE("mobile_device", "default_mobile_device"),
+		JENKINS_JOB_URL("jenkins_job_url", "default_jenkins_job_url"),
 		
 		JIRA_UPDATER("jira_updater", "default_jira_updater"),
 		
@@ -168,8 +152,39 @@ public class Configuration
 
         JIRA_PROJECT_SHORT("jira_project_short", "default_jira_project_short"),
         
-        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket", "default_jira_create_new_ticket");
+        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket", "default_jira_create_new_ticket"),
+        
+        // Appium 1.1.x mobile capabilities: iOS and Android
+        MOBILE_DEVICE_NAME("mobile_device_name", "default_mobile_device_name"), 
+        
+        MOBILE_PLATFORM_NAME("mobile_platform_name", "default_mobile_platform_name"),
+        
+        MOBILE_PLATFORM_VERSION("mobile_platform_version", "default_mobile_platform_version"),
+        
+        MOBILE_BROWSER_NAME("mobile_browser_name", "default_mobile_browser_name"),
+        
+        MOBILE_AUTOMATION_NAME("mobile_automation_name", "default_mobile_automation_name"), // Sendroid 
+        
+        MOBILE_APP("mobile_app", "default_mobile_app"),
+        
+        MOBILE_APP_ACTIVITY("mobile_app_activity", "default_mobile_app_activity"),
+        
+		MOBILE_APP_PACKAGE("mobile_app_package", "default_mobile_app_package"), 
+		
+		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout", "default_mobile_new_command_timeout"),
+		
+		// video recording and uploading to Dropbox
+		MOBILE_DEVICE_UDID("mobile_device_udid", "default_mobile_device_udid"),
+		
+		DROPBOX_ACCESS_TOKEN("dropbox_access_token", "default_dropbox_access_token"), 
+		
+		VIDEO_RECORDING("video_recording", "default_video_recording"),
+		
+		ADB_HOST("adb_host", "default_adb_host"),
+		
+		ADB_PORT("adb_port", "default_adb_port");
 
+		
 		private final String key;
 
 		private final String defaultKey;

@@ -80,6 +80,7 @@ public class DriverHelper
 	protected TestLogHelper summary;
 
 	protected WebDriver driver;
+	private static ThreadLocal<WebDriver> webDrivers = new ThreadLocal<WebDriver>();
 	
 	protected CryptoTool cryptoTool;
 
@@ -116,6 +117,13 @@ public class DriverHelper
 	// Base UI interaction operations
 	// --------------------------------------------------------------------------
 
+	public void setImplicitTimeout(long implicit_wait){
+		getDriver().manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);		
+	}
+	
+	public long getImplicitTimeout(){
+		return Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+	}	
 	/**
 	 * Initializes test log container dedicated to WebDriver instance.
 	 * 
@@ -126,41 +134,111 @@ public class DriverHelper
 		summary = new TestLogHelper(driver);
 	}
 
-	/**
-	 * Check that element present.
-	 * 
-	 * @param element
-	 *            to find.
-	 * @return element existence status.
-	 */
-	public boolean isElementPresent(final ExtendedWebElement extWebElement)
+	protected void initSummary(String sessionId)
 	{
-		boolean result;
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		summary = new TestLogHelper(sessionId);
+	}
+
+	/**
+	 * Find Extended Web Element on page using By.
+	 * 
+	 * @param by
+	 * @param name
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+
+	public ExtendedWebElement findExtendedWebElement(final By by, String name)
+	{
+		return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
+	}
+	/**
+	 * Find Extended Web Element on page using By.
+	 * 
+	 * @param by
+	 * @param name
+	 * @param maxWait
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+
+	public ExtendedWebElement findExtendedWebElement(final By by, String name, long maxWait)
+	{
+		ExtendedWebElement element;
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return extWebElement.getElement().isDisplayed();
+					return !drv.findElements(by).isEmpty();
 				}
 			});
-			result = true;
-			summary.log(Messager.ELEMENT_PRESENT.info(extWebElement.getName()));
+			element = new ExtendedWebElement(driver.findElement(by), name, by);
+			summary.log(Messager.ELEMENT_FOUND.info(name));
 		}
 		catch (Exception e)
 		{
-			result = false;
-			summary.log(Messager.ELEMENT_NOT_PRESENT.error(extWebElement.getNameWithLocator()));
+			element = null;
+			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
 		}
-		return result;
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return element;
 	}
+	
+	/**
+	 * Find Extended Web Elements on page using By.
+	 * 
+	 * @param by
+	 * @param name
+	 * @return List<ExtendedWebElement> if exists otherwise empty list.
+	 */
 
-	public boolean isElementPresent(String controlInfo, final WebElement element)
+	public List<ExtendedWebElement> findExtendedWebElements(final By by, String name)
 	{
-		return isElementPresent(new ExtendedWebElement(element, controlInfo));
+		return findExtendedWebElements(by, name, EXPLICIT_TIMEOUT);
 	}
+	/**
+	 * Find Extended Web Elements on page using By.
+	 * 
+	 * @param by
+	 * @param name
+	 * @param maxWait
+	 * @return List<ExtendedWebElement> if exists otherwise empty list.
+	 */
+
+	public List<ExtendedWebElement> findExtendedWebElements(final By by, String name, long maxWait)
+	{
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<WebElement> webElements = new ArrayList<WebElement> ();
+		
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !drv.findElements(by).isEmpty();
+				}
+			});
+			webElements = driver.findElements(by);
+		}
+		catch (Exception e)
+		{
+			//do nothing
+		}
+		
+		for (WebElement element : webElements) {
+			extendedWebElements.add(new ExtendedWebElement(element, "extendedWebElement"));
+		}		
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return extendedWebElements;
+	}
+	
 
 	/**
 	 * Check that element present within specified timeout.
@@ -174,8 +252,9 @@ public class DriverHelper
 	public boolean isElementPresent(final ExtendedWebElement extWebElement, long maxWait)
 	{
 		boolean result;
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-		wait = new WebDriverWait(driver, maxWait, RETRY_TIME);
+		WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -191,9 +270,62 @@ public class DriverHelper
 		{
 			result = false;
 		}
-		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return result;
 	}
+	/**
+	 * Check that element present.
+	 * 
+	 * @param element
+	 *            to find.
+	 * @return element existence status.
+	 */
+	public boolean isElementPresent(final ExtendedWebElement extWebElement)
+	{
+		return isElementPresent(extWebElement, EXPLICIT_TIMEOUT);
+	}
+
+	public boolean isElementPresent(String controlInfo, final WebElement element)
+	{
+		return isElementPresent(new ExtendedWebElement(element, controlInfo));
+	}
+
+	
+	/**
+	 * Check that element present on page using By.
+	 * 
+	 * @param by
+	 * @return element non-existence status.
+	 */
+	public boolean isElementPresent(String elementName, final By by, long maxWait)
+	{
+		boolean result;
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !drv.findElements(by).isEmpty();
+				}
+			});
+			result = true;
+		}
+		catch (Exception e)
+		{
+			result = false;
+		}
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return result;
+	}
+
+	public boolean isElementPresent(String elementName, final By by)
+	{
+		return isElementPresent(elementName, by, EXPLICIT_TIMEOUT);
+	}	
 
 	public boolean isElementPresent(String controlInfo, final WebElement element, long maxWait)
 	{
@@ -213,7 +345,7 @@ public class DriverHelper
 	{
 		boolean result;
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		wait = new WebDriverWait(getDriver(), EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -245,7 +377,7 @@ public class DriverHelper
 	{
 		boolean result;
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		wait = new WebDriverWait(driver, maxWait, RETRY_TIME);
+		wait = new WebDriverWait(getDriver(), maxWait, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -282,7 +414,7 @@ public class DriverHelper
 	public boolean isElementNotPresent(final ExtendedWebElement extWebElement)
 	{
 		boolean result;
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		wait = new WebDriverWait(getDriver(), EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -316,15 +448,16 @@ public class DriverHelper
 	public boolean isElementNotPresent(String elementName, final By by)
 	{
 		boolean result;
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return driver.findElements(by).isEmpty();
+					return drv.findElements(by).isEmpty();
 				}
 			});
 			result = true;
@@ -334,7 +467,7 @@ public class DriverHelper
 			result = false;
 			summary.log(Messager.UNEXPECTED_ELEMENT_PRESENT.error(elementName));
 		}
-		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return result;
 	}
 
@@ -350,7 +483,8 @@ public class DriverHelper
 	{
 		String msg;
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -369,9 +503,10 @@ public class DriverHelper
 		{
 			msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, extWebElement.getNameWithLocator());
 			summary.log(msg);
+			e.printStackTrace();
 			Assert.fail(msg);
 		}
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
 	public void type(String controlInfo, WebElement control, String text)
@@ -387,13 +522,13 @@ public class DriverHelper
 	 */
 	public void click(final ExtendedWebElement extendedWebElement)
 	{
-		isElementPresent(extendedWebElement);
+		//isElementPresent(extendedWebElement);
 		clickSafe(extendedWebElement, true);
 		String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
 		summary.log(msg);
 		try
 		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
 		}
 		catch (Exception e)
 		{
@@ -405,7 +540,41 @@ public class DriverHelper
 	{
 		click(new ExtendedWebElement(control, controlInfo));
 	}
+	
+	public boolean clickIfPresent(final ExtendedWebElement extWebElement)
+	{
+		return clickIfPresent(extWebElement, EXPLICIT_TIMEOUT);
+	}	
 
+	public boolean clickIfPresent(final ExtendedWebElement extWebElement, long maxWait)
+	{
+		boolean result;
+		WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					if (extWebElement.getElement().isDisplayed()){
+						String msg = Messager.ELEMENT_CLICKED.info(extWebElement.getName());
+						summary.log(msg);
+						extWebElement.getElement().click();
+					}
+					return true;
+				}
+			});
+			result = true;
+		}
+		catch (Exception e)
+		{
+			result = false;
+		}
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return result;
+	}	
 	/**
 	 * Safe click on element, used to reduce any problems with that action.
 	 * 
@@ -426,7 +595,7 @@ public class DriverHelper
 		}
 		catch (UnhandledAlertException e)
 		{
-			driver.switchTo().alert().accept();
+			getDriver().switchTo().alert().accept();
 		}
 		catch (Exception e)
 		{
@@ -441,10 +610,90 @@ public class DriverHelper
 			}
 			else
 			{
+				e.printStackTrace();
 				Assert.fail(Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator()));
 			}
 		}
 	}
+	
+	
+	/**
+	 * Double Clicks on element.
+	 * 
+	 * @param element
+	 *            to click.
+	 */
+	public void doubleClick(final ExtendedWebElement extendedWebElement)
+	{
+		//isElementPresent(extendedWebElement);
+		doubleClickSafe(extendedWebElement, true);
+		String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(extendedWebElement.getName());
+		summary.log(msg);
+		try
+		{
+			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+		}
+		catch (Exception e)
+		{
+			LOGGER.info(e.getMessage());
+		}
+	}
+
+	public void doubleClick(String controlInfo, WebElement control)
+	{
+		doubleClick(new ExtendedWebElement(control, controlInfo));
+	}
+	
+	/**
+	 * Safe doubleClick on element, used to reduce any problems with that action.
+	 * 
+	 * @param elementName
+	 * @param element
+	 * @param startTimer
+	 */
+	private void doubleClickSafe(final ExtendedWebElement extendedWebElement, boolean startTimer)
+	{
+		WebDriver drv = getDriver();
+		Actions action = new Actions(drv);
+
+		if (startTimer)
+		{
+			timer = System.currentTimeMillis();
+		}
+		try
+		{
+			Thread.sleep(RETRY_TIME);
+			//String mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
+			//JavascriptExecutor js = (JavascriptExecutor) driver;
+			//js.executeScript(mouseOverScript, extendedWebElement.getElement());
+			//action.doubleClick().build().perform();
+			
+			action.moveToElement(extendedWebElement.getElement()).doubleClick().build().perform();
+			//action.doubleClick(extendedWebElement.getElement()).build().perform();
+
+		}
+		catch (UnhandledAlertException e)
+		{
+			drv.switchTo().alert().accept();
+		}
+		catch (Exception e)
+		{
+			if (e.getMessage().contains("Element is not clickable"))
+			{
+				scrollTo(extendedWebElement);
+			}
+
+			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
+			{
+				doubleClickSafe(extendedWebElement, false);
+			}
+			else
+			{
+				e.printStackTrace();
+				Assert.fail(Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(extendedWebElement.getNameWithLocator()));
+			}
+		}
+	}	
 
 	/**
 	 * Sends enter to element.
@@ -458,7 +707,7 @@ public class DriverHelper
 		pressEnterSafe(extendedWebElement, true);
 		String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
 	}
 
 	public void pressEnter(String controlInfo, WebElement control)
@@ -487,7 +736,7 @@ public class DriverHelper
 		}
 		catch (UnhandledAlertException e)
 		{
-			driver.switchTo().alert().accept();
+			getDriver().switchTo().alert().accept();
 		}
 		catch (Exception e)
 		{
@@ -540,7 +789,8 @@ public class DriverHelper
 	{
 		String msg;
 		final String decryptedFilePath = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -560,7 +810,7 @@ public class DriverHelper
 			summary.log(msg);
 			Assert.fail(msg);
 		}
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
 	/**
@@ -574,18 +824,19 @@ public class DriverHelper
 		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
 		decryptedURL = decryptedURL.contains("http:") || decryptedURL.contains("https:") ? decryptedURL : Configuration.get(Parameter.URL)
 				+ decryptedURL;
+		WebDriver drv = getDriver();
 		try
 		{
-			driver.get(decryptedURL);
+			drv.get(decryptedURL);
 		}
 		catch (UnhandledAlertException e)
 		{
-			driver.switchTo().alert().accept();
+			drv.switchTo().alert().accept();
 		}
 		//AUTO-250 tweak core to start browser in maximized mode - to prevent stability issues
 		try
-		{
-			driver.manage().window().maximize();
+		{			
+			drv.manage().window().maximize();				
 		}
 		catch (Exception e)
 		{
@@ -596,7 +847,7 @@ public class DriverHelper
 		
 		String msg = Messager.OPEN_URL.info(url);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
 	/**
@@ -609,14 +860,15 @@ public class DriverHelper
 	{
 		String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
 		decryptedURL = decryptedURL.startsWith("http") ? decryptedURL : Configuration.get(Parameter.URL) + decryptedURL;
-		if (LogicUtils.isURLEqual(decryptedURL, driver.getCurrentUrl()))
+		WebDriver drv = getDriver();
+		if (LogicUtils.isURLEqual(decryptedURL, drv.getCurrentUrl()))
 		{
-			summary.log(Messager.EXPECTED_URL.info(driver.getCurrentUrl()));
+			summary.log(Messager.EXPECTED_URL.info(drv.getCurrentUrl()));
 			return true;
 		}
 		else
 		{
-			Messager.UNEXPECTED_URL.error(expectedURL, driver.getCurrentUrl());
+			Messager.UNEXPECTED_URL.error(expectedURL, drv.getCurrentUrl());
 			return false;
 		}
 	}
@@ -664,23 +916,24 @@ public class DriverHelper
 	{
 		boolean result;
 		final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		final WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return driver.getTitle().contains(decryptedExpectedTitle);
+					return drv.getTitle().contains(decryptedExpectedTitle);
 				}
 			});
 			result = true;
-			summary.log(Messager.TITLE_CORERECT.info(driver.getCurrentUrl(), expectedTitle));
+			summary.log(Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), expectedTitle));
 		}
 		catch (Exception e)
 		{
 			result = false;
-			summary.log(Messager.TITLE_NOT_CORERECT.error(driver.getCurrentUrl(), expectedTitle, driver.getTitle()));
+			summary.log(Messager.TITLE_NOT_CORERECT.error(drv.getCurrentUrl(), expectedTitle, drv.getTitle()));
 		}
 		return result;
 	}
@@ -696,17 +949,18 @@ public class DriverHelper
 	{
 		boolean result;
 		final String decryptedExpectedPattern = cryptoTool.decryptByPattern(expectedPattern, CRYPTO_PATTERN);
-		String actual = driver.getTitle();
+		WebDriver drv = getDriver();
+		String actual = drv.getTitle();
 		Pattern p = Pattern.compile(decryptedExpectedPattern);
 		Matcher m = p.matcher(actual);
 		if (m.find())
 		{
-			summary.log(Messager.TITLE_CORERECT.info(driver.getCurrentUrl(), actual));
+			summary.log(Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), actual));
 			result = true;
 		}
 		else
 		{
-			summary.log(Messager.TITLE_DOES_NOT_MATCH_TO_PATTERN.error(driver.getCurrentUrl(), expectedPattern, actual));
+			summary.log(Messager.TITLE_DOES_NOT_MATCH_TO_PATTERN.error(drv.getCurrentUrl(), expectedPattern, actual));
 			result = false;
 		}
 		return result;
@@ -717,7 +971,7 @@ public class DriverHelper
 	 */
 	public void navigateBack()
 	{
-		driver.navigate().back();
+		getDriver().navigate().back();
 		summary.log(Messager.BACK.info());
 	}
 
@@ -726,7 +980,7 @@ public class DriverHelper
 	 */
 	public void refresh()
 	{
-		driver.navigate().refresh();
+		getDriver().navigate().refresh();
 		summary.log(Messager.REFRESH.info());
 	}
 
@@ -754,8 +1008,9 @@ public class DriverHelper
 		boolean isSelected = false;
 		final String decryptedSelectText = cryptoTool.decryptByPattern(selectText, CRYPTO_PATTERN);
 		final Select s = new Select(extendedWebElement.getElement());
+		WebDriver drv = getDriver();
 		String msg = null;
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -780,9 +1035,10 @@ public class DriverHelper
 		catch (Exception e)
 		{
 			msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(selectText, extendedWebElement.getNameWithLocator());
+			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 
 		return isSelected;
 	}
@@ -827,8 +1083,9 @@ public class DriverHelper
 	{
 		boolean isSelected = false;
 		final Select s = new Select(extendedWebElement.getElement());
+		WebDriver drv = getDriver();
 		String msg = null;
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -861,9 +1118,10 @@ public class DriverHelper
 		catch (Exception e)
 		{
 			msg = Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), extendedWebElement.getNameWithLocator());
+			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 
 		return isSelected;
 	}
@@ -884,8 +1142,9 @@ public class DriverHelper
 	{
 		boolean isSelected = false;
 		final Select s = new Select(extendedWebElement.getElement());
+		WebDriver drv = getDriver();
 		String msg = null;
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -910,9 +1169,10 @@ public class DriverHelper
 		catch (Exception e)
 		{
 			msg = Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), extendedWebElement.getNameWithLocator());
+			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 
 		return isSelected;
 	}
@@ -930,15 +1190,39 @@ public class DriverHelper
 	 */
 	public void hover(final ExtendedWebElement extendedWebElement)
 	{
+		WebDriver drv = getDriver();
 		if (isElementPresent(extendedWebElement))
 		{
-			Actions action = new Actions(driver);
-			action.moveToElement(extendedWebElement.getElement());
-			action.perform();
+			
+			if (!drv.toString().contains("safari")) {
+				Actions action = new Actions(drv);
+				action.moveToElement(extendedWebElement.getElement());
+				action.perform();				
+			}
+			else {
+				//https://code.google.com/p/selenium/issues/detail?id=4136
+				JavascriptExecutor js = (JavascriptExecutor) drv;
+				String locatorType = extendedWebElement.getBy().toString().substring(3);
+				String elem = "var elem = document;";
+				if (locatorType.startsWith("id")) {
+					elem = "var elem = document.getElementById(\""+locatorType.substring(4)+"\");";
+				}
+				else if (locatorType.startsWith("xpath")) {
+					String snippet = "document.getElementByXPath = function(sValue) { var a = this.evaluate(sValue, this, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null); if (a.snapshotLength > 0) { return a.snapshotItem(0); } }; ";
+					js.executeScript(snippet);
+					elem = "var elem = document.getElementByXPath(\""+locatorType.substring(7)+"\");";
+				}
+				else if (locatorType.startsWith("className")) {
+					elem = "var elem = document.getElementsByClassName(\""+locatorType.substring(14)+"\")[0];";
+				}
+				String mouseOverScript = elem + " if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false);" +
+						" elem.dispatchEvent(evObj);} else if(document.createEventObject) { elem.fireEvent('onmouseover');}";
+				js.executeScript(mouseOverScript);
+			}
 
 			String msg = Messager.HOVER_IMG.info(extendedWebElement.getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 		}
 		else
 		{
@@ -959,11 +1243,12 @@ public class DriverHelper
 	 */
 	public void hover(String elementName, String xpathLocator)
 	{
-		Actions action = new Actions(driver);
-		action.moveToElement(driver.findElement(By.xpath(xpathLocator))).perform();
+		WebDriver drv = getDriver();
+		Actions action = new Actions(drv);
+		action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
 		String msg = Messager.HOVER_IMG.info(elementName);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
 	public void scrollTo(final ExtendedWebElement extendedWebElement)
@@ -972,7 +1257,7 @@ public class DriverHelper
 		{
 			Locatable locatableElement = (Locatable) extendedWebElement.getElement();
 			int y = locatableElement.getCoordinates().onScreen().getY();
-			((JavascriptExecutor) driver).executeScript("window.scrollBy(0," + (y - 120) + ");");
+			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
 		}
 		catch (Exception e)
 		{
@@ -984,14 +1269,14 @@ public class DriverHelper
 
 	public void pressTab()
 	{
-		Actions builder = new Actions(driver);
+		Actions builder = new Actions(getDriver());
 		builder.sendKeys(Keys.TAB).perform();
 	}
 
 	public void sendKeys(String keys)
 	{
 		final String decryptedKeys = cryptoTool.decryptByPattern(keys, CRYPTO_PATTERN);
-		Actions builder = new Actions(driver);
+		Actions builder = new Actions(getDriver());
 		builder.sendKeys(decryptedKeys).perform();
 	}
 
@@ -1000,11 +1285,12 @@ public class DriverHelper
 	 */
 	public void sielentAlert()
 	{
-		if (!(driver instanceof HtmlUnitDriver))
+		WebDriver drv = getDriver();
+		if (!(drv instanceof HtmlUnitDriver))
 		{
-			((JavascriptExecutor) driver).executeScript("window.alert = function(msg) { return true; }");
-			((JavascriptExecutor) driver).executeScript("window.confirm = function(msg) { return true; }");
-			((JavascriptExecutor) driver).executeScript("window.prompt = function(msg) { return true; }");
+			((JavascriptExecutor) drv).executeScript("window.alert = function(msg) { return true; }");
+			((JavascriptExecutor) drv).executeScript("window.confirm = function(msg) { return true; }");
+			((JavascriptExecutor) drv).executeScript("window.prompt = function(msg) { return true; }");
 		}
 	}
 
@@ -1021,13 +1307,14 @@ public class DriverHelper
 
 		if (isElementPresent(from) && isElementPresent(to))
 		{
-			Actions builder = new Actions(driver);
+			WebDriver drv = getDriver();
+			Actions builder = new Actions(drv);
 			Action dragAndDrop = builder.clickAndHold(from.getElement()).moveToElement(to.getElement()).release(to.getElement()).build();
 			dragAndDrop.perform();
 
 			String msg = Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 		}
 		else
 		{
@@ -1046,10 +1333,11 @@ public class DriverHelper
 	{
 		if (isElementPresent(slider))
 		{
-			(new Actions(driver)).moveToElement(slider.getElement()).dragAndDropBy(slider.getElement(), moveX, moveY).build().perform();
+			WebDriver drv = getDriver();
+			(new Actions(drv)).moveToElement(slider.getElement()).dragAndDropBy(slider.getElement(), moveX, moveY).build().perform();
 			String msg = Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 		}
 		else
 		{
@@ -1092,7 +1380,8 @@ public class DriverHelper
 	 */
 	public void acceptAlert()
 	{
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -1102,7 +1391,7 @@ public class DriverHelper
 					return isAlertPresent();
 				}
 			});
-			driver.switchTo().alert().accept();
+			drv.switchTo().alert().accept();
 			Messager.ALERT_ACCEPTED.info("");
 		}
 		catch (Exception e)
@@ -1116,7 +1405,8 @@ public class DriverHelper
 	 */
 	public void cancelAlert()
 	{
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
@@ -1126,7 +1416,7 @@ public class DriverHelper
 					return isAlertPresent();
 				}
 			});
-			driver.switchTo().alert().dismiss();
+			drv.switchTo().alert().dismiss();
 			Messager.ALERT_CANCELED.info("");
 		}
 		catch (Exception e)
@@ -1144,7 +1434,7 @@ public class DriverHelper
 	{
 		try
 		{
-			driver.switchTo().alert();
+			getDriver().switchTo().alert();
 			return true;
 		}
 		catch (NoAlertPresentException Ex)
@@ -1160,36 +1450,39 @@ public class DriverHelper
 	public void setElementText(String controlInfo, String frame, String id, String text)
 	{
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		((JavascriptExecutor) driver).executeScript(String.format(
+		WebDriver drv = getDriver();
+		((JavascriptExecutor) drv).executeScript(String.format(
 				"document.getElementById('%s').contentWindow.document.getElementById('%s').innerHTML='%s'", frame, id, decryptedText));
 		String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
 	public void setElementText(String controlInfo, String text)
 	{
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		((JavascriptExecutor) driver)
+		WebDriver drv = getDriver();
+		((JavascriptExecutor) drv)
 				.executeScript(String
 						.format("document.contentWindow.getElementsByTagName('ol')[0].getElementsByTagName('li')[1].getElementsByClassName('CodeMirror-lines')[0].getElementsByTagName('div')[0].getElementsByTagName('div')[2].innerHTML=<pre><span class='cm-plsql-word'>'%s'</span></pre>",
 								decryptedText));
 		String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
 	public boolean isPageOpened(final AbstractPage page)
 	{
 		boolean result;
-		wait = new WebDriverWait(driver, EXPLICIT_TIMEOUT, RETRY_TIME);
+		final WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return LogicUtils.isURLEqual(page.getPageURL(), driver.getCurrentUrl());
+					return LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl());
 				}
 			});
 			result = true;
@@ -1204,14 +1497,15 @@ public class DriverHelper
 	public boolean isPageOpened(final AbstractPage page, long timeout)
 	{
 		boolean result;
-		wait = new WebDriverWait(driver, timeout, RETRY_TIME);
+		final WebDriver drv = getDriver();
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
 			wait.until(new ExpectedCondition<Boolean>()
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return LogicUtils.isURLEqual(page.getPageURL(), driver.getCurrentUrl());
+					return LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl());
 				}
 			});
 			result = true;
@@ -1235,7 +1529,7 @@ public class DriverHelper
 	 */
 	public void trigger(String script, WebElement element)
 	{
-		((JavascriptExecutor) driver).executeScript(script, element);
+		((JavascriptExecutor) getDriver()).executeScript(script, element);
 	}
 
 	/**
@@ -1248,7 +1542,7 @@ public class DriverHelper
 	 */
 	public Object trigger(String script)
 	{
-		return ((JavascriptExecutor) driver).executeScript(script);
+		return ((JavascriptExecutor) getDriver()).executeScript(script);
 	}
 
 	/**
@@ -1278,14 +1572,15 @@ public class DriverHelper
 
 	public void switchWindow() throws NoSuchWindowException, NoSuchWindowException
 	{
-		Set<String> handles = driver.getWindowHandles();
-		String current = driver.getWindowHandle();
+		WebDriver drv = getDriver();
+		Set<String> handles = drv.getWindowHandles();
+		String current = drv.getWindowHandle();
 		if (handles.size() > 1)
 		{
 			handles.remove(current);
 		}
 		String newTab = handles.iterator().next();
-		driver.switchTo().window(newTab);
+		drv.switchTo().window(newTab);
 	}
 
 	/**
@@ -1298,7 +1593,7 @@ public class DriverHelper
 	 */
 	public void swipe(double startX, double startY, double endX, double endY, double duration)
 	{
-		JavascriptExecutor js = (JavascriptExecutor) driver;
+		JavascriptExecutor js = (JavascriptExecutor) getDriver();
 		HashMap<String, Double> swipeObject = new HashMap<String, Double>();
 		swipeObject.put("startX", startX);
 		swipeObject.put("startY", startY);
@@ -1321,7 +1616,7 @@ public class DriverHelper
 		if (isElementPresent(extWebElement, maxWait))
 		{
 			TestLogCollector
-					.addScreenshotComment(Screenshot.capture(driver), Messager.ELEMENT_PRESENT.getMessage(extWebElement.toString()));
+					.addScreenshotComment(Screenshot.capture(getDriver()), Messager.ELEMENT_PRESENT.getMessage(extWebElement.toString()));
 		}
 		else
 		{
@@ -1338,7 +1633,7 @@ public class DriverHelper
 	{
 		if (isElementWithTextPresent(extWebElement, text, maxWait))
 		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(driver),
+			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()),
 					Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(extWebElement.toString(), text));
 		}
 		else
@@ -1353,6 +1648,69 @@ public class DriverHelper
 	private void logMakingScreen(String msg)
 	{
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
 	}
-}
+	
+
+	// --------------------------------------------------------------------------
+	// Web Drivers
+	// --------------------------------------------------------------------------
+	public static WebDriver getDriver() {
+		return webDrivers.get();
+	}
+	 
+	public static void setDriver(WebDriver driver) {
+		webDrivers.set(driver);
+	}
+
+    public static void closeDriver() {
+    	webDrivers.get().close();
+    }
+    
+    public static void quitDriver() {
+    	try {
+	    	LOGGER.info("Driver exiting..." + webDrivers.get());
+    		//webDrivers.get().close();
+	    	webDrivers.get().quit();
+	    	LOGGER.info("Driver exited..." + webDrivers.get());
+    	}
+    	catch (Exception e) {
+    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
+    		LOGGER.info("======================================================================================================================================");
+    	} finally {
+    		//TODO analyze how to forcibly kill session on device
+	    	webDrivers.remove();
+	    	//LOGGER.info("Driver exited finally: " + webDrivers.get());
+    	}
+    }    
+    
+	public ExtendedWebElement findExtendedWebElement(By by) {
+		ExtendedWebElement element;
+		try
+		{
+			element = new ExtendedWebElement(getDriver().findElement(by), "extendedWebElement");
+		}
+		catch (Exception e)
+		{
+			element = null;
+		}
+		return element;
+	}	
+	
+	public List<ExtendedWebElement> findExtendedWebElements(By by) {
+		List<ExtendedWebElement> elements = new ArrayList<ExtendedWebElement>();
+		try
+		{
+			List<WebElement> webElements = getDriver().findElements(by);
+			for (WebElement element : webElements) {
+				elements.add(new ExtendedWebElement(element, "extendedWebElement"));
+			}			
+		}
+		catch (Exception e)
+		{
+			elements = null;
+		}
+		return elements;
+	}		
+     
+}    

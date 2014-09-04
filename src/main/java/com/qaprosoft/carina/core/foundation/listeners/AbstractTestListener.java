@@ -25,7 +25,6 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -37,6 +36,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 
@@ -45,23 +45,18 @@ public abstract class AbstractTestListener extends TestArgsListener
 	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
 
 	@Override
+	public void onStart(ITestContext testContext)
+	{
+		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateWordAN(8));
+	}
+	
+	@Override
 	public void onTestStart(ITestResult result)
 	{
 		super.onTestStart(result);
 		
-		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
-		
-		// Populate JIRA ID
-		 if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET))
-		 {
-		   result.setAttribute(SpecialKeywords.JIRA_TICKET, result.getMethod().getDescription().split("#")[1]);
-		 }
-		 else if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null)
-		 {
-		   result.setAttribute(SpecialKeywords.JIRA_TICKET, result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
-		 }
-
-		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER))
+		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
+				result.getParameters().length > 0) //set parameters from XLS only if test contains any parameter at all)
 		{
 			if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_ARGS))
 			{				
@@ -76,41 +71,79 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}
 		}
 
-		String testName = TestNamingUtil.getCanonicalTestName(result);
+		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
+		
+		String test = TestNamingUtil.getCanonicalTestName(result);
 
-		RetryCounter.initCounter(testName);
+		RetryCounter.initCounter(test);
 
-		Messager.TEST_STARTED.info(testName, DateUtils.now());
+		Messager.TEST_STARTED.info(test, DateUtils.now());
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
 		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
-		Jira.updateAfterTest(result);
 		super.onTestSuccess(result);
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String testName = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(testName);
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		int count = RetryCounter.getRunCount(test);
 		if (count >= MAX_COUNT && result.getThrowable().getMessage() != null)
 		{
+			String errorMessage = "";
+			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+			if (thr != null) {
+				errorMessage = getFullStackTrace(thr);
+			}
+			
 			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
 			if (globalLog != null) {
-				String msg = Messager.TEST_FAILED.error(testName, DateUtils.now(), result.getThrowable().getMessage());
+				if (result.getThrowable() != null) {
+					//errorMessage = result.getThrowable().getMessage();
+					errorMessage = getFullStackTrace(result.getThrowable());
+				}				
+				String msg = Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 				globalLog.log(Type.COMMON, msg);
 			}
 			else{
 				Log.error("GlobalTestLog is NULL! for " + result.toString());
 			}
-				
-			//((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_FAILED.error(testName, DateUtils.now(), result.getThrowable().getMessage()));
 		}
-		Jira.updateAfterTest(result);
 		super.onTestFailure(result);
+	}
+	
+	@Override
+	public void onTestSkipped(ITestResult result)
+	{
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		int count = RetryCounter.getRunCount(test);
+		if (count >= MAX_COUNT)
+		{
+			String errorMessage = "";
+			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+			if (thr != null) {
+				//errorMessage = thr.getMessage();
+				errorMessage = getFullStackTrace(thr);
+			}
+
+			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
+			if (globalLog != null) {
+/*				if (result.getThrowable() != null) {
+					//errorMessage = result.getThrowable().getMessage();
+					errorMessage = getFullStackTrace(result.getThrowable());
+				}*/
+				String msg = Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
+				globalLog.log(Type.COMMON, msg);
+			}
+			else{
+				Log.error("GlobalTestLog is NULL! for " + result.toString());
+			}
+		}
+		super.onTestSkipped(result);
 	}
 	
 	@Override
@@ -181,6 +214,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String group = TestNamingUtil.getPackageName(test);
 		String testName = TestNamingUtil.getCanonicalTestName(test);
 		String linkToLog = ReportContext.getTestLogLink(testName);
+		String linkToVideo = ReportContext.getTestVideoLink(testName);
+		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
 		if(!FileUtils.listFiles(ReportContext.getTestDir(testName), new String[]{"png"}, false).isEmpty()
 			&& Configuration.getBoolean(Parameter.AUTO_SCREENSHOT)
@@ -188,9 +223,23 @@ public abstract class AbstractTestListener extends TestArgsListener
 		{
 			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, failReason);
+		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, linkToVideo, failReason);
 		testResultItem.setDescription(description);
 		testResultItem.setJiraTicket((String)test.getAttribute(SpecialKeywords.JIRA_TICKET));
 		return testResultItem;
 	}
+	
+	protected String getFullStackTrace(Throwable thr) {
+		String stackTrace = "";
+		
+	    if (thr != null) {
+	    	stackTrace = thr.getMessage() + "\n";
+	    	
+            StackTraceElement[] elems = thr.getStackTrace();
+	        for (StackTraceElement elem : elems) {
+	        	stackTrace = stackTrace + "\n" + elem.toString();
+            }
+	    }
+	    return stackTrace;
+	}	
 }
