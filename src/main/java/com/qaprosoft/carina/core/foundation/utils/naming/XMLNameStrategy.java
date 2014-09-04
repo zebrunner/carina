@@ -17,18 +17,16 @@ package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.HashMap;
 import java.util.Map;
+
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
-//import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-//import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+
 
 public class XMLNameStrategy implements INamingStrategy
 {
-//	private Map<String, String> testNameMappedToID = Collections.synchronizedMap(new HashMap<String, String>());
     private static final ThreadLocal<String> testLogId = new ThreadLocal<String>();
 	
 	@Override
@@ -45,8 +43,8 @@ public class XMLNameStrategy implements INamingStrategy
 		
 		String testName = "";
 		
-		String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));		
 		if (testnameMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
 			if (testnameMap.containsKey(testHash)) {
 				testName = testnameMap.get(testHash);
 			}
@@ -55,6 +53,22 @@ public class XMLNameStrategy implements INamingStrategy
 		if (testName.isEmpty())
 			testName = result.getTestContext().getCurrentXmlTest().getName();
 		
+		
+		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
+				result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
+			//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
+			String methodUID = "";
+			for (int i=0; i<result.getParameters().length; i++) {
+				  if (result.getParameters()[i] != null) {
+					  if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
+						  methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+					  }
+				  }
+			}
+			if (!methodUID.isEmpty()) {
+				testName = methodUID + " - " + testName;
+			}
+		}
 		
 		String invocationID = ""; 
 		if (result.getMethod().getInvocationCount() > 1){
@@ -70,93 +84,7 @@ public class XMLNameStrategy implements INamingStrategy
 
 		
 		return testName;
-		
-/*		XmlTest xmlTest = result.getTestContext().getCurrentXmlTest();
-		
-		String logID = xmlTest.getParameter(SpecialKeywords.TEST_LOG_ID);
-		
-		
-		//String sessionID = xmlTest.getParameter("SpecialKeywords.SESSION_ID");
-		
-		Thread thread = Thread.currentThread();
-		logID = thread.getId() + "-" + logID;
 
-		startThread(logID);
-		
-		if(!testNameMappedToID.containsKey(logID))
-		{
-			//testNameMappedToID.put(logID, "temp_id");
-			String testName = xmlTest.getName();
-			XLSDSBean ds = new XLSDSBean(result.getTestContext());
-		
-			if(!ds.getArgs().isEmpty())
-			{
-				if(ds.getArgs().contains(SpecialKeywords.TUID))
-				{
-					testName = ds.getTestParams().get(SpecialKeywords.TUID) + " - " + testName + " [" + ds.argsToString() + "]";
-				}
-				else
-				{
-					if (ds.argsToString()!= null && !ds.argsToString().isEmpty())
-						testName = testName + " [" + ds.argsToString() + "]";
-				}
-			} 
-			
-			if(ds.getArgs().isEmpty() && !ds.getUidArgs().isEmpty())
-			{
-				// retrieve {excel_ds_uid} fields from results->parameters->dynamicArgs Map
-				// 0th element should be Map<String, String> as we generate such structure in AbstractTest::createTestArgSets2 for XLS Data provider
-				if (result.getParameters().length > 0){
-					if (result.getParameters()[0] instanceof Map)
-					{
-						@SuppressWarnings("unchecked")
-						Map<String, String> testParams = (Map<String, String>) result.getParameters()[0];	
-						String sTUID = testParams.get(SpecialKeywords.TUID);
-						if (!sTUID.isEmpty())
-						{
-							testName = sTUID + " - " + testName + " [" + ds.argsToString(testParams) + "]";
-						}
-						else
-						{
-							testName = testName + " [" + ds.argsToString(testParams) + "]";						
-						}
-					}
-				}
-			}
-		
-			//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
-			String methodUID = "";
-			for (int i = 0; i < result.getParameters().length; i++)
-			{
-				if (result.getParameters()[i] instanceof String)
-				{
-					if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":"))
-					{
-						methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
-					}
-				}
-			}
-	
-			if (result.getMethod().getInvocationCount() > 1){
-				methodUID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
-			}
-			
-			
-			if (!methodUID.isEmpty()){
-				testName = methodUID + " - " + testName + " - " +  result.getMethod().getMethodName();
-			} else
-			{
-				testName = testName + " - " +  result.getMethod().getMethodName();
-			}
-			
-//			System.out.println("testName: " + testName);
-//			System.out.println("testNameMappedToID size:" + testNameMappedToID.size());
-//			testNameMappedToID.put(logID, testName);
-//			System.out.println("testNameMappedToID size 2:" + testNameMappedToID.size());
-			//return value as is to minimize HashMap read/write operations
-			return testName;			
-		}
-		return testNameMappedToID.get(logID);*/
 	}
 
 	@Override

@@ -23,27 +23,30 @@ public class TestResultItem
 	private String test = null;
 	private String linkToLog = null;
 	private String linkToScreenshots = null;
+	private String linkToVideo = null;
 	private String failReason = null;
 	private String description = null;
 	private String jiraTicket = null;
 	private TestResultType result = null;
 
-	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog)
+	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo)
 	{
 		this.pack = group;
 		this.test = test;
 		this.result = result;
 		this.linkToLog = linkToLog;
 		this.linkToScreenshots = linkToScreenshots;
+		this.linkToVideo = linkToVideo;
 	}
 
-	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String failReason)
+	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo, String failReason)
 	{
 		this.pack = group;
 		this.test = test;
 		this.result = result;
 		this.linkToLog = linkToLog;
 		this.linkToScreenshots = linkToScreenshots;
+		this.linkToVideo = linkToVideo;
 		this.failReason = failReason;
 	}
 
@@ -92,10 +95,20 @@ public class TestResultItem
 		return linkToScreenshots;
 	}
 
+	public void setLinkToVideo(String linkToVideo)
+	{
+		this.linkToVideo = linkToVideo;
+	}
+	
+	public String getLinkToVideo()
+	{
+		return linkToVideo;
+	}
+
 	public void setLinkToScreenshots(String linkToScreenshots)
 	{
 		this.linkToScreenshots = linkToScreenshots;
-	}
+	}	
 
 	public String getFailReason()
 	{

@@ -174,7 +174,16 @@ public class ReportContext
 	 */
 	public static String getTestScreenshotsLink(String test)
 	{
-		return String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		}
+		else {
+			link = String.format("%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		}
+		
+		return link;
+		
 	}
 
 	/**
@@ -185,9 +194,36 @@ public class ReportContext
 	 */
 	public static String getTestLogLink(String test)
 	{
-		return String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		}
+		else {
+			link = String.format("%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		}
+		
+		return link;
 	}
 
+	
+	/**
+	 * Returns URL for test video record.
+	 * 
+	 * @param test
+	 * @return - URL to test log folder.
+	 */
+	public static String getTestVideoLink(String test)
+	{
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			link = String.format("%s/%d/%s/video.mp4", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		}
+		else {
+			link = String.format("%s/%s/video.mp4", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		}
+		
+		return link;
+	}	
 	/**
 	 * Returns URL for performance report.
 	 * 

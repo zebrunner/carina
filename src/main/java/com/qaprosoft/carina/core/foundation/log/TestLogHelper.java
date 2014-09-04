@@ -52,7 +52,28 @@ public class TestLogHelper
 	{
 		TestLogCollector.logToSession(sessionID, prefix + msg);
 	}
-
+	
+	public void log(String msg, Throwable thr)
+	{
+        StackTraceElement[] elems = thr.getStackTrace();
+        for (StackTraceElement elem : elems) {
+        	msg = msg + "\n" + elem.toString();
+        }
+		TestLogCollector.logToSession(sessionID, prefix + msg);
+	}
+	
+	public void log(Throwable thr)
+	{
+		String msg = thr.getMessage();
+		
+        StackTraceElement[] elems = thr.getStackTrace();
+        for (StackTraceElement elem : elems) {
+        	msg = msg + "\n" + elem.toString();
+        }
+        
+        TestLogCollector.logToSession(sessionID, prefix + msg);
+	}
+	
 	public String getSessionLogs()
 	{
 		return TestLogCollector.getSessionLogs(sessionID);
