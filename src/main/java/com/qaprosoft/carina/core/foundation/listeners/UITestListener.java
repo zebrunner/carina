@@ -15,18 +15,13 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.Reporter;
 
-import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
@@ -43,21 +38,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class UITestListener extends AbstractTestListener
 {
-	private static final Logger LOGGER = Logger.getLogger(UITestListener.class);
-	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
-	
-    // Dropbox client
-    DropboxClient dropboxClient;	
-
-	@Override
-	public void onStart(ITestContext testContext)
-	{
-		super.onStart(testContext);
-	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
-	    {
-	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
-	    }		
-	}
+	//private static final Logger LOGGER = Logger.getLogger(UITestListener.class);
 	
 	@Override
 	public void onTestStart(ITestResult result)
@@ -72,74 +53,39 @@ public class UITestListener extends AbstractTestListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
-		if (count < MAX_COUNT)
-		{
-			LOGGER.warn(String.format("Test '%s' FAILED! Retry %d/%d time.", test, count + 1, MAX_COUNT));
-			RetryCounter.incrementRunCount(test);
-			result.setStatus(ITestResult.SKIP);
-			ReportContext.removeTestReport(test);
+		String errorMessage = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
 		}
-		else
-		{
-			if (MAX_COUNT != 0)
-				LOGGER.error("Retry limit exceeded for " + result.getName());
-			
-			
-			String errorMessage = "";
-			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-			if (thr != null) {
-				errorMessage = getFullStackTrace(thr);
-			}
-			
-			if (result.getThrowable() != null) {
-				errorMessage = getFullStackTrace(result.getThrowable());
-			}
+		
+		if (result.getThrowable() != null) {
+			errorMessage = getFullStackTrace(result.getThrowable());
+		}
 
-			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
-			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
-			
-			super.onTestFailure(result);
-		}
-		Reporter.setCurrentTestResult(result);
+		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
+		
+		super.onTestFailure(result);
 		
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
-		if (count < MAX_COUNT)
-		{
-			LOGGER.warn(String.format("Test '%s' SKIPPED! Retry %d/%d time.", test, count + 1, MAX_COUNT));
-			RetryCounter.incrementRunCount(test);
-			result.setStatus(ITestResult.SKIP);
-			ReportContext.removeTestReport(test);
+		String errorMessage = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
 		}
-		else
-		{
-			if (MAX_COUNT != 0)
-				LOGGER.error("Retry limit exceeded for " + result.getName());
-			
-			
-			String errorMessage = "";
-			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-			if (thr != null) {
-				errorMessage = getFullStackTrace(thr);
-			}
-			
-			if (result.getThrowable() != null) {
-				errorMessage = getFullStackTrace(result.getThrowable());
-			}
-			//TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST SKIPPED - " + errorMessage);
-			EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
-			
-			super.onTestSkipped(result);
-		}
-		Reporter.setCurrentTestResult(result);
 		
+		if (result.getThrowable() != null) {
+			errorMessage = getFullStackTrace(result.getThrowable());
+		}
+		//TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST SKIPPED - " + errorMessage);
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
+		
+		super.onTestSkipped(result);
 	}
 	
 	@Override

@@ -104,7 +104,9 @@ public class EmailReportGenerator
 	{
 		if (testResultItems.size() > 0)
 		{
-			Collections.sort(testResultItems, new EmailReportItemComparator());
+			if (Configuration.getBoolean(Parameter.RESULT_SORTING)) {
+				Collections.sort(testResultItems, new EmailReportItemComparator());
+			}
 			
 			String packageName = testResultItems.get(0).getPack();
 
@@ -285,15 +287,7 @@ public class EmailReportGenerator
 				skipped++;
 				break;
 			}
-/*			if(ri.getResult().equals(TestResultType.PASS))
-			{
-				passed++;
-			}
-			else
-			{
-				failed++;
-			}
-*/		}
+		}
 		TestResultType result;
 		if (passed > 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
@@ -302,16 +296,7 @@ public class EmailReportGenerator
 		} else {
 			result = TestResultType.FAIL;
 		}
-/*		
-		
-		if (failed == 0 && passed == 0){
-			result = TestResultType.SKIP;
-		}else if (failed == 0 && passed > 0){
-			result = TestResultType.PASS;
-		}else{
-			result = TestResultType.FAIL;
-		}
-*/		return result;
+		return result;
 		
 	}
 

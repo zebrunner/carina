@@ -25,6 +25,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -43,12 +44,19 @@ import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 
 public abstract class AbstractTestListener extends TestArgsListener
 {
+    // Dropbox client
+    DropboxClient dropboxClient;	
+	
 	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
 
 	@Override
 	public void onStart(ITestContext testContext)
 	{
 		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateWordAN(8));
+	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
+	    {
+	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
+	    }		
 	}
 	
 	@Override

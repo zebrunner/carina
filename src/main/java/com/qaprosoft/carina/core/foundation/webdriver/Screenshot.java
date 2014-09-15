@@ -75,7 +75,12 @@ public class Screenshot
 				String fileID = test.replaceAll(" ", "_") + "-" + System.currentTimeMillis();
 				screenName = fileID + ".png";
 				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
-				WebDriver augmentedDriver = new DriverAugmenter().augment(driver);
+				
+				WebDriver augmentedDriver = driver;
+				if (!driver.toString().contains("AppiumNativeDriver")) {
+					//do not augment for Appium 1.x anymore
+					augmentedDriver = new DriverAugmenter().augment(driver);
+				} 
 				
 				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
 				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
@@ -99,8 +104,9 @@ public class Screenshot
 			}
 			catch (Exception e)
 			{
-				LOGGER.error("Unable to capture screenshot!");
-				//e.printStackTrace();
+//				LOGGER.error("Unable to capture screenshot!");
+				LOGGER.error("Unable to capture screenshot! " + e.getMessage());
+				e.printStackTrace();
 			}
 		}
 		return screenName;

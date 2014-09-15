@@ -23,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class DriverPool
@@ -37,12 +38,22 @@ public class DriverPool
 	{
 		String sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
 		sessionIdDriverMap.put(sessionId, driver);
-		if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
 			//init our single driver variable
 			single_driver = driver;
 		}
 		return sessionId;
 	}
+	
+	public static synchronized String registerDriverSession(String sessionId, WebDriver driver)
+	{
+		sessionIdDriverMap.put(sessionId, driver);
+		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
+			//init our single driver variable
+			single_driver = driver;
+		}
+		return sessionId;
+	}	
 	
 	public static synchronized void associateTestNameWithDriver(String test, WebDriver driver)
 	{
@@ -61,7 +72,7 @@ public class DriverPool
 		if (sessionIdDriverMap.containsKey(sessionId)) {
 			drv = sessionIdDriverMap.get(sessionId);
 		}
-		else if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+		else if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
 			//init our single driver variable
 			drv = single_driver;
 		}
