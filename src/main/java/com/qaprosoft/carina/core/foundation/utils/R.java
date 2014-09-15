@@ -102,6 +102,11 @@ public enum R
 		return Double.parseDouble(get(key));
 	}
 
+	public boolean getBoolean(String key)
+	{
+		return Boolean.valueOf(get(key));
+	}
+
 	public static String getResourcePath(String resource)
 	{
 		String path = StringUtils.removeStart(ClassLoader.getSystemResource(resource).getPath(), "/");

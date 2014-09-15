@@ -40,6 +40,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
@@ -80,7 +81,6 @@ public class DriverHelper
 	protected TestLogHelper summary;
 
 	protected WebDriver driver;
-	private static ThreadLocal<WebDriver> webDrivers = new ThreadLocal<WebDriver>();
 	
 	protected CryptoTool cryptoTool;
 
@@ -186,60 +186,6 @@ public class DriverHelper
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return element;
 	}
-	
-	/**
-	 * Find Extended Web Elements on page using By.
-	 * 
-	 * @param by
-	 * @param name
-	 * @return List<ExtendedWebElement> if exists otherwise empty list.
-	 */
-
-	public List<ExtendedWebElement> findExtendedWebElements(final By by, String name)
-	{
-		return findExtendedWebElements(by, name, EXPLICIT_TIMEOUT);
-	}
-	/**
-	 * Find Extended Web Elements on page using By.
-	 * 
-	 * @param by
-	 * @param name
-	 * @param maxWait
-	 * @return List<ExtendedWebElement> if exists otherwise empty list.
-	 */
-
-	public List<ExtendedWebElement> findExtendedWebElements(final By by, String name, long maxWait)
-	{
-		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
-		List<WebElement> webElements = new ArrayList<WebElement> ();
-		
-		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return !drv.findElements(by).isEmpty();
-				}
-			});
-			webElements = driver.findElements(by);
-		}
-		catch (Exception e)
-		{
-			//do nothing
-		}
-		
-		for (WebElement element : webElements) {
-			extendedWebElements.add(new ExtendedWebElement(element, "extendedWebElement"));
-		}		
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-		return extendedWebElements;
-	}
-	
-
 	/**
 	 * Check that element present within specified timeout.
 	 * 
@@ -522,7 +468,20 @@ public class DriverHelper
 	 */
 	public void click(final ExtendedWebElement extendedWebElement)
 	{
-		//isElementPresent(extendedWebElement);
+		isElementPresent(extendedWebElement, EXPLICIT_TIMEOUT); //just wait and try to link anyway
+		click(extendedWebElement, EXPLICIT_TIMEOUT);
+	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param element
+	 *            to click.
+	 */
+	public void click(final ExtendedWebElement extendedWebElement, long timeout)
+	{
+		isElementPresent(extendedWebElement, timeout);
+		
 		clickSafe(extendedWebElement, true);
 		String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
 		summary.log(msg);
@@ -534,7 +493,7 @@ public class DriverHelper
 		{
 			LOGGER.info(e.getMessage());
 		}
-	}
+	}	
 
 	public void click(String controlInfo, WebElement control)
 	{
@@ -623,8 +582,8 @@ public class DriverHelper
 	 * @param element
 	 *            to click.
 	 */
-	public void doubleClick(final ExtendedWebElement extendedWebElement)
-	{
+	
+	public void doubleClick(final ExtendedWebElement extendedWebElement) {
 		//isElementPresent(extendedWebElement);
 		doubleClickSafe(extendedWebElement, true);
 		String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(extendedWebElement.getName());
@@ -663,14 +622,7 @@ public class DriverHelper
 		try
 		{
 			Thread.sleep(RETRY_TIME);
-			//String mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
-			//JavascriptExecutor js = (JavascriptExecutor) driver;
-			//js.executeScript(mouseOverScript, extendedWebElement.getElement());
-			//action.doubleClick().build().perform();
-			
-			action.moveToElement(extendedWebElement.getElement()).doubleClick().build().perform();
-			//action.doubleClick(extendedWebElement.getElement()).build().perform();
-
+			action.moveToElement(extendedWebElement.getElement()).doubleClick(extendedWebElement.getElement()).build().perform();
 		}
 		catch (UnhandledAlertException e)
 		{
@@ -758,7 +710,8 @@ public class DriverHelper
 	 */
 	public void check(final ExtendedWebElement checkbox)
 	{
-		if (isElementPresent(checkbox) && !checkbox.getElement().isSelected())
+		if (isElementPresent(checkbox) &&
+				(!checkbox.getElement().isSelected() || checkbox.getElement().getAttribute("checked").equalsIgnoreCase("false")))
 		{
 			click(checkbox);
 			logMakingScreen(Messager.CHECKBOX_CHECKED.info(checkbox.getName()));
@@ -772,13 +725,28 @@ public class DriverHelper
 	 */
 	public void uncheck(final ExtendedWebElement checkbox)
 	{
-		if (isElementPresent(checkbox) && checkbox.getElement().isSelected())
+		if (isElementPresent(checkbox) && 
+				(checkbox.getElement().isSelected() || checkbox.getElement().getAttribute("checked").equalsIgnoreCase("true")))
 		{
 			click(checkbox);
 			logMakingScreen(Messager.CHECKBOX_UNCHECKED.info(checkbox.getName()));
 		}
 	}
 
+	/**
+	 * Get checkbox state.
+	 * 
+	 * @param checkbox
+	 *            - checkbox to test
+	 * @return - current state
+	 */
+	public boolean isChecked(final ExtendedWebElement checkbox)
+	{
+		assertElementPresent(checkbox);
+		return checkbox.getElement().isSelected() || checkbox.getElement().getAttribute("checked").equalsIgnoreCase("true");
+	}
+
+	
 	/**
 	 * Inputs file path to specified element.
 	 * 
@@ -847,7 +815,7 @@ public class DriverHelper
 		
 		String msg = Messager.OPEN_URL.info(url);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
 	}
 
 	/**
@@ -1044,19 +1012,6 @@ public class DriverHelper
 	}
 
 	/**
-	 * Get checkbox state.
-	 * 
-	 * @param checkbox
-	 *            - checkbox to test
-	 * @return - current state
-	 */
-	public boolean isChecked(final ExtendedWebElement checkbox)
-	{
-		assertElementPresent(checkbox);
-		return checkbox.getElement().isSelected();
-	}
-
-	/**
 	 * Select multiple text values in specified select element.
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final String[] values)
@@ -1188,7 +1143,10 @@ public class DriverHelper
 	 * @param element
 	 *            to be hovered.
 	 */
-	public void hover(final ExtendedWebElement extendedWebElement)
+	public void hover(final ExtendedWebElement extendedWebElement) {
+		hover(extendedWebElement, null, null);
+	}
+	public void hover(final ExtendedWebElement extendedWebElement, Integer xOffset, Integer  yOffset)
 	{
 		WebDriver drv = getDriver();
 		if (isElementPresent(extendedWebElement))
@@ -1196,7 +1154,13 @@ public class DriverHelper
 			
 			if (!drv.toString().contains("safari")) {
 				Actions action = new Actions(drv);
-				action.moveToElement(extendedWebElement.getElement());
+				if (xOffset != null && yOffset != null) {
+					action.moveToElement(extendedWebElement.getElement(), xOffset, yOffset);
+				}
+				else {
+					action.moveToElement(extendedWebElement.getElement());
+				}
+
 				action.perform();				
 			}
 			else {
@@ -1308,9 +1272,19 @@ public class DriverHelper
 		if (isElementPresent(from) && isElementPresent(to))
 		{
 			WebDriver drv = getDriver();
-			Actions builder = new Actions(drv);
-			Action dragAndDrop = builder.clickAndHold(from.getElement()).moveToElement(to.getElement()).release(to.getElement()).build();
-			dragAndDrop.perform();
+			if (!drv.toString().contains("safari")) {			
+				Actions builder = new Actions(drv);
+				Action dragAndDrop = builder.clickAndHold(from.getElement()).moveToElement(to.getElement()).release(to.getElement()).build();
+				dragAndDrop.perform();
+			} else {			
+				WebElement LocatorFrom = from.getElement();
+				WebElement LocatorTo = to.getElement();
+				String xto=Integer.toString(LocatorTo.getLocation().x);
+				String yto=Integer.toString(LocatorTo.getLocation().y);
+				((JavascriptExecutor)driver).executeScript("function simulate(f,c,d,e){var b,a=null;for(b in eventMatchers)if(eventMatchers[b].test(c)){a=b;break}if(!a)return!1;document.createEvent?(b=document.createEvent(a),a==\"HTMLEvents\"?b.initEvent(c,!0,!0):b.initMouseEvent(c,!0,!0,document.defaultView,0,d,e,d,e,!1,!1,!1,!1,0,null),f.dispatchEvent(b)):(a=document.createEventObject(),a.detail=0,a.screenX=d,a.screenY=e,a.clientX=d,a.clientY=e,a.ctrlKey=!1,a.altKey=!1,a.shiftKey=!1,a.metaKey=!1,a.button=1,f.fireEvent(\"on\"+c,a));return!0} var eventMatchers={HTMLEvents:/^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,MouseEvents:/^(?:click|dblclick|mouse(?:down|up|over|move|out))$/}; " +
+				"simulate(arguments[0],\"mousedown\",0,0); simulate(arguments[0],\"mousemove\",arguments[1],arguments[2]); simulate(arguments[0],\"mouseup\",arguments[1],arguments[2]); ",
+				LocatorFrom,xto,yto);			
+			}
 
 			String msg = Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
 			summary.log(msg);
@@ -1602,6 +1576,24 @@ public class DriverHelper
 		swipeObject.put("duration", duration);
 		js.executeScript("mobile: swipe", swipeObject);
 	}
+	
+    public void swipe(ExtendedWebElement element, Double startX, Double startY, Double endX, Double endY, Double duration) {
+		LOGGER.info(String.format("Swipe on element %s. Start point (%s;%s), end point (%s;%s)", element.getNameWithLocator(), startX, startY, endX, endY));
+		isElementPresent(element);
+
+		
+		final JavascriptExecutor js = (JavascriptExecutor) getDriver();
+		final HashMap<String, String> swipeObject = new HashMap<String, String>();
+		swipeObject.put("startX", startX.toString());
+		swipeObject.put("startY", startY.toString());
+		swipeObject.put("endX", endX.toString());
+		swipeObject.put("endY", endY.toString());
+		swipeObject.put("element", ((RemoteWebElement) element.getElement()).getId());
+		swipeObject.put("duration", duration.toString());
+		LOGGER.info(String.format("Swipe object: %s", swipeObject));
+		js.executeScript("mobile: swipe", swipeObject);
+		
+    }	
 
 	// --------------------------------------------------------------------------
 	// Base UI validations
@@ -1652,39 +1644,14 @@ public class DriverHelper
 	}
 	
 
-	// --------------------------------------------------------------------------
-	// Web Drivers
-	// --------------------------------------------------------------------------
-	public WebDriver getDriver() {
-		return webDrivers.get();
-	}
-	 
-	public static void setDriver(WebDriver driver) {
-		webDrivers.set(driver);
-	}
-
-    public static void closeDriver() {
-    	webDrivers.get().close();
+   
+    
+    public ExtendedWebElement findExtendedWebElement(By by) {
+    	return findExtendedWebElement(by, EXPLICIT_TIMEOUT);
     }
-    
-    public static void quitDriver() {
-    	try {
-	    	LOGGER.info("Driver exiting..." + webDrivers.get());
-    		//webDrivers.get().close();
-	    	webDrivers.get().quit();
-	    	LOGGER.info("Driver exited..." + webDrivers.get());
-    	}
-    	catch (Exception e) {
-    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
-    		LOGGER.info("======================================================================================================================================");
-    	} finally {
-    		//TODO analyze how to forcibly kill session on device
-	    	webDrivers.remove();
-	    	//LOGGER.info("Driver exited finally: " + webDrivers.get());
-    	}
-    }    
-    
-	public ExtendedWebElement findExtendedWebElement(By by) {
+	public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
+		isElementPresent("extendedWebElement", by, timeout);
+		
 		ExtendedWebElement element;
 		try
 		{
@@ -1697,20 +1664,43 @@ public class DriverHelper
 		return element;
 	}	
 	
+	
 	public List<ExtendedWebElement> findExtendedWebElements(By by) {
-		List<ExtendedWebElement> elements = new ArrayList<ExtendedWebElement>();
+		return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
+	}
+	
+	public List<ExtendedWebElement> findExtendedWebElements(final By by, long maxWait)
+	{
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<WebElement> webElements = new ArrayList<WebElement> ();
+		
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, maxWait, RETRY_TIME);
 		try
 		{
-			List<WebElement> webElements = getDriver().findElements(by);
-			for (WebElement element : webElements) {
-				elements.add(new ExtendedWebElement(element, "extendedWebElement"));
-			}			
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !drv.findElements(by).isEmpty();
+				}
+			});
+			webElements = driver.findElements(by);
 		}
 		catch (Exception e)
 		{
-			elements = null;
+			//do nothing
 		}
-		return elements;
-	}		
+		
+		for (WebElement element : webElements) {
+			extendedWebElements.add(new ExtendedWebElement(element, element.getText()));
+		}		
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return extendedWebElements;
+	}	
      
+	protected WebDriver getDriver() {
+		return driver;
+	}	
 }    

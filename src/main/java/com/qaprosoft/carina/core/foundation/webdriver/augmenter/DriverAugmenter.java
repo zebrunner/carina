@@ -8,7 +8,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 public class DriverAugmenter extends Augmenter {
 
 	public DriverAugmenter() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	@Override

@@ -50,6 +50,31 @@ public class Configuration
 	}
 
 	/**
+	 * All available configuration for diver initialization phase.
+	 */
+
+	public enum DriverMode
+	{
+		SUITE_MODE("suite_mode"),
+		
+		CLASS_MODE("class_mode"),
+		
+		METHOD_MODE("method_mode");
+		
+		private final String key;
+
+		private DriverMode(String key)
+		{
+			this.key = key;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+
+	}
+	/**
 	 * All available configuration parameter keys along with default values.
 	 */
 	public enum Parameter
@@ -68,7 +93,7 @@ public class Configuration
 
 		SELENIUM_HOST("selenium_host", "default_selenium_host"),
 		
-		TESTS_DEPENDENT_MODE("test_dependent_mode", "default_tests_dependent_mode"),
+		DRIVER_MODE("default_driver_mode", "driver_mode"),
 		
 		APP_VERSION("app_version", "default_app_version"),
 
@@ -91,6 +116,8 @@ public class Configuration
 		ROOT_REPORT_DIRECTORY("root_report_directory", "default_root_report_directory"),
 
 		MAX_SCREENSHOOT_HISTORY("max_screen_history", "default_max_screen_history"),
+		
+		RESULT_SORTING("result_sorting", "default_result_sorting"),
 
 		KEEP_ALL_SCREENSHOTS("keep_all_screenshots", "default_keep_all_screenshots"),
 
@@ -257,6 +284,11 @@ public class Configuration
 		return Boolean.valueOf(get(param));
 	}
 
+	public static DriverMode getDriverMode(Parameter param)
+	{
+		return DriverMode.valueOf(get(param).toUpperCase());
+	}
+	
 	public static Locale getLocale()
 	{
 		Locale locale = null;

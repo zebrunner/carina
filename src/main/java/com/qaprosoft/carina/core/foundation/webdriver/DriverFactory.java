@@ -15,7 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -49,11 +49,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.appium.AppiumNativeDriver;
  */
 public class DriverFactory
 {
+	public static final String CHROME = "chrome";
 	public static final String HTML_UNIT = "htmlunit";
 	public static final String IOS = "iOS";
 	public static final String ANDROID = "Android";
 	public static final String SAFARI = "safari";
-	public static final String SELENDROID = "Selendroid";
 	public static final String MOBILE_GRID = "mobile_grid";
 	public static final String MOBILE = "mobile";
 	
@@ -62,7 +62,7 @@ public class DriverFactory
 	private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
 
-	public static Object createObject(String className, Object[] args) {
+/*	public static Object create(String className, Object[] args) {
 		Class<?> clazz;
 		Object object = null;
 		try {
@@ -74,6 +74,34 @@ public class DriverFactory
 			e.printStackTrace();
 		}	
 		return object;
+	}*/
+	
+	public static synchronized WebDriver create(String testName, String browser)
+	{
+		WebDriver driver = null;
+		try {
+			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
+			{
+				driver = new FirefoxDriver();
+			}
+			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
+			{
+				driver = new InternetExplorerDriver();
+			}
+			else if (CHROME.equalsIgnoreCase(browser))
+			{
+				driver = new ChromeDriver();
+			}
+			else {
+				LOGGER.error("Unsupported extra local driver is requested: " + browser);
+			}
+		}
+		catch (Exception e)
+		{
+			LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
+		}		
+			
+		return driver;
 	}
 
 	public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host)
@@ -150,29 +178,29 @@ public class DriverFactory
 							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 				}					
 			}
-			else if (SELENDROID.equalsIgnoreCase(browser))
+			else if (SAFARI.equalsIgnoreCase(browser))
 			{
-				capabilities = getSelendroidCapabilities(testName);
+				capabilities = getSafariCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}			
 			else
 			{
 				capabilities = getChromeCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 
+	    	LOGGER.info("-------------------------------------- Driver Factory start ----------------------------------");			
 			if (browser.toLowerCase().contains(MOBILE.toLowerCase()))
 			{
 				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
 				driver = new AppiumNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
-				return driver;
 			} else {		
 				driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
 			}
+	    	LOGGER.info("-------------------------------------- Driver Factory finish ---------------------------------");			
 		}
 		catch (Exception e)
 		{
 	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
 		}
-		
 		return driver;
 	}
 	
@@ -315,18 +343,25 @@ public class DriverFactory
 		return capabilities;
 	}
 
-	private static DesiredCapabilities getHtmlUnitCapabilities(String testName)
+	public static DesiredCapabilities getHtmlUnitCapabilities(String testName)
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
 		//capabilities.setBrowserName(BrowserType.CHROME);
-		capabilities.setPlatform(Platform.WINDOWS);
+		String platform = Configuration.get(Parameter.PLATFORM);
+		if (!platform.equals("*")) {
+			capabilities.setPlatform(Platform.extractFromSysProperty(platform));
+		}
 		capabilities.setJavascriptEnabled(true);
 		return capabilities;
 	}
 	
-	private static DesiredCapabilities getSelendroidCapabilities(String testName)
+	public static DesiredCapabilities getSafariCapabilities(String testName) {
+		return getSafariCapabilities(testName, "*");
+	}
+	public static DesiredCapabilities getSafariCapabilities(String testName, String browserVersion)
 	{
-		DesiredCapabilities capabilities = DesiredCapabilities.android();
+		DesiredCapabilities capabilities = DesiredCapabilities.safari();
+		capabilities = initBaseCapabilities(capabilities, BrowserType.SAFARI, browserVersion, testName);		
 		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
