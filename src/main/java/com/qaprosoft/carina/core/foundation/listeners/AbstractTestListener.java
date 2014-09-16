@@ -53,10 +53,14 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onStart(ITestContext testContext)
 	{
 		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateWordAN(8));
+		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
-	    }		
+	    }
+	    
+	    //spira logging
+    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());	    
 	}
 	
 	@Override

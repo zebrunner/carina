@@ -182,6 +182,8 @@ public class DriverHelper
 		{
 			element = null;
 			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+			throw new RuntimeException(e);
 		}
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return element;
@@ -541,7 +543,7 @@ public class DriverHelper
 	 * @param element
 	 * @param startTimer
 	 */
-	private void clickSafe(final ExtendedWebElement extendedWebElement, boolean startTimer)
+	private void clickSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
 	{
 		if (startTimer)
 		{
@@ -563,6 +565,12 @@ public class DriverHelper
 				scrollTo(extendedWebElement);
 			}
 
+			if (e.getMessage().contains("Element is not currently visible"))
+			{
+				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+				scrollTo(extendedWebElement);
+			}
+			
 			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
 			{
 				clickSafe(extendedWebElement, false);
