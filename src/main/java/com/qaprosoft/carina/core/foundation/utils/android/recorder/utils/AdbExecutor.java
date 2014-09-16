@@ -77,7 +77,7 @@ public class AdbExecutor {
             Process process = executor.start();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = in.readLine();
-            LOGGER.info("sdkVersion: " + line);
+            LOGGER.debug("sdkVersion: " + line);
             int sdkVersion = Integer.parseInt(line);
             correctDevice = sdkVersion >= 19;
 
@@ -106,7 +106,7 @@ public class AdbExecutor {
 
             while ((line = in.readLine()) != null) {
             	
-                LOGGER.info(line);
+                LOGGER.debug(line);
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
