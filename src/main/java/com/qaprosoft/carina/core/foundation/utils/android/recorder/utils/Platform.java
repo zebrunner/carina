@@ -61,7 +61,7 @@ public class Platform {
 			}
 			//String cmd = sb.append(" /f /t").toString();
             String cmd = sb.append(" /F /T").toString();
-			LOGGER.info(cmd);
+			LOGGER.debug(cmd);
 			Runtime.getRuntime().exec(cmd);
 		} catch (Exception e) {
 			// ignore
@@ -75,7 +75,7 @@ public class Platform {
                 sb.append(" ").append(pid);
             }
             String cmd = sb.toString();
-            LOGGER.info(cmd);
+            LOGGER.debug(cmd);
             Runtime.getRuntime().exec(cmd);
         }catch (Exception e){
             //ignore
