@@ -137,7 +137,7 @@ public class DriverFactory
 			String browser = Configuration.get(Parameter.BROWSER);
 			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
-				capabilities = getFirefoxCapabilities(testName, browser, Configuration.get(Parameter.USER_AGENT));
+				capabilities = getFirefoxCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION), Configuration.get(Parameter.USER_AGENT));
 			}
 			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{

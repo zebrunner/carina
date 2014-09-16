@@ -194,6 +194,10 @@ public abstract class AbstractTest extends DriverHelper
 		    
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
 		    Jira.updateAfterTest(result);
+
+		    //clear jira tickets to be sure that next test is not affected.
+		    jiraTickets.clear();
+
 		    
 			String testName = TestNamingUtil.getCanonicalTestName(result);
 			GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
