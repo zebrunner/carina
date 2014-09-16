@@ -224,6 +224,7 @@ public abstract class AbstractTest extends DriverHelper
 	    FileWriter fw = new FileWriter(testLogFile);
 	    
 	    // Populate JIRA ID
+	    LOGGER.debug("jiraTickets after test methd: " + jiraTickets);
 	    if (jiraTickets.size() == 0) { //it was not redefined in the test
 			if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
 				jiraTickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
@@ -241,8 +242,13 @@ public abstract class AbstractTest extends DriverHelper
 				}
 			}	    	
 	    }
+	    LOGGER.debug("jiraTickets before updating jira: " + jiraTickets);	    
 		result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
 	    Jira.updateAfterTest(result);
+	    
+	    //clear jira tickets to be sure that next test is not affected.
+	    jiraTickets.clear();
+	    LOGGER.debug("jiraTickets after updating jira and cleanup: " + jiraTickets);
 	    
 	    WebDriver drv = getDriver();
 
