@@ -54,6 +54,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -155,6 +156,7 @@ public abstract class AbstractTest extends DriverHelper
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
     	//do nothing for now
+    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
     }
 
     @AfterClass(alwaysRun = true)

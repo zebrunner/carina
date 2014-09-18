@@ -560,25 +560,30 @@ public class DriverHelper
 		}
 		catch (Exception e)
 		{
-			if (e.getMessage().contains("Element is not clickable"))
-			{
-				scrollTo(extendedWebElement);
-			}
-
-			if (e.getMessage().contains("Element is not currently visible"))
-			{
+			//finding element again via By to be actual 
+			try {
 				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
-				scrollTo(extendedWebElement);
 			}
-			
-			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
-			{
-				clickSafe(extendedWebElement, false);
+			catch(Exception ex) {
+				//do nothing here as extendedWebElement is already defined
 			}
-			else
-			{
-				e.printStackTrace();
-				Assert.fail(Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator()));
+			scrollTo(extendedWebElement);
+
+			try {
+				//click via activating and pressing <Enter> key
+				extendedWebElement.getElement().sendKeys(Keys.ENTER);
+			}
+			catch(Exception ex) {
+				//repeat again until timeout achieved
+				if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
+				{
+					clickSafe(extendedWebElement, false);
+				}
+				else
+				{
+					e.printStackTrace();
+					Assert.fail(Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator()));
+				}
 			}
 		}
 	}

@@ -60,7 +60,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    }
 	    
 	    //spira logging
-    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());	    
+	    
+//    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
 	}
 	
 	@Override
