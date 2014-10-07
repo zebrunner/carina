@@ -167,7 +167,8 @@ public class HtmlReportGenerator
 
 	private static void copyGalleryLib()
 	{
-		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
+//		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
+		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
 		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
 		{
 			try

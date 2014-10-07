@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -35,6 +36,8 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  */
 public class EmailReportGenerator
 {
+	protected static final Logger LOGGER = Logger.getLogger(EmailReportGenerator.class);
+	
 	private static String CONTAINER = R.EMAIL.get("container");
 	private static String PACKAGE_TR = R.EMAIL.get("package_tr");
 	private static String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
@@ -104,7 +107,9 @@ public class EmailReportGenerator
 	{
 		if (testResultItems.size() > 0)
 		{
-			Collections.sort(testResultItems, new EmailReportItemComparator());
+			if (Configuration.getBoolean(Parameter.RESULT_SORTING)) {
+				Collections.sort(testResultItems, new EmailReportItemComparator());
+			}
 			
 			String packageName = testResultItems.get(0).getPack();
 
@@ -188,63 +193,26 @@ public class EmailReportGenerator
 			passCount++;
 		}
 		
-/*		
-		if ("FAIL".equals(testResultItem.getResult().name()) || "SKIP".equals(testResultItem.getResult().name()))
+		List<String> jiraTickets = testResultItem.getJiraTickets();
+		
+		String bugId = "N/A";
+		String bugUrl = "#";
+		
+		if (jiraTickets.size() > 0)
 		{
-			result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
-			result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-			
-			String failReason = testResultItem.getFailReason();
-			if (!StringUtils.isEmpty(failReason))
-			{
-				// Make description more compact for email report																																																											
-				failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
-				result = result.replace(FAIL_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
-			}
-			else
-			{
-				result = result.replace(FAIL_REASON_PLACEHOLDER, "Test RuntimeException: contact qa engineer!");
-			}
-			
-			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-			
-			if(testResultItem.getLinkToScreenshots() != null)
-			{
-				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
-			}
-			
-			failCount++;
+			bugId = jiraTickets.get(0);
+		    
+		    if (!Configuration.get(Parameter.JIRA_URL).equalsIgnoreCase("null")) {
+		    	bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + jiraTickets.get(0);
+		    }
+		    
+		    if (jiraTickets.size() > 1) {
+		    	LOGGER.error("Current implementation doesn't support email report generation with several Jira Tickets fo single test!");
+		    }
 		}
-		else
-		{
-			result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
-			result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-			
-			if(testResultItem.getLinkToScreenshots() != null)
-			{
-				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
-			}
-			passCount++;
-		}*/
-//		if (testResultItem.getDescription() != null && testResultItem.getDescription().contains("JIRA#"))
-//		{
-//			String id = testResultItem.getDescription().split("#")[1];
-//			String url = Configuration.get(Parameter.JIRA_URL) + id;
-//			result = result.replace(BUG_ID_PLACEHOLDER, id);
-//			result = result.replace(BUG_URL_PLACEHOLDER, url);
-//		}
-		 if (testResultItem.getJiraTicket() != null)
-         {
-             String url = Configuration.get(Parameter.JIRA_URL) + "/browse/" + testResultItem.getJiraTicket();
-             result = result.replace(BUG_ID_PLACEHOLDER, testResultItem.getJiraTicket());
-             result = result.replace(BUG_URL_PLACEHOLDER, url);
-         }
-         else
-         {
-             result = result.replace(BUG_ID_PLACEHOLDER, "N/A");
-             result = result.replace(BUG_URL_PLACEHOLDER, "#");
-         }
+	    result = result.replace(BUG_ID_PLACEHOLDER, bugId);
+	    result = result.replace(BUG_URL_PLACEHOLDER, bugUrl);
+
 		return result;
 	}
 
@@ -285,15 +253,7 @@ public class EmailReportGenerator
 				skipped++;
 				break;
 			}
-/*			if(ri.getResult().equals(TestResultType.PASS))
-			{
-				passed++;
-			}
-			else
-			{
-				failed++;
-			}
-*/		}
+		}
 		TestResultType result;
 		if (passed > 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
@@ -302,16 +262,7 @@ public class EmailReportGenerator
 		} else {
 			result = TestResultType.FAIL;
 		}
-/*		
-		
-		if (failed == 0 && passed == 0){
-			result = TestResultType.SKIP;
-		}else if (failed == 0 && passed > 0){
-			result = TestResultType.PASS;
-		}else{
-			result = TestResultType.FAIL;
-		}
-*/		return result;
+		return result;
 		
 	}
 

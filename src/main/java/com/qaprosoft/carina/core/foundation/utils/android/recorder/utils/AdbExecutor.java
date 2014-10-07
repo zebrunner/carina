@@ -169,4 +169,11 @@ public class AdbExecutor {
         }
     }
     
+    public void pressKey(int key){
+    	if (!isDeviceCorrect())
+    		return;
+    	
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", Configuration.get(Parameter.MOBILE_DEVICE_UDID), "shell", "input", "keyevent", String.valueOf(key));
+    	execute(cmd);
+    }    
 }

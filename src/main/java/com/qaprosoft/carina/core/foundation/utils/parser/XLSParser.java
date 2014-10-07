@@ -52,7 +52,7 @@ public class XLSParser
 		}
 		int cellN = locales.indexOf(locale.getCountry()) + 1;
 
-		List<String> locatorKeys = getLoctorKeys(sheet);
+		List<String> locatorKeys = getLocatorKeys(sheet);
 		if (!locatorKeys.contains(locatorKey))
 		{
 			throw new RuntimeException("Can't find locatorKey '" + locatorKey + "' in xls '" + xlsPath + "'!");
@@ -83,7 +83,7 @@ public class XLSParser
 		return locales;
 	}
 
-	private static List<String> getLoctorKeys(Sheet sheet)
+	private static List<String> getLocatorKeys(Sheet sheet)
 	{
 		List<String> locatorKeys = new ArrayList<String>();
 		int lastRow = sheet.getLastRowNum();
@@ -183,6 +183,7 @@ public class XLSParser
 		case Cell.CELL_TYPE_BOOLEAN:
 			return df.formatCellValue(cell).trim();
 		case Cell.CELL_TYPE_FORMULA:
+			
 			return df.formatCellValue(cell, evaluator).trim();
 		case Cell.CELL_TYPE_BLANK:
 			return "";

@@ -16,6 +16,8 @@
 package com.qaprosoft.carina.core.foundation.report;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestResultItem
 {
@@ -26,7 +28,7 @@ public class TestResultItem
 	private String linkToVideo = null;
 	private String failReason = null;
 	private String description = null;
-	private String jiraTicket = null;
+	private List<String> jiraTickets = new ArrayList<String>(); //empty list
 	private TestResultType result = null;
 
 	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo)
@@ -138,14 +140,14 @@ public class TestResultItem
 		this.description = description;
 	}
 	
-	public String getJiraTicket()
+	public List<String> getJiraTickets()
 	{
-		return jiraTicket;
+		return jiraTickets;
 	}
 
-	public void setJiraTicket(String jiraTicket)
+	public void setJiraTickets(List<String> jiraTickets)
 	{
-		this.jiraTicket = jiraTicket;
+		this.jiraTickets = jiraTickets;
 	}
 
 	public String hash()

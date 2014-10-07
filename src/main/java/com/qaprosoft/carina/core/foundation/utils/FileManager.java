@@ -84,7 +84,7 @@ public class FileManager
 
 	public static File createLogRootFolder(String name)
 	{
-		createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
+		//createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
 		createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
 		return createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY) + "/" + name);
 	}

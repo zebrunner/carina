@@ -25,12 +25,16 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
+import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
+import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -42,12 +46,22 @@ import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 
 public abstract class AbstractTestListener extends TestArgsListener
 {
-	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
-
+    // Dropbox client
+    DropboxClient dropboxClient;	
+	
 	@Override
 	public void onStart(ITestContext testContext)
 	{
 		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateWordAN(8));
+		//dropbox client initialization 
+	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
+	    {
+	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
+	    }
+	    
+	    //spira logging
+	    
+//    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
 	}
 	
 	@Override
@@ -84,6 +98,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestSuccess(ITestResult result)
 	{
 		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
+		
+	    //Spira test steps integration
+	    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result);		
 		super.onTestSuccess(result);
 	}
 
@@ -91,8 +108,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestFailure(ITestResult result)
 	{
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
-		if (count >= MAX_COUNT && result.getThrowable().getMessage() != null)
+		int count = RetryCounter.getRunCount(test);		
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		
+		if (count >= maxCount && result.getThrowable().getMessage() != null)
 		{
 			String errorMessage = "";
 			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
@@ -104,8 +123,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 			if (globalLog != null) {
 				if (result.getThrowable() != null) {
 					//errorMessage = result.getThrowable().getMessage();
-					errorMessage = getFullStackTrace(result.getThrowable());
-				}				
+					thr = result.getThrowable();
+					errorMessage = getFullStackTrace(thr);
+				}
+				
+			    //Spira test steps integration
+			    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
+			    
 				String msg = Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 				globalLog.log(Type.COMMON, msg);
 			}
@@ -121,7 +145,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);
-		if (count >= MAX_COUNT)
+		
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		if (count >= maxCount)
 		{
 			String errorMessage = "";
 			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
@@ -149,7 +175,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onFinish(ITestContext testContext)
 	{
-		removeIncorrectlyFailedTests(testContext);
+		//removeIncorrectlyFailedTests(testContext);
 		super.onFinish(testContext);
 	}
 
@@ -209,23 +235,25 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 	}
 
-	protected TestResultItem createTestResult(ITestResult test, TestResultType result, String failReason, String description)
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description)
 	{
-		String group = TestNamingUtil.getPackageName(test);
-		String testName = TestNamingUtil.getCanonicalTestName(test);
+		String group = TestNamingUtil.getPackageName(result);
+		String testName = TestNamingUtil.getCanonicalTestName(result);
 		String linkToLog = ReportContext.getTestLogLink(testName);
 		String linkToVideo = ReportContext.getTestVideoLink(testName);
 		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
 		if(!FileUtils.listFiles(ReportContext.getTestDir(testName), new String[]{"png"}, false).isEmpty()
 			&& Configuration.getBoolean(Parameter.AUTO_SCREENSHOT)
-			&& (TestResultType.FAIL.equals(result) || Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)))
+			&& (TestResultType.FAIL.equals(resultType) || Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)))
 		{
 			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, linkToVideo, failReason);
+		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason);
 		testResultItem.setDescription(description);
-		testResultItem.setJiraTicket((String)test.getAttribute(SpecialKeywords.JIRA_TICKET));
+		if (!resultType.equals(TestResultType.PASS)) {
+			testResultItem.setJiraTickets(Jira.getTickets(result));
+		}
 		return testResultItem;
 	}
 	

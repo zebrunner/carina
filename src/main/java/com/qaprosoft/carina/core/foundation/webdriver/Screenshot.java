@@ -63,6 +63,11 @@ public class Screenshot
 		
 		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 		{
+			if (driver.toString().contains("null")) {
+				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
+				return null;
+			}
+			
 			try
 			{
 				// Define test screenshot root
@@ -75,7 +80,12 @@ public class Screenshot
 				String fileID = test.replaceAll(" ", "_") + "-" + System.currentTimeMillis();
 				screenName = fileID + ".png";
 				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
-				WebDriver augmentedDriver = new DriverAugmenter().augment(driver);
+				
+				WebDriver augmentedDriver = driver;
+				if (!driver.toString().contains("AppiumNativeDriver")) {
+					//do not augment for Appium 1.x anymore
+					augmentedDriver = new DriverAugmenter().augment(driver);
+				} 
 				
 				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
 				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
@@ -95,12 +105,13 @@ public class Screenshot
 			catch (IOException e)
 			{
 				LOGGER.error("Unable to capture screenshot due to the I/O issues!");
-				//e.printStackTrace();
+//				e.printStackTrace();
 			}
 			catch (Exception e)
 			{
-				LOGGER.error("Unable to capture screenshot!");
-				//e.printStackTrace();
+//				LOGGER.error("Unable to capture screenshot!");
+				LOGGER.error("Unable to capture screenshot! " + e.getMessage());
+				e.printStackTrace();
 			}
 		}
 		return screenName;

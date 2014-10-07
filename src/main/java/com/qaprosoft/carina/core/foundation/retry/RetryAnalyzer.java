@@ -20,22 +20,25 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
-public class RetryAnalyzer implements IRetryAnalyzer
-{
+public class RetryAnalyzer implements IRetryAnalyzer {
 	public static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
 
 	public int attemptsCount = 0;
 
-	public boolean retry(ITestResult result)
-	{
-		boolean isRerunnable = false;
-		if (attemptsCount < Configuration.getInt(Parameter.RETRY_COUNT))
-		{
-			attemptsCount++;
-			isRerunnable = true;
+	public boolean retry(ITestResult result) {
+		if (attemptsCount++ < getMaxRetryCountForTest(result)) {
+			return true;
 		}
-		return isRerunnable;
+		return false;
+	}
+
+	public static int getMaxRetryCountForTest(ITestResult result) {
+		if (result.getMethod().getDescription() == null) {
+			return Configuration.getInt(Parameter.RETRY_COUNT);
+		}
+		return result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET) ? 0 : Configuration.getInt(Parameter.RETRY_COUNT);
 	}
 }

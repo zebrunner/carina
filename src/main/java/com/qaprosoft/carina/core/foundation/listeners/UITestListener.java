@@ -15,17 +15,19 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -35,142 +37,172 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 /**
- * Listener that controls retry logic for test according to retry_count configuration attribute.
- * Also it generates test result item if test passed or retry limit is exceed.
+ * Listener that controls retry logic for test according to retry_count
+ * configuration attribute. Also it generates test result item if test passed or
+ * retry limit is exceed.
  * 
  * @author Alex Khursevich
  */
 
-public class UITestListener extends AbstractTestListener
-{
+public class UITestListener extends AbstractTestListener {
+	// private static final Logger LOGGER =
+	// Logger.getLogger(UITestListener.class);
 	private static final Logger LOGGER = Logger.getLogger(UITestListener.class);
-	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
 	
-    // Dropbox client
-    DropboxClient dropboxClient;	
 
 	@Override
-	public void onStart(ITestContext testContext)
-	{
-		super.onStart(testContext);
-	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
-	    {
-	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
-	    }		
-	}
-	
-	@Override
-	public void onTestStart(ITestResult result)
-	{
+	public void onTestStart(ITestResult result) {
 		super.onTestStart(result);
 		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
 		WebDriver drv = DriverPool.getDriverBySessionId(sessionId);
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		DriverPool.associateTestNameWithDriver(test, drv);
 	}
-	
+
 	@Override
-	public void onTestFailure(ITestResult result)
-	{
+	public void onTestFailure(ITestResult result) {
 		String test = TestNamingUtil.getCanonicalTestName(result);
+		
 		int count = RetryCounter.getRunCount(test);
-		if (count < MAX_COUNT)
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		
+		String errorMessage = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
+		}
+
+		if (result.getThrowable() != null) {
+			errorMessage = getFullStackTrace(result.getThrowable());
+		}
+		
+		
+		if (count < maxCount)
 		{
-			LOGGER.warn(String.format("Test '%s' FAILED! Retry %d/%d time.", test, count + 1, MAX_COUNT));
+			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count + 1, maxCount, errorMessage));
 			RetryCounter.incrementRunCount(test);
-			result.setStatus(ITestResult.SKIP);
 			ReportContext.removeTestReport(test);
 		}
 		else
-		{
-			if (MAX_COUNT != 0)
+		{		
+			if (count > 0) {
 				LOGGER.error("Retry limit exceeded for " + result.getName());
-			
-			
-			String errorMessage = "";
-			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-			if (thr != null) {
-				errorMessage = getFullStackTrace(thr);
 			}
-			
-			if (result.getThrowable() != null) {
-				errorMessage = getFullStackTrace(result.getThrowable());
-			}
-
+	
 			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
-			
 			super.onTestFailure(result);
 		}
 		Reporter.setCurrentTestResult(result);
-		
 	}
 
 	@Override
-	public void onTestSkipped(ITestResult result)
-	{
+	public void onTestSkipped(ITestResult result) {
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);
-		if (count < MAX_COUNT)
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		
+		String errorMessage = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
+		}
+
+		if (result.getThrowable() != null) {
+			errorMessage = getFullStackTrace(result.getThrowable());
+		}
+		
+		if (count < maxCount)
 		{
-			LOGGER.warn(String.format("Test '%s' SKIPPED! Retry %d/%d time.", test, count + 1, MAX_COUNT));
+			LOGGER.error(String.format("Test '%s' SKIPPED! Retry %d of %d time - %s", test, count + 1, maxCount, errorMessage));
 			RetryCounter.incrementRunCount(test);
-			result.setStatus(ITestResult.SKIP);
 			ReportContext.removeTestReport(test);
 		}
 		else
-		{
-			if (MAX_COUNT != 0)
+		{	
+			if (count > 0) {
 				LOGGER.error("Retry limit exceeded for " + result.getName());
-			
-			
-			String errorMessage = "";
-			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-			if (thr != null) {
-				errorMessage = getFullStackTrace(thr);
-			}
-			
-			if (result.getThrowable() != null) {
-				errorMessage = getFullStackTrace(result.getThrowable());
-			}
-			//TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST SKIPPED - " + errorMessage);
+			}			
+			// TestLogCollector.addScreenshotComment(takeScreenshot(result),
+			// "TEST SKIPPED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
-			
 			super.onTestSkipped(result);
 		}
 		Reporter.setCurrentTestResult(result);
-		
 	}
-	
+
 	@Override
-	public void onTestSuccess(ITestResult result)
-	{
+	public void onTestSuccess(ITestResult result) {
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 
+		// TestLogCollector.addScreenshotComment(takeScreenshot(result),
+		// "TEST PASSED!");
 
-		//TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST PASSED!");
-
-		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS))
-		{
+		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
 			ReportContext.removeTestReport(test);
 		}
 		super.onTestSuccess(result);
 	}
 
-	private String takeScreenshot(ITestResult result) 
-	{
+	private String takeScreenshot(ITestResult result) {
 		String screenId = "";
 		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
-		
+
 		WebDriver driver = DriverPool.getDriverBySessionId(sessionId);
-		
+
 		if (driver != null) {
-			screenId = Screenshot.capture(driver, true); //in case of failure make screenshot by default
+			screenId = Screenshot.capture(driver, true); // in case of failure
+															// make screenshot
+															// by default
 		}
 
-		
 		return screenId;
 	}
-		
+
+	// cleaning of test results after retry logic work
+	public void onFinish(ITestContext testContext) {
+		super.onFinish(testContext);
+
+/*		// List of test results which we will delete later
+		List<ITestResult> testsToBeRemoved = new ArrayList<ITestResult>();
+
+		// collect all id's from passed test
+		Set<Integer> passedTestIds = new HashSet<Integer>();
+		for (ITestResult passedTest : testContext.getPassedTests().getAllResults()) {
+			passedTestIds.add(TestUtil.getId(passedTest));
+		}
+
+		Set<Integer> failedTestIds = new HashSet<Integer>();
+		for (ITestResult failedTest : testContext.getFailedTests().getAllResults()) {
+
+			// id = class + method + dataprovider
+			int failedTestId = TestUtil.getId(failedTest);
+
+			// if we saw this test as a failed test before we mark as to be deleted
+			// or delete this failed test if there is at least one passed version
+			if (failedTestIds.contains(failedTestId) || passedTestIds.contains(failedTestId)) {
+				testsToBeRemoved.add(failedTest);
+			} else {
+				failedTestIds.add(failedTestId);
+			}
+		}
+
+		// finally delete all tests that are marked
+		for (Iterator<ITestResult> iterator = testContext.getFailedTests().getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			if (testsToBeRemoved.contains(testResult)) {
+				iterator.remove();
+			}
+		}*/
+	}
+
+	public static class TestUtil {
+		public static int getId(ITestResult result) {
+			int id = result.getTestClass().getName().hashCode();
+			id = 31 * id + result.getMethod().getMethodName().hashCode();
+			id = 31 * id + (result.getParameters() != null ? Arrays.hashCode(result.getParameters()) : 0);
+			return id;
+		}
+	}
 }

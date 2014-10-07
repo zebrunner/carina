@@ -23,63 +23,63 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class DriverPool
 {
 	static WebDriver single_driver;
 	private static Map<WebDriver, String> driverTestMap = Collections.synchronizedMap(new HashMap<WebDriver, String>());
-//	private static Map<String, WebDriver> testDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
-
 	private static Map<String, WebDriver> sessionIdDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
 
 	public static synchronized String registerDriverSession(WebDriver driver)
 	{
 		String sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
 		sessionIdDriverMap.put(sessionId, driver);
-		if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
 			//init our single driver variable
 			single_driver = driver;
 		}
 		return sessionId;
 	}
 	
+	public static synchronized String registerDriverSession(String sessionId, WebDriver driver)
+	{
+		sessionIdDriverMap.put(sessionId, driver);
+		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
+			//init our single driver variable
+			single_driver = driver;
+		}
+		return sessionId;
+	}
+	
+	public static String replaceDriver(String oldSessionId, WebDriver driver) {
+		sessionIdDriverMap.remove(oldSessionId);
+		return registerDriverSession(driver);
+	}
+	
+	public static WebDriver getSingleDriver() {
+		return single_driver;
+	}
+	
 	public static synchronized void associateTestNameWithDriver(String test, WebDriver driver)
 	{
-//		testDriverMap.put(test, driver);
 		driverTestMap.put(driver, test);
 	}
 
-/*	public static synchronized WebDriver getDriverByTestName(String test)
-	{
-		return testDriverMap.get(test);
-	}
-*/
 	public static WebDriver getDriverBySessionId(String sessionId)
 	{
 		WebDriver drv = null;
 		if (sessionIdDriverMap.containsKey(sessionId)) {
 			drv = sessionIdDriverMap.get(sessionId);
 		}
-		else if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
+		else if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
 			//init our single driver variable
 			drv = single_driver;
 		}
 		return drv;
 
 	}
-
-	/*public static String getSessionIdByTestName(String test)
-	{
-		if (testDriverMap.containsKey(test))
-		{
-			RemoteWebDriver driver = (RemoteWebDriver) testDriverMap.get(test);
-			return driver.getSessionId().toString();
-		} else
-		{
-			return null;
-		}
-	}*/
 
 	public static String getTestNameByDriver(WebDriver driver)
 	{

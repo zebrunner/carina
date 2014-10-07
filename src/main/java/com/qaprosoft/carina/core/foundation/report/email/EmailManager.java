@@ -93,7 +93,8 @@ public class EmailManager
 		}
 		catch (MessagingException e)
 		{
-			LOGGER.info("Email with reports was NOT send: " + e.getMessage());
+			LOGGER.error("Email with reports was NOT send!", e);
+			LOGGER.debug(e.getMessage(), e);
 		}
 	}
 
