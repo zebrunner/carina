@@ -113,8 +113,6 @@ public class Configuration
 
 		PROJECT_REPORT_DIRECTORY("project_report_directory", "default_project_report_directory"),
 
-		ROOT_REPORT_DIRECTORY("root_report_directory", "default_root_report_directory"),
-
 		MAX_SCREENSHOOT_HISTORY("max_screen_history", "default_max_screen_history"),
 		
 		RESULT_SORTING("result_sorting", "default_result_sorting"),
