@@ -15,7 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 
@@ -50,12 +53,12 @@ public class ReportContext
 	{
 		if (baseDirectory == null)
 		{
-			File reportRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
+/*			File reportRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.ROOT_REPORT_DIRECTORY)));
 			if (!reportRoot.exists())
 			{
 				reportRoot.mkdir();
-			}
+			}*/
 
 			File projectRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
@@ -105,16 +108,24 @@ public class ReportContext
 	}
 
 	/**
-	 * Removes oldest screenshots directories according to history size defined
+	 * Removes emailable html report and oldest screenshots directories according to history size defined
 	 * in config.
 	 */
 	public static void removeOldReports()
 	{
 		File baseDir = new File(String.format("%s/%s", System.getProperty("user.dir"),
 				Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
-
+		
 		if (baseDir.exists())
 		{
+			//remove old emailable report
+			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
+					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
+			// if file doesnt exists, then create it
+			if (reportFile.exists()) {
+				reportFile.delete();
+			}
+			
 			List<File> files = FileManager.getFilesInDir(baseDir);
 			List<File> screenshotFolders = new ArrayList<File>();
 			for(File file : files)
@@ -165,6 +176,27 @@ public class ReportContext
 			LOGGER.error(e.getMessage());
 		}
 	}
+	
+	public static void generateHtmlReport(String content) {
+		try {
+			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
+					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
+
+			// if file doesnt exists, then create it
+			if (!reportFile.exists()) {
+				reportFile.createNewFile();
+			}
+ 
+			FileWriter fw = new FileWriter(reportFile.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(content);
+			bw.close();
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 
 	/**
 	 * Returns URL for test screenshot folder.
@@ -179,7 +211,7 @@ public class ReportContext
 			link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
-			link = String.format("%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("file://%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
 		return link;
@@ -199,7 +231,7 @@ public class ReportContext
 			link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
-			link = String.format("%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("file://%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
 		return link;
@@ -219,7 +251,7 @@ public class ReportContext
 			link = String.format("%s/%d/%s/video.mp4", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
-			link = String.format("%s/%s/video.mp4", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("file://%s/%s/video.mp4", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
 		return link;
