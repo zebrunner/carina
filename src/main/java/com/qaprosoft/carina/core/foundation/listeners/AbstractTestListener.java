@@ -26,11 +26,13 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
+import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
+import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -47,8 +49,6 @@ public abstract class AbstractTestListener extends TestArgsListener
     // Dropbox client
     DropboxClient dropboxClient;	
 	
-	private static final int MAX_COUNT = Configuration.getInt(Parameter.RETRY_COUNT);
-
 	@Override
 	public void onStart(ITestContext testContext)
 	{
@@ -108,8 +108,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestFailure(ITestResult result)
 	{
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
-		if (count >= MAX_COUNT && result.getThrowable().getMessage() != null)
+		int count = RetryCounter.getRunCount(test);		
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		
+		if (count >= maxCount && result.getThrowable().getMessage() != null)
 		{
 			String errorMessage = "";
 			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
@@ -143,7 +145,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);
-		if (count >= MAX_COUNT)
+		
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		if (count >= maxCount)
 		{
 			String errorMessage = "";
 			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
@@ -171,7 +175,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onFinish(ITestContext testContext)
 	{
-		removeIncorrectlyFailedTests(testContext);
+		//removeIncorrectlyFailedTests(testContext);
 		super.onFinish(testContext);
 	}
 
@@ -231,23 +235,25 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 	}
 
-	protected TestResultItem createTestResult(ITestResult test, TestResultType result, String failReason, String description)
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description)
 	{
-		String group = TestNamingUtil.getPackageName(test);
-		String testName = TestNamingUtil.getCanonicalTestName(test);
+		String group = TestNamingUtil.getPackageName(result);
+		String testName = TestNamingUtil.getCanonicalTestName(result);
 		String linkToLog = ReportContext.getTestLogLink(testName);
 		String linkToVideo = ReportContext.getTestVideoLink(testName);
 		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
 		if(!FileUtils.listFiles(ReportContext.getTestDir(testName), new String[]{"png"}, false).isEmpty()
 			&& Configuration.getBoolean(Parameter.AUTO_SCREENSHOT)
-			&& (TestResultType.FAIL.equals(result) || Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)))
+			&& (TestResultType.FAIL.equals(resultType) || Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)))
 		{
 			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, result, linkToScreenshots, linkToLog, linkToVideo, failReason);
+		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason);
 		testResultItem.setDescription(description);
-		testResultItem.setJiraTicket((String)test.getAttribute(SpecialKeywords.JIRA_TICKET));
+		if (!resultType.equals(TestResultType.PASS)) {
+			testResultItem.setJiraTickets(Jira.getTickets(result));
+		}
 		return testResultItem;
 	}
 	
