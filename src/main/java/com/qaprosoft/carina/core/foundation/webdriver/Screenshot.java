@@ -63,6 +63,11 @@ public class Screenshot
 		
 		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 		{
+			if (driver.toString().contains("null")) {
+				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
+				return null;
+			}
+			
 			try
 			{
 				// Define test screenshot root
@@ -100,7 +105,7 @@ public class Screenshot
 			catch (IOException e)
 			{
 				LOGGER.error("Unable to capture screenshot due to the I/O issues!");
-				//e.printStackTrace();
+//				e.printStackTrace();
 			}
 			catch (Exception e)
 			{
