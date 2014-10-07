@@ -30,8 +30,6 @@ public class DriverPool
 {
 	static WebDriver single_driver;
 	private static Map<WebDriver, String> driverTestMap = Collections.synchronizedMap(new HashMap<WebDriver, String>());
-//	private static Map<String, WebDriver> testDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
-
 	private static Map<String, WebDriver> sessionIdDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
 
 	public static synchronized String registerDriverSession(WebDriver driver)
@@ -53,19 +51,22 @@ public class DriverPool
 			single_driver = driver;
 		}
 		return sessionId;
-	}	
+	}
+	
+	public static String replaceDriver(String oldSessionId, WebDriver driver) {
+		sessionIdDriverMap.remove(oldSessionId);
+		return registerDriverSession(driver);
+	}
+	
+	public static WebDriver getSingleDriver() {
+		return single_driver;
+	}
 	
 	public static synchronized void associateTestNameWithDriver(String test, WebDriver driver)
 	{
-//		testDriverMap.put(test, driver);
 		driverTestMap.put(driver, test);
 	}
 
-/*	public static synchronized WebDriver getDriverByTestName(String test)
-	{
-		return testDriverMap.get(test);
-	}
-*/
 	public static WebDriver getDriverBySessionId(String sessionId)
 	{
 		WebDriver drv = null;
@@ -79,18 +80,6 @@ public class DriverPool
 		return drv;
 
 	}
-
-	/*public static String getSessionIdByTestName(String test)
-	{
-		if (testDriverMap.containsKey(test))
-		{
-			RemoteWebDriver driver = (RemoteWebDriver) testDriverMap.get(test);
-			return driver.getSessionId().toString();
-		} else
-		{
-			return null;
-		}
-	}*/
 
 	public static String getTestNameByDriver(WebDriver driver)
 	{
