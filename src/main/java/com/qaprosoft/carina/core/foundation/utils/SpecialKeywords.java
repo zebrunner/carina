@@ -54,6 +54,8 @@ public class SpecialKeywords
 	public static final String SPIRA_TESTSET_ID = "SPIRA_TESTSET_ID";
 	public static final String SPIRA_TESTCASE_ID = "SPIRA_TESTCASE_ID";
 	public static final String SPIRA_TESTSTEP_ID = "SPIRA_TESTSTEP_ID";
+	
+	public static final String HTML_REPORT = "emailable-report.html";
 
 	
 }
