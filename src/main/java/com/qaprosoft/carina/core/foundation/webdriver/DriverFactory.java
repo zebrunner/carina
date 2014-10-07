@@ -187,7 +187,7 @@ public class DriverFactory
 				capabilities = getChromeCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 
-	    	LOGGER.info("-------------------------------------- Driver Factory start ----------------------------------");			
+	    	LOGGER.debug("-------------------------------------- Driver Factory start ----------------------------------");			
 			if (browser.toLowerCase().contains(MOBILE.toLowerCase()))
 			{
 				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
@@ -195,7 +195,7 @@ public class DriverFactory
 			} else {		
 				driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
 			}
-	    	LOGGER.info("-------------------------------------- Driver Factory finish ---------------------------------");			
+	    	LOGGER.debug("-------------------------------------- Driver Factory finish ---------------------------------");			
 		}
 		catch (Exception e)
 		{
