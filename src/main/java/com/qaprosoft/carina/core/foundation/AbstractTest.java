@@ -177,21 +177,7 @@ public abstract class AbstractTest extends DriverHelper
 		{	    
 		    // Populate JIRA ID
 		    if (jiraTickets.size() == 0) { //it was not redefined in the test
-				if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
-					jiraTickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
-				}
-				if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
-					jiraTickets.add(result.getMethod().getDescription().split("#")[1]); 
-				}
-	
-				@SuppressWarnings("unchecked")
-				Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute("jiraTicketsMappedToArgs");		
-				if (testnameJiraMap != null) {
-					String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
-					if (testnameJiraMap.containsKey(testHash)) {
-						jiraTickets.add(testnameJiraMap.get(testHash));
-					}
-				}	    	
+		    	jiraTickets = Jira.getTickets(result);
 		    }
 		    
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
@@ -307,9 +293,12 @@ public abstract class AbstractTest extends DriverHelper
 		    		deviceName, browser, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
 				    EmailReportItemCollector.getCreatedItems());	    
 	
-		    // Send report for specified emails
-		    EmailManager.send(title, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
+		    String emailContent = report.getEmailBody();
+		    EmailManager.send(title, emailContent, Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
 			    Configuration.get(Parameter.SENDER_PASSWORD));
+		    
+		    // Store emailable report under emailable-report.html
+		    ReportContext.generateHtmlReport(emailContent);
 	
 		    printExecutionSummary(EmailReportItemCollector.getTestResults());
 		    
