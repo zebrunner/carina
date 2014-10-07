@@ -4,10 +4,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Rotatable;
 import org.openqa.selenium.ScreenOrientation;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.HasTouchScreen;
 import org.openqa.selenium.interactions.TouchScreen;
@@ -15,12 +18,28 @@ import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteTouchScreen;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.collect.ImmutableMap;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScreen, Rotatable {
 
+	protected static final Logger LOGGER = Logger.getLogger(AppiumNativeDriver.class);
+
+	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+
+	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+
+	protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_TIMEOUT);	
+	
+	protected static Wait<WebDriver> wait;
+	
     private RemoteTouchScreen touch;
 
 /*    // for resolving IllegalArgumentException during using Augmenter for taking screenshots
@@ -63,19 +82,73 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 		return findElementByIosUIAutomation(using, "extendedWebElement");
 	}
 	
-	public ExtendedWebElement findElementByIosUIAutomation(String using, String controlInfo) {
-		return new ExtendedWebElement(findElement("-ios uiautomation", using), controlInfo);
+	public ExtendedWebElement findElementByIosUIAutomation(String using, String name) {
+		return findElementByIosUIAutomation(using, name, EXPLICIT_TIMEOUT);
 	}		
+	
+	public ExtendedWebElement findElementByIosUIAutomation(final String using, String name, long timeout)
+	{
+		ExtendedWebElement element;
+		manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(this, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !findElements("-ios uiautomation", using).isEmpty();
+				}
+			});
+			
+			element = new ExtendedWebElement(findElement("-ios uiautomation", using), name);
+			LOGGER.info(Messager.ELEMENT_FOUND.info(name));
+		}
+		catch (Exception e)
+		{
+			element = null;
+			LOGGER.info(Messager.ELEMENT_NOT_FOUND.error(name));
+			manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+			throw new RuntimeException(e);
+		}
+		manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return element;
+	}	
+	
 
 	public List<ExtendedWebElement> findElementsByIosUIAutomation(String using) {
-		List<WebElement> webElements = findElements("-ios uiautomation", using);
-		List<ExtendedWebElement> webExtendedElements = new ArrayList<ExtendedWebElement>();
+		return findElementsByIosUIAutomation(using, EXPLICIT_TIMEOUT);
+	}
+	
+	public List<ExtendedWebElement> findElementsByIosUIAutomation(final String using, long timeout)
+	{
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<WebElement> webElements = new ArrayList<WebElement> ();
+		
+		manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(this, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !findElements("-ios uiautomation", using).isEmpty();
+				}
+			});
+			webElements = findElements("-ios uiautomation", using);
+		}
+		catch (Exception e)
+		{
+			//do nothing
+		}
 		
 		for (WebElement element : webElements) {
-			webExtendedElements.add(new ExtendedWebElement(element, "extendedWebElement"));
-		}
-		return webExtendedElements;
-	}   
+			extendedWebElements.add(new ExtendedWebElement(element, element.getText()));
+		}		
+		manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return extendedWebElements;
+	}		
 	
 	
 	
