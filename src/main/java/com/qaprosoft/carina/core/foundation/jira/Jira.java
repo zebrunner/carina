@@ -15,7 +15,10 @@
  */
 package com.qaprosoft.carina.core.foundation.jira;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.rcarz.jiraclient.BasicCredentials;
@@ -90,5 +93,27 @@ public class Jira
 				LOG.error("Jira 'updateAfterSuite' not performed: " + e.getMessage());
 			}
 		}
+	}
+	public synchronized static List<String> getTickets(ITestResult result)
+	{
+		List<String> tickets = new ArrayList<String>();
+		
+		if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
+			tickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
+		}
+		if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
+			tickets.add(result.getMethod().getDescription().split("#")[1].trim()); 
+		}
+
+		@SuppressWarnings("unchecked")
+		Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute("jiraTicketsMappedToArgs");		
+		if (testnameJiraMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
+			if (testnameJiraMap.containsKey(testHash)) {
+				tickets.add(testnameJiraMap.get(testHash));
+			}
+		}
+		return tickets;
+		
 	}
 }

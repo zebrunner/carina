@@ -65,7 +65,7 @@ public class ProcessBuilderExecutor {
             throw new ExecutorException("Multiple execution attempt.");
         }
         ProcessBuilder pb = getProcessBuilder();
-        LOGGER.info("trying to execute:  " + pb.command());
+        LOGGER.debug("trying to execute:  " + pb.command());
         try {
             process = pb.start();
 
@@ -76,7 +76,7 @@ public class ProcessBuilderExecutor {
             throw new ExecutorException(e.getMessage(), e);
         } finally {
             alreadyPerformed = true;
-            LOGGER.info("Process started. PID = " + pid);
+            LOGGER.debug("Process started. PID = " + pid);
         }
     }
 
@@ -86,7 +86,7 @@ public class ProcessBuilderExecutor {
 
     @Override
     protected void finalize() throws Throwable {
-        LOGGER.info("finalize");
+        LOGGER.debug("finalize");
         try {
             gc();
         } finally {
@@ -137,7 +137,7 @@ public class ProcessBuilderExecutor {
         synchronized (ProcessBuilderExecutor.class) {
 
             Collection<Process> processes = runPIDs.values();
-            LOGGER.info("perform process cleaning ... (" + processes.size() + " processes need to destroy)");
+            LOGGER.debug("perform process cleaning ... (" + processes.size() + " processes need to destroy)");
             for (Process p : processes) {
                 destroyProcess(p);
             }
