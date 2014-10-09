@@ -70,7 +70,7 @@ public class UITest extends AbstractTest
     	super.executeBeforeTestSuite(context);
 		try
 		{
-		    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE  && getDriver() == null)
+		    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE  && getDriver(true) == null)
 		    {
 		    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
 		    	driver = DriverFactory.create(context.getSuite().getName());
@@ -106,7 +106,7 @@ public class UITest extends AbstractTest
 		    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
     			}
 		    }
-    		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver() == null)
+    		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver(true) == null)
  		    {
  		    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
  		    	driver = DriverFactory.create(this.getClass().getName());
@@ -146,7 +146,7 @@ public class UITest extends AbstractTest
 		    }
     	    
 			String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
-	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE && getDriver() == null)
+	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE && getDriver(true) == null)
 	    	{
 	    		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
 		    	driver = DriverFactory.create(test);
@@ -298,15 +298,26 @@ public class UITest extends AbstractTest
 		}
 	}
 	
+	protected WebDriver getDriver(boolean threadOnly) {
+		if (webDrivers.get() != null && !webDrivers.get().toString().contains("(null")) {
+			return webDrivers.get();
+		} else {
+			LOGGER.warn("Unable to find valid driver!");
+			return null;
+		}		
+	}
 	protected WebDriver getDriver() {
 		//webDrivers.get() or simple driver
 		//return webDrivers.get() != null ? webDrivers.get() : driver;
 		
 		if (webDrivers.get() != null && !webDrivers.get().toString().contains("(null")) {
+			LOGGER.debug("Returning thread safety valid driver");
 			return webDrivers.get();
 		} else if (driver != null && !driver.toString().contains("null")) {
+			LOGGER.debug("Returning default driver as thread safety driver absent!");
 			return driver;
 		} else {
+			LOGGER.debug("Unable to find valid driver!");
 			return null;
 		}
 	}
@@ -341,11 +352,11 @@ public class UITest extends AbstractTest
     	}
     	catch (Exception e) {
     		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
-    		LOGGER.info("======================================================================================================================================");
+    		LOGGER.debug("======================================================================================================================================");
     	} finally {
     		//TODO analyze how to forcibly kill session on device
 	    	webDrivers.remove();
-	    	//LOGGER.info("Driver exited finally: " + webDrivers.get());
+	    	//LOGGER.debug("Driver exited finally: " + webDrivers.get());
     	}
     }
 	
