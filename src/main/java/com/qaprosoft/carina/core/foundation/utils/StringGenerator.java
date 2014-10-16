@@ -23,11 +23,10 @@ public class StringGenerator
 {
 
 	private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-
 	private static final String GENERATE = "$generate";
 
 	private static final Random RANDOM = new Random();
-
+	
 	public static String generateWord(int keySize)
 	{
 
@@ -54,7 +53,12 @@ public class StringGenerator
 
 		return result.toString();
 	}
-
+	
+	public static String generateNumeric(int keySize)
+	{
+		return RandomStringUtils.randomNumeric(keySize);
+	}
+	
 	public static String generateWordAN(int keySize)
 	{
 		return RandomStringUtils.randomAlphanumeric(keySize);

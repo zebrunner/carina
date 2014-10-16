@@ -670,7 +670,11 @@ public class DriverHelper
 	public boolean isChecked(final ExtendedWebElement checkbox)
 	{
 		assertElementPresent(checkbox);
-		return checkbox.getElement().isSelected() || checkbox.getElement().getAttribute("checked").equalsIgnoreCase("true");
+		boolean res = checkbox.getElement().isSelected();
+		if (checkbox.getElement().getAttribute("checked") != null ) {
+			res |= checkbox.getElement().getAttribute("checked").equalsIgnoreCase("true");
+		}
+		return res;
 	}
 
 	
@@ -1662,11 +1666,14 @@ public class DriverHelper
 	}	
      
 	protected WebDriver getDriver() {
-		//duty hack to replace obsolete driver for all pages
-	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
-	    {
-			driver = DriverPool.getSingleDriver();
-	    }		
+		if (driver == null || driver.toString().contains("(null")) {
+			if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
+		    {
+				//duty hack to replace obsolete driver for all pages
+				driver = DriverPool.getSingleDriver();
+		    }
+		}
+		
 		return driver;
 	}	
 }    

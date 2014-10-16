@@ -201,15 +201,16 @@ public class UITest extends AbstractTest
 				    LOGGER.error("AfterTest - unable to get test logs. " + e.getMessage());
 				}
 	
-		    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE) {
-		    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
-					quitDriver();
-				}
 		    }
 	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE ||
 	    			Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE) {
 				stopRecording(testName);
-	    	}		    
+	    	}
+	    	
+	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE) {
+	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
+				quitDriver();
+			}	    	
 		    
 		    try
 		    {
@@ -302,7 +303,7 @@ public class UITest extends AbstractTest
 		if (webDrivers.get() != null && !webDrivers.get().toString().contains("(null")) {
 			return webDrivers.get();
 		} else {
-			LOGGER.warn("Unable to find valid driver!");
+			LOGGER.debug("Unable to find valid driver!");
 			return null;
 		}		
 	}
