@@ -17,6 +17,7 @@ public class ParameterGenerator {
 	private static Pattern GENERATE_UUID_PATTERN = Pattern.compile(SpecialKeywords.GENERATE_UUID);
 	private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);
 	private static Pattern GENERATEAN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEAN);
+	private static Pattern GENERATEN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEN);
 	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
 	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
 	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
@@ -56,6 +57,15 @@ public class ParameterGenerator {
 				int size = Integer.valueOf(param.substring(start, end));
 				return StringUtils.replace(param, matcher.group(), StringGenerator.generateWordAN(size));
 			}
+			
+			matcher = GENERATEN_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(":") + 1;
+				int end = param.indexOf("}");
+				int size = Integer.valueOf(param.substring(start, end));
+				return StringUtils.replace(param, matcher.group(), StringGenerator.generateNumeric(size));
+			}			
 			
 			matcher = ENV_PATTERN.matcher(param);
 			if (matcher.find())

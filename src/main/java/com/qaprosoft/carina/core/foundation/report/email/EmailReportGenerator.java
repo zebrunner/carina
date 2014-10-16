@@ -89,7 +89,7 @@ public class EmailReportGenerator
 		emailBody = emailBody.replace(VERSION_PLACEHOLDER, version);
 		emailBody = emailBody.replace(BROWSER_PLACEHOLDER, browser);
 		emailBody = emailBody.replace(FINISH_DATE_PLACEHOLDER, finishDate);
-		emailBody = emailBody.replace(CI_TEST_JOB, !StringUtils.isEmpty(ciTestJob) ? ciTestJob : "n/a");
+		emailBody = emailBody.replace(CI_TEST_JOB, !StringUtils.isEmpty(ciTestJob) ? ciTestJob : "");
 		emailBody = emailBody.replace(RESULTS_PLACEHOLDER, getTestResultsList(testResultItems));
 		emailBody = emailBody.replace(PASS_COUNT_PLACEHOLDER, String.valueOf(passCount));
 		emailBody = emailBody.replace(FAIL_COUNT_PLACEHOLDER, String.valueOf(failCount));

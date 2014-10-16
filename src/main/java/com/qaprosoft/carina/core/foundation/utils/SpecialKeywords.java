@@ -26,6 +26,7 @@ public class SpecialKeywords
 	public static final String GENERATE = "\\{generate:\\d*\\}";
 	public static final String GENERATE_UUID = "\\{generate_uuid\\}";
 	public static final String GENERATEAN = "\\{generatean:\\d*\\}";
+	public static final String GENERATEN = "\\{generaten:\\d*\\}";
 	public static final String TESTDATA = "\\{testdata:.*\\}";
 	public static final String ENV = "\\{env:.*\\}";
 	public static final String L18N = "\\{l18n:.*\\}";

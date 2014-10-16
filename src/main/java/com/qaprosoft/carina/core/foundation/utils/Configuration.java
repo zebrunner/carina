@@ -93,7 +93,7 @@ public class Configuration
 
 		SELENIUM_HOST("selenium_host", "default_selenium_host"),
 		
-		DRIVER_MODE("default_driver_mode", "driver_mode"),
+		DRIVER_MODE("driver_mode", "default_driver_mode"),
 		
 		APP_VERSION("app_version", "default_app_version"),
 
@@ -266,27 +266,27 @@ public class Configuration
 
 	public static int getInt(Parameter param)
 	{
-		return Integer.valueOf(get(param));
+		return Integer.valueOf(get(param).trim());
 	}
 
 	public static long getLong(Parameter param)
 	{
-		return Long.valueOf(get(param));
+		return Long.valueOf(get(param).trim());
 	}
 
 	public static double getDouble(Parameter param)
 	{
-		return Double.valueOf(get(param));
+		return Double.valueOf(get(param).trim());
 	}
 
 	public static boolean getBoolean(Parameter param)
 	{
-		return Boolean.valueOf(get(param));
+		return Boolean.valueOf(get(param).trim());
 	}
 
 	public static DriverMode getDriverMode(Parameter param)
 	{
-		return DriverMode.valueOf(get(param).toUpperCase());
+		return DriverMode.valueOf(get(param).trim().toUpperCase());
 	}
 	
 	public static Locale getLocale()

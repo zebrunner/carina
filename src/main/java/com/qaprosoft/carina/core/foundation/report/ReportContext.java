@@ -53,18 +53,11 @@ public class ReportContext
 	{
 		if (baseDirectory == null)
 		{
-/*			File reportRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
-					Configuration.get(Parameter.ROOT_REPORT_DIRECTORY)));
-			if (!reportRoot.exists())
-			{
-				reportRoot.mkdir();
-			}*/
-
 			File projectRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
 			if (!projectRoot.exists())
 			{
-				projectRoot.mkdir();
+				projectRoot.mkdirs();
 			}
 
 			rootID = System.currentTimeMillis();
@@ -162,6 +155,8 @@ public class ReportContext
 				}
 			}
 		}
+		//create base dir and initialize rootID
+		getBaseDir();		
 	}
 
 	public static void removeTestReport(String test)
@@ -208,6 +203,8 @@ public class ReportContext
 	{
 		String link = "";
 		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
@@ -228,6 +225,8 @@ public class ReportContext
 	{
 		String link = "";
 		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/test.log", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
@@ -248,6 +247,8 @@ public class ReportContext
 	{
 		String link = "";
 		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/video.mp4", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/video.mp4", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
@@ -263,6 +264,17 @@ public class ReportContext
 	 */
 	public static String getPerformanceReportLink()
 	{
-		return String.format("%s/%d/report.html", Configuration.get(Parameter.REPORT_URL), rootID);
+		
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+			//remove report url and make link relative
+			//link = String.format("./%d/report.html", rootID);
+			link=String.format("%s/%d/report.html", Configuration.get(Parameter.REPORT_URL), rootID);
+		}
+		else {
+			link = String.format("file://%s/report.html", baseDirectory);
+		}
+		
+		return link;
 	}
 }
