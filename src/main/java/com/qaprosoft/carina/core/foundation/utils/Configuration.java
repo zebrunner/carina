@@ -108,6 +108,10 @@ public class Configuration
 		IMPLICIT_TIMEOUT("implicit_timeout", "default_implicit_timeout"),
 
 		EXPLICIT_TIMEOUT("explicit_timeout", "default_explicit_timeout"),
+		
+		AUTO_DOWNLOAD("auto_download", "default_auto_download"),
+		
+		AUTO_DOWNLOAD_APPS("auto_download_apps", "default_auto_download_apps"),
 
 		RETRY_TIMEOUT("retry_timeout", "default_retry_timeout"),
 
@@ -136,8 +140,6 @@ public class Configuration
 		LOCALE("locale", "default_locale"),
 
 		THREAD_COUNT("thread_count", "default_thread_count"),
-		
-		USER_AGENT("user_agent", "default_user_agent"),
 		
 		TEST_ID("test_id", "default_test_id"),
 		
