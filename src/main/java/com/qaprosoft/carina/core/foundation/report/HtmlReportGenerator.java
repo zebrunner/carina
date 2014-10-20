@@ -144,7 +144,7 @@ public class HtmlReportGenerator
 			for (int i = 0; i < imgNames.size(); i++)
 			{
 				// convert toString
-				String image = (R.REPORT.get("image") != null) ? R.REPORT.get("image") : "";
+				String image = R.REPORT.get("image");
 				
 				image = image.replace("${image}", imgNames.get(i).toString());
 				image = image.replace("${thumbnail}", imgNames.get(i).toString());
@@ -154,11 +154,7 @@ public class HtmlReportGenerator
 				report.append(image);
 			}
 			//String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
-			String container = R.REPORT.get("container");
-			String wholeReport = "";
-			if (container != null) {
-				wholeReport = container.replace("${images}", report.toString());
-			}
+			String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
 			wholeReport = wholeReport.replace("${title}", TITLE);
 			String folder = testFolder.getAbsolutePath();
 			FileManager.createFileWithContent(folder + REPORT_NAME, wholeReport);
