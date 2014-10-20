@@ -52,7 +52,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onStart(ITestContext testContext)
 	{
-		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateWordAN(8));
+		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateNumeric(8));
 		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
