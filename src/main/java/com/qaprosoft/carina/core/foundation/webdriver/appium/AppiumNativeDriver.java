@@ -144,7 +144,12 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 		}
 		
 		for (WebElement element : webElements) {
-			extendedWebElements.add(new ExtendedWebElement(element, element.getText()));
+			String name = "undefined";
+			try {
+				name = element.getText();
+			} catch (Exception e) {/* do nothing*/}
+			
+			extendedWebElements.add(new ExtendedWebElement(element, name));
 		}		
 		manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return extendedWebElements;
