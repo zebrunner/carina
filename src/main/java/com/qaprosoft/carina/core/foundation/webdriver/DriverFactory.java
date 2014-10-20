@@ -19,8 +19,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
@@ -137,7 +138,7 @@ public class DriverFactory
 			String browser = Configuration.get(Parameter.BROWSER);
 			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
-				capabilities = getFirefoxCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION), Configuration.get(Parameter.USER_AGENT));
+				capabilities = getFirefoxCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
@@ -260,17 +261,29 @@ public class DriverFactory
 	{
 		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
 		return cap.getVersion().toString();	
-		
 	}
 
 	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName) {
-		return getFirefoxCapabilities(testName, "*", Configuration.get(Parameter.USER_AGENT));
+		FirefoxProfile profile = getDefaultFirefoxProfile();
+		return getFirefoxCapabilities(testName, "*", profile);
 	}
-	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName, String browserVersion, String userAgent) {
+	
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName, String browserVersion) {
+		FirefoxProfile profile = getDefaultFirefoxProfile();
+		return getFirefoxCapabilities(testName, browserVersion, profile);
+	}
+	
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName, String browserVersion, FirefoxProfile profile) {
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-		//capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);		
+	
 		capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, browserVersion, testName);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+		
+		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+		return capabilities;
+	}
+	
+	public static synchronized FirefoxProfile getDefaultFirefoxProfile() {
 		FirefoxProfile profile = new FirefoxProfile();
 		
 		//AUTO-411 eTAF randomly fails a test with 'Unable to bind to locking port 7054 within 45000 ms' error 
@@ -290,25 +303,29 @@ public class DriverFactory
 		if (firefoxPorts.size() > 20) {
 			firefoxPorts.remove(0);
 		}
-		LOGGER.info(firefoxPorts);
+		LOGGER.debug(firefoxPorts);
 		
 		profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
-		LOGGER.info("FireFox profile will use '" + newPort + "' port number.");
+		LOGGER.debug("FireFox profile will use '" + newPort + "' port number.");
         
 		profile.setPreference("dom.max_chrome_script_run_time", 0);
 		profile.setPreference("dom.max_script_run_time", 0);
 		//profile.setEnableNativeEvents(false);
 		//VD enable native events to support drag&drop using javascript
 		profile.setEnableNativeEvents(true);
-		if (!StringUtils.isEmpty(userAgent) && !"n/a".equals(userAgent))
-		{
-			profile.setPreference("general.useragent.override", userAgent);
+		
+		if (Configuration.getBoolean(Parameter.AUTO_DOWNLOAD)) {
+			// specify auto download options
+			profile.setPreference("browser.download.folderList", 2);
+			profile.setPreference("browser.download.dir", System.getProperty("java.io.tmpdir"));
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Parameter.AUTO_DOWNLOAD_APPS)); //"application/pdf"
+			profile.setPreference("browser.download.manager.showWhenStarting", false);
+			profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
 		}
-		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-		return capabilities;
-
+		
+		return profile;
 	}
-
+	
 	public static DesiredCapabilities getInternetExplorerCapabilities(String testName)
 	{
 		return getInternetExplorerCapabilities(testName, "*");
@@ -337,8 +354,21 @@ public class DriverFactory
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
+
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("test-type");
+		
+/*		if (Configuration.getBoolean(Parameter.AUTO_DOWNLOAD)) {
+			// specify auto download options
+			Map<String, String> prefs = new Hashtable<String, String>();
+			prefs.put("download.prompt_for_download", "false");
+			prefs.put("download.default_directory", System.getProperty("java.io.tmpdir"));
+			prefs.put("download.extensions_to_open", Configuration.get(Parameter.AUTO_DOWNLOAD_APPS));
+
+			capabilities.setCapability("chrome.prefs", prefs);
+
+		}*/
+		
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		return capabilities;
 	}
