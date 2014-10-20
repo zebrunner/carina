@@ -255,7 +255,7 @@ public abstract class AbstractTest extends DriverHelper
 		    			Configuration.get(Parameter.MOBILE_PLATFORM_NAME) + " " +
 		    			Configuration.get(Parameter.MOBILE_PLATFORM_VERSION) + ")";
 		    	
-		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null")) {
+		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
 		    			browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
 		    			driverTitle = driverTitle + "/" + browser;
 		    	}

@@ -249,19 +249,21 @@ public class Configuration
 		String startupArg = System.getProperty(param.getKey());
 		String defaultConfigArg = R.CONFIG.get(param.getDefaultKey());
 		String configArg = R.CONFIG.get(param.getKey());
+		String value = defaultConfigArg;
 		
-		if(!StringUtils.isEmpty(startupArg))
-		{
-			 return startupArg;
+		if(!StringUtils.isEmpty(configArg)) {
+			value = configArg;
 		}
-		else if(!StringUtils.isEmpty(configArg))
-		{
-			return configArg;
+		else if(!StringUtils.isEmpty(startupArg)) {
+			 value = startupArg;
 		}
-		else
-		{
-			return defaultConfigArg;
+		
+		if (value == null) {
+			value = "";
 		}
+		
+		return value;
+		
 	}
 
 	public static int getInt(Parameter param)
