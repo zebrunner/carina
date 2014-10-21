@@ -12,7 +12,7 @@ import com.jayway.restassured.path.xml.XmlPath;
 
 public class JenkinsClient
 {
-	protected static final Logger LOG = Logger.getLogger(JenkinsClient.class);
+	protected static final Logger LOGGER = Logger.getLogger(JenkinsClient.class);
 	
 	private static final String JOB = "%s/job/%s/%s/console";
 	private static final String JOB_API = "%s/job/%s/api/xml?depth=1";
@@ -33,16 +33,27 @@ public class JenkinsClient
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			con.getResponseCode();
-			
+
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
-	 
-			while((inputLine = in.readLine()) != null) 
-			{
-				response.append(inputLine);
+			
+			try {
+				while((inputLine = in.readLine()) != null) 
+				{
+					response.append(inputLine);
+				}
+			} catch (Exception e) {
+				LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+			} finally {
+				try {
+					in.close();
+				} catch (Exception e) {
+		    		LOGGER.debug("Error during FileWriter close. " + e.getMessage(), e.getCause());
+		    	}
+				
 			}
-			in.close();
+			
 			XmlPath xmlPath = new XmlPath(response.toString());
 			if(xmlPath.getBoolean("freeStyleProject.lastBuild.building"))
 			{
@@ -52,7 +63,7 @@ public class JenkinsClient
 		catch(Exception e)
 		{
 			url = "";
-			LOG.error(e.getMessage());	
+			LOGGER.error(e.getMessage());	
 		}
 		return url;
 	}
