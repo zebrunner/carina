@@ -77,36 +77,43 @@ public abstract class APITest extends AbstractTest
 		    if (!testLogFile.exists()) testLogFile.createNewFile();
 		    FileWriter fw = new FileWriter(testLogFile);
 		    
-		    if (!StringUtils.isEmpty(glblLog.readLog(Type.SOAP)))
-		    {
-				fw.append("\r\n************************** SoapUI logs **************************\r\n\r\n");
-				fw.append(glblLog.readLog(Type.SOAP));
-		    }
-		    
-			
-		    if (apiMethodBuilder != null)
-		    {
-		    	if (apiMethodBuilder.getTempFile().exists())
-		    	{
-					String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
-					if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
-					{
-					    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
-					    fw.append(tempLog);
-					    fw.append(glblLog.readLog(Type.REST));
-					}
-		    	}
-		    }
 		    try
 		    {
-				fw.close();
-				if (apiMethodBuilder != null)
-					apiMethodBuilder.close();
+			    if (!StringUtils.isEmpty(glblLog.readLog(Type.SOAP)))
+			    {
+					fw.append("\r\n************************** SoapUI logs **************************\r\n\r\n");
+					fw.append(glblLog.readLog(Type.SOAP));
+			    }
+			    
+				
+			    if (apiMethodBuilder != null)
+			    {
+			    	if (apiMethodBuilder.getTempFile().exists())
+			    	{
+						String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
+						if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
+						{
+						    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
+						    fw.append(tempLog);
+						    fw.append(glblLog.readLog(Type.REST));
+						}
+			    	} 
+			    	apiMethodBuilder.close();
+			    }
+					
 		    }
 		    catch (Exception e)
 		    {
-		    	LOGGER.error("Error during FileWriter close. " + e.getMessage());
-		    	e.printStackTrace();
+		    	//LOGGER.error("Error during FileWriter close. " + e.getMessage());
+		    	LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+		    	//e.printStackTrace();
+		    }
+		    finally {
+		    	try {
+		    		fw.close();
+		    	} catch (Exception e) {
+		    		LOGGER.debug(e.getMessage(), e.getCause());
+		    	}
 		    }
 		    
 		}

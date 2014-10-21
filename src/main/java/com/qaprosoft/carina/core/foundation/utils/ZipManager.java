@@ -25,8 +25,12 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.log4j.Logger;
+
 public class ZipManager
 {
+	protected static final Logger LOGGER = Logger.getLogger(ZipManager.class);
+	
 	@SuppressWarnings("rawtypes")
 	public static void unzip(String zip, String extractTo)
 	{
@@ -62,7 +66,7 @@ public class ZipManager
 				zipFile.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.debug(e.getMessage(), e.getCause());
 			}			
 		}
 	}
