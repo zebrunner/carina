@@ -19,8 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;

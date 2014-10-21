@@ -79,7 +79,7 @@ public class UITestListener extends AbstractTestListener {
 		
 		if (count < maxCount)
 		{
-			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count + 1, maxCount, errorMessage));
+			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
 			RetryCounter.incrementRunCount(test);
 			ReportContext.removeTestReport(test);
 		}
