@@ -194,20 +194,26 @@ public abstract class AbstractTest extends DriverHelper
 		    if (!testLogFile.exists()) testLogFile.createNewFile();
 		    FileWriter fw = new FileWriter(testLogFile);
 		    
-		    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
-		    {
-				fw.append("\r\n************************** Common logs **************************\r\n\r\n");
-				fw.append(glblLog.readLog(Type.COMMON));
-		    }
-	
 		    try
 		    {
-				fw.close();
+	    	
+			    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
+			    {
+					fw.append("\r\n************************** Common logs **************************\r\n\r\n");
+					fw.append(glblLog.readLog(Type.COMMON));
+			    }
+			    
 		    }
 		    catch (Exception e)
 		    {
-		    	LOGGER.error("Error during FileWriter close. " + e.getMessage());
-		    	e.printStackTrace();
+		    	LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+		    }
+		    finally {
+		    	try {
+		    		fw.close();
+		    	} catch (Exception e) {
+		    		LOGGER.debug(e.getMessage(), e.getCause());
+		    	}
 		    }
 	
 		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
@@ -231,6 +237,7 @@ public abstract class AbstractTest extends DriverHelper
 		    LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
 		    e.printStackTrace();
 		}
+
     }
 
     @AfterSuite(alwaysRun = true)
