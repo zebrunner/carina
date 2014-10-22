@@ -84,7 +84,12 @@ public enum R
 	{
 		String sysProperty = System.getProperty(key);
 		String cnfgProperty = propertiesKeeper.get(resourceFile).getProperty(key);
-		return !StringUtils.isEmpty(sysProperty) ? sysProperty : cnfgProperty;
+		String value = !StringUtils.isEmpty(sysProperty) ? sysProperty : cnfgProperty;
+		
+		if (value == null) {
+			value = "";
+		}
+		return value;
 	}
 
 	public int getInt(String key)
@@ -100,6 +105,11 @@ public enum R
 	public double getDouble(String key)
 	{
 		return Double.parseDouble(get(key));
+	}
+
+	public boolean getBoolean(String key)
+	{
+		return Boolean.valueOf(get(key));
 	}
 
 	public static String getResourcePath(String resource)

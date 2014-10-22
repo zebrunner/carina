@@ -50,6 +50,31 @@ public class Configuration
 	}
 
 	/**
+	 * All available configuration for diver initialization phase.
+	 */
+
+	public enum DriverMode
+	{
+		SUITE_MODE("suite_mode"),
+		
+		CLASS_MODE("class_mode"),
+		
+		METHOD_MODE("method_mode");
+		
+		private final String key;
+
+		private DriverMode(String key)
+		{
+			this.key = key;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+
+	}
+	/**
 	 * All available configuration parameter keys along with default values.
 	 */
 	public enum Parameter
@@ -68,7 +93,7 @@ public class Configuration
 
 		SELENIUM_HOST("selenium_host", "default_selenium_host"),
 		
-		TESTS_DEPENDENT_MODE("test_dependent_mode", "default_tests_dependent_mode"),
+		DRIVER_MODE("driver_mode", "default_driver_mode"),
 		
 		APP_VERSION("app_version", "default_app_version"),
 
@@ -83,14 +108,18 @@ public class Configuration
 		IMPLICIT_TIMEOUT("implicit_timeout", "default_implicit_timeout"),
 
 		EXPLICIT_TIMEOUT("explicit_timeout", "default_explicit_timeout"),
+		
+		AUTO_DOWNLOAD("auto_download", "default_auto_download"),
+		
+		AUTO_DOWNLOAD_APPS("auto_download_apps", "default_auto_download_apps"),
 
 		RETRY_TIMEOUT("retry_timeout", "default_retry_timeout"),
 
 		PROJECT_REPORT_DIRECTORY("project_report_directory", "default_project_report_directory"),
 
-		ROOT_REPORT_DIRECTORY("root_report_directory", "default_root_report_directory"),
-
 		MAX_SCREENSHOOT_HISTORY("max_screen_history", "default_max_screen_history"),
+		
+		RESULT_SORTING("result_sorting", "default_result_sorting"),
 
 		KEEP_ALL_SCREENSHOTS("keep_all_screenshots", "default_keep_all_screenshots"),
 
@@ -111,8 +140,6 @@ public class Configuration
 		LOCALE("locale", "default_locale"),
 
 		THREAD_COUNT("thread_count", "default_thread_count"),
-		
-		USER_AGENT("user_agent", "default_user_agent"),
 		
 		TEST_ID("test_id", "default_test_id"),
 		
@@ -182,7 +209,12 @@ public class Configuration
 		
 		ADB_HOST("adb_host", "default_adb_host"),
 		
-		ADB_PORT("adb_port", "default_adb_port");
+		ADB_PORT("adb_port", "default_adb_port"),
+		
+		// spira
+		SPIRA_RELEASE_ID("spira_release_id", "default_spira_release_id"),
+		
+		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id");
 
 		
 		private final String key;
@@ -219,41 +251,48 @@ public class Configuration
 		String startupArg = System.getProperty(param.getKey());
 		String defaultConfigArg = R.CONFIG.get(param.getDefaultKey());
 		String configArg = R.CONFIG.get(param.getKey());
+		String value = defaultConfigArg;
 		
-		if(!StringUtils.isEmpty(startupArg))
-		{
-			 return startupArg;
+		if(!StringUtils.isEmpty(configArg)) {
+			value = configArg;
 		}
-		else if(!StringUtils.isEmpty(configArg))
-		{
-			return configArg;
+		else if(!StringUtils.isEmpty(startupArg)) {
+			 value = startupArg;
 		}
-		else
-		{
-			return defaultConfigArg;
+		
+		if (value == null) {
+			value = "";
 		}
+		
+		return value;
+		
 	}
 
 	public static int getInt(Parameter param)
 	{
-		return Integer.valueOf(get(param));
+		return Integer.valueOf(get(param).trim());
 	}
 
 	public static long getLong(Parameter param)
 	{
-		return Long.valueOf(get(param));
+		return Long.valueOf(get(param).trim());
 	}
 
 	public static double getDouble(Parameter param)
 	{
-		return Double.valueOf(get(param));
+		return Double.valueOf(get(param).trim());
 	}
 
 	public static boolean getBoolean(Parameter param)
 	{
-		return Boolean.valueOf(get(param));
+		return Boolean.valueOf(get(param).trim());
 	}
 
+	public static DriverMode getDriverMode(Parameter param)
+	{
+		return DriverMode.valueOf(get(param).trim().toUpperCase());
+	}
+	
 	public static Locale getLocale()
 	{
 		Locale locale = null;
@@ -304,6 +343,11 @@ public class Configuration
 	{
 		return envArgResolver.get(get(Parameter.ENV), key);
 	}
+	
+/*	public static String getEnvArg(String profile, Parameter param)
+	{
+		return envArgResolver.get(profile, param);
+	}*/
 
 	public static IEnvArgResolver getEnvArgResolver()
 	{

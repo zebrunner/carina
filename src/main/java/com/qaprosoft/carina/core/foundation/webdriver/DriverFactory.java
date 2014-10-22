@@ -20,10 +20,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -47,16 +48,77 @@ import com.qaprosoft.carina.core.foundation.webdriver.appium.AppiumNativeDriver;
  */
 public class DriverFactory
 {
+	public static final String CHROME = "chrome";
 	public static final String HTML_UNIT = "htmlunit";
 	public static final String IOS = "iOS";
 	public static final String ANDROID = "Android";
 	public static final String SAFARI = "safari";
-	public static final String SELENDROID = "Selendroid";
 	public static final String MOBILE_GRID = "mobile_grid";
 	public static final String MOBILE = "mobile";
 	
+	protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
+	
 	private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
+
+/*	public static Object create(String className, Object[] args) {
+		Class<?> clazz;
+		Object object = null;
+		try {
+			clazz = Class.forName(className);
+
+			Constructor<?> ctor = clazz.getConstructor(URL.class, Capabilities.class);
+			object = ctor.newInstance(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		return object;
+	}*/
+	
+	public static synchronized WebDriver create(String testName, String browser)
+	{
+		WebDriver driver = null;
+		try {
+			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
+			{
+				driver = new FirefoxDriver();
+			}
+			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
+			{
+				driver = new InternetExplorerDriver();
+			}
+			else if (CHROME.equalsIgnoreCase(browser))
+			{
+				driver = new ChromeDriver();
+			}
+			else {
+				LOGGER.error("Unsupported extra local driver is requested: " + browser);
+			}
+		}
+		catch (Exception e)
+		{
+			LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
+		}		
+			
+		return driver;
+	}
+
+	public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host)
+	{
+		RemoteWebDriver driver = null;
+		try {
+			if (capabilities.getCapability("automationName") == null)
+				driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
+			else		
+				driver = new AppiumNativeDriver(new URL(selenium_host), capabilities);
+		}
+		catch (Exception e)
+		{
+			LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
+		}		
+			
+		return driver;
+	}
 	/**
 	 * Creates driver instance for specified test.
 	 * 
@@ -71,148 +133,155 @@ public class DriverFactory
 		DesiredCapabilities capabilities = null;
 		try
 		{
-			if (BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			String browser = Configuration.get(Parameter.BROWSER);
+			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
-				capabilities = getFirefoxCapabilities(testName);
+				capabilities = getFirefoxCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
-			else if (BrowserType.IEXPLORE.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
-				capabilities = getInternetExplorerCapabilities(testName);
+				capabilities = getInternetExplorerCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
-			else if (HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (HTML_UNIT.equalsIgnoreCase(browser))
 			{
 				capabilities = getHtmlUnitCapabilities(testName);
 			}
-			else if (MOBILE.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (MOBILE.equalsIgnoreCase(browser))
 			{
-				capabilities = new DesiredCapabilities();				
-				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
+				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty())
 				{
-					//Mobile Web
-			        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_BROWSER_NAME));
-			        capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));
+					capabilities = getMobileWebCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
 				}
 				else {
-					//Mobile App
-			        capabilities.setCapability("browserName", "");
-			        capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null"))
-				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
-			        if (!Configuration.get(Parameter.MOBILE_APP_ACTIVITY).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appActivity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
-			        
-			        if (!Configuration.get(Parameter.MOBILE_APP_PACKAGE).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appPackage", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-			        
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
-			        
+					capabilities = getMobileAppCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
+							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 				}
 			}
-			else if (MOBILE_GRID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (MOBILE_GRID.equalsIgnoreCase(browser))
 			{
-				capabilities = new DesiredCapabilities();				
-				if (Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
+				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty())
 				{
-					//Mobile App
-			        capabilities.setCapability("platform", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-			        capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-
-			        capabilities.setCapability("version", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null")) {
-				        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        }
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("app", Configuration.get(Parameter.MOBILE_APP));
-			        if (!Configuration.get(Parameter.MOBILE_APP_ACTIVITY).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appActivity", Configuration.get(Parameter.MOBILE_APP_ACTIVITY));
-			        
-			        if (!Configuration.get(Parameter.MOBILE_APP_PACKAGE).equalsIgnoreCase("null"))
-			        	capabilities.setCapability("appPackage", Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-			        
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
+					capabilities = getMobileWebCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
 				}
 				else
 				{
-					//Mobile Web App
-					capabilities.setCapability("platformName", Configuration.get(Parameter.MOBILE_PLATFORM_NAME)); //iOS
-					if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase("iOS")) {
-						capabilities.setCapability("platform", "MAC");
-					}
-					else {
-						capabilities.setCapability("platform", Configuration.get(Parameter.MOBILE_PLATFORM_NAME));
-					}
-			        
-			        capabilities.setCapability("version", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        capabilities.setCapability("platformVersion", Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-			        
-			        if (!Configuration.get(Parameter.MOBILE_DEVICE_NAME).equalsIgnoreCase("null")) {
-				        capabilities.setCapability("browserName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-				        capabilities.setCapability("deviceName", Configuration.get(Parameter.MOBILE_DEVICE_NAME));
-			        }
-			        capabilities.setCapability("automationName", Configuration.get(Parameter.MOBILE_AUTOMATION_NAME));
-			        capabilities.setCapability("newCommandTimeout", Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT));			        
+					capabilities = getMobileAppCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
+							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
+							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 				}					
-					
 			}
-			else if (SELENDROID.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+			else if (SAFARI.equalsIgnoreCase(browser))
 			{
-				capabilities = getSelendroidCapabilities(testName);
+				capabilities = getSafariCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}			
 			else
 			{
-				capabilities = getChromeCapabilities(testName);
+				capabilities = getChromeCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
 			}
 
-			if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(MOBILE.toLowerCase()))
+	    	LOGGER.debug("-------------------------------------- Driver Factory start ----------------------------------");			
+			if (browser.toLowerCase().contains(MOBILE.toLowerCase()))
 			{
 				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
 				driver = new AppiumNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
-				return driver;
 			} else {		
 				driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
 			}
-		}
-		catch (MalformedURLException e)
-		{
-			//throw new RuntimeException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST));
-	    	throw new SkipException("Can't connect to selenium server: " + Configuration.get(Parameter.SELENIUM_HOST) + "\r\nTest will be SKIPPED due to the\r\n" + e.getMessage());			
+	    	LOGGER.debug("-------------------------------------- Driver Factory finish ---------------------------------");			
 		}
 		catch (Exception e)
 		{
 	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
 		}
-		
 		return driver;
 	}
+	
+	public static DesiredCapabilities getMobileAppCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName, 
+			String automationName, String commandTimeout, String app, String appActivity, String appPackage) {
+		return getMobileCapabilities(gridMode, testName, platform, platformVersion, deviceName, automationName, commandTimeout, null, app, appActivity, appPackage);
+	}
+	public static DesiredCapabilities getMobileWebCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName, 
+			String automationName, String commandTimeout, String browserName) {
+		return getMobileCapabilities(gridMode, testName, platform, platformVersion, deviceName, automationName, commandTimeout, browserName, null, null, null);
+	}
+	
+	private static DesiredCapabilities getMobileCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName, 
+			String automationName, String commandTimeout, String browserName, String app, String appActivity, String appPackage) 
+	{
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("platformName", platform); //Parameter.MOBILE_PLATFORM_NAME
+        capabilities.setCapability("platformVersion", platformVersion); //Parameter.MOBILE_PLATFORM_VERSION
+        if (deviceName != null) 
+        	capabilities.setCapability("deviceName", deviceName); //Parameter.MOBILE_DEVICE_NAME
 
+        capabilities.setCapability("automationName", automationName); //Parameter.MOBILE_AUTOMATION_NAME
+        capabilities.setCapability("newCommandTimeout", commandTimeout); //Parameter.MOBILE_NEW_COMMAND_TIMEOUT
+        
+
+        if (gridMode) {
+	        capabilities.setCapability("platform", platform);
+	        capabilities.setCapability("version", platformVersion);
+	        capabilities.setCapability("browserName", deviceName);
+        }
+
+		if (browserName != null) //Mobile Web
+		{
+	        capabilities.setCapability("browserName", browserName);
+	        if (gridMode && platform.equalsIgnoreCase("iOS")) {
+	        	capabilities.setCapability("platform", "MAC");
+	        }
+		}
+		else { //Mobile App
+	        capabilities.setCapability("browserName", "");
+	        capabilities.setCapability("app", app); //Parameter.MOBILE_APP
+	        if (appActivity != null)
+	        	capabilities.setCapability("appActivity", appActivity); //Parameter.MOBILE_APP_ACTIVITY
+	        
+	        if (appPackage != null)
+	        	capabilities.setCapability("appPackage", appPackage); //Parameter.MOBILE_APP_PACKAGE
+		}
+		
+        return capabilities;
+	}
 	public static String getBrowserName(WebDriver driver)
 	{
 		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
 		return cap.getBrowserName().toString();	
 	}
-	
 	public static String getBrowserVersion(WebDriver driver)
 	{
 		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
 		return cap.getVersion().toString();	
-		
 	}
 
-	private static synchronized DesiredCapabilities getFirefoxCapabilities(String testName) throws MalformedURLException
-	{
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName) {
+		FirefoxProfile profile = getDefaultFirefoxProfile();
+		return getFirefoxCapabilities(testName, "*", profile);
+	}
+	
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName, String browserVersion) {
+		FirefoxProfile profile = getDefaultFirefoxProfile();
+		return getFirefoxCapabilities(testName, browserVersion, profile);
+	}
+	
+	public static synchronized DesiredCapabilities getFirefoxCapabilities(String testName, String browserVersion, FirefoxProfile profile) {
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-		//capabilities = initBaseCapabilities(capabilities, Platform.WINDOWS, Configuration.get(Parameter.BROWSER), R.CONFIG.get("firefox_version"), "name", testName);
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);		
+	
+		capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, browserVersion, testName);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+		
+		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+		return capabilities;
+	}
+	
+	public static synchronized FirefoxProfile getDefaultFirefoxProfile() {
 		FirefoxProfile profile = new FirefoxProfile();
 		
 		//AUTO-411 eTAF randomly fails a test with 'Unable to bind to locking port 7054 within 45000 ms' error 
@@ -232,39 +301,50 @@ public class DriverFactory
 		if (firefoxPorts.size() > 20) {
 			firefoxPorts.remove(0);
 		}
-		System.out.println(firefoxPorts);
+		LOGGER.debug(firefoxPorts);
 		
 		profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
-		System.out.println("FireFox profile will use '" + newPort + "' port numer.");
+		LOGGER.debug("FireFox profile will use '" + newPort + "' port number.");
         
 		profile.setPreference("dom.max_chrome_script_run_time", 0);
 		profile.setPreference("dom.max_script_run_time", 0);
 		//profile.setEnableNativeEvents(false);
 		//VD enable native events to support drag&drop using javascript
 		profile.setEnableNativeEvents(true);
-		if (!StringUtils.isEmpty(Configuration.get(Parameter.USER_AGENT)) && !"n/a".equals(Configuration.get(Parameter.USER_AGENT)))
-		{
-			profile.setPreference("general.useragent.override", Configuration.get(Parameter.USER_AGENT));
+		
+		if (Configuration.getBoolean(Parameter.AUTO_DOWNLOAD)) {
+			// specify auto download options
+			profile.setPreference("browser.download.folderList", 2);
+			profile.setPreference("browser.download.dir", System.getProperty("java.io.tmpdir"));
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Parameter.AUTO_DOWNLOAD_APPS)); //"application/pdf"
+			profile.setPreference("browser.download.manager.showWhenStarting", false);
+			profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
 		}
-		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-		return capabilities;
-
+		
+		return profile;
 	}
-
-	private static DesiredCapabilities getInternetExplorerCapabilities(String testName) throws MalformedURLException
+	
+	public static DesiredCapabilities getInternetExplorerCapabilities(String testName)
+	{
+		return getInternetExplorerCapabilities(testName, "*");
+	}
+	public static DesiredCapabilities getInternetExplorerCapabilities(String testName, String browserVersion)
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		capabilities = initBaseCapabilities(capabilities, BrowserType.IEXPLORE, browserVersion, testName);
 		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 		return capabilities;
 	}
 
-	private static DesiredCapabilities getChromeCapabilities(String testName) throws MalformedURLException
+	public static DesiredCapabilities getChromeCapabilities(String testName) {
+		return getChromeCapabilities(testName, "*");
+	}
+	public static DesiredCapabilities getChromeCapabilities(String testName, String browserVersion)
 	{
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, Configuration.get(Parameter.BROWSER), Configuration.get(Parameter.BROWSER_VERSION), testName);
+		capabilities = initBaseCapabilities(capabilities, BrowserType.CHROME, browserVersion, testName);
 		
 		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized"/*, "--ignore-certificate-errors"*/));
 		
@@ -272,39 +352,59 @@ public class DriverFactory
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
+
 		ChromeOptions options = new ChromeOptions();
-		
 		options.addArguments("test-type");
+		
+/*		if (Configuration.getBoolean(Parameter.AUTO_DOWNLOAD)) {
+			// specify auto download options
+			Map<String, String> prefs = new Hashtable<String, String>();
+			prefs.put("download.prompt_for_download", "false");
+			prefs.put("download.default_directory", System.getProperty("java.io.tmpdir"));
+			prefs.put("download.extensions_to_open", Configuration.get(Parameter.AUTO_DOWNLOAD_APPS));
+
+			capabilities.setCapability("chrome.prefs", prefs);
+
+		}*/
+		
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		return capabilities;
 	}
 
-	private static DesiredCapabilities getHtmlUnitCapabilities(String testName) throws MalformedURLException
+	public static DesiredCapabilities getHtmlUnitCapabilities(String testName)
 	{
 		DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
 		//capabilities.setBrowserName(BrowserType.CHROME);
-		capabilities.setPlatform(Platform.WINDOWS);
+		String platform = Configuration.get(Parameter.PLATFORM);
+		if (!platform.equals("*")) {
+			capabilities.setPlatform(Platform.extractFromSysProperty(platform));
+		}
 		capabilities.setJavascriptEnabled(true);
 		return capabilities;
 	}
 	
-	private static DesiredCapabilities getSelendroidCapabilities(String testName) throws MalformedURLException
+	public static DesiredCapabilities getSafariCapabilities(String testName) {
+		return getSafariCapabilities(testName, "*");
+	}
+	public static DesiredCapabilities getSafariCapabilities(String testName, String browserVersion)
 	{
-		DesiredCapabilities capabilities = DesiredCapabilities.android();
+		DesiredCapabilities capabilities = DesiredCapabilities.safari();
+		capabilities = initBaseCapabilities(capabilities, BrowserType.SAFARI, browserVersion, testName);		
 		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
 	
-	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String... args)
+	private static DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String browserVersion, String testName)
 	{	
 		//platform should be detected and provided into capabilities automatically
 		String platform = Configuration.get(Parameter.PLATFORM);
-		if (!platform.equals("*"))
+		if (!platform.equals("*")) {
 			capabilities.setPlatform(Platform.extractFromSysProperty(platform));
+		}
 
-		capabilities.setBrowserName(args[0]);
-		capabilities.setVersion(args[1]);
-		capabilities.setCapability("name", args[2]);
+		capabilities.setBrowserName(browser);
+		capabilities.setVersion(browserVersion);
+		capabilities.setCapability("name", testName);
 		return capabilities;
 	}
 }

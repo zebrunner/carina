@@ -62,6 +62,7 @@ public class XMLNameStrategy implements INamingStrategy
 				  if (result.getParameters()[i] != null) {
 					  if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
 						  methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+						  break; //first TUID: parameter is used
 					  }
 				  }
 			}

@@ -15,7 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 
@@ -50,18 +53,11 @@ public class ReportContext
 	{
 		if (baseDirectory == null)
 		{
-			File reportRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
-					Configuration.get(Parameter.ROOT_REPORT_DIRECTORY)));
-			if (!reportRoot.exists())
-			{
-				reportRoot.mkdir();
-			}
-
 			File projectRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
 			if (!projectRoot.exists())
 			{
-				projectRoot.mkdir();
+				projectRoot.mkdirs();
 			}
 
 			rootID = System.currentTimeMillis();
@@ -105,16 +101,24 @@ public class ReportContext
 	}
 
 	/**
-	 * Removes oldest screenshots directories according to history size defined
+	 * Removes emailable html report and oldest screenshots directories according to history size defined
 	 * in config.
 	 */
 	public static void removeOldReports()
 	{
 		File baseDir = new File(String.format("%s/%s", System.getProperty("user.dir"),
 				Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
-
+		
 		if (baseDir.exists())
 		{
+			//remove old emailable report
+			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
+					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
+			// if file doesnt exists, then create it
+			if (reportFile.exists()) {
+				reportFile.delete();
+			}
+			
 			List<File> files = FileManager.getFilesInDir(baseDir);
 			List<File> screenshotFolders = new ArrayList<File>();
 			for(File file : files)
@@ -151,6 +155,8 @@ public class ReportContext
 				}
 			}
 		}
+		//create base dir and initialize rootID
+		getBaseDir();		
 	}
 
 	public static void removeTestReport(String test)
@@ -165,6 +171,27 @@ public class ReportContext
 			LOGGER.error(e.getMessage());
 		}
 	}
+	
+	public static void generateHtmlReport(String content) {
+		try {
+			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
+					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
+
+			// if file doesnt exists, then create it
+			if (!reportFile.exists()) {
+				reportFile.createNewFile();
+			}
+ 
+			FileWriter fw = new FileWriter(reportFile.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(content);
+			bw.close();
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 
 	/**
 	 * Returns URL for test screenshot folder.
@@ -175,11 +202,13 @@ public class ReportContext
 	public static String getTestScreenshotsLink(String test)
 	{
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
-			link = String.format("%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("file://%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
 		return link;
@@ -195,11 +224,13 @@ public class ReportContext
 	public static String getTestLogLink(String test)
 	{
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/test.log", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
-			link = String.format("%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("file://%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
 		return link;
@@ -215,11 +246,13 @@ public class ReportContext
 	public static String getTestVideoLink(String test)
 	{
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
+		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/video.mp4", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/video.mp4", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
-			link = String.format("%s/%s/video.mp4", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("file://%s/%s/video.mp4", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
 		return link;
@@ -231,6 +264,17 @@ public class ReportContext
 	 */
 	public static String getPerformanceReportLink()
 	{
-		return String.format("%s/%d/report.html", Configuration.get(Parameter.REPORT_URL), rootID);
+		
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+			//remove report url and make link relative
+			//link = String.format("./%d/report.html", rootID);
+			link=String.format("%s/%d/report.html", Configuration.get(Parameter.REPORT_URL), rootID);
+		}
+		else {
+			link = String.format("file://%s/report.html", baseDirectory);
+		}
+		
+		return link;
 	}
 }

@@ -143,8 +143,9 @@ public class HtmlReportGenerator
 			StringBuilder report = new StringBuilder();
 			for (int i = 0; i < imgNames.size(); i++)
 			{
-				// convert toString 
-				String image = R.REPORT.get("image").toString();
+				// convert toString
+				String image = R.REPORT.get("image");
+				
 				image = image.replace("${image}", imgNames.get(i).toString());
 				image = image.replace("${thumbnail}", imgNames.get(i).toString());
 				image = image.replace("${alt}", imgNames.get(i).toString());
@@ -152,6 +153,7 @@ public class HtmlReportGenerator
 				image = image.replace("${title}", title.toString());
 				report.append(image);
 			}
+			//String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
 			String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
 			wholeReport = wholeReport.replace("${title}", TITLE);
 			String folder = testFolder.getAbsolutePath();
@@ -167,7 +169,8 @@ public class HtmlReportGenerator
 
 	private static void copyGalleryLib()
 	{
-		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
+//		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
+		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
 		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
 		{
 			try

@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.report.email;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
  */
 public class EmailReportItemCollector
 {
-	private static Map<String, TestResultItem> emailResultsMap = Collections.synchronizedMap(new HashMap<String, TestResultItem>());
+	private static LinkedHashMap<String, TestResultItem> emailResultsMap = new LinkedHashMap<String, TestResultItem>();
 	private static Map<String, TestResultItem> testResultsMap = Collections.synchronizedMap(new HashMap<String, TestResultItem>());
 	private static List<String> createdItems = new ArrayList<String>();
 
