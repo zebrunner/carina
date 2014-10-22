@@ -98,10 +98,7 @@ public class UITestListener extends AbstractTestListener {
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
-		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
-		
+		//retry logic shouldn't work for Skipped tests as DriverFactory already implemented driver initializarion retry
 		String errorMessage = "";
 		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
 		if (thr != null) {
@@ -112,23 +109,10 @@ public class UITestListener extends AbstractTestListener {
 			errorMessage = getFullStackTrace(result.getThrowable());
 		}
 		
-		if (count < maxCount)
-		{
-			LOGGER.error(String.format("Test '%s' SKIPPED! Retry %d of %d time - %s", test, count + 1, maxCount, errorMessage));
-			RetryCounter.incrementRunCount(test);
-			ReportContext.removeTestReport(test);
-		}
-		else
-		{	
-			if (count > 0) {
-				LOGGER.error("Retry limit exceeded for " + result.getName());
-			}			
-			// TestLogCollector.addScreenshotComment(takeScreenshot(result),
-			// "TEST SKIPPED - " + errorMessage);
-			EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
-			super.onTestSkipped(result);
-		}
-		Reporter.setCurrentTestResult(result);
+		// TestLogCollector.addScreenshotComment(takeScreenshot(result),
+		// "TEST SKIPPED - " + errorMessage);
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
+		super.onTestSkipped(result);
 	}
 
 	@Override
