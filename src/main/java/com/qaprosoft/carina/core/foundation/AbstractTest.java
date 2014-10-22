@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,29 +26,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.xml.XmlTest;
 
 import com.jayway.restassured.RestAssured;
-import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
 import com.qaprosoft.carina.core.foundation.jenkins.JenkinsClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
-import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -57,6 +54,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -65,14 +63,11 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSTable;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.testexecuter.client.ExecutionContext;
 import com.qaprosoft.testexecuter.client.ITestExecuterClient;
 import com.qaprosoft.testexecuter.client.TestDetailsBean;
@@ -89,27 +84,24 @@ public abstract class AbstractTest extends DriverHelper
 {
 	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
 	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
-    protected static final Logger LOG = Logger.getLogger(AbstractTest.class);
+    protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
     protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
 
 	
     // Test-Executer integration items
-    private static ExecutionContext executionContext;
+    protected static ExecutionContext executionContext;
     protected TestDetailsBean TEST_EXECUTER_LOG;
     
     //Jira ticket(s)
     protected List<String> jiraTickets = new ArrayList<String>();
 
-    protected APIMethodBuilder apiMethodBuilder;
-    private String browserVersion = "";
+    protected String browserVersion = "";
     
-    private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
-    private int adb_pid;
-    
+   
     @BeforeSuite(alwaysRun = true)
-    public void executeBeforeSuite(ITestContext context) throws Throwable
+    public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
 		try
 		{
@@ -118,7 +110,7 @@ public abstract class AbstractTest extends DriverHelper
 		    // Set SoapUI log4j properties
 		    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 	
-		    LOG.info(Configuration.asString());
+		    LOGGER.info(Configuration.asString());
 		    Configuration.validateConfiguration();
 	
 		    ReportContext.removeOldReports();
@@ -148,8 +140,9 @@ public abstract class AbstractTest extends DriverHelper
 		    }
 		    catch (Exception e)
 		    {
-		    	LOG.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
+		    
 		}
 		catch (Throwable thr)
 		{
@@ -159,194 +152,99 @@ public abstract class AbstractTest extends DriverHelper
 
     }
 
+    
+    @BeforeClass(alwaysRun = true)
+    public void executeBeforeTestClass(ITestContext context) throws Throwable {
+    	//do nothing for now
+    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void executeAfterTestClass(ITestContext context) throws Throwable {
+    	//do nothing for now
+    }
+    
     @BeforeMethod(alwaysRun = true)
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
-		try
-		{
-		    String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
-
-		    if (isUITest())
-		    {
-		    	if (getDriver() == null) {
-			    	if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {	
-			    		// TODO Implement logic to Skip Test if secondary etc test hasn't driver 
-				    	LOG.warn("Driver is initializing in scenario tests mode.");
-				    	
-			    	}
-			    	LOGGER.info("-------------------------------------- Driver Factory start ----------------------------------");
-			    	driver = DriverFactory.create(test);
-		    		setDriver(driver);		    		
-			    	LOGGER.info("-------------------------------------- Driver Factory finish ---------------------------------");		    		
-		    		
-		    		
-			    	String sessionId = DriverPool.registerDriverSession(driver);
-			    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-					initSummary(driver);
-					
-			    	//enable recording if needed
-					if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-						executor.dropFile(SpecialKeywords.VIDEO_FILE_NAME);
-						adb_pid = executor.startRecording(SpecialKeywords.VIDEO_FILE_NAME);
-					}
-					
-		    	} else {
-		    		if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
-		    			LOG.error("Driver still exists in atomic test mode!");
-		    		}
-		    	}
-		    	if (browserVersion.isEmpty())
-		    		browserVersion = DriverFactory.getBrowserVersion(getDriver());		    	
-		    }
-		    TEST_EXECUTER_LOG = executionContext.initBeforeTest(xmlTest.getName());
-		    apiMethodBuilder = new APIMethodBuilder();
-		}
-		catch (Throwable thr)
-		{
-			LOGGER.error(thr.getMessage());
-			thr.printStackTrace();
-		    context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-		    throw thr;
-		}
+    	//do nothing for now
     }
 
     @AfterMethod(alwaysRun = true)
-    public void executeAfterTestMethod(ITestResult result) throws IOException
+    public void executeAfterTestMethod(ITestResult result)
     {
-	try
-	{
-		String testName = TestNamingUtil.getCanonicalTestName(result);
+		try
+		{	    
+		    // Populate JIRA ID
+		    if (jiraTickets.size() == 0) { //it was not redefined in the test
+		    	jiraTickets = Jira.getTickets(result);
+		    }
+		    
+			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
+		    Jira.updateAfterTest(result);
 
-		GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
-    
-	    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
-	    if (!testLogFile.exists()) testLogFile.createNewFile();
-	    FileWriter fw = new FileWriter(testLogFile);
+		    //clear jira tickets to be sure that next test is not affected.
+		    jiraTickets.clear();
+
+		    
+			String testName = TestNamingUtil.getCanonicalTestName(result);
+			GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
 	    
-	    // Populate JIRA ID
-	    if (jiraTickets.size() == 0) { //it was not redefined in the test
-			if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
-				jiraTickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
-			}
-			if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
-				jiraTickets.add(result.getMethod().getDescription().split("#")[1]); 
-			}
-
-			@SuppressWarnings("unchecked")
-			Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute("jiraTicketsMappedToArgs");		
-			if (testnameJiraMap != null) {
-				String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
-				if (testnameJiraMap.containsKey(testHash)) {
-					jiraTickets.add(testnameJiraMap.get(testHash));
-				}
-			}	    	
-	    }
-		result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
-	    Jira.updateAfterTest(result);
-	    
-	    WebDriver drv = getDriver();
-
-	    if (isUITest() && drv != null)
-	    {
-			fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
-			
-			try
-			{
-				//fw.append(TestLogHelper.getSessionLogs(testName));
-				fw.append(TestLogHelper.getSessionLogs(drv));
-			}
-			catch (Exception e)
-			{
-			    LOG.error("AfterTest - unable to get test logs. " + e.getMessage());
-			}
-
-			if (!Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE)) {
-				quitDriver();
-
-				if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-					executor.stopRecording(adb_pid); //stop recording
-					pause(3); //very often video from device is black. trying to wait before pulling the file
-					executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, ReportContext.getTestDir(testName) + "/video.mp4");
-				}
-			}
-	    }
-
-	    if (!StringUtils.isEmpty(glblLog.readLog(Type.SOAP)))
-	    {
-			fw.append("\r\n************************** SoapUI logs **************************\r\n\r\n");
-			fw.append(glblLog.readLog(Type.SOAP));
-	    }
-
-	    if (apiMethodBuilder != null)
-	    {
-	    	if (apiMethodBuilder.getTempFile().exists())
-	    	{
-				String tempLog = FileUtils.readFileToString(apiMethodBuilder.getTempFile());
-				if (!StringUtils.isEmpty(glblLog.readLog(Type.REST)) || !StringUtils.isEmpty(tempLog))
+		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
+		    if (!testLogFile.exists()) testLogFile.createNewFile();
+		    FileWriter fw = new FileWriter(testLogFile);
+		    
+		    try
+		    {
+	    	
+			    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
+			    {
+					fw.append("\r\n************************** Common logs **************************\r\n\r\n");
+					fw.append(glblLog.readLog(Type.COMMON));
+			    }
+			    
+		    }
+		    catch (Exception e)
+		    {
+		    	LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+		    }
+		    finally {
+		    	try {
+		    		fw.close();
+		    	} catch (Exception e) {
+		    		LOGGER.debug(e.getMessage(), e.getCause());
+		    	}
+		    }
+	
+		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
+		    {
+			    TestResultItem testResult = EmailReportItemCollector.pull(result);
+				if (TestResultType.PASS.equals(testResult.getResult()))
 				{
-				    fw.append("\r\n*********************** Rest-Assured logs ***********************\r\n\r\n");
-				    fw.append(tempLog);
-				    fw.append(glblLog.readLog(Type.REST));
+				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
 				}
-	    	}
-	    }
+				else
+				{
+				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
+				    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
+				}
+				TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
+				TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
+		    }
+		}
+		catch (Exception e)
+		{
+		    LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
+		    e.printStackTrace();
+		}
 
-	    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
-	    {
-			fw.append("\r\n************************** Common logs **************************\r\n\r\n");
-			fw.append(glblLog.readLog(Type.COMMON));
-	    }
-
-	    try
-	    {
-			fw.close();
-			if (apiMethodBuilder != null)
-				apiMethodBuilder.close();
-	    }
-	    catch (Exception e)
-	    {
-	    	LOG.error("Error during FileWriter close. " + e.getMessage());
-	    	e.printStackTrace();
-	    }
-
-	    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
-	    {
-		    TestResultItem testResult = EmailReportItemCollector.pull(result);
-			if (TestResultType.PASS.equals(testResult.getResult()))
-			{
-			    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
-			}
-			else
-			{
-			    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
-			    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
-			}
-			TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
-			TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
-	    }
-	}
-	catch (Exception e)
-	{
-	    LOG.error("Exception in executeAfterTestMethod");
-	    e.printStackTrace();
-	}
     }
 
     @AfterSuite(alwaysRun = true)
-    public void executeAfterSuite(ITestContext context)
+    public void executeAfterTestSuite(ITestContext context)
     {
 		try
 		{
-			if (Configuration.getBoolean(Parameter.TESTS_DEPENDENT_MODE) && isUITest() && getDriver() != null) {
-				quitDriver();
-
-				if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-					executor.stopRecording(adb_pid); //stop recording
-					pause(3); //very often video from device is black. trying to wait before pulling the file
-					executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, ReportContext.getBaseDir() + "/video.mp4");
-				}				
-			}
-			
 		    executionContext.finilizeAfterSuite();
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
@@ -359,8 +257,12 @@ public abstract class AbstractTest extends DriverHelper
 		    String driverTitle = browser;
 		    
 		    if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile") || Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile_grid")) {
-		    	deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
-		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null")) {
+		    	//deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
+		    	deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME) + " (" +
+		    			Configuration.get(Parameter.MOBILE_PLATFORM_NAME) + " " +
+		    			Configuration.get(Parameter.MOBILE_PLATFORM_VERSION) + ")";
+		    	
+		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
 		    			browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
 		    			driverTitle = driverTitle + "/" + browser;
 		    	}
@@ -398,9 +300,12 @@ public abstract class AbstractTest extends DriverHelper
 		    		deviceName, browser, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
 				    EmailReportItemCollector.getCreatedItems());	    
 	
-		    // Send report for specified emails
-		    EmailManager.send(title, report.getEmailBody(), Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
+		    String emailContent = report.getEmailBody();
+		    EmailManager.send(title, emailContent, Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
 			    Configuration.get(Parameter.SENDER_PASSWORD));
+		    
+		    // Store emailable report under emailable-report.html
+		    ReportContext.generateHtmlReport(emailContent);
 	
 		    printExecutionSummary(EmailReportItemCollector.getTestResults());
 		    
@@ -411,7 +316,7 @@ public abstract class AbstractTest extends DriverHelper
 		}
 		catch (Exception e)
 		{
-		    LOG.error("Exception in executeAfterSuite");
+		    LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
 		    e.printStackTrace();
 		}
     }
@@ -528,6 +433,7 @@ public abstract class AbstractTest extends DriverHelper
 		}
     }
 
+    
     private String getCIJobReference()
     {
 		String ciTestJob = null;
@@ -539,12 +445,12 @@ public abstract class AbstractTest extends DriverHelper
 		    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
 		    if (StringUtils.isEmpty(ciTestJob))
 		    {
-		    	LOG.info("Could not connect to Jenkins!");
+		    	LOGGER.info("Could not connect to Jenkins!");
 		    }
 		}
 		else
 		{
-		    	LOG.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
+		    	LOGGER.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
 		}
 		return ciTestJob;
     }

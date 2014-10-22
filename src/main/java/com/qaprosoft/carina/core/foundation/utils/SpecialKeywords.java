@@ -26,6 +26,7 @@ public class SpecialKeywords
 	public static final String GENERATE = "\\{generate:\\d*\\}";
 	public static final String GENERATE_UUID = "\\{generate_uuid\\}";
 	public static final String GENERATEAN = "\\{generatean:\\d*\\}";
+	public static final String GENERATEN = "\\{generaten:\\d*\\}";
 	public static final String TESTDATA = "\\{testdata:.*\\}";
 	public static final String ENV = "\\{env:.*\\}";
 	public static final String L18N = "\\{l18n:.*\\}";
@@ -49,5 +50,13 @@ public class SpecialKeywords
 	public static final String INITIALIZATION_FAILURE = "initializeFailure";
 	public static final String UUID = "UUID";
 	public static final String VIDEO_FILE_NAME = "/sdcard/test_record.mp4";
+	
+	public static final String SPIRA_RELEASE_ID = "SPIRA_RELEASE_ID";
+	public static final String SPIRA_TESTSET_ID = "SPIRA_TESTSET_ID";
+	public static final String SPIRA_TESTCASE_ID = "SPIRA_TESTCASE_ID";
+	public static final String SPIRA_TESTSTEP_ID = "SPIRA_TESTSTEP_ID";
+	
+	public static final String HTML_REPORT = "emailable-report.html";
+
 	
 }

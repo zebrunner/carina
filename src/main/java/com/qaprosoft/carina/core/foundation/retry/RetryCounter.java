@@ -36,6 +36,9 @@ public class RetryCounter
 
 	public static void initCounter(String test)
 	{
+		if(runCountMap.containsKey(test))
+			return;
+		
 		runCountMap.put(test, 0);
 	}
 	
