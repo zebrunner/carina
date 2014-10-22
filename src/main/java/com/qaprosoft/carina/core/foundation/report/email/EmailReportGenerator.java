@@ -202,7 +202,7 @@ public class EmailReportGenerator
 		{
 			bugId = jiraTickets.get(0);
 		    
-		    if (!Configuration.get(Parameter.JIRA_URL).isEmpty()) {
+		    if (!Configuration.get(Parameter.JIRA_URL).equalsIgnoreCase("null")) {
 		    	bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + jiraTickets.get(0);
 		    }
 		    
