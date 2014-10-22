@@ -148,7 +148,7 @@ public class DriverFactory
 			}
 			else if (MOBILE.equalsIgnoreCase(browser))
 			{
-				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty())
+				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
 				{
 					capabilities = getMobileWebCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
 							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
@@ -163,7 +163,7 @@ public class DriverFactory
 			}
 			else if (MOBILE_GRID.equalsIgnoreCase(browser))
 			{
-				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty())
+				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null"))
 				{
 					capabilities = getMobileWebCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
 							Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
