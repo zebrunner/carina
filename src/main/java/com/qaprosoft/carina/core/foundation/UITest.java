@@ -56,6 +56,8 @@ public class UITest extends AbstractTest
 
     private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
     private int adb_pid = 0;
+    
+    Throwable init_throwable;
 
 	
 	@Override
@@ -68,108 +70,96 @@ public class UITest extends AbstractTest
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
     	super.executeBeforeTestSuite(context);
-		try
-		{
-		    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE  && getDriver(true) == null)
-		    {
-		    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
-		    	driver = DriverFactory.create(context.getSuite().getName());
-	    		setDriver(driver);
-	    		
-	    		//String sessionId = 
-	    		DriverPool.registerDriverSession(driver);
-	    		
-	    		DriverPool.associateTestNameWithDriver("BeforeSuite " + context.getSuite().getName(), driver);
-	    		
-				initSummary(driver);
-	    		
-		    }
-		}
-		catch (Throwable thr)
-		{
-			context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-			throw thr;
-		}		
+
+	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE  && getDriver(true) == null)
+	    {
+	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
+	    	if (!initDriver(context.getSuite().getName())) {
+	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
+	    		throw init_throwable;
+	    	}
+    		setDriver(driver);
+    		
+    		//String sessionId = 
+    		DriverPool.registerDriverSession(driver);
+    		
+    		DriverPool.associateTestNameWithDriver("BeforeSuite " + context.getSuite().getName(), driver);
+    		
+			initSummary(driver);
+    		
+	    }
     }
     
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
     	super.executeBeforeTestClass(context);    	
-    	try {
-    	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
-		    {
-    	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
-    			driver = DriverPool.getSingleDriver();
-    			if (driver != null) {
-	     	    	setDriver(driver);
-		    		String sessionId = DriverPool.registerDriverSession(driver);
-		    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
-    			}
-		    }
-    		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver(true) == null)
- 		    {
- 		    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
- 		    	driver = DriverFactory.create(this.getClass().getName());
- 	    		setDriver(driver);
- 	    		
+
+	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
+	    {
+	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
+			driver = DriverPool.getSingleDriver();
+			if (driver != null) {
+     	    	setDriver(driver);
 	    		String sessionId = DriverPool.registerDriverSession(driver);
 	    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
-	    		
-	    		DriverPool.associateTestNameWithDriver("BeforeClass " + this.getClass().getName(), driver);
-	    		
-				initSummary(driver);
- 		    }    		
-		}
-		catch (Throwable thr)
-		{
-			context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-			throw thr;
-		}    	
+			}
+	    }
+		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver(true) == null)
+	    {
+	    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
+	    	if (!initDriver(this.getClass().getName())) {
+	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
+	    		throw init_throwable;
+	    	}
+    		setDriver(driver);
+    		
+    		String sessionId = DriverPool.registerDriverSession(driver);
+    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
+    		
+    		DriverPool.associateTestNameWithDriver("BeforeClass " + this.getClass().getName(), driver);
+    		
+			initSummary(driver);
+	    }    		
     }
     
     @BeforeMethod(alwaysRun = true)
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
 		super.executeBeforeTestMethod(xmlTest, testMethod, context);    	
-		try
-		{
-    	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
-		    {
-    	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
-    			driver = DriverPool.getSingleDriver();
+	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
+	    {
+	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
+			driver = DriverPool.getSingleDriver();
 
-    			if (driver != null) {
-	     	    	setDriver(driver);
-		    		String sessionId = DriverPool.registerDriverSession(driver);
-		    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
-    			}
-		    }
-    	    
-			String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
-	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE && getDriver(true) == null)
-	    	{
-	    		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
-		    	driver = DriverFactory.create(test);
-	    		setDriver(driver);		    		
-	    		
-		    	String sessionId = DriverPool.registerDriverSession(driver);
-		    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-				initSummary(driver);
-				
-	    	}
-	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE ||
-	    			Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE) {
-				startRecording();
-	    	}		    	
+			if (driver != null) {
+     	    	setDriver(driver);
+	    		String sessionId = DriverPool.registerDriverSession(driver);
+	    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
+			}
+	    }
+	    
+		String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
+    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE && getDriver(true) == null)
+    	{
+    		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
+	    	if (!initDriver(test)) {
+	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
+	    		throw init_throwable;
+	    	}	    		
+    		setDriver(driver);		    		
+    		
+	    	String sessionId = DriverPool.registerDriverSession(driver);
+	    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
+			initSummary(driver);
+			
+    	}
+    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE ||
+    			Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE) {
+			startRecording();
+    	}		    	
 
-	    	if (browserVersion.isEmpty() && getDriver() != null)
-	    		browserVersion = DriverFactory.getBrowserVersion(getDriver());
-		}
-		catch (Throwable thr)
-		{
-		    context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-		    throw thr;
-		}
+    	if (browserVersion.isEmpty() && getDriver() != null)
+    		browserVersion = DriverFactory.getBrowserVersion(getDriver());
 	}    
 
     @AfterMethod(alwaysRun = true)
@@ -382,4 +372,21 @@ public class UITest extends AbstractTest
 		}	
 	}
 	
+	protected boolean initDriver(String name) {
+		int maxCount = Configuration.getInt(Parameter.RETRY_COUNT) + 1; //1 - is default run without retry
+    	boolean init = false;
+    	int count = 0;
+    	while (!init & count++ < maxCount) {
+    		try {
+    			driver = DriverFactory.create(name);
+    			init = true;
+    		}
+    		catch (Throwable thr) {
+    			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
+    			init_throwable = thr;
+    		}
+    	}
+
+    	return init;
+	}
 }

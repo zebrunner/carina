@@ -202,7 +202,7 @@ public class ReportContext
 	public static String getTestScreenshotsLink(String test)
 	{
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
@@ -224,7 +224,7 @@ public class ReportContext
 	public static String getTestLogLink(String test)
 	{
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/test.log", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
@@ -246,7 +246,7 @@ public class ReportContext
 	public static String getTestVideoLink(String test)
 	{
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/video.mp4", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 			link = String.format("%s/%d/%s/video.mp4", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
@@ -266,7 +266,7 @@ public class ReportContext
 	{
 		
 		String link = "";
-		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+		if (!Configuration.get(Parameter.REPORT_URL).equalsIgnoreCase("null")) {
 			//remove report url and make link relative
 			//link = String.format("./%d/report.html", rootID);
 			link=String.format("%s/%d/report.html", Configuration.get(Parameter.REPORT_URL), rootID);
