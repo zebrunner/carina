@@ -84,7 +84,7 @@ public class EmailManager
 		try
 		{
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress("QATeam"));
+			message.setFrom(new InternetAddress(senderEmail));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(adresses));
 			message.setSubject(subject);
 			message.setContent(emailContent, "text/html");
