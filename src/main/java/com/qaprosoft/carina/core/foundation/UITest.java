@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
@@ -35,7 +33,6 @@ import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.listeners.UITestListener;
-import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
@@ -168,49 +165,49 @@ public class UITest extends AbstractTest
     	try
     	{	    
     		quitExtraDriver(); //all extraDrivers should be exited after test method!
-    		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
-		    WebDriver drv = getDriver(sessionId);
+//    		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
+//		    WebDriver drv = getDriver(sessionId);
 	
-			String testName = TestNamingUtil.getCanonicalTestName(result);
+//			String testName = TestNamingUtil.getCanonicalTestName(result);
 	
-		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
-		    if (!testLogFile.exists()) testLogFile.createNewFile();
-		    FileWriter fw = new FileWriter(testLogFile);
-		    
-		    if (drv != null)
-		    {
-				fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
-				
-				try
-				{
-					//fw.append(TestLogHelper.getSessionLogs(testName));
-					fw.append(TestLogHelper.getSessionLogs(drv));
-				}
-				catch (Exception e)
-				{
-				    LOGGER.error("AfterTest - unable to get test logs. " + e.getMessage());
-				}
-	
-		    }
+//		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
+//		    if (!testLogFile.exists()) testLogFile.createNewFile();
+//		    FileWriter fw = new FileWriter(testLogFile);
+//		    
+//		    if (drv != null)
+//		    {
+//				fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
+//				
+//				try
+//				{
+//					//fw.append(TestLogHelper.getSessionLogs(testName));
+//					fw.append(TestLogHelper.getSessionLogs(drv));
+//				}
+//				catch (Exception e)
+//				{
+//				    LOGGER.error("AfterTest - unable to get test logs. " + e.getMessage());
+//				}
+//	
+//		    }
+//		    try
+//		    {
+//				fw.close();
+//		    }
+//		    catch (Exception e)
+//		    {
+//		    	LOGGER.error("Error during FileWriter close. " + e.getMessage());
+//		    	e.printStackTrace();
+//		    }	
+			
 	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE ||
 	    			Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE) {
-				stopRecording(testName);
+				stopRecording(TestNamingUtil.getCanonicalTestName(result));
 	    	}
 	    	
 	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE) {
 	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
 				quitDriver();
 			}	    	
-		    
-		    try
-		    {
-				fw.close();
-		    }
-		    catch (Exception e)
-		    {
-		    	LOGGER.error("Error during FileWriter close. " + e.getMessage());
-		    	e.printStackTrace();
-		    }		    
     	}
 		catch (Exception e)
 		{

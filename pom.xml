@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qaprosoft</groupId>
 	<artifactId>carina-core</artifactId>
-	<version>2.2.6.1</version>
+	<version>2.2.6.2</version>
 	<packaging>jar</packaging>
 	<name>Carina Test Core</name>
 	<description>Test core for multi-purpose testing of web-applications.</description>
@@ -17,10 +17,6 @@
 	</properties>
 
 	<repositories>
-		<repository>
-			<id>test-executer-client</id>
-			<url>https://raw.github.com/qaprosoft/test-executer-client/master</url>
-		</repository>
 		<repository>
 			<id>soapui-java-client</id>
 			<url>https://raw.github.com/qaprosoft/soapui-java-client/master</url>
@@ -198,11 +194,6 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.9</version>
-		</dependency>
-		<dependency>
-			<groupId>com.qaprosoft.testexecuter</groupId>
-			<artifactId>test-executer-client</artifactId>
-			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
