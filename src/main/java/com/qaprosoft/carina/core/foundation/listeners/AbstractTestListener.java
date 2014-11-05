@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.jfree.util.Log;
 import org.testng.IResultMap;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -28,7 +27,6 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
-import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -88,7 +86,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
 		
 		String test = TestNamingUtil.getCanonicalTestName(result);
-
+		TestNamingUtil.accociateTest2Thread(test, Thread.currentThread().getId());
+		
 		RetryCounter.initCounter(test);
 
 		Messager.TEST_STARTED.info(test, DateUtils.now());
@@ -97,7 +96,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
+//		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
+		Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now());
 		
 	    //Spira test steps integration
 	    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result);		
@@ -119,23 +119,26 @@ public abstract class AbstractTestListener extends TestArgsListener
 				errorMessage = getFullStackTrace(thr);
 			}
 			
-			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
-			if (globalLog != null) {
-				if (result.getThrowable() != null) {
-					//errorMessage = result.getThrowable().getMessage();
-					thr = result.getThrowable();
-					errorMessage = getFullStackTrace(thr);
-				}
-				
-			    //Spira test steps integration
-			    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
-			    
-				String msg = Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
-				globalLog.log(Type.COMMON, msg);
-			}
-			else{
-				Log.error("GlobalTestLog is NULL! for " + result.toString());
-			}
+			SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
+			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
+			
+////			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
+//			if (globalLog != null) {
+//				if (result.getThrowable() != null) {
+//					//errorMessage = result.getThrowable().getMessage();
+//					thr = result.getThrowable();
+//					errorMessage = getFullStackTrace(thr);
+//				}
+//				
+//			    //Spira test steps integration
+//			    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
+//			    
+//				String msg = Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
+//				globalLog.log(Type.COMMON, msg);
+//			}
+//			else{
+//				Log.error("GlobalTestLog is NULL! for " + result.toString());
+//			}
 		}
 		super.onTestFailure(result);
 	}
@@ -155,19 +158,21 @@ public abstract class AbstractTestListener extends TestArgsListener
 				//errorMessage = thr.getMessage();
 				errorMessage = getFullStackTrace(thr);
 			}
+			
+			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
 
-			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
-			if (globalLog != null) {
-/*				if (result.getThrowable() != null) {
-					//errorMessage = result.getThrowable().getMessage();
-					errorMessage = getFullStackTrace(result.getThrowable());
-				}*/
-				String msg = Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
-				globalLog.log(Type.COMMON, msg);
-			}
-			else{
-				Log.error("GlobalTestLog is NULL! for " + result.toString());
-			}
+//			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
+//			if (globalLog != null) {
+///*				if (result.getThrowable() != null) {
+//					//errorMessage = result.getThrowable().getMessage();
+//					errorMessage = getFullStackTrace(result.getThrowable());
+//				}*/
+//				String msg = Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
+//				globalLog.log(Type.COMMON, msg);
+//			}
+//			else{
+//				Log.error("GlobalTestLog is NULL! for " + result.toString());
+//			}
 		}
 		super.onTestSkipped(result);
 	}
@@ -176,6 +181,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onFinish(ITestContext testContext)
 	{
 		//removeIncorrectlyFailedTests(testContext);
+		TestNamingUtil.releaseTestFromThread(Thread.currentThread().getId());
 		super.onFinish(testContext);
 	}
 
