@@ -106,8 +106,12 @@ public class FileManager
 		File folder = new File(name);
 		if (!folder.exists())
 		{
-			folder.mkdir();
+			boolean isCreated = folder.mkdir();
+			if (isCreated)
+			{
+				return folder;
+			}
 		}
-		return folder;
+		throw new RuntimeException("Folder not created");
 	}
 }

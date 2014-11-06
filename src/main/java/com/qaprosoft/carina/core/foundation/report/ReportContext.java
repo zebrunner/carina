@@ -28,9 +28,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 
 public class ReportContext
@@ -57,14 +57,22 @@ public class ReportContext
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
 			if (!projectRoot.exists())
 			{
-				projectRoot.mkdirs();
+				boolean isCreated = projectRoot.mkdirs();
+				if (!isCreated)
+				{
+					throw new RuntimeException("Folder not created");
+				}
 			}
 
 			rootID = System.currentTimeMillis();
 			String directory = String.format("%s/%s/%d", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), rootID);
 			baseDirectory = new File(directory);
-			baseDirectory.mkdir();
+			boolean isCreated = baseDirectory.mkdir();
+			if (!isCreated)
+			{
+				throw new RuntimeException("Folder not created");
+			}
 		}
 		return baseDirectory;
 	}
@@ -74,7 +82,11 @@ public class ReportContext
 		if (tempDirectory == null)
 		{
 			tempDirectory = new File(getBaseDir().getAbsolutePath() + "/temp");
-			tempDirectory.mkdir();
+			boolean isCreated = tempDirectory.mkdir();
+			if (!isCreated)
+			{
+				throw new RuntimeException("Folder not created");
+			}
 		}
 		return tempDirectory;
 	}
@@ -93,9 +105,17 @@ public class ReportContext
 		File screenDir = new File(directory);
 		if (!screenDir.exists())
 		{
-			screenDir.mkdir();
+			boolean isCreated = screenDir.mkdir();
+			if (!isCreated)
+			{
+				throw new RuntimeException("Folder not created");
+			}
 			File thumbDir = new File(screenDir.getAbsolutePath() + "/thumbnails");
-			thumbDir.mkdir();
+			isCreated = thumbDir.mkdir();
+			if (!isCreated)
+			{
+				throw new RuntimeException("Folder not created");
+			}
 		}
 		return screenDir;
 	}
@@ -183,9 +203,26 @@ public class ReportContext
 			}
  
 			FileWriter fw = new FileWriter(reportFile.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(content);
-			bw.close();
+			try
+			{
+				BufferedWriter bw = new BufferedWriter(fw);
+				try
+				{
+					bw.write(content);
+				} finally
+				{
+					if (bw != null)
+					{
+						bw.close();
+					}
+				}
+			} finally
+			{
+				if (fw != null)
+				{
+					fw.close();
+				}
+			}
  
 		} catch (IOException e) {
 			e.printStackTrace();
