@@ -38,7 +38,9 @@ public class DropboxClient {
 			DbxEntry.File uploadedFile = client.uploadFile(targetPath, DbxWriteMode.add(), inputFile.length(), inputStream);
 			System.out.println("Uploaded: " + uploadedFile.toString());
 		} finally {
+		    if(inputStream != null) {
 			inputStream.close();
+		    }
 		}
 	}
 	

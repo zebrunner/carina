@@ -49,25 +49,63 @@ public class ZipManager
 
 				if (entry.isDirectory())
 				{
-					(new File(extractTo + "/" + entry.getName())).mkdir();
+					boolean isCreated = (new File(extractTo + "/" + entry.getName())).mkdir();
+					if (!isCreated)
+					{
+						throw new RuntimeException("Folder not created");
+					}
 					continue;
 				}
 
-				copyInputStream(zipFile.getInputStream(entry),
-						new BufferedOutputStream(new FileOutputStream(extractTo + "/" + entry.getName())));
+				InputStream is = zipFile.getInputStream(entry);
+				try
+				{
+					FileOutputStream fos = new FileOutputStream(extractTo + "/" + entry.getName());
+					try
+					{
+						BufferedOutputStream bos = new BufferedOutputStream(fos);
+						try
+						{
+							copyInputStream(is, bos);
+						} finally
+						{
+							if (bos != null)
+							{
+								bos.close();
+							}
+						}
+					} finally
+					{
+						if (fos != null)
+						{
+							fos.close();
+						}
+					}
+				} finally
+				{
+					if (is != null)
+					{
+						is.close();
+					}
+				}
 			}
 
 		} catch (IOException e)
 		{
 			e.printStackTrace();
-		} 
-		finally {
-			try {
-				zipFile.close();
-			} catch (IOException e) {
+		} finally
+		{
+			try
+			{
+				if (zipFile != null)
+				{
+					zipFile.close();
+				}
+			} catch (IOException e)
+			{
 				// TODO Auto-generated catch block
 				LOGGER.debug(e.getMessage(), e.getCause());
-			}			
+			}
 		}
 	}
 
