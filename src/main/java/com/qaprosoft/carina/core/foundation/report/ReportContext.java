@@ -60,7 +60,7 @@ public class ReportContext
 				boolean isCreated = projectRoot.mkdirs();
 				if (!isCreated)
 				{
-					throw new RuntimeException("Folder not created");
+					throw new RuntimeException("Folder not created: " + projectRoot.getAbsolutePath());
 				}
 			}
 
@@ -71,7 +71,7 @@ public class ReportContext
 			boolean isCreated = baseDirectory.mkdir();
 			if (!isCreated)
 			{
-				throw new RuntimeException("Folder not created");
+				throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
 			}
 		}
 		return baseDirectory;
@@ -85,7 +85,7 @@ public class ReportContext
 			boolean isCreated = tempDirectory.mkdir();
 			if (!isCreated)
 			{
-				throw new RuntimeException("Folder not created");
+				throw new RuntimeException("Folder not created: " + tempDirectory.getAbsolutePath());
 			}
 		}
 		return tempDirectory;
@@ -108,13 +108,13 @@ public class ReportContext
 			boolean isCreated = screenDir.mkdir();
 			if (!isCreated)
 			{
-				throw new RuntimeException("Folder not created");
+				throw new RuntimeException("Folder not created: " + screenDir.getAbsolutePath());
 			}
 			File thumbDir = new File(screenDir.getAbsolutePath() + "/thumbnails");
 			isCreated = thumbDir.mkdir();
 			if (!isCreated)
 			{
-				throw new RuntimeException("Folder not created");
+				throw new RuntimeException("Folder not created: " + thumbDir.getAbsolutePath());
 			}
 		}
 		return screenDir;

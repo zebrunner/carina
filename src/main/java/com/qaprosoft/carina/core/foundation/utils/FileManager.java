@@ -112,6 +112,6 @@ public class FileManager
 				return folder;
 			}
 		}
-		throw new RuntimeException("Folder not created");
+		throw new RuntimeException("Folder not created: " + folder.getAbsolutePath());
 	}
 }

@@ -79,7 +79,7 @@ public class Platform {
 			int processStatus = p.waitFor();
 			if(processStatus != 0)
 			{
-			    throw new RuntimeException("Process not terminated properly");
+				throw new RuntimeException("Process not terminated properly. Code: " + processStatus);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e);
@@ -98,7 +98,7 @@ public class Platform {
 			int processStatus = p.waitFor();
 			if (processStatus != 0)
 			{
-				throw new RuntimeException("Process not terminated properly");
+				throw new RuntimeException("Process not terminated properly. Code: " + processStatus);
 			}
 		} catch (Exception e)
 		{
