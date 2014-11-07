@@ -49,10 +49,11 @@ public class ZipManager
 
 				if (entry.isDirectory())
 				{
-					boolean isCreated = (new File(extractTo + "/" + entry.getName())).mkdir();
+					File folder = new File(extractTo + "/" + entry.getName());
+					boolean isCreated = folder.mkdir();
 					if (!isCreated)
 					{
-						throw new RuntimeException("Folder not created");
+						throw new RuntimeException("Folder not created: " + folder.getAbsolutePath());
 					}
 					continue;
 				}
