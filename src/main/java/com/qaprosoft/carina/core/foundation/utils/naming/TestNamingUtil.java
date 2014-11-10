@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.testng.ITestResult;
@@ -32,6 +33,8 @@ public class TestNamingUtil
 {
 	private static INamingStrategy namingStrategy;
 
+	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	
 	static
 	{
 		try
@@ -56,5 +59,20 @@ public class TestNamingUtil
 	public static String getPackageName(ITestResult result)
 	{
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
+	}
+	
+	public static synchronized void accociateTest2Thread(String test, Long threadId)
+	{
+		threadId2TestName.put(threadId, test);
+	}
+	
+	public static synchronized void releaseTestFromThread(Long threadId)
+	{
+		threadId2TestName.remove(threadId);
+	}
+	
+	public static String getTestByThread(Long threadId)
+	{
+		return threadId2TestName.get(threadId);
 	}
 }

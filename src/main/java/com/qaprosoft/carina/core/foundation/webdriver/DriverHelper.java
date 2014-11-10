@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -33,6 +34,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -339,6 +341,7 @@ public class DriverHelper
 					return extWebElement.getElement().isDisplayed();
 				}
 			});
+			scrollTo(extWebElement);
 			extWebElement.getElement().clear();
 			extWebElement.getElement().sendKeys(decryptedText);
 			msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, extWebElement.getName());
@@ -452,21 +455,24 @@ public class DriverHelper
 		try
 		{
 			Thread.sleep(RETRY_TIME);
+			if (extendedWebElement.getElement() == null) {
+				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+			}
 			extendedWebElement.getElement().click();
 		}
 		catch (UnhandledAlertException e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			getDriver().switchTo().alert().accept();
+		}
+		catch(StaleElementReferenceException e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
 		}
 		catch (Exception e)
 		{
-			//finding element again via By to be actual 
-			try {
-				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
-			}
-			catch(Exception ex) {
-				//do nothing here as extendedWebElement is already defined
-			}
+			LOGGER.debug(e.getMessage(), e.getCause());
 			scrollTo(extendedWebElement);
 			//repeat again until timeout achieved
 			if (System.currentTimeMillis() - timer < timeout * 1000)
@@ -479,25 +485,6 @@ public class DriverHelper
 				summary.log(msg);			
 				throw new RuntimeException(msg, e); 			
 			}
-					
-
-/*			try {
-				//click via activating and pressing <Enter> key
-				extendedWebElement.getElement().sendKeys(Keys.ENTER);
-			}
-			catch(Exception ex) {
-				//repeat again until timeout achieved
-				if (System.currentTimeMillis() - timer < timeout * 1000)
-				{
-					clickSafe(extendedWebElement, timeout, false);
-				}
-				else
-				{
-					String msg = Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator());
-					summary.log(msg);			
-					throw new RuntimeException(msg, ex); 			
-				}
-			}*/
 		}
 	}
 	
@@ -536,7 +523,7 @@ public class DriverHelper
 	 * @param element
 	 * @param startTimer
 	 */
-	private void doubleClickSafe(final ExtendedWebElement extendedWebElement, boolean startTimer)
+	private void doubleClickSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
 	{
 		WebDriver drv = getDriver();
 		Actions action = new Actions(drv);
@@ -548,14 +535,24 @@ public class DriverHelper
 		try
 		{
 			Thread.sleep(RETRY_TIME);
+			if (extendedWebElement.getElement() == null) {
+				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+			}
 			action.moveToElement(extendedWebElement.getElement()).doubleClick(extendedWebElement.getElement()).build().perform();
 		}
 		catch (UnhandledAlertException e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			drv.switchTo().alert().accept();
+		}
+		catch(StaleElementReferenceException e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
 		}
 		catch (Exception e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			if (e.getMessage().contains("Element is not clickable"))
 			{
 				scrollTo(extendedWebElement);
@@ -577,7 +574,7 @@ public class DriverHelper
 	/**
 	 * Sends enter to element.
 	 * 
-	 * @param element
+	 * @param extendedWebElement
 	 *            to send enter.
 	 */
 	public void pressEnter(final ExtendedWebElement extendedWebElement)
@@ -589,19 +586,19 @@ public class DriverHelper
 		TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
 	}
 
+	/**
+	 * Safe enter sending to specified element.
+	 * 
+	 * @param controlInfo
+	 * @param control
+	 */	
 	public void pressEnter(String controlInfo, WebElement control)
 	{
 		pressEnter(new ExtendedWebElement(control, controlInfo));
 	}
 
-	/**
-	 * Safe enter sending to specified element.
-	 * 
-	 * @param elementName
-	 * @param element
-	 * @param startTimer
-	 */
-	private void pressEnterSafe(final ExtendedWebElement extendedWebElement, boolean startTimer)
+
+	private void pressEnterSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
 	{
 
 		if (startTimer)
@@ -611,14 +608,24 @@ public class DriverHelper
 		try
 		{
 			Thread.sleep(RETRY_TIME);
+			if (extendedWebElement.getElement() == null) {
+				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+			}
 			extendedWebElement.getElement().sendKeys(Keys.ENTER);
 		}
 		catch (UnhandledAlertException e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			getDriver().switchTo().alert().accept();
 		}
+		catch(StaleElementReferenceException e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+		}		
 		catch (Exception e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
 			{
 				pressEnterSafe(extendedWebElement, false);
@@ -637,7 +644,7 @@ public class DriverHelper
 	 * 
 	 * @param checkbox
 	 */
-	public void check(final ExtendedWebElement checkbox)
+	public void check(ExtendedWebElement checkbox)
 	{
 		if (isElementPresent(checkbox) && !checkbox.getElement().isSelected())
 		{
@@ -651,7 +658,7 @@ public class DriverHelper
 	 * 
 	 * @param checkbox
 	 */
-	public void uncheck(final ExtendedWebElement checkbox)
+	public void uncheck(ExtendedWebElement checkbox)
 	{
 		if (isElementPresent(checkbox) && checkbox.getElement().isSelected())
 		{
@@ -1675,5 +1682,41 @@ public class DriverHelper
 		}
 		
 		return driver;
-	}	
+	}
+	public ExtendedWebElement format(ExtendedWebElement element, Object...objects) {
+		String locator = element.getBy().toString();
+		By by = null;
+		if (locator.startsWith("By.id: "))
+		{
+			by =  By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
+		}
+		if (locator.startsWith("By.name: "))
+		{
+			by =  By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
+		}
+		if (locator.startsWith("By.xpath: "))
+		{
+			by =  By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
+		}
+		if (locator.startsWith("linkText: "))
+		{
+			by =  By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
+		}
+		if (locator.startsWith("css: "))
+		{
+			by =  By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
+		}
+		if (locator.startsWith("tagName: "))
+		{
+			by =  By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
+		}
+		
+		ExtendedWebElement res = null;
+		try {
+			res = findExtendedWebElement(by);
+		} catch (Exception e) {
+			res = new ExtendedWebElement(null, element.getName(), by);
+		}
+		return res;
+	}
 }    

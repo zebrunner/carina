@@ -176,11 +176,40 @@ public class HtmlReportGenerator
 			try
 			{
 				InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
-				ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
-						+ GALLERY_ZIP)));
-				ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP, reportsRootDir.getAbsolutePath());
-				File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
-				zip.delete();
+				try
+				{
+					FileOutputStream fos = new FileOutputStream(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+					try
+					{
+						BufferedOutputStream bos = new BufferedOutputStream(fos);
+						try
+						{
+							ZipManager.copyInputStream(is, bos);
+							ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP,
+									reportsRootDir.getAbsolutePath());
+							File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+							zip.delete();
+						} finally
+						{
+							if (bos != null)
+							{
+								bos.close();
+							}
+						}
+					} finally
+					{
+						if (fos != null)
+						{
+							fos.close();
+						}
+					}
+				} finally
+				{
+					if (is != null)
+					{
+						is.close();
+					}
+				}
 			}
 			catch (Exception e)
 			{

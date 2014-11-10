@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,8 +43,7 @@ import org.testng.xml.XmlTest;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.carina.core.foundation.jenkins.JenkinsClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
-import com.qaprosoft.carina.core.foundation.log.GlobalTestLog.Type;
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -68,11 +65,6 @@ import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
-import com.qaprosoft.testexecuter.client.ExecutionContext;
-import com.qaprosoft.testexecuter.client.ITestExecuterClient;
-import com.qaprosoft.testexecuter.client.TestDetailsBean;
-import com.qaprosoft.testexecuter.client.TestDetailsBean.TestStatus;
-import com.qaprosoft.testexecuter.client.TestExecuterClient;
 
 
 /*
@@ -89,11 +81,6 @@ public abstract class AbstractTest extends DriverHelper
     protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
     protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
 
-	
-    // Test-Executer integration items
-    protected static ExecutionContext executionContext;
-    protected TestDetailsBean TEST_EXECUTER_LOG;
-    
     //Jira ticket(s)
     protected List<String> jiraTickets = new ArrayList<String>();
 
@@ -111,7 +98,7 @@ public abstract class AbstractTest extends DriverHelper
 		    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 	
 		    LOGGER.info(Configuration.asString());
-		    Configuration.validateConfiguration();
+//		    Configuration.validateConfiguration();
 	
 		    ReportContext.removeOldReports();
 		    context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
@@ -120,17 +107,7 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	RestAssured.baseURI = Configuration.get(Parameter.URL);
 		    }
-	
-		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
-		    {
-				Assert.assertTrue(Configuration.getLong(Parameter.TEST_ID) > 0, "Parameter 'test_id' not specified");
-				ITestExecuterClient client = new TestExecuterClient(Configuration.get(Parameter.TESTEXECUTER_URL));
-				executionContext = ExecutionContext.INSTANCE.initBeforeSuite(Configuration.getLong(Parameter.TEST_ID), client);
-		    }
-		    else
-		    {
-		    	executionContext = ExecutionContext.INSTANCE.initBeforeSuite();
-		    }
+
 
 		    try
 		    {
@@ -186,51 +163,56 @@ public abstract class AbstractTest extends DriverHelper
 		    //clear jira tickets to be sure that next test is not affected.
 		    jiraTickets.clear();
 
+		    ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+			if(tla != null)
+			{
+				tla.closeResource(TestNamingUtil.getCanonicalTestName(result));
+			}
 		    
-			String testName = TestNamingUtil.getCanonicalTestName(result);
-			GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
-	    
-		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
-		    if (!testLogFile.exists()) testLogFile.createNewFile();
-		    FileWriter fw = new FileWriter(testLogFile);
+//			String testName = TestNamingUtil.getCanonicalTestName(result);
+//			GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
+//	    
+//		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
+//		    if (!testLogFile.exists()) testLogFile.createNewFile();
+//		    FileWriter fw = new FileWriter(testLogFile);
 		    
-		    try
-		    {
-	    	
-			    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
-			    {
-					fw.append("\r\n************************** Common logs **************************\r\n\r\n");
-					fw.append(glblLog.readLog(Type.COMMON));
-			    }
-			    
-		    }
-		    catch (Exception e)
-		    {
-		    	LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
-		    }
-		    finally {
-		    	try {
-		    		fw.close();
-		    	} catch (Exception e) {
-		    		LOGGER.debug(e.getMessage(), e.getCause());
-		    	}
-		    }
-	
-		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
-		    {
-			    TestResultItem testResult = EmailReportItemCollector.pull(result);
-				if (TestResultType.PASS.equals(testResult.getResult()))
-				{
-				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
-				}
-				else
-				{
-				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
-				    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
-				}
-				TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
-				TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
-		    }
+//		    try
+//		    {
+//	    	
+//			    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
+//			    {
+//					fw.append("\r\n************************** Common logs **************************\r\n\r\n");
+//					fw.append(glblLog.readLog(Type.COMMON));
+//			    }
+//			    
+//		    }
+//		    catch (Exception e)
+//		    {
+//		    	LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+//		    }
+//		    finally {
+//		    	try {
+//		    		fw.close();
+//		    	} catch (Exception e) {
+//		    		LOGGER.debug(e.getMessage(), e.getCause());
+//		    	}
+//		    }
+//	
+//		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
+//		    {
+//			    TestResultItem testResult = EmailReportItemCollector.pull(result);
+//				if (TestResultType.PASS.equals(testResult.getResult()))
+//				{
+//				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
+//				}
+//				else
+//				{
+//				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
+//				    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
+//				}
+//				TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
+//				TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
+//		    }
 		}
 		catch (Exception e)
 		{
@@ -245,7 +227,6 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{
-		    executionContext.finilizeAfterSuite();
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
 		    String deviceName = "Desktop";
