@@ -24,13 +24,12 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -81,6 +80,11 @@ public class UITestListener extends AbstractTestListener {
 		{
 			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
 			RetryCounter.incrementRunCount(test);
+			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+			if(tla != null)
+			{
+				tla.closeResource(test);
+			}
 			ReportContext.removeTestReport(test);
 		}
 		else
@@ -117,15 +121,20 @@ public class UITestListener extends AbstractTestListener {
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		String test = TestNamingUtil.getCanonicalTestName(result);
+//		String test = TestNamingUtil.getCanonicalTestName(result);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 
 		// TestLogCollector.addScreenshotComment(takeScreenshot(result),
 		// "TEST PASSED!");
 
-		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
-			ReportContext.removeTestReport(test);
-		}
+//		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
+//			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+//			if(tla != null)
+//			{
+//				tla.closeResource(test);
+//			}
+//			ReportContext.removeTestReport(test);
+//		}
 		super.onTestSuccess(result);
 	}
 

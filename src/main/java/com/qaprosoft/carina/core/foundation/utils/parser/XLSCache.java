@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.parser;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,9 +33,18 @@ public class XLSCache
 			Workbook wb;
 			try
 			{
-				wb = WorkbookFactory.create(ClassLoader.getSystemResourceAsStream(xlsPath));
-			} 
-			catch (Exception e)
+				InputStream is = ClassLoader.getSystemResourceAsStream(xlsPath);
+				try
+				{
+					wb = WorkbookFactory.create(is);
+				} finally
+				{
+					if (is != null)
+					{
+						is.close();
+					}
+				}
+			} catch (Exception e)
 			{
 				throw new RuntimeException("Can't read xls: " + xlsPath);
 			}
