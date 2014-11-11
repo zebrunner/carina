@@ -161,59 +161,48 @@ public class HtmlReportGenerator
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
-			LOGGER.error(e.getMessage());
-			LOGGER.error(e.getStackTrace().toString());
+			LOGGER.error(e);
 		}
 	}
 
 	private static void copyGalleryLib()
 	{
 //		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
-		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
-		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
+		File reportsRootDir = new File(System.getProperty("user.dir") + File.separator + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
+		if (!new File(reportsRootDir.getAbsolutePath() + File.separator + "gallery-lib").exists())
 		{
 			try
 			{
 				InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
 				try
 				{
-					FileOutputStream fos = new FileOutputStream(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+					FileOutputStream fos = new FileOutputStream(reportsRootDir.getAbsolutePath() + File.separator + GALLERY_ZIP);
 					try
 					{
 						BufferedOutputStream bos = new BufferedOutputStream(fos);
 						try
 						{
 							ZipManager.copyInputStream(is, bos);
-							ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP,
+							ZipManager.unzip(reportsRootDir.getAbsolutePath() + File.separator + GALLERY_ZIP,
 									reportsRootDir.getAbsolutePath());
-							File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+							File zip = new File(reportsRootDir.getAbsolutePath() + File.separator + GALLERY_ZIP);
 							zip.delete();
 						} finally
 						{
-							if (bos != null)
-							{
-								bos.close();
-							}
+							FileManager.close(bos);
 						}
 					} finally
 					{
-						if (fos != null)
-						{
-							fos.close();
-						}
+						FileManager.close(fos);
 					}
 				} finally
 				{
-					if (is != null)
-					{
-						is.close();
-					}
+					FileManager.close(is);
 				}
 			}
 			catch (Exception e)
 			{
-				LOGGER.error(e.getMessage());
+				LOGGER.error(e);
 			}
 		}
 	}
