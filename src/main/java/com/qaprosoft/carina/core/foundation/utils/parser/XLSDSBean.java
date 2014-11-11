@@ -58,6 +58,23 @@ public class XLSDSBean
 		}
 	}
 
+	public XLSDSBean(String xlsFile, String xlsSheet, String dsArgs, String dsUids)
+	{
+		this.xlsFile = xlsFile;
+		this.xlsSheet = xlsSheet;
+		this.args = new ArrayList<String>();
+		this.uidArgs = new ArrayList<String>();
+
+		if(!dsArgs.isEmpty())
+		{
+			args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
+		}
+		if(!dsUids.isEmpty())
+		{
+			uidArgs = Arrays.asList(dsUids.replace(",", ";").replace(" ", "").split(";"));
+		}
+	}
+	
 	public String getXlsFile()
 	{
 		return xlsFile;
