@@ -43,16 +43,22 @@ public class ThreadLogAppender extends AppenderSkeleton
 		} catch (IOException e)
 		{
 			e.printStackTrace();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
 		}
+		
 	}
 	
 	public void closeResource(String test)
 	{
 		try
 		{
-			test2file.get(test).close();
-			test2file.remove(test);
-		} catch (IOException e)
+			if (test2file.get(test) != null) {
+				test2file.get(test).close();
+				test2file.remove(test);
+			}
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}

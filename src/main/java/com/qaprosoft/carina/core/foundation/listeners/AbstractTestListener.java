@@ -56,10 +56,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
-	    
-	    //spira logging
-	    
-//    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
 	}
 	
 	@Override
@@ -119,26 +115,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 				errorMessage = getFullStackTrace(thr);
 			}
 			
+			if (result.getThrowable() != null) {
+				thr = result.getThrowable();
+				errorMessage = getFullStackTrace(thr);
+			}			
+			
 			SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
-			
-////			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
-//			if (globalLog != null) {
-//				if (result.getThrowable() != null) {
-//					//errorMessage = result.getThrowable().getMessage();
-//					thr = result.getThrowable();
-//					errorMessage = getFullStackTrace(thr);
-//				}
-//				
-//			    //Spira test steps integration
-//			    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
-//			    
-//				String msg = Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
-//				globalLog.log(Type.COMMON, msg);
-//			}
-//			else{
-//				Log.error("GlobalTestLog is NULL! for " + result.toString());
-//			}
 		}
 		super.onTestFailure(result);
 	}
@@ -158,6 +141,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 				//errorMessage = thr.getMessage();
 				errorMessage = getFullStackTrace(thr);
 			}
+			if (result.getThrowable() != null) {
+				thr = result.getThrowable();
+				errorMessage = getFullStackTrace(thr);
+			}			
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
 

@@ -19,13 +19,13 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
@@ -64,6 +64,7 @@ public class UITestListener extends AbstractTestListener {
 		
 		int count = RetryCounter.getRunCount(test);
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
 		
 		String errorMessage = "";
 		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
@@ -75,17 +76,32 @@ public class UITestListener extends AbstractTestListener {
 			errorMessage = getFullStackTrace(result.getThrowable());
 		}
 		
+		IRetryAnalyzer retry=result.getMethod().getRetryAnalyzer();
+		if (count < maxCount && retry == null) {
+			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
+		}
 		
-		if (count < maxCount)
+		
+		if (count < maxCount && retry != null)
 		{
 			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
+			LOGGER.debug("UITestListener->onTestFailure retry analyzer: " + result.getMethod().getRetryAnalyzer());
+			
 			RetryCounter.incrementRunCount(test);
-			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-			if(tla != null)
-			{
-				tla.closeResource(test);
+			//temporary wrap into try/catch to analyze any possible failures with extended logging
+			try {
+				ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+				if(tla != null)
+				{
+					tla.closeResource(test);
+				}
+				LOGGER.debug("count < maxCount: onTestFailure listener finished successfully.");
 			}
-			ReportContext.removeTestReport(test);
+			catch (Exception e) {
+				LOGGER.error("onTestFailure listener was not successful.");
+				e.printStackTrace();
+			}
+			//ReportContext.removeTestReport(test);			
 		}
 		else
 		{		
@@ -96,8 +112,10 @@ public class UITestListener extends AbstractTestListener {
 			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
 			super.onTestFailure(result);
+			LOGGER.debug("count >= maxCount: onTestFailure listener finished successfully.");
 		}
 		Reporter.setCurrentTestResult(result);
+		LOGGER.debug("onTestFailure listener finished successfully.");
 	}
 
 	@Override
@@ -124,17 +142,6 @@ public class UITestListener extends AbstractTestListener {
 //		String test = TestNamingUtil.getCanonicalTestName(result);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 
-		// TestLogCollector.addScreenshotComment(takeScreenshot(result),
-		// "TEST PASSED!");
-
-//		if (!Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
-//			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-//			if(tla != null)
-//			{
-//				tla.closeResource(test);
-//			}
-//			ReportContext.removeTestReport(test);
-//		}
 		super.onTestSuccess(result);
 	}
 
