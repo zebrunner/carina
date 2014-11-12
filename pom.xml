@@ -22,6 +22,10 @@
 			<url>https://raw.github.com/qaprosoft/soapui-java-client/master</url>
 		</repository>
 		<repository>
+			<id>zafira-client</id>
+			<url>https://raw.github.com/qaprosoft/zafira-client/master</url>
+		</repository>
+		<repository>
 			<id>central</id>
 			<name>Atlassian Public Repository</name>
 			<layout>default</layout>
@@ -242,6 +246,12 @@
 			<groupId>com.dropbox.core</groupId>
 			<artifactId>dropbox-core-sdk</artifactId>
 			<version>[1.7,1.8)</version>
+		</dependency>
+		<!-- Zafira -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>zafira-client</artifactId>
+			<version>1.0</version>
 		</dependency>
 	</dependencies>
 
