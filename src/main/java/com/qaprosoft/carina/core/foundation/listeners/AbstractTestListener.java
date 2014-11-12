@@ -96,7 +96,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now());
 		
 	    //Spira test steps integration
-	    SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result);		
+	    SpiraTestIntegrator.logTestStepsInfo(result);	
+	    //Ownership.getMethodOwner(result);
 		super.onTestSuccess(result);
 	}
 
@@ -120,7 +121,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 				errorMessage = getFullStackTrace(thr);
 			}			
 			
-			SpiraTestIntegrator.logTestStepsInfo(result.getMethod().getTestClass().getName(), result, thr);
+			SpiraTestIntegrator.logTestStepsInfo(result, thr);
+			//Ownership.getMethodOwner(result);
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 		}
 		super.onTestFailure(result);
@@ -147,6 +149,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}			
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
+			//Ownership.getMethodOwner(result);
 
 //			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
 //			if (globalLog != null) {

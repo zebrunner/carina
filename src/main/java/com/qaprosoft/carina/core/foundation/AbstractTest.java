@@ -120,6 +120,8 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
 		    
+		    //LOGGER.info("TestSuite owner is " + Ownership.getSuiteOwner(context));
+		    
 		}
 		catch (Throwable thr)
 		{
@@ -184,7 +186,7 @@ public abstract class AbstractTest extends DriverHelper
 		try
 		{
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
-
+		    
 		    String deviceName = "Desktop";
 		    String browser = Configuration.get(Parameter.BROWSER);
 		    if (!browserVersion.isEmpty()) {
