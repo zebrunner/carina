@@ -120,6 +120,8 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
 		    
+		    //LOGGER.info("TestSuite owner is " + Ownership.getSuiteOwner(context));
+		    
 		}
 		catch (Throwable thr)
 		{
@@ -169,50 +171,6 @@ public abstract class AbstractTest extends DriverHelper
 				tla.closeResource(TestNamingUtil.getCanonicalTestName(result));
 			}
 		    
-//			String testName = TestNamingUtil.getCanonicalTestName(result);
-//			GlobalTestLog glblLog = ((GlobalTestLog) result.getAttribute(GlobalTestLog.KEY));
-//	    
-//		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
-//		    if (!testLogFile.exists()) testLogFile.createNewFile();
-//		    FileWriter fw = new FileWriter(testLogFile);
-		    
-//		    try
-//		    {
-//	    	
-//			    if (!StringUtils.isEmpty(glblLog.readLog(Type.COMMON)))
-//			    {
-//					fw.append("\r\n************************** Common logs **************************\r\n\r\n");
-//					fw.append(glblLog.readLog(Type.COMMON));
-//			    }
-//			    
-//		    }
-//		    catch (Exception e)
-//		    {
-//		    	LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
-//		    }
-//		    finally {
-//		    	try {
-//		    		fw.close();
-//		    	} catch (Exception e) {
-//		    		LOGGER.debug(e.getMessage(), e.getCause());
-//		    	}
-//		    }
-//	
-//		    if (Configuration.getBoolean(Parameter.IS_TESTEXECUTER))
-//		    {
-//			    TestResultItem testResult = EmailReportItemCollector.pull(result);
-//				if (TestResultType.PASS.equals(testResult.getResult()))
-//				{
-//				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.PASS);
-//				}
-//				else
-//				{
-//				    TEST_EXECUTER_LOG.setTestStatus(TestStatus.FAIL);
-//				    TEST_EXECUTER_LOG.setFailure(testResult.getFailReason());
-//				}
-//				TEST_EXECUTER_LOG.setScreenshotLink(isUITest() ? testResult.getLinkToScreenshots() : "#");
-//				TEST_EXECUTER_LOG.setLogLink(testResult.getLinkToLog());
-//		    }
 		}
 		catch (Exception e)
 		{
@@ -228,7 +186,7 @@ public abstract class AbstractTest extends DriverHelper
 		try
 		{
 		    HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
-
+		    
 		    String deviceName = "Desktop";
 		    String browser = Configuration.get(Parameter.BROWSER);
 		    if (!browserVersion.isEmpty()) {
@@ -303,10 +261,12 @@ public abstract class AbstractTest extends DriverHelper
     }
 
 
-    public Object[][] createTestArgSets2(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
+    //separate method to be able to retrieve information from different sheets in the same java test.
+    public Object[][] createTestArgSets(ITestContext context, String xlsFile, String xlsSheet, String dsArgs, String dsUids, String executeColumn, String executeValue, String... staticArgs)
     {
-		XLSDSBean dsBean = new XLSDSBean(context);
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
+		XLSDSBean dsBean = new XLSDSBean(xlsFile, xlsSheet, dsArgs, dsUids);
+		
+		XLSTable dsData = XLSParser.parseSpreadSheet(xlsFile, xlsSheet, executeColumn, executeValue);
 		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
 		
 		String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
@@ -340,6 +300,60 @@ public abstract class AbstractTest extends DriverHelper
 		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
 		
 		return args;
+    }
+    
+    public Object[][] createTestArgSets(ITestContext context, String xlsSheet, String dsArgs, String dsUids, String executeColumn, String executeValue, String... staticArgs)
+    {
+    	XLSDSBean dsBean = new XLSDSBean(context);
+    	return createTestArgSets(context, dsBean.getXlsFile(), xlsSheet, dsArgs, dsUids, executeColumn, executeValue, staticArgs);
+    }
+    
+    
+    //separate method to be able to retrieve information from different sheets in the same java test.
+    public Object[][] createTestArgSets2(ITestContext context, String sheet, String executeColumn, String executeValue, String... staticArgs)
+    {
+		XLSDSBean dsBean = new XLSDSBean(context);
+		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), sheet, executeColumn, executeValue);
+		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
+		
+		String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
+		
+		int rowIndex = 0;
+		for (Map<String, String> xlsRow : dsData.getDataRows())
+		{
+			String testName = context.getName();
+			
+			args[rowIndex][0] = xlsRow;
+
+		    for (int i=0; i<staticArgs.length; i++){
+		    	args[rowIndex][i + 1] = ParameterGenerator.process(dsBean.getTestParams().get(staticArgs[i]), context.getAttribute(SpecialKeywords.UUID).toString()); //zero element is a hashmap 
+		    }
+		    //update testName adding UID values from DataSource arguments if any
+			testName = dsBean.setDataSorceUUID(testName, xlsRow);
+
+			testNameMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+			
+			//add jira ticket from xls datasource to special hashMap
+			if (jiraColumnName != null) {
+				if (!jiraColumnName.isEmpty()) {
+					jiraTicketsMappedToArgs.put(String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow.get(jiraColumnName));
+				}
+			}
+			
+		    rowIndex++;
+		}
+
+		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
+		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
+		
+		return args;
+    }
+    
+    public Object[][] createTestArgSets2(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
+    {
+		XLSDSBean dsBean = new XLSDSBean(context);    	
+    	return createTestArgSets2(context, dsBean.getXlsSheet(), executeColumn, executeValue, staticArgs);
+
     }
     
     @DataProvider(name = "excel_ds2")

@@ -32,16 +32,16 @@ public class SpiraTestIntegrator {
 		}
 	}
 	
-	public static void logTestStepsInfo(String className, ITestResult result) {
-		logTestStepsInfo(className, result, null);
+	public static void logTestStepsInfo(ITestResult result) {
+		logTestStepsInfo(result, null);
 	}
 	
-	public static void logTestStepsInfo(String className, ITestResult result, Throwable thr) {
+	public static void logTestStepsInfo(ITestResult result, Throwable thr) {
 	    //Spira test steps integration
 		//Get a handle to the class and method
 		Class<?> testClass;
 		try {
-			testClass = Class.forName(className);
+			testClass = Class.forName(result.getMethod().getTestClass().getName());
 			
 			//We can't use getMethod() because we may have parameterized tests
 			//for which we won't know the matching signature
