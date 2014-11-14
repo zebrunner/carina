@@ -87,7 +87,6 @@ public class UITestListener extends AbstractTestListener {
 			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
 			LOGGER.debug("UITestListener->onTestFailure retry analyzer: " + result.getMethod().getRetryAnalyzer());
 			
-			RetryCounter.incrementRunCount(test);
 			//temporary wrap into try/catch to analyze any possible failures with extended logging
 			try {
 				ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");

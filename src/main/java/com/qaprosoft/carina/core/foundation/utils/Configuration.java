@@ -214,7 +214,11 @@ public class Configuration
 		// spira
 		SPIRA_RELEASE_ID("spira_release_id", "default_spira_release_id"),
 		
-		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id");
+		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id"),
+		
+		//zafira
+		ZAFIRA_SERVICE_URL("zafira_service_url", "default_zafira_service_url");
+		
 
 		
 		private final String key;
