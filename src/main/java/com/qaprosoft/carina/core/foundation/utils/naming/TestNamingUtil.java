@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -34,6 +35,7 @@ public class TestNamingUtil
 	private static INamingStrategy namingStrategy;
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	
 	static
 	{
@@ -75,4 +77,20 @@ public class TestNamingUtil
 	{
 		return threadId2TestName.get(threadId);
 	}
+	
+	public static synchronized void accociateTestStartDate(String test)
+	{
+		testName2StartDate.put(test, new Date().getTime());
+	}
+	
+	public static Long getTestStartDate(String test)
+	{
+		return testName2StartDate.get(test);
+	}
+	
+	public static synchronized void releaseTestStartDate(String test)
+	{
+		testName2StartDate.remove(test);
+	}	
+	
 }

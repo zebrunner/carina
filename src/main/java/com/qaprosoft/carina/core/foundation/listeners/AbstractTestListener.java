@@ -31,6 +31,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.spira.SpiraTestIntegrator;
+import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -48,14 +49,16 @@ public abstract class AbstractTestListener extends TestArgsListener
     DropboxClient dropboxClient;	
 	
 	@Override
-	public void onStart(ITestContext testContext)
+	public void onStart(ITestContext context)
 	{
-		testContext.setAttribute(SpecialKeywords.UUID, StringGenerator.generateNumeric(8));
+		context.setAttribute(SpecialKeywords.UUID, StringGenerator.generateNumeric(8));
 		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
+	    
+	    ZafiraIntegrator.register(context);
 	}
 	
 	@Override
@@ -83,6 +86,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		TestNamingUtil.accociateTest2Thread(test, Thread.currentThread().getId());
+		TestNamingUtil.accociateTestStartDate(test);
 		
 		RetryCounter.initCounter(test);
 
@@ -92,12 +96,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-//		((GlobalTestLog)result.getAttribute(GlobalTestLog.KEY)).log(Type.COMMON, Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now()));
-		Messager.TEST_PASSED.info(TestNamingUtil.getCanonicalTestName(result), DateUtils.now());
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		Messager.TEST_PASSED.info(test, DateUtils.now());
 		
 	    //Spira test steps integration
 	    SpiraTestIntegrator.logTestStepsInfo(result);	
-	    //Ownership.getMethodOwner(result);
+
+	    @SuppressWarnings("unchecked")
+		List<String> jiraTickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
+	    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "", jiraTickets);
 		super.onTestSuccess(result);
 	}
 
@@ -121,9 +128,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 				errorMessage = getFullStackTrace(thr);
 			}			
 			
-			SpiraTestIntegrator.logTestStepsInfo(result, thr);
-			//Ownership.getMethodOwner(result);
+
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
+			
+			SpiraTestIntegrator.logTestStepsInfo(result, thr);
+			
+		    @SuppressWarnings("unchecked")
+			List<String> jiraTickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
+		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage, jiraTickets);
+
 		}
 		super.onTestFailure(result);
 	}
@@ -149,30 +162,21 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}			
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
-			//Ownership.getMethodOwner(result);
 
-//			GlobalTestLog globalLog = (GlobalTestLog)result.getAttribute(GlobalTestLog.KEY);
-//			if (globalLog != null) {
-///*				if (result.getThrowable() != null) {
-//					//errorMessage = result.getThrowable().getMessage();
-//					errorMessage = getFullStackTrace(result.getThrowable());
-//				}*/
-//				String msg = Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
-//				globalLog.log(Type.COMMON, msg);
-//			}
-//			else{
-//				Log.error("GlobalTestLog is NULL! for " + result.toString());
-//			}
+			@SuppressWarnings("unchecked")
+			List<String> jiraTickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
+		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage, jiraTickets);
 		}
 		super.onTestSkipped(result);
 	}
 	
 	@Override
-	public void onFinish(ITestContext testContext)
+	public void onFinish(ITestContext context)
 	{
+		ZafiraIntegrator.finish();
 		//removeIncorrectlyFailedTests(testContext);
 		TestNamingUtil.releaseTestFromThread(Thread.currentThread().getId());
-		super.onFinish(testContext);
+		super.onFinish(context);
 	}
 
 	/**
