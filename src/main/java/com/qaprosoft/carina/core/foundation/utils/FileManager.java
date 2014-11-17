@@ -15,7 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -114,13 +113,5 @@ public class FileManager
 			}
 		}
 		throw new RuntimeException("Folder not created: " + folder.getAbsolutePath());
-	}
-	
-	public static void close(Closeable toClose) throws IOException
-	{
-		if(toClose != null)
-		{
-			toClose.close();
-		}
 	}
 }

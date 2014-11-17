@@ -49,7 +49,7 @@ public class ZipManager
 
 				if (entry.isDirectory())
 				{
-					File folder = new File(extractTo + File.separator + entry.getName());
+					File folder = new File(extractTo + "/" + entry.getName());
 					boolean isCreated = folder.mkdir();
 					if (!isCreated)
 					{
@@ -61,7 +61,7 @@ public class ZipManager
 				InputStream is = zipFile.getInputStream(entry);
 				try
 				{
-					FileOutputStream fos = new FileOutputStream(extractTo + File.separator + entry.getName());
+					FileOutputStream fos = new FileOutputStream(extractTo + "/" + entry.getName());
 					try
 					{
 						BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -70,15 +70,24 @@ public class ZipManager
 							copyInputStream(is, bos);
 						} finally
 						{
-							FileManager.close(bos);
+							if (bos != null)
+							{
+								bos.close();
+							}
 						}
 					} finally
 					{
-						FileManager.close(fos);
+						if (fos != null)
+						{
+							fos.close();
+						}
 					}
 				} finally
 				{					
-					FileManager.close(is);
+					if (is != null)
+					{
+						is.close();
+					}
 				}
 			}
 		} catch (IOException e)
@@ -88,7 +97,10 @@ public class ZipManager
 		{
 			try
 			{
-				FileManager.close(zipFile);
+				if (zipFile != null)
+				{
+					zipFile.close();
+				}
 			} catch (IOException e)
 			{
 				LOGGER.error(e);
@@ -104,7 +116,7 @@ public class ZipManager
 		while ((len = in.read(buffer)) >= 0)
 			out.write(buffer, 0, len);
 
-		FileManager.close(in);
-		FileManager.close(out);
+		in.close();
+		out.close();
 	}
 }
