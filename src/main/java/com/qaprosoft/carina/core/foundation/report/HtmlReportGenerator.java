@@ -167,6 +167,27 @@ public class HtmlReportGenerator
 
 	private static void copyGalleryLib()
 	{
+		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
+		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
+		{
+			try
+			{
+				InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
+				ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
+						+ GALLERY_ZIP)));
+				ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP, reportsRootDir.getAbsolutePath());
+				File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+				zip.delete();
+			}
+			catch (Exception e)
+			{
+				LOGGER.error(e.getMessage());
+			}
+		}
+	}
+
+/*	private static void copyGalleryLib()
+	{
 //		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
 		File reportsRootDir = new File(System.getProperty("user.dir") + File.separator + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
 		if (!new File(reportsRootDir.getAbsolutePath() + File.separator + "gallery-lib").exists())
@@ -205,5 +226,5 @@ public class HtmlReportGenerator
 				LOGGER.error(e);
 			}
 		}
-	}
+	}*/
 }
