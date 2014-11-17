@@ -51,7 +51,8 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.spira.SpiraTestIntegrator;
+import com.qaprosoft.carina.core.foundation.report.spira.SpiraTestIntegrator;
+import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -120,8 +121,8 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
 		    
-		    //LOGGER.info("TestSuite owner is " + Ownership.getSuiteOwner(context));
-		    
+		    //LOGGER.info("TestSuite owner is " + Ownership.getSuiteOwner(context));		    
+		    ZafiraIntegrator.register(context);
 		}
 		catch (Throwable thr)
 		{
@@ -359,7 +360,7 @@ public abstract class AbstractTest extends DriverHelper
     @DataProvider(name = "excel_ds2")
     public Object[][] readDataFromXLS2(ITestContext context)
     {
-	return createTestArgSets2(context, "Execute", "Y");
+		return createTestArgSets2(context, "Execute", "Y");
     }
     
     public Object[][] createTestArgSets(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
