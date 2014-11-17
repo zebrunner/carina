@@ -41,7 +41,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.xml.XmlTest;
 
 import com.jayway.restassured.RestAssured;
-import com.qaprosoft.carina.core.foundation.jenkins.JenkinsClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
@@ -52,7 +51,6 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.spira.SpiraTestIntegrator;
-import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -121,8 +119,6 @@ public abstract class AbstractTest extends DriverHelper
 		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
 		    
-		    //LOGGER.info("TestSuite owner is " + Ownership.getSuiteOwner(context));		    
-		    ZafiraIntegrator.register(context);
 		}
 		catch (Throwable thr)
 		{
@@ -435,7 +431,7 @@ public abstract class AbstractTest extends DriverHelper
 		String ciTestJob = null;
 		if (!Configuration.isNull(Parameter.JENKINS_JOB_URL)) {
 			ciTestJob = Configuration.get(Parameter.JENKINS_JOB_URL);
-		} else if (!Configuration.isNull(Parameter.JENKINS_URL) && !Configuration.isNull(Parameter.JENKINS_JOB))
+		} /*else if (!Configuration.isNull(Parameter.JENKINS_URL) && !Configuration.isNull(Parameter.JENKINS_JOB))
 		{
 		    JenkinsClient jc = new JenkinsClient(Configuration.get(Parameter.JENKINS_URL));
 		    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
@@ -447,7 +443,7 @@ public abstract class AbstractTest extends DriverHelper
 		else
 		{
 		    	LOGGER.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
-		}
+		}*/
 		return ciTestJob;
     }
 

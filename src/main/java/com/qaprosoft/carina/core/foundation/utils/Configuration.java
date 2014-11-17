@@ -159,11 +159,23 @@ public class Configuration
 		
 		SUITE_NAME("suite_name", "default_suite_name"),
 		
-		JENKINS_URL("jenkins_url", "default_jenkins_url"),
+		//JENKINS_URL("jenkins_url", "default_jenkins_url"),
 		
-		JENKINS_JOB("jenkins_job", "default_jenkins_job"),
+		//JENKINS_JOB("jenkins_job", "default_jenkins_job"),
 		
 		JENKINS_JOB_URL("jenkins_job_url", "default_jenkins_job_url"),
+		
+		JENKINS_JOB_BUILD("jenkins_job_build", "default_jenkins_job_build"),		
+		
+		JENKINS_USER("jenkins_user", "default_jenkins_user"),
+		
+		JENKINS_PASSWORD("jenkins_password", "default_jenkins_password"),
+		
+		BUILD_USER_ID("build_user_id", "default_build_user_id"),
+		
+		BUILD_USER_FIRST_NAME("build_user_first_name", "default_build_user_first_name"),
+		
+		BUILD_USER_SECOND_NAME("build_user_second_name", "default_build_user_second_name"),
 		
 		JIRA_UPDATER("jira_updater", "default_jira_updater"),
 		
