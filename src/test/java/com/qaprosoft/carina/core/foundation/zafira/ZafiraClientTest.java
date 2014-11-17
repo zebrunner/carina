@@ -12,6 +12,7 @@ import com.qaprosoft.zafira.client.ZafiraClient.Response;
 import com.qaprosoft.zafira.client.model.JobType;
 import com.qaprosoft.zafira.client.model.TestCaseType;
 import com.qaprosoft.zafira.client.model.TestRunType;
+import com.qaprosoft.zafira.client.model.UserType;
 import com.qaprosoft.zafira.client.model.TestRunType.Initiator;
 import com.qaprosoft.zafira.client.model.TestSuiteType;
 import com.qaprosoft.zafira.client.model.TestType;
@@ -21,6 +22,15 @@ public class ZafiraClientTest
 	private static final boolean ENABLED = false;
 	
 	private static final ZafiraClient zc = new ZafiraClient(Configuration.get(Parameter.ZAFIRA_SERVICE_URL));
+	
+	@Test(enabled=ENABLED)
+	public void testCreateUser()
+	{
+		// userName:R, email:NR, firstName:NR, lastName:NR
+		UserType user = new UserType("vdelendik", "abc@gmail.com", "Vadim", "Delendik");
+		Response<UserType> response = zc.createUser(user);
+		Assert.assertEquals(response.getStatus(), 200);
+	}
 	
 	@Test(enabled=ENABLED)
 	public void testCreateJob()
