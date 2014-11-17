@@ -1,6 +1,8 @@
 package com.qaprosoft.carina.core.foundation.zafira;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -89,7 +91,9 @@ public class ZafiraClientTest
 	{
 		// TODO: work items not created yet
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR, startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", new String[]{"JIRA-1234"});
+		List<String> workItems = new ArrayList<String>();
+		workItems.add("JIRA-1234");
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems);
 		Response<TestType> response = zc.createTest(test);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
