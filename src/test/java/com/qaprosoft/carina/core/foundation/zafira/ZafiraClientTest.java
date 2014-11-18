@@ -14,10 +14,10 @@ import com.qaprosoft.zafira.client.ZafiraClient.Response;
 import com.qaprosoft.zafira.client.model.JobType;
 import com.qaprosoft.zafira.client.model.TestCaseType;
 import com.qaprosoft.zafira.client.model.TestRunType;
-import com.qaprosoft.zafira.client.model.UserType;
 import com.qaprosoft.zafira.client.model.TestRunType.Initiator;
 import com.qaprosoft.zafira.client.model.TestSuiteType;
 import com.qaprosoft.zafira.client.model.TestType;
+import com.qaprosoft.zafira.client.model.UserType;
 
 public class ZafiraClientTest
 {
@@ -55,7 +55,7 @@ public class ZafiraClientTest
 	@Test(enabled=ENABLED)
 	public void testCreateTestRunByHUMAN()
 	{
-		// testSuiteId:R, userId:R, scmURL:NR, scmBranch:NR, scmRevision:NR, configXML:NR, jobId:R, buildNumber:R, startedBy:R, workItemJiraId:NR
+		// testSuiteId:R, userId:R, scmURL:NR, scmBranch:NR, scmCommit:NR, configXML:NR, jobId:R, buildNumber:R, startedBy:R, workItemJiraId:NR
 		TestRunType testRun = new TestRunType(1L, 1L, "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", 1L, 10, Initiator.HUMAN, "JIRA-1234");
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		Assert.assertEquals(response.getStatus(), 200);
@@ -64,7 +64,7 @@ public class ZafiraClientTest
 	@Test(enabled=ENABLED)
 	public void testCreateTestRunByUPSTREAM_JOB()
 	{
-		// testSuiteId:R, scmURL:NR, scmBranch:NR, scmRevision:NR, configXML:NR, jobId:R, upstreamJobId:R, upstreamJobBuildNumber:R, buildNumber:R, startedBy:R, workItemJiraId:NR
+		// testSuiteId:R, scmURL:NR, scmBranch:NR, scmCommit:NR, configXML:NR, jobId:R, upstreamJobId:R, upstreamJobBuildNumber:R, buildNumber:R, startedBy:R, workItemJiraId:NR
 		TestRunType testRun = new TestRunType(1L, "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", 1L, 1L, 20, 11, Initiator.UPSTREAM_JOB, "JIRA-1234");
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		Assert.assertEquals(response.getStatus(), 200);
@@ -73,7 +73,7 @@ public class ZafiraClientTest
 	@Test(enabled=ENABLED)
 	public void testCreateTestRunBySCHEDULER()
 	{
-		// testSuiteId:R, scmURL:NR, scmBranch:NR, scmRevision:NR, configXML:NR, jobId:R, buildNumber:R, startedBy:R, workItemJiraId:NR
+		// testSuiteId:R, scmURL:NR, scmBranch:NR, scmCommit:NR, configXML:NR, jobId:R, buildNumber:R, startedBy:R, workItemJiraId:NR
 		TestRunType testRun = new TestRunType(1L, "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", 1L, 30, Initiator.SCHEDULER, "JIRA-1234");
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		Assert.assertEquals(response.getStatus(), 200);
@@ -82,7 +82,7 @@ public class ZafiraClientTest
 	@Test(enabled=ENABLED)
 	public void testFinishTestRun()
 	{
-		Response<TestRunType> response = zc.finishTestRun(4);
+		Response<TestRunType> response = zc.finishTestRun(14);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
 
@@ -93,7 +93,7 @@ public class ZafiraClientTest
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR, startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		List<String> workItems = new ArrayList<String>();
 		workItems.add("JIRA-1234");
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems);
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 14L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems);
 		Response<TestType> response = zc.createTest(test);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
