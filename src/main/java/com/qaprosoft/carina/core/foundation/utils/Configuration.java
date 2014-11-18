@@ -159,23 +159,23 @@ public class Configuration
 		
 		SUITE_NAME("suite_name", "default_suite_name"),
 		
-		//JENKINS_URL("jenkins_url", "default_jenkins_url"),
+		CI_JOB_URL("ci_job_url", "default_ci_job_url"),
 		
-		//JENKINS_JOB("jenkins_job", "default_jenkins_job"),
+		CI_JOB_BUILD("ci_job_build", "default_ci_job_build"),		
 		
-		JENKINS_JOB_URL("jenkins_job_url", "default_jenkins_job_url"),
+		CI_BUILD_CAUSE("ci_build_cause", "default_ci_build_cause"),
 		
-		JENKINS_JOB_BUILD("jenkins_job_build", "default_jenkins_job_build"),		
+//		CI_USER("ci_user", "default_ci_user"),
 		
-		JENKINS_USER("jenkins_user", "default_jenkins_user"),
+//		CI_PASSWORD("ci_password", "default_ci_password"),
 		
-		JENKINS_PASSWORD("jenkins_password", "default_jenkins_password"),
+		CI_USER_ID("ci_user_id", "default_ci_user_id"),
 		
-		BUILD_USER_ID("build_user_id", "default_build_user_id"),
+		CI_USER_FIRST_NAME("ci_user_first_name", "default_ci_user_first_name"),
 		
-		BUILD_USER_FIRST_NAME("build_user_first_name", "default_build_user_first_name"),
+		CI_USER_SECOND_NAME("ci_user_second_name", "default_ci_user_second_name"),
 		
-		BUILD_USER_SECOND_NAME("build_user_second_name", "default_build_user_second_name"),
+		CI_USER_EMAIL("ci_user_email", "default_ci_user_email"),
 		
 		JIRA_UPDATER("jira_updater", "default_jira_updater"),
 		

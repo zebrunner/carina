@@ -429,21 +429,9 @@ public abstract class AbstractTest extends DriverHelper
     private String getCIJobReference()
     {
 		String ciTestJob = null;
-		if (!Configuration.isNull(Parameter.JENKINS_JOB_URL)) {
-			ciTestJob = Configuration.get(Parameter.JENKINS_JOB_URL);
-		} /*else if (!Configuration.isNull(Parameter.JENKINS_URL) && !Configuration.isNull(Parameter.JENKINS_JOB))
-		{
-		    JenkinsClient jc = new JenkinsClient(Configuration.get(Parameter.JENKINS_URL));
-		    ciTestJob = jc.getCurrentJobURL(Configuration.get(Parameter.JENKINS_JOB));
-		    if (StringUtils.isEmpty(ciTestJob))
-		    {
-		    	LOGGER.info("Could not connect to Jenkins!");
-		    }
+		if (!Configuration.isNull(Parameter.CI_JOB_URL)) {
+			ciTestJob = Configuration.get(Parameter.CI_JOB_URL);
 		}
-		else
-		{
-		    	LOGGER.info("Specify 'jenkins_url' and 'jenkins_job' in CONFIG to have reference to test job!");
-		}*/
 		return ciTestJob;
     }
 
