@@ -1666,7 +1666,12 @@ public class DriverHelper
 		}
 		
 		for (WebElement element : webElements) {
-			extendedWebElements.add(new ExtendedWebElement(element, element.getText()));
+			String name = "undefined";
+			try {
+				name = element.getText();
+			} catch (Exception e) {/* do nothing*/}
+
+			extendedWebElements.add(new ExtendedWebElement(element, name));
 		}		
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return extendedWebElements;

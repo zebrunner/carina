@@ -1,22 +1,12 @@
 package com.qaprosoft.carina.core.foundation.zafira;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.offbytwo.jenkins.JenkinsServer;
-import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.Job;
-import com.offbytwo.jenkins.model.JobWithDetails;
-import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
-import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.zafira.client.ZafiraClient;
@@ -24,37 +14,17 @@ import com.qaprosoft.zafira.client.ZafiraClient.Response;
 import com.qaprosoft.zafira.client.model.JobType;
 import com.qaprosoft.zafira.client.model.TestCaseType;
 import com.qaprosoft.zafira.client.model.TestRunType;
+import com.qaprosoft.zafira.client.model.UserType;
 import com.qaprosoft.zafira.client.model.TestRunType.Initiator;
 import com.qaprosoft.zafira.client.model.TestSuiteType;
 import com.qaprosoft.zafira.client.model.TestType;
-import com.qaprosoft.zafira.client.model.UserType;
 
 public class ZafiraClientTest
 {
-	private static final Logger LOGGER = Logger.getLogger(ZafiraClientTest.class);
-	
 	private static final boolean ENABLED = false;
 	
 	private static final ZafiraClient zc = new ZafiraClient(Configuration.get(Parameter.ZAFIRA_SERVICE_URL));
 	
-/*	private static final String jenkinsUsername = Configuration.get(Parameter.JENKINS_USER);
-	private static final String jenkinsPassword = Configuration.get(Parameter.JENKINS_PASSWORD);
-	private static final String jenkinsJobUrl = Configuration.get(Parameter.JENKINS_JOB_URL);
-	private static final String jenkinsJobBuild = Configuration.get(Parameter.JENKINS_JOB_BUILD);*/
-	
-/*	@Test(enabled=true)
-	public void Jenkinstest() throws URISyntaxException, IOException
-	{
-		JenkinsServer jenkins = new JenkinsServer(new URI("http://82.209.196.137:8081/jenkins"), jenkinsUsername, jenkinsPassword); //by default it should be jenkins url
-		Map<String, Job> jobs = jenkins.getJobs();
-		JobWithDetails jobDetails = jenkins.getJob(ZafiraIntegrator.getJenkinsJobName(jenkinsJobUrl));
-		List<Job> upstreamJobs = jobDetails.getUpstreamProjects();
-		
-		Map<String, String> desc = jobDetails.getLastBuild().details().getParameters();
-		String fullDisplayName = jobDetails.getLastBuild().details().getFullDisplayName();
-		Build build = jobDetails.getBuilds().get(Integer.valueOf(jenkinsJobBuild));
-		
-	}*/
 	@Test(enabled=ENABLED)
 	public void testCreateUser()
 	{
@@ -121,7 +91,9 @@ public class ZafiraClientTest
 	{
 		// TODO: work items not created yet
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR, startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", new String[]{"JIRA-1234"});
+		List<String> workItems = new ArrayList<String>();
+		workItems.add("JIRA-1234");
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems);
 		Response<TestType> response = zc.createTest(test);
 		Assert.assertEquals(response.getStatus(), 200);
 	}

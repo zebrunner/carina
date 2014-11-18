@@ -35,8 +35,8 @@ public class ZafiraIntegrator {
 	Map<String, Long> testStartTime;
 	//private static final String jenkinsUsername = Configuration.get(Parameter.JENKINS_USER);
 	//private static final String jenkinsPassword = Configuration.get(Parameter.JENKINS_PASSWORD);
-	private static final String jenkinsJobUrl = Configuration.get(Parameter.JENKINS_JOB_URL);
-	private static final Integer jenkinsJobBuild = Integer.valueOf(Configuration.get(Parameter.JENKINS_JOB_BUILD));
+	private static final String jenkinsJobUrl = Configuration.get(Parameter.CI_JOB_URL);
+	private static final Integer jenkinsJobBuild = Integer.valueOf(Configuration.get(Parameter.CI_JOB_BUILD));
 	
 	
 	
@@ -52,17 +52,29 @@ public class ZafiraIntegrator {
 			return;
 		
 		try {
-			user = registerUser(Configuration.get(Parameter.BUILD_USER_ID), "", Configuration.get(Parameter.BUILD_USER_FIRST_NAME), Configuration.get(Parameter.BUILD_USER_SECOND_NAME));
+			user = registerUser(Configuration.get(Parameter.CI_USER_ID), Configuration.get(Parameter.CI_USER_EMAIL), Configuration.get(Parameter.CI_USER_FIRST_NAME), Configuration.get(Parameter.CI_USER_SECOND_NAME));
 			job = registerJob(jenkinsJobUrl, user.getId());
 			
 			UserType suiteOwner = new UserType(Ownership.getSuiteOwner(context), null, null, null);
 			suite = registerTestSuite(context.getSuite().getName(), suiteOwner.getId());
 			
-			LOGGER.error("TODO: add implementation to identify scmURL, scmBranch, scmRevision, configXML, workItem");
-			String scmURL, scmBranch, scmRevision, configXML, workItem;
-			scmURL=scmBranch=scmRevision=configXML=workItem="";
-			LOGGER.error("TODO: identify initiator type - HUMAN, SCHEDULER, UPSTREAM JOB");
-			run = registerTestRun(suite.getId(), user.getId(), scmURL, scmBranch, scmRevision, configXML, job.getId(), jenkinsJobBuild, Initiator.HUMAN, workItem);
+			String workItem = Configuration.get(Parameter.JIRA_SUITE_ID);
+			
+			LOGGER.error("TODO: add implementation to identify scmURL, scmBranch, scmRevision, configXML");
+			String scmURL, scmBranch, scmRevision, configXML;
+			scmURL=scmBranch=scmRevision=configXML="";
+			
+			Initiator initiator = null;
+			if (Configuration.get(Parameter.CI_BUILD_CAUSE).equalsIgnoreCase("MANUALTRIGGER")) {
+				initiator = Initiator.HUMAN;
+			}
+			if (Configuration.get(Parameter.CI_BUILD_CAUSE).equalsIgnoreCase("UPSTREAMTRIGGER")) {
+				initiator = Initiator.UPSTREAM_JOB;
+			}
+			if (Configuration.get(Parameter.CI_BUILD_CAUSE).equalsIgnoreCase("TIMERTRIGGER")) {
+				initiator = Initiator.SCHEDULER;
+			}
+			run = registerTestRun(suite.getId(), user.getId(), scmURL, scmBranch, scmRevision, configXML, job.getId(), jenkinsJobBuild, initiator, workItem);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -95,15 +107,13 @@ public class ZafiraIntegrator {
 	    String demoUrl = ReportContext.getTestScreenshotsLink(test);
 	    String logUrl = ReportContext.getTestLogLink(test);
 
-		LOGGER.error("TODO: find a way to save startTime for particular test!");
 		registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl, workItem);
 	}
 
 	
 	private static boolean isValid() {
 		//TODO: add logic to return if jenkinsJobUrl or jenkinsJobBuild is NULL
-		return !jenkinsJobUrl.isEmpty() && jenkinsJobUrl.equalsIgnoreCase("null");
-		
+		return !Configuration.get(Parameter.ZAFIRA_SERVICE_URL).isEmpty() && !Configuration.get(Parameter.ZAFIRA_SERVICE_URL).equalsIgnoreCase("null");
 	}
 	private static UserType registerUser(String userName, String email, String firstName, String lastName)
 	{
@@ -147,7 +157,7 @@ public class ZafiraIntegrator {
 	}
 	
 	private static TestType registerTest(String name, Status status, String testArgs, Long testRunId, Long testCaseId, String message,
-			Long startTime, Long finishTime, String demoURL, String logURL, String...workItem)
+			Long startTime, Long finishTime, String demoURL, String logURL, List<String> workItem)
 	{
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR, startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, workItem);
