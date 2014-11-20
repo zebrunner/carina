@@ -52,7 +52,8 @@ public abstract class AbstractPage extends AbstractUIObject
 	protected void setPageURL(String relURL)
 	{
 		String baseURL;
-		if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)))
+		//if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)))
+		if (!Configuration.get(Parameter.ENV).isEmpty())
 		{
 			baseURL = Configuration.getEnvArg("base");
 		}

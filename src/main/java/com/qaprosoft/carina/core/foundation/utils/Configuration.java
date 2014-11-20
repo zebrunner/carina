@@ -280,10 +280,11 @@ public class Configuration
 			 value = startupArg;
 		}
 		
-		if (value == null) {
+		if (value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
 			value = "";
 		}
 		
+	
 		return value;
 		
 	}
@@ -353,10 +354,6 @@ public class Configuration
 				throw new RuntimeException("Configuration failure: parameter '" + param.getKey() + "' not specified!");
 			}
 		}
-//		if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)) && getEnvArg("base") == null)
-//		{
-//			throw new RuntimeException("If config arg 'evn' not null, arg 'env'.base should be set!");
-//		}
 	}
 	
 	public static String getEnvArg(String key)
@@ -364,11 +361,6 @@ public class Configuration
 		return envArgResolver.get(get(Parameter.ENV), key);
 	}
 	
-/*	public static String getEnvArg(String profile, Parameter param)
-	{
-		return envArgResolver.get(profile, param);
-	}*/
-
 	public static IEnvArgResolver getEnvArgResolver()
 	{
 		return envArgResolver;
@@ -381,6 +373,6 @@ public class Configuration
 	
 	public static boolean isNull(Parameter param)
 	{
-		return get(param) == null || "NULL".equalsIgnoreCase(get(param)); 
+		return get(param) == null || SpecialKeywords.NULL.equalsIgnoreCase(get(param)); 
 	}
 }
