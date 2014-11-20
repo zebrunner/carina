@@ -1678,7 +1678,7 @@ public class DriverHelper
 	}	
      
 	protected WebDriver getDriver() {
-		if (driver == null || driver.toString().contains("(null")) {
+		if (driver == null || driver.toString().contains("null")) {
 			if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
 		    {
 				//duty hack to replace obsolete driver for all pages
