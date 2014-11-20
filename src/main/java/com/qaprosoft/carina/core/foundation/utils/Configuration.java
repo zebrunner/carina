@@ -158,22 +158,22 @@ public class Configuration
 		CRYPTO_KEY_PATH("crypto_key_path", "default_crypto_key_path"),
 		
 		SUITE_NAME("suite_name", "default_suite_name"),
+
+		CI_URL("ci_url", "default_ci_url"),
 		
-		CI_JOB_URL("ci_job_url", "default_ci_job_url"),
-		
-		CI_JOB_BUILD("ci_job_build", "default_ci_job_build"),		
+		CI_BUILD("ci_build", "default_ci_build"),		
 		
 		CI_BUILD_CAUSE("ci_build_cause", "default_ci_build_cause"),
 		
-//		CI_USER("ci_user", "default_ci_user"),
+		CI_PARENT_URL("ci_parent_url", "default_ci_parent_url"),
 		
-//		CI_PASSWORD("ci_password", "default_ci_password"),
+		CI_PARENT_BUILD("ci_parent_build", "default_ci_parent_build"),
 		
 		CI_USER_ID("ci_user_id", "default_ci_user_id"),
 		
 		CI_USER_FIRST_NAME("ci_user_first_name", "default_ci_user_first_name"),
 		
-		CI_USER_SECOND_NAME("ci_user_second_name", "default_ci_user_second_name"),
+		CI_USER_LAST_NAME("ci_user_last_name", "default_ci_user_last_name"),
 		
 		CI_USER_EMAIL("ci_user_email", "default_ci_user_email"),
 		
@@ -229,9 +229,13 @@ public class Configuration
 		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id"),
 		
 		//zafira
-		ZAFIRA_SERVICE_URL("zafira_service_url", "default_zafira_service_url");
+		ZAFIRA_SERVICE_URL("zafira_service_url", "default_zafira_service_url"),
 		
-
+		GIT_BRANCH("git_branch", "default_git_branch"),
+		
+		GIT_COMMIT("git_commit", "default_git_commit"),
+		
+		GIT_URL("git_url", "default_git_url");
 		
 		private final String key;
 

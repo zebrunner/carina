@@ -102,9 +102,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    //Spira test steps integration
 	    SpiraTestIntegrator.logTestStepsInfo(result);	
 
-	    @SuppressWarnings("unchecked")
-		List<String> jiraTickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
-	    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "", jiraTickets);
+	    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
 		super.onTestSuccess(result);
 	}
 
@@ -133,10 +131,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			
 			SpiraTestIntegrator.logTestStepsInfo(result, thr);
 			
-		    @SuppressWarnings("unchecked")
-			List<String> jiraTickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
-		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage, jiraTickets);
-
+		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
 		}
 		super.onTestFailure(result);
 	}
@@ -163,9 +158,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
 
-			@SuppressWarnings("unchecked")
-			List<String> jiraTickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
-		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage, jiraTickets);
+		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
 		}
 		super.onTestSkipped(result);
 	}
