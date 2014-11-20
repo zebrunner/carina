@@ -158,6 +158,8 @@ public abstract class AbstractTest extends DriverHelper
 		    
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
 		    Jira.updateAfterTest(result);
+		    
+		    //TODO: implement zafira work items population
 
 		    //clear jira tickets to be sure that next test is not affected.
 		    jiraTickets.clear();
@@ -259,7 +261,7 @@ public abstract class AbstractTest extends DriverHelper
 
 
     //separate method to be able to retrieve information from different sheets in the same java test.
-    public Object[][] createTestArgSets(ITestContext context, String xlsFile, String xlsSheet, String dsArgs, String dsUids, String executeColumn, String executeValue, String... staticArgs)
+    public Object[][] createTestArgSets(String xlsFile, String xlsSheet, String dsArgs, String dsUids, ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
 		XLSDSBean dsBean = new XLSDSBean(xlsFile, xlsSheet, dsArgs, dsUids);
 		
@@ -299,15 +301,15 @@ public abstract class AbstractTest extends DriverHelper
 		return args;
     }
     
-    public Object[][] createTestArgSets(ITestContext context, String xlsSheet, String dsArgs, String dsUids, String executeColumn, String executeValue, String... staticArgs)
+    public Object[][] createTestArgSets(String xlsSheet, String dsArgs, String dsUids, ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
     	XLSDSBean dsBean = new XLSDSBean(context);
-    	return createTestArgSets(context, dsBean.getXlsFile(), xlsSheet, dsArgs, dsUids, executeColumn, executeValue, staticArgs);
+    	return createTestArgSets(dsBean.getXlsFile(), xlsSheet, dsArgs, dsUids, context, executeColumn, executeValue, staticArgs);
     }
     
     
     //separate method to be able to retrieve information from different sheets in the same java test.
-    public Object[][] createTestArgSets2(ITestContext context, String sheet, String executeColumn, String executeValue, String... staticArgs)
+    public Object[][] createTestArgSets2(String sheet, ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
 		XLSDSBean dsBean = new XLSDSBean(context);
 		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), sheet, executeColumn, executeValue);
@@ -349,7 +351,7 @@ public abstract class AbstractTest extends DriverHelper
     public Object[][] createTestArgSets2(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
 		XLSDSBean dsBean = new XLSDSBean(context);    	
-    	return createTestArgSets2(context, dsBean.getXlsSheet(), executeColumn, executeValue, staticArgs);
+    	return createTestArgSets2(dsBean.getXlsSheet(), context, executeColumn, executeValue, staticArgs);
 
     }
     
@@ -429,8 +431,8 @@ public abstract class AbstractTest extends DriverHelper
     private String getCIJobReference()
     {
 		String ciTestJob = null;
-		if (!Configuration.isNull(Parameter.CI_JOB_URL)) {
-			ciTestJob = Configuration.get(Parameter.CI_JOB_URL);
+		if (!Configuration.isNull(Parameter.CI_URL) && !Configuration.isNull(Parameter.CI_BUILD)) {
+			ciTestJob = Configuration.get(Parameter.CI_URL) + Configuration.get(Parameter.CI_BUILD);
 		}
 		return ciTestJob;
     }
