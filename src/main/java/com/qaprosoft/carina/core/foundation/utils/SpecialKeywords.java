@@ -57,6 +57,7 @@ public class SpecialKeywords
 	public static final String SPIRA_TESTSTEP_ID = "SPIRA_TESTSTEP_ID";
 	
 	public static final String HTML_REPORT = "emailable-report.html";
+	public static final String NULL = "NULL";
 
 	
 }

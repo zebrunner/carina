@@ -24,6 +24,7 @@ import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.zafira.client.model.TestType;
 
 /**
  * Common naming utility for unique test method identification.
@@ -36,6 +37,7 @@ public class TestNamingUtil
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
 	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
+	private static final ConcurrentHashMap<String, TestType> testName2ZafiraTest = new ConcurrentHashMap<String, TestType>();
 	
 	static
 	{
@@ -92,5 +94,21 @@ public class TestNamingUtil
 	{
 		testName2StartDate.remove(test);
 	}	
+
+	public static synchronized void accociateZafiraTest(String test, TestType zafiraTest)
+	{
+		if (zafiraTest == null)
+			return;
+		testName2ZafiraTest.put(test, zafiraTest);
+	}
 	
+	public static TestType getZafiraTest(String test)
+	{
+		return testName2ZafiraTest.get(test);
+	}
+	
+	public static synchronized void releaseZafiraTest(String test)
+	{
+		testName2ZafiraTest.remove(test);
+	}
 }

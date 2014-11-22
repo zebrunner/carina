@@ -58,7 +58,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
 	    
-	    ZafiraIntegrator.register(context);
+	    ZafiraIntegrator.startSuite(context);
 	}
 	
 	@Override
@@ -102,7 +102,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    //Spira test steps integration
 	    SpiraTestIntegrator.logTestStepsInfo(result);	
 
-	    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
+	    ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
 		super.onTestSuccess(result);
 	}
 
@@ -131,7 +131,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			
 			SpiraTestIntegrator.logTestStepsInfo(result, thr);
 			
-		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
+			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
 		}
 		super.onTestFailure(result);
 	}
@@ -158,7 +158,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
 
-		    ZafiraIntegrator.updateTest(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
+			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
 		}
 		super.onTestSkipped(result);
 	}
@@ -166,7 +166,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onFinish(ITestContext context)
 	{
-		ZafiraIntegrator.finish();
+		ZafiraIntegrator.finishSuite();
 		//removeIncorrectlyFailedTests(testContext);
 		TestNamingUtil.releaseTestFromThread(Thread.currentThread().getId());
 		super.onFinish(context);

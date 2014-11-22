@@ -22,7 +22,6 @@ public class ParameterGenerator {
 	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
 	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
 	private static Pattern EXCEL_PATTERN = Pattern.compile(SpecialKeywords.EXCEL);
-	//private static String NULL = "NULL";
 
 	private static Matcher matcher;
 
