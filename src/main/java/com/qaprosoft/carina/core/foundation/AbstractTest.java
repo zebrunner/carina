@@ -51,6 +51,7 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.spira.SpiraTestIntegrator;
+import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -64,6 +65,7 @@ import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
+import com.qaprosoft.zafira.client.model.TestType;
 
 
 /*
@@ -106,7 +108,6 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	RestAssured.baseURI = Configuration.get(Parameter.URL);
 		    }
-
 
 		    try
 		    {
@@ -151,6 +152,7 @@ public abstract class AbstractTest extends DriverHelper
     {
 		try
 		{	    
+			String test = TestNamingUtil.getCanonicalTestName(result);
 		    // Populate JIRA ID
 		    if (jiraTickets.size() == 0) { //it was not redefined in the test
 		    	jiraTickets = Jira.getTickets(result);
@@ -160,6 +162,11 @@ public abstract class AbstractTest extends DriverHelper
 		    Jira.updateAfterTest(result);
 		    
 		    //TODO: implement zafira work items population
+		    TestType testType = TestNamingUtil.getZafiraTest(test);
+		    if (testType != null && jiraTickets.size() > 0) {
+		    	ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
+		    }
+		    
 
 		    //clear jira tickets to be sure that next test is not affected.
 		    jiraTickets.clear();
@@ -167,7 +174,7 @@ public abstract class AbstractTest extends DriverHelper
 		    ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if(tla != null)
 			{
-				tla.closeResource(TestNamingUtil.getCanonicalTestName(result));
+				tla.closeResource(test);
 			}
 		    
 		}
@@ -195,14 +202,13 @@ public abstract class AbstractTest extends DriverHelper
 		    String driverTitle = browser;
 		    
 		    if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile") || Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile_grid")) {
-		    	//deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
-		    	deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME) + " (" +
+		    	deviceName = driverTitle = Configuration.get(Parameter.MOBILE_DEVICE_NAME) + " - " +
 		    			Configuration.get(Parameter.MOBILE_PLATFORM_NAME) + " " +
-		    			Configuration.get(Parameter.MOBILE_PLATFORM_VERSION) + ")";
+		    			Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
 		    	
-		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).equalsIgnoreCase("null")) {
+		    	if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
 		    			browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
-		    			driverTitle = driverTitle + "/" + browser;
+		    			driverTitle = driverTitle + " - " + browser;
 		    	}
 		    	else {
 		    		browser = "";
