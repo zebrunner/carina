@@ -1666,14 +1666,19 @@ public class DriverHelper
 		}
 		
 		for (WebElement element : webElements) {
-			extendedWebElements.add(new ExtendedWebElement(element, element.getText()));
+			String name = "undefined";
+			try {
+				name = element.getText();
+			} catch (Exception e) {/* do nothing*/}
+
+			extendedWebElements.add(new ExtendedWebElement(element, name));
 		}		
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return extendedWebElements;
 	}	
      
 	protected WebDriver getDriver() {
-		if (driver == null || driver.toString().contains("(null")) {
+		if (driver == null || driver.toString().contains("null")) {
 			if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
 		    {
 				//duty hack to replace obsolete driver for all pages
