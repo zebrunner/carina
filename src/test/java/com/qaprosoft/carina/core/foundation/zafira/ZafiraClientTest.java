@@ -110,20 +110,20 @@ public class ZafiraClientTest
 	}
 	
 	@Test(enabled=ENABLED)
-	public void testCreateTestCase()
-	{
-		// testClass:R, testMethod:R, info:NR, testSuiteId:R, userId:R
-		TestCaseType testCase = new TestCaseType("com.qaprosoft.zafira.Test", "testLogin", "Hello!", 3L, 8L);
-		Response<TestCaseType> response = zc.createTestCase(testCase);
-		Assert.assertEquals(response.getStatus(), 200);
-	}
-	
-	@Test(enabled=ENABLED)
 	public void testCreateTestCases()
 	{
 		// testClass:R, testMethod:R, info:NR, testSuiteId:R, userId:R
 		TestCaseType[] testCases = new TestCaseType[] {new TestCaseType("com.qaprosoft.zafira.Test", "testLogin", "Hello!", 1L, 1L), new TestCaseType("com.qaprosoft.zafira.Test", "testLogout", "Hello!", 1L, 1L)};
 		Response<TestCaseType[]> response = zc.createTestCases(testCases);
+		Assert.assertEquals(response.getStatus(), 200);
+	}
+	
+	@Test(enabled=ENABLED)
+	public void testCreateTestCase()
+	{
+		// testClass:R, testMethod:R, info:NR, testSuiteId:R, userId:R
+		TestCaseType testCase = new TestCaseType("com.qaprosoft.zafira.Test", "testLogin", "Hello!", 3L, 8L);
+		Response<TestCaseType> response = zc.createTestCase(testCase);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
 }
