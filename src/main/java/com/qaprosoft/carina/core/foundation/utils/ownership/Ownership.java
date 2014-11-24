@@ -38,7 +38,7 @@ public class Ownership {
 				{
 					MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
 					owner = methodAnnotation.owner();
-					LOGGER.info("Method " + testMethod + " owner is " + owner);
+					LOGGER.debug("Method " + testMethod + " owner is " + owner);
 				}
 			}
 		} catch (ClassNotFoundException e) {
@@ -49,6 +49,10 @@ public class Ownership {
 	}
 	
 	public static String getSuiteOwner(ITestContext context) {
-		return context.getSuite().getParameter("suiteOwner");
+		String owner = context.getSuite().getParameter("suiteOwner");
+		if (owner == null) {
+			owner = "";
+		}
+		return owner;
 	}
 }

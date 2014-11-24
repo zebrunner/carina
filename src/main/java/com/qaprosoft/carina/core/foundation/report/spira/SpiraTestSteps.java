@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.spira;
+package com.qaprosoft.carina.core.foundation.report.spira;
 
 import java.lang.annotation.*;
 
