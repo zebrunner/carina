@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,6 +27,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jfree.util.Log;
 
+import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class XLSParser
@@ -160,7 +162,7 @@ public class XLSParser
 				}
 				else
 				{
-					dataTable.addDataRow(sheet.getRow(i));
+					dataTable.addDataRow(sheet.getRow(i), wb, sheet);
 				}
 			}
 		}
@@ -182,8 +184,7 @@ public class XLSParser
 			return df.formatCellValue(cell).trim();
 		case Cell.CELL_TYPE_BOOLEAN:
 			return df.formatCellValue(cell).trim();
-		case Cell.CELL_TYPE_FORMULA:
-			
+		case Cell.CELL_TYPE_FORMULA:			
 			return df.formatCellValue(cell, evaluator).trim();
 		case Cell.CELL_TYPE_BLANK:
 			return "";
@@ -191,4 +192,36 @@ public class XLSParser
 			return null;
 		}
 	}
+	
+	public static XLSChildTable parseCellLinks(Cell cell, Workbook wb, Sheet sheet) 
+	{
+		if(cell == null) return null;
+		
+		if(cell.getCellType() == Cell.CELL_TYPE_FORMULA)
+		{
+			String cellValue = cell.getCellFormula().replace("=", "");
+			List<String> paths = Arrays.asList(cellValue.split("!"));
+			
+			int rowNumber = 0;
+			XLSChildTable childTable = new XLSChildTable();
+			switch(paths.size())
+			{
+				case 1:
+					rowNumber = Integer.valueOf(paths.get(0).replaceAll("\\D+", "")) - 1;
+					childTable.setHeaders(sheet.getRow(0));
+					childTable.addDataRow(sheet.getRow(rowNumber));
+					return childTable;					
+				case 2:					
+					Sheet childSheet = wb.getSheet(paths.get(0));
+					rowNumber = Integer.valueOf(paths.get(1).replaceAll("\\D+", "")) - 1;
+					if(childSheet == null) throw new DataLoadingException(String.format("Sheet with '%s' doesn't exist!",  paths.get(0)));					
+					childTable.setHeaders(childSheet.getRow(0));
+					childTable.addDataRow(childSheet.getRow(rowNumber));
+					return childTable;
+				default:
+					return null;
+			}
+		}		
+		return null;
+	}	
 }
