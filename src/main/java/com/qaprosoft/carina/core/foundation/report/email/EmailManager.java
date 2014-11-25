@@ -69,7 +69,8 @@ public class EmailManager
 				props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
 			}
 			
-			session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
+			//session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
+			session = Session.getInstance(props, new javax.mail.Authenticator()
 			{
 				protected PasswordAuthentication getPasswordAuthentication()
 				{
