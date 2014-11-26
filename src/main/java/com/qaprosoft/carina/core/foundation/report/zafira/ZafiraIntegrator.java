@@ -224,6 +224,8 @@ public class ZafiraIntegrator {
 		if (regUser == null) {
 			LOGGER.error("Unable to register user '" + userName + "' for zafira service: " + zafiraUrl + " . Anonymous user will be specified.");
 			regUser = registerUser(ANONYMOUS_USER);
+			response = zc.createUser(regUser);
+			regUser = response.getObject();
 		}
 		
 		if (regUser == null)
