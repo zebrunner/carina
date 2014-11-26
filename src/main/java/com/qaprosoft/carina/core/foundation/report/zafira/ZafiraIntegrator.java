@@ -221,12 +221,12 @@ public class ZafiraIntegrator {
 		Response<UserType> response = zc.createUser(regUser);
 		regUser = response.getObject();
 		
-		if (regUser == null) {
+/*		if (regUser == null && !userName.equals(ANONYMOUS_USER)) {
 			LOGGER.error("Unable to register user '" + userName + "' for zafira service: " + zafiraUrl + " . Anonymous user will be specified.");
-			regUser = registerUser(ANONYMOUS_USER);
+			regUser = new UserType(ANONYMOUS_USER, null, null, null);
 			response = zc.createUser(regUser);
 			regUser = response.getObject();
-		}
+		}*/
 		
 		if (regUser == null)
 			throw new RuntimeException("Unable to register user '" + userName + "' for zafira service: " + zafiraUrl);
