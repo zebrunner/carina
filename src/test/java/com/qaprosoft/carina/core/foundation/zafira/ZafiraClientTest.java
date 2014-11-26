@@ -19,13 +19,20 @@ import com.qaprosoft.zafira.client.model.UserType;
 
 public class ZafiraClientTest
 {
-	private static final boolean ENABLED = false;
+	private static final boolean ENABLED = true;
 	private UserType user;
 	private JobType job;
 	private TestSuiteType testSuite;
 	TestRunType testRun;
 	
 	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
+	
+	@Test(enabled=ENABLED)
+	public void testStatus()
+	{
+		boolean isAvailable = zc.isAvailable();
+		Assert.assertTrue(isAvailable);
+	}
 	
 	@Test(enabled=ENABLED)
 	public void testCreateUser()
