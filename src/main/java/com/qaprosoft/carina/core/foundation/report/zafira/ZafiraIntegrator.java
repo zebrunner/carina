@@ -199,7 +199,7 @@ public class ZafiraIntegrator {
 
 	private static boolean isValid() {
 		//TODO: add logic to return if jenkinsJobUrl or jenkinsJobBuild is NULL
-		return !zafiraUrl.isEmpty();
+		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
 	
 	private static UserType registerUser(String userName)
