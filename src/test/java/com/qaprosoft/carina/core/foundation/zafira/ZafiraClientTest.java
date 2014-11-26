@@ -28,6 +28,13 @@ public class ZafiraClientTest
 	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
 	
 	@Test(enabled=ENABLED)
+	public void testStatus()
+	{
+		boolean isAvailable = zc.isAvailable();
+		Assert.assertTrue(isAvailable);
+	}
+	
+	@Test(enabled=ENABLED)
 	public void testCreateUser()
 	{
 		// userName:R, email:NR, firstName:NR, lastName:NR
