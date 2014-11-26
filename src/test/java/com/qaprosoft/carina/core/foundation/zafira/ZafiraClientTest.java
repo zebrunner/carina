@@ -19,7 +19,7 @@ import com.qaprosoft.zafira.client.model.UserType;
 
 public class ZafiraClientTest
 {
-	private static final boolean ENABLED = true;
+	private static final boolean ENABLED = false;
 	private UserType user;
 	private JobType job;
 	private TestSuiteType testSuite;
