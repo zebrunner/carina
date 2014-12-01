@@ -158,12 +158,24 @@ public class Configuration
 		CRYPTO_KEY_PATH("crypto_key_path", "default_crypto_key_path"),
 		
 		SUITE_NAME("suite_name", "default_suite_name"),
+
+		CI_URL("ci_url", "default_ci_url"),
 		
-		JENKINS_URL("jenkins_url", "default_jenkins_url"),
+		CI_BUILD("ci_build", "default_ci_build"),		
 		
-		JENKINS_JOB("jenkins_job", "default_jenkins_job"),
+		CI_BUILD_CAUSE("ci_build_cause", "default_ci_build_cause"),
 		
-		JENKINS_JOB_URL("jenkins_job_url", "default_jenkins_job_url"),
+		CI_PARENT_URL("ci_parent_url", "default_ci_parent_url"),
+		
+		CI_PARENT_BUILD("ci_parent_build", "default_ci_parent_build"),
+		
+		CI_USER_ID("ci_user_id", "default_ci_user_id"),
+		
+		CI_USER_FIRST_NAME("ci_user_first_name", "default_ci_user_first_name"),
+		
+		CI_USER_LAST_NAME("ci_user_last_name", "default_ci_user_last_name"),
+		
+		CI_USER_EMAIL("ci_user_email", "default_ci_user_email"),
 		
 		JIRA_UPDATER("jira_updater", "default_jira_updater"),
 		
@@ -214,8 +226,16 @@ public class Configuration
 		// spira
 		SPIRA_RELEASE_ID("spira_release_id", "default_spira_release_id"),
 		
-		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id");
-
+		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id"),
+		
+		//zafira
+		ZAFIRA_SERVICE_URL("zafira_service_url", "default_zafira_service_url"),
+		
+		GIT_BRANCH("git_branch", "default_git_branch"),
+		
+		GIT_COMMIT("git_commit", "default_git_commit"),
+		
+		GIT_URL("git_url", "default_git_url");
 		
 		private final String key;
 
@@ -260,10 +280,11 @@ public class Configuration
 			 value = startupArg;
 		}
 		
-		if (value == null) {
+		if (value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
 			value = "";
 		}
 		
+	
 		return value;
 		
 	}
@@ -333,10 +354,6 @@ public class Configuration
 				throw new RuntimeException("Configuration failure: parameter '" + param.getKey() + "' not specified!");
 			}
 		}
-//		if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)) && getEnvArg("base") == null)
-//		{
-//			throw new RuntimeException("If config arg 'evn' not null, arg 'env'.base should be set!");
-//		}
 	}
 	
 	public static String getEnvArg(String key)
@@ -344,11 +361,6 @@ public class Configuration
 		return envArgResolver.get(get(Parameter.ENV), key);
 	}
 	
-/*	public static String getEnvArg(String profile, Parameter param)
-	{
-		return envArgResolver.get(profile, param);
-	}*/
-
 	public static IEnvArgResolver getEnvArgResolver()
 	{
 		return envArgResolver;
@@ -361,6 +373,6 @@ public class Configuration
 	
 	public static boolean isNull(Parameter param)
 	{
-		return get(param) == null || "NULL".equalsIgnoreCase(get(param)); 
+		return get(param) == null || SpecialKeywords.NULL.equalsIgnoreCase(get(param)); 
 	}
 }

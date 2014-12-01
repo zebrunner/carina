@@ -287,7 +287,7 @@ public class UITest extends AbstractTest
 	}
 	
 	protected WebDriver getDriver(boolean threadOnly) {
-		if (webDrivers.get() != null && !webDrivers.get().toString().contains("(null")) {
+		if (webDrivers.get() != null && !webDrivers.get().toString().contains("null")) {
 			return webDrivers.get();
 		} else {
 			LOGGER.debug("Unable to find valid driver!");
@@ -298,7 +298,7 @@ public class UITest extends AbstractTest
 		//webDrivers.get() or simple driver
 		//return webDrivers.get() != null ? webDrivers.get() : driver;
 		
-		if (webDrivers.get() != null && !webDrivers.get().toString().contains("(null")) {
+		if (webDrivers.get() != null && !webDrivers.get().toString().contains("null")) {
 			LOGGER.debug("Returning thread safety valid driver");
 			return webDrivers.get();
 		} else if (driver != null && !driver.toString().contains("null")) {
@@ -312,7 +312,7 @@ public class UITest extends AbstractTest
 	protected WebDriver getDriver(String sessionId) {
 		//sometime driver can be replaced by recovery system. 
 		//in this case we should analyze if current driver closed and try to find driver in DriverPool by new sessionId
-		if (webDrivers.get() == null || webDrivers.get().toString().contains("(null")) {
+		if (webDrivers.get() == null || webDrivers.get().toString().contains("null")) {
 			driver = DriverPool.getDriverBySessionId(sessionId);
 			if (driver != null) {
 				setDriver(driver);

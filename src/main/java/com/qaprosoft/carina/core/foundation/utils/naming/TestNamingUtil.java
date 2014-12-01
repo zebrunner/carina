@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -23,6 +24,7 @@ import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.zafira.client.model.TestType;
 
 /**
  * Common naming utility for unique test method identification.
@@ -34,6 +36,8 @@ public class TestNamingUtil
 	private static INamingStrategy namingStrategy;
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
+	private static final ConcurrentHashMap<String, TestType> testName2ZafiraTest = new ConcurrentHashMap<String, TestType>();
 	
 	static
 	{
@@ -74,5 +78,37 @@ public class TestNamingUtil
 	public static String getTestByThread(Long threadId)
 	{
 		return threadId2TestName.get(threadId);
+	}
+	
+	public static synchronized void accociateTestStartDate(String test)
+	{
+		testName2StartDate.put(test, new Date().getTime());
+	}
+	
+	public static Long getTestStartDate(String test)
+	{
+		return testName2StartDate.get(test);
+	}
+	
+	public static synchronized void releaseTestStartDate(String test)
+	{
+		testName2StartDate.remove(test);
+	}	
+
+	public static synchronized void accociateZafiraTest(String test, TestType zafiraTest)
+	{
+		if (zafiraTest == null)
+			return;
+		testName2ZafiraTest.put(test, zafiraTest);
+	}
+	
+	public static TestType getZafiraTest(String test)
+	{
+		return testName2ZafiraTest.get(test);
+	}
+	
+	public static synchronized void releaseZafiraTest(String test)
+	{
+		testName2ZafiraTest.remove(test);
 	}
 }
