@@ -161,43 +161,75 @@ public class HtmlReportGenerator
 		}
 		catch (Exception e)
 		{
-			LOGGER.error(e);
+			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			LOGGER.error(e.getStackTrace().toString());
 		}
 	}
 
 	private static void copyGalleryLib()
 	{
+		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
+		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
+		{
+			try
+			{
+				InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
+				ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
+						+ GALLERY_ZIP)));
+				ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP, reportsRootDir.getAbsolutePath());
+				File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+				zip.delete();
+			}
+			catch (Exception e)
+			{
+				LOGGER.error(e.getMessage());
+			}
+		}
+	}
+
+/*	private static void copyGalleryLib()
+	{
 //		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
-		File reportsRootDir = new File(System.getProperty("user.dir") + File.separator + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
-		if (!new File(reportsRootDir.getAbsolutePath() + File.separator + "gallery-lib").exists())
+		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
+		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
 		{
 			try
 			{
 				InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
 				try
 				{
-					FileOutputStream fos = new FileOutputStream(reportsRootDir.getAbsolutePath() + File.separator + GALLERY_ZIP);
+					FileOutputStream fos = new FileOutputStream(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
 					try
 					{
 						BufferedOutputStream bos = new BufferedOutputStream(fos);
 						try
 						{
 							ZipManager.copyInputStream(is, bos);
-							ZipManager.unzip(reportsRootDir.getAbsolutePath() + File.separator + GALLERY_ZIP,
+							ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP,
 									reportsRootDir.getAbsolutePath());
-							File zip = new File(reportsRootDir.getAbsolutePath() + File.separator + GALLERY_ZIP);
+							File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
 							zip.delete();
 						} finally
 						{
-							FileManager.close(bos);
+							if (bos != null)
+							{
+								bos.close();
+							}
 						}
 					} finally
 					{
-						FileManager.close(fos);
+						if (fos != null)
+						{
+							fos.close();
+						}
 					}
 				} finally
 				{
-					FileManager.close(is);
+					if (is != null)
+					{
+						is.close();
+					}
 				}
 			}
 			catch (Exception e)
@@ -205,5 +237,5 @@ public class HtmlReportGenerator
 				LOGGER.error(e);
 			}
 		}
-	}
+	}*/
 }
