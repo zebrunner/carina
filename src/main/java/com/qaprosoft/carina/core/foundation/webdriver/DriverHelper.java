@@ -1158,14 +1158,16 @@ public class DriverHelper
 		try
 		{
 			Locatable locatableElement = (Locatable) extendedWebElement.getElement();
+			//[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
+			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
+			
 			int y = locatableElement.getCoordinates().onScreen().getY();
 			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
 		}
 		catch (Exception e)
 		{
 			// TODO: calm error logging as it is too noisy
-			// LOGGER.error("Scroll to element: " + extendedWebElement.getName()
-			// + " not performed, seems not clickable yet!");
+			LOGGER.debug("Scroll to element: " + extendedWebElement.getName() + " not performed!" + e.getMessage());
 		}
 	}
 
