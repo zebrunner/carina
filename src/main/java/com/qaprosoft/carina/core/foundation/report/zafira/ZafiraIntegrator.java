@@ -50,8 +50,8 @@ public class ZafiraIntegrator {
 	private static final String gitUrl = Configuration.get(Parameter.GIT_URL);
 	
 	
-	private static final String VIEW_PATTER = "/view/";
-	private static final String JOB_PATTER = "/job/";
+	private static final String VIEW_PATTERN = "/view/";
+	private static final String JOB_PATTERN = "/job/";
 	
 	private static final String ANONYMOUS_USER = "anonymous";
 	private static Boolean isRegistered = false;
@@ -198,7 +198,6 @@ public class ZafiraIntegrator {
 	}
 
 	private static boolean isValid() {
-		//TODO: add logic to return if jenkinsJobUrl or jenkinsJobBuild is NULL
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
 	
@@ -220,13 +219,6 @@ public class ZafiraIntegrator {
 		UserType regUser = new UserType(userName, email, firstName, lastName);
 		Response<UserType> response = zc.createUser(regUser);
 		regUser = response.getObject();
-		
-/*		if (regUser == null && !userName.equals(ANONYMOUS_USER)) {
-			LOGGER.error("Unable to register user '" + userName + "' for zafira service: " + zafiraUrl + " . Anonymous user will be specified.");
-			regUser = new UserType(ANONYMOUS_USER, null, null, null);
-			response = zc.createUser(regUser);
-			regUser = response.getObject();
-		}*/
 		
 		if (regUser == null)
 			throw new RuntimeException("Unable to register user '" + userName + "' for zafira service: " + zafiraUrl);
@@ -318,17 +310,19 @@ public class ZafiraIntegrator {
 			LOGGER.error("CI job URL is not valid! Verify that ci_url or ci_parent_url properties are specified!");
 			return "";
 		}
-		return jobURL.contains(VIEW_PATTER) ? jobURL.split(VIEW_PATTER)[0] : jobURL.split(JOB_PATTER)[0];
+		return jobURL.contains(VIEW_PATTERN) ? jobURL.split(VIEW_PATTERN)[0] : jobURL.split(JOB_PATTERN)[0];
 	}
 	
 	private static String getJenkinsJobName(String jobURL)
 	{
+		String[] items = jobURL.split("/");
+		jobURL = items[items.length - 1]; //there is no need to verify on length > 0 as it always equals 1 even if string is empty
+
 		if (jobURL.isEmpty()) {
 			LOGGER.error("CI job URL is not valid! Verify that ci_url or ci_parent_url properties are specified!");
-			return "";
 		}
-		
-		return jobURL.split(JOB_PATTER)[1].replaceAll("/", "");
+
+		return jobURL;
 	}
 	
 	
