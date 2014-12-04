@@ -22,9 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class XLSTable
 {
+	private final static String FK_PREFIX = "FK_LINK_";
+	
 	private List<String> headers;
 	private List<Map<String, String>> dataRows;
 	private String executeColumn;
@@ -52,7 +56,7 @@ public class XLSTable
 		}
 	}
 
-	public void addDataRow(Row row)
+	public void addDataRow(Row row, Workbook wb, Sheet sheet)
 	{
 		if(executeColumn != null && executeValue != null && headers.contains(executeColumn))
 		{
@@ -62,16 +66,44 @@ public class XLSTable
 			}
 		}
 		
+		XLSChildTable childRow = null;
+		
 		Map<String, String> dataMap = new HashMap<String, String>();
-		for (int i = 1; i < headers.size(); i++)
+		for (int i = 0; i < headers.size(); i++)
 		{
+			String header = headers.get(i);
+			if(header.startsWith(FK_PREFIX))
+				childRow = XLSParser.parseCellLinks(row.getCell(i), wb, sheet);
+				
 			synchronized (dataMap){ 
-				dataMap.put(headers.get(i), XLSParser.getCellValue(row.getCell(i)));
+				dataMap.put(header, XLSParser.getCellValue(row.getCell(i)));
 			}
 		}
+		
+		// If row has hyperlink than merge headers and data		
+		if(childRow != null)
+		{			
+			for(int i = 0; i < childRow.getHeaders().size(); i++)
+			{
+				String currentHeader = childRow.getHeaders().get(i);			
+						
+				if(dataMap.get(currentHeader) == null)
+				{
+					// Merge headers				
+					if(!this.headers.contains(currentHeader)) this.headers.add(currentHeader);
+					
+					//	Merge data				
+					synchronized (dataMap)
+					{ 
+						dataMap.put(currentHeader, childRow.getDataRows().get(0).get(currentHeader));
+					}
+				}
+			}			
+		}
+		
 		dataRows.add(dataMap);
 	}
-
+	
 	public List<String> getHeaders()
 	{
 		return headers;
