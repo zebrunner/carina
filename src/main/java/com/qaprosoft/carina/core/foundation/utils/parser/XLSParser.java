@@ -25,6 +25,10 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.model.ExternalLinksTable;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFTable;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.util.Log;
 
 import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
@@ -175,7 +179,8 @@ public class XLSParser
 	
 	public static String getCellValue(Cell cell)
 	{
-		if(cell == null) return "";
+		if(cell == null) return "";		
+			
 		switch (cell.getCellType())
 		{
 		case Cell.CELL_TYPE_STRING:
@@ -184,8 +189,8 @@ public class XLSParser
 			return df.formatCellValue(cell).trim();
 		case Cell.CELL_TYPE_BOOLEAN:
 			return df.formatCellValue(cell).trim();
-		case Cell.CELL_TYPE_FORMULA:			
-			return df.formatCellValue(cell, evaluator).trim();
+		case Cell.CELL_TYPE_FORMULA:
+			return (cell.getCellFormula().contains("[") && cell.getCellFormula().contains("]")) ? null : df.formatCellValue(cell, evaluator).trim();
 		case Cell.CELL_TYPE_BLANK:
 			return "";
 		default:
@@ -195,33 +200,112 @@ public class XLSParser
 	
 	public static XLSChildTable parseCellLinks(Cell cell, Workbook wb, Sheet sheet) 
 	{
-		if(cell == null) return null;
-		
+ 		if(cell == null) return null;
+ 		
 		if(cell.getCellType() == Cell.CELL_TYPE_FORMULA)
 		{
-			String cellValue = cell.getCellFormula().replace("=", "");
-			List<String> paths = Arrays.asList(cellValue.split("!"));
-			
-			int rowNumber = 0;
-			XLSChildTable childTable = new XLSChildTable();
-			switch(paths.size())
+			if(cell.getCellFormula().contains("#This Row"))
 			{
-				case 1:
-					rowNumber = Integer.valueOf(paths.get(0).replaceAll("\\D+", "")) - 1;
-					childTable.setHeaders(sheet.getRow(0));
-					childTable.addDataRow(sheet.getRow(rowNumber));
-					return childTable;					
-				case 2:					
-					Sheet childSheet = wb.getSheet(paths.get(0));
-					rowNumber = Integer.valueOf(paths.get(1).replaceAll("\\D+", "")) - 1;
-					if(childSheet == null) throw new DataLoadingException(String.format("Sheet with '%s' doesn't exist!",  paths.get(0)));					
-					childTable.setHeaders(childSheet.getRow(0));
-					childTable.addDataRow(childSheet.getRow(rowNumber));
-					return childTable;
-				default:
-					return null;
+				if(cell.getCellFormula().contains("!"))
+				{
+					// Parse link to the cell with table name in the external doc([2]!Table1[[#This Row],[Header6]])					
+					List<String> paths = Arrays.asList(cell.getCellFormula().split("!"));
+					int externalLinkNumber = Integer.valueOf(paths.get(0).replaceAll("\\D+", "")) - 1;
+					String tableName = paths.get(1).split("\\[")[0];
+					if(wb instanceof XSSFWorkbook)
+					{							
+						ExternalLinksTable link = ((XSSFWorkbook) wb).getExternalLinksTable().get(externalLinkNumber);
+						XSSFWorkbook childWb = (XSSFWorkbook) XLSCache.getWorkbook(link.getLinkedFileName());
+						if (childWb == null)  throw new DataLoadingException(String.format("WorkBook '%s' doesn't exist!",  link.getLinkedFileName()));
+						for(int i = 0; i < childWb.getNumberOfSheets(); i++)
+						{
+							XSSFSheet childSheet = (XSSFSheet) childWb.getSheetAt(i);
+							for (XSSFTable table : childSheet.getTables())
+							{
+								if(table.getName().equals(tableName))
+								{
+									return createChildTable(childSheet, cell.getRowIndex());
+								}
+							}
+						}					
+					}
+					else
+					{
+						throw new DataLoadingException("Unsupported format. External links supports only for .xlsx documents.");
+					}
+				} else
+				{
+					// Parse link to the cell with table name in the same doc(=Table1[[#This Row],[Header6]])
+					List<String> paths = Arrays.asList(cell.getCellFormula().replace("=", "").split("\\["));
+					if(wb instanceof XSSFWorkbook)
+					{
+						for(int i = 0; i < wb.getNumberOfSheets(); i++)
+						{
+							XSSFSheet childSheet = (XSSFSheet) wb.getSheetAt(i);
+							for (XSSFTable table : childSheet.getTables())
+							{
+								if(table.getName().equals(paths.get(0)))
+								{
+									return createChildTable(childSheet, cell.getRowIndex());
+								}
+							}
+						}					
+					}
+					else
+					{
+						throw new DataLoadingException("Unsupported format. Links with table name supports only for .xlsx documents.");
+					}
+				}
+			} 
+			else 
+			{								
+				String cellValue = cell.getCellFormula().replace("=", "").replace("[", "").replace("]", "!").replace("'", "");
+				List<String> paths = Arrays.asList(cellValue.split("!"));			
+				int rowNumber = 0;		
+				Sheet childSheet = null;								
+				
+				switch(paths.size())
+				{
+					// Parse link to the cell in the same sheet(=A4)
+					case 1:
+						rowNumber = Integer.valueOf(paths.get(0).replaceAll("\\D+", "")) - 1;
+						return createChildTable(sheet, rowNumber);
+					// Parse link to the cell in another sheet in the same doc(=SheetName!A4)				
+					case 2:					
+						childSheet = wb.getSheet(paths.get(0));
+						if(childSheet == null) throw new DataLoadingException(String.format("Sheet '%s' doesn't exist!",  paths.get(0)));	
+						rowNumber = Integer.valueOf(paths.get(1).replaceAll("\\D+", "")) - 1;
+						return createChildTable(childSheet, rowNumber);
+					// Parse link to the cell in another doc(=[2]SheetName!A4)
+					case 3:
+						if(wb instanceof XSSFWorkbook)
+						{	
+							ExternalLinksTable link = ((XSSFWorkbook) wb).getExternalLinksTable().get(Integer.valueOf(paths.get(0)) - 1);
+							XSSFWorkbook childWb = (XSSFWorkbook) XLSCache.getWorkbook(link.getLinkedFileName());						
+							
+							if (childWb == null)  throw new DataLoadingException(String.format("WorkBook '%s' doesn't exist!",  paths.get(0)));
+							childSheet = childWb.getSheet(paths.get(1));
+							if(childSheet == null) throw new DataLoadingException(String.format("Sheet '%s' doesn't exist!",  paths.get(0)));
+							rowNumber = Integer.valueOf(paths.get(2).replaceAll("\\D+", "")) - 1;
+							return createChildTable(childSheet, rowNumber);
+						}
+						else
+						{
+							throw new DataLoadingException("Unsupported format. External links supports only for .xlsx documents.");
+						}
+					default:
+						return null;
+				}
 			}
 		}		
 		return null;
 	}	
+	
+	private static XLSChildTable createChildTable(Sheet sheet, int rowNumber)
+	{
+ 		XLSChildTable childTable = new XLSChildTable();
+ 		childTable.setHeaders(sheet.getRow(0));
+		childTable.addDataRow(sheet.getRow(rowNumber));
+ 		return childTable;
+	}
 }
