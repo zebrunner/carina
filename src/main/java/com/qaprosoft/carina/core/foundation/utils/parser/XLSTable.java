@@ -21,12 +21,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public class XLSTable
 {
+	private static final Logger LOGGER = Logger.getLogger(XLSTable.class);
 	private final static String FK_PREFIX = "FK_LINK_";
 	
 	private List<String> headers;
@@ -69,6 +72,7 @@ public class XLSTable
 		XLSChildTable childRow = null;
 		
 		Map<String, String> dataMap = new HashMap<String, String>();
+		LOGGER.debug("Loading data from row: ");
 		for (int i = 0; i < headers.size(); i++)
 		{
 			String header = headers.get(i);
@@ -76,18 +80,20 @@ public class XLSTable
 				childRow = XLSParser.parseCellLinks(row.getCell(i), wb, sheet);
 				
 			synchronized (dataMap){ 
-				dataMap.put(header, XLSParser.getCellValue(row.getCell(i)));
+				dataMap.put(header, XLSParser.getCellValue(row.getCell(i)));				
 			}
-		}
+			LOGGER.debug(header + ": " + dataMap.get(header));
+		}	
 		
-		// If row has hyperlink than merge headers and data		
+		// If row has foreign key than merge headers and data		
 		if(childRow != null)
-		{			
+		{		
+			LOGGER.debug("Loading data from child row: ");
 			for(int i = 0; i < childRow.getHeaders().size(); i++)
 			{
 				String currentHeader = childRow.getHeaders().get(i);			
 						
-				if(dataMap.get(currentHeader) == null)
+				if(StringUtils.isBlank(dataMap.get(currentHeader)))
 				{
 					// Merge headers				
 					if(!this.headers.contains(currentHeader)) this.headers.add(currentHeader);
@@ -98,7 +104,14 @@ public class XLSTable
 						dataMap.put(currentHeader, childRow.getDataRows().get(0).get(currentHeader));
 					}
 				}
+				LOGGER.debug(currentHeader + ": " + childRow.getDataRows().get(0).get(currentHeader));
 			}			
+		}
+		
+		LOGGER.debug("Merged row: ");
+		for (int i = 0; i < headers.size(); i++)
+		{
+			LOGGER.debug(headers.get(i) + ": " + dataMap.get(headers.get(i)));
 		}
 		
 		dataRows.add(dataMap);

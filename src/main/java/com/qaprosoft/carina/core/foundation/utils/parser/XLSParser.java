@@ -37,7 +37,7 @@ import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 public class XLSParser
 {
 	private static DataFormatter df;
-	private static FormulaEvaluator evaluator;
+	private static FormulaEvaluator evaluator;	
 	
 	static 
 	{
