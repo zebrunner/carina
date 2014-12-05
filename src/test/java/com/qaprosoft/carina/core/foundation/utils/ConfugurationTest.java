@@ -30,8 +30,7 @@ public class ConfugurationTest
 	@Test(expectedExceptions={RuntimeException.class})
 	public void testInvalidConfigValidation()
 	{
-		System.setProperty("url", "{must_override}");
+		System.setProperty("platform", "{must_override}");
 		Configuration.validateConfiguration();
-		System.clearProperty("url");
 	}
 }
