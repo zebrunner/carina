@@ -58,6 +58,18 @@ public class MarshallerHelper {
 		marshall(jaxbElement, new StreamResult(os));
 	};
 
+	
+	/**
+	 * Serializes JAXBElement to String
+	 * 
+	 * @param jaxbElement
+	 *            - JAXBElement
+	 * @return String
+	 */	
+	public static String marshall(Object jaxbElement){
+		  return marshaller.marshall(jaxbElement);
+		 }
+	
 	/**
 	 * Create JAXBElement from Source
 	 * 

@@ -10,6 +10,9 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.configuration.ArgumentType;
+import com.qaprosoft.carina.core.foundation.utils.configuration.ConfigurationBin;
+import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.zafira.client.ZafiraClient;
@@ -95,7 +98,7 @@ public class ZafiraIntegrator {
 			}
 			
 			
-			String configXML = "";
+			String configXML = getConfiguration();
 			
 			if (ciBuildCause.equalsIgnoreCase("MANUALTRIGGER")) {
 				run = registerTestRunByHUMAN(suite.getId(), user.getId(),
@@ -325,6 +328,29 @@ public class ZafiraIntegrator {
 		return jobURL;
 	}
 	
+	private static String getConfiguration() {
+        ConfigurationBin conf = new ConfigurationBin();
+        for (Configuration.Parameter parameter : Configuration.Parameter.values()) {
+            conf.getArg().add(getArgByParameter(parameter));
+        }
+
+        return MarshallerHelper.marshall(conf);
+	}
 	
+    private static ArgumentType getArgByParameter(Configuration.Parameter parameter) {
+        ArgumentType arg = new ArgumentType();
+        arg.setKey(parameter.getKey());
+        arg.setValue(Configuration.get(parameter));       
+        return arg;
+    }
+	
+	@SuppressWarnings("unused")
+	private static void setConfiguration(String configXML) {
+        ConfigurationBin conf = MarshallerHelper.unmarshall(configXML, ConfigurationBin.class);
+        //TODO: implement setter methods for all Configuration parameters
+        for (ArgumentType arg : conf.getArg()) {
+            LOGGER.debug("Key: " + arg.getKey() + " Value: " + arg.getValue());
+        }
+	}    
 
 }
