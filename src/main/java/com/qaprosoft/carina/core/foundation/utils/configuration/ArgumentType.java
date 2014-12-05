@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlType;
  * Created by Patotsky on 04.12.2014.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "key", "defaultKey", "value" })
+@XmlType(name = "", propOrder = { "key", "value" })
 public class ArgumentType {
 
 	@XmlElement(required = true)
