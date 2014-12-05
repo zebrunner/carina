@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.core.foundation.report.zafira;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -342,10 +341,10 @@ public class ZafiraIntegrator {
         ArgumentType arg = new ArgumentType();
         arg.setKey(parameter.getKey());
         arg.setDefaultKey(parameter.getDefaultKey());
-        arg.setValue(Configuration.get(parameter));
-        return arg;
+        arg.setValue(Configuration.get(parameter));        return arg;
     }
 	
+	@SuppressWarnings("unused")
 	private static void setConfiguration(String configXML) {
         ConfigurationBin conf = MarshallerHelper.unmarshall(configXML, ConfigurationBin.class);
         //TODO: implement setter methods for all Configuration parameters
