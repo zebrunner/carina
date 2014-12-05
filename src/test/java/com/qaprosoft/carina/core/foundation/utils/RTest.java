@@ -47,4 +47,10 @@ public class RTest
 	{
 		Assert.assertEquals(R.CONFIG.get("credentials"), "test@gmail.com/EncryptMe");
 	}
+	
+	@Test
+	public void testPlaceholdersInEmail()
+	{
+		Assert.assertEquals(R.EMAIL.get("title"), "${test}");
+	}
 }
