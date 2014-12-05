@@ -82,7 +82,7 @@ public enum R
 					LOGGER.info("Override properties loaded: " + String.format(OVERRIDE_FORMAT, resource.resourceFile));
 				}
 				
-				if(!API.equals(resource) && !EMAIL.equals(resource) && !REPORT.equals(resource) && !PlaceholderResolver.isValid(properties))
+				if(CONFIG.equals(resource) && !PlaceholderResolver.isValid(properties))
 				{
 					throw new PlaceholderResolverException();
 				}
@@ -111,7 +111,8 @@ public enum R
 	public String get(String key)
 	{
 		String startupProperty = System.getProperty(key);
-		String configProperty = PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key);
+		String configProperty = 
+				CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key) : propertiesHolder.get(resourceFile).getProperty(key);
 		String value = !StringUtils.isEmpty(startupProperty) ? startupProperty : configProperty;
 		// TODO: why we return empty instead of null?
 		return value != null ? decrypt(value) : StringUtils.EMPTY;
