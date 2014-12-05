@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.marshaller;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -181,4 +182,16 @@ class Marshaller {
 		}
 
 	}
+	
+	public String marshall(Object jaxbElement) {
+		try {
+			final StringWriter w = new StringWriter();
+			getMarshaller(jaxbElement.getClass()).marshal(jaxbElement, w);
+			return w.toString();
+		} catch (JAXBException e) {
+			LOGGER.error(e);
+			throw new RuntimeException(e);
+		}
+
+	}	
 }
