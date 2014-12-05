@@ -34,10 +34,10 @@ public class XLSDSBean
 	private String xlsFile;
 	private String xlsSheet;
 
-	@SuppressWarnings("deprecation")
+
 	public XLSDSBean(ITestContext context)
 	{
-		 this(context.getCurrentXmlTest().getParameters());
+		this(context.getCurrentXmlTest().getAllParameters());
 	}
 	
 	public XLSDSBean(Map<String, String> testParams)
