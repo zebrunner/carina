@@ -82,7 +82,7 @@ public enum R
 					LOGGER.info("Override properties loaded: " + String.format(OVERRIDE_FORMAT, resource.resourceFile));
 				}
 				
-				if(!EMAIL.equals(resource) && !REPORT.equals(resource) && !PlaceholderResolver.isValid(properties))
+				if(!API.equals(resource) && !EMAIL.equals(resource) && !REPORT.equals(resource) && !PlaceholderResolver.isValid(properties))
 				{
 					throw new PlaceholderResolverException();
 				}

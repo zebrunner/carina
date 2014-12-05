@@ -20,7 +20,7 @@ import java.util.Calendar;
 
 public class DateUtils
 {
-	private static final String DATE_FORMAT_NOW = R.CONFIG.get("default_date_format");
+	private static final String DATE_FORMAT_NOW = R.CONFIG.get("date_format");
 
 	public static String now()
 	{
