@@ -28,8 +28,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Configuration
 {
-	private static final String MUST_OVERRIDE = "{must_override}";
-	
 	private static IEnvArgResolver envArgResolver;
 	
 	static
@@ -79,182 +77,174 @@ public class Configuration
 	 */
 	public enum Parameter
 	{
-		URL("url", "default_url"),
+		URL("url"),
 		
-		ENV("env", "default_env"),
+		ENV("env"),
 		
-		ENV_ARG_RESOLVER("env_arg_resolver", "default_env_arg_resolver"),
+		ENV_ARG_RESOLVER("env_arg_resolver"),
 		
-		PLATFORM("platform", "default_platform"),
+		PLATFORM("platform"),
 
-		BROWSER("browser", "default_browser"),
+		BROWSER("browser"),
 		
-		BROWSER_VERSION("browser_version", "default_browser_version"),
+		BROWSER_VERSION("browser_version"),
 
-		SELENIUM_HOST("selenium_host", "default_selenium_host"),
+		SELENIUM_HOST("selenium_host"),
 		
-		DRIVER_MODE("driver_mode", "default_driver_mode"),
+		DRIVER_MODE("driver_mode"),
 		
-		APP_VERSION("app_version", "default_app_version"),
+		APP_VERSION("app_version"),
 
-		REPORT_URL("report_url", "default_report_url"),
+		REPORT_URL("report_url"),
 
-		EMAIL_LIST("email_list", "default_email_list"),
+		EMAIL_LIST("email_list"),
 
-		AUTO_SCREENSHOT("auto_screenshot", "default_auto_screenshot"),
+		AUTO_SCREENSHOT("auto_screenshot"),
 		
-		TAKE_ONLY_FAIL_SCREENSHOT("take_only_fail_screenshot", "default_take_only_fail_screenshot"),
+		TAKE_ONLY_FAIL_SCREENSHOT("take_only_fail_screenshot"),
 
-		IMPLICIT_TIMEOUT("implicit_timeout", "default_implicit_timeout"),
+		IMPLICIT_TIMEOUT("implicit_timeout"),
 
-		EXPLICIT_TIMEOUT("explicit_timeout", "default_explicit_timeout"),
+		EXPLICIT_TIMEOUT("explicit_timeout"),
 		
-		AUTO_DOWNLOAD("auto_download", "default_auto_download"),
+		AUTO_DOWNLOAD("auto_download"),
 		
-		AUTO_DOWNLOAD_APPS("auto_download_apps", "default_auto_download_apps"),
+		AUTO_DOWNLOAD_APPS("auto_download_apps"),
 
-		RETRY_TIMEOUT("retry_timeout", "default_retry_timeout"),
+		RETRY_TIMEOUT("retry_timeout"),
 
-		PROJECT_REPORT_DIRECTORY("project_report_directory", "default_project_report_directory"),
+		PROJECT_REPORT_DIRECTORY("project_report_directory"),
 
-		MAX_SCREENSHOOT_HISTORY("max_screen_history", "default_max_screen_history"),
+		MAX_SCREENSHOOT_HISTORY("max_screen_history"),
 		
-		RESULT_SORTING("result_sorting", "default_result_sorting"),
+		RESULT_SORTING("result_sorting"),
 
-		KEEP_ALL_SCREENSHOTS("keep_all_screenshots", "default_keep_all_screenshots"),
+		KEEP_ALL_SCREENSHOTS("keep_all_screenshots"),
 
-		BIG_SCREEN_WIDTH("big_screen_width", "default_big_screen_width"),
+		BIG_SCREEN_WIDTH("big_screen_width"),
 
-		BIG_SCREEN_HEIGHT("big_screen_height", "default_big_screen_height"),
+		BIG_SCREEN_HEIGHT("big_screen_height"),
 
-		SMALL_SCREEN_WIDTH("small_screen_width", "default_small_screen_width"),
+		SMALL_SCREEN_WIDTH("small_screen_width"),
 
-		SMALL_SCREEN_HEIGHT("small_screen_height", "default_small_screen_height"),
+		SMALL_SCREEN_HEIGHT("small_screen_height"),
 
-		SENDER_EMAIL("sender_email", "default_sender_email"),
+		SENDER_EMAIL("sender_email"),
 
-		SENDER_PASSWORD("sender_pswd", "default_sender_pswd"),
+		SENDER_PASSWORD("sender_pswd"),
 		
-		RETRY_COUNT("retry_count", "default_retry_count"),
+		RETRY_COUNT("retry_count"),
 
-		LOCALE("locale", "default_locale"),
+		LOCALE("locale"),
 
-		THREAD_COUNT("thread_count", "default_thread_count"),
+		THREAD_COUNT("thread_count"),
 		
-		TEST_ID("test_id", "default_test_id"),
+		TEST_ID("test_id"),
 		
-		IS_TESTEXECUTER("is_testexecuter", "default_is_testexecuter"),
+		IS_TESTEXECUTER("is_testexecuter"),
 		
-		TESTEXECUTER_URL("testexecuter_url", "default_testexecuter_url"),
+		TESTEXECUTER_URL("testexecuter_url"),
 		
-		LOG_ALL_JSON("log_all_json", "default_log_all_json"),
+		LOG_ALL_JSON("log_all_json"),
 
-		DATE_FORMAT("date_format", "default_date_format"),
+		DATE_FORMAT("date_format"),
 		
-		IS_API("is_api", "default_is_api"),
+		IS_API("is_api"),
 		
-		LOAD_SETTINGS("load_settings", "default_load_settings"),
+		LOAD_SETTINGS("load_settings"),
 		
-		CRYPTO_KEY_PATH("crypto_key_path", "default_crypto_key_path"),
+		CRYPTO_KEY_PATH("crypto_key_path"),
 		
-		SUITE_NAME("suite_name", "default_suite_name"),
+		SUITE_NAME("suite_name"),
 
-		CI_URL("ci_url", "default_ci_url"),
+		CI_URL("ci_url"),
 		
-		CI_BUILD("ci_build", "default_ci_build"),		
+		CI_BUILD("ci_build"),		
 		
-		CI_BUILD_CAUSE("ci_build_cause", "default_ci_build_cause"),
+		CI_BUILD_CAUSE("ci_build_cause"),
 		
-		CI_PARENT_URL("ci_parent_url", "default_ci_parent_url"),
+		CI_PARENT_URL("ci_parent_url"),
 		
-		CI_PARENT_BUILD("ci_parent_build", "default_ci_parent_build"),
+		CI_PARENT_BUILD("ci_parent_build"),
 		
-		CI_USER_ID("ci_user_id", "default_ci_user_id"),
+		CI_USER_ID("ci_user_id"),
 		
-		CI_USER_FIRST_NAME("ci_user_first_name", "default_ci_user_first_name"),
+		CI_USER_FIRST_NAME("ci_user_first_name"),
 		
-		CI_USER_LAST_NAME("ci_user_last_name", "default_ci_user_last_name"),
+		CI_USER_LAST_NAME("ci_user_last_name"),
 		
-		CI_USER_EMAIL("ci_user_email", "default_ci_user_email"),
+		CI_USER_EMAIL("ci_user_email"),
 		
-		JIRA_UPDATER("jira_updater", "default_jira_updater"),
+		JIRA_UPDATER("jira_updater"),
 		
-		JIRA_URL("jira_url", "default_jira_url"),
+		JIRA_URL("jira_url"),
 		
-		JIRA_USER("jira_user", "default_jira_user"),
+		JIRA_USER("jira_user"),
 		
-		JIRA_PASSWORD("jira_password", "default_jira_password"),
+		JIRA_PASSWORD("jira_password"),
 		
-		JIRA_SUITE_ID("jira_suite_id", "default_jira_suite_id"),
+		JIRA_SUITE_ID("jira_suite_id"),
 
-        JIRA_PROJECT("jira_project", "default_jira_project"),
+        JIRA_PROJECT("jira_project"),
 
-        JIRA_PROJECT_SHORT("jira_project_short", "default_jira_project_short"),
+        JIRA_PROJECT_SHORT("jira_project_short"),
         
-        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket", "default_jira_create_new_ticket"),
+        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
         
         // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_DEVICE_NAME("mobile_device_name", "default_mobile_device_name"), 
+        MOBILE_DEVICE_NAME("mobile_device_name"), 
         
-        MOBILE_PLATFORM_NAME("mobile_platform_name", "default_mobile_platform_name"),
+        MOBILE_PLATFORM_NAME("mobile_platform_name"),
         
-        MOBILE_PLATFORM_VERSION("mobile_platform_version", "default_mobile_platform_version"),
+        MOBILE_PLATFORM_VERSION("mobile_platform_version"),
         
-        MOBILE_BROWSER_NAME("mobile_browser_name", "default_mobile_browser_name"),
+        MOBILE_BROWSER_NAME("mobile_browser_name"),
         
-        MOBILE_AUTOMATION_NAME("mobile_automation_name", "default_mobile_automation_name"), // Sendroid 
+        MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Sendroid 
         
-        MOBILE_APP("mobile_app", "default_mobile_app"),
+        MOBILE_APP("mobile_app"),
         
-        MOBILE_APP_ACTIVITY("mobile_app_activity", "default_mobile_app_activity"),
+        MOBILE_APP_ACTIVITY("mobile_app_activity"),
         
-		MOBILE_APP_PACKAGE("mobile_app_package", "default_mobile_app_package"), 
+		MOBILE_APP_PACKAGE("mobile_app_package"), 
 		
-		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout", "default_mobile_new_command_timeout"),
+		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout"),
 		
 		// video recording and uploading to Dropbox
-		MOBILE_DEVICE_UDID("mobile_device_udid", "default_mobile_device_udid"),
+		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
-		DROPBOX_ACCESS_TOKEN("dropbox_access_token", "default_dropbox_access_token"), 
+		DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
 		
-		VIDEO_RECORDING("video_recording", "default_video_recording"),
+		VIDEO_RECORDING("video_recording"),
 		
-		ADB_HOST("adb_host", "default_adb_host"),
+		ADB_HOST("adb_host"),
 		
-		ADB_PORT("adb_port", "default_adb_port"),
+		ADB_PORT("adb_port"),
 		
 		// spira
-		SPIRA_RELEASE_ID("spira_release_id", "default_spira_release_id"),
+		SPIRA_RELEASE_ID("spira_release_id"),
 		
-		SPIRA_TESTSET_ID("spira_testset_id", "default_spira_testset_id"),
+		SPIRA_TESTSET_ID("spira_testset_id"),
 		
 		//zafira
-		ZAFIRA_SERVICE_URL("zafira_service_url", "default_zafira_service_url"),
+		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
-		GIT_BRANCH("git_branch", "default_git_branch"),
+		GIT_BRANCH("git_branch"),
 		
-		GIT_COMMIT("git_commit", "default_git_commit"),
+		GIT_COMMIT("git_commit"),
 		
-		GIT_URL("git_url", "default_git_url");
+		GIT_URL("git_url");
 		
 		private final String key;
 
-		private final String defaultKey;
-
-		private Parameter(String key, String defaultKey)
+		private Parameter(String key)
 		{
 			this.key = key;
-			this.defaultKey = defaultKey;
 		}
 
-		private String getKey()
+		public String getKey()
 		{
 			return key;
-		}
-
-		private String getDefaultKey()
-		{
-			return defaultKey;
 		}
 	}
 
@@ -268,25 +258,8 @@ public class Configuration
 	 */
 	public static String get(Parameter param)
 	{
-		String startupArg = System.getProperty(param.getKey());
-		String defaultConfigArg = R.CONFIG.get(param.getDefaultKey());
-		String configArg = R.CONFIG.get(param.getKey());
-		String value = defaultConfigArg;
-		
-		if(!StringUtils.isEmpty(configArg)) {
-			value = configArg;
-		}
-		else if(!StringUtils.isEmpty(startupArg)) {
-			 value = startupArg;
-		}
-		
-		if (value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
-			value = "";
-		}
-		
-	
-		return value;
-		
+		String value = R.CONFIG.get(param.getKey());
+		return !(value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) ? value : StringUtils.EMPTY;
 	}
 
 	public static int getInt(Parameter param)
@@ -349,7 +322,7 @@ public class Configuration
 	{
 		for (Parameter param : Parameter.values())
 		{
-			if (StringUtils.isEmpty(Configuration.get(param)) || MUST_OVERRIDE.equals(Configuration.get(param)))
+			if (StringUtils.isEmpty(Configuration.get(param)) || SpecialKeywords.MUST_OVERRIDE.equals(Configuration.get(param)))
 			{
 				throw new RuntimeException("Configuration failure: parameter '" + param.getKey() + "' not specified!");
 			}

@@ -32,7 +32,10 @@ public class SpecialKeywords
 	public static final String L18N = "\\{l18n:.*\\}";
 	public static final String EXCEL = "\\{excel:.*\\}";
 	public static final String CRYPT = "\\{crypt:[^\\{\\}]*\\}";
+	public static final String CRYPT_WRAPPER = "{crypt:%s}";
+	public static final String PLACEHOLER = "\\$\\{[^\\{\\}]*\\}";
 	
+	public static final String MUST_OVERRIDE = "{must_override}";
 	public static final String EXCEL_DS_ARGS = "{excel_ds_args}";
 	public static final String EXCEL_DS_UID = "{excel_ds_uid}";
 	public static final String EXCEL_DS_JIRA = "{excel_ds_jira}";

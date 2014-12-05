@@ -38,6 +38,7 @@ import com.qaprosoft.carina.core.foundation.utils.ZipManager;
 public class HtmlReportGenerator
 {
 	private static final Logger LOGGER = Logger.getLogger(HtmlReportGenerator.class);
+	
 	private static final String REPORT_NAME = "/report.html";
 	private static final String GALLERY_ZIP = "gallery-lib.zip";
 	private static final String TITLE = "Test steps demo";
@@ -187,55 +188,4 @@ public class HtmlReportGenerator
 			}
 		}
 	}
-
-/*	private static void copyGalleryLib()
-	{
-//		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
-		File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
-		if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists())
-		{
-			try
-			{
-				InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
-				try
-				{
-					FileOutputStream fos = new FileOutputStream(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
-					try
-					{
-						BufferedOutputStream bos = new BufferedOutputStream(fos);
-						try
-						{
-							ZipManager.copyInputStream(is, bos);
-							ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP,
-									reportsRootDir.getAbsolutePath());
-							File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
-							zip.delete();
-						} finally
-						{
-							if (bos != null)
-							{
-								bos.close();
-							}
-						}
-					} finally
-					{
-						if (fos != null)
-						{
-							fos.close();
-						}
-					}
-				} finally
-				{
-					if (is != null)
-					{
-						is.close();
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				LOGGER.error(e);
-			}
-		}
-	}*/
 }
