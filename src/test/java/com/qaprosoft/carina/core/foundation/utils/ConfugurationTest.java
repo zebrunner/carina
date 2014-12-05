@@ -32,5 +32,6 @@ public class ConfugurationTest
 	{
 		System.setProperty("url", "{must_override}");
 		Configuration.validateConfiguration();
+		System.clearProperty("url");
 	}
 }
