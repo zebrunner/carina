@@ -247,12 +247,12 @@ public class Configuration
 			this.defaultKey = defaultKey;
 		}
 
-		private String getKey()
+		public String getKey()
 		{
 			return key;
 		}
 
-		private String getDefaultKey()
+		public String getDefaultKey()
 		{
 			return defaultKey;
 		}
