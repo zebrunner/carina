@@ -1,0 +1,91 @@
+/*
+ * Copyright 2014 QAPROSOFT (http://qaprosoft.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.qaprosoft.carina.core.foundation.utils;
+
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
+
+/**
+ * PlaceholderResolver - resolves placeholders in properties.
+ * 
+ * @author Alexey Khursevich (hursevich@gmail.com)
+ */
+public class PlaceholderResolver
+{
+	protected static final Logger LOGGER = Logger.getLogger(PlaceholderResolver.class);
+	
+	private static final Pattern PATTERN = Pattern.compile(SpecialKeywords.PLACEHOLER);
+	
+	/**
+	 * Resolves value by placehodler recursivly.
+	 * @param properties
+	 * @param key
+	 * @return resolved value
+	 */
+	public static String resolve(Properties properties, String key)
+	{
+		String value = properties.getProperty(key);
+		if(value != null)
+		{
+			Matcher matcher = PATTERN.matcher(value);
+			while(matcher.find())
+			{
+				String placeholder = matcher.group();
+				String placeholderKey = placeholder.replace("${", "").replace("}", "");
+				value = value.replace(placeholder, resolve(properties, placeholderKey));
+			}
+		}
+		else
+		{
+			throw new PlaceholderResolverException(key);
+		}
+		return value;
+	}
+	
+	/**
+	 * Verifies that properties file contains all placeholder definitions and does not have infinit placeholder loops.
+	 * @param properties
+	 * @return validation results
+	 */
+	public static boolean isValid(Properties properties)
+	{
+		Set<Object> keys = properties.keySet();
+		for(Object key : keys)
+		{
+			try
+			{
+				resolve(properties, (String) key);
+			}
+			catch(StackOverflowError e)
+			{
+				LOGGER.error("Infinit placeholder loop was found for '" + properties.getProperty((String) key) + "'");
+				return false;
+			}
+			catch (PlaceholderResolverException e) 
+			{
+				LOGGER.error(e.getMessage());
+				return false;
+			}
+		}
+		return true;
+	}
+}

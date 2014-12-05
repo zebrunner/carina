@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2014 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,24 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
+import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
+
 /**
  * R - loads properties from resource files.
  * 
- * @author Alexey Khursevich (hursevich@gmail.com)
+ * @author Alexey Khursevich 
+ * @email hursevich@gmail.com
  */
 public enum R
 {
@@ -43,10 +49,16 @@ public enum R
 	DATABASE("database.properties");
 
 	private static final Logger LOGGER = Logger.getLogger(R.class);
+	
+	private static final String OVERRIDE_FORMAT = "_%s";
 
 	private String resourceFile;
 
-	private static Map<String, Properties> propertiesKeeper = new HashMap<String, Properties>();
+	private static CryptoTool cryptoTool;
+	
+	private static Pattern CRYPT_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+	
+	private static Map<String, Properties> propertiesHolder = new HashMap<String, Properties>();
 
 	static
 	{
@@ -54,22 +66,32 @@ public enum R
 		{
 			try
 			{
-				Properties prop = new Properties();
-				prop.load(ClassLoader.getSystemResource(resource.resourceFile).openStream());
-
-				// Ovveride properties
-				try
+				Properties properties = new Properties();
+				
+				URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
+				if(baseResource != null)
 				{
-					prop.load(ClassLoader.getSystemResource("_" + resource.resourceFile).openStream());
-					LOGGER.info("Properties: " + resource.resourceFile + " were overriden.");
-				} catch (Exception e)
-				{
+					properties.load(baseResource.openStream());
+					LOGGER.info("Base properties loaded: " + resource.resourceFile);
 				}
-
-				propertiesKeeper.put(resource.resourceFile, prop);
-			} catch (IOException e)
+				
+				URL overrideResource = ClassLoader.getSystemResource(String.format(OVERRIDE_FORMAT, resource.resourceFile));
+				if(overrideResource != null)
+				{
+					properties.load(overrideResource.openStream());
+					LOGGER.info("Override properties loaded: " + String.format(OVERRIDE_FORMAT, resource.resourceFile));
+				}
+				
+				if(!EMAIL.equals(resource) && !REPORT.equals(resource) && !PlaceholderResolver.isValid(properties))
+				{
+					throw new PlaceholderResolverException();
+				}
+				
+				propertiesHolder.put(resource.resourceFile, properties);
+			} 
+			catch (Exception e)
 			{
-				LOGGER.error("Properties: " + resource.resourceFile + " not found initialized!");
+				throw new InvalidConfigurationException("Invalid config in '" + resource + "': " + e.getMessage());
 			}
 		}
 	}
@@ -79,17 +101,26 @@ public enum R
 		this.resourceFile = resourceKey;
 	}
 
-	// Will override config property if system property is specified.
+	/**
+	 * Returns value either from systems properties or config properties context.
+	 * Systems properties have higher priority.
+	 * Decryption is performed if required.
+	 * @param key
+	 * @return config value
+	 */
 	public String get(String key)
 	{
-		String sysProperty = System.getProperty(key);
-		String cnfgProperty = propertiesKeeper.get(resourceFile).getProperty(key);
-		String value = !StringUtils.isEmpty(sysProperty) ? sysProperty : cnfgProperty;
-		
-		if (value == null) {
-			value = "";
-		}
-		return value;
+		String startupProperty = System.getProperty(key);
+		String configProperty = PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key);
+		String value = !StringUtils.isEmpty(startupProperty) ? startupProperty : configProperty;
+		// TODO: why we return empty instead of null?
+		return value != null ? decrypt(value) : StringUtils.EMPTY;
+	}
+	
+	public String getSecured(String key)
+	{
+		String value = get(key);
+		return value != null ? encrypt(value) : StringUtils.EMPTY;
 	}
 
 	public int getInt(String key)
@@ -118,5 +149,35 @@ public enum R
 		path = StringUtils.replaceChars(path, "/", "\\");
 		path = StringUtils.replaceChars(path, "!", "");
 		return path;
+	}
+	
+	private static String encrypt(String value)
+	{
+		return String.format(SpecialKeywords.CRYPT_WRAPPER, getCryptoTool().encrypt(value));
+	}
+	
+	private static String decrypt(String value)
+	{
+		if(CRYPT_PATTERN.matcher(value).find())
+		{
+			value = getCryptoTool().decryptByPattern(value, CRYPT_PATTERN);
+		}
+		return value;
+	}
+	
+	private static CryptoTool getCryptoTool()
+	{
+		if(cryptoTool == null)
+		{
+			try
+			{
+				cryptoTool = new CryptoTool();
+			}
+			catch(Exception e)
+			{
+				throw new InvalidConfigurationException("Invalid crypto tool configuration: " + e.getMessage());
+			}
+		}
+		return cryptoTool;
 	}
 }
