@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.dataprovider.XlsDataSourceParameters;
 
 
 public class XLSDSBean
@@ -31,15 +32,20 @@ public class XLSDSBean
 	Map<String, String> testParams;
 	private List<String> args;
 	private List<String> uidArgs;
+	private List<String> staticArgs;
+	
+
 	private String xlsFile;
 	private String xlsSheet;
 
 
+	@Deprecated
 	public XLSDSBean(ITestContext context)
 	{
 		this(context.getCurrentXmlTest().getAllParameters());
 	}
 	
+	@Deprecated
 	public XLSDSBean(Map<String, String> testParams)
 	{
 		this.testParams = testParams;
@@ -58,6 +64,7 @@ public class XLSDSBean
 		}
 	}
 
+	@Deprecated
 	public XLSDSBean(String xlsFile, String xlsSheet, String dsArgs, String dsUids)
 	{
 		this.xlsFile = xlsFile;
@@ -65,13 +72,65 @@ public class XLSDSBean
 		this.args = new ArrayList<String>();
 		this.uidArgs = new ArrayList<String>();
 
-		if(!dsArgs.isEmpty())
+		if(dsArgs != null && !dsArgs.isEmpty())
 		{
 			args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
 		}
-		if(!dsUids.isEmpty())
+		if(dsUids != null && !dsUids.isEmpty())
 		{
 			uidArgs = Arrays.asList(dsUids.replace(",", ";").replace(" ", "").split(";"));
+		}
+		
+	}
+	
+	public XLSDSBean(XlsDataSourceParameters parameters, Map<String, String> testParams)
+	{
+		
+		//initialize default Xls data source parameters from suite xml file
+		String xlsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
+		String xlsSheet = testParams.get(SpecialKeywords.EXCEL_DS_SHEET);
+		String dsArgs = testParams.get(SpecialKeywords.EXCEL_DS_ARGS);
+		String dsUid = testParams.get(SpecialKeywords.EXCEL_DS_UID);
+		String dsStaticArgs = "";
+		
+		
+	    if (parameters != null) {
+	    	//reinitialize paameters from annotation if any
+	    	if (!parameters.path().isEmpty())
+	    		xlsFile = parameters.path();
+	    	
+	    	if (!parameters.sheet().isEmpty())
+	    		xlsSheet = parameters.sheet();
+	    	
+	    	if (!parameters.dsArgs().isEmpty())
+	    		dsArgs = parameters.dsArgs();
+	    	
+	    	if (!parameters.dsUid().isEmpty())
+	    		dsUid = parameters.dsUid();
+	    	
+	    	if (!parameters.staticArgs().isEmpty())
+	    		dsStaticArgs = parameters.staticArgs();
+	    }		
+		
+		this.testParams = testParams;
+		this.xlsFile = xlsFile;
+		this.xlsSheet = xlsSheet;
+		this.args = new ArrayList<String>();
+		this.uidArgs = new ArrayList<String>();
+		this.staticArgs = new ArrayList<String>();
+
+		if(dsArgs != null && !dsArgs.isEmpty())
+		{
+			args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
+		}
+		if(dsUid != null && !dsUid.isEmpty())
+		{
+			uidArgs = Arrays.asList(dsUid.replace(",", ";").replace(" ", "").split(";"));
+		}
+		
+		if(dsStaticArgs != null && !dsStaticArgs.isEmpty())
+		{
+			staticArgs = Arrays.asList(dsStaticArgs.replace(",", ";").replace(" ", "").split(";"));
 		}
 	}
 	
@@ -107,6 +166,14 @@ public class XLSDSBean
 	public void setArgs(List<String> args)
 	{
 		this.args = args;
+	}
+	
+	public List<String> getStaticArgs() {
+		return staticArgs;
+	}
+
+	public void setStaticArgs(List<String> staticArgs) {
+		this.staticArgs = staticArgs;
 	}
 	
 	public Map<String, String> getTestParams()
