@@ -108,12 +108,12 @@ public class ReportContext
 		return artifactsDirectory;
 	}
 	
-	public List<File> getAllArtifacts()
+	public static List<File> getAllArtifacts()
 	{
 		return Arrays.asList(getArtifactsFolder().listFiles());
 	}
 	
-	public File getArtifact(String name)
+	public static File getArtifact(String name)
 	{
 		File artifact = null;
 		for(File file : getAllArtifacts())
@@ -127,7 +127,7 @@ public class ReportContext
 		return artifact;
 	}
 	
-	public void deleteAllArtifacts()
+	public static void deleteAllArtifacts()
 	{
 		for(File file : getAllArtifacts())
 		{
@@ -135,7 +135,7 @@ public class ReportContext
 		}
 	}
 	
-	public void deleteArtifact(String name)
+	public static void deleteArtifact(String name)
 	{
 		for(File file : getAllArtifacts())
 		{
