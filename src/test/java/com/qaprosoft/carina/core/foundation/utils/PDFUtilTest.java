@@ -15,6 +15,7 @@ public class PDFUtilTest
 	{
 		InputStream is = PDFUtilTest.class.getClassLoader().getResourceAsStream("test.pdf");
 		String text = PDFUtil.readTxtFromPDF(is, 1, 1);
-		Assert.assertEquals(text, "This is Carina PDF test!\r\n");
+		Assert.assertNotNull(text);
+		Assert.assertTrue(text.contains("This is Carina PDF test!"));
 	}
 }
