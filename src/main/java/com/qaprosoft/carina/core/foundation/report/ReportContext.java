@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,6 +41,8 @@ public class ReportContext
 	private static File baseDirectory;
 
 	private static File tempDirectory;
+	
+	private static File artifactsDirectory;
 	
 	private static long rootID;
 
@@ -89,6 +92,59 @@ public class ReportContext
 			}
 		}
 		return tempDirectory;
+	}
+	
+	public static synchronized File getArtifactsFolder()
+	{
+		if (artifactsDirectory == null)
+		{
+			artifactsDirectory = new File(getBaseDir().getAbsolutePath() + "/artifacts");
+			boolean isCreated = artifactsDirectory.mkdir();
+			if (!isCreated)
+			{
+				throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
+			}
+		}
+		return artifactsDirectory;
+	}
+	
+	public List<File> getAllArtifacts()
+	{
+		return Arrays.asList(getArtifactsFolder().listFiles());
+	}
+	
+	public File getArtifact(String name)
+	{
+		File artifact = null;
+		for(File file : getAllArtifacts())
+		{
+			if(file.getName().equals(name))
+			{
+				artifact = file;
+				break;
+			}
+		}
+		return artifact;
+	}
+	
+	public void deleteAllArtifacts()
+	{
+		for(File file : getAllArtifacts())
+		{
+			file.delete();
+		}
+	}
+	
+	public void deleteArtifact(String name)
+	{
+		for(File file : getAllArtifacts())
+		{
+			if(file.getName().equals(name))
+			{
+				file.delete();
+				break;
+			}
+		}
 	}
 
 	/**

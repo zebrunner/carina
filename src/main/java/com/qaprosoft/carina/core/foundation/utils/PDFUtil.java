@@ -1,31 +1,57 @@
+/*
+ * Copyright 2014 QAPROSOFT (http://qaprosoft.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.qaprosoft.carina.core.foundation.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
+/**
+ * PDFUtil - utility for PDF file parsing.
+ * 
+ * @author Sergey Zagriychuk
+ * @email szagriychuk@gmail.com
+ *
+ */
 public class PDFUtil
 {
-
-	public static String readTxtFromPDF(String resourcePath, int startPage, int endPage)
+	/**
+	 * Reads PDF content in specified page range.
+	 * 
+	 * @param resourcePath
+	 * @param startPage
+	 * @param endPage
+	 * @return PDF content
+	 */
+	public static String readTxtFromPDF(InputStream inputStream, int startPage, int endPage)
 	{
 		PDFTextStripper pdfStripper = null;
 		PDDocument pdDoc = null;
 		COSDocument cosDoc = null;
-		InputStream is = PDFUtil.class.getClassLoader().getResourceAsStream(resourcePath);
-		if (is == null)
+		if (inputStream == null)
 		{
 			throw new RuntimeException("Input stream not opened");
 		}
 		try
 		{
-			PDFParser parser = new PDFParser(is);
+			PDFParser parser = new PDFParser(inputStream);
 			parser.parse();
 			cosDoc = parser.getDocument();
 			pdfStripper = new PDFTextStripper();
@@ -41,9 +67,9 @@ public class PDFUtil
 		{
 			try
 			{
-				if (is != null)
+				if (inputStream != null)
 				{
-					is.close();
+					inputStream.close();
 				}
 			} catch (IOException e)
 			{
@@ -51,23 +77,4 @@ public class PDFUtil
 			}
 		}
 	}
-
-	public static String getFirstMatch(String pdfText, String regex)
-	{
-		Matcher m = Pattern.compile(regex).matcher(pdfText);
-		if (m.find())
-		{
-			return m.group();
-		} else
-		{
-			return null;
-		}
-	}
-
-	// public static void main(String[] args)
-	// {
-	// String txt = readTxtFromPDF("pdf/2014-10.pdf", 1, 1);
-	// System.out.println("Total start = "
-	// + getFirstMatch(txt, "(?<=Total \\$)(([0-9][0-9]{0,2}(,[0-9]{3})*)(\\.[0-9]{2}))"));
-	// }
 }
