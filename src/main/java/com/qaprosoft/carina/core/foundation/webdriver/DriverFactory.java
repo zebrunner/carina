@@ -36,6 +36,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.SkipException;
 
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.appium.AppiumNativeDriver;
@@ -315,10 +316,14 @@ public class DriverFactory
 		if (Configuration.getBoolean(Parameter.AUTO_DOWNLOAD)) {
 			// specify auto download options
 			profile.setPreference("browser.download.folderList", 2);
-			profile.setPreference("browser.download.dir", System.getProperty("java.io.tmpdir"));
+			//profile.setPreference("browser.download.dir", System.getProperty("java.io.tmpdir"));
+			profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
 			profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Parameter.AUTO_DOWNLOAD_APPS)); //"application/pdf"
 			profile.setPreference("browser.download.manager.showWhenStarting", false);
 			profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
+			profile.setPreference("pdfjs.disabled", true);
+			profile.setPreference("plugin.scan.plid.all", false);
+			profile.setPreference("plugin.scan.Acrobat", "99.0");
 		}
 		
 		return profile;
