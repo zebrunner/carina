@@ -259,6 +259,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- PDF parsing -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>1.8.7</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
