@@ -24,21 +24,41 @@ import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.dataprovider.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.utils.dataprovider.XlsDataSourceParameters;
-
 
 public class XLSDSBean
 {
+	DataProviderType dsType;
+
 	Map<String, String> testParams;
 	private List<String> args;
 	private List<String> uidArgs;
 	private List<String> staticArgs;
 	
 
-	private String xlsFile;
+	private String dsFile;
 	private String xlsSheet;
 
 
+	public enum DataProviderType
+	{
+		XLS("xls"),
+		
+		CSV("csv");
+		
+		private final String key;
+
+		private DataProviderType(String key)
+		{
+			this.key = key;
+		}
+
+		public String getKey() {
+			return key;
+		}
+	}
+	
 	@Deprecated
 	public XLSDSBean(ITestContext context)
 	{
@@ -48,8 +68,9 @@ public class XLSDSBean
 	@Deprecated
 	public XLSDSBean(Map<String, String> testParams)
 	{
+		this.dsType = DataProviderType.XLS;
 		this.testParams = testParams;
-		this.xlsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
+		this.dsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
 		this.xlsSheet = testParams.get(SpecialKeywords.EXCEL_DS_SHEET);
 		this.args = new ArrayList<String>();
 		this.uidArgs = new ArrayList<String>();
@@ -67,7 +88,8 @@ public class XLSDSBean
 	@Deprecated
 	public XLSDSBean(String xlsFile, String xlsSheet, String dsArgs, String dsUids)
 	{
-		this.xlsFile = xlsFile;
+		this.dsType = DataProviderType.XLS;
+		this.dsFile = xlsFile;
 		this.xlsSheet = xlsSheet;
 		this.args = new ArrayList<String>();
 		this.uidArgs = new ArrayList<String>();
@@ -85,7 +107,7 @@ public class XLSDSBean
 	
 	public XLSDSBean(XlsDataSourceParameters parameters, Map<String, String> testParams)
 	{
-		
+		this.dsType = DataProviderType.XLS;
 		//initialize default Xls data source parameters from suite xml file
 		String xlsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
 		String xlsSheet = testParams.get(SpecialKeywords.EXCEL_DS_SHEET);
@@ -95,7 +117,7 @@ public class XLSDSBean
 		
 		
 	    if (parameters != null) {
-	    	//reinitialize paameters from annotation if any
+	    	//reinitialize parameters from annotation if any
 	    	if (!parameters.path().isEmpty())
 	    		xlsFile = parameters.path();
 	    	
@@ -113,7 +135,7 @@ public class XLSDSBean
 	    }		
 		
 		this.testParams = testParams;
-		this.xlsFile = xlsFile;
+		this.dsFile = xlsFile;
 		this.xlsSheet = xlsSheet;
 		this.args = new ArrayList<String>();
 		this.uidArgs = new ArrayList<String>();
@@ -134,14 +156,61 @@ public class XLSDSBean
 		}
 	}
 	
-	public String getXlsFile()
+	public XLSDSBean(CsvDataSourceParameters parameters, Map<String, String> testParams)
 	{
-		return xlsFile;
+		this.dsType = DataProviderType.CSV;
+		//initialize default Xls data source parameters from suite xml file
+		String dsFile = testParams.get(SpecialKeywords.DS_FILE);
+		String dsArgs = testParams.get(SpecialKeywords.DS_ARGS);
+		String dsUid = testParams.get(SpecialKeywords.DS_UID);
+		String dsStaticArgs = "";
+		
+		
+	    if (parameters != null) {
+	    	//reinitialize parameters from annotation if any
+	    	if (!parameters.path().isEmpty())
+	    		dsFile = parameters.path();
+	    	
+	    	if (!parameters.dsArgs().isEmpty())
+	    		dsArgs = parameters.dsArgs();
+	    	
+	    	if (!parameters.dsUid().isEmpty())
+	    		dsUid = parameters.dsUid();
+	    	
+	    	if (!parameters.staticArgs().isEmpty())
+	    		dsStaticArgs = parameters.staticArgs();
+	    }		
+		
+		this.testParams = testParams;
+		this.dsFile = dsFile;
+		this.xlsSheet = null;
+		this.args = new ArrayList<String>();
+		this.uidArgs = new ArrayList<String>();
+		this.staticArgs = new ArrayList<String>();
+
+		if(dsArgs != null && !dsArgs.isEmpty())
+		{
+			args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
+		}
+		if(dsUid != null && !dsUid.isEmpty())
+		{
+			uidArgs = Arrays.asList(dsUid.replace(",", ";").replace(" ", "").split(";"));
+		}
+		
+		if(dsStaticArgs != null && !dsStaticArgs.isEmpty())
+		{
+			staticArgs = Arrays.asList(dsStaticArgs.replace(",", ";").replace(" ", "").split(";"));
+		}
+	}
+	
+	public String getDsFile()
+	{
+		return dsFile;
 	}
 
-	public void setXlsFile(String xlsFile)
+	public void setDsFile(String xlsFile)
 	{
-		this.xlsFile = xlsFile;
+		this.dsFile = xlsFile;
 	}
 
 	public String getXlsSheet()
@@ -184,6 +253,14 @@ public class XLSDSBean
 	public void setTestParams(Map<String, String> testParams)
 	{
 		this.testParams = testParams;
+	}
+	
+	public DataProviderType getDsType() {
+		return dsType;
+	}
+
+	public void setDsType(DataProviderType dsType) {
+		this.dsType = dsType;
 	}
 
 	public String argsToString(List<String> args, Map<String, String> params)
