@@ -131,7 +131,7 @@ public class ZafiraIntegrator {
 		}
 		catch (Exception e) {
 			isRegistered = false;
-			LOGGER.error(e.getMessage());
+			LOGGER.error("Undefined error during test run registration!", e);
 		}
 
 	}
@@ -146,7 +146,7 @@ public class ZafiraIntegrator {
 			//LOGGER.debug("run: " + finishedRun.getId() + "|" + finishedRun.getClass() + "|" + finishedRun.getBuildNumber() + "|" + finishedRun.getJobId() + "|" + finishedRun.getTestSuiteId() + "|" + finishedRun.getUserId() + "|" + finishedRun.getScmBranch());
 		}
 		catch (Exception e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error("Undefined error during test run finish!", e);
 		}
 	}
 	
@@ -186,7 +186,7 @@ public class ZafiraIntegrator {
 		}
 		catch (Exception e) {
 			isRegistered = false;
-			LOGGER.error(e.getMessage());
+			LOGGER.error("Undefined error during test case/method finish!", e);
 		}
 		return registeredTest;
 	}
