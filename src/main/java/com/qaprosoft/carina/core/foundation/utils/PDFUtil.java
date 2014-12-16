@@ -67,6 +67,14 @@ public class PDFUtil
 		{
 			try
 			{
+				if (cosDoc != null)
+				{
+					cosDoc.close();
+				}
+				if (pdDoc != null)
+				{
+					pdDoc.close();
+				}
 				if (inputStream != null)
 				{
 					inputStream.close();

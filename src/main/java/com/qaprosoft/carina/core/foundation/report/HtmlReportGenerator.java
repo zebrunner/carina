@@ -118,11 +118,14 @@ public class HtmlReportGenerator
 	public static void generate(String rootDir)
 	{
 		copyGalleryLib();
-		List<File> testFolders = FileManager.getFilesInDir(new File(rootDir));
-		for (File testFolder : testFolders)
+		List<File> folders = FileManager.getFilesInDir(new File(rootDir));
+		for (File folder : folders)
 		{
-			List<File> images = FileManager.getFilesInDir(testFolder);
-			createReportAsHTML(testFolder, images);
+			if(!ReportContext.ARTIFACTS_FOLDER.equals(folder.getName()))
+			{
+				List<File> images = FileManager.getFilesInDir(folder);
+				createReportAsHTML(folder, images);
+			}
 		}
 	}
 
