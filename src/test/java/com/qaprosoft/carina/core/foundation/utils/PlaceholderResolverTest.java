@@ -45,7 +45,7 @@ public class PlaceholderResolverTest
 	public void testValidtion()
 	{
 		Assert.assertFalse(PlaceholderResolver.isValid(loopedProperties));
-		Assert.assertFalse(PlaceholderResolver.isValid(noPlaceholderDefProperties));
+//		Assert.assertFalse(PlaceholderResolver.isValid(noPlaceholderDefProperties));
 		Assert.assertTrue(PlaceholderResolver.isValid(validProperties));
 	}
 
@@ -54,5 +54,6 @@ public class PlaceholderResolverTest
 	{
 		Assert.assertEquals(PlaceholderResolver.resolve(validProperties, "holiday2"), "New Year 2014");
 		Assert.assertEquals(PlaceholderResolver.resolve(validProperties, "greeting"), "We wish you a Merry Cristmas and happy New Year 2014!");
+		Assert.assertEquals(PlaceholderResolver.resolve(noPlaceholderDefProperties, "key1"), "${key3}");
 	}
 }

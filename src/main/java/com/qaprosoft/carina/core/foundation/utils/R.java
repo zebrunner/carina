@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
-import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
 
 /**
  * R - loads properties from resource files.
@@ -81,11 +80,12 @@ public enum R
 					properties.load(overrideResource.openStream());
 					LOGGER.info("Override properties loaded: " + String.format(OVERRIDE_FORMAT, resource.resourceFile));
 				}
-				
-				if(CONFIG.equals(resource) && !PlaceholderResolver.isValid(properties))
-				{
-					throw new PlaceholderResolverException();
-				}
+		
+				// TODO: may we skip the validation?
+//				if(CONFIG.equals(resource) && !PlaceholderResolver.isValid(properties))
+//				{
+//					throw new PlaceholderResolverException();
+//				}
 				
 				propertiesHolder.put(resource.resourceFile, properties);
 			} 

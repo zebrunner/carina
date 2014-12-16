@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -37,6 +39,10 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 public class ReportContext
 {
 	private static final Logger LOGGER = Logger.getLogger(ReportContext.class);
+	
+	public static final String ARTIFACTS_FOLDER = "artifacts";
+	
+	public static final String TEMP_FOLDER = "temp";
 
 	private static File baseDirectory;
 
@@ -84,7 +90,7 @@ public class ReportContext
 	{
 		if (tempDirectory == null)
 		{
-			tempDirectory = new File(getBaseDir().getAbsolutePath() + "/temp");
+			tempDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), TEMP_FOLDER));
 			boolean isCreated = tempDirectory.mkdir();
 			if (!isCreated)
 			{
@@ -98,7 +104,7 @@ public class ReportContext
 	{
 		if (artifactsDirectory == null)
 		{
-			artifactsDirectory = new File(getBaseDir().getAbsolutePath() + "/artifacts");
+			artifactsDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), ARTIFACTS_FOLDER));
 			boolean isCreated = artifactsDirectory.mkdir();
 			if (!isCreated)
 			{
@@ -145,6 +151,20 @@ public class ReportContext
 				break;
 			}
 		}
+	}
+	
+	public static void saveArtifact(String name, InputStream source) throws IOException
+	{
+		File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
+		artifact.createNewFile();
+		FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
+	}
+	
+	public static void saveArtifact(File source) throws IOException
+	{
+		File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
+		artifact.createNewFile();
+		FileUtils.copyFile(source, artifact);
 	}
 
 	/**

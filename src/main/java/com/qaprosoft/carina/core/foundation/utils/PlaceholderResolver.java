@@ -51,12 +51,16 @@ public class PlaceholderResolver
 			{
 				String placeholder = matcher.group();
 				String placeholderKey = placeholder.replace("${", "").replace("}", "");
-				value = value.replace(placeholder, resolve(properties, placeholderKey));
+				String resolvedValue = resolve(properties, placeholderKey);
+				if(resolvedValue != null)
+				{
+					value = value.replace(placeholder, resolvedValue);
+				}
 			}
 		}
 		else
 		{
-			throw new PlaceholderResolverException(key);
+			LOGGER.warn("Value not resolved by key: " + key);
 		}
 		return value;
 	}
