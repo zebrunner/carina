@@ -71,7 +71,7 @@ public class CellLinksIntegrationTest
 	@Test
 	public void testCellLinksForCurrentWB()
 	{
-		XLSTable table = XLSParser.parseSpreadSheet("ParentTest.xlsx", "Sheet1");
+		XLSTable table = XLSParser.parseSpreadSheet("xlsx_data/ParentTest.xlsx", "Sheet1");
 		verifyHeaders(table.getHeaders());
 		verifyDataRow(firstRow, table.getHeaders(), table.getDataRows().get(0));
 		verifyDataRow(secondRow, table.getHeaders(), table.getDataRows().get(1));
