@@ -4,6 +4,8 @@ package com.qaprosoft.carina.core.foundation.utils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
 /**
  * Tests for {@link Configuration}
  */
@@ -32,5 +34,13 @@ public class ConfugurationTest
 	{
 		System.setProperty("platform", "{must_override}");
 		Configuration.validateConfiguration();
+	}
+	
+	@Test
+	public void testConfigurationPlacehodler()
+	{
+		System.setProperty("env", "STG");
+		Assert.assertEquals(Configuration.getEnvArg("url"), "http://localhost:8081");
+		Assert.assertEquals(Configuration.get(Parameter.URL), "http://localhost:8081");
 	}
 }
