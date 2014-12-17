@@ -43,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
 {
     // Dropbox client
