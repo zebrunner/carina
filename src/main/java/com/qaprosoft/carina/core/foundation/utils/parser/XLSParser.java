@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.parser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -200,7 +201,7 @@ public class XLSParser
 	
 	public static XLSChildTable parseCellLinks(Cell cell, Workbook wb, Sheet sheet) 
 	{
- 		if(cell == null) return null;
+ 		if(cell == null) return null; 		
  		
 		if(cell.getCellType() == Cell.CELL_TYPE_FORMULA)
 		{
@@ -215,7 +216,8 @@ public class XLSParser
 					if(wb instanceof XSSFWorkbook)
 					{							
 						ExternalLinksTable link = ((XSSFWorkbook) wb).getExternalLinksTable().get(externalLinkNumber);
-						XSSFWorkbook childWb = (XSSFWorkbook) XLSCache.getWorkbook(link.getLinkedFileName());
+						File file = new File(XLSCache.getWorkbookPath(wb));
+						XSSFWorkbook childWb = (XSSFWorkbook) XLSCache.getWorkbook(file.getParent() + "/" + link.getLinkedFileName());
 						if (childWb == null)  throw new DataLoadingException(String.format("WorkBook '%s' doesn't exist!",  link.getLinkedFileName()));
 						for(int i = 0; i < childWb.getNumberOfSheets(); i++)
 						{
@@ -281,7 +283,8 @@ public class XLSParser
 						if(wb instanceof XSSFWorkbook)
 						{	
 							ExternalLinksTable link = ((XSSFWorkbook) wb).getExternalLinksTable().get(Integer.valueOf(paths.get(0)) - 1);
-							XSSFWorkbook childWb = (XSSFWorkbook) XLSCache.getWorkbook(link.getLinkedFileName());						
+							File file = new File(XLSCache.getWorkbookPath(wb));
+							XSSFWorkbook childWb = (XSSFWorkbook) XLSCache.getWorkbook(file.getParent() + "/" +link.getLinkedFileName());						
 							
 							if (childWb == null)  throw new DataLoadingException(String.format("WorkBook '%s' doesn't exist!",  paths.get(0)));
 							childSheet = childWb.getSheet(paths.get(1));
