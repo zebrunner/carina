@@ -465,7 +465,7 @@ public abstract class AbstractTest extends DriverHelper
 	}
 	
 	
-	@DataProvider(name = "XLSDataProvider")
+	@DataProvider(name = "XLSDataProvider", parallel=true)
 	public Object[][] getDataFromXlsFile(final Method testMethod,
 			ITestContext context) {
 
