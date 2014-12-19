@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.parser;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -51,5 +52,15 @@ public class XLSCache
 			xlsCache.put(xlsPath, wb);
 		}
 		return xlsCache.get(xlsPath);
+	}
+	
+	public static synchronized String getWorkbookPath(Workbook book)
+	{
+		for (Entry<String, Workbook> entry : xlsCache.entrySet()) 
+		{
+			if(entry.getValue() == book)
+				return entry.getKey();
+		}
+		return null;
 	}
 }
