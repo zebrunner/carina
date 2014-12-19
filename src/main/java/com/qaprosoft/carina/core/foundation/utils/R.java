@@ -82,10 +82,20 @@ public enum R
 				}
 		
 				// TODO: may we skip the validation?
-//				if(CONFIG.equals(resource) && !PlaceholderResolver.isValid(properties))
-//				{
-//					throw new PlaceholderResolverException();
-//				}
+				// if(CONFIG.equals(resource) && !PlaceholderResolver.isValid(properties))
+				// {
+				//		throw new PlaceholderResolverException();
+				// }
+				
+				// Overrides properties by systems values
+				for(Object key : properties.keySet())
+				{
+					String systemValue = System.getProperty((String) key);
+					if(!StringUtils.isEmpty(systemValue))
+					{
+						properties.put(key, systemValue);
+					}
+				}
 				
 				propertiesHolder.put(resource.resourceFile, properties);
 			} 
@@ -101,6 +111,11 @@ public enum R
 		this.resourceFile = resourceKey;
 	}
 
+	public void put(String key, String value)
+	{
+		propertiesHolder.get(resourceFile).put(key, value);
+	}
+	
 	/**
 	 * Returns value either from systems properties or config properties context.
 	 * Systems properties have higher priority.
@@ -110,10 +125,8 @@ public enum R
 	 */
 	public String get(String key)
 	{
-		String startupProperty = System.getProperty(key);
-		String configProperty = 
+		String value = 
 				CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key) : propertiesHolder.get(resourceFile).getProperty(key);
-		String value = !StringUtils.isEmpty(startupProperty) ? startupProperty : configProperty;
 		// TODO: why we return empty instead of null?
 		return value != null ? decrypt(value) : StringUtils.EMPTY;
 	}

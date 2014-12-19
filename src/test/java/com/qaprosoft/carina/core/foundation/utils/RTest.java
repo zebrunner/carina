@@ -13,7 +13,7 @@ public class RTest
 	public void testOverrideBySystemParam()
 	{
 		final String BROWSER = "firefox";
-		System.setProperty("browser", BROWSER);
+		R.CONFIG.put("browser", BROWSER);
 		Assert.assertEquals(R.CONFIG.get("browser"), BROWSER);
 	}
 	
