@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
@@ -43,7 +44,8 @@ public class PlaceholderResolver
 	 */
 	public static String resolve(Properties properties, String key)
 	{
-		String value = properties.getProperty(key);
+		String startupProperty = System.getProperty(key);
+		String value = !StringUtils.isEmpty(startupProperty) ? startupProperty : properties.getProperty(key);
 		if(value != null)
 		{
 			Matcher matcher = PATTERN.matcher(value);
