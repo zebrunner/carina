@@ -8,8 +8,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSTable;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
 
 public class CellLinksIntegrationTest
 {

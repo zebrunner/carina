@@ -67,5 +67,7 @@ public class SpecialKeywords
 	public static final String HTML_REPORT = "emailable-report.html";
 	public static final String NULL = "NULL";
 
+	public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
+	public static final String JIRA_ARGS_MAP = "jiraArgsMap";
 	
 }
