@@ -39,7 +39,7 @@ public class XMLNameStrategy implements INamingStrategy
 	public String getCanonicalTestName(ITestResult result) {
 		
 		@SuppressWarnings("unchecked")
-		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute("testNameMappedToArgs");
+		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
 		
 		String testName = "";
 		

@@ -41,7 +41,7 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -72,7 +72,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		{
 			if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_ARGS))
 			{				
-				XLSDSBean dsBean = new XLSDSBean(result.getTestContext());
+				DSBean dsBean = new DSBean(result.getTestContext());
 				int index = 0;
 				for (String arg : dsBean.getArgs())
 				{

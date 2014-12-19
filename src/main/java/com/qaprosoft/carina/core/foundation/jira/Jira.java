@@ -106,7 +106,7 @@ public class Jira
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute("jiraTicketsMappedToArgs");		
+		Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.JIRA_ARGS_MAP);
 		if (testnameJiraMap != null) {
 			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
 			if (testnameJiraMap.containsKey(testHash)) {
