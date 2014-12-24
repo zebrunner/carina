@@ -63,7 +63,9 @@ public class ZafiraIntegrator {
 	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
 	
 	public static void startSuite(ITestContext context) {
-		if (!isValid() && !isRegistered)
+		if (!isValid())
+			return;
+		if (isRegistered) //AUTO-731 jobs with several test classes are not registered in zafira reporting service
 			return;
 		
 		try {
