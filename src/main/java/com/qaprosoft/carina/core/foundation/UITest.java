@@ -67,8 +67,11 @@ public class UITest extends AbstractTest
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
     	super.executeBeforeTestSuite(context);
+    	
+    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+		
 
-	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE  && getDriver(true) == null)
+	    if (driverMode == DriverMode.SUITE_MODE  && getDriver(true) == null)
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
 	    	if (!initDriver(context.getSuite().getName())) {
@@ -83,15 +86,17 @@ public class UITest extends AbstractTest
     		DriverPool.associateTestNameWithDriver("BeforeSuite " + context.getSuite().getName(), driver);
     		
 			initSummary(driver);
-    		
 	    }
+
     }
     
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
-    	super.executeBeforeTestClass(context);    	
+    	super.executeBeforeTestClass(context);
+    	
+    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
 
-	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
+	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
 			driver = DriverPool.getSingleDriver();
@@ -101,7 +106,7 @@ public class UITest extends AbstractTest
 	    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
 			}
 	    }
-		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver(true) == null)
+		if (driverMode == DriverMode.CLASS_MODE && getDriver(true) == null)
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
 	    	if (!initDriver(this.getClass().getName())) {
@@ -116,14 +121,18 @@ public class UITest extends AbstractTest
     		DriverPool.associateTestNameWithDriver("BeforeClass " + this.getClass().getName(), driver);
     		
 			initSummary(driver);
-	    }    		
+	    }
     }
     
     @BeforeMethod(alwaysRun = true)
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
-		super.executeBeforeTestMethod(xmlTest, testMethod, context);    	
-	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
+		super.executeBeforeTestMethod(xmlTest, testMethod, context);
+		quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
+		
+		DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+		
+	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
 			driver = DriverPool.getSingleDriver();
@@ -135,8 +144,10 @@ public class UITest extends AbstractTest
 			}
 	    }
 	    
+
+	    
 		String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
-    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE && getDriver(true) == null)
+    	if (driverMode == DriverMode.METHOD_MODE && getDriver(true) == null)
     	{
     		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
 	    	if (!initDriver(test)) {
@@ -150,8 +161,7 @@ public class UITest extends AbstractTest
 			initSummary(driver);
 			
     	}
-    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE ||
-    			Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE) {
+    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 			startRecording();
     	}		    	
 
@@ -164,47 +174,14 @@ public class UITest extends AbstractTest
     {
     	try
     	{	    
-    		quitExtraDriver(); //all extraDrivers should be exited after test method!
-//    		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
-//		    WebDriver drv = getDriver(sessionId);
-	
-//			String testName = TestNamingUtil.getCanonicalTestName(result);
-	
-//		    File testLogFile = new File(ReportContext.getTestDir(testName) + "/test.log");
-//		    if (!testLogFile.exists()) testLogFile.createNewFile();
-//		    FileWriter fw = new FileWriter(testLogFile);
-//		    
-//		    if (drv != null)
-//		    {
-//				fw.append("\r\n**************************** UI logs ****************************\r\n\r\n");
-//				
-//				try
-//				{
-//					//fw.append(TestLogHelper.getSessionLogs(testName));
-//					fw.append(TestLogHelper.getSessionLogs(drv));
-//				}
-//				catch (Exception e)
-//				{
-//				    LOGGER.error("AfterTest - unable to get test logs. " + e.getMessage());
-//				}
-//	
-//		    }
-//		    try
-//		    {
-//				fw.close();
-//		    }
-//		    catch (Exception e)
-//		    {
-//		    	LOGGER.error("Error during FileWriter close. " + e.getMessage());
-//		    	e.printStackTrace();
-//		    }	
+    		quitExtraDriver(); 
+    		DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
 			
-	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE ||
-	    			Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE) {
+	    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 				stopRecording(TestNamingUtil.getCanonicalTestName(result));
 	    	}
 	    	
-	    	if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.METHOD_MODE) {
+	    	if (driverMode == DriverMode.METHOD_MODE) {
 	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
 				quitDriver();
 			}	    	
@@ -221,6 +198,7 @@ public class UITest extends AbstractTest
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
     	try {
+    		quitExtraDriver();
     	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver() != null)
     	    {
     	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
@@ -239,6 +217,7 @@ public class UITest extends AbstractTest
     @AfterSuite(alwaysRun = true)
     public void executeAfterTestSuite(ITestContext context)
     {
+    	quitExtraDriver();
 	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE && getDriver() != null)
 	    {
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterSuite.");
