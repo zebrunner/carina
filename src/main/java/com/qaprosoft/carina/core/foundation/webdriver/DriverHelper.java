@@ -1597,6 +1597,7 @@ public class DriverHelper
 	{
 		return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
 	}
+	
 	/**
 	 * Find Extended Web Element on page using By.
 	 * 
@@ -1637,6 +1638,10 @@ public class DriverHelper
     
     public ExtendedWebElement findExtendedWebElement(By by) {
     	return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
+    }
+    
+    public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
+    	return findExtendedWebElement(by, by.toString(), timeout);
     }
 	
 	public List<ExtendedWebElement> findExtendedWebElements(By by) {
@@ -1691,6 +1696,9 @@ public class DriverHelper
 		return driver;
 	}
 	public ExtendedWebElement format(ExtendedWebElement element, Object...objects) {
+		return format(element, EXPLICIT_TIMEOUT, objects);
+	}
+	public ExtendedWebElement format(ExtendedWebElement element, long timeout, Object...objects) {
 		String locator = element.getBy().toString();
 		By by = null;
 		if (locator.startsWith("By.id: "))
@@ -1720,7 +1728,7 @@ public class DriverHelper
 		
 		ExtendedWebElement res = null;
 		try {
-			res = findExtendedWebElement(by);
+			res = findExtendedWebElement(by, timeout);
 		} catch (Exception e) {
 			res = new ExtendedWebElement(null, element.getName(), by);
 		}

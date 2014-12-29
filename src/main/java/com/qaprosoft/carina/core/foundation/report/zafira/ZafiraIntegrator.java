@@ -63,7 +63,9 @@ public class ZafiraIntegrator {
 	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
 	
 	public static void startSuite(ITestContext context) {
-		if (!isValid() && !isRegistered)
+		if (!isValid())
+			return;
+		if (isRegistered) //AUTO-731 jobs with several test classes are not registered in zafira reporting service
 			return;
 		
 		try {
@@ -100,11 +102,7 @@ public class ZafiraIntegrator {
 			
 			String configXML = getConfiguration();
 			
-			if (ciBuildCause.equalsIgnoreCase("MANUALTRIGGER")) {
-				run = registerTestRunByHUMAN(suite.getId(), user.getId(),
-						gitUrl, gitBranch, gitCommit, configXML, job.getId(),
-						build, Initiator.HUMAN, workItem);
-			} else if (ciBuildCause.equalsIgnoreCase("UPSTREAMTRIGGER")) {
+			if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
 				//register/retrieve anonymous
 				UserType anonymousUser = registerUser(ANONYMOUS_USER);
 				//register parentJob
@@ -114,10 +112,14 @@ public class ZafiraIntegrator {
 						gitCommit, configXML, job.getId(), parentJob.getId(),
 						parentBuild, build,
 						Initiator.UPSTREAM_JOB, workItem);
-			} else if (ciBuildCause.equalsIgnoreCase("TIMERTRIGGER")) {
+			} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
 				run = registerTestRunBySCHEDULER(suite.getId(), gitUrl,
 						gitBranch, gitCommit, configXML, job.getId(),
 						build, Initiator.SCHEDULER, workItem);
+			} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
+				run = registerTestRunByHUMAN(suite.getId(), user.getId(),
+						gitUrl, gitBranch, gitCommit, configXML, job.getId(),
+						build, Initiator.HUMAN, workItem);
 			} else {
 				throw new RuntimeException("Unable to register test run for zafira service: " + zafiraUrl + " due to the misses build cause: '" + ciBuildCause +"'");
 			}
