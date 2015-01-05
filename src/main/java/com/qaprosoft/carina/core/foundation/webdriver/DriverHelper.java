@@ -1695,10 +1695,8 @@ public class DriverHelper
 		
 		return driver;
 	}
+
 	public ExtendedWebElement format(ExtendedWebElement element, Object...objects) {
-		return format(element, EXPLICIT_TIMEOUT, objects);
-	}
-	public ExtendedWebElement format(ExtendedWebElement element, long timeout, Object...objects) {
 		String locator = element.getBy().toString();
 		By by = null;
 		if (locator.startsWith("By.id: "))
@@ -1728,7 +1726,7 @@ public class DriverHelper
 		
 		ExtendedWebElement res = null;
 		try {
-			res = findExtendedWebElement(by, timeout);
+			res = findExtendedWebElement(by, IMPLICIT_TIMEOUT); //by default use implicit timeout for dynamic elements observation 
 		} catch (Exception e) {
 			res = new ExtendedWebElement(null, element.getName(), by);
 		}
