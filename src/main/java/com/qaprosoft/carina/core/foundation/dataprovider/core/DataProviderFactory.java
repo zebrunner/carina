@@ -73,33 +73,10 @@ public class DataProviderFactory {
         		e.printStackTrace();
         		//do nothing
         	}
-        	
-/*            DataProviderType dataProviderType = DataProviderType.fromString(getAnnotationName(annotation));
-            switch (dataProviderType) {
-                case XLS_DATA_SOURCE:
-                    XlsDataProvider xmlDataProvider = new XlsDataProvider();
-                    provider = ArrayUtils.addAll(provider, xmlDataProvider.getDataProvider(annotation, context));
-                    testNameArgsMap.putAll(xmlDataProvider.getTestNameArgsMap());
-                    jiraArgsMap.putAll(xmlDataProvider.getJiraArgsMap());
-                    break;
-                case CSV_DATA_SOURCE:
-                    CsvDataProvider csvDataProvider = new CsvDataProvider();
-                    provider = ArrayUtils.addAll(provider, csvDataProvider.getDataProvider(annotation, context));
-                    testNameArgsMap.putAll(csvDataProvider.getTestNameArgsMap());
-                    jiraArgsMap.putAll(csvDataProvider.getJiraArgsMap());
-                    break;
-                case UNKNOWN:
-                    break;
-            }*/
         }
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
         return provider;
     }
 
-/*
-    private static String getAnnotationName(Annotation annotation) {
-        Class<? extends Annotation> annotationType = annotation.annotationType();
-        return annotationType.getSimpleName();
-    }*/
 }

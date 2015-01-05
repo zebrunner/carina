@@ -556,7 +556,7 @@ public abstract class AbstractTest extends DriverHelper
 	}
 	
 	 @DataProvider(name = "DataProvider")
-	    public Object[][] createData1(final Method testMethod,
+	    public Object[][] createData(final Method testMethod,
 	                                  ITestContext context) {
 	        Annotation[] annotations = testMethod.getDeclaredAnnotations();
 	        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context);
