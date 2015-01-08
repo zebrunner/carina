@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.utils.parser;
+package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
 import java.util.HashMap;
 import java.util.Map;

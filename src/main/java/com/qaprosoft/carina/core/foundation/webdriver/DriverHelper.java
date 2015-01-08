@@ -1600,6 +1600,7 @@ public class DriverHelper
 	{
 		return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
 	}
+	
 	/**
 	 * Find Extended Web Element on page using By.
 	 * 
@@ -1640,6 +1641,10 @@ public class DriverHelper
     
     public ExtendedWebElement findExtendedWebElement(By by) {
     	return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
+    }
+    
+    public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
+    	return findExtendedWebElement(by, by.toString(), timeout);
     }
 	
 	public List<ExtendedWebElement> findExtendedWebElements(By by) {
@@ -1693,6 +1698,7 @@ public class DriverHelper
 		
 		return driver;
 	}
+
 	public ExtendedWebElement format(ExtendedWebElement element, Object...objects) {
 		String locator = element.getBy().toString();
 		By by = null;
@@ -1723,7 +1729,7 @@ public class DriverHelper
 		
 		ExtendedWebElement res = null;
 		try {
-			res = findExtendedWebElement(by);
+			res = findExtendedWebElement(by, IMPLICIT_TIMEOUT); //by default use implicit timeout for dynamic elements observation 
 		} catch (Exception e) {
 			res = new ExtendedWebElement(null, element.getName(), by);
 		}

@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.listeners.TestArgsListener;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 
 public class ParameterGenerator {
 

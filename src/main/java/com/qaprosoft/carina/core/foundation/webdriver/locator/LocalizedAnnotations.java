@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
 
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 
 public class LocalizedAnnotations extends Annotations
 {
