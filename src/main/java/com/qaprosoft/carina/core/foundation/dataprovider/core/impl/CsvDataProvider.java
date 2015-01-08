@@ -2,6 +2,7 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;

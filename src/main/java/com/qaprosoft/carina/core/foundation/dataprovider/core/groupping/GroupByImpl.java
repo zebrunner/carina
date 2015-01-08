@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
+package com.qaprosoft.carina.core.foundation.dataprovider.core.groupping;
 
 import java.util.*;
 
@@ -8,7 +8,7 @@ import java.util.*;
 
 public class GroupByImpl {
 
-    public static Object[][] getOrderedProvider(Object[][] objects, int fieldNumber) {
+    public static Object[][] getGroupedDataProviderArgs(Object[][] objects, int fieldNumber) {
 
         List<Object[]> listOfObjects = sortDefaultObject(objects, fieldNumber);
         Iterator iterator = listOfObjects.iterator();
@@ -46,7 +46,7 @@ public class GroupByImpl {
 
     }
 
-    public static Object[][] getOrderedProvider(Object[][] objects, String fieldName) {
+    public static Object[][] getGroupedDataProviderMap(Object[][] objects, String fieldName) {
 
         List<Object[]> listOfObjects = sortMapObject(objects, fieldName);
         Iterator iterator = listOfObjects.iterator();
