@@ -44,6 +44,11 @@ public class SpecialKeywords
 	public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
 	public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
 	public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
+	public static final String DS_ARGS = "{ds_args}";
+	public static final String DS_UID = "{ds_uid}";
+	public static final String DS_JIRA = "{ds_jira}";
+	public static final String DS_FLAG = "{ds_flag}";
+	public static final String DS_FILE = "{ds_file}";
 	public static final String TUID = "TUID";
 	
 	public static final String TEST_LOG_ID = "{test_log_id}";
@@ -62,5 +67,7 @@ public class SpecialKeywords
 	public static final String HTML_REPORT = "emailable-report.html";
 	public static final String NULL = "NULL";
 
+	public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
+	public static final String JIRA_ARGS_MAP = "jiraArgsMap";
 	
 }

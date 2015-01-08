@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,11 @@ import org.testng.annotations.DataProvider;
 import org.testng.xml.XmlTest;
 
 import com.jayway.restassured.RestAssured;
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
@@ -60,11 +66,7 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.dataprovider.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSDSBean;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSParser;
-import com.qaprosoft.carina.core.foundation.utils.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.zafira.client.model.TestType;
 
@@ -177,7 +179,7 @@ public abstract class AbstractTest extends DriverHelper
 			{
 				tla.closeResource(test);
 			}
-		    
+
 		}
 		catch (Exception e)
 		{
@@ -271,7 +273,7 @@ public abstract class AbstractTest extends DriverHelper
     @Deprecated
     public Object[][] createTestArgSets(String xlsFile, String xlsSheet, String dsArgs, String dsUids, ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
-		XLSDSBean dsBean = new XLSDSBean(xlsFile, xlsSheet, dsArgs, dsUids);
+		DSBean dsBean = new DSBean(xlsFile, xlsSheet, dsArgs, dsUids);
 		
 		XLSTable dsData = XLSParser.parseSpreadSheet(xlsFile, xlsSheet, executeColumn, executeValue);
 		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
@@ -303,17 +305,16 @@ public abstract class AbstractTest extends DriverHelper
 		    rowIndex++;
 		}
 
-		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
-		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
-		
+		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameMappedToArgs);
+		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraTicketsMappedToArgs);
 		return args;
     }
     
     @Deprecated
     public Object[][] createTestArgSets(String xlsSheet, String dsArgs, String dsUids, ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
-    	XLSDSBean dsBean = new XLSDSBean(context);
-    	return createTestArgSets(dsBean.getXlsFile(), xlsSheet, dsArgs, dsUids, context, executeColumn, executeValue, staticArgs);
+    	DSBean dsBean = new DSBean(context);
+    	return createTestArgSets(dsBean.getDsFile(), xlsSheet, dsArgs, dsUids, context, executeColumn, executeValue, staticArgs);
     }
     
     
@@ -321,8 +322,8 @@ public abstract class AbstractTest extends DriverHelper
     @Deprecated
     public Object[][] createTestArgSets2(String sheet, ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
-		XLSDSBean dsBean = new XLSDSBean(context);
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), sheet, executeColumn, executeValue);
+		DSBean dsBean = new DSBean(context);
+		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(), sheet, executeColumn, executeValue);
 		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
 		
 		String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
@@ -352,38 +353,37 @@ public abstract class AbstractTest extends DriverHelper
 		    rowIndex++;
 		}
 
-		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
-		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
-		
+		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameMappedToArgs);
+		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraTicketsMappedToArgs);
 		return args;
     }
     
     @Deprecated
     public Object[][] createTestArgSets2(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
     {
-		XLSDSBean dsBean = new XLSDSBean(context);    	
+		DSBean dsBean = new DSBean(context);
     	return createTestArgSets2(dsBean.getXlsSheet(), context, executeColumn, executeValue, staticArgs);
 
     }
     
-    @Deprecated
-    @DataProvider(name = "excel_ds2")
-    public Object[][] readDataFromXLS2(ITestContext context)
-    {
-		return createTestArgSets2(context, "Execute", "Y");
-    }
-    
-    @Deprecated
-    public Object[][] createTestArgSets(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
-    {
-		String[] argNames = ArrayUtils.addAll(context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_ARGS).split(";"), staticArgs);
-		XLSDSBean dsBean = new XLSDSBean(context);
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
-		Object[][] args = new Object[dsData.getDataRows().size()][argNames.length];
-		
-		String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
-		
-		int rowIndex = 0;
+   @Deprecated
+		@DataProvider(name = "excel_ds2")
+		public Object[][] readDataFromXLS2(ITestContext context)
+		{
+			return createTestArgSets2(context, "Execute", "Y");
+		}
+
+		@Deprecated
+		public Object[][] createTestArgSets(ITestContext context, String executeColumn, String executeValue, String... staticArgs)
+		{
+			String[] argNames = ArrayUtils.addAll(context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_ARGS).split(";"), staticArgs);
+			DSBean dsBean = new DSBean(context);
+			XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), executeColumn, executeValue);
+			Object[][] args = new Object[dsData.getDataRows().size()][argNames.length];
+
+			String jiraColumnName = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
+
+			int rowIndex = 0;
 		for (Map<String, String> xlsRow : dsData.getDataRows())
 		{
 			String testName = context.getName();
@@ -416,8 +416,8 @@ public abstract class AbstractTest extends DriverHelper
 		}
 		
 		
-		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
-		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
+		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameMappedToArgs);
+		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraTicketsMappedToArgs);
 
 		return args;
     }
@@ -471,7 +471,7 @@ public abstract class AbstractTest extends DriverHelper
 
 		XlsDataSourceParameters parameters = testMethod
 				.getAnnotation(XlsDataSourceParameters.class);
-		XLSDSBean dsBean = new XLSDSBean(parameters, context
+		DSBean dsBean = new DSBean(parameters, context
 				.getCurrentXmlTest().getAllParameters());
 
 		String executeColumn = "Execute";
@@ -483,7 +483,7 @@ public abstract class AbstractTest extends DriverHelper
 		if (!parameters.executeValue().isEmpty())
 			executeValue = parameters.executeValue();
 
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getXlsFile(),
+		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(),
 				dsBean.getXlsSheet(), executeColumn, executeValue);
 
 		List<String> argsList = dsBean.getArgs();
@@ -549,11 +549,18 @@ public abstract class AbstractTest extends DriverHelper
 			rowIndex++;
 		}
 
-		context.setAttribute("testNameMappedToArgs", testNameMappedToArgs);
-		context.setAttribute("jiraTicketsMappedToArgs", jiraTicketsMappedToArgs);
+		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameMappedToArgs);
+		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraTicketsMappedToArgs);
 
 		return args;
 	}
 	
-	
+	 @DataProvider(name = "DataProvider")
+	    public Object[][] createData(final Method testMethod,
+	                                  ITestContext context) {
+	        Annotation[] annotations = testMethod.getDeclaredAnnotations();
+	        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context);
+	        return objects;
+	    }
+
 }
