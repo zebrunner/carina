@@ -29,6 +29,7 @@ import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -1552,7 +1553,8 @@ public class DriverHelper
 		}
 		else
 		{
-			summary.log(Messager.ELEMENT_NOT_PRESENT.getMessage(extWebElement.getNameWithLocator()));
+			Assert.fail(Messager.ELEMENT_NOT_PRESENT.getMessage(extWebElement.getNameWithLocator()));
+//			summary.log(Messager.ELEMENT_NOT_PRESENT.getMessage(extWebElement.getNameWithLocator()));
 		}
 	}
 
@@ -1570,7 +1572,8 @@ public class DriverHelper
 		}
 		else
 		{
-			summary.log(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(extWebElement.toString(), text));
+			Assert.fail(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(extWebElement.toString(), text));
+//			summary.log(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(extWebElement.toString(), text));
 		}
 	}
 
