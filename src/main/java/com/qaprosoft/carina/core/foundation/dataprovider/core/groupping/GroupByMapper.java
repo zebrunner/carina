@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
+package com.qaprosoft.carina.core.foundation.dataprovider.core.groupping;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,15 +13,15 @@ public class GroupByMapper {
 
     private static Set<String> instanceString;
 
-    private static boolean isHashMapped = false;
+    private static boolean hashMapped = false;
 
 
-    public static boolean isIsHashMapped() {
-        return isHashMapped;
+    public static boolean isHashMapped() {
+        return hashMapped;
     }
 
     public static void setIsHashMapped(boolean isHashMapped) {
-        GroupByMapper.isHashMapped = isHashMapped;
+        GroupByMapper.hashMapped = isHashMapped;
     }
 
 
