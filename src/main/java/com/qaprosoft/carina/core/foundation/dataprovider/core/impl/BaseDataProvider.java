@@ -15,7 +15,7 @@ import java.util.Map;
  * Created by Patotsky on 19.12.2014.
  */
 
-public abstract class BaseDataProvider{
+public abstract class BaseDataProvider {
 
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
@@ -24,6 +24,7 @@ public abstract class BaseDataProvider{
     protected List<String> argsList;
 
     protected List<String> staticArgsList;
+
 
     public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context);
 
@@ -34,12 +35,17 @@ public abstract class BaseDataProvider{
                         .toString());
     }
 
+
+
     public Map<String, String> getTestNameArgsMap() {
 
         return testNameArgsMap;
     }
 
+
     public Map<String, String> getJiraArgsMap() {
         return jiraArgsMap;
     }
+
+
 }
