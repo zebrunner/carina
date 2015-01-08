@@ -1,18 +1,19 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.GroupByImpl;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.GroupByMapper;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-
-import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -34,6 +35,7 @@ public class DataProviderFactory {
         
 
         Object[][] provider = new Object[][]{};
+
         for (Annotation annotation : annotations) {
         	try {
         		Class<? extends Annotation> type = annotation.annotationType();
@@ -74,9 +76,37 @@ public class DataProviderFactory {
         		//do nothing
         	}
         }
+
+		if (!GroupByMapper.getInstanceInt().isEmpty()||!GroupByMapper.getInstanceStrings().isEmpty()){
+			provider = getOrderedList(provider);
+		}
+
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
         return provider;
     }
+
+
+	private static Object[][] getOrderedList(Object[][] provider){
+		Object[][] finalProvider;
+		if (GroupByMapper.isIsHashMapped()){
+			if (GroupByMapper.getInstanceStrings().size()==1){
+				finalProvider = GroupByImpl.getOrderedProvider(provider,GroupByMapper.getInstanceStrings().iterator().next());
+			}
+			else{
+				throw new RuntimeException("Incorrect group by parameters");
+			}
+		}
+		else{
+			if (GroupByMapper.getInstanceInt().size()==1&&!GroupByMapper.getInstanceInt().contains(-1)){
+				finalProvider = GroupByImpl.getOrderedProvider(provider,GroupByMapper.getInstanceInt().iterator().next());
+			}
+			else {
+				throw new RuntimeException("Incorrect group by parameters");
+			}
+		}
+
+	return finalProvider;
+	}
 
 }

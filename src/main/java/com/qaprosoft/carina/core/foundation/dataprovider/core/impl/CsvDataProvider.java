@@ -1,36 +1,29 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import au.com.bytecode.opencsv.CSVReader;
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 
-import au.com.bytecode.opencsv.CSVReader;
-
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Created by Patotsky on 16.12.2014.
  */
 public class CsvDataProvider extends BaseDataProvider {
 
-	protected static final Logger LOGGER = Logger.getLogger(CsvDataProvider.class);
+    protected static final Logger LOGGER = Logger.getLogger(CsvDataProvider.class);
 
-    
-	@Override
+
+    @Override
     public Object[][] getDataProvider(Annotation annotation, ITestContext context) {
         CsvDataSourceParameters parameters = (CsvDataSourceParameters) annotation;
         DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest().getAllParameters());
-        
+
         String executeColumn, executeValue;
         char separator, quote;
 
@@ -42,30 +35,40 @@ public class CsvDataProvider extends BaseDataProvider {
         List<String> argsList = dsBean.getArgs();
         List<String> staticArgsList = dsBean.getStaticArgs();
 
+        String groupByParameter = parameters.groupColumn();
+        if (!groupByParameter.isEmpty()) {
+            GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
+            GroupByMapper.getInstanceStrings().add(groupByParameter);
+        }
+
+        if (parameters.dsArgs().isEmpty() )
+        {
+            GroupByMapper.setIsHashMapped(true);
+        }
         CSVReader reader;
         List<String[]> list = new ArrayList<String[]>();
-        
+
         try {
-        	String csvFile = ClassLoader.getSystemResource(dsBean.getDsFile()).getFile();
+            String csvFile = ClassLoader.getSystemResource(dsBean.getDsFile()).getFile();
             reader = new CSVReader(new FileReader(csvFile), separator, quote);
             list = reader.readAll();
         } catch (IOException e) {
-        	LOGGER.error("Unable to read data from CSV DataProvider", e.getCause());
+            LOGGER.error("Unable to read data from CSV DataProvider", e.getCause());
             e.printStackTrace();
         }
-        
+
         if (list.size() == 0) {
-        	throw new RuntimeException("Unable to retrieve data from CSV DataProvider! Verify separator and quote settings.");
+            throw new RuntimeException("Unable to retrieve data from CSV DataProvider! Verify separator and quote settings.");
         }
         List<String> headers = Arrays.asList((String[]) list.get(0));
-        
+
         Map<String, Integer> mapper = getMapper(argsList, headers, executeColumn);
         list.remove(0);
 
         Iterator<String[]> iter = list.iterator();
         while (iter.hasNext()) {
-        	int index = mapper.get(executeColumn);
-        	
+            int index = mapper.get(executeColumn);
+
             String[] line = (String[]) iter.next();
             if (!line[index].equalsIgnoreCase(executeValue)) {
                 iter.remove();
@@ -115,7 +118,7 @@ public class CsvDataProvider extends BaseDataProvider {
         } else {
             throw new RuntimeException("Unable to find column '" + filterColumn + "' in DataProvider among '" + headers + "'!  Verify separator and quote settings.");
         }
-        
+
         return mapper;
     }
 

@@ -21,4 +21,6 @@ public @interface XlsDataSourceParameters {
     String executeValue() default "y";
 
     String staticArgs() default "";
+
+    String groupColumn() default "";
 }

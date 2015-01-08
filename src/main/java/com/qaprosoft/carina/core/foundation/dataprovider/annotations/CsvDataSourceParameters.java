@@ -26,4 +26,6 @@ public @interface CsvDataSourceParameters {
     String executeValue() default "y";
 
     String staticArgs() default "";
+
+    String groupColumn() default "";
 }
