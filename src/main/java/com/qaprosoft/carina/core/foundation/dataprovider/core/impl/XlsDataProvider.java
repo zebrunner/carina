@@ -59,8 +59,16 @@ public class XlsDataProvider extends BaseDataProvider {
             if (argsList.size() == 0) {
             	//process each column in xlsRow data obligatory replacing special keywords like UUID etc
             	for (Map.Entry<String, String> entry : xlsRow.entrySet()) {
-            		String newValue = ParameterGenerator.process(entry.getValue().toString(), context.getAttribute(SpecialKeywords.UUID).toString()).toString();
-            		if (!entry.getValue().toString().equals(newValue)) {
+            		String value = entry.getValue();
+            		if (value == null)
+            			continue;
+        			
+            		Object param = ParameterGenerator.process(entry.getValue().toString(), context.getAttribute(SpecialKeywords.UUID).toString());
+        			if (param == null)
+        				continue;
+            		
+        			String newValue = param.toString();
+            		if (!value.equals(newValue)) {
             			entry.setValue(newValue);
             		}
             	}
@@ -81,10 +89,8 @@ public class XlsDataProvider extends BaseDataProvider {
                     args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
                 }
             }
-            // update testName adding UID values from DataSource arguments if
-            // any
+            // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, xlsRow);
-            //testName = dsBean.setDataSorceUUID(testName, xlsRow);
             
 
             testNameArgsMap.put(
