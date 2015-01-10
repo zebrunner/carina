@@ -56,7 +56,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.spira.SpiraTestIntegrator;
+import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -136,7 +136,6 @@ public abstract class AbstractTest extends DriverHelper
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
     	//do nothing for now
-    	SpiraTestIntegrator.logTestCaseInfo(this.getClass().getName());
     }
 
     @AfterClass(alwaysRun = true)
@@ -170,10 +169,9 @@ public abstract class AbstractTest extends DriverHelper
 		    	ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
 		    }
 		    
-
 		    //clear jira tickets to be sure that next test is not affected.
 		    jiraTickets.clear();
-
+		    
 		    ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if(tla != null)
 			{
@@ -221,27 +219,33 @@ public abstract class AbstractTest extends DriverHelper
 		    String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 	
 		    String title = null;
+		    String suiteName = "";
+		    TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
+		    String status = testResult.getName();
+		    
 		    if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName()))
 		    {
-				String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? context.getSuite().getXmlSuite().getName() : Configuration
+				suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context.getSuite().getXmlSuite().getName() : Configuration
 					.get(Parameter.SUITE_NAME);
 				String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
 					.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
-				title = String.format(XML_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-						xmlFile, env, driverTitle);			
+				title = String.format(XML_TITLE, status, suiteName, xmlFile, env, driverTitle);			
 		    }
 		    else
 		    {
-				String suiteName = Configuration.isNull(Parameter.SUITE_NAME) ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
-				title = String.format(CLASS_TITLE, EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).name(), suiteName,
-						env, driverTitle);			
+				suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
+				title = String.format(CLASS_TITLE, status, suiteName, env, driverTitle);			
 		    }
 		    
 		    ReportContext.getTempDir().delete();
 	
 		    // Update JIRA
 		    Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
-	
+		    
+		    //Update Spira		    
+		    
+		    Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, Spira.getStepResults());
+		    
 		    // Generate email report
 		    EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),
 		    		deviceName, browser, DateUtils.now(), getCIJobReference(), EmailReportItemCollector.getTestResults(),
@@ -250,6 +254,7 @@ public abstract class AbstractTest extends DriverHelper
 		    String emailContent = report.getEmailBody();
 		    EmailManager.send(title, emailContent, Configuration.get(Parameter.EMAIL_LIST), Configuration.get(Parameter.SENDER_EMAIL), 
 			    Configuration.get(Parameter.SENDER_PASSWORD));
+		    
 		    
 		    // Store emailable report under emailable-report.html
 		    ReportContext.generateHtmlReport(emailContent);
@@ -440,7 +445,6 @@ public abstract class AbstractTest extends DriverHelper
 		    Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
 		}
     }
-
     
     private String getCIJobReference()
     {

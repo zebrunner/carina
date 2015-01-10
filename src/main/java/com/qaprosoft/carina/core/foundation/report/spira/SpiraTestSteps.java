@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.foundation.report.spira;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * This defines the 'SpiraTestSteps' annotation used to specify the
