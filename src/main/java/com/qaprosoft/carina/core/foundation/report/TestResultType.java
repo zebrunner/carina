@@ -27,14 +27,51 @@ public enum TestResultType
 	SKIP("SKIP");
 
 	private String result;
+	
+	int passed;
+	int failed;
+	int skipped;
 
 	TestResultType(String result)
 	{
 		this.result = result;
+	}
+	
+	TestResultType(String result, int passed, int failed, int skipped)
+	{
+		this.result = result;
+		this.passed = passed;
+		this.failed = failed;
+		this.skipped = skipped;
 	}
 
 	public String getName()
 	{
 		return result;
 	}
+	
+	public int getPassed() {
+		return passed;
+	}
+
+	public void setPassed(int passed) {
+		this.passed = passed;
+	}
+
+	public int getFailed() {
+		return failed;
+	}
+
+	public void setFailed(int failed) {
+		this.failed = failed;
+	}
+
+	public int getSkipped() {
+		return skipped;
+	}
+
+	public void setSkipped(int skipped) {
+		this.skipped = skipped;
+	}
+
 }

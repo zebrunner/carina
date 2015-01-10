@@ -262,6 +262,9 @@ public class EmailReportGenerator
 		} else {
 			result = TestResultType.FAIL;
 		}
+		result.setPassed(passed);
+		result.setFailed(failed);
+		result.setSkipped(skipped);
 		return result;
 		
 	}
@@ -292,4 +295,5 @@ public class EmailReportGenerator
 		}
 		return reasonText;
 	}
+	
 }

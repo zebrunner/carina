@@ -30,7 +30,7 @@ import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.report.spira.SpiraTestIntegrator;
+import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
@@ -101,7 +101,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		Messager.TEST_PASSED.info(test, DateUtils.now());
 		
 	    //Spira test steps integration
-	    SpiraTestIntegrator.logTestStepsInfo(result);	
+	    Spira.updateAfterTest(result, null);
 
 	    ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
 		super.onTestSuccess(result);
@@ -130,7 +130,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 			
-			SpiraTestIntegrator.logTestStepsInfo(result, thr);
+			Spira.updateAfterTest(result, thr);
 			
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
 		}
