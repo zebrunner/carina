@@ -73,6 +73,9 @@ public class XlsDataProvider extends BaseDataProvider {
             if (argsList.size() == 0) {
             	//process each column in xlsRow data obligatory replacing special keywords like UUID etc
             	for (Map.Entry<String, String> entry : xlsRow.entrySet()) {
+            		if (entry == null)
+            			continue;
+            		
             		String value = entry.getValue();
             		if (value == null)
             			continue;
