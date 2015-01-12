@@ -72,7 +72,7 @@ public class DriverHelper
 	protected static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
 
 	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
-
+	
 	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
 	protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_TIMEOUT);
@@ -121,11 +121,11 @@ public class DriverHelper
 	// --------------------------------------------------------------------------
 
 	public void setImplicitTimeout(long implicit_wait){
-		getDriver().manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);		
+		getDriver().manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 	}
 	
 	public long getImplicitTimeout(){
-		return Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+		return IMPLICIT_TIMEOUT;
 	}	
 	/**
 	 * Initializes test log container dedicated to WebDriver instance.
@@ -1614,7 +1614,8 @@ public class DriverHelper
 	{
 		ExtendedWebElement element;
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		setImplicitTimeout(0);
+		//drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -1632,10 +1633,12 @@ public class DriverHelper
 		{
 			element = null;
 			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
-			drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+			//drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
 		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		//drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return element;
 	}	
     
@@ -1700,6 +1703,9 @@ public class DriverHelper
 	}
 
 	public ExtendedWebElement format(ExtendedWebElement element, Object...objects) {
+		return format(IMPLICIT_TIMEOUT, element, objects);
+	}
+	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object...objects) {
 		String locator = element.getBy().toString();
 		By by = null;
 		if (locator.startsWith("By.id: "))
@@ -1729,7 +1735,7 @@ public class DriverHelper
 		
 		ExtendedWebElement res = null;
 		try {
-			res = findExtendedWebElement(by, IMPLICIT_TIMEOUT); //by default use implicit timeout for dynamic elements observation 
+			res = findExtendedWebElement(by, timeout); 
 		} catch (Exception e) {
 			res = new ExtendedWebElement(null, element.getName(), by);
 		}
