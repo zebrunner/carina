@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -89,7 +90,7 @@ public abstract class AbstractTest extends DriverHelper
     protected List<String> jiraTickets = new ArrayList<String>();
 
     protected String browserVersion = "";
-    
+    protected long startDate;
    
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
@@ -101,6 +102,7 @@ public abstract class AbstractTest extends DriverHelper
 		    // Set SoapUI log4j properties
 		    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 	
+		    startDate = new Date().getTime();
 		    LOGGER.info(Configuration.asString());
 //		    Configuration.validateConfiguration();
 	
@@ -244,7 +246,7 @@ public abstract class AbstractTest extends DriverHelper
 		    
 		    //Update Spira		    
 		    
-		    Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, Spira.getStepResults());
+		    Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, Spira.getStepResults(), startDate);
 		    
 		    // Generate email report
 		    EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),

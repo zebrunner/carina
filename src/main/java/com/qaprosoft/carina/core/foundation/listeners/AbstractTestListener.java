@@ -158,6 +158,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}			
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
+			
+			Spira.updateAfterTest(result, thr);
 
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
 		}

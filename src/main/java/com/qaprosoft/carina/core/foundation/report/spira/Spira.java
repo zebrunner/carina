@@ -91,13 +91,13 @@ public class Spira
 		}
 	}
 
-	public synchronized static void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, String details)
+	public synchronized static void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, String details, long startDate)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				 updater.updateAfterSuite(testClass, testResult, message, testName, details);
+				 updater.updateAfterSuite(testClass, testResult, message, testName, details, startDate);
 			}
 			catch(Exception e)
 			{

@@ -24,7 +24,7 @@ public class DefaultSpiraUpdater implements ISpiraUpdater
 {
 
 	@Override
-	public void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, String details) {
+	public void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, String details, long startDate) {
 		// DO nothing by default
 		
 	}
