@@ -12,4 +12,5 @@ import java.lang.annotation.*;
 public @interface SpiraTestCase
 {
 	int testCaseId () default -1;
+	int projectId () default -1;
 }

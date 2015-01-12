@@ -230,8 +230,6 @@ public class Configuration
 		
 		SPIRA_UPDATER("spira_updater"),
 		
-		SPIRA_PROJECT_ID("spira_project_id"),
-		
 		SPIRA_RELEASE_ID("spira_release_id"),
 		
 		SPIRA_TESTSET_ID("spira_testset_id"),
