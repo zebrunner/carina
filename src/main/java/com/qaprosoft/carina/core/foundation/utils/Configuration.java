@@ -220,7 +220,17 @@ public class Configuration
 		ADB_HOST("adb_host"),
 		
 		ADB_PORT("adb_port"),
-		
+
+		//TestRail
+
+		TESTRAIL_URL("testrail_url"),
+
+		TESTRAIL_USER("testrail_user"),
+
+		TESTRAIL_PASSWORD("testrail_password"),
+
+		TESTRAIL_UPDATER("testrail_updater"),
+
 		// spira
 		SPIRA_URL("spira_url"),
 		

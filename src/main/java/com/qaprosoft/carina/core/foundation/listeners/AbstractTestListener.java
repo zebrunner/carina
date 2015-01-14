@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import org.apache.commons.io.FileUtils;
 import org.testng.IResultMap;
 import org.testng.ITestContext;
@@ -53,7 +54,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onStart(ITestContext context)
 	{
 		context.setAttribute(SpecialKeywords.UUID, StringGenerator.generateNumeric(8));
-		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
@@ -101,8 +101,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		Messager.TEST_PASSED.info(test, DateUtils.now());
 		
 	    //Spira test steps integration
-	    Spira.updateAfterTest(result, null);
-
+	    Spira.updateAfterTest(result);
+		TestRail.updateAfterTest(result);
 	    ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
 		super.onTestSuccess(result);
 	}
@@ -131,7 +131,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 			
 			Spira.updateAfterTest(result, thr);
-			
+			TestRail.updateAfterTest(result,thr);
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
 		}
 		super.onTestFailure(result);
@@ -160,7 +160,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
 			
 			Spira.updateAfterTest(result, thr);
-
+			TestRail.updateAfterTest(result,thr);
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
 		}
 		super.onTestSkipped(result);
@@ -170,7 +170,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onFinish(ITestContext context)
 	{
 		ZafiraIntegrator.finishSuite();
-		//removeIncorrectlyFailedTests(testContext);
 		TestNamingUtil.releaseTestFromThread(Thread.currentThread().getId());
 		super.onFinish(context);
 	}
