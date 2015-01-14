@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Target(value=java.lang.annotation.ElementType.TYPE)
 public @interface SpiraTestCase
 {
-	int testCaseId () default -1;
-	int projectId () default -1;
+	int testCaseId ();
+	int projectId ();
 }
