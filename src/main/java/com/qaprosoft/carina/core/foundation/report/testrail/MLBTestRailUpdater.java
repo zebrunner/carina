@@ -7,6 +7,7 @@ import com.qaprosoft.carina.core.foundation.report.testrail.dto.Run;
 import com.qaprosoft.carina.core.foundation.report.testrail.dto.User;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import org.json.simple.JSONObject;
 import org.testng.ITestResult;
 
 import java.lang.reflect.Method;
@@ -46,14 +47,15 @@ public class MLBTestRailUpdater implements ITestRailUpdater {
         apiClient.setPassword(password);
 
         Object obj = apiClient.sendRequest(User.getUserByEmail(user));
-        userId = (Integer) (((HashMap) obj).get("id"));
+        userId = Integer.parseInt(((HashMap) obj).get("id").toString());
     }
 
 
     @Override
     public void updateBeforeSuite(String className) {
         Object obj = apiClient.sendRequest(Run.addRun(getSuiteId(className), DateUtils.now().toString(), userId, getProjectId(className)));
-        runId = (Integer) (((HashMap) obj).get("id"));
+        runId = Integer.parseInt(((HashMap) obj).get("id").toString());
+
 
 
     }
