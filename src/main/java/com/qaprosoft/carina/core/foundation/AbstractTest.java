@@ -79,15 +79,23 @@ import com.qaprosoft.zafira.client.model.TestType;
  */
 public abstract class AbstractTest extends DriverHelper
 {
+	@Deprecated
 	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
+	@Deprecated
 	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
+	
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
     protected static final String CLASS_TITLE = "%s:%s %s - %s (%s)";
     protected static final String XML_TITLE = "%s:%s %s (%s) - %s (%s)";
 
+    //3rd party integrations
     //Jira ticket(s)
-    protected List<String> jiraTickets = new ArrayList<String>();
+    private List<String> jiraTickets = new ArrayList<String>();
+    //Spira step(s)
+    private List<String> spiraSteps = new ArrayList<String>();
+    //TestRails case(s)
+    private List<String> testRailsCases = new ArrayList<String>();
 
     protected String browserVersion = "";
     protected long startDate;
@@ -161,9 +169,17 @@ public abstract class AbstractTest extends DriverHelper
 		    if (jiraTickets.size() == 0) { //it was not redefined in the test
 		    	jiraTickets = Jira.getTickets(result);
 		    }
-		    
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);	    
 		    Jira.updateAfterTest(result);
+		    
+		    //Populate Spira Steps
+		    if (spiraSteps.size() == 0) { //it was not redefined in the test
+		    	spiraSteps = Spira.getSteps(result);
+		    }
+			result.setAttribute(SpecialKeywords.SPIRA_TESTSTEPS_ID, spiraSteps);	    
+		    Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
+		    
+		    
 		    
 		    //TODO: implement zafira work items population
 		    TestType testType = TestNamingUtil.getZafiraTest(test);
@@ -173,6 +189,8 @@ public abstract class AbstractTest extends DriverHelper
 		    
 		    //clear jira tickets to be sure that next test is not affected.
 		    jiraTickets.clear();
+		    spiraSteps.clear();
+		    testRailsCases.clear();
 		    
 		    ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if(tla != null)
@@ -465,17 +483,36 @@ public abstract class AbstractTest extends DriverHelper
 
     protected abstract boolean isUITest();
     
-	protected void setJiraTicket(String ticket) {
-		jiraTickets = new ArrayList<String>();
-		jiraTickets.add(ticket);
-	}
-	protected void setJiraTicket(String[] tickets) {
-		jiraTickets = new ArrayList<String>();
+    
+	/**
+	 * Redefine Jira tickets from test.
+	 * @param tickets to set
+	 */
+	protected void setJiraTicket(String...tickets) {
 		for (String ticket : tickets) {
 			jiraTickets.add(ticket);
 		}
 	}
 	
+	/**
+	 * Redefine SpiraTest steps from test.
+	 * @param steps to set
+	 */
+	protected void setSpiraStep(String...steps) {
+		for (String step : steps) {
+			spiraSteps.add(step);
+		}
+	}
+
+	/**
+	 * Redefine TestRails cases from test.
+	 * @param cases to set
+	 */
+	protected void setTestRailsCase(String...cases) {
+		for (String _case : cases) {
+			testRailsCases.add(_case);
+		}
+	}
 	
     @Deprecated	
 	@DataProvider(name = "XLSDataProvider", parallel=true)

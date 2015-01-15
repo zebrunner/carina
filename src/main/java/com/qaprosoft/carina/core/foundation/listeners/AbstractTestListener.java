@@ -24,13 +24,13 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
@@ -41,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -100,10 +99,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		Messager.TEST_PASSED.info(test, DateUtils.now());
 		
-	    //Spira test steps integration
-	    Spira.updateAfterTest(result, null);
-
-	    ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
+		ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
 		super.onTestSuccess(result);
 	}
 
@@ -116,21 +112,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		if (count >= maxCount && result.getThrowable().getMessage() != null)
 		{
-			String errorMessage = "";
-			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-			if (thr != null) {
-				errorMessage = getFullStackTrace(thr);
-			}
-			
-			if (result.getThrowable() != null) {
-				thr = result.getThrowable();
-				errorMessage = getFullStackTrace(thr);
-			}			
-			
-
+			String errorMessage = getFailureReason(result);
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
 			
-			Spira.updateAfterTest(result, thr);
 			
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
 		}
@@ -146,21 +130,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		if (count >= maxCount)
 		{
-			String errorMessage = "";
-			Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-			if (thr != null) {
-				//errorMessage = thr.getMessage();
-				errorMessage = getFullStackTrace(thr);
-			}
-			if (result.getThrowable() != null) {
-				thr = result.getThrowable();
-				errorMessage = getFullStackTrace(thr);
-			}			
+			String errorMessage = getFailureReason(result);
 			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
 			
-			Spira.updateAfterTest(result, thr);
-
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
 		}
 		super.onTestSkipped(result);
@@ -253,7 +226,26 @@ public abstract class AbstractTestListener extends TestArgsListener
 		return testResultItem;
 	}
 	
-	protected String getFullStackTrace(Throwable thr) {
+	protected String getFailureReason(ITestResult result) {
+		String errorMessage = "";
+		String message = "";
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		if (thr != null) {
+			errorMessage = getFullStackTrace(thr);
+			message = thr.getMessage();
+		}
+		
+		if (result.getThrowable() != null) {
+			thr = result.getThrowable();
+			errorMessage = getFullStackTrace(thr);
+			message = thr.getMessage();
+		}
+		
+		result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE, message);
+		return errorMessage;
+	}
+	
+	private String getFullStackTrace(Throwable thr) {
 		String stackTrace = "";
 		
 	    if (thr != null) {
@@ -265,5 +257,5 @@ public abstract class AbstractTestListener extends TestArgsListener
             }
 	    }
 	    return stackTrace;
-	}	
+	}
 }
