@@ -102,6 +102,7 @@ public class Jira
 			tickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
 		}
 		if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
+			tickets.clear();
 			tickets.add(result.getMethod().getDescription().split("#")[1].trim()); 
 		}
 
@@ -110,10 +111,10 @@ public class Jira
 		if (testnameJiraMap != null) {
 			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
 			if (testnameJiraMap.containsKey(testHash)) {
+				tickets.clear();
 				tickets.add(testnameJiraMap.get(testHash));
 			}
 		}
 		return tickets;
-		
 	}
 }

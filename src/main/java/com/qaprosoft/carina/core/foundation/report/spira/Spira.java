@@ -15,9 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.report.spira;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 
@@ -35,8 +32,6 @@ public class Spira
 	private static ISpiraUpdater updater;
 	private static boolean isInitialized = false;
 	
-	private static final LinkedHashMap<String, String> spiraStepsResult = new LinkedHashMap<String, String>();
-	
 	static
 	{
 		try
@@ -51,25 +46,6 @@ public class Spira
 		}
 	}
 
-	public static synchronized void putStepResult(String step, String result)
-	{
-		spiraStepsResult.put(step, result);
-	}
-	
-	public static synchronized String getStepResult(String step)
-	{
-		return spiraStepsResult.get(step);
-	}
-	
-	public static synchronized String getStepResults() {
-		//combine all test steps into single String
-		String res = "";
-		for (Map.Entry<String,String> entry : spiraStepsResult.entrySet()) {
-			res = res + entry.getKey() + " : " + entry.getValue() + "\n"; 
-		}
-		return res;
-	}
-	
 	public synchronized static void updateAfterTest(ITestResult result)
 	{
 		updateAfterTest(result, null);
@@ -91,13 +67,13 @@ public class Spira
 		}
 	}
 
-	public synchronized static void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, String details, long startDate)
+	public synchronized static void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, long startDate)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				 updater.updateAfterSuite(testClass, testResult, message, testName, details, startDate);
+				 updater.updateAfterSuite(testClass, testResult, message, testName, startDate);
 			}
 			catch(Exception e)
 			{
