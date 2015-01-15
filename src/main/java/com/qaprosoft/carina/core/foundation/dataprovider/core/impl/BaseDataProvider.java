@@ -20,9 +20,10 @@ public abstract class BaseDataProvider {
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
     protected Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+	protected Map<String, String> spiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+    protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
-    protected List<String> argsList;
-
+	protected List<String> argsList;
     protected List<String> staticArgsList;
 
 
@@ -35,17 +36,22 @@ public abstract class BaseDataProvider {
                         .toString());
     }
 
-
-
     public Map<String, String> getTestNameArgsMap() {
 
         return testNameArgsMap;
     }
 
-
     public Map<String, String> getJiraArgsMap() {
         return jiraArgsMap;
     }
+
+    public Map<String, String> getSpiraArgsMap() {
+ 		return spiraArgsMap;
+ 	}
+
+    public Map<String, String> getTestRailsArgsMap() {
+		return testRailsArgsMap;
+	}
 
 
 }

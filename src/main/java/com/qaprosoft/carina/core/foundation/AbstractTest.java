@@ -83,8 +83,8 @@ public abstract class AbstractTest extends DriverHelper
 	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
-    protected static final String CLASS_TITLE = "%s: %s - %s (%s)";
-    protected static final String XML_TITLE = "%s: %s (%s) - %s (%s)";
+    protected static final String CLASS_TITLE = "%s: %s - %s - %s (%s)";
+    protected static final String XML_TITLE = "%s: %s - %s (%s) - %s (%s)";
 
     //Jira ticket(s)
     protected List<String> jiraTickets = new ArrayList<String>();
@@ -220,7 +220,9 @@ public abstract class AbstractTest extends DriverHelper
 		    
 		    String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 	
-		    String title = null;
+		    String title = "";
+		    String app_version = !Configuration.get(Parameter.APP_VERSION).isEmpty() ? Configuration.get(Parameter.APP_VERSION) : "N/A";
+
 		    String suiteName = "";
 		    TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
 		    String status = testResult.getName();
@@ -231,12 +233,12 @@ public abstract class AbstractTest extends DriverHelper
 					.get(Parameter.SUITE_NAME);
 				String xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml" : StringUtils
 					.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
-				title = String.format(XML_TITLE, status, suiteName, xmlFile, env, driverTitle);			
+				title = String.format(XML_TITLE, status, app_version, suiteName, xmlFile, env, driverTitle);			
 		    }
 		    else
 		    {
 				suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
-				title = String.format(CLASS_TITLE, status, suiteName, env, driverTitle);			
+				title = String.format(CLASS_TITLE, status, app_version, suiteName, env, driverTitle);			
 		    }
 		    
 		    ReportContext.getTempDir().delete();
@@ -245,8 +247,7 @@ public abstract class AbstractTest extends DriverHelper
 		    Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 		    
 		    //Update Spira		    
-		    
-		    Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, Spira.getStepResults(), startDate);
+		    Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, startDate);
 		    
 		    // Generate email report
 		    EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),
@@ -471,6 +472,7 @@ public abstract class AbstractTest extends DriverHelper
 	}
 	
 	
+    @Deprecated	
 	@DataProvider(name = "XLSDataProvider", parallel=true)
 	public Object[][] getDataFromXlsFile(final Method testMethod,
 			ITestContext context) {

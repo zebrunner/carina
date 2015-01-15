@@ -40,14 +40,12 @@ public class XlsDataProvider extends BaseDataProvider {
                 dsBean.getXlsSheet(), executeColumn, executeValue);
 
         argsList = dsBean.getArgs();
-
-        if (parameters.dsArgs().isEmpty() )
+        staticArgsList = dsBean.getStaticArgs();
+        
+        if (parameters.dsArgs().isEmpty())
         {
             GroupByMapper.setIsHashMapped(true);
         }
-
-
-        staticArgsList = dsBean.getStaticArgs();
 
         String groupByParameter = parameters.groupColumn();
         if (!groupByParameter.isEmpty()) {
@@ -55,8 +53,19 @@ public class XlsDataProvider extends BaseDataProvider {
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
-        String jiraColumnName = context.getCurrentXmlTest().getParameter(
-                SpecialKeywords.EXCEL_DS_JIRA);
+        String jiraColumn = context.getCurrentXmlTest().getParameter(SpecialKeywords.EXCEL_DS_JIRA);
+        
+        if (!parameters.jiraColumn().isEmpty())
+        	jiraColumn = parameters.jiraColumn();
+        
+        String spiraColumn = "";
+        if (!parameters.spiraColumn().isEmpty())
+        	spiraColumn = parameters.spiraColumn();
+        
+        String testRailsColumn = "";
+        if (!parameters.testRailsColumn().isEmpty())
+        	testRailsColumn = parameters.testRailsColumn();
+
 
         int width = 0;
         if (argsList.size() == 0) {
@@ -110,21 +119,28 @@ public class XlsDataProvider extends BaseDataProvider {
             testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
 
-            testNameArgsMap.put(
-                    String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
 
             // add jira ticket from xls datasource to special hashMap
-            if (jiraColumnName != null) {
-                if (!jiraColumnName.isEmpty()) {
-                    jiraArgsMap.put(
-                            String.valueOf(Arrays.hashCode(args[rowIndex])),
-                            xlsRow.get(jiraColumnName));
-                }
-            }
+            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            
+            // add spira steps from xls datasource to special hashMap
+            addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            
+            // add testrails cases from xls datasource to special hashMap
+            addValueToSpecialMap(testRailsArgsMap, testRailsColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
 
             rowIndex++;
         }
 
         return args;
+    }
+    
+    private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Map<String,String> xlsRow) {
+        if (column != null) {
+            if (!column.isEmpty()) {
+            	map.put(hashCode, xlsRow.get(column));
+            }
+        }    	
     }
 }

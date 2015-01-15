@@ -23,4 +23,10 @@ public @interface XlsDataSourceParameters {
     String staticArgs() default "";
 
     String groupColumn() default "";
+    
+    String jiraColumn() default "JiraTicket";
+    
+    String spiraColumn() default "SpiraStep";
+    
+    String testRailsColumn() default "TestRailCase";
 }
