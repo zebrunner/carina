@@ -83,8 +83,8 @@ public abstract class AbstractTest extends DriverHelper
 	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
-    protected static final String CLASS_TITLE = "%s: %s - %s - %s (%s)";
-    protected static final String XML_TITLE = "%s: %s - %s (%s) - %s (%s)";
+    protected static final String CLASS_TITLE = "%s:%s %s - %s (%s)";
+    protected static final String XML_TITLE = "%s:%s %s (%s) - %s (%s)";
 
     //Jira ticket(s)
     protected List<String> jiraTickets = new ArrayList<String>();
@@ -221,7 +221,12 @@ public abstract class AbstractTest extends DriverHelper
 		    String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 	
 		    String title = "";
-		    String app_version = !Configuration.get(Parameter.APP_VERSION).isEmpty() ? Configuration.get(Parameter.APP_VERSION) : "N/A";
+		    String app_version = "";
+		    if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
+		    	//if nothing is specified then title will contain nothing
+		    	app_version = " " + Configuration.get(Parameter.APP_VERSION) + " -"; //' %s -'
+		    }
+		    
 
 		    String suiteName = "";
 		    TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
