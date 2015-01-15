@@ -19,7 +19,6 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /*
  * API test listener is responsible for log initialization/finalization and test result generation.
@@ -45,16 +44,8 @@ public class APITestListener extends AbstractTestListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String errorMessage = "";
-		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-		if (thr != null) {
-			errorMessage = getFullStackTrace(thr);
-		}
-		
-		if (result.getThrowable() != null) {
-			errorMessage = getFullStackTrace(result.getThrowable());
-		}
-		
+		String errorMessage = getFailureReason(result);
+
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
 		super.onTestFailure(result);
 	}
@@ -62,16 +53,8 @@ public class APITestListener extends AbstractTestListener
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
-		String errorMessage = "";
-		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-		if (thr != null) {
-			errorMessage = getFullStackTrace(thr);
-		}
-		
-		if (result.getThrowable() != null) {
-			errorMessage = getFullStackTrace(result.getThrowable());
-		}
-		
+		String errorMessage = getFailureReason(result);
+
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));		
 		super.onTestSkipped(result);
 	}

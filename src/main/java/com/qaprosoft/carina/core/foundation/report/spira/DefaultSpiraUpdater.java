@@ -30,7 +30,7 @@ public class DefaultSpiraUpdater implements ISpiraUpdater
 	}
 
 	@Override
-	public void updateAfterTest(ITestResult result, Throwable thr) {
+	public void updateAfterTest(ITestResult result, String errorMessager) {
 		// TODO Auto-generated method stub
 		
 	}

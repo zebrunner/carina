@@ -66,16 +66,8 @@ public class UITestListener extends AbstractTestListener {
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
 		
-		String errorMessage = "";
-		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-		if (thr != null) {
-			errorMessage = getFullStackTrace(thr);
-		}
+		String errorMessage = getFailureReason(result);
 
-		if (result.getThrowable() != null) {
-			errorMessage = getFullStackTrace(result.getThrowable());
-		}
-		
 		IRetryAnalyzer retry=result.getMethod().getRetryAnalyzer();
 		if (count < maxCount && retry == null) {
 			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
@@ -119,16 +111,9 @@ public class UITestListener extends AbstractTestListener {
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
-		//retry logic shouldn't work for Skipped tests as DriverFactory already implemented driver initializarion retry
-		String errorMessage = "";
-		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
-		if (thr != null) {
-			errorMessage = getFullStackTrace(thr);
-		}
+		//retry logic shouldn't work for Skipped tests as DriverFactory already implemented driver initialization retry
+		String errorMessage = getFailureReason(result);
 
-		if (result.getThrowable() != null) {
-			errorMessage = getFullStackTrace(result.getThrowable());
-		}
 		
 		// TestLogCollector.addScreenshotComment(takeScreenshot(result),
 		// "TEST SKIPPED - " + errorMessage);
