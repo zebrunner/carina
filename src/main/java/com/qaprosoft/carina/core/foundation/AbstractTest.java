@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -132,7 +133,8 @@ public abstract class AbstractTest extends DriverHelper
 		    {
 		    	LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 		    }
-		    
+
+			TestRail.updateBeforeSuite(this.getClass().getName());
 		}
 		catch (Throwable thr)
 		{
