@@ -15,10 +15,18 @@
  */
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.testng.ITestResult;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /*
  * TODO: Add Java doc
@@ -53,13 +61,13 @@ public class TestRail
 		updateAfterTest(result, null);
 	}
 	
-	public synchronized static void updateAfterTest(ITestResult result, Throwable thr)
+	public synchronized static void updateAfterTest(ITestResult result, String errorMessage)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				updater.updateAfterTest(result, thr);
+				updater.updateAfterTest(result, errorMessage);
 			}
 			catch(Exception e)
 			{
@@ -83,5 +91,61 @@ public class TestRail
 				LOGGER.error("TestRail 'updateAfterSuite' not performed: " + e.getMessage());
 			}
 		}
+	}
+	
+	public synchronized static List<String> getCases(ITestResult result)
+	{
+		List<String> cases = getCasesIdFromDataProvider(result); //higher priority
+		
+		if (cases.size() == 0)
+			cases = getCasesIdFromAnnotation(result); //lower priority
+
+		return cases;
+	}
+	
+	private static List<String> getCasesIdFromDataProvider(ITestResult result) {
+		List<String> cases = new ArrayList<String>();
+		@SuppressWarnings("unchecked")
+		Map<Object[], String> testNameTestRailMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
+		if (testNameTestRailMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
+			if (testNameTestRailMap.containsKey(testHash) && testNameTestRailMap.get(testHash) != null) {
+				cases = new ArrayList<String>(Arrays.asList(testNameTestRailMap.get(testHash).split(",")));
+			}
+		}
+		return cases;
+	}
+	
+	private static List<String> getCasesIdFromAnnotation(ITestResult result) {
+        Class<?> testClass;
+        String testCasesId = "";
+        try {
+            testClass = Class.forName(result.getMethod().getTestClass().getName());
+
+            //We can't use getMethod() because we may have parameterized tests
+            //for which we won't know the matching signature
+            String methodName = result.getMethod().getMethodName();
+            Method testMethod = null;
+            Method[] possibleMethods = testClass.getMethods();
+            for (Method possibleMethod : possibleMethods) {
+                if (possibleMethod.getName().equals(methodName)) {
+                    testMethod = possibleMethod;
+                    break;
+                }
+            }
+
+            if (testMethod != null) {
+                //Extract the TestRailCases test case id - if present
+                if (testMethod.isAnnotationPresent(TestRailCases.class)) {
+                    TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
+                    testCasesId = methodAnnotation.testCasesId();
+                }
+            }
+                
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+		
+		return new ArrayList<String>(Arrays.asList(testCasesId.split(",")));
 	}
 }

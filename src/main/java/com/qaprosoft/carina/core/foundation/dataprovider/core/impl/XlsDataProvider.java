@@ -63,8 +63,8 @@ public class XlsDataProvider extends BaseDataProvider {
         	spiraColumn = parameters.spiraColumn();
         
         String testRailsColumn = "";
-        if (!parameters.testRailsColumn().isEmpty())
-        	testRailsColumn = parameters.testRailsColumn();
+        if (!parameters.testRailColumn().isEmpty())
+        	testRailsColumn = parameters.testRailColumn();
 
 
         int width = 0;

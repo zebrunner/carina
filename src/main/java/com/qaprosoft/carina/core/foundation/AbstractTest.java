@@ -96,7 +96,7 @@ public abstract class AbstractTest extends DriverHelper
     //Spira step(s)
     private List<String> spiraSteps = new ArrayList<String>();
     //TestRails case(s)
-    private List<String> testRailsCases = new ArrayList<String>();
+    private List<String> testRailCases = new ArrayList<String>();
 
     protected String browserVersion = "";
     protected long startDate;
@@ -178,12 +178,17 @@ public abstract class AbstractTest extends DriverHelper
 		    if (spiraSteps.size() == 0) { //it was not redefined in the test
 		    	spiraSteps = Spira.getSteps(result);
 		    }
-			result.setAttribute(SpecialKeywords.SPIRA_TESTSTEPS_ID, spiraSteps);	    
+			result.setAttribute(SpecialKeywords.SPIRA_STEPS_ID, spiraSteps);	    
 		    Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
 		    
 		    
+		    //Populate TestRail Cases
+		    if (testRailCases.size() == 0) { //it was not redefined in the test
+		    	testRailCases = TestRail.getCases(result);
+		    }
+			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);	    
+		    TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
 		    
-		    //TODO: implement zafira work items population
 		    TestType testType = TestNamingUtil.getZafiraTest(test);
 		    if (testType != null && jiraTickets.size() > 0) {
 		    	ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
@@ -192,7 +197,7 @@ public abstract class AbstractTest extends DriverHelper
 		    //clear jira tickets to be sure that next test is not affected.
 		    jiraTickets.clear();
 		    spiraSteps.clear();
-		    testRailsCases.clear();
+		    testRailCases.clear();
 		    
 		    ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if(tla != null)
@@ -510,9 +515,9 @@ public abstract class AbstractTest extends DriverHelper
 	 * Redefine TestRails cases from test.
 	 * @param cases to set
 	 */
-	protected void setTestRailsCase(String...cases) {
+	protected void setTestRailCase(String...cases) {
 		for (String _case : cases) {
-			testRailsCases.add(_case);
+			testRailCases.add(_case);
 		}
 	}
 	
