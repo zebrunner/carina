@@ -1,12 +1,13 @@
 package com.qaprosoft.carina.core.foundation.report.testrail.dto;
 
-import com.qaprosoft.carina.core.foundation.report.testrail.TestStatus;
-import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
+import com.qaprosoft.carina.core.foundation.report.testrail.core.TestStatus;
 
 public class Results {
 

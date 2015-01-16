@@ -16,7 +16,7 @@ public enum TestStatus {
 
     }
 
-    public int getNummer() {
+    public int getNumber() {
         return i;
     }
 }

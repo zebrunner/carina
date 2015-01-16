@@ -90,7 +90,7 @@ public class DataProviderFactory {
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
         context.setAttribute(SpecialKeywords.SPIRA_ARGS_MAP, spiraArgsMap);
-        context.setAttribute(SpecialKeywords.TESTRAILS_ARGS_MAP, testRailsArgsMap);
+        context.setAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP, testRailsArgsMap);
         return provider;
     }
 

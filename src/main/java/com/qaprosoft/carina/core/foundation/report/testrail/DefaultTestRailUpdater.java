@@ -15,22 +15,20 @@
  */
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.report.spira.ISpiraUpdater;
 import org.testng.ITestResult;
 
 
-public class DefaultTestRailUpdater implements ISpiraUpdater
+public class DefaultTestRailUpdater implements ITestRailUpdater
 {
 
 	@Override
-	public void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, String details, long startDate) {
-		// DO nothing by default
+	public void updateAfterTest(ITestResult result, String errorMessage) {
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void updateAfterTest(ITestResult result, Throwable thr) {
+	public void updateBeforeSuite(String testClass) {
 		// TODO Auto-generated method stub
 		
 	}
