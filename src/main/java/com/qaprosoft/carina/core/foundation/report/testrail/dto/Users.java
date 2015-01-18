@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 /**
  * Created by Patotsky on 14.01.2015.
  */
-public class User {
+public class Users {
 
     public static Request getUserByEmail(String userEmail){
         return new Request(new JSONObject(),"get_user_by_email&email="+userEmail,"GET");

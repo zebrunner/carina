@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 /**
  * Created by Patotsky on 13.01.2015.
  */
-public class Run {
+public class Runs {
 
     public static Request addRun(int suite_id, String name, int assignedto_id, int projectID){
         JSONObject obj=new JSONObject();
