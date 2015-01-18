@@ -53,7 +53,6 @@ import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -83,7 +82,7 @@ public class DriverHelper
 
 	protected TestLogHelper summary;
 
-	protected WebDriver driver;
+	private WebDriver driver;
 	
 	protected CryptoTool cryptoTool;
 
@@ -1690,13 +1689,18 @@ public class DriverHelper
 		return extendedWebElements;
 	}	
      
+	protected void setDriver(WebDriver driver) {
+		this.driver = driver;
+	}
+	
 	protected WebDriver getDriver() {
 		if (driver == null || driver.toString().contains("null")) {
-			if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
+			driver = DriverPool.getDriverByThread(Thread.currentThread().getId());
+/*			if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE)
 		    {
 				//duty hack to replace obsolete driver for all pages
 				driver = DriverPool.getSingleDriver();
-		    }
+		    }*/
 		}
 		
 		return driver;

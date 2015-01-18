@@ -58,7 +58,7 @@ public abstract class PerformanceTest extends DriverHelper implements Callable<P
 
 		LOGGER.info(performanceTestResult.toString());
 
-		driver.quit();
+		//driver.quit();
 
 		return performanceTestResult;
 	}

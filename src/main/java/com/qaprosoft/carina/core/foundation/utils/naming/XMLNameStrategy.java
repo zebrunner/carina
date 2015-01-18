@@ -37,11 +37,13 @@ public class XMLNameStrategy implements INamingStrategy
 
 	@Override
 	public String getCanonicalTestName(ITestResult result) {
+		//verify if testName is already registered with thread then return it back
+		String testName = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
+		if (testName != null)
+			return testName;
 		
 		@SuppressWarnings("unchecked")
 		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
-		
-		String testName = "";
 		
 		if (testnameMap != null) {
 			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
@@ -50,7 +52,7 @@ public class XMLNameStrategy implements INamingStrategy
 			}
 		}
 		
-		if (testName.isEmpty())
+		if (testName == null)
 			testName = result.getTestContext().getCurrentXmlTest().getName();
 		
 		
@@ -71,21 +73,20 @@ public class XMLNameStrategy implements INamingStrategy
 			}
 		}
 		
-		String invocationID = ""; 
+		String invocationID = "";
 		if (result.getMethod().getInvocationCount() > 1){
 			invocationID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
 		}
 		
 		if (!invocationID.isEmpty()) {
-			testName = testName + " - " +  result.getMethod().getMethodName() + " (InvCount=" + invocationID + ")";
+			//testName = testName + " - " +  result.getMethod().getMethodName() + " (InvCount=" + invocationID + ")";
+			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", invocationID));;
 		}
 		else {
 			testName = testName + " - " +  result.getMethod().getMethodName();
 		}
 
-		
 		return testName;
-
 	}
 
 	@Override

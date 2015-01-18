@@ -139,6 +139,8 @@ public class Configuration
 
 		THREAD_COUNT("thread_count"),
 		
+		CORE_LOG_LEVEL("core_log_level"),
+		
 		TEST_ID("test_id"),
 		
 		IS_TESTEXECUTER("is_testexecuter"),

@@ -60,7 +60,6 @@ public class SpecialKeywords
 	public static final String TEST_LOG_ID = "{test_log_id}";
 	
 	public static final String JIRA_TICKET = "JIRA#";
-	public static final String SESSION_ID = "sessionId";
 	public static final String INITIALIZATION_FAILURE = "initializeFailure";
 	public static final String TEST_FAILURE = "testFailure";
 	public static final String UUID = "UUID";
@@ -81,5 +80,9 @@ public class SpecialKeywords
 	public static final String SPIRA_ARGS_MAP = "spiraStepsArgsMap";
 	public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
 	public static final String TESTRAIL_CASES_ID = "testRailCases";
+	
+	public static final String INVOCATION_COUNTER = " (InvCount=%s)";
+	
+	
 	
 }
