@@ -20,10 +20,12 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.zafira.client.model.TestType;
 
 /**
@@ -33,11 +35,16 @@ import com.qaprosoft.zafira.client.model.TestType;
  */
 public class TestNamingUtil
 {
+	private static final Logger LOGGER = Logger.getLogger(TestNamingUtil.class);
+	
 	private static INamingStrategy namingStrategy;
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
 	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, TestType> testName2ZafiraTest = new ConcurrentHashMap<String, TestType>();
+	
+	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
+	
 	
 	static
 	{
@@ -65,24 +72,44 @@ public class TestNamingUtil
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
 	}
 	
-	public static synchronized void accociateTest2Thread(String test, Long threadId)
+	public static synchronized String accociateTestInfo2Thread(String test, Long threadId)
 	{
+		//introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid getInvocationCount() value
+		int count = 1;
+		if (testName2Counter.containsKey(test)) {
+			count = testName2Counter.get(test) + 1;
+			LOGGER.warn(test + " test was already registered. Incrementing invocation count to " + count);
+		}
+		testName2Counter.put(test, count);
+		
+		if (count > 1) {
+			//test = test + " (InvCount=" + count + ")";
+			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", count));
+		}
+		
 		threadId2TestName.put(threadId, test);
+		testName2StartDate.put(test, new Date().getTime());
+		return test;
 	}
 	
-	public static synchronized void releaseTestFromThread(Long threadId)
+	public static synchronized void decreaseRetryCounter(String test)
+	{
+		//introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid getInvocationCount() value
+		if (testName2Counter.containsKey(test)) {
+			int count = testName2Counter.get(test) - 1;
+			testName2Counter.put(test, count);
+		}
+	}
+	
+	public static synchronized void releaseTestInfoByThread(Long threadId)
 	{
 		threadId2TestName.remove(threadId);
+		testName2StartDate.remove(threadId);
 	}
 	
-	public static String getTestByThread(Long threadId)
+	public static String getTestNameByThread(Long threadId)
 	{
 		return threadId2TestName.get(threadId);
-	}
-	
-	public static synchronized void accociateTestStartDate(String test)
-	{
-		testName2StartDate.put(test, new Date().getTime());
 	}
 	
 	public static Long getTestStartDate(String test)
@@ -90,11 +117,6 @@ public class TestNamingUtil
 		return testName2StartDate.get(test);
 	}
 	
-	public static synchronized void releaseTestStartDate(String test)
-	{
-		testName2StartDate.remove(test);
-	}	
-
 	public static synchronized void accociateZafiraTest(String test, TestType zafiraTest)
 	{
 		if (zafiraTest == null)

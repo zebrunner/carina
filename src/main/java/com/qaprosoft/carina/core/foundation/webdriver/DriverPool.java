@@ -15,10 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -28,61 +27,54 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class DriverPool
 {
+	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
+	
 	static WebDriver single_driver;
-	private static Map<WebDriver, String> driverTestMap = Collections.synchronizedMap(new HashMap<WebDriver, String>());
-	private static Map<String, WebDriver> sessionIdDriverMap = Collections.synchronizedMap(new HashMap<String, WebDriver>());
+	private static final ConcurrentHashMap<Long, WebDriver> threadId2Driver = new ConcurrentHashMap<Long, WebDriver>();
 
-	public static synchronized String registerDriverSession(WebDriver driver)
+	public static synchronized void registerDriver2Thread(WebDriver driver, Long threadId)
 	{
-		String sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
-		sessionIdDriverMap.put(sessionId, driver);
+		threadId2Driver.put(threadId, driver);
 		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
 			//init our single driver variable
 			single_driver = driver;
 		}
-		return sessionId;
+
+		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; sessionId: " + ((RemoteWebDriver) driver).getSessionId().toString() + "; driver: " + driver);
 	}
 	
-	public static synchronized String registerDriverSession(String sessionId, WebDriver driver)
+	public static WebDriver getDriverByThread(long threadId)
 	{
-		sessionIdDriverMap.put(sessionId, driver);
-		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
-			//init our single driver variable
-			single_driver = driver;
+		WebDriver drv = null;
+		if (threadId2Driver.containsKey(threadId)) {
+			drv = threadId2Driver.get(threadId);
+			LOGGER.debug("##########        GET threadId: " + threadId + "; sessionId: " + ((RemoteWebDriver) drv).getSessionId().toString() + "; driver: " + drv);
 		}
-		return sessionId;
+		else if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
+			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
+			//init our single driver variable
+			drv = single_driver;
+		}
+		return drv;
 	}
 	
-	public static String replaceDriver(String oldSessionId, WebDriver driver) {
-		sessionIdDriverMap.remove(oldSessionId);
-		return registerDriverSession(driver);
+	public static synchronized void deregisterDriverByThread(long threadId)
+	{
+		if (threadId2Driver.containsKey(threadId)) {
+			WebDriver drv = threadId2Driver.get(threadId);
+			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; sessionId: " + ((RemoteWebDriver) drv).getSessionId().toString() + "; driver: " + drv);
+			threadId2Driver.remove(threadId);
+		}
+	}
+	
+	public static void replaceDriver(WebDriver driver) {
+		long threadId = Thread.currentThread().getId();
+		threadId2Driver.remove(threadId);
+		registerDriver2Thread(driver, threadId);
 	}
 	
 	public static WebDriver getSingleDriver() {
 		return single_driver;
 	}
 	
-	public static synchronized void associateTestNameWithDriver(String test, WebDriver driver)
-	{
-		driverTestMap.put(driver, test);
-	}
-
-	public static WebDriver getDriverBySessionId(String sessionId)
-	{
-		WebDriver drv = null;
-		if (sessionIdDriverMap.containsKey(sessionId)) {
-			drv = sessionIdDriverMap.get(sessionId);
-		}
-		else if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
-			//init our single driver variable
-			drv = single_driver;
-		}
-		return drv;
-
-	}
-
-	public static String getTestNameByDriver(WebDriver driver)
-	{
-		return driverTestMap.containsKey(driver) ? driverTestMap.get(driver) : null;
-	}
 }

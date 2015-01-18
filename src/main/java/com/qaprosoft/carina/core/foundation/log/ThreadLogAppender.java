@@ -24,7 +24,7 @@ public class ThreadLogAppender extends AppenderSkeleton
 	{
 		try
 		{
-			String test = TestNamingUtil.getTestByThread(Thread.currentThread().getId());
+			String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
 			if(test == null)
 			{
 				return;

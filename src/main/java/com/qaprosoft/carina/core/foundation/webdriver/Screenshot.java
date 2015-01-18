@@ -32,6 +32,7 @@ import org.openqa.selenium.WebDriver;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 
 /**
@@ -71,9 +72,11 @@ public class Screenshot
 			try
 			{
 				// Define test screenshot root
-				String test = DriverPool.getTestNameByDriver(driver);
-				if (StringUtils.isEmpty(test))
+				String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
+				if (test == null || StringUtils.isEmpty(test)) {
+					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
 					return null;
+				}
 				File testScreenRootDir = ReportContext.getTestDir(test);
 
 				// Capture full page screenshot and resize

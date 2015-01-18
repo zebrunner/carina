@@ -21,14 +21,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.testng.Assert;
@@ -59,6 +61,7 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -69,7 +72,6 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.zafira.client.model.TestType;
 
 
@@ -78,7 +80,7 @@ import com.qaprosoft.zafira.client.model.TestType;
  * 
  * @author Alex Khursevich
  */
-public abstract class AbstractTest extends DriverHelper
+public abstract class AbstractTest //extends DriverHelper
 {
 	@Deprecated
 	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
@@ -87,6 +89,10 @@ public abstract class AbstractTest extends DriverHelper
 	
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
+	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+
+	
     protected static final String CLASS_TITLE = "%s:%s %s - %s (%s)";
     protected static final String XML_TITLE = "%s:%s %s (%s) - %s (%s)";
 
@@ -110,6 +116,16 @@ public abstract class AbstractTest extends DriverHelper
 		    PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
 		    // Set SoapUI log4j properties
 		    System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
+		    
+		    Logger root = Logger.getRootLogger();
+		    Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+	        //root.setLevel(Level.DEBUG);
+	        while (allLoggers.hasMoreElements()){
+	            Category tmpLogger = (Category) allLoggers.nextElement();
+	            if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
+	            	tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+	            }
+	        }
 	
 		    startDate = new Date().getTime();
 		    LOGGER.info(Configuration.asString());
@@ -620,4 +636,36 @@ public abstract class AbstractTest extends DriverHelper
 	        return objects;
 	    }
 
+		/**
+		 * Pause for specified timeout.
+		 * 
+		 * @param timeout
+		 *            in seconds.
+		 */
+
+		public void pause(long timeout)
+		{
+			try
+			{
+				Thread.sleep(timeout * 1000);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}	
+		
+		public void pause(Double timeout)
+		{
+			try
+			{
+				timeout = timeout * 1000;
+				long miliSec = timeout.longValue();
+				Thread.sleep(miliSec);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}	
 }

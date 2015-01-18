@@ -84,9 +84,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
 		
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		TestNamingUtil.accociateTest2Thread(test, Thread.currentThread().getId());
-		TestNamingUtil.accociateTestStartDate(test);
+		String test = TestNamingUtil.accociateTestInfo2Thread(TestNamingUtil.getCanonicalTestName(result), Thread.currentThread().getId());
 		
 		RetryCounter.initCounter(test);
 
@@ -100,6 +98,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		Messager.TEST_PASSED.info(test, DateUtils.now());
 		
 		ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "");
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSuccess(result);
 	}
 
@@ -118,6 +117,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.FAILED, errorMessage);
 		}
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestFailure(result);
 	}
 	
@@ -136,6 +136,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			
 			ZafiraIntegrator.finishTestMethod(result, com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED, errorMessage);
 		}
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
 	}
 	
@@ -144,7 +145,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		ZafiraIntegrator.finishSuite();
 		//removeIncorrectlyFailedTests(testContext);
-		TestNamingUtil.releaseTestFromThread(Thread.currentThread().getId());
 		super.onFinish(context);
 	}
 

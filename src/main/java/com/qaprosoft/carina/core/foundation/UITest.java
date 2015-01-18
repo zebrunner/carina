@@ -46,7 +46,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 @Listeners({ UITestListener.class })
 public class UITest extends AbstractTest
 {
-    protected static final Logger LOGGER = Logger.getLogger(UITest.class);
+    private static final Logger LOGGER = Logger.getLogger(UITest.class);
+    
+    protected WebDriver driver;
     
 	protected WebDriver extraDriver;
 	protected static ThreadLocal<WebDriver> webDrivers = new ThreadLocal<WebDriver>();
@@ -68,24 +70,18 @@ public class UITest extends AbstractTest
     {
     	super.executeBeforeTestSuite(context);
     	
-    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
-		
+    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);		
 
-	    if (driverMode == DriverMode.SUITE_MODE  && getDriver(true) == null)
+	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
 	    	if (!initDriver(context.getSuite().getName())) {
 	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
 	    		throw init_throwable;
 	    	}
-    		setDriver(driver);
+    		//DriverPool.associateTestNameWithDriver("BeforeSuite " + context.getSuite().getName(), driver);
     		
-    		//String sessionId = 
-    		DriverPool.registerDriverSession(driver);
-    		
-    		DriverPool.associateTestNameWithDriver("BeforeSuite " + context.getSuite().getName(), driver);
-    		
-			initSummary(driver);
+//			initSummary(driver);
 	    }
 
     }
@@ -102,25 +98,19 @@ public class UITest extends AbstractTest
 			driver = DriverPool.getSingleDriver();
 			if (driver != null) {
      	    	setDriver(driver);
-	    		String sessionId = DriverPool.registerDriverSession(driver);
-	    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
 			}
 	    }
-		if (driverMode == DriverMode.CLASS_MODE && getDriver(true) == null)
+		if (driverMode == DriverMode.CLASS_MODE && getDriver() == null)
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
 	    	if (!initDriver(this.getClass().getName())) {
 	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
 	    		throw init_throwable;
 	    	}
-    		setDriver(driver);
     		
-    		String sessionId = DriverPool.registerDriverSession(driver);
-    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
+    		//DriverPool.associateTestNameWithDriver("BeforeClass " + this.getClass().getName(), driver);
     		
-    		DriverPool.associateTestNameWithDriver("BeforeClass " + this.getClass().getName(), driver);
-    		
-			initSummary(driver);
+//			initSummary(driver);
 	    }
     }
     
@@ -139,27 +129,20 @@ public class UITest extends AbstractTest
 
 			if (driver != null) {
      	    	setDriver(driver);
-	    		String sessionId = DriverPool.registerDriverSession(driver);
-	    		context.getCurrentXmlTest().addParameter(SpecialKeywords.SESSION_ID, sessionId);
 			}
 	    }
 	    
 
 	    
 		String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
-    	if (driverMode == DriverMode.METHOD_MODE && getDriver(true) == null)
+    	if (driverMode == DriverMode.METHOD_MODE && getDriver() == null)
     	{
     		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
 	    	if (!initDriver(test)) {
 	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
 	    		throw init_throwable;
 	    	}	    		
-    		setDriver(driver);		    		
-    		
-	    	String sessionId = DriverPool.registerDriverSession(driver);
-	    	xmlTest.addParameter(SpecialKeywords.SESSION_ID, sessionId);
-			initSummary(driver);
-			
+//			initSummary(driver);
     	}
     	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 			startRecording();
@@ -234,7 +217,7 @@ public class UITest extends AbstractTest
 	// --------------------------------------------------------------------------
 	protected WebDriver createExtraDriver(String driverName, DesiredCapabilities capabilities, String selenium_host) {
 		if (extraDriver != null) {
-			LOGGER.warn("Extra Driver is already initialized! Exsting extraDriver will be closed!");
+			LOGGER.warn("Extra Driver is already initialized! Existing extraDriver will be closed!");
 			extraDriver.quit();
 		}
 		if (capabilities == null && selenium_host == null) {
@@ -265,66 +248,39 @@ public class UITest extends AbstractTest
 		}
 	}
 	
-	protected WebDriver getDriver(boolean threadOnly) {
-		if (webDrivers.get() != null && !webDrivers.get().toString().contains("null")) {
-			return webDrivers.get();
-		} else {
-			LOGGER.debug("Unable to find valid driver!");
-			return null;
-		}		
-	}
 	protected WebDriver getDriver() {
-		//webDrivers.get() or simple driver
-		//return webDrivers.get() != null ? webDrivers.get() : driver;
-		
-		if (webDrivers.get() != null && !webDrivers.get().toString().contains("null")) {
-			LOGGER.debug("Returning thread safety valid driver");
-			return webDrivers.get();
-		} else if (driver != null && !driver.toString().contains("null")) {
-			LOGGER.debug("Returning default driver as thread safety driver absent!");
-			return driver;
-		} else {
-			LOGGER.debug("Unable to find valid driver!");
-			return null;
+		long threadId = Thread.currentThread().getId();
+		WebDriver drv = DriverPool.getDriverByThread(threadId);
+		if (drv == null) {
+			LOGGER.debug("Unable to find valid driver using threadId: " + threadId);
 		}
+		return drv;
 	}
-	protected WebDriver getDriver(String sessionId) {
-		//sometime driver can be replaced by recovery system. 
-		//in this case we should analyze if current driver closed and try to find driver in DriverPool by new sessionId
-		if (webDrivers.get() == null || webDrivers.get().toString().contains("null")) {
-			driver = DriverPool.getDriverBySessionId(sessionId);
-			if (driver != null) {
-				setDriver(driver);
-				return driver;
-			}
-		}
-		return webDrivers.get();
-	}	
- 
 	 
-	protected static void setDriver(WebDriver driver) {
+	protected void setDriver(WebDriver driver) {
 		webDrivers.set(driver);
 	}
-
-	protected static void closeDriver() {
-    	webDrivers.get().close();
-    }
     
 	protected static void quitDriver() {
-    	try {
-	    	LOGGER.debug("Driver exiting..." + webDrivers.get());
-    		//webDrivers.get().close();
-	    	webDrivers.get().quit();
-	    	LOGGER.debug("Driver exited..." + webDrivers.get());
-    	}
-    	catch (Exception e) {
+		long threadId = Thread.currentThread().getId();
+		WebDriver drv = DriverPool.getDriverByThread(threadId);
+		
+		try {
+			if (drv == null) {
+				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
+			}
+
+			LOGGER.debug("Driver exiting..." + drv);
+	    	DriverPool.deregisterDriverByThread(threadId);
+			drv.quit();
+	    	LOGGER.debug("Driver exited..." + drv);
+		} catch (Exception e) {
     		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
     		LOGGER.debug("======================================================================================================================================");
-    	} finally {
+		} finally {
     		//TODO analyze how to forcibly kill session on device
 	    	webDrivers.remove();
-	    	//LOGGER.debug("Driver exited finally: " + webDrivers.get());
-    	}
+		}
     }
 	
 	protected void startRecording() {
@@ -348,13 +304,16 @@ public class UITest extends AbstractTest
 		}	
 	}
 	
-	protected boolean initDriver(String name) {
+	protected synchronized boolean initDriver(String name) {
 		int maxCount = Configuration.getInt(Parameter.RETRY_COUNT) + 1; //1 - is default run without retry
     	boolean init = false;
     	int count = 0;
     	while (!init & count++ < maxCount) {
     		try {
-    			driver = DriverFactory.create(name);
+    			WebDriver drv = DriverFactory.create(name);
+    			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
+    			driver = drv;
+    			setDriver(drv);
     			init = true;
     		}
     		catch (Throwable thr) {

@@ -30,7 +30,6 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -52,10 +51,9 @@ public class UITestListener extends AbstractTestListener {
 	@Override
 	public void onTestStart(ITestResult result) {
 		super.onTestStart(result);
-		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
-		WebDriver drv = DriverPool.getDriverBySessionId(sessionId);
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		DriverPool.associateTestNameWithDriver(test, drv);
+		//WebDriver drv = DriverPool.getDriverByThread(Thread.currentThread().getId());
+		//String test = TestNamingUtil.getCanonicalTestName(result);
+		//DriverPool.associateTestNameWithDriver(test, drv);
 	}
 
 	@Override
@@ -78,6 +76,9 @@ public class UITestListener extends AbstractTestListener {
 		{
 			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
 			LOGGER.debug("UITestListener->onTestFailure retry analyzer: " + result.getMethod().getRetryAnalyzer());
+
+			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
+			TestNamingUtil.decreaseRetryCounter(test);
 			
 			//temporary wrap into try/catch to analyze any possible failures with extended logging
 			try {
@@ -114,16 +115,12 @@ public class UITestListener extends AbstractTestListener {
 		//retry logic shouldn't work for Skipped tests as DriverFactory already implemented driver initialization retry
 		String errorMessage = getFailureReason(result);
 
-		
-		// TestLogCollector.addScreenshotComment(takeScreenshot(result),
-		// "TEST SKIPPED - " + errorMessage);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 		super.onTestSkipped(result);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-//		String test = TestNamingUtil.getCanonicalTestName(result);
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 
 		super.onTestSuccess(result);
@@ -131,10 +128,8 @@ public class UITestListener extends AbstractTestListener {
 
 	private String takeScreenshot(ITestResult result) {
 		String screenId = "";
-		String sessionId = result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.SESSION_ID);
-
-		WebDriver driver = DriverPool.getDriverBySessionId(sessionId);
-
+		WebDriver driver = DriverPool.getDriverByThread(Thread.currentThread().getId());
+		
 		if (driver != null) {
 			screenId = Screenshot.capture(driver, true); // in case of failure
 															// make screenshot
