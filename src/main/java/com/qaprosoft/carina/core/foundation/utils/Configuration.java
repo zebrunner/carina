@@ -231,6 +231,8 @@ public class Configuration
 
 		TESTRAIL_UPDATER("testrail_updater"),
 
+		TESTRAIL_MILESTONE("testrail_milestone"),
+
 		// spira
 		SPIRA_URL("spira_url"),
 		
