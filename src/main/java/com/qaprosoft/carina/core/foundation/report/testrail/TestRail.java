@@ -77,13 +77,13 @@ public class TestRail
 		}
 	}
 
-	public synchronized static void updateBeforeSuite(String testClass)
+	public synchronized static void updateBeforeSuite(String testClass, String title)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				 updater.updateBeforeSuite(testClass);
+				 updater.updateBeforeSuite(testClass, title);
 			}
 			catch(Exception e)
 			{

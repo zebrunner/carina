@@ -28,7 +28,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater
 	}
 
 	@Override
-	public void updateBeforeSuite(String testClass) {
+	public void updateBeforeSuite(String testClass, String title) {
 		// TODO Auto-generated method stub
 		
 	}
