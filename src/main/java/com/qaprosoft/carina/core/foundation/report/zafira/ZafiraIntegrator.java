@@ -78,7 +78,8 @@ public class ZafiraIntegrator {
 			
 			//register suiteOwner
 			UserType suiteOwner = registerUser(Ownership.getSuiteOwner(context));
-			suite = registerTestSuite(context.getSuite().getName(), suiteOwner.getId());
+			// TODO: add file name here
+			suite = registerTestSuite(context.getSuite().getName(), "", suiteOwner.getId());
 
 			
 			//LOGGER.debug("suite: " + suite.getId() + "|" + suite.getName() + "|" + suite.getClass() + "|" + suite.getUserId() + "|" + suite.getDescription());
@@ -249,9 +250,9 @@ public class ZafiraIntegrator {
 	}
 	
 	
-	private static TestSuiteType registerTestSuite(String suiteName, Long userId)
+	private static TestSuiteType registerTestSuite(String suiteName, String fileName, Long userId)
 	{
-		TestSuiteType testSuite = new  TestSuiteType(suiteName, userId);
+		TestSuiteType testSuite = new  TestSuiteType(suiteName, fileName, userId);
 		Response<TestSuiteType> response = zc.createTestSuite(testSuite);
 		testSuite = response.getObject();
 		
