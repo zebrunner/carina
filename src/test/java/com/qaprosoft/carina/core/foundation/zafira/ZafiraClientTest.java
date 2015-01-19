@@ -25,7 +25,7 @@ public class ZafiraClientTest
 	private TestSuiteType testSuite;
 	TestRunType testRun;
 	
-	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
+	private static final ZafiraClient zc = new ZafiraClient("http://localhost:8080/zafira");
 	
 	@Test(enabled=ENABLED)
 	public void testStatus()
@@ -56,7 +56,7 @@ public class ZafiraClientTest
 	public void testCreateTestSuite()
 	{
 		// name:R, description:NR, userId:R
-		testSuite = new  TestSuiteType("sanity", user.getId());
+		testSuite = new  TestSuiteType("sanity", "test-suite.xml", user.getId());
 		Response<TestSuiteType> response = zc.createTestSuite(testSuite);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
