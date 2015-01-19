@@ -82,7 +82,7 @@ public class DriverHelper
 
 	protected TestLogHelper summary;
 
-	private WebDriver driver;
+	protected WebDriver driver;
 	
 	protected CryptoTool cryptoTool;
 
