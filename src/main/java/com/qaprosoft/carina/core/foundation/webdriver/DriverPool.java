@@ -40,7 +40,7 @@ public class DriverPool
 			single_driver = driver;
 		}
 
-		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; sessionId: " + ((RemoteWebDriver) driver).getSessionId().toString() + "; driver: " + driver);
+		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
 	}
 	
 	public static WebDriver getDriverByThread(long threadId)
@@ -48,7 +48,7 @@ public class DriverPool
 		WebDriver drv = null;
 		if (threadId2Driver.containsKey(threadId)) {
 			drv = threadId2Driver.get(threadId);
-			LOGGER.debug("##########        GET threadId: " + threadId + "; sessionId: " + ((RemoteWebDriver) drv).getSessionId().toString() + "; driver: " + drv);
+			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
 		}
 		else if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
 			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
@@ -62,7 +62,7 @@ public class DriverPool
 	{
 		if (threadId2Driver.containsKey(threadId)) {
 			WebDriver drv = threadId2Driver.get(threadId);
-			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; sessionId: " + ((RemoteWebDriver) drv).getSessionId().toString() + "; driver: " + drv);
+			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
 			threadId2Driver.remove(threadId);
 		}
 	}
