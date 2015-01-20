@@ -235,6 +235,8 @@ public class Configuration
 
 		TESTRAIL_MILESTONE("testrail_milestone"),
 
+		TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
+
 		// spira
 		SPIRA_URL("spira_url"),
 		
