@@ -62,7 +62,7 @@ public class ZafiraIntegrator {
 
 	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
 	
-	public static void startSuite(ITestContext context) {
+	public static void startSuite(ITestContext context, String suiteFileName) {
 		if (!isValid())
 			return;
 		if (isRegistered) //AUTO-731 jobs with several test classes are not registered in zafira reporting service
@@ -78,8 +78,7 @@ public class ZafiraIntegrator {
 			
 			//register suiteOwner
 			UserType suiteOwner = registerUser(Ownership.getSuiteOwner(context));
-			// TODO: add file name here
-			suite = registerTestSuite(context.getSuite().getName(), "", suiteOwner.getId());
+			suite = registerTestSuite(context.getSuite().getName(), suiteFileName, suiteOwner.getId());
 
 			
 			//LOGGER.debug("suite: " + suite.getId() + "|" + suite.getName() + "|" + suite.getClass() + "|" + suite.getUserId() + "|" + suite.getDescription());
@@ -153,9 +152,25 @@ public class ZafiraIntegrator {
 		}
 	}
 	
-	public static TestType finishTestMethod(ITestResult result, Status status, String message) {
+	public static TestType finishTestMethod(ITestResult result, String message) {
 		if (!isValid() || !isRegistered)
 			return null;
+		
+		Status status = null;
+		switch (result.getStatus()) {
+		case ITestResult.SUCCESS:
+			status = com.qaprosoft.zafira.client.model.TestType.Status.PASSED;
+			break;
+		case ITestResult.SKIP:
+			status = com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED;
+			break;
+		case ITestResult.FAILURE:
+			status = com.qaprosoft.zafira.client.model.TestType.Status.FAILED;
+			break;
+		default:
+			new RuntimeException("Undefined test result status! " + result.getStatus()); 
+			break;
+		}
 		
 		TestType registeredTest = null;
 		try {		
