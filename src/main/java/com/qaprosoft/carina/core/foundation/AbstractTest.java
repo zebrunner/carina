@@ -153,6 +153,7 @@ public abstract class AbstractTest // extends DriverHelper
 				LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
 			}
 
+			ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
 			TestRail.updateBeforeSuite(this.getClass().getName(),
 					getTitle(context));
 		} catch (Throwable thr) {
@@ -206,6 +207,9 @@ public abstract class AbstractTest // extends DriverHelper
 			TestRail.updateAfterTest(result, (String) result.getTestContext()
 					.getAttribute(SpecialKeywords.TEST_FAILURE));
 
+			ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext()
+					.getAttribute(SpecialKeywords.TEST_FAILURE));
+			
 			TestType testType = TestNamingUtil.getZafiraTest(test);
 			if (testType != null && jiraTickets.size() > 0) {
 				ZafiraIntegrator.registerWorkItems(testType.getId(),
@@ -355,7 +359,7 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 
 		String suiteName = getSuiteName(context);
-		String xmlFile = getSuiteXMLName(context);
+		String xmlFile = getSuiteFileName(context);
 
 		title = String.format(SUITE_TITLE, app_version, suiteName,
 				String.format(XML_SUITE_NAME, xmlFile), env, browser);
@@ -363,7 +367,7 @@ public abstract class AbstractTest // extends DriverHelper
 		return title;
 	}
 
-	private String getSuiteXMLName(ITestContext context) {
+	private String getSuiteFileName(ITestContext context) {
 		String xmlFile = "";
 		if (context.getSuite().getXmlSuite() != null
 				&& !"Default suite".equals(context.getSuite().getXmlSuite()
