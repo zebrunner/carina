@@ -82,7 +82,6 @@ public class SpecialKeywords
 	public static final String TESTRAIL_CASES_ID = "testRailCases";
 	
 	public static final String INVOCATION_COUNTER = " (InvCount=%s)";
-	
-	
+	public static final String MOBILE = "mobile";
 	
 }

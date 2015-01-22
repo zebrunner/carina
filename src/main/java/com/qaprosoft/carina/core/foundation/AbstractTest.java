@@ -82,18 +82,13 @@ import com.qaprosoft.zafira.client.model.TestType;
 public abstract class AbstractTest // extends DriverHelper
 {
 	@Deprecated
-	private Map<String, String> testNameMappedToArgs = Collections
-			.synchronizedMap(new HashMap<String, String>());
-	@Deprecated
-	private Map<String, String> jiraTicketsMappedToArgs = Collections
-			.synchronizedMap(new HashMap<String, String>());
+	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
+	@Deprecated	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
 
 	protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
-	protected static final long IMPLICIT_TIMEOUT = Configuration
-			.getLong(Parameter.IMPLICIT_TIMEOUT);
-	protected static final long EXPLICIT_TIMEOUT = Configuration
-			.getLong(Parameter.EXPLICIT_TIMEOUT);
+	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
 	protected static final String SUITE_TITLE = "%s %s%s - %s (%s)";
 	protected static final String XML_SUITE_NAME = " (%s)";
@@ -113,21 +108,17 @@ public abstract class AbstractTest // extends DriverHelper
 	public void executeBeforeTestSuite(ITestContext context) throws Throwable {
 		try {
 			// Set log4j properties
-			PropertyConfigurator.configure(ClassLoader
-					.getSystemResource("log4j.properties"));
+			PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
 			// Set SoapUI log4j properties
-			System.setProperty("soapui.log4j.config",
-					"./src/main/resources/soapui-log4j.xml");
+			System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 
 			Logger root = Logger.getRootLogger();
-			Enumeration<?> allLoggers = root.getLoggerRepository()
-					.getCurrentCategories();
+			Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
 			// root.setLevel(Level.DEBUG);
 			while (allLoggers.hasMoreElements()) {
 				Category tmpLogger = (Category) allLoggers.nextElement();
 				if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-					tmpLogger.setLevel(Level.toLevel(Configuration
-							.get(Parameter.CORE_LOG_LEVEL)));
+					tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
 				}
 			}
 
@@ -136,10 +127,7 @@ public abstract class AbstractTest // extends DriverHelper
 			// Configuration.validateConfiguration();
 
 			ReportContext.removeOldReports();
-			context.getCurrentXmlTest()
-					.getSuite()
-					.setThreadCount(
-							Configuration.getInt(Parameter.THREAD_COUNT));
+			context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
 
 			if (!Configuration.isNull(Parameter.URL)) {
 				RestAssured.baseURI = Configuration.get(Parameter.URL);
@@ -154,8 +142,7 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 
 			ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
-			TestRail.updateBeforeSuite(this.getClass().getName(),
-					getTitle(context));
+			TestRail.updateBeforeSuite(this.getClass().getName(), getTitle(context));
 		} catch (Throwable thr) {
 			context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
 			throw thr;
@@ -195,25 +182,20 @@ public abstract class AbstractTest // extends DriverHelper
 				spiraSteps = Spira.getSteps(result);
 			}
 			result.setAttribute(SpecialKeywords.SPIRA_STEPS_ID, spiraSteps);
-			Spira.updateAfterTest(result, (String) result.getTestContext()
-					.getAttribute(SpecialKeywords.TEST_FAILURE));
+			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
 
 			// Populate TestRail Cases
 			if (testRailCases.size() == 0) { // it was not redefined in the test
 				testRailCases = TestRail.getCases(result);
 			}
-			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID,
-					testRailCases);
-			TestRail.updateAfterTest(result, (String) result.getTestContext()
-					.getAttribute(SpecialKeywords.TEST_FAILURE));
+			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
+			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
 
-			ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext()
-					.getAttribute(SpecialKeywords.TEST_FAILURE));
+			ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
 			
 			TestType testType = TestNamingUtil.getZafiraTest(test);
 			if (testType != null && jiraTickets.size() > 0) {
-				ZafiraIntegrator.registerWorkItems(testType.getId(),
-						jiraTickets);
+				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
 			}
 
 			// clear jira tickets to be sure that next test is not affected.
@@ -221,15 +203,13 @@ public abstract class AbstractTest // extends DriverHelper
 			spiraSteps.clear();
 			testRailCases.clear();
 
-			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger()
-					.getAppender("ThreadLogAppender");
+			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if (tla != null) {
 				tla.closeResource(test);
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: "
-					+ e.getMessage());
+			LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -238,32 +218,34 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
 		try {
-			HtmlReportGenerator.generate(ReportContext.getBaseDir()
-					.getAbsolutePath());
+			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
 			String browser = getBrowser();
 			String deviceName = getDeviceName();
 			String suiteName = getSuiteName(context);
 			String title = getTitle(context);
 
-			TestResultType testResult = EmailReportGenerator
-					.getSuiteResult(EmailReportItemCollector.getTestResults());
+			TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
 			String status = testResult.getName();
 
 			title = status + ": " + title;
 
-			String env = !Configuration.isNull(Parameter.ENV) ? Configuration
-					.get(Parameter.ENV) : Configuration.get(Parameter.URL);
+			String env = "";
+			if (!Configuration.isNull(Parameter.ENV)) {
+				env = Configuration.get(Parameter.ENV); 
+			}
+			
+			if (!Configuration.get(Parameter.URL).isEmpty()) {
+				env += " - " + Configuration.get(Parameter.URL);
+			}
 
 			ReportContext.getTempDir().delete();
 
 			// Update JIRA
-			Jira.updateAfterSuite(context,
-					EmailReportItemCollector.getTestResults());
+			Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 
 			// Update Spira
-			Spira.updateAfterSuite(this.getClass().getName(), testResult, title
-					+ "; " + getCIJobReference(), suiteName, startDate);
+			Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, startDate);
 
 			// Generate email report
 			EmailReportGenerator report = new EmailReportGenerator(title, env,
@@ -283,15 +265,12 @@ public abstract class AbstractTest // extends DriverHelper
 
 			printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-			if (EmailReportGenerator.getSuiteResult(
-					EmailReportItemCollector.getTestResults()).equals(
-					TestResultType.SKIP)) {
+			if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP)) {
 				Assert.fail("Skipped tests detected! Analyze logs to determine possible configuration issues.");
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Exception in AbstractTest->executeAfterSuite: "
-					+ e.getMessage());
+			LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -300,16 +279,12 @@ public abstract class AbstractTest // extends DriverHelper
 		String deviceName = "Desktop";
 
 		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile")
-				|| Configuration.get(Parameter.BROWSER).equalsIgnoreCase(
-						"mobile_grid")) {
-			deviceName = Configuration.get(Parameter.MOBILE_DEVICE_NAME)
-					+ " - " + Configuration.get(Parameter.MOBILE_PLATFORM_NAME)
-					+ " "
-					+ Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
+				|| Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile_grid")) {
+			deviceName = Configuration.get(Parameter.MOBILE_DEVICE_NAME) + " - " + Configuration.get(Parameter.MOBILE_PLATFORM_NAME)
+					+ " " + Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
 
 			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				deviceName += " "
-						+ Configuration.get(Parameter.MOBILE_BROWSER_NAME);
+				deviceName += " " + Configuration.get(Parameter.MOBILE_BROWSER_NAME);
 			} else {
 				deviceName = "";
 			}
@@ -324,61 +299,48 @@ public abstract class AbstractTest // extends DriverHelper
 			browser = browser + " " + browserVersion;
 		}
 
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile")
-				|| Configuration.get(Parameter.BROWSER).equalsIgnoreCase(
-						"mobile_grid")) {
-			browser = Configuration.get(Parameter.MOBILE_DEVICE_NAME) + " - "
-					+ Configuration.get(Parameter.MOBILE_PLATFORM_NAME) + " "
-					+ Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
-
+		//Samsung - Android 4.4.2 - Chrome; iPhone - iOS 7 - Safari
+		String deviceTemplate = "%s - %s %s %s"; 
+		String mobileBrowser = "";
+				
+		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
 			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				browser += " "
-						+ Configuration.get(Parameter.MOBILE_BROWSER_NAME);
-			} else {
-				browser = "";
+				mobileBrowser = " - " + Configuration.get(Parameter.MOBILE_BROWSER_NAME);
 			}
-		}
 
+			browser = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION), mobileBrowser); 
+		}
 		return browser;
 	}
 
 	private String getTitle(ITestContext context) {
 		String browser = getBrowser();
 
-		String env = !Configuration.isNull(Parameter.ENV) ? Configuration
-				.get(Parameter.ENV) : Configuration.get(Parameter.URL);
+		String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 
 		String title = "";
 		String app_version = "";
 
 		if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
 			// if nothing is specified then title will contain nothing
-			app_version = Configuration.get(Parameter.APP_VERSION) + " -"; // '
-																			// %s
-																			// -'
+			app_version = Configuration.get(Parameter.APP_VERSION) + " -";
 		}
 
 		String suiteName = getSuiteName(context);
 		String xmlFile = getSuiteFileName(context);
 
-		title = String.format(SUITE_TITLE, app_version, suiteName,
-				String.format(XML_SUITE_NAME, xmlFile), env, browser);
+		title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser);
 
 		return title;
 	}
 
 	private String getSuiteFileName(ITestContext context) {
 		String xmlFile = "";
-		if (context.getSuite().getXmlSuite() != null
-				&& !"Default suite".equals(context.getSuite().getXmlSuite()
-						.getName())) {
-			xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System
-					.getProperty("suite") + ".xml"
-					: StringUtils.substringAfterLast(context.getSuite()
-							.getXmlSuite().getFileName(), "\\");
+		if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
+			xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml"
+					: StringUtils.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
 		}
 		return xmlFile;
-
 	}
 
 	private String getSuiteName(ITestContext context) {
@@ -388,15 +350,11 @@ public abstract class AbstractTest // extends DriverHelper
 		// EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
 		// String status = testResult.getName();
 
-		if (context.getSuite().getXmlSuite() != null
-				&& !"Default suite".equals(context.getSuite().getXmlSuite()
-						.getName())) {
-			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context
-					.getSuite().getXmlSuite().getName()
+		if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
+			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context.getSuite().getXmlSuite().getName()
 					: Configuration.get(Parameter.SUITE_NAME);
 		} else {
-			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL
-					.get("title") : Configuration.get(Parameter.SUITE_NAME);
+			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
 		}
 		return suiteName;
 	}
