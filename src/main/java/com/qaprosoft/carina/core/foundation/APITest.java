@@ -26,7 +26,6 @@ import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
 import com.qaprosoft.carina.core.foundation.listeners.APITestListener;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 @Listeners({ APITestListener.class })
 public abstract class APITest extends AbstractTest
@@ -43,17 +42,7 @@ public abstract class APITest extends AbstractTest
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
     	super.executeBeforeTestMethod(xmlTest, testMethod, context);
-    	
-		try
-		{
-		    apiMethodBuilder = new APIMethodBuilder();
-		}
-		catch (Throwable thr)
-		{
-			LOGGER.error(thr.getMessage());
-		    context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-		    throw thr;
-		}
+    	apiMethodBuilder = new APIMethodBuilder();
     }
     
     @AfterMethod(alwaysRun = true)

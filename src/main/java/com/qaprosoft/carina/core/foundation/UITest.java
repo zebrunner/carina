@@ -76,12 +76,8 @@ public class UITest extends AbstractTest
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
 	    	if (!initDriver(context.getSuite().getName())) {
-	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
 	    		throw init_throwable;
 	    	}
-    		//DriverPool.associateTestNameWithDriver("BeforeSuite " + context.getSuite().getName(), driver);
-    		
-//			initSummary(driver);
 	    }
 
     }
@@ -104,13 +100,8 @@ public class UITest extends AbstractTest
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
 	    	if (!initDriver(this.getClass().getName())) {
-	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
 	    		throw init_throwable;
 	    	}
-    		
-    		//DriverPool.associateTestNameWithDriver("BeforeClass " + this.getClass().getName(), driver);
-    		
-//			initSummary(driver);
 	    }
     }
     
@@ -139,10 +130,8 @@ public class UITest extends AbstractTest
     	{
     		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
 	    	if (!initDriver(test)) {
-	    		context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, init_throwable);
 	    		throw init_throwable;
 	    	}	    		
-//			initSummary(driver);
     	}
     	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 			startRecording();
@@ -180,19 +169,12 @@ public class UITest extends AbstractTest
     
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
-    	try {
-    		quitExtraDriver();
-    	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver() != null)
-    	    {
-    	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
-    			quitDriver();
-    	    }
-    	}
-    	catch (Throwable thr)
-    	{
-			context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-			throw thr;
-    	}
+		quitExtraDriver();
+	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver() != null)
+	    {
+	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
+			quitDriver();
+	    }
     	
 		super.executeAfterTestClass(context);    	
     }
