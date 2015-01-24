@@ -106,47 +106,42 @@ public abstract class AbstractTest // extends DriverHelper
 
 	@BeforeSuite(alwaysRun = true)
 	public void executeBeforeTestSuite(ITestContext context) throws Throwable {
-		try {
-			// Set log4j properties
-			PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
-			// Set SoapUI log4j properties
-			System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
+		// Set log4j properties
+		PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
+		// Set SoapUI log4j properties
+		System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 
-			Logger root = Logger.getRootLogger();
-			Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-			// root.setLevel(Level.DEBUG);
-			while (allLoggers.hasMoreElements()) {
-				Category tmpLogger = (Category) allLoggers.nextElement();
-				if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-					tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-				}
+		Logger root = Logger.getRootLogger();
+		Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+		// root.setLevel(Level.DEBUG);
+		while (allLoggers.hasMoreElements()) {
+			Category tmpLogger = (Category) allLoggers.nextElement();
+			if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
+				tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
 			}
-
-			startDate = new Date().getTime();
-			LOGGER.info(Configuration.asString());
-			// Configuration.validateConfiguration();
-
-			ReportContext.removeOldReports();
-			context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-
-			if (!Configuration.isNull(Parameter.URL)) {
-				RestAssured.baseURI = Configuration.get(Parameter.URL);
-			}
-
-			try {
-				String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
-				String country = Configuration.get(Parameter.LOCALE).split("_")[1];
-				L18n.init("l18n.messages", new Locale(lang, country));
-			} catch (Exception e) {
-				LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
-			}
-
-			ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
-			TestRail.updateBeforeSuite(this.getClass().getName(), getTitle(context));
-		} catch (Throwable thr) {
-			context.setAttribute(SpecialKeywords.INITIALIZATION_FAILURE, thr);
-			throw thr;
 		}
+
+		startDate = new Date().getTime();
+		LOGGER.info(Configuration.asString());
+		// Configuration.validateConfiguration();
+
+		ReportContext.removeOldReports();
+		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+
+		if (!Configuration.isNull(Parameter.URL)) {
+			RestAssured.baseURI = Configuration.get(Parameter.URL);
+		}
+
+		try {
+			String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
+			String country = Configuration.get(Parameter.LOCALE).split("_")[1];
+			L18n.init("l18n.messages", new Locale(lang, country));
+		} catch (Exception e) {
+			LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+		}
+
+		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
+		TestRail.updateBeforeSuite(this.getClass().getName(), getTitle(context));
 
 	}
 
@@ -182,16 +177,16 @@ public abstract class AbstractTest // extends DriverHelper
 				spiraSteps = Spira.getSteps(result);
 			}
 			result.setAttribute(SpecialKeywords.SPIRA_STEPS_ID, spiraSteps);
-			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
+			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 
 			// Populate TestRail Cases
 			if (testRailCases.size() == 0) { // it was not redefined in the test
 				testRailCases = TestRail.getCases(result);
 			}
 			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
-			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
+			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 
-			ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE));
+			ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 			
 			TestType testType = TestNamingUtil.getZafiraTest(test);
 			if (testType != null && jiraTickets.size() > 0) {

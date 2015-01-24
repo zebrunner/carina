@@ -31,6 +31,7 @@ import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
+import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
@@ -46,8 +47,25 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 public abstract class AbstractTestListener extends TestArgsListener
 {
     // Dropbox client
-    DropboxClient dropboxClient;	
-	
+    DropboxClient dropboxClient;
+    
+    @Override
+    public void onConfigurationFailure(ITestResult result) {
+    	String test = result.getMethod().getMethodName();
+    	String errorMessage = getFailureReason(result);
+    	//TODO: remove hard-coded text
+    	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
+    		Messager.CONFIGURATION_FAILED.error(test, DateUtils.now(), errorMessage);
+    	}
+    }
+    
+    @Override
+    public void onConfigurationSkip(ITestResult result) {
+    	String test = result.getMethod().getMethodName();
+    	String errorMessage = getFailureReason(result);
+		Messager.CONFIGURATION_SKIPPED.error(test, DateUtils.now(), errorMessage);
+    }
+    
 	@Override
 	public void onStart(ITestContext context)
 	{
@@ -94,6 +112,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		Messager.TEST_PASSED.info(test, DateUtils.now());
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
+		
+		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSuccess(result);
@@ -110,8 +132,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 		{
 			String errorMessage = getFailureReason(result);
 			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
+			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
 			
-			
+			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestFailure(result);
@@ -127,9 +151,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 		if (count >= maxCount)
 		{
 			String errorMessage = getFailureReason(result);
-			
 			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
+			EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 			
+			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
@@ -224,7 +250,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	protected String getFailureReason(ITestResult result) {
 		String errorMessage = "";
 		String message = "";
-		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.INITIALIZATION_FAILURE);
+		
+		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		if (thr != null) {
 			errorMessage = getFullStackTrace(thr);
 			message = thr.getMessage();
@@ -234,9 +261,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 			thr = result.getThrowable();
 			errorMessage = getFullStackTrace(thr);
 			message = thr.getMessage();
+			result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE, message);
+			result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION, thr);
 		}
 		
-		result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE, message);
 		return errorMessage;
 	}
 	

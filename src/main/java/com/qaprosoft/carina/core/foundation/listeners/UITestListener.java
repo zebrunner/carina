@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.testng.IRetryAnalyzer;
@@ -26,8 +24,6 @@ import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
-import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -43,17 +39,12 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  */
 
 public class UITestListener extends AbstractTestListener {
-	// private static final Logger LOGGER =
-	// Logger.getLogger(UITestListener.class);
 	private static final Logger LOGGER = Logger.getLogger(UITestListener.class);
 	
 
 	@Override
 	public void onTestStart(ITestResult result) {
 		super.onTestStart(result);
-		//WebDriver drv = DriverPool.getDriverByThread(Thread.currentThread().getId());
-		//String test = TestNamingUtil.getCanonicalTestName(result);
-		//DriverPool.associateTestNameWithDriver(test, drv);
 	}
 
 	@Override
@@ -102,7 +93,6 @@ public class UITestListener extends AbstractTestListener {
 			}
 	
 			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
-			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
 			super.onTestFailure(result);
 			LOGGER.debug("count >= maxCount: onTestFailure listener finished successfully.");
 		}
@@ -113,16 +103,11 @@ public class UITestListener extends AbstractTestListener {
 	@Override
 	public void onTestSkipped(ITestResult result) {
 		//retry logic shouldn't work for Skipped tests as DriverFactory already implemented driver initialization retry
-		String errorMessage = getFailureReason(result);
-
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 		super.onTestSkipped(result);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
-
 		super.onTestSuccess(result);
 	}
 
@@ -174,14 +159,5 @@ public class UITestListener extends AbstractTestListener {
 				iterator.remove();
 			}
 		}*/
-	}
-
-	public static class TestUtil {
-		public static int getId(ITestResult result) {
-			int id = result.getTestClass().getName().hashCode();
-			id = 31 * id + result.getMethod().getMethodName().hashCode();
-			id = 31 * id + (result.getParameters() != null ? Arrays.hashCode(result.getParameters()) : 0);
-			return id;
-		}
 	}
 }
