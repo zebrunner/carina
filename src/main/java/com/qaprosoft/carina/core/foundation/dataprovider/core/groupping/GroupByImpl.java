@@ -11,7 +11,8 @@ public class GroupByImpl {
     public static Object[][] getGroupedDataProviderArgs(Object[][] objects, int fieldNumber) {
 
         List<Object[]> listOfObjects = sortDefaultObject(objects, fieldNumber);
-        Iterator iterator = listOfObjects.iterator();
+        @SuppressWarnings("rawtypes")
+		Iterator iterator = listOfObjects.iterator();
         Object[] temp = (Object[]) iterator.next();
         List<List<Object[]>> ordered = new ArrayList<List<Object[]>>();
         List<Object[]> tempList = new ArrayList<Object[]>();
@@ -46,7 +47,8 @@ public class GroupByImpl {
 
     }
 
-    public static Object[][] getGroupedDataProviderMap(Object[][] objects, String fieldName) {
+    @SuppressWarnings("rawtypes")
+	public static Object[][] getGroupedDataProviderMap(Object[][] objects, String fieldName) {
 
         List<Object[]> listOfObjects = sortMapObject(objects, fieldName);
         Iterator iterator = listOfObjects.iterator();
@@ -92,7 +94,8 @@ public class GroupByImpl {
 
     }
 
-    private static List<HashMap> getHashMaps(List<Object[]> list) {
+    @SuppressWarnings("rawtypes")
+	private static List<HashMap> getHashMaps(List<Object[]> list) {
         List<HashMap> hashMaps = new ArrayList<HashMap>();
         for (Object[] objects : list) {
             hashMaps.add((HashMap) objects[0]);
@@ -116,7 +119,8 @@ public class GroupByImpl {
     private static List<Object[]> sortMapObject(Object[][] objects, final String keyName) {
         List<Object[]> listOfObjects = Arrays.asList(objects);
         Collections.sort(listOfObjects, new Comparator<Object[]>() {
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public int compare(final Object[] object1, final Object[] object2) {
                 String firstField = ((HashMap<String, String>) object1[0]).get(keyName);
                 String secondField = ((HashMap<String, String>) object2[0]).get(keyName);

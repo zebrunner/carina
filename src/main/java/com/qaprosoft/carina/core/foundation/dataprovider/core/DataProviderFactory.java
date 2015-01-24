@@ -28,8 +28,6 @@ public class DataProviderFactory {
     }
 
 
-// TODO: WTF?! remove hard code from map
-
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context) {
     	
         Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
@@ -48,7 +46,7 @@ public class DataProviderFactory {
                 
                 for (Method method : type.getDeclaredMethods()) {
                     if (method.getName().equalsIgnoreCase("classname")) {
-                    	providerClass = (String) method.invoke(annotation, null);
+                    	providerClass = (String) method.invoke(annotation);
                     	break;
                     }
                 }

@@ -20,7 +20,8 @@ public class CsvDataProvider extends BaseDataProvider {
     protected static final Logger LOGGER = Logger.getLogger(CsvDataProvider.class);
 
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Object[][] getDataProvider(Annotation annotation, ITestContext context) {
         CsvDataSourceParameters parameters = (CsvDataSourceParameters) annotation;
         DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest().getAllParameters());
