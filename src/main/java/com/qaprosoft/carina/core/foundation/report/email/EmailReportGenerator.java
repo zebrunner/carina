@@ -169,7 +169,7 @@ public class EmailReportGenerator
 			}
 			else
 			{
-				result = result.replace(SKIP_REASON_PLACEHOLDER, "TestNG skipped test! Verify tests dependencies or Before Suite/Class/Test logs.");
+				result = result.replace(SKIP_REASON_PLACEHOLDER, "Skipped due to the TestNG dependency.");
 			}
 			
 			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
