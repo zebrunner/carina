@@ -330,12 +330,7 @@ public abstract class AbstractTest // extends DriverHelper
 	}
 
 	private String getSuiteFileName(ITestContext context) {
-		String xmlFile = "";
-		if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
-			xmlFile = !StringUtils.isEmpty(System.getProperty("suite")) ? System.getProperty("suite") + ".xml"
-					: StringUtils.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
-		}
-		return xmlFile;
+		return StringUtils.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
 	}
 
 	private String getSuiteName(ITestContext context) {
