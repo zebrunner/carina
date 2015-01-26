@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -39,7 +38,9 @@ import org.testng.SkipException;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.appium.AppiumNativeDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -54,12 +55,14 @@ public class DriverFactory
 	public static final String IOS = "iOS";
 	public static final String ANDROID = "Android";
 	public static final String SAFARI = "safari";
-	public static final String MOBILE_GRID = "mobile_grid";
-	public static final String MOBILE = "mobile";
+	public static final String MOBILE = SpecialKeywords.MOBILE;
+	public static final String MOBILE_GRID = SpecialKeywords.MOBILE_GRID;
+	public static final String MOBILE_POOL = SpecialKeywords.MOBILE_POOL;
 	
 	protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
 	
 	private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
+	private static final Device nullDevice = new Device();
 
 
 /*	public static Object create(String className, Object[] args) {
@@ -76,7 +79,7 @@ public class DriverFactory
 		return object;
 	}*/
 	
-	public static synchronized WebDriver create(String testName, String browser)
+/*	public static synchronized WebDriver create(String testName, String browser)
 	{
 		WebDriver driver = null;
 		try {
@@ -102,7 +105,7 @@ public class DriverFactory
 		}		
 			
 		return driver;
-	}
+	}*/
 
 	public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host)
 	{
@@ -128,10 +131,15 @@ public class DriverFactory
 	 * @return RemoteWebDriver instance
 	 * @throws MalformedURLException 
 	 */
-	public static synchronized WebDriver create(String testName)
+	public static synchronized WebDriver create(String testName) {
+		return create(testName, nullDevice);
+	}
+	
+	public static synchronized WebDriver create(String testName, Device device)
 	{
 		RemoteWebDriver driver = null;
 		DesiredCapabilities capabilities = null;
+		String selenium = Configuration.get(Parameter.SELENIUM_HOST);
 		try
 		{
 			String browser = Configuration.get(Parameter.BROWSER);
@@ -178,6 +186,27 @@ public class DriverFactory
 							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
 				}					
 			}
+			else if (MOBILE_POOL.equalsIgnoreCase(browser))
+			{
+				// 1. parse mobile_devices
+				// 2. verify status for each selenium/appium server
+				// 3. !adjust thread count if possible or organize delays when all devices are busy
+				// 4. create driver using any free device
+				if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty())
+				{
+					selenium = device.getSeleniumServer();
+					capabilities = getMobileWebCapabilities(false, testName, device.getOs(), device.getOsVersion(),
+							device.getName(), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
+				}
+				else {
+					selenium = device.getSeleniumServer();
+					capabilities = getMobileAppCapabilities(false, testName, device.getOs(), device.getOsVersion(),
+							device.getName(), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
+							Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
+							Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
+				}
+			}
 			else if (SAFARI.equalsIgnoreCase(browser))
 			{
 				capabilities = getSafariCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
@@ -191,14 +220,15 @@ public class DriverFactory
 			if (browser.toLowerCase().contains(MOBILE.toLowerCase()))
 			{
 				//only in case of "mobile" or "mobile_grid" as browser and ANDROID as mobile_platform_name
-				driver = new AppiumNativeDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
+				driver = new AppiumNativeDriver(new URL(selenium), capabilities);
 			} else {		
-				driver = new RemoteWebDriver(new URL(Configuration.get(Parameter.SELENIUM_HOST)), capabilities);
+				driver = new RemoteWebDriver(new URL(selenium), capabilities);
 			}
 	    	LOGGER.debug("-------------------------------------- Driver Factory finish ---------------------------------");			
 		}
 		catch (Exception e)
 		{
+			LOGGER.debug("Unable to initialize driver. Test will be SKIPPED due to the\r\n", e);
 	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
 		}
 		return driver;

@@ -42,11 +42,14 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExec
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @Listeners({ UITestListener.class })
 public class UITest extends AbstractTest
 {
     private static final Logger LOGGER = Logger.getLogger(UITest.class);
+    private static int driverInitCount = Configuration.getInt(Parameter.RETRY_COUNT) + 1; //1 - is default run without retry
     
     protected WebDriver driver;
     
@@ -70,12 +73,13 @@ public class UITest extends AbstractTest
     {
     	super.executeBeforeTestSuite(context);
     	
-    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);		
-
+    	DevicePool.registerDevices();
+    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+    	
 	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
-	    	if (!initDriver(context.getSuite().getName())) {
+	    	if (!initDriver(context.getSuite().getName(), driverInitCount)) {
 	    		throw init_throwable;
 	    	}
 	    }
@@ -99,7 +103,7 @@ public class UITest extends AbstractTest
 		if (driverMode == DriverMode.CLASS_MODE && getDriver() == null)
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
-	    	if (!initDriver(this.getClass().getName())) {
+	    	if (!initDriver(this.getClass().getName(), driverInitCount)) {
 	    		throw init_throwable;
 	    	}
 	    }
@@ -129,7 +133,7 @@ public class UITest extends AbstractTest
     	if (driverMode == DriverMode.METHOD_MODE && getDriver() == null)
     	{
     		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
-	    	if (!initDriver(test)) {
+	    	if (!initDriver(test, driverInitCount)) {
 	    		throw init_throwable;
 	    	}	    		
     	}
@@ -197,27 +201,41 @@ public class UITest extends AbstractTest
 	// --------------------------------------------------------------------------
 	// Web Drivers
 	// --------------------------------------------------------------------------
+	protected WebDriver createExtraDriver(final String driverName) {
+		return createExtraDriver(driverName, null, null);
+	}
+	
 	protected WebDriver createExtraDriver(String driverName, DesiredCapabilities capabilities, String selenium_host) {
 		if (extraDriver != null) {
 			LOGGER.warn("Extra Driver is already initialized! Existing extraDriver will be closed!");
 			extraDriver.quit();
 		}
-		if (capabilities == null && selenium_host == null) {
-			extraDriver = DriverFactory.create(driverName);	
+		
+		try {
+			if (capabilities == null && selenium_host == null) {
+				Device device = null;
+				if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+					device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
+				} 
+				extraDriver = DriverFactory.create(driverName, device);	
+			}
+			else {
+				extraDriver = DriverFactory.create(driverName, capabilities, selenium_host);
+			}
+	    	
+	    	if (extraDriver == null ) {
+	    		Assert.fail("Unable to initialize extra driver: " + driverName + "!");
+	    	}
 		}
-		else {
-			extraDriver = DriverFactory.create(driverName, capabilities, selenium_host);
-		}
-    	
-    	if (extraDriver == null ) {
-    		Assert.fail("Unable to initialize extra driver: " + driverName + "!");
-    	}
+		catch (Throwable thr) {
+			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
+			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()));
+			init_throwable = thr;
+		}    	
 		return extraDriver;		
 	}
 	
-	protected WebDriver createExtraDriver(final String driverName) {
-		return createExtraDriver(driverName, null, null);
-	}
+
 
 	protected WebDriver getExtraDriver() {
 		return extraDriver;
@@ -225,6 +243,7 @@ public class UITest extends AbstractTest
 
 	protected void quitExtraDriver() {
 		if (extraDriver != null) {
+			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
 			extraDriver.quit();
 			extraDriver = null;
 		}
@@ -243,6 +262,33 @@ public class UITest extends AbstractTest
 		webDrivers.set(driver);
 	}
     
+	protected synchronized boolean initDriver(String name, int maxCount) {
+    	boolean init = false;
+    	int count = 0;
+    	while (!init & count++ < maxCount) {
+    		try {
+    			Device device = null;
+    			if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+    				device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
+    			}    			
+
+    			WebDriver drv = DriverFactory.create(name, device);
+    			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
+    			
+    			driver = drv;
+    			setDriver(drv);
+    			init = true;
+    		}
+    		catch (Throwable thr) {
+    			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
+    			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
+    			init_throwable = thr;
+    		}
+    	}
+
+    	return init;
+	}
+	
 	protected static void quitDriver() {
 		long threadId = Thread.currentThread().getId();
 		WebDriver drv = DriverPool.getDriverByThread(threadId);
@@ -254,6 +300,7 @@ public class UITest extends AbstractTest
 
 			LOGGER.debug("Driver exiting..." + drv);
 	    	DriverPool.deregisterDriverByThread(threadId);
+	    	DevicePool.deregisterDeviceByThread(threadId);
 			drv.quit();
 	    	LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
@@ -286,24 +333,5 @@ public class UITest extends AbstractTest
 		}	
 	}
 	
-	protected synchronized boolean initDriver(String name) {
-		int maxCount = Configuration.getInt(Parameter.RETRY_COUNT) + 1; //1 - is default run without retry
-    	boolean init = false;
-    	int count = 0;
-    	while (!init & count++ < maxCount) {
-    		try {
-    			WebDriver drv = DriverFactory.create(name);
-    			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
-    			driver = drv;
-    			setDriver(drv);
-    			init = true;
-    		}
-    		catch (Throwable thr) {
-    			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
-    			init_throwable = thr;
-    		}
-    	}
 
-    	return init;
-	}
 }

@@ -141,7 +141,7 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
-		TestRail.updateBeforeSuite(this.getClass().getName(), getTitle(context));
+		TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
 
 	}
 

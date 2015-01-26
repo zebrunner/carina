@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestResult;
@@ -26,15 +27,18 @@ import com.qaprosoft.carina.core.foundation.performance.PerformanceTestRunner;
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestResult.Status;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 
-public abstract class PerformanceTest extends DriverHelper implements Callable<PerformanceTestResult>
+public abstract class PerformanceTest /*extends DriverHelper*/ implements Callable<PerformanceTestResult>
 {
+	private static final Logger LOGGER = Logger.getLogger(PerformanceTest.class);
+	
 	private CountDownLatch latch;
 	protected PerformanceTestResult performanceTestResult;
 	private Map<String, String> testParams;
+	protected WebDriver driver;
 
 	public PerformanceTest(WebDriver driver, CountDownLatch latch, Map<String, String> testParams)
 	{
-		super(driver);
+		this.driver = driver;
 		this.latch = latch;
 		this.testParams = testParams;
 		this.performanceTestResult = new PerformanceTestResult(testParams.get(PerformanceTestRunner.TEST_KEY));

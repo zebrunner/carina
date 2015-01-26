@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -77,13 +78,13 @@ public class TestRail
 		}
 	}
 
-	public synchronized static void updateBeforeSuite(String testClass, String title)
+	public synchronized static void updateBeforeSuite(ITestContext context, String testClass, String title)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				 updater.updateBeforeSuite(testClass, title);
+				 updater.updateBeforeSuite(context, testClass, title);
 			}
 			catch(Exception e)
 			{
