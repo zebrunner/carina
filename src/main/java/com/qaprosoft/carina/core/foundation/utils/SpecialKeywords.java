@@ -80,8 +80,13 @@ public class SpecialKeywords
 	public static final String SPIRA_ARGS_MAP = "spiraStepsArgsMap";
 	public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
 	public static final String TESTRAIL_CASES_ID = "testRailCases";
+	public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
+	public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
+	
 	
 	public static final String INVOCATION_COUNTER = " (InvCount=%s)";
 	public static final String MOBILE = "mobile";
+	public static final String MOBILE_POOL = "mobile_pool";
+	public static final String MOBILE_GRID = "mobile_grid";
 	
 }

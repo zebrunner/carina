@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 
@@ -28,7 +29,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater
 	}
 
 	@Override
-	public void updateBeforeSuite(String testClass, String title) {
+	public void updateBeforeSuite(ITestContext context, String testClass, String title) {
 		// TODO Auto-generated method stub
 		
 	}

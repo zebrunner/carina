@@ -212,6 +212,8 @@ public class Configuration
 		
 		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout"),
 		
+		MOBILE_DEVICES("mobile_devices"),
+		
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
