@@ -11,9 +11,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * Created by YP.
@@ -71,7 +70,7 @@ public class AdbExecutor {
         BufferedReader in = null;
         boolean correctDevice = false;
         try {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", Configuration.get(Parameter.MOBILE_DEVICE_UDID), "shell", "getprop", "ro.build.version.sdk");
+            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "getprop", "ro.build.version.sdk");
             executor = new ProcessBuilderExecutor(cmd);
 
             Process process = executor.start();
@@ -121,7 +120,7 @@ public class AdbExecutor {
     		return -1;
     	
     	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", Configuration.get(Parameter.MOBILE_DEVICE_UDID), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
 
     	try {
             ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
@@ -148,7 +147,7 @@ public class AdbExecutor {
     	if (!isDeviceCorrect())
     		return;
     	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", Configuration.get(Parameter.MOBILE_DEVICE_UDID), "pull", pathFrom, pathTo);
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
     	execute(cmd);
     }
     
@@ -156,7 +155,7 @@ public class AdbExecutor {
     	if (!isDeviceCorrect())
     		return;
     	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", Configuration.get(Parameter.MOBILE_DEVICE_UDID), "shell", "rm", pathToFile);
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
     	execute(cmd);
     }
     
@@ -173,7 +172,7 @@ public class AdbExecutor {
     	if (!isDeviceCorrect())
     		return;
     	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", Configuration.get(Parameter.MOBILE_DEVICE_UDID), "shell", "input", "keyevent", String.valueOf(key));
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
     	execute(cmd);
     }    
 }
