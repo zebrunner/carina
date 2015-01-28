@@ -151,6 +151,8 @@ public class Configuration
 
 		DATE_FORMAT("date_format"),
 		
+		TIME_FORMAT("time_format"),
+		
 		IS_API("is_api"),
 		
 		LOAD_SETTINGS("load_settings"),
