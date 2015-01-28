@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class DevicePool
@@ -85,5 +86,15 @@ public class DevicePool
 			threadId2Device.remove(threadId);
 			LOGGER.debug("Deregistering device '" + device.getName() + "' with thread '" + threadId + "'");
 		}
+	}
+	
+	public static synchronized String getDeviceUdid() {
+		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+			Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
+			udid = device.getUdid();
+		} 
+		
+		return udid;
 	}
 }
