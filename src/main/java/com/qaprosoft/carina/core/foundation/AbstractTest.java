@@ -90,7 +90,7 @@ public abstract class AbstractTest // extends DriverHelper
 	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
 	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
-	protected static final String SUITE_TITLE = "%s %s%s - %s (%s)";
+	protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
 	protected static final String XML_SUITE_NAME = " (%s)";
 
 	// 3rd party integrations
@@ -231,7 +231,7 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 			
 			if (!Configuration.get(Parameter.URL).isEmpty()) {
-				env += " - " + Configuration.get(Parameter.URL);
+				env += " - <a href='" + Configuration.get(Parameter.URL) + "'>" + Configuration.get(Parameter.URL) + "</a>";
 			}
 
 			ReportContext.getTempDir().delete();
@@ -245,7 +245,7 @@ public abstract class AbstractTest // extends DriverHelper
 			// Generate email report
 			EmailReportGenerator report = new EmailReportGenerator(title, env,
 					Configuration.get(Parameter.APP_VERSION), deviceName,
-					browser, DateUtils.now(), getCIJobReference(),
+					browser, DateUtils.now(), DateUtils.timeDiff(startDate), getCIJobReference(),
 					EmailReportItemCollector.getTestResults(),
 					EmailReportItemCollector.getCreatedItems());
 
@@ -272,17 +272,11 @@ public abstract class AbstractTest // extends DriverHelper
 
 	private String getDeviceName() {
 		String deviceName = "Desktop";
-
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile")
-				|| Configuration.get(Parameter.BROWSER).equalsIgnoreCase("mobile_grid")) {
-			deviceName = Configuration.get(Parameter.MOBILE_DEVICE_NAME) + " - " + Configuration.get(Parameter.MOBILE_PLATFORM_NAME)
-					+ " " + Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
-
-			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				deviceName += " " + Configuration.get(Parameter.MOBILE_BROWSER_NAME);
-			} else {
-				deviceName = "";
-			}
+		
+		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+			//Samsung - Android 4.4.2; iPhone - iOS 7
+			String deviceTemplate = "%s - %s %s"; 
+			deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
 		}
 
 		return deviceName;
@@ -294,22 +288,21 @@ public abstract class AbstractTest // extends DriverHelper
 			browser = browser + " " + browserVersion;
 		}
 
-		//Samsung - Android 4.4.2 - Chrome; iPhone - iOS 7 - Safari
-		String deviceTemplate = "%s - %s %s %s"; 
-		String mobileBrowser = "";
-				
 		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+			browser = "";
 			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				mobileBrowser = " - " + Configuration.get(Parameter.MOBILE_BROWSER_NAME);
+				browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
 			}
-
-			browser = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION), mobileBrowser); 
 		}
 		return browser;
 	}
 
 	private String getTitle(ITestContext context) {
 		String browser = getBrowser();
+		if (!browser.isEmpty()) {
+			browser = " " + browser; //insert the space before
+		}
+		String device = getDeviceName();
 
 		String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
 
@@ -318,27 +311,31 @@ public abstract class AbstractTest // extends DriverHelper
 
 		if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
 			// if nothing is specified then title will contain nothing
-			app_version = Configuration.get(Parameter.APP_VERSION) + " -";
+			app_version = Configuration.get(Parameter.APP_VERSION) + " - ";
 		}
 
 		String suiteName = getSuiteName(context);
 		String xmlFile = getSuiteFileName(context);
 
-		title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser);
+		title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, device, browser);
 
 		return title;
 	}
 
 	private String getSuiteFileName(ITestContext context) {
-		return StringUtils.substringAfterLast(context.getSuite().getXmlSuite().getFileName(), "\\");
+		String fileName = context.getSuite().getXmlSuite().getFileName();
+		LOGGER.debug("Full suite file name: " + fileName);
+		if (fileName.contains("\\")) {
+			fileName = fileName.replaceAll("\\\\", "/");
+		}
+		fileName = StringUtils.substringAfterLast(fileName, "/");
+		LOGGER.debug("Short suite file name: " + fileName);
+		return fileName;
 	}
 
 	private String getSuiteName(ITestContext context) {
 
 		String suiteName = "";
-		// TestResultType testResult =
-		// EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-		// String status = testResult.getName();
 
 		if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
 			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context.getSuite().getXmlSuite().getName()

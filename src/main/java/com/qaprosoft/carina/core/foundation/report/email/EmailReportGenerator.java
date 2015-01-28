@@ -54,6 +54,7 @@ public class EmailReportGenerator
 	private static final String BROWSER_PLACEHOLDER = "${browser}";
 	private static final String VERSION_PLACEHOLDER = "${version}";
 	private static final String FINISH_DATE_PLACEHOLDER = "${finish_date}";
+	private static final String ELAPSED_TIME_PLACEHOLDER = "${elapsed_time}";
 	private static final String CI_TEST_JOB = "${ci_test_job}";
 	private static final String PASS_COUNT_PLACEHOLDER = "${pass_count}";
 	private static final String FAIL_COUNT_PLACEHOLDER = "${fail_count}";
@@ -80,7 +81,7 @@ public class EmailReportGenerator
 	private int failCount = 0;
 	
 
-	public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String ciTestJob,
+	public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String elapsedTime, String ciTestJob,
 			List<TestResultItem> testResultItems, List<String> createdItems)
 	{
 		emailBody = emailBody.replace(TITLE_PLACEHOLDER, title);
@@ -89,6 +90,7 @@ public class EmailReportGenerator
 		emailBody = emailBody.replace(VERSION_PLACEHOLDER, version);
 		emailBody = emailBody.replace(BROWSER_PLACEHOLDER, browser);
 		emailBody = emailBody.replace(FINISH_DATE_PLACEHOLDER, finishDate);
+		emailBody = emailBody.replace(ELAPSED_TIME_PLACEHOLDER, elapsedTime);
 		emailBody = emailBody.replace(CI_TEST_JOB, !StringUtils.isEmpty(ciTestJob) ? ciTestJob : "");
 		emailBody = emailBody.replace(RESULTS_PLACEHOLDER, getTestResultsList(testResultItems));
 		emailBody = emailBody.replace(PASS_COUNT_PLACEHOLDER, String.valueOf(passCount));
