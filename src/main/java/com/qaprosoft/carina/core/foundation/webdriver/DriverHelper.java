@@ -170,12 +170,6 @@ public class DriverHelper
 		return isElementPresent(extWebElement, EXPLICIT_TIMEOUT);
 	}
 
-	public boolean isElementPresent(String controlInfo, final WebElement element)
-	{
-		return isElementPresent(new ExtendedWebElement(element, controlInfo));
-	}
-
-	
 	/**
 	 * Check that element present on page using By.
 	 * 
@@ -214,7 +208,31 @@ public class DriverHelper
 
 	public boolean isElementPresent(String controlInfo, final WebElement element, long timeout)
 	{
-		return isElementPresent(new ExtendedWebElement(element, controlInfo), timeout);
+		boolean result;
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return element.isDisplayed() && element.isEnabled();
+				}
+			});
+			result = true;
+		} catch (Exception e)
+		{
+			result = false;
+		}
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return result;
+	}
+
+	public boolean isElementPresent(String controlInfo, final WebElement element)
+	{
+		return isElementPresent(controlInfo, element, EXPLICIT_TIMEOUT);
 	}
 
 	/**
