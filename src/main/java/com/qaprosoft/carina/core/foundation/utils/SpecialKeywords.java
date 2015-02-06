@@ -61,7 +61,6 @@ public class SpecialKeywords
 	
 	public static final String JIRA_TICKET = "JIRA#";
 	public static final String TEST_FAILURE_MESSAGE = "testFailureMessage";
-	public static final String TEST_FAILURE_EXCEPTION = "testFailureException";
 	public static final String UUID = "UUID";
 	public static final String VIDEO_FILE_NAME = "/sdcard/test_record.mp4";
 	

@@ -27,7 +27,6 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.log.GlobalTestLog;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -53,6 +52,8 @@ public abstract class AbstractTestListener extends TestArgsListener
     public void onConfigurationFailure(ITestResult result) {
     	String test = result.getMethod().getMethodName();
     	String errorMessage = getFailureReason(result);
+    	EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), true));
+
     	//TODO: remove hard-coded text
     	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
     		Messager.CONFIGURATION_FAILED.error(test, DateUtils.now(), errorMessage);
@@ -98,9 +99,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}
 		}
 
-		result.setAttribute(GlobalTestLog.KEY, new GlobalTestLog());
-		
-		String test = TestNamingUtil.accociateTestInfo2Thread(TestNamingUtil.getCanonicalTestName(result), Thread.currentThread().getId());
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
 		
 		RetryCounter.initCounter(test);
 
@@ -115,7 +115,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 		
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSuccess(result);
@@ -135,7 +134,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
 			
 			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestFailure(result);
@@ -155,7 +153,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 			EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 			
 			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
@@ -225,7 +222,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 	}
 
-	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description)
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description) {
+		return createTestResult(result, resultType, failReason, description, false);
+	}
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean configTest)
 	{
 		String group = TestNamingUtil.getPackageName(result);
 		String testName = TestNamingUtil.getCanonicalTestName(result);
@@ -239,7 +239,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		{
 			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason);
+		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, configTest);
 		testResultItem.setDescription(description);
 		if (!resultType.equals(TestResultType.PASS)) {
 			testResultItem.setJiraTickets(Jira.getTickets(result));
@@ -251,18 +251,12 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String errorMessage = "";
 		String message = "";
 		
-		Throwable thr = (Throwable) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION);
-		if (thr != null) {
-			errorMessage = getFullStackTrace(thr);
-			message = thr.getMessage();
-		}
 		
 		if (result.getThrowable() != null) {
-			thr = result.getThrowable();
+			Throwable thr = result.getThrowable();
 			errorMessage = getFullStackTrace(thr);
 			message = thr.getMessage();
 			result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE, message);
-			result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE_EXCEPTION, thr);
 		}
 		
 		return errorMessage;

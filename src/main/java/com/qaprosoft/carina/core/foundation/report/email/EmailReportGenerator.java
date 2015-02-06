@@ -155,8 +155,9 @@ public class EmailReportGenerator
 			{
 				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 			}
-			
-			failCount++;
+			if (!testResultItem.isConfigTest()) {
+				failCount++;
+			}
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
 			result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
@@ -171,7 +172,7 @@ public class EmailReportGenerator
 			}
 			else
 			{
-				result = result.replace(SKIP_REASON_PLACEHOLDER, "Skipped due to the TestNG dependency.");
+				result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze initializeServices log for details.");
 			}
 			
 			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
@@ -234,7 +235,6 @@ public class EmailReportGenerator
 			result = TestResultType.FAIL;
 		}
 		return result;
-		//return (failCount == 0 && skipCount == 0 && passCount > 0) ? TestResultType.PASS : TestResultType.FAIL;
 	}
 	
 	public static TestResultType getSuiteResult(List<TestResultItem> ris)
@@ -244,6 +244,10 @@ public class EmailReportGenerator
 		int skipped = 0;
 		for(TestResultItem ri : ris)
 		{
+			if (ri.isConfigTest()) {
+				//do not calculate configuration steps into the overall statistics
+				continue;
+			}
 			switch (ri.getResult()) {
 			case PASS:
 				passed++;
