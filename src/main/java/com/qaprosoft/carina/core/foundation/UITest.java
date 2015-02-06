@@ -49,7 +49,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 public class UITest extends AbstractTest
 {
     private static final Logger LOGGER = Logger.getLogger(UITest.class);
-    private static int driverInitCount = Configuration.getInt(Parameter.RETRY_COUNT) + 1; //1 - is default run without retry
+    private static int driverInitCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; //1 - is default run without retry
     
     protected WebDriver driver;
     
@@ -228,9 +228,12 @@ public class UITest extends AbstractTest
 	    	}
 		}
 		catch (Throwable thr) {
+			thr.printStackTrace();
+			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()), thr);
 			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
 			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()));
 			init_throwable = thr;
+
 		}    	
 		return extraDriver;		
 	}

@@ -133,6 +133,8 @@ public class Configuration
 
 		SENDER_PASSWORD("sender_pswd"),
 		
+		INIT_RETRY_COUNT("init_retry_count"),
+		
 		RETRY_COUNT("retry_count"),
 
 		LOCALE("locale"),
