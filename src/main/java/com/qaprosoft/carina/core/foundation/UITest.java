@@ -283,6 +283,7 @@ public class UITest extends AbstractTest
     			init = true;
     		}
     		catch (Throwable thr) {
+    			DevicePool.ignoreDevice();
     			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
     			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
     			init_throwable = thr;
