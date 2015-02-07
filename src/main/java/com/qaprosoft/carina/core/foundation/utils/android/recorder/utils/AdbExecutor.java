@@ -77,8 +77,12 @@ public class AdbExecutor {
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = in.readLine();
             LOGGER.debug("sdkVersion: " + line);
-            int sdkVersion = Integer.parseInt(line);
-            correctDevice = sdkVersion >= 19;
+            if (line != null) {
+            	int sdkVersion = Integer.parseInt(line);
+            	correctDevice = sdkVersion >= 19;
+            } else {
+            	LOGGER.error("SDK version for '" + DevicePool.getDevice().getName() + "' device is not recognized!");
+            }
 
         } catch (Exception e) {
         	e.printStackTrace();
