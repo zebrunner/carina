@@ -108,6 +108,26 @@ public class DevicePool
 
 	}
 	
+	public static synchronized void ignoreDevice()
+	{
+		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
+			return;
+		}
+		Long threadId = Thread.currentThread().getId();
+		Device device = getDeviceByThread(threadId);
+		if (device == null) {
+			return;
+		}
+		
+		List<Device> devices = new ArrayList<Device>(); 
+		if (threadId2IgnoredDevices.containsKey(threadId)) {
+			devices = threadId2IgnoredDevices.get(threadId);
+		}
+		devices.add(device);
+		
+		threadId2IgnoredDevices.put(threadId, devices);
+	}
+	
 	public static synchronized void ignoreDevice(Long threadId, Device device)
 	{
 		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
@@ -147,6 +167,14 @@ public class DevicePool
 			LOGGER.debug("Deregistering all ignored devices for thread '" + threadId + "'");
 			threadId2IgnoredDevices.remove(threadId);
 		}
+	}
+
+	public static synchronized Device getDevice() {
+		Device device = null;
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+			device = DevicePool.getDeviceByThread(Thread.currentThread().getId());
+		} 
+		return device;
 	}
 	
 	public static synchronized String getDeviceUdid() {
