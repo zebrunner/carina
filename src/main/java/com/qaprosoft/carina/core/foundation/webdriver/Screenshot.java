@@ -80,7 +80,7 @@ public class Screenshot
 				File testScreenRootDir = ReportContext.getTestDir(test);
 
 				// Capture full page screenshot and resize
-				String fileID = test.replaceAll(" ", "_") + "-" + System.currentTimeMillis();
+				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
 				screenName = fileID + ".png";
 				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 				
