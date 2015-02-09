@@ -178,5 +178,22 @@ public class AdbExecutor {
     	
     	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
     	execute(cmd);
-    }    
+    }
+    
+    public void clearAppData(String app){
+    	if (!isDeviceCorrect())
+    		return;
+    	//adb -s UDID shell pm clear com.myfitnesspal.android
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
+    	execute(cmd);
+    }
+    
+    public void uninstallApp(String app){
+    	if (!isDeviceCorrect())
+    		return;
+    	//adb -s UDID uninstall com.myfitnesspal.android 
+    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
+    	execute(cmd);
+    }
+    
 }
