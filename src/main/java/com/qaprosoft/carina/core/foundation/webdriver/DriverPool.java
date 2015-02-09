@@ -22,7 +22,6 @@ import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class DriverPool
 {
@@ -34,7 +33,7 @@ public class DriverPool
 	public static synchronized void registerDriver2Thread(WebDriver driver, Long threadId)
 	{
 		threadId2Driver.put(threadId, driver);
-		if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
+		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
 			//init our single driver variable
 			single_driver = driver;
 		}
@@ -49,7 +48,7 @@ public class DriverPool
 			drv = threadId2Driver.get(threadId);
 			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
 		}
-		else if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE) {
+		else if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
 			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
 			//init our single driver variable
 			drv = single_driver;

@@ -74,7 +74,7 @@ public class UITest extends AbstractTest
     	super.executeBeforeTestSuite(context);
     	
     	DevicePool.registerDevices();
-    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+    	DriverMode driverMode = Configuration.getDriverMode();
     	
 	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
 	    {
@@ -90,7 +90,7 @@ public class UITest extends AbstractTest
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
     	super.executeBeforeTestClass(context);
     	
-    	DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+    	DriverMode driverMode = Configuration.getDriverMode();
 
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
@@ -115,7 +115,7 @@ public class UITest extends AbstractTest
 		super.executeBeforeTestMethod(xmlTest, testMethod, context);
 		quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
 		
-		DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+		DriverMode driverMode = Configuration.getDriverMode();
 		
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
@@ -151,7 +151,7 @@ public class UITest extends AbstractTest
     	try
     	{	    
     		quitExtraDriver(); 
-    		DriverMode driverMode = Configuration.getDriverMode(Parameter.DRIVER_MODE);
+    		DriverMode driverMode = Configuration.getDriverMode();
 			
 	    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 				stopRecording(TestNamingUtil.getCanonicalTestName(result));
@@ -174,7 +174,7 @@ public class UITest extends AbstractTest
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
 		quitExtraDriver();
-	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.CLASS_MODE && getDriver() != null)
+	    if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null)
 	    {
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
 			quitDriver();
@@ -187,7 +187,7 @@ public class UITest extends AbstractTest
     public void executeAfterTestSuite(ITestContext context)
     {
     	quitExtraDriver();
-	    if (Configuration.getDriverMode(Parameter.DRIVER_MODE) == DriverMode.SUITE_MODE && getDriver() != null)
+	    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && getDriver() != null)
 	    {
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterSuite.");
 			quitDriver();
