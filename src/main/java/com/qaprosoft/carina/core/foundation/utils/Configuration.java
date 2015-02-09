@@ -312,9 +312,9 @@ public class Configuration
 		return Boolean.valueOf(get(param).trim());
 	}
 
-	public static DriverMode getDriverMode(Parameter param)
+	public static DriverMode getDriverMode()
 	{
-		return DriverMode.valueOf(get(param).trim().toUpperCase());
+		return DriverMode.valueOf(get(Parameter.DRIVER_MODE).trim().toUpperCase());
 	}
 	
 	public static Locale getLocale()
