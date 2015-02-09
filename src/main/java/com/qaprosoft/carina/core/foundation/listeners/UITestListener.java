@@ -93,10 +93,13 @@ public class UITestListener extends AbstractTestListener {
 				LOGGER.error("Retry limit exceeded for " + result.getName());
 			}
 	
-			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 			super.onTestFailure(result);
 			LOGGER.debug("count >= maxCount: onTestFailure listener finished successfully.");
 		}
+		
+		//screenshot should be added for all cases obligatory
+		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
+		
 		Reporter.setCurrentTestResult(result);
 		LOGGER.debug("onTestFailure listener finished successfully.");
 	}
