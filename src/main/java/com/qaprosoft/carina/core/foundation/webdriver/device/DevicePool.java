@@ -36,12 +36,12 @@ public class DevicePool
 	public static synchronized void registerDevices() {
 		String params = Configuration.get(Parameter.MOBILE_DEVICES);
 		if (params.isEmpty()) {
-			LOGGER.debug("Parameter.MOBILE_DEVICES is empty. Skip devices registration.");
+			LOGGER.info("Parameter.MOBILE_DEVICES is empty. Skip devices registration.");
 			return;
 		}
 		if (devices.size() > 0) {
 			//already registered
-			LOGGER.debug("devices are already registered. Count is: " + devices.size());
+			LOGGER.info("devices are already registered. Count is: " + devices.size());
 			return;
 		}
 		//TODO: implement 1) device status verification; 2) adjustments of thread numbers
@@ -52,7 +52,7 @@ public class DevicePool
 			}
 			Device device = new Device(devicesArgs[i]);
 			devices.add(device);
-			LOGGER.debug("Adding new device into the list: " + device.getName());
+			LOGGER.info("Adding new device into the list: " + device.getName());
 		}
 	}
 	
@@ -67,28 +67,28 @@ public class DevicePool
 		Device freeDevice = null;
 		while (++count<100 && !found) {
 			for (Device device : devices) {
-				LOGGER.debug("Check device status for registration: " + device.getName());
+				LOGGER.info("Check device status for registration: " + device.getName());
 				if (!threadId2Device.containsValue(device)) {
 					if (!threadId2IgnoredDevices.containsKey(threadId)) {
 						//current thread doesn't have ignored devices
-						LOGGER.debug("identified free non-ingnored device: " + device.getName());
+						LOGGER.info("identified free non-ingnored device: " + device.getName());
 						freeDevice = device;
 						found = true;
 						break;						
 					} else if (!threadId2IgnoredDevices.get(threadId).contains(device)) {
-						LOGGER.debug("identified free non-ingnored device: " + device.getName());
+						LOGGER.info("identified free non-ingnored device: " + device.getName());
 						freeDevice = device;
 						found = true;
 						break;
 					} else {
 						//additional verification onto the count of the ignored devices. If all of them are added into ignored list then choose any again
 						if (devices.size() == threadId2IgnoredDevices.get(threadId).size()) {
-							LOGGER.debug("device from ignored list will be added as all devices are ignored!");
+							LOGGER.info("device from ignored list will be added as all devices are ignored!");
 							freeDevice = device;
 							found = true;
 							break;							
 						}
-						LOGGER.debug("Unable to register device as it is in the ignored pool!");
+						LOGGER.info("Unable to register device as it is in the ignored pool!");
 					}
 				}
 			}
@@ -100,7 +100,7 @@ public class DevicePool
 		
 		if (freeDevice != null) {
 			threadId2Device.put(threadId, freeDevice);
-			LOGGER.debug("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
+			LOGGER.info("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
 		} else {
 			throw new RuntimeException("Unable to find available device after '" + count + "' attempts!");	
 		}
@@ -110,22 +110,9 @@ public class DevicePool
 	
 	public static synchronized void ignoreDevice()
 	{
-		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
-			return;
-		}
 		Long threadId = Thread.currentThread().getId();
 		Device device = getDeviceByThread(threadId);
-		if (device == null) {
-			return;
-		}
-		
-		List<Device> devices = new ArrayList<Device>(); 
-		if (threadId2IgnoredDevices.containsKey(threadId)) {
-			devices = threadId2IgnoredDevices.get(threadId);
-		}
-		devices.add(device);
-		
-		threadId2IgnoredDevices.put(threadId, devices);
+		ignoreDevice(threadId, device);
 	}
 	
 	public static synchronized void ignoreDevice(Long threadId, Device device)
@@ -133,14 +120,22 @@ public class DevicePool
 		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
 			return;
 		}
+		if (devices.size() <= 1) {
+			LOGGER.info("Unable to irnore single device!");
+			return;
+		}
+		if (device == null) {
+			return;
+		}
 		
+		LOGGER.info("Put device '" + device.getName() + "' into ignored list.");
 		List<Device> devices = new ArrayList<Device>(); 
 		if (threadId2IgnoredDevices.containsKey(threadId)) {
 			devices = threadId2IgnoredDevices.get(threadId);
 		}
 		devices.add(device);
 		
-		threadId2IgnoredDevices.put(threadId, devices);
+		threadId2IgnoredDevices.put(threadId, devices);	
 	}
 	
 	
@@ -149,7 +144,7 @@ public class DevicePool
 		Device device = null;
 		if (threadId2Device.containsKey(threadId)) {
 			device = threadId2Device.get(threadId);
-			LOGGER.debug("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
+			LOGGER.info("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
 		}
 		return device;
 	}
@@ -160,11 +155,11 @@ public class DevicePool
 			Device device = threadId2Device.get(threadId);
 			
 			threadId2Device.remove(threadId);
-			LOGGER.debug("Deregistering device '" + device.getName() + "' with thread '" + threadId + "'");
+			LOGGER.info("Deregistering device '" + device.getName() + "' with thread '" + threadId + "'");
 		}
 		
 		if (threadId2IgnoredDevices.containsKey(threadId)) {
-			LOGGER.debug("Deregistering all ignored devices for thread '" + threadId + "'");
+			LOGGER.info("Deregistering all ignored devices for thread '" + threadId + "'");
 			threadId2IgnoredDevices.remove(threadId);
 		}
 	}
