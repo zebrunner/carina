@@ -182,6 +182,9 @@ public class DevicePool
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
 			Device device = DevicePool.getDeviceByThread(Thread.currentThread().getId());
+			if (device == null) {
+				throw new RuntimeException("Unable to find device by thread!");
+			}
 			udid = device.getUdid();
 		} 
 		
