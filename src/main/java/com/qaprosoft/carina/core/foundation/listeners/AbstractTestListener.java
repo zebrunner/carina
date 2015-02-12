@@ -77,11 +77,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
+	    
+	    String test = context.getName();
+	    test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
 	}
 	
 	@Override
 	public void onTestStart(ITestResult result)
 	{
+		long threadId = Thread.currentThread().getId();
 		super.onTestStart(result);
 		
 		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
@@ -98,10 +102,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 				result.getTestContext().getCurrentXmlTest().setParameters(dsBean.getTestParams());
 
 			}
-		}
-
+		}				
+		
+		// remove configuration test info(logger)		
+		TestNamingUtil.releaseTestInfoByThread(threadId);
+		
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
+		test = TestNamingUtil.accociateTestInfo2Thread(test, threadId);
 		
 		RetryCounter.initCounter(test);
 

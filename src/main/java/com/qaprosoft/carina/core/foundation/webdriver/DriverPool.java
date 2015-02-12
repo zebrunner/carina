@@ -29,6 +29,7 @@ public class DriverPool
 	
 	static WebDriver single_driver;
 	private static final ConcurrentHashMap<Long, WebDriver> threadId2Driver = new ConcurrentHashMap<Long, WebDriver>();
+	private static final ConcurrentHashMap<Long, WebDriver> threadId2ExtraDriver = new ConcurrentHashMap<Long, WebDriver>();
 
 	public static synchronized void registerDriver2Thread(WebDriver driver, Long threadId)
 	{
@@ -39,6 +40,13 @@ public class DriverPool
 		}
 
 		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
+	}
+	
+	public static synchronized void registerExtraDriver2Thread(WebDriver driver, Long threadId)
+	{
+		threadId2ExtraDriver.put(threadId, driver);
+
+		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; extra driver: " + driver);
 	}
 	
 	public static WebDriver getDriverByThread(long threadId)
@@ -56,12 +64,31 @@ public class DriverPool
 		return drv;
 	}
 	
+	public static WebDriver getExtraDriverByThread(long threadId)
+	{
+		WebDriver drv = null;
+		if (threadId2ExtraDriver.containsKey(threadId)) {
+			drv = threadId2ExtraDriver.get(threadId);
+			LOGGER.debug("##########        GET threadId: " + threadId + "; extra driver: " + drv);
+		}
+		return drv;
+	}
+	
 	public static synchronized void deregisterDriverByThread(long threadId)
 	{
 		if (threadId2Driver.containsKey(threadId)) {
 			WebDriver drv = threadId2Driver.get(threadId);
 			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
 			threadId2Driver.remove(threadId);
+		}
+	}
+	
+	public static synchronized void deregisterExtraDriverByThread(long threadId)
+	{
+		if (threadId2ExtraDriver.containsKey(threadId)) {
+			WebDriver drv = threadId2ExtraDriver.get(threadId);
+			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; extra driver: " + drv);
+			threadId2ExtraDriver.remove(threadId);
 		}
 	}
 	
