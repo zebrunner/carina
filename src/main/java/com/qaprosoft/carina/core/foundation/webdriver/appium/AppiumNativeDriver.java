@@ -36,7 +36,7 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 
 	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
-	protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_TIMEOUT);	
+	protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);	
 	
 	protected static Wait<WebDriver> wait;
 	

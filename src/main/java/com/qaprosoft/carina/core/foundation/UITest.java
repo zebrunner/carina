@@ -288,6 +288,7 @@ public class UITest extends AbstractTest
     			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
     			init_throwable = thr;
     		}
+    		pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
     	}
 
     	return init;
