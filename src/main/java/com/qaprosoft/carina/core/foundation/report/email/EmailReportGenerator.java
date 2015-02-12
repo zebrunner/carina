@@ -42,9 +42,11 @@ public class EmailReportGenerator
 	private static String PACKAGE_TR = R.EMAIL.get("package_tr");
 	private static String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
 	private static String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
+	private static String SERVICE_TEST_LOG_DEMO_TR = R.EMAIL.get("service_test_log_demo_tr");
 	private static String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
 	private static String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
 	private static String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
+	private static String SERVICE_TEST_LOG_TR = R.EMAIL.get("service_test_log_tr");
 	private static String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
 	private static String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
 	private static String CREATED_ITEM = R.EMAIL.get("created_item");
@@ -58,12 +60,14 @@ public class EmailReportGenerator
 	private static final String CI_TEST_JOB = "${ci_test_job}";
 	private static final String PASS_COUNT_PLACEHOLDER = "${pass_count}";
 	private static final String FAIL_COUNT_PLACEHOLDER = "${fail_count}";
+	private static final String SERVICE_COUNT_PLACEHOLDER = "${service_count}";
 	private static final String SKIP_COUNT_PLACEHOLDER = "${skip_count}";
 	private static final String PASS_RATE_PLACEHOLDER = "${pass_rate}";
 	private static final String RESULTS_PLACEHOLDER = "${result_rows}";
 	private static final String PACKAGE_NAME_PLACEHOLDER = "${package_name}";
 	private static final String TEST_NAME_PLACEHOLDER = "${test_name}";
 	private static final String FAIL_REASON_PLACEHOLDER = "${fail_reason}";
+	private static final String SERVICE_REASON_PLACEHOLDER = "${service_reason}";
 	private static final String SKIP_REASON_PLACEHOLDER = "${skip_reason}";
 	private static final String SCREENSHOTS_URL_PLACEHOLDER = "${screenshots_url}";
 	private static final String LOG_URL_PLACEHOLDER = "${log_url}";
@@ -79,7 +83,7 @@ public class EmailReportGenerator
 	
 	private int passCount = 0;
 	private int failCount = 0;
-	
+	private int serviceCount = 0;
 
 	public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String elapsedTime, String ciTestJob,
 			List<TestResultItem> testResultItems, List<String> createdItems)
@@ -95,6 +99,7 @@ public class EmailReportGenerator
 		emailBody = emailBody.replace(RESULTS_PLACEHOLDER, getTestResultsList(testResultItems));
 		emailBody = emailBody.replace(PASS_COUNT_PLACEHOLDER, String.valueOf(passCount));
 		emailBody = emailBody.replace(FAIL_COUNT_PLACEHOLDER, String.valueOf(failCount));
+		emailBody = emailBody.replace(SERVICE_COUNT_PLACEHOLDER, String.valueOf(serviceCount));
 		emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
 		emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
 		emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
@@ -157,8 +162,45 @@ public class EmailReportGenerator
 			}
 			if (!testResultItem.isConfigTest()) {
 				failCount++;
+			} else {
+				LOGGER.info("Config Test Failure");
+				serviceCount++;
 			}
 		}
+		if (testResultItem.getResult().name().equalsIgnoreCase("SERVICE")) {
+			result = testResultItem.getLinkToScreenshots() != null ? SERVICE_TEST_LOG_DEMO_TR : SERVICE_TEST_LOG_TR;
+			result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
+			
+			failReason = testResultItem.getFailReason();
+			
+			LOGGER.info("failReason: "+failReason);
+			if (!StringUtils.isEmpty(failReason))
+			{
+				// Make description more compact for email report																																																											
+				failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
+				result = result.replace(SERVICE_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
+			}
+			else
+			{
+				result = result.replace(SERVICE_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
+			}
+			
+			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
+			
+			if(testResultItem.getLinkToScreenshots() != null)
+			{
+				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+			}
+			if (testResultItem.isConfigTest()) {
+				serviceCount++;
+				LOGGER.info("serviceCount: "+serviceCount);
+			} else {
+				serviceCount++;
+				LOGGER.info("SOME (Not config) serviceCount: "+serviceCount);
+			}
+				
+		}
+		
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
 			result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
 			result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
@@ -181,8 +223,13 @@ public class EmailReportGenerator
 			{
 				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 			}
+			if (!testResultItem.isConfigTest()) {
+				skipCount++;
+			} else {
+				LOGGER.info("Config Test Skip");
+				serviceCount++;
+			}
 			
-			skipCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("PASS")) {
 			result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
@@ -229,8 +276,12 @@ public class EmailReportGenerator
 		TestResultType result;
 		if (passCount > 0 && failCount == 0 && skipCount == 0) {
 			result = TestResultType.PASS;
-		} else if (passCount >= 0 && failCount == 0 && skipCount > 0){
+		} else if (passCount >= 0 && failCount == 0 && skipCount > 0 && serviceCount == 0){
+			LOGGER.info("Result Skip. skipCount:"+skipCount+" ,serviceCount:"+serviceCount);
 			result = TestResultType.SKIP;
+		} else if (passCount >= 0 && failCount == 0 && skipCount >= 0 && serviceCount > 0){
+			LOGGER.info("Result Service. skipCount:"+skipCount+" ,serviceCount:"+serviceCount);
+			result = TestResultType.SERVICE;
 		} else {
 			result = TestResultType.FAIL;
 		}
@@ -241,13 +292,14 @@ public class EmailReportGenerator
 	{
 		int passed = 0;
 		int failed = 0;
+		int service = 0;
 		int skipped = 0;
 		for(TestResultItem ri : ris)
 		{
-			if (ri.isConfigTest()) {
+			/*if (ri.isConfigTest()) {
 				//do not calculate configuration steps into the overall statistics
 				continue;
-			}
+			}*/
 			switch (ri.getResult()) {
 			case PASS:
 				passed++;
@@ -255,6 +307,9 @@ public class EmailReportGenerator
 			case FAIL:
 				failed++;
 				break;
+			case SERVICE:
+				service++;
+				break;	
 			case SKIP:
 				skipped++;
 				break;
@@ -263,13 +318,18 @@ public class EmailReportGenerator
 		TestResultType result;
 		if (passed > 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
-		} else if (passed >= 0 && failed == 0 && skipped > 0){
+		} else if (passed >= 0 && failed == 0 && skipped > 0 && service == 0){
+			LOGGER.info("Suite Result Skip. skipCount:"+skipped+" ,serviceCount:"+service);
 			result = TestResultType.SKIP;
+		} else if (passed >= 0 && failed == 0 && skipped >= 0 && service > 0){
+			LOGGER.info("Suite Result Service. skipCount:"+skipped+" ,serviceCount:"+service);
+			result = TestResultType.SERVICE;
 		} else {
 			result = TestResultType.FAIL;
 		}
 		result.setPassed(passed);
 		result.setFailed(failed);
+		result.setService(service);
 		result.setSkipped(skipped);
 		return result;
 		
