@@ -138,6 +138,17 @@ public class DevicePool
 		threadId2IgnoredDevices.put(threadId, devices);	
 	}
 	
+	public static synchronized void deregisterIgnoredDeviceByThread() {
+		deregisterIgnoredDeviceByThread(Thread.currentThread().getId());
+	}
+	public static synchronized void deregisterIgnoredDeviceByThread(long threadId)
+	{
+		if (threadId2IgnoredDevices.containsKey(threadId)) {
+			LOGGER.info("Deregistering all ignored devices for thread '" + threadId + "'");
+			threadId2IgnoredDevices.remove(threadId);
+		}
+	}
+	
 	
 	public static Device getDeviceByThread(long threadId)
 	{
@@ -157,11 +168,6 @@ public class DevicePool
 			threadId2Device.remove(threadId);
 			LOGGER.info("Deregistering device '" + device.getName() + "' with thread '" + threadId + "'");
 		}
-		
-		if (threadId2IgnoredDevices.containsKey(threadId)) {
-			LOGGER.info("Deregistering all ignored devices for thread '" + threadId + "'");
-			threadId2IgnoredDevices.remove(threadId);
-		}
 	}
 
 	public static synchronized Device getDevice() {
@@ -176,6 +182,9 @@ public class DevicePool
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
 			Device device = DevicePool.getDeviceByThread(Thread.currentThread().getId());
+			if (device == null) {
+				throw new RuntimeException("Unable to find device by thread!");
+			}
 			udid = device.getUdid();
 		} 
 		
