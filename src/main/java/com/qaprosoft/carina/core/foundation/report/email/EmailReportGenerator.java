@@ -43,9 +43,11 @@ public class EmailReportGenerator
 	private static String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
 	private static String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
 	private static String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
+	private static String SERVICE_TEST_LOG_DEMO_TR = R.EMAIL.get("service_test_log_demo_tr");
 	private static String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
 	private static String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
 	private static String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
+	private static String SERVICE_TEST_LOG_TR = R.EMAIL.get("service_test_log_tr");
 	private static String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
 	private static String CREATED_ITEM = R.EMAIL.get("created_item");
 	private static final String TITLE_PLACEHOLDER = "${title}";
@@ -59,12 +61,14 @@ public class EmailReportGenerator
 	private static final String PASS_COUNT_PLACEHOLDER = "${pass_count}";
 	private static final String FAIL_COUNT_PLACEHOLDER = "${fail_count}";
 	private static final String SKIP_COUNT_PLACEHOLDER = "${skip_count}";
+	private static final String SERVICE_COUNT_PLACEHOLDER = "${service_count}";
 	private static final String PASS_RATE_PLACEHOLDER = "${pass_rate}";
 	private static final String RESULTS_PLACEHOLDER = "${result_rows}";
 	private static final String PACKAGE_NAME_PLACEHOLDER = "${package_name}";
 	private static final String TEST_NAME_PLACEHOLDER = "${test_name}";
 	private static final String FAIL_REASON_PLACEHOLDER = "${fail_reason}";
 	private static final String SKIP_REASON_PLACEHOLDER = "${skip_reason}";
+	private static final String SERVICE_REASON_PLACEHOLDER = "${service_reason}";
 	private static final String SCREENSHOTS_URL_PLACEHOLDER = "${screenshots_url}";
 	private static final String LOG_URL_PLACEHOLDER = "${log_url}";
 	private static final String CREATED_ITEMS_LIST_PLACEHOLDER = "${created_items_list}";
@@ -79,7 +83,7 @@ public class EmailReportGenerator
 	
 	private int passCount = 0;
 	private int failCount = 0;
-	
+	private int serviceCount = 0;
 
 	public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String elapsedTime, String ciTestJob,
 			List<TestResultItem> testResultItems, List<String> createdItems)
@@ -96,6 +100,7 @@ public class EmailReportGenerator
 		emailBody = emailBody.replace(PASS_COUNT_PLACEHOLDER, String.valueOf(passCount));
 		emailBody = emailBody.replace(FAIL_COUNT_PLACEHOLDER, String.valueOf(failCount));
 		emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
+		emailBody = emailBody.replace(SERVICE_COUNT_PLACEHOLDER, String.valueOf(serviceCount));
 		emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
 		emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
 	}
@@ -155,9 +160,8 @@ public class EmailReportGenerator
 			{
 				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 			}
-			if (!testResultItem.isConfigTest()) {
-				failCount++;
-			}
+
+			failCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
 			result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
@@ -183,6 +187,31 @@ public class EmailReportGenerator
 			}
 			
 			skipCount++;
+		}
+		if (testResultItem.getResult().name().equalsIgnoreCase("SERVICE")) {
+			result = testResultItem.getLinkToScreenshots() != null ? SERVICE_TEST_LOG_DEMO_TR : SERVICE_TEST_LOG_TR;
+			result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
+			
+			failReason = testResultItem.getFailReason();
+			if (!StringUtils.isEmpty(failReason))
+			{
+				// Make description more compact for email report																																																											
+				failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
+				result = result.replace(SERVICE_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
+			}
+			else
+			{
+				result = result.replace(SERVICE_REASON_PLACEHOLDER, "Analyze initializeServices log for details.");
+			}
+			
+			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
+			
+			if(testResultItem.getLinkToScreenshots() != null)
+			{
+				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+			}
+			
+			serviceCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("PASS")) {
 			result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
@@ -242,12 +271,9 @@ public class EmailReportGenerator
 		int passed = 0;
 		int failed = 0;
 		int skipped = 0;
+		int service = 0;
 		for(TestResultItem ri : ris)
 		{
-			if (ri.isConfigTest()) {
-				//do not calculate configuration steps into the overall statistics
-				continue;
-			}
 			switch (ri.getResult()) {
 			case PASS:
 				passed++;
@@ -257,6 +283,9 @@ public class EmailReportGenerator
 				break;
 			case SKIP:
 				skipped++;
+				break;
+			case SERVICE:
+				service++;
 				break;
 			}
 		}
@@ -271,6 +300,8 @@ public class EmailReportGenerator
 		result.setPassed(passed);
 		result.setFailed(failed);
 		result.setSkipped(skipped);
+		result.setService(service);
+		
 		return result;
 		
 	}

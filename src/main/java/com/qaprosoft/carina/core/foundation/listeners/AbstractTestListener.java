@@ -50,9 +50,9 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	String test = result.getMethod().getMethodName();
+    	String test = TestNamingUtil.getCanonicalTestName(result);
     	String errorMessage = getFailureReason(result);
-    	EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), true));
+    	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
 
     	//TODO: remove hard-coded text
     	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
@@ -62,8 +62,9 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-    	String test = result.getMethod().getMethodName();
+    	String test = TestNamingUtil.getCanonicalTestName(result);
     	String errorMessage = getFailureReason(result);
+    	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
 		Messager.CONFIGURATION_SKIPPED.error(test, DateUtils.now(), errorMessage);
     }
     
@@ -222,10 +223,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 	}
 
-	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description) {
-		return createTestResult(result, resultType, failReason, description, false);
-	}
-	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean configTest)
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description)
 	{
 		String group = TestNamingUtil.getPackageName(result);
 		String testName = TestNamingUtil.getCanonicalTestName(result);
@@ -239,7 +237,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		{
 			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, configTest);
+		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason);
 		testResultItem.setDescription(description);
 		if (!resultType.equals(TestResultType.PASS)) {
 			testResultItem.setJiraTickets(Jira.getTickets(result));

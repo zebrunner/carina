@@ -24,25 +24,28 @@ public enum TestResultType
 {
 	PASS("PASS"),
 	FAIL("FAIL"),
-	SKIP("SKIP");
+	SKIP("SKIP"),
+	SERVICE("SERVICE");
 
 	private String result;
 	
 	int passed;
 	int failed;
 	int skipped;
+	int service;
 
 	TestResultType(String result)
 	{
 		this.result = result;
 	}
 	
-	TestResultType(String result, int passed, int failed, int skipped)
+	TestResultType(String result, int passed, int failed, int skipped, int service)
 	{
 		this.result = result;
 		this.passed = passed;
 		this.failed = failed;
 		this.skipped = skipped;
+		this.service = service;
 	}
 
 	public String getName()
@@ -72,6 +75,14 @@ public enum TestResultType
 
 	public void setSkipped(int skipped) {
 		this.skipped = skipped;
+	}
+	
+	public int getService() {
+		return service;
+	}
+	
+	public void setService(int service) {
+		this.service = service;
 	}
 
 }
