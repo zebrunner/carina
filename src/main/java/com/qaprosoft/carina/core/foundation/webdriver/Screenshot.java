@@ -47,7 +47,7 @@ public class Screenshot
 
 	public static String capture(WebDriver driver)
 	{
-		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) && !Configuration.getBoolean(Parameter.TAKE_ONLY_FAIL_SCREENSHOT));
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT));
 	}
 	
 	/**
