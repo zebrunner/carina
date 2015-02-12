@@ -101,8 +101,6 @@ public class Configuration
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
-		TAKE_ONLY_FAIL_SCREENSHOT("take_only_fail_screenshot"),
-
 		IMPLICIT_TIMEOUT("implicit_timeout"),
 
 		EXPLICIT_TIMEOUT("explicit_timeout"),
@@ -111,7 +109,7 @@ public class Configuration
 		
 		AUTO_DOWNLOAD_APPS("auto_download_apps"),
 
-		RETRY_TIMEOUT("retry_timeout"),
+		RETRY_INTERVAL("retry_interval"),
 
 		PROJECT_REPORT_DIRECTORY("project_report_directory"),
 
@@ -134,6 +132,8 @@ public class Configuration
 		SENDER_PASSWORD("sender_pswd"),
 		
 		INIT_RETRY_COUNT("init_retry_count"),
+		
+		INIT_RETRY_INTERVAL("init_retry_interval"),
 		
 		RETRY_COUNT("retry_count"),
 
