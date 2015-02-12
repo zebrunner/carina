@@ -64,7 +64,15 @@ public abstract class AbstractTestListener extends TestArgsListener
     public void onConfigurationSkip(ITestResult result) {
     	String test = result.getMethod().getMethodName();
     	String errorMessage = getFailureReason(result);
+    	
 		Messager.CONFIGURATION_SKIPPED.error(test, DateUtils.now(), errorMessage);
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription(), true));
+		//EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription(), false));
+		//result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		
+		super.onConfigurationSkip(result);
     }
     
 	@Override
