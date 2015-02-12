@@ -69,6 +69,9 @@ public class UITestListener extends AbstractTestListener {
 			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
 			LOGGER.debug("UITestListener->onTestFailure retry analyzer: " + result.getMethod().getRetryAnalyzer());
 
+			//screenshot should be added for all cases obligatory
+			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
+
 			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
 			TestNamingUtil.decreaseRetryCounter(test);
 			DevicePool.ignoreDevice();
@@ -89,16 +92,17 @@ public class UITestListener extends AbstractTestListener {
 		}
 		else
 		{		
+			DevicePool.deregisterIgnoredDeviceByThread();
 			if (count > 0) {
 				LOGGER.error("Retry limit exceeded for " + result.getName());
 			}
 	
+			//screenshot should be added for all cases obligatory
+			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
+
 			super.onTestFailure(result);
 			LOGGER.debug("count >= maxCount: onTestFailure listener finished successfully.");
 		}
-		
-		//screenshot should be added for all cases obligatory
-		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 		
 		Reporter.setCurrentTestResult(result);
 		LOGGER.debug("onTestFailure listener finished successfully.");
