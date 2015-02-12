@@ -49,6 +49,14 @@ public class UITestListener extends AbstractTestListener {
 	}
 
 	@Override
+	public void onConfigurationFailure(ITestResult result) {
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		String errorMessage = getFailureReason(result);
+		TestLogCollector.addScreenshotComment(takeScreenshot(result), "CONFIGURATION FAILED - " + errorMessage);
+		closeLogAppender(test);
+	}
+	
+	@Override
 	public void onTestFailure(ITestResult result) {
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		
@@ -75,19 +83,8 @@ public class UITestListener extends AbstractTestListener {
 			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
 			TestNamingUtil.decreaseRetryCounter(test);
 			DevicePool.ignoreDevice();
-			//temporary wrap into try/catch to analyze any possible failures with extended logging
-			try {
-				ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-				if(tla != null)
-				{
-					tla.closeResource(test);
-				}
-				LOGGER.debug("count < maxCount: onTestFailure listener finished successfully.");
-			}
-			catch (Exception e) {
-				LOGGER.error("onTestFailure listener was not successful.");
-				e.printStackTrace();
-			}
+			
+			closeLogAppender(test);
 			//ReportContext.removeTestReport(test);			
 		}
 		else
@@ -121,7 +118,8 @@ public class UITestListener extends AbstractTestListener {
 
 	private String takeScreenshot(ITestResult result) {
 		String screenId = "";
-		WebDriver driver = DriverPool.getDriverByThread(Thread.currentThread().getId());
+		long threadId = Thread.currentThread().getId();
+		WebDriver driver = DriverPool.getDriverByThread(threadId) != null ? DriverPool.getDriverByThread(threadId) : DriverPool.getExtraDriverByThread(threadId);
 		
 		if (driver != null) {
 			screenId = Screenshot.capture(driver, true); // in case of failure
@@ -167,5 +165,20 @@ public class UITestListener extends AbstractTestListener {
 				iterator.remove();
 			}
 		}*/
+	}
+	
+	private void closeLogAppender(String test)
+	{
+		try {
+			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+			if(tla != null)
+			{
+				tla.closeResource(test);
+			}
+		}
+		catch (Exception e) {
+			LOGGER.error("close log appender was not successful.");
+			e.printStackTrace();
+		}
 	}
 }
