@@ -53,6 +53,7 @@ public class UITestListener extends AbstractTestListener {
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		String errorMessage = getFailureReason(result);
 		TestLogCollector.addScreenshotComment(takeScreenshot(result), "CONFIGURATION FAILED - " + errorMessage);
+		LOGGER.error("CONFIGURATION FAILED - " + errorMessage);
 		closeLogAppender(test);
 	}
 	

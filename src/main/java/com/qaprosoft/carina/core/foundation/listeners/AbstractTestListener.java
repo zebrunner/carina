@@ -47,10 +47,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 {
     // Dropbox client
     DropboxClient dropboxClient;
-    
+ 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+//    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = result.getTestName();
     	String errorMessage = getFailureReason(result);
     	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
 
@@ -62,7 +63,8 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+//    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = result.getTestName();
     	String errorMessage = getFailureReason(result);
     	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
 		Messager.CONFIGURATION_SKIPPED.error(test, DateUtils.now(), errorMessage);
@@ -78,7 +80,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
 	    
-	    String test = context.getName();
+	    String test = context.getClass().getCanonicalName();
 	    test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
 	}
 	
