@@ -47,10 +47,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 {
     // Dropbox client
     DropboxClient dropboxClient;
-    
+ 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+//    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = result.getTestName();
     	String errorMessage = getFailureReason(result);
     	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
 
@@ -62,7 +63,8 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+//    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = result.getTestName();
     	String errorMessage = getFailureReason(result);
     	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
 		Messager.CONFIGURATION_SKIPPED.error(test, DateUtils.now(), errorMessage);
@@ -77,11 +79,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
+	    
+	    String test = context.getClass().getCanonicalName();
+	    test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
 	}
 	
 	@Override
 	public void onTestStart(ITestResult result)
 	{
+		long threadId = Thread.currentThread().getId();
 		super.onTestStart(result);
 		
 		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
@@ -98,10 +104,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 				result.getTestContext().getCurrentXmlTest().setParameters(dsBean.getTestParams());
 
 			}
-		}
-
+		}				
+		
+		// remove configuration test info(logger)		
+		TestNamingUtil.releaseTestInfoByThread(threadId);
+		
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
+		test = TestNamingUtil.accociateTestInfo2Thread(test, threadId);
 		
 		RetryCounter.initCounter(test);
 
