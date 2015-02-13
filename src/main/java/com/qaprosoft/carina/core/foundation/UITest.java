@@ -235,6 +235,8 @@ public class UITest extends AbstractTest
 			init_throwable = thr;
 
 		}    	
+		
+		DriverPool.registerExtraDriver2Thread(extraDriver, Thread.currentThread().getId());
 		return extraDriver;		
 	}
 	
@@ -249,7 +251,8 @@ public class UITest extends AbstractTest
 			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
 			extraDriver.quit();
 			extraDriver = null;
-		}
+			DriverPool.deregisterDriverByThread(Thread.currentThread().getId());
+		}		
 	}
 	
 	protected WebDriver getDriver() {
