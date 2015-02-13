@@ -82,6 +82,8 @@ public class DevicePool
 						break;
 					} else {
 						//additional verification onto the count of the ignored devices. If all of them are added into ignored list then choose any again
+						LOGGER.info("devices pool size is: " + devices.size());
+						LOGGER.info("ignored devices pool size is: " + threadId2IgnoredDevices.get(threadId).size());
 						if (devices.size() == threadId2IgnoredDevices.get(threadId).size()) {
 							LOGGER.info("device from ignored list will be added as all devices are ignored!");
 							freeDevice = device;
@@ -93,8 +95,9 @@ public class DevicePool
 				}
 			}
 			if (!found) {
-				LOGGER.warn("There is no free device, wating 3 min... attempt: " + count);
-				pause(180);
+				int sec = Configuration.getInt(Parameter.INIT_RETRY_INTERVAL);
+				LOGGER.warn("There is no free device, wating " + sec + " sec... attempt: " + count);
+				pause(sec);
 			}
 		}
 		
@@ -128,14 +131,15 @@ public class DevicePool
 			return;
 		}
 		
-		LOGGER.info("Put device '" + device.getName() + "' into ignored list.");
+		LOGGER.error("Ignoring device feature is disabled!");
+/*		LOGGER.info("Put device '" + device.getName() + "' into ignored list.");
 		List<Device> devices = new ArrayList<Device>(); 
 		if (threadId2IgnoredDevices.containsKey(threadId)) {
 			devices = threadId2IgnoredDevices.get(threadId);
 		}
 		devices.add(device);
 		
-		threadId2IgnoredDevices.put(threadId, devices);	
+		threadId2IgnoredDevices.put(threadId, devices);	*/
 	}
 	
 	public static synchronized void deregisterIgnoredDeviceByThread() {
