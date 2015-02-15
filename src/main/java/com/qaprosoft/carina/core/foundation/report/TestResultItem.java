@@ -30,18 +30,10 @@ public class TestResultItem
 	private String description = null;
 	private List<String> jiraTickets = new ArrayList<String>(); //empty list
 	private TestResultType result = null;
+	
+	private boolean config = false;
 
-/*	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo)
-	{
-		this.pack = group;
-		this.test = test;
-		this.result = result;
-		this.linkToLog = linkToLog;
-		this.linkToScreenshots = linkToScreenshots;
-		this.linkToVideo = linkToVideo;
-	}
-*/
-	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo, String failReason)
+	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo, String failReason, boolean config)
 	{
 		this.pack = group;
 		this.test = test;
@@ -50,6 +42,7 @@ public class TestResultItem
 		this.linkToScreenshots = linkToScreenshots;
 		this.linkToVideo = linkToVideo;
 		this.failReason = failReason;
+		this.config = config;
 	}
 	public String getPack()
 	{
@@ -152,5 +145,9 @@ public class TestResultItem
 	public String hash()
 	{
 		return String.valueOf(pack.hashCode()) + "-" + String.valueOf(test.hashCode());
+	}
+	
+	public boolean isConfig() {
+		return config;
 	}
 }

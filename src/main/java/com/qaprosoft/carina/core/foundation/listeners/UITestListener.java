@@ -29,7 +29,6 @@ import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * Listener that controls retry logic for test according to retry_count
@@ -83,14 +82,14 @@ public class UITestListener extends AbstractTestListener {
 
 			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
 			TestNamingUtil.decreaseRetryCounter(test);
-			DevicePool.ignoreDevice();
+			//DevicePool.ignoreDevice();
 			
 			closeLogAppender(test);
 			//ReportContext.removeTestReport(test);			
 		}
 		else
 		{		
-			DevicePool.deregisterIgnoredDeviceByThread();
+			//DevicePool.deregisterIgnoredDeviceByThread();
 			if (count > 0) {
 				LOGGER.error("Retry limit exceeded for " + result.getName());
 			}
