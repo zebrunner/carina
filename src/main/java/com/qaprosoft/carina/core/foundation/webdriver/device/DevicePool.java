@@ -30,7 +30,7 @@ public class DevicePool
 	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
 	
 	private static final ConcurrentHashMap<Long, Device> threadId2Device = new ConcurrentHashMap<Long, Device>();
-	private static final ConcurrentHashMap<Long, List<Device>> threadId2IgnoredDevices = new ConcurrentHashMap<Long, List<Device>>();
+//	private static final ConcurrentHashMap<Long, List<Device>> threadId2IgnoredDevices = new ConcurrentHashMap<Long, List<Device>>();
 	private static List<Device> devices = new ArrayList<Device>();
 
 	public static synchronized void registerDevices() {
@@ -57,6 +57,43 @@ public class DevicePool
 	}
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
+	{
+		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
+			return null;
+		}
+		
+		int count = 0;
+		boolean found = false;
+		Device freeDevice = null;
+		while (++count<100 && !found) {
+			for (Device device : devices) {
+				LOGGER.info("Check device status for registration: " + device.getName());
+				if (!threadId2Device.containsValue(device)) {
+						//current thread doesn't have ignored devices
+						LOGGER.info("identified free non-ingnored device: " + device.getName());
+						freeDevice = device;
+						found = true;
+						break;						
+				}
+			}
+			if (!found) {
+				int sec = Configuration.getInt(Parameter.INIT_RETRY_INTERVAL);
+				LOGGER.warn("There is no free device, wating " + sec + " sec... attempt: " + count);
+				pause(sec);
+			}
+		}
+		
+		if (freeDevice != null) {
+			threadId2Device.put(threadId, freeDevice);
+			LOGGER.info("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
+		} else {
+			throw new RuntimeException("Unable to find available device after '" + count + "' attempts!");	
+		}
+		return freeDevice;
+
+	}	
+	
+/*	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
 		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
 			return null;
@@ -109,9 +146,9 @@ public class DevicePool
 		}
 		return freeDevice;
 
-	}
+	}*/
 	
-	public static synchronized void ignoreDevice()
+/*	public static synchronized void ignoreDevice()
 	{
 		Long threadId = Thread.currentThread().getId();
 		Device device = getDeviceByThread(threadId);
@@ -132,14 +169,14 @@ public class DevicePool
 		}
 		
 		LOGGER.error("Ignoring device feature is disabled!");
-/*		LOGGER.info("Put device '" + device.getName() + "' into ignored list.");
+		LOGGER.info("Put device '" + device.getName() + "' into ignored list.");
 		List<Device> devices = new ArrayList<Device>(); 
 		if (threadId2IgnoredDevices.containsKey(threadId)) {
 			devices = threadId2IgnoredDevices.get(threadId);
 		}
 		devices.add(device);
 		
-		threadId2IgnoredDevices.put(threadId, devices);	*/
+		threadId2IgnoredDevices.put(threadId, devices);	
 	}
 	
 	public static synchronized void deregisterIgnoredDeviceByThread() {
@@ -151,10 +188,24 @@ public class DevicePool
 			LOGGER.info("Deregistering all ignored devices for thread '" + threadId + "'");
 			threadId2IgnoredDevices.remove(threadId);
 		}
+	}*/
+	
+	
+	public static synchronized Device getDevice() {
+		Device device = null;
+		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+			return null;
+		}
+		long threadId = Thread.currentThread().getId();
+		if (threadId2Device.containsKey(threadId)) {
+			device = threadId2Device.get(threadId);
+			LOGGER.debug("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
+		}
+		return device;
 	}
 	
 	
-	public static Device getDeviceByThread(long threadId)
+/*	public static Device getDeviceByThread(long threadId)
 	{
 		Device device = null;
 		if (threadId2Device.containsKey(threadId)) {
@@ -163,7 +214,7 @@ public class DevicePool
 		}
 		return device;
 	}
-	
+	*/
 	public static synchronized void deregisterDeviceByThread(long threadId)
 	{
 		if (threadId2Device.containsKey(threadId)) {
@@ -174,22 +225,28 @@ public class DevicePool
 		}
 	}
 
-	public static synchronized Device getDevice() {
-		Device device = null;
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
-			device = DevicePool.getDeviceByThread(Thread.currentThread().getId());
-		} 
-		return device;
-	}
-	
+
 	public static synchronized String getDeviceUdid() {
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
-			Device device = DevicePool.getDeviceByThread(Thread.currentThread().getId());
+			Device device = DevicePool.getDevice();
 			if (device == null) {
 				throw new RuntimeException("Unable to find device by thread!");
 			}
 			udid = device.getUdid();
+		} 
+		
+		return udid;
+	}
+	
+	public static synchronized String getDeviceName() {
+		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+			Device device = DevicePool.getDevice();
+			if (device == null) {
+				throw new RuntimeException("Unable to find device by thread!");
+			}
+			udid = device.getName();
 		} 
 		
 		return udid;
