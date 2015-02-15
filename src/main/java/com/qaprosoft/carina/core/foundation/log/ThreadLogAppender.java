@@ -22,6 +22,10 @@ public class ThreadLogAppender extends AppenderSkeleton
 	@Override
 	public synchronized void append(LoggingEvent event)
 	{
+		if (ReportContext.isBaseDireCreated()) {
+			//don't write into file until all required structure is created
+			return;
+		}
 		try
 		{
 			String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
