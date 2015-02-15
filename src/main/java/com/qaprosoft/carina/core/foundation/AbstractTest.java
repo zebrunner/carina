@@ -113,19 +113,17 @@ public abstract class AbstractTest // extends DriverHelper
 
 		Logger root = Logger.getRootLogger();
 		Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-		// root.setLevel(Level.DEBUG);
 		while (allLoggers.hasMoreElements()) {
 			Category tmpLogger = (Category) allLoggers.nextElement();
 			if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
 				tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
 			}
 		}
-
+		
 		startDate = new Date().getTime();
 		LOGGER.info(Configuration.asString());
 		// Configuration.validateConfiguration();
 
-		ReportContext.removeOldReports();
 		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
 
 		if (!Configuration.isNull(Parameter.URL)) {
