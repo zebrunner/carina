@@ -41,33 +41,112 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
 {
+	private final static String TEST = "TEST";
+	private final static String CONFIGURATION = "CONFIGURATION";
     // Dropbox client
     DropboxClient dropboxClient;
- 
-    @Override
-    public void onConfigurationFailure(ITestResult result) {
-//    	String test = TestNamingUtil.getCanonicalTestName(result);
-    	String test = result.getTestName();
-    	String errorMessage = getFailureReason(result);
-    	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
-
-    	//TODO: remove hard-coded text
+    
+    private synchronized void startItem(ITestResult result, String name){
+		ReportContext.getBaseDir(); //create directory for logging as soon as possible
+		
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
+		
+		String deviceName = getDeviceName();		
+		Messager.TEST_STARTED.info(deviceName, name, test, DateUtils.now());	      	
+    }
+    
+    private void passItem(ITestResult result, String name){
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		if (test.endsWith("executeBeforeTestSuite")) {
+			//exit as test folder was not created for this action
+			return;
+		}
+		String deviceName = getDeviceName();
+		
+		Messager.TEST_PASSED.info(deviceName, name, test, DateUtils.now());
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), name.equals(CONFIGURATION)));
+		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+    }
+    
+    private void failItem(ITestResult result, String name){
+    	String test = TestNamingUtil.getCanonicalTestName(result);
+		if (test.endsWith("executeBeforeTestSuite")) {
+			//exit as test folder was not created for this action
+			return;
+		}
+		String errorMessage = getFailureReason(result);
+		String deviceName = getDeviceName();
+		
     	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
-    		Messager.CONFIGURATION_FAILED.error(test, DateUtils.now(), errorMessage);
+        	//TODO: remove hard-coded text
+    		Messager.TEST_FAILED.error(deviceName, name, test, DateUtils.now(), errorMessage);
+    		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), name.equals(CONFIGURATION)));    		
+    	}
+
+		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+    }
+ 
+    private void skipItem(ITestResult result, String name){
+    	String test = TestNamingUtil.getCanonicalTestName(result);
+		if (test.endsWith("executeBeforeTestSuite")) {
+			//exit as test folder was not created for this action
+			return;
+		}
+		String errorMessage = getFailureReason(result);
+		String deviceName = getDeviceName();
+		
+		Messager.TEST_SKIPPED.error(deviceName, name, test, DateUtils.now(), errorMessage);
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), name.equals(CONFIGURATION)));
+		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+    }
+    
+    private String getDeviceName() {
+    	String deviceName = "";
+    	Device device = DevicePool.getDevice();
+    	if (device != null) {
+    		deviceName = device.getName();
+    	}
+    	return deviceName;
+    }
+    
+    @Override
+    public void beforeConfiguration(ITestResult result) {
+    	//TODO: wrap into correct log level comparison
+    	if (Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("DEBUG")) {
+    		startItem(result, CONFIGURATION);
+    	}
+    }
+    
+    @Override
+    public void onConfigurationSuccess(ITestResult result) {
+    	//TODO: wrap into correct log level comparison
+    	if (Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("DEBUG")) {
+    		passItem(result, CONFIGURATION);
     	}
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-//    	String test = TestNamingUtil.getCanonicalTestName(result);
-    	String test = result.getTestName();
-    	String errorMessage = getFailureReason(result);
-    	EmailReportItemCollector.push(createTestResult(result, TestResultType.SERVICE, errorMessage, result.getMethod().getDescription()));
-		Messager.CONFIGURATION_SKIPPED.error(test, DateUtils.now(), errorMessage);
+    	//TODO: wrap into correct log level comparison
+    	if (Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("DEBUG")) {
+    		skipItem(result, CONFIGURATION);
+    	}
+    }
+
+    @Override
+    public void onConfigurationFailure(ITestResult result) {
+    	//write about configuration failure with any log level
+    	failItem(result, CONFIGURATION);
     }
     
 	@Override
@@ -79,15 +158,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
-	    
-	    String test = context.getClass().getCanonicalName();
-	    test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
 	}
 	
 	@Override
 	public void onTestStart(ITestResult result)
 	{
-		long threadId = Thread.currentThread().getId();
 		super.onTestStart(result);
 		
 		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
@@ -105,28 +180,17 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 			}
 		}				
-		
-		// remove configuration test info(logger)		
-		TestNamingUtil.releaseTestInfoByThread(threadId);
-		
+
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		test = TestNamingUtil.accociateTestInfo2Thread(test, threadId);
-		
 		RetryCounter.initCounter(test);
 
-		Messager.TEST_STARTED.info(test, DateUtils.now());
+		startItem(result, TEST);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		Messager.TEST_PASSED.info(test, DateUtils.now());
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
-		
-		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		passItem(result, TEST);
 		super.onTestSuccess(result);
 	}
 
@@ -139,11 +203,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		if (count >= maxCount && result.getThrowable().getMessage() != null)
 		{
-			String errorMessage = getFailureReason(result);
-			Messager.TEST_FAILED.error(test, DateUtils.now(), errorMessage);
-			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
-			
-			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+			failItem(result, TEST);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestFailure(result);
@@ -158,11 +218,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		if (count >= maxCount)
 		{
-			String errorMessage = getFailureReason(result);
-			Messager.TEST_SKIPPED.error(test, DateUtils.now(), errorMessage);
-			EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
-			
-			result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+			skipItem(result, TEST);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
@@ -232,21 +288,25 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 	}
 
-	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description)
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
 	{
 		String group = TestNamingUtil.getPackageName(result);
-		String testName = TestNamingUtil.getCanonicalTestName(result);
-		String linkToLog = ReportContext.getTestLogLink(testName);
-		String linkToVideo = ReportContext.getTestVideoLink(testName);
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		String linkToLog = ReportContext.getTestLogLink(test);
+		String linkToVideo = ReportContext.getTestVideoLink(test);
 		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
-		if(!FileUtils.listFiles(ReportContext.getTestDir(testName), new String[]{"png"}, false).isEmpty()
-			&& Configuration.getBoolean(Parameter.AUTO_SCREENSHOT)
-			&& (TestResultType.FAIL.equals(resultType) || Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)))
-		{
-			linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
+
+		if(!FileUtils.listFiles(ReportContext.getTestDir(test), new String[]{"png"}, false).isEmpty()){
+			if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
+				//TODO: remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve cooperation with CI tools
+				ReportContext.removeTestScreenshots(test);
+			}
+			else {
+				linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
+			}
 		}
-		TestResultItem testResultItem = new TestResultItem(group, testName, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason);
+		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
 		testResultItem.setDescription(description);
 		if (!resultType.equals(TestResultType.PASS)) {
 			testResultItem.setJiraTickets(Jira.getTickets(result));
