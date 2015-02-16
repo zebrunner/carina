@@ -53,24 +53,33 @@ public abstract class AbstractTestListener extends TestArgsListener
     DropboxClient dropboxClient;
     
     private synchronized void startItem(ITestResult result, String name){
+		
 		ReportContext.getBaseDir(); //create directory for logging as soon as possible
 		
-		String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = TestNamingUtil.getCanonicalTestName(result);
 		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
 		
 		String deviceName = getDeviceName();		
-		Messager.TEST_STARTED.info(deviceName, name, test, DateUtils.now());	      	
+		if (name.equals(TEST)) {
+			Messager.TEST_STARTED.info(deviceName, test, DateUtils.now());
+		} else {
+			Messager.CONFIG_STARTED.info(deviceName, test, DateUtils.now());
+		}		
     }
     
     private void passItem(ITestResult result, String name){
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		if (test.endsWith("executeBeforeTestSuite")) {
-			//exit as test folder was not created for this action
-			return;
-		}
+//		if (test.endsWith("executeBeforeTestSuite")) {
+//			//exit as test folder was not created for this action
+//			return;
+//		}
 		String deviceName = getDeviceName();
 		
-		Messager.TEST_PASSED.info(deviceName, name, test, DateUtils.now());
+		if (name.equals(TEST)) {
+			Messager.TEST_PASSED.info(deviceName, test, DateUtils.now());
+		} else {
+			Messager.CONFIG_PASSED.info(deviceName, test, DateUtils.now());
+		}
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), name.equals(CONFIGURATION)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
@@ -78,16 +87,21 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     private void failItem(ITestResult result, String name){
     	String test = TestNamingUtil.getCanonicalTestName(result);
-		if (test.endsWith("executeBeforeTestSuite")) {
-			//exit as test folder was not created for this action
-			return;
-		}
+//		if (test.endsWith("executeBeforeTestSuite")) {
+//			//exit as test folder was not created for this action
+//			return;
+//		}
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
-		
+
+    	//TODO: remove hard-coded text		
     	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
-        	//TODO: remove hard-coded text
-    		Messager.TEST_FAILED.error(deviceName, name, test, DateUtils.now(), errorMessage);
+    		if (name.equals(TEST)) {
+    			Messager.TEST_FAILED.info(deviceName, test, DateUtils.now(), errorMessage);
+    		} else {
+    			Messager.CONFIG_FAILED.info(deviceName, test, DateUtils.now(), errorMessage);
+    		}		
+
     		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), name.equals(CONFIGURATION)));    		
     	}
 
@@ -97,20 +111,24 @@ public abstract class AbstractTestListener extends TestArgsListener
  
     private void skipItem(ITestResult result, String name){
     	String test = TestNamingUtil.getCanonicalTestName(result);
-		if (test.endsWith("executeBeforeTestSuite")) {
-			//exit as test folder was not created for this action
-			return;
-		}
+//		if (test.endsWith("executeBeforeTestSuite")) {
+//			//exit as test folder was not created for this action
+//			return;
+//		}
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
 		
-		Messager.TEST_SKIPPED.error(deviceName, name, test, DateUtils.now(), errorMessage);
+		if (name.equals(TEST)) {
+			Messager.TEST_SKIPPED.info(deviceName, test, DateUtils.now(), errorMessage);
+		} else {
+			Messager.CONFIG_SKIPPED.info(deviceName, test, DateUtils.now(), errorMessage);
+		}			
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), name.equals(CONFIGURATION)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
     
-    private String getDeviceName() {
+    protected String getDeviceName() {
     	String deviceName = "";
     	Device device = DevicePool.getDevice();
     	if (device != null) {
@@ -121,31 +139,21 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void beforeConfiguration(ITestResult result) {
-    	//TODO: wrap into correct log level comparison
-    	if (Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("DEBUG")) {
-    		startItem(result, CONFIGURATION);
-    	}
+   		startItem(result, CONFIGURATION);
     }
     
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-    	//TODO: wrap into correct log level comparison
-    	if (Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("DEBUG")) {
-    		passItem(result, CONFIGURATION);
-    	}
+   		passItem(result, CONFIGURATION);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-    	//TODO: wrap into correct log level comparison
-    	if (Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("DEBUG")) {
-    		skipItem(result, CONFIGURATION);
-    	}
+   		skipItem(result, CONFIGURATION);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	//write about configuration failure with any log level
     	failItem(result, CONFIGURATION);
     }
     

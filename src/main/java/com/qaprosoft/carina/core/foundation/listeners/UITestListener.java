@@ -74,14 +74,20 @@ public class UITestListener extends AbstractTestListener {
 		
 		if (count < maxCount && retry != null)
 		{
-			LOGGER.error(String.format("Test '%s' FAILED! Retry %d of %d time - %s", test, count, maxCount, errorMessage));
+			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
+			TestNamingUtil.decreaseRetryCounter(test);
+			
+			String deviceName = getDeviceName();
+			if (!deviceName.isEmpty()){
+				deviceName = " on " + deviceName;
+			}
+			LOGGER.error(String.format("Test '%s' FAILED%s! Retry %d of %d time - %s", test, deviceName, count, maxCount, errorMessage));
 			LOGGER.debug("UITestListener->onTestFailure retry analyzer: " + result.getMethod().getRetryAnalyzer());
 
 			//screenshot should be added for all cases obligatory
 			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 
-			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
-			TestNamingUtil.decreaseRetryCounter(test);
+
 			//DevicePool.ignoreDevice();
 			
 			closeLogAppender(test);

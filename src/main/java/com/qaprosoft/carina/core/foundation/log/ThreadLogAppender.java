@@ -22,8 +22,13 @@ public class ThreadLogAppender extends AppenderSkeleton
 	@Override
 	public synchronized void append(LoggingEvent event)
 	{
-		if (ReportContext.isBaseDireCreated()) {
-			//don't write into file until all required structure is created
+		int count = 0;
+		//wait 10 seconds until folder structure is create
+		while (!ReportContext.isBaseDireCreated() && ++count<10) {
+			pause(1);
+		}
+		if (!ReportContext.isBaseDireCreated()) {
+			System.out.println("Folder structue is not created yet!");
 			return;
 		}
 		try
@@ -85,5 +90,13 @@ public class ThreadLogAppender extends AppenderSkeleton
 	public boolean requiresLayout()
 	{
 		return false;
+	}
+	
+	private void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
