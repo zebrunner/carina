@@ -546,13 +546,11 @@ public abstract class AbstractTest // extends DriverHelper
 				.info("**************** Test execution summary ****************");
 		int num = 1;
 		for (TestResultItem tri : tris) {
-			String reportLinks = !StringUtils.isEmpty(tri
-					.getLinkToScreenshots()) ? "screenshots="
-					+ tri.getLinkToScreenshots() + " | " : "";
-			reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log="
-					+ tri.getLinkToLog() : "";
-			Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri
-					.getResult().toString(), reportLinks);
+			if (!tri.isConfig()) {
+				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
+				reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
+				Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
+			}
 		}
 	}
 
