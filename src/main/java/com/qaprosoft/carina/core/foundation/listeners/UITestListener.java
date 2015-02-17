@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
@@ -55,54 +54,6 @@ public class UITestListener extends AbstractTestListener {
 		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 		LOGGER.error("TEST FAILED - " + errorMessage);
 		
-/*		
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		
-		int count = RetryCounter.getRunCount(test);
-		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
-		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
-		
-		String errorMessage = getFailureReason(result);
-
-		IRetryAnalyzer retry=result.getMethod().getRetryAnalyzer();
-		if (count < maxCount && retry == null) {
-			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
-		}
-		
-		
-		if (count < maxCount && retry != null)
-		{
-			//decrease counter for TestNamingUtil.testName2Counter. It should fix invCount for re-executed tests
-			TestNamingUtil.decreaseRetryCounter(test);
-			
-			String deviceName = getDeviceName();
-			if (!deviceName.isEmpty()){
-				deviceName = " on " + deviceName;
-			}
-			LOGGER.error(String.format("Test '%s' FAILED%s! Retry %d of %d time - %s", test, deviceName, count, maxCount, errorMessage));
-			LOGGER.debug("UITestListener->onTestFailure retry analyzer: " + result.getMethod().getRetryAnalyzer());
-
-			//screenshot should be added for all cases obligatory
-			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
-
-			closeLogAppender(test);
-
-			//clean test results from failure 
-			//result.getTestContext().getFailedTests().removeResult(result.getMethod());
-		}
-		else
-		{		
-			if (count > 0) {
-				LOGGER.error("Retry limit exceeded for " + result.getName());
-			}
-	
-			//screenshot should be added for all cases obligatory
-			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
-			LOGGER.debug("count >= maxCount: onTestFailure listener finished successfully.");
-			super.onTestFailure(result);
-		}*/
-	
-		//Reporter.setCurrentTestResult(result);
 		LOGGER.debug("onTestFailure listener finished successfully.");
 		super.onTestFailure(result);		
 	}
@@ -132,8 +83,4 @@ public class UITestListener extends AbstractTestListener {
 		return screenId;
 	}
 
-//	// cleaning of test results after retry logic work
-//	public void onFinish(ITestContext testContext) {
-//		super.onFinish(testContext);
-//	}
 }
