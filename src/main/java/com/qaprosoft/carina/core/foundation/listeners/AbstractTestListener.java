@@ -219,14 +219,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
-		
-		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
-		if (count >= maxCount)
-		{
-			skipItem(result, Messager.TEST_SKIPPED);
-		}		
+		skipItem(result, Messager.TEST_SKIPPED);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
 	}
