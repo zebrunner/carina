@@ -17,16 +17,10 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
-import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
-import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -49,15 +43,19 @@ public class UITestListener extends AbstractTestListener {
 
 	@Override
 	public void onConfigurationFailure(ITestResult result) {
-		String test = TestNamingUtil.getCanonicalTestName(result);
 		String errorMessage = getFailureReason(result);
 		TestLogCollector.addScreenshotComment(takeScreenshot(result), "CONFIGURATION FAILED - " + errorMessage);
 		LOGGER.error("CONFIGURATION FAILED - " + errorMessage);
-		closeLogAppender(test);
+		super.onConfigurationFailure(result);
 	}
 	
 	@Override
 	public void onTestFailure(ITestResult result) {
+		String errorMessage = getFailureReason(result);
+		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
+		LOGGER.error("TEST FAILED - " + errorMessage);
+		
+/*		
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		
 		int count = RetryCounter.getRunCount(test);
@@ -87,28 +85,26 @@ public class UITestListener extends AbstractTestListener {
 			//screenshot should be added for all cases obligatory
 			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
 
-
-			//DevicePool.ignoreDevice();
-			
 			closeLogAppender(test);
-			//ReportContext.removeTestReport(test);			
+
+			//clean test results from failure 
+			//result.getTestContext().getFailedTests().removeResult(result.getMethod());
 		}
 		else
 		{		
-			//DevicePool.deregisterIgnoredDeviceByThread();
 			if (count > 0) {
 				LOGGER.error("Retry limit exceeded for " + result.getName());
 			}
 	
 			//screenshot should be added for all cases obligatory
 			TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
-
-			super.onTestFailure(result);
 			LOGGER.debug("count >= maxCount: onTestFailure listener finished successfully.");
-		}
-		
-		Reporter.setCurrentTestResult(result);
+			super.onTestFailure(result);
+		}*/
+	
+		//Reporter.setCurrentTestResult(result);
 		LOGGER.debug("onTestFailure listener finished successfully.");
+		super.onTestFailure(result);		
 	}
 
 	@Override
@@ -136,55 +132,8 @@ public class UITestListener extends AbstractTestListener {
 		return screenId;
 	}
 
-	// cleaning of test results after retry logic work
-	public void onFinish(ITestContext testContext) {
-		super.onFinish(testContext);
-
-/*		// List of test results which we will delete later
-		List<ITestResult> testsToBeRemoved = new ArrayList<ITestResult>();
-
-		// collect all id's from passed test
-		Set<Integer> passedTestIds = new HashSet<Integer>();
-		for (ITestResult passedTest : testContext.getPassedTests().getAllResults()) {
-			passedTestIds.add(TestUtil.getId(passedTest));
-		}
-
-		Set<Integer> failedTestIds = new HashSet<Integer>();
-		for (ITestResult failedTest : testContext.getFailedTests().getAllResults()) {
-
-			// id = class + method + dataprovider
-			int failedTestId = TestUtil.getId(failedTest);
-
-			// if we saw this test as a failed test before we mark as to be deleted
-			// or delete this failed test if there is at least one passed version
-			if (failedTestIds.contains(failedTestId) || passedTestIds.contains(failedTestId)) {
-				testsToBeRemoved.add(failedTest);
-			} else {
-				failedTestIds.add(failedTestId);
-			}
-		}
-
-		// finally delete all tests that are marked
-		for (Iterator<ITestResult> iterator = testContext.getFailedTests().getAllResults().iterator(); iterator.hasNext();) {
-			ITestResult testResult = iterator.next();
-			if (testsToBeRemoved.contains(testResult)) {
-				iterator.remove();
-			}
-		}*/
-	}
-	
-	private void closeLogAppender(String test)
-	{
-		try {
-			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-			if(tla != null)
-			{
-				tla.closeResource(test);
-			}
-		}
-		catch (Exception e) {
-			LOGGER.error("close log appender was not successful.");
-			e.printStackTrace();
-		}
-	}
+//	// cleaning of test results after retry logic work
+//	public void onFinish(ITestContext testContext) {
+//		super.onFinish(testContext);
+//	}
 }
