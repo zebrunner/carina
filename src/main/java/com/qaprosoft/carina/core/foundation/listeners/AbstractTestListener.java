@@ -210,9 +210,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 			failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
 		} else {
 			failItem(result, Messager.TEST_FAILED);
+			closeLogAppender(test);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
-		closeLogAppender(test);
 		super.onTestFailure(result);		
 	}
 	
