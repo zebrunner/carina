@@ -15,11 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
-import org.testng.IResultMap;
+import org.apache.log4j.Logger;
+import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -27,6 +25,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -47,83 +46,71 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
 {
-	private final static String TEST = "TEST";
-	private final static String CONFIGURATION = "CONFIGURATION";
+	private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
+	
     // Dropbox client
     DropboxClient dropboxClient;
+ 
+    private void startItem(ITestResult result, Messager messager){
+		
+ 		ReportContext.getBaseDir(); //create directory for logging as soon as possible
+ 		
+     	String test = TestNamingUtil.getCanonicalTestName(result);
+ 		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
+ 		
+ 		String deviceName = getDeviceName();
+ 		messager.info(deviceName, test, DateUtils.now());
+     }
     
-    private synchronized void startItem(ITestResult result, String name){
-		
-		ReportContext.getBaseDir(); //create directory for logging as soon as possible
-		
-    	String test = TestNamingUtil.getCanonicalTestName(result);
-		test = TestNamingUtil.accociateTestInfo2Thread(test, Thread.currentThread().getId());
-		
-		String deviceName = getDeviceName();		
-		if (name.equals(TEST)) {
-			Messager.TEST_STARTED.info(deviceName, test, DateUtils.now());
-		} else {
-			Messager.CONFIG_STARTED.info(deviceName, test, DateUtils.now());
-		}		
-    }
-    
-    private void passItem(ITestResult result, String name){
+    private void passItem(ITestResult result, Messager messager){
 		String test = TestNamingUtil.getCanonicalTestName(result);
-//		if (test.endsWith("executeBeforeTestSuite")) {
-//			//exit as test folder was not created for this action
-//			return;
-//		}
+
 		String deviceName = getDeviceName();
 		
-		if (name.equals(TEST)) {
-			Messager.TEST_PASSED.info(deviceName, test, DateUtils.now());
-		} else {
-			Messager.CONFIG_PASSED.info(deviceName, test, DateUtils.now());
-		}
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), name.equals(CONFIGURATION)));
+		messager.info(deviceName, test, DateUtils.now());
+		
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_PASSED)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
     
-    private void failItem(ITestResult result, String name){
+    private void failItem(ITestResult result, Messager messager){
     	String test = TestNamingUtil.getCanonicalTestName(result);
-//		if (test.endsWith("executeBeforeTestSuite")) {
-//			//exit as test folder was not created for this action
-//			return;
-//		}
+
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
 
     	//TODO: remove hard-coded text		
     	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
-    		if (name.equals(TEST)) {
-    			Messager.TEST_FAILED.info(deviceName, test, DateUtils.now(), errorMessage);
-    		} else {
-    			Messager.CONFIG_FAILED.info(deviceName, test, DateUtils.now(), errorMessage);
-    		}		
-
-    		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), name.equals(CONFIGURATION)));    		
+   			messager.info(deviceName, test, DateUtils.now(), errorMessage);
+    		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));    		
     	}
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
- 
-    private void skipItem(ITestResult result, String name){
+    
+    private void failRetryItem(ITestResult result, Messager messager, int count, int maxCount){
     	String test = TestNamingUtil.getCanonicalTestName(result);
-//		if (test.endsWith("executeBeforeTestSuite")) {
-//			//exit as test folder was not created for this action
-//			return;
-//		}
+
+		String errorMessage = getFailureReason(result);
+		String deviceName = getDeviceName();
+
+		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
+
+		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+    }    
+ 
+    private void skipItem(ITestResult result, Messager messager){
+    	String test = TestNamingUtil.getCanonicalTestName(result);
+
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
 		
-		if (name.equals(TEST)) {
-			Messager.TEST_SKIPPED.info(deviceName, test, DateUtils.now(), errorMessage);
-		} else {
-			Messager.CONFIG_SKIPPED.info(deviceName, test, DateUtils.now(), errorMessage);
-		}			
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), name.equals(CONFIGURATION)));
+		messager.info(deviceName, test, DateUtils.now(), errorMessage);
+		
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_SKIPPED)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
@@ -139,22 +126,24 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void beforeConfiguration(ITestResult result) {
-   		startItem(result, CONFIGURATION);
+   		startItem(result, Messager.CONFIG_STARTED);
     }
     
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-   		passItem(result, CONFIGURATION);
+   		passItem(result, Messager.CONFIG_PASSED);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-   		skipItem(result, CONFIGURATION);
+   		skipItem(result, Messager.CONFIG_SKIPPED);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	failItem(result, CONFIGURATION);
+    	failItem(result, Messager.CONFIG_FAILED);
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		closeLogAppender(test);
     }
     
 	@Override
@@ -192,13 +181,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		RetryCounter.initCounter(test);
 
-		startItem(result, TEST);
+		startItem(result, Messager.TEST_STARTED);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		passItem(result, TEST);
+		passItem(result, Messager.TEST_PASSED);
 		super.onTestSuccess(result);
 	}
 
@@ -208,13 +197,23 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);		
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
+
+		IRetryAnalyzer retry=result.getMethod().getRetryAnalyzer();
+		if (count < maxCount && retry == null) {
+			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
+		}
 		
-		if (count >= maxCount && result.getThrowable().getMessage() != null)
+		if (count < maxCount && retry != null)
 		{
-			failItem(result, TEST);
+			TestNamingUtil.decreaseRetryCounter(test);
+			failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
+		} else {
+			failItem(result, Messager.TEST_FAILED);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
-		super.onTestFailure(result);
+		closeLogAppender(test);
+		super.onTestFailure(result);		
 	}
 	
 	@Override
@@ -226,8 +225,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		if (count >= maxCount)
 		{
-			skipItem(result, TEST);
-		}
+			skipItem(result, Messager.TEST_SKIPPED);
+		}		
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
 	}
@@ -235,8 +234,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onFinish(ITestContext context)
 	{
-		ZafiraIntegrator.finishSuite();
-		//removeIncorrectlyFailedTests(testContext);
+		ZafiraIntegrator.finishSuite();		removeIncorrectlyFailedTests(context);
 		super.onFinish(context);
 	}
 
@@ -247,53 +245,22 @@ public abstract class AbstractTestListener extends TestArgsListener
 	 * @param test
 	 *            - test context.
 	 */
-	public static void removeIncorrectlyFailedTests(ITestContext test)
+	public static void removeIncorrectlyFailedTests(ITestContext context)
 	{
-		IResultMap failedTests = test.getFailedTests();
-		IResultMap skippedTests = test.getSkippedTests();
-
-		int countOfSkippedResults = test.getSkippedTests().getAllResults().size();
-		int countOfPassedResults = test.getPassedTests().getAllResults().size();
-		int countOfFailedResults = test.getFailedTests().getAllResults().size();
-		int countOfAllResults = test.getAllTestMethods().length;
-
-		List<ITestNGMethod> failsToRemove = new ArrayList<ITestNGMethod>();
-		for (ITestResult result : test.getFailedTests().getAllResults())
-		{
-			long failedResultTime = result.getEndMillis();
-
-			for (ITestResult resultToCheck : test.getSkippedTests().getAllResults())
-			{
-				if (failedResultTime == resultToCheck.getEndMillis())
-				{
-					failsToRemove.add(resultToCheck.getMethod());
-					break;
-				}
-			}
-
-			for (ITestResult resultToCheck : test.getPassedTests().getAllResults())
-			{
-				if (failedResultTime == resultToCheck.getEndMillis())
-				{
-					failsToRemove.add(resultToCheck.getMethod());
-					break;
+		ITestNGMethod[] methods = context.getAllTestMethods();
+		for(int i=0;i<methods.length;i++){
+			if(methods[i].getCurrentInvocationCount()>1){
+				if (context.getFailedTests().getResults(methods[i]).size() > 1 && 
+						context.getPassedTests().getResults(methods[i]).size() == 1){
+					
+					while (context.getFailedTests().size() > 0) {
+						LOGGER.debug("Removing " + methods[i].getMethodName() + " from failed results as passed result determined.");
+						context.getFailedTests().removeResult(methods[i]);
+					}
 				}
 			}
 		}
 
-		for (ITestNGMethod method : failsToRemove)
-		{
-			failedTests.removeResult(method);
-		}
-
-		// remove rerun skipped tests
-		if ((countOfAllResults == countOfPassedResults || countOfAllResults == countOfFailedResults) && countOfSkippedResults != 0)
-		{
-			for (ITestNGMethod method : test.getSkippedTests().getAllMethods())
-			{
-				skippedTests.removeResult(method);
-			}
-		}
 	}
 
 	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
@@ -349,5 +316,20 @@ public abstract class AbstractTestListener extends TestArgsListener
             }
 	    }
 	    return stackTrace;
+	}
+	
+	private void closeLogAppender(String test)
+	{
+		try {
+			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+			if(tla != null)
+			{
+				tla.closeResource(test);
+			}
+		}
+		catch (Exception e) {
+			LOGGER.error("close log appender was not successful.");
+			e.printStackTrace();
+		}
 	}
 }
