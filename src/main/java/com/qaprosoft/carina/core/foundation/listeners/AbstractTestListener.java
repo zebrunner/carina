@@ -248,8 +248,14 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public static void removeIncorrectlyFailedTests(ITestContext context)
 	{
 		ITestNGMethod[] methods = context.getAllTestMethods();
+		LOGGER.debug("number of all executed methods is: " + methods.length);
 		for(int i=0;i<methods.length;i++){
+			LOGGER.debug("Analyzed method is: " + methods[i].getMethodName());
 			if(methods[i].getCurrentInvocationCount()>1){
+				LOGGER.debug("Analyzed method invocation count is: " + methods[i].getCurrentInvocationCount());
+				LOGGER.debug("Count of failed method is: " + context.getFailedTests().getResults(methods[i]).size());
+				LOGGER.debug("Count of passed method is: " + context.getPassedTests().getResults(methods[i]).size());
+				
 				if (context.getFailedTests().getResults(methods[i]).size() > 1 && 
 						context.getPassedTests().getResults(methods[i]).size() == 1){
 					
