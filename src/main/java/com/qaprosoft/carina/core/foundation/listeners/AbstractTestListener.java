@@ -227,7 +227,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onFinish(ITestContext context)
 	{
-		ZafiraIntegrator.finishSuite();		removeIncorrectlyFailedTests(context);
+		ZafiraIntegrator.finishSuite();		
+		removeIncorrectlyFailedTests(context);
 		super.onFinish(context);
 	}
 
