@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
@@ -44,7 +45,7 @@ public class UITestListener extends AbstractTestListener {
 	public void onConfigurationFailure(ITestResult result) {
 		String errorMessage = getFailureReason(result);
 		TestLogCollector.addScreenshotComment(takeScreenshot(result), "CONFIGURATION FAILED - " + errorMessage);
-		LOGGER.error("CONFIGURATION FAILED - " + errorMessage);
+		//LOGGER.error("CONFIGURATION FAILED - " + errorMessage);
 		super.onConfigurationFailure(result);
 	}
 	
@@ -52,7 +53,7 @@ public class UITestListener extends AbstractTestListener {
 	public void onTestFailure(ITestResult result) {
 		String errorMessage = getFailureReason(result);
 		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
-		LOGGER.error("TEST FAILED - " + errorMessage);
+		//LOGGER.error("TEST FAILED - " + errorMessage);
 		
 		LOGGER.debug("onTestFailure listener finished successfully.");
 		super.onTestFailure(result);		
@@ -67,6 +68,11 @@ public class UITestListener extends AbstractTestListener {
 	@Override
 	public void onTestSuccess(ITestResult result) {
 		super.onTestSuccess(result);
+	}
+	
+	// cleaning of test results after retry logic work
+	public void onFinish(ITestContext context) {
+		super.onFinish(context);
 	}
 
 	private String takeScreenshot(ITestResult result) {
