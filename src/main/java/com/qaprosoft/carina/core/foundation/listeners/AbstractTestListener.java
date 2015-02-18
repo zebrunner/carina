@@ -81,7 +81,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String deviceName = getDeviceName();
 
     	//TODO: remove hard-coded text		
-    	if (!errorMessage.contains("Skipped tests detected! Analyze logs to determine possible configuration issues.")) {
+    	if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
    			messager.info(deviceName, test, DateUtils.now(), errorMessage);
     		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));    		
     	}
@@ -274,7 +274,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 		if(!FileUtils.listFiles(ReportContext.getTestDir(test), new String[]{"png"}, false).isEmpty()){
 			if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
-				//TODO: remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve cooperation with CI tools
+				//remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve cooperation with CI tools
 				ReportContext.removeTestScreenshots(test);
 			}
 			else {
