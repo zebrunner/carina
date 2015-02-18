@@ -121,17 +121,14 @@ public class EmailReportGenerator
 				Collections.sort(testResultItems, new EmailReportItemComparator());
 			}
 			
-			String packageName = testResultItems.get(0).getPack();
-
-			testResults = new StringBuilder(PACKAGE_TR.replace(PACKAGE_NAME_PLACEHOLDER, packageName));
+			String packageName = "";
+			testResults = new StringBuilder();
 			for (TestResultItem testResultItem : testResultItems)
 			{
-				if (!packageName.equals(testResultItem.getPack()))
+				if (!testResultItem.isConfig() && !packageName.equals(testResultItem.getPack()))
 				{
 					packageName = testResultItem.getPack();
-					if (!testResultItem.isConfig()) {
-						testResults.append(PACKAGE_TR.replace(PACKAGE_NAME_PLACEHOLDER, packageName));
-					}
+					testResults.append(PACKAGE_TR.replace(PACKAGE_NAME_PLACEHOLDER, packageName));
 				}
 				testResults.append(getTestRow(testResultItem));
 			}
