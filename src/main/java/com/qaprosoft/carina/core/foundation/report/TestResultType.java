@@ -24,7 +24,8 @@ public enum TestResultType
 {
 	PASS("PASS"),
 	FAIL("FAIL"),
-	SKIP("SKIP");
+	SKIP("SKIP"),
+	SKIP_ALL("SKIP_ALL");
 
 
 	private String result;

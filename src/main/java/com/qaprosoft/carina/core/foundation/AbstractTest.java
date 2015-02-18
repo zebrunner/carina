@@ -258,8 +258,8 @@ public abstract class AbstractTest // extends DriverHelper
 
 			printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-			if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP)) {
-				Assert.fail("Skipped tests detected! Analyze logs to determine possible configuration issues.");
+			if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP_ALL)) {
+				Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
 			}
 
 		} catch (Exception e) {

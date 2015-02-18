@@ -83,10 +83,6 @@ public class EmailReportGenerator
 	private int failCount = 0;
 	private int skipCount = 0;
 	
-	private int configPassCount = 0;
-	private int configFailCount = 0;
-	private int configSkipCount = 0;
-
 	public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String elapsedTime, String ciTestJob,
 			List<TestResultItem> testResultItems, List<String> createdItems)
 	{
@@ -156,8 +152,6 @@ public class EmailReportGenerator
 				{
 					result = result.replace(FAIL_CONFIG_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
 				}
-				
-				configFailCount++;
 			} else {
 				result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
 				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
@@ -186,39 +180,33 @@ public class EmailReportGenerator
 			}
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
-			if (testResultItem.isConfig()) {
-				configSkipCount++;
-			} else {
+			if (!testResultItem.isConfig()) {
+				result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
+				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
+				
+				failReason = testResultItem.getFailReason();
+				if (!StringUtils.isEmpty(failReason))
+				{
+					// Make description more compact for email report																																																											
+					failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
+					result = result.replace(SKIP_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
+				}
+				else
+				{
+					result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze initializeServices log for details.");
+				}
+				
+				result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
+				
+				if(testResultItem.getLinkToScreenshots() != null)
+				{
+					result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+				}
 				skipCount++;
-			}
-			
-			result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
-			result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-			
-			failReason = testResultItem.getFailReason();
-			if (!StringUtils.isEmpty(failReason))
-			{
-				// Make description more compact for email report																																																											
-				failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
-				result = result.replace(SKIP_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
-			}
-			else
-			{
-				result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze initializeServices log for details.");
-			}
-			
-			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-			
-			if(testResultItem.getLinkToScreenshots() != null)
-			{
-				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 			}
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("PASS")) {
-			if (testResultItem.isConfig()) {
-				configPassCount++;
-				//do not add information about passed configuration tests into email
-			} else {
+			if (!testResultItem.isConfig()) {
 				passCount++;
 
 				result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
@@ -278,11 +266,16 @@ public class EmailReportGenerator
 			case SKIP:
 				skipped++;
 				break;
+			case SKIP_ALL:
+				//do nothing
+				break;
 			}
 		}
 		TestResultType result;
 		if (passed > 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
+		} else if (passed == 0 && failed == 0 && skipped > 0){
+			result = TestResultType.SKIP_ALL;
 		} else if (passed >= 0 && failed == 0 && skipped > 0){
 			result = TestResultType.SKIP;
 		} else {
