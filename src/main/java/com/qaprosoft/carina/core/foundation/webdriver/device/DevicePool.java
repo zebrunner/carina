@@ -93,104 +93,6 @@ public class DevicePool
 
 	}	
 	
-/*	public static synchronized Device registerDevice2Thread(Long threadId)
-	{
-		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
-			return null;
-		}
-		
-		int count = 0;
-		boolean found = false;
-		Device freeDevice = null;
-		while (++count<100 && !found) {
-			for (Device device : devices) {
-				LOGGER.info("Check device status for registration: " + device.getName());
-				if (!threadId2Device.containsValue(device)) {
-					if (!threadId2IgnoredDevices.containsKey(threadId)) {
-						//current thread doesn't have ignored devices
-						LOGGER.info("identified free non-ingnored device: " + device.getName());
-						freeDevice = device;
-						found = true;
-						break;						
-					} else if (!threadId2IgnoredDevices.get(threadId).contains(device)) {
-						LOGGER.info("identified free non-ingnored device: " + device.getName());
-						freeDevice = device;
-						found = true;
-						break;
-					} else {
-						//additional verification onto the count of the ignored devices. If all of them are added into ignored list then choose any again
-						LOGGER.info("devices pool size is: " + devices.size());
-						LOGGER.info("ignored devices pool size is: " + threadId2IgnoredDevices.get(threadId).size());
-						if (devices.size() == threadId2IgnoredDevices.get(threadId).size()) {
-							LOGGER.info("device from ignored list will be added as all devices are ignored!");
-							freeDevice = device;
-							found = true;
-							break;							
-						}
-						LOGGER.info("Unable to register device as it is in the ignored pool!");
-					}
-				}
-			}
-			if (!found) {
-				int sec = Configuration.getInt(Parameter.INIT_RETRY_INTERVAL);
-				LOGGER.warn("There is no free device, wating " + sec + " sec... attempt: " + count);
-				pause(sec);
-			}
-		}
-		
-		if (freeDevice != null) {
-			threadId2Device.put(threadId, freeDevice);
-			LOGGER.info("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
-		} else {
-			throw new RuntimeException("Unable to find available device after '" + count + "' attempts!");	
-		}
-		return freeDevice;
-
-	}*/
-	
-/*	public static synchronized void ignoreDevice()
-	{
-		Long threadId = Thread.currentThread().getId();
-		Device device = getDeviceByThread(threadId);
-		ignoreDevice(threadId, device);
-	}
-	
-	public static synchronized void ignoreDevice(Long threadId, Device device)
-	{
-		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
-			return;
-		}
-		if (devices.size() <= 1) {
-			LOGGER.info("Unable to irnore single device!");
-			return;
-		}
-		if (device == null) {
-			return;
-		}
-		
-		LOGGER.error("Ignoring device feature is disabled!");
-		LOGGER.info("Put device '" + device.getName() + "' into ignored list.");
-		List<Device> devices = new ArrayList<Device>(); 
-		if (threadId2IgnoredDevices.containsKey(threadId)) {
-			devices = threadId2IgnoredDevices.get(threadId);
-		}
-		devices.add(device);
-		
-		threadId2IgnoredDevices.put(threadId, devices);	
-	}
-	
-	public static synchronized void deregisterIgnoredDeviceByThread() {
-		deregisterIgnoredDeviceByThread(Thread.currentThread().getId());
-	}
-	public static synchronized void deregisterIgnoredDeviceByThread(long threadId)
-	{
-		if (threadId2IgnoredDevices.containsKey(threadId)) {
-			LOGGER.info("Deregistering all ignored devices for thread '" + threadId + "'");
-			threadId2IgnoredDevices.remove(threadId);
-		}
-	}*/
-	
-	
 	public static synchronized Device getDevice() {
 		Device device = null;
 		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
@@ -204,17 +106,6 @@ public class DevicePool
 		return device;
 	}
 	
-	
-/*	public static Device getDeviceByThread(long threadId)
-	{
-		Device device = null;
-		if (threadId2Device.containsKey(threadId)) {
-			device = threadId2Device.get(threadId);
-			LOGGER.info("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
-		}
-		return device;
-	}
-	*/
 	public static synchronized void deregisterDeviceByThread(long threadId)
 	{
 		if (threadId2Device.containsKey(threadId)) {
