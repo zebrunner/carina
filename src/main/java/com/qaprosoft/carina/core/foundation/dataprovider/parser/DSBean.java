@@ -251,16 +251,16 @@ public class DSBean
 	public String setDataSorceUUID(String testName, Map<String, String> params)
 	{
 		
+		if (!params.isEmpty()){
+			if(params.containsKey(SpecialKeywords.TUID))
+			{
+				testName = params.get(SpecialKeywords.TUID) + " - " + testName;
+			}
+		}
 		if(!uidArgs.isEmpty())
 		{
-			if(uidArgs.contains(SpecialKeywords.TUID))
-			{
-				testName = params.get(SpecialKeywords.TUID) + " - " + testName + " [" + argsToString(uidArgs, params) + "]";
-			}
-			else
-			{
-				if (!argsToString(uidArgs, params).isEmpty())
-					testName = testName + " [" + argsToString(uidArgs, params) + "]";
+			if (!argsToString(uidArgs, params).isEmpty()){
+				testName = testName + " [" + argsToString(uidArgs, params) + "]";
 			}
 		}		
 		
