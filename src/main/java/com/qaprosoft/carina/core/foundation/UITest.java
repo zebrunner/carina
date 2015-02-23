@@ -59,7 +59,7 @@ public class UITest extends AbstractTest
     private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
     private int adb_pid = 0;
     
-    Throwable init_throwable;
+    protected Throwable init_throwable;
 
 	
 	@Override
