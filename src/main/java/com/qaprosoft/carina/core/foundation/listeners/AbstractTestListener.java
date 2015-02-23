@@ -115,7 +115,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
     
-    protected String getDeviceName() {
+    private String getDeviceName() {
     	String deviceName = "";
     	Device device = DevicePool.getDevice();
     	if (device != null) {
@@ -127,16 +127,19 @@ public abstract class AbstractTestListener extends TestArgsListener
     @Override
     public void beforeConfiguration(ITestResult result) {
    		startItem(result, Messager.CONFIG_STARTED);
+   		super.beforeConfiguration(result);
     }
     
     @Override
     public void onConfigurationSuccess(ITestResult result) {
    		passItem(result, Messager.CONFIG_PASSED);
+   		super.onConfigurationSuccess(result);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
    		skipItem(result, Messager.CONFIG_SKIPPED);
+   		super.onConfigurationSkip(result);
     }
 
     @Override
@@ -144,6 +147,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     	failItem(result, Messager.CONFIG_FAILED);
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		closeLogAppender(test);
+		super.onConfigurationFailure(result);
     }
     
 	@Override
@@ -155,6 +159,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
 	    }
+	    super.onStart(context);
 	}
 	
 	@Override
