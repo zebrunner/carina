@@ -1173,6 +1173,10 @@ public class DriverHelper
 
 	public void scrollTo(final ExtendedWebElement extendedWebElement)
 	{
+		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains("mobile")) {
+			LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
+			return;
+		}
 		try
 		{
 			Locatable locatableElement = (Locatable) extendedWebElement.getElement();
