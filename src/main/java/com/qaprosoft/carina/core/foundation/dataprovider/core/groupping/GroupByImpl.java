@@ -21,7 +21,6 @@ public class GroupByImpl {
             Object[] current = (Object[]) iterator.next();
             if (temp[fieldNumber].equals(current[fieldNumber])) {
                 tempList.add(current);
-
             } else {
                 temp = current;
                 ordered.add(tempList);
@@ -31,6 +30,10 @@ public class GroupByImpl {
                     ordered.add(tempList);
                 }
             }
+        }
+        if(tempList.size() > 0) {
+        	//add last grouped rows 
+        	ordered.add(tempList);
         }
 
         int arraySize = listOfObjects.get(0).length;
@@ -60,7 +63,6 @@ public class GroupByImpl {
             Object[] current = (Object[]) iterator.next();
             if (((HashMap) (temp[0])).get(fieldName).equals(((HashMap) (current[0])).get(fieldName))) {
                 tempList.add(current);
-
             } else {
                 temp = current;
                 ordered.add(tempList);
@@ -70,6 +72,11 @@ public class GroupByImpl {
                     ordered.add(tempList);
                 }
             }
+        }
+        
+        if(tempList.size() > 0) {
+        	//add last grouped rows 
+        	ordered.add(tempList);
         }
 
         int arraySize = listOfObjects.get(0).length;
