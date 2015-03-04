@@ -36,7 +36,7 @@ public class DevicePool
 	public static synchronized void registerDevices() {
 		String params = Configuration.get(Parameter.MOBILE_DEVICES);
 		if (params.isEmpty()) {
-			LOGGER.info("Parameter.MOBILE_DEVICES is empty. Skip devices registration.");
+			LOGGER.debug("Parameter.MOBILE_DEVICES is empty. Skip devices registration.");
 			return;
 		}
 		if (devices.size() > 0) {
