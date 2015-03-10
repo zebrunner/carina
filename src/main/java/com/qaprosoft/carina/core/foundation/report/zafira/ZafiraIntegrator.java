@@ -8,7 +8,6 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -183,9 +182,7 @@ public class ZafiraIntegrator {
 			String demoUrl = ReportContext.getTestScreenshotsLink(test);
 			String logUrl = ReportContext.getTestLogLink(test);
 
-			int count = RetryCounter.getRunCount(test);		
-			
-			registeredTest = registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl, count);
+			registeredTest = registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl);
 			TestNamingUtil.accociateZafiraTest(test, registeredTest);
 
 		} catch (Exception e) {
@@ -352,7 +349,9 @@ public class ZafiraIntegrator {
 	}
 
 	private static TestType registerTest(String name, Status status,String testArgs, Long testRunId, Long testCaseId, String message,
-			Long startTime, Long finishTime, String demoURL, String logURL, Integer retry) {
+			Long startTime, Long finishTime, String demoURL, String logURL) {
+		
+		int retry = RetryCounter.getRunCount(name);
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR,
 		// startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry);
