@@ -25,7 +25,7 @@ public class ZafiraClientTest
 	private TestSuiteType testSuite;
 	TestRunType testRun;
 	
-	private static final ZafiraClient zc = new ZafiraClient("http://localhost:8080/zafira");
+	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
 	
 	@Test(enabled=ENABLED)
 	public void testStatus()
@@ -100,8 +100,7 @@ public class ZafiraClientTest
 	{
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR, startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		List<String> workItems = new ArrayList<String>();
-		workItems.add("JIRA-1234");
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 14L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems);
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems, 2);
 		Response<TestType> response = zc.createTest(test);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
