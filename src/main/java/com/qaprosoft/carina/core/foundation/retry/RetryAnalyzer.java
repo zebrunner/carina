@@ -15,13 +15,13 @@
  */
 package com.qaprosoft.carina.core.foundation.retry;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
     public static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
@@ -36,9 +36,6 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     }
 
     public static int getMaxRetryCountForTest(ITestResult result) {
-        if (result.getMethod().getDescription() == null) {
-            return Configuration.getInt(Parameter.RETRY_COUNT);
-        }
-        return result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET) ? 0 : Configuration.getInt(Parameter.RETRY_COUNT);
+        return Configuration.getInt(Parameter.RETRY_COUNT);
     }
 }
