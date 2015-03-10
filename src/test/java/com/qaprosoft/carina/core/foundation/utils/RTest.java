@@ -53,4 +53,14 @@ public class RTest
 	{
 		Assert.assertEquals(R.EMAIL.get("title"), "${test}");
 	}
+	
+	@Test
+	public void testOverride()
+	{
+		Assert.assertEquals(R.TESTDATA.get("key1"), "3");
+		Assert.assertEquals(R.TESTDATA.get("key2"), "2");
+		Assert.assertEquals(R.TESTDATA.get("key3"), "1");
+		Assert.assertEquals(R.TESTDATA.get("key4"), "3");
+		Assert.assertEquals(R.TESTDATA.get("key5"), "2");
+	}
 }
