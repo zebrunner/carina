@@ -40,9 +40,9 @@ public class TestNamingUtil
 	private static INamingStrategy namingStrategy;
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
-	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
-	private static final ConcurrentHashMap<String, TestType> testName2ZafiraTest = new ConcurrentHashMap<String, TestType>();
+	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 	
+	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
 	
 	
@@ -117,20 +117,20 @@ public class TestNamingUtil
 		return testName2StartDate.get(test);
 	}
 	
-	public static synchronized void accociateZafiraTest(String test, TestType zafiraTest)
+	public static synchronized void accociateZafiraTest(TestType zafiraTest, Long threadId)
 	{
 		if (zafiraTest == null)
 			return;
-		testName2ZafiraTest.put(test, zafiraTest);
+		threadId2ZafiraTest.put(threadId, zafiraTest);
 	}
 	
-	public static TestType getZafiraTest(String test)
+	public static TestType getZafiraTest(Long threadId)
 	{
-		return testName2ZafiraTest.get(test);
+		return threadId2ZafiraTest.get(threadId);
 	}
 	
-	public static synchronized void releaseZafiraTest(String test)
+	public static synchronized void releaseZafiraTest(Long threadId)
 	{
-		testName2ZafiraTest.remove(test);
+		threadId2ZafiraTest.remove(threadId);
 	}
 }
