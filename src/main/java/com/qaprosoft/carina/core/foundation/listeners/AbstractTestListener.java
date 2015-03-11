@@ -145,6 +145,10 @@ public abstract class AbstractTestListener extends TestArgsListener
     @Override
     public void beforeConfiguration(ITestResult result) {
    		startItem(result, Messager.CONFIG_STARTED);
+		// do failure test cleanup in this place as right after the test context
+		// doesn't have up-to-date information. Latest test result is not
+		// available
+		removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
     
@@ -236,7 +240,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			closeLogAppender(test);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
-		super.onTestFailure(result);		
+		super.onTestFailure(result);
 	}
 	
 	@Override
@@ -273,7 +277,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 				LOGGER.debug("Count of failed method is: " + context.getFailedTests().getResults(methods[i]).size());
 				LOGGER.debug("Count of passed method is: " + context.getPassedTests().getResults(methods[i]).size());
 				
-				if (context.getFailedTests().getResults(methods[i]).size() > 1 && 
+				if (context.getFailedTests().getResults(methods[i]).size() > 0 && 
 						context.getPassedTests().getResults(methods[i]).size() == 1){
 					
 					while (context.getFailedTests().size() > 0) {
