@@ -1409,25 +1409,7 @@ public class DriverHelper
 
 	public boolean isPageOpened(final AbstractPage page)
 	{
-		boolean result;
-		final WebDriver drv = getDriver();
-		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl());
-				}
-			});
-			result = true;
-		}
-		catch (Exception e)
-		{
-			result = false;
-		}
-		return result;
+		return isPageOpened(page, EXPLICIT_TIMEOUT);
 	}
 
 	public boolean isPageOpened(final AbstractPage page, long timeout)
