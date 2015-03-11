@@ -62,7 +62,7 @@ public abstract class AbstractTestListener extends TestArgsListener
  		messager.info(deviceName, test, DateUtils.now());
      }
     
-    private void passItem(ITestResult result, Messager messager){
+    private void passItem(ITestResult result, Messager messager, boolean testItem){
 		String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String deviceName = getDeviceName();
@@ -71,10 +71,14 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_PASSED)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
+		
+		if (testItem) {
+			ZafiraIntegrator.finishTestMethod(result, null);
+		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
     
-    private void failItem(ITestResult result, Messager messager){
+    private void failItem(ITestResult result, Messager messager, boolean testItem){
     	String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String errorMessage = getFailureReason(result);
@@ -86,11 +90,17 @@ public abstract class AbstractTestListener extends TestArgsListener
     		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));    		
     	}
 
+		if (testItem) {
+	    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
+		}
+
+
+    	
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
     
-    private void failRetryItem(ITestResult result, Messager messager, int count, int maxCount){
+    private void failRetryItem(ITestResult result, Messager messager, boolean testItem, int count, int maxCount){
     	String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String errorMessage = getFailureReason(result);
@@ -98,11 +108,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
 
+		if (testItem) {
+	    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
+		}
+		
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }    
  
-    private void skipItem(ITestResult result, Messager messager){
+    private void skipItem(ITestResult result, Messager messager, boolean testItem){
     	String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String errorMessage = getFailureReason(result);
@@ -111,6 +125,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 		messager.info(deviceName, test, DateUtils.now(), errorMessage);
 		
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_SKIPPED)));
+		
+		if (testItem) {
+	    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
+		}		
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
     }
@@ -132,19 +150,19 @@ public abstract class AbstractTestListener extends TestArgsListener
     
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-   		passItem(result, Messager.CONFIG_PASSED);
+   		passItem(result, Messager.CONFIG_PASSED, false);
    		super.onConfigurationSuccess(result);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-   		skipItem(result, Messager.CONFIG_SKIPPED);
+   		skipItem(result, Messager.CONFIG_SKIPPED, false);
    		super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	failItem(result, Messager.CONFIG_FAILED);
+    	failItem(result, Messager.CONFIG_FAILED, false);
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		closeLogAppender(test);
 		super.onConfigurationFailure(result);
@@ -192,7 +210,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		passItem(result, Messager.TEST_PASSED);
+		passItem(result, Messager.TEST_PASSED, true);
 		super.onTestSuccess(result);
 	}
 
@@ -212,9 +230,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		if (count < maxCount && retry != null)
 		{
 			TestNamingUtil.decreaseRetryCounter(test);
-			failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
+			failRetryItem(result, Messager.RETRY_RETRY_FAILED, true, count, maxCount);
 		} else {
-			failItem(result, Messager.TEST_FAILED);
+			failItem(result, Messager.TEST_FAILED, true);
 			closeLogAppender(test);
 		}
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
@@ -224,7 +242,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
-		skipItem(result, Messager.TEST_SKIPPED);
+		skipItem(result, Messager.TEST_SKIPPED, true);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
 		super.onTestSkipped(result);
 	}
