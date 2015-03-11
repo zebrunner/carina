@@ -73,4 +73,14 @@ public abstract class AbstractPage extends AbstractUIObject
 	{
 		return pageURL;
 	}
+	
+	public boolean isPageOpened()
+	{
+		return isPageOpened(this);
+	}
+	
+	public boolean isPageOpened(long timeout)
+	{
+		return isPageOpened(this, timeout);
+	}
 }
