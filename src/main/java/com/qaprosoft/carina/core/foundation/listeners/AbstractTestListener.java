@@ -37,6 +37,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -175,7 +176,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onStart(ITestContext context)
 	{
-		context.setAttribute(SpecialKeywords.UUID, StringGenerator.generateNumeric(8));
+		String uuid = StringGenerator.generateNumeric(8);
+		ParameterGenerator.setUUID(uuid);
+		
 		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
