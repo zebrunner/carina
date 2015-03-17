@@ -24,8 +24,10 @@ public class ParameterGenerator {
 	private static Pattern EXCEL_PATTERN = Pattern.compile(SpecialKeywords.EXCEL);
 
 	private static Matcher matcher;
+	
+	private static String UUID;
 
-	public static Object process(String param, String UUID)
+	public static Object process(String param)
 	{
 		try
 		{
@@ -121,5 +123,13 @@ public class ParameterGenerator {
 		String key = xlsSheetKey.split("#")[2];
 
 		return XLSParser.parseValue(xls, sheet, key);
+	}
+	
+	public static String getUUID() {
+		return UUID;
+	}
+
+	public static void setUUID(String uUID) {
+		UUID = uUID;
 	}
 }

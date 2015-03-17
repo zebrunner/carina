@@ -368,8 +368,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 			for (int i = 0; i < staticArgs.length; i++) {
 				args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-						.getTestParams().get(staticArgs[i]), context
-						.getAttribute(SpecialKeywords.UUID).toString()); // zero
+						.getTestParams().get(staticArgs[i])); // zero
 																			// element
 																			// is
 																			// a
@@ -431,8 +430,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 			for (int i = 0; i < staticArgs.length; i++) {
 				args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-						.getTestParams().get(staticArgs[i]), context
-						.getAttribute(SpecialKeywords.UUID).toString()); // zero
+						.getTestParams().get(staticArgs[i])); // zero
 																			// element
 																			// is
 																			// a
@@ -501,13 +499,10 @@ public abstract class AbstractTest // extends DriverHelper
 				// read one line from xls and set to arguments from DataSource
 				if (dsBean.getArgs().contains(argNames[i])) {
 					args[rowIndex][i] = ParameterGenerator.process(xlsRow
-							.get(argNames[i]),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString());
+							.get(argNames[i]));
 				} else {
 					args[rowIndex][i] = ParameterGenerator.process(dsBean
-							.getTestParams().get(argNames[i]), context
-							.getAttribute(SpecialKeywords.UUID).toString());
+							.getTestParams().get(argNames[i]));
 				}
 			}
 			// update testName adding UID values from DataSource arguments if
@@ -648,26 +643,20 @@ public abstract class AbstractTest // extends DriverHelper
 
 				for (int i = 0; i < staticArgsList.size(); i++) {
 					args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-							.getTestParams().get(staticArgsList.get(i)),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString()); // zero element is a hashmap
+							.getTestParams().get(staticArgsList.get(i))); // zero element is a hashmap
 				}
 			} else {
 				int i = 0;
 				for (i = 0; i < argsList.size(); i++) {
 					args[rowIndex][i] = ParameterGenerator.process(xlsRow
-							.get(argsList.get(i)),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString());
+							.get(argsList.get(i)));
 
 				}
 				// populate the rest of items by static parameters from
 				// testParams
 				for (int j = 0; j < staticArgsList.size(); j++) {
 					args[rowIndex][i + j] = ParameterGenerator.process(dsBean
-							.getTestParams().get(staticArgsList.get(j)),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString());
+							.getTestParams().get(staticArgsList.get(j)));
 				}
 			}
 			// update testName adding UID values from DataSource arguments if

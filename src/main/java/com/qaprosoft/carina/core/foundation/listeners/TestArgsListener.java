@@ -21,7 +21,6 @@ import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /*
  * Test arguments listener is responsible for processing test parameters with wildcards.
@@ -39,7 +38,7 @@ public class TestArgsListener extends TestListenerAdapter
 			{
 				if (result.getParameters()[i] instanceof String)
 				{
-					result.getParameters()[i] = ParameterGenerator.process(result.getParameters()[i].toString(), result.getTestContext().getAttribute(SpecialKeywords.UUID).toString());
+					result.getParameters()[i] = ParameterGenerator.process(result.getParameters()[i].toString());
 				}
 				
 				if (result.getParameters()[i] instanceof Map)
@@ -47,7 +46,7 @@ public class TestArgsListener extends TestListenerAdapter
 					@SuppressWarnings("unchecked")
 					Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
 					for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
-						Object param = ParameterGenerator.process(entry.getValue(), result.getTestContext().getAttribute(SpecialKeywords.UUID).toString());
+						Object param = ParameterGenerator.process(entry.getValue());
 						if (param != null)
 							dynamicAgrs.put(entry.getKey(), param.toString());
 						else
