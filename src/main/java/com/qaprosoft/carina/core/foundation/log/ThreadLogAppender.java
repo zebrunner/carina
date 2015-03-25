@@ -46,7 +46,11 @@ public class ThreadLogAppender extends AppenderSkeleton
 				fw = new BufferedWriter(new FileWriter(testLogFile));
 				test2file.put(test, fw);
 			}
-			fw.write(event.getMessage().toString());
+			if (event != null) {
+				fw.write(event.getMessage().toString());
+			} else {
+				fw.write("null");
+			}
 			fw.write("\n");
 			fw.flush();
 		} catch (IOException e)
