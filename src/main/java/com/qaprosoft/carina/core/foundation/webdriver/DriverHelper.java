@@ -1184,7 +1184,9 @@ public class DriverHelper
 			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
 			
 			int y = locatableElement.getCoordinates().onScreen().getY();
-			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
+			if (y > 120) {
+				((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
+			}
 		}
 		catch (Exception e)
 		{
