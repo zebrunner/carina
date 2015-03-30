@@ -265,10 +265,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	/**
 	 * When the test is restarted this method cleans fail statistics in test
 	 * context.
-	 * 
-	 * @param test
-	 *            - test context.
-	 */
+	 *
+     */
 	public static void removeIncorrectlyFailedTests(ITestContext context)
 	{
 		ITestNGMethod[] methods = context.getAllTestMethods();

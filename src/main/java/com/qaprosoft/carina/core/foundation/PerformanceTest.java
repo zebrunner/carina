@@ -25,7 +25,6 @@ import org.openqa.selenium.WebDriver;
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestResult;
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestRunner;
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestResult.Status;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 
 public abstract class PerformanceTest /*extends DriverHelper*/ implements Callable<PerformanceTestResult>
 {

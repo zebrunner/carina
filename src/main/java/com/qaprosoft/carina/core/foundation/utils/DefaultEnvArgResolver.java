@@ -21,7 +21,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  * DefaultEnvArgsResolver
  * 
  * @author Aliaksei_Khursevich
- * @email hursevich@gmail.com
+ *  <a href="mailto:hursevich@gmail.com">Aliaksei_Khursevich</a>
+ *
  */
 public class DefaultEnvArgResolver implements IEnvArgResolver
 {

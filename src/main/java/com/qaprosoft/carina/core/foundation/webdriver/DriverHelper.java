@@ -129,7 +129,7 @@ public class DriverHelper
 	/**
 	 * Initializes test log container dedicated to WebDriver instance.
 	 * 
-	 * @param driver
+	 * @param driver WebDriver
 	 */
 	protected void initSummary(WebDriver driver)
 	{
@@ -145,8 +145,6 @@ public class DriverHelper
 	/**
 	 * Check that element present within specified timeout.
 	 * 
-	 * @param element
-	 *            to find.
 	 * @param timeout
 	 *            - timeout.
 	 * @return element existence status.
@@ -161,8 +159,6 @@ public class DriverHelper
 	/**
 	 * Check that element present.
 	 * 
-	 * @param element
-	 *            to find.
 	 * @return element existence status.
 	 */
 	public boolean isElementPresent(final ExtendedWebElement extWebElement)
@@ -173,7 +169,7 @@ public class DriverHelper
 	/**
 	 * Check that element present on page using By.
 	 * 
-	 * @param by
+	 * @param by Selenium By locator
 	 * @return element non-existence status.
 	 */
 	public boolean isElementPresent(String elementName, final By by, long timeout)
@@ -238,8 +234,6 @@ public class DriverHelper
 	/**
 	 * Check that element with text present.
 	 * 
-	 * @param element
-	 *            to find.
 	 * @param text
 	 *            of element to check.
 	 * @return element with text existence status.
@@ -284,7 +278,6 @@ public class DriverHelper
 	/**
 	 * Check that element not present on page.
 	 * 
-	 * @param element
 	 * @return element non-existence status.
 	 */
 	public boolean isElementNotPresent(final ExtendedWebElement extWebElement) {
@@ -303,7 +296,7 @@ public class DriverHelper
 	/**
 	 * Check that element not present on page.
 	 * 
-	 * @param by
+	 * @param by Selenium By locator
 	 * @return element non-existence status.
 	 */
 	public boolean isElementNotPresent(String elementName, final By by) {
@@ -339,8 +332,6 @@ public class DriverHelper
 	/**
 	 * Types text to specified element.
 	 * 
-	 * @param element
-	 *            in which the text should be typed.
 	 * @param text
 	 *            to type.
 	 */
@@ -382,10 +373,8 @@ public class DriverHelper
 
 	/**
 	 * Clicks on element.
-	 * 
-	 * @param element
-	 *            to click.
-	 */
+	 *
+     */
 	public void click(final ExtendedWebElement extendedWebElement)
 	{
 		//isElementPresent(extendedWebElement, EXPLICIT_TIMEOUT); //just wait and try to link anyway
@@ -394,10 +383,8 @@ public class DriverHelper
 	
 	/**
 	 * Clicks on element.
-	 * 
-	 * @param element
-	 *            to click.
-	 */
+	 *
+     */
 	public void click(final ExtendedWebElement extendedWebElement, long timeout)
 	{
 		//isElementPresent(extendedWebElement, timeout);
@@ -457,9 +444,7 @@ public class DriverHelper
 	/**
 	 * Safe click on element, used to reduce any problems with that action.
 	 * 
-	 * @param elementName
-	 * @param element
-	 * @param startTimer
+	 * @param startTimer Start time
 	 */
 	private void clickSafe(ExtendedWebElement extendedWebElement, long timeout, boolean startTimer)
 	{
@@ -509,10 +494,8 @@ public class DriverHelper
 	
 	/**
 	 * Double Clicks on element.
-	 * 
-	 * @param element
-	 *            to click.
-	 */
+	 *
+     */
 	
 	public void doubleClick(final ExtendedWebElement extendedWebElement) {
 		//isElementPresent(extendedWebElement);
@@ -537,9 +520,7 @@ public class DriverHelper
 	/**
 	 * Safe doubleClick on element, used to reduce any problems with that action.
 	 * 
-	 * @param elementName
-	 * @param element
-	 * @param startTimer
+	 * @param startTimer Start time
 	 */
 	private void doubleClickSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
 	{
@@ -607,8 +588,8 @@ public class DriverHelper
 	/**
 	 * Safe enter sending to specified element.
 	 * 
-	 * @param controlInfo
-	 * @param control
+	 * @param controlInfo controlInfo
+	 * @param control control
 	 */	
 	public void pressEnter(String controlInfo, WebElement control)
 	{
@@ -660,7 +641,7 @@ public class DriverHelper
 	/**
 	 * Check checkbox
 	 * 
-	 * @param checkbox
+	 * @param checkbox Element
 	 */
 	public void check(ExtendedWebElement checkbox)
 	{
@@ -674,7 +655,7 @@ public class DriverHelper
 	/**
 	 * Uncheck checkbox
 	 * 
-	 * @param checkbox
+	 * @param checkbox Element
 	 */
 	public void uncheck(ExtendedWebElement checkbox)
 	{
@@ -705,9 +686,9 @@ public class DriverHelper
 	
 	/**
 	 * Inputs file path to specified element.
-	 * 
-	 * @param element
-	 * @param filePath
+	 *
+     * @param extendedWebElement Element
+	 * @param filePath path
 	 */
 	public void attachFile(final ExtendedWebElement extendedWebElement, String filePath)
 	{
@@ -777,7 +758,7 @@ public class DriverHelper
 	/**
 	 * Checks that current URL is as expected.
 	 * 
-	 * @param expectedURL
+	 * @param expectedURL Expected Url
 	 * @return validation result.
 	 */
 	public boolean isUrlAsExpected(String expectedURL)
@@ -833,7 +814,7 @@ public class DriverHelper
 	/**
 	 * Checks that page title is as expected.
 	 * 
-	 * @param expectedTitle
+	 * @param expectedTitle Expected title
 	 * @return validation result.
 	 */
 	public boolean isTitleAsExpected(final String expectedTitle)
@@ -865,8 +846,7 @@ public class DriverHelper
 	/**
 	 * Checks that page suites to expected pattern.
 	 * 
-	 * @param title
-	 * @param expectedPattern
+	 * @param expectedPattern  Expected Pattern
 	 * @return validation result.
 	 */
 	public boolean isTitleAsExpectedPattern(String expectedPattern)
@@ -922,9 +902,9 @@ public class DriverHelper
 
 	/**
 	 * Selects text in specified select element.
-	 * 
-	 * @param select
-	 * @param selectText
+	 *
+     * @param extendedWebElement Element
+	 * @param selectText select text
 	 * @return true if item selected, otherwise false.
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final String selectText)
@@ -985,9 +965,9 @@ public class DriverHelper
 
 	/**
 	 * Selects value according to text value matcher.
-	 * 
-	 * @param select
-	 * @param matcher
+	 *
+     * @param extendedWebElement Element
+	 * @param matcher {@link} BaseMatcher
 	 * @return true if item selected, otherwise false.
 	 */
 	public boolean selectByMatcher(final ExtendedWebElement extendedWebElement, final BaseMatcher<String> matcher)
@@ -1045,8 +1025,6 @@ public class DriverHelper
 	/**
 	 * Selects item by index in specified select element.
 	 * 
-	 * @param select
-	 * @param selectText
 	 * @return true if item selected, otherwise false.
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final int index)
@@ -1095,10 +1073,8 @@ public class DriverHelper
 
 	/**
 	 * Hovers over element.
-	 * 
-	 * @param element
-	 *            to be hovered.
-	 */
+	 *
+     */
 	public void hover(final ExtendedWebElement extendedWebElement) {
 		hover(extendedWebElement, null, null);
 	}
@@ -1158,8 +1134,8 @@ public class DriverHelper
 	/**
 	 * Hovers over element.
 	 * 
-	 * @param xpathLocator
-	 * @param elementName
+	 * @param xpathLocator xpathLocator
+	 * @param elementName element name
 	 */
 	public void hover(String elementName, String xpathLocator)
 	{
@@ -1261,9 +1237,9 @@ public class DriverHelper
 	/**
 	 * Performs slider move for specified offset.
 	 * 
-	 * @param slider
-	 * @param moveX
-	 * @param moveY
+	 * @param slider slider
+	 * @param moveX move x
+	 * @param moveY move y
 	 */
 	public void slide(ExtendedWebElement slider, int moveX, int moveY)
 	{
@@ -1284,7 +1260,7 @@ public class DriverHelper
 	/**
 	 * Get selected elements from one-value select.
 	 * 
-	 * @param select
+	 * @param select Element
 	 * @return selected value
 	 */
 	public String getSelectedValue(ExtendedWebElement select)
@@ -1296,7 +1272,7 @@ public class DriverHelper
 	/**
 	 * Get selected elements from multi-value select.
 	 * 
-	 * @param select
+	 * @param select Element
 	 * @return selected value
 	 */
 	public List<String> getSelectedValues(ExtendedWebElement select)
@@ -1438,7 +1414,7 @@ public class DriverHelper
 	/**
 	 * Executes a script on an element
 	 * 
-	 * @note Really should only be used when the web driver is sucking at
+	 *  Really should only be used when the web driver is sucking at
 	 *       exposing functionality natively
 	 * @param script
 	 *            The script to execute
@@ -1453,7 +1429,7 @@ public class DriverHelper
 	/**
 	 * Executes a script
 	 * 
-	 * @note Really should only be used when the web driver is sucking at
+	 * Really should only be used when the web driver is sucking at
 	 *       exposing functionality natively
 	 * @param script
 	 *            The script to execute
@@ -1503,11 +1479,11 @@ public class DriverHelper
 
 	/**
 	 * Swipes mobile screen by coordinates.
-	 * @param startX
-	 * @param startY
-	 * @param endX
-	 * @param endY
-	 * @param duration
+	 * @param startX start x
+	 * @param startY start y
+	 * @param endX end x
+	 * @param endY end y
+	 * @param duration duration
 	 */
 	public void swipe(double startX, double startY, double endX, double endY, double duration)
 	{
@@ -1594,8 +1570,8 @@ public class DriverHelper
 	/**
 	 * Find Extended Web Element on page using By.
 	 * 
-	 * @param by
-	 * @param name
+	 * @param by Selenium By locator
+	 * @param name Element name
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
 
@@ -1607,9 +1583,9 @@ public class DriverHelper
 	/**
 	 * Find Extended Web Element on page using By.
 	 * 
-	 * @param by
-	 * @param name
-	 * @param timeout
+	 * @param by Selenium By locator
+	 * @param name Element name
+	 * @param timeout Timeout to find
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
 

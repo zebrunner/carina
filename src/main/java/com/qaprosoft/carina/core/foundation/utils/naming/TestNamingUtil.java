@@ -31,7 +31,7 @@ import com.qaprosoft.zafira.client.model.TestType;
 /**
  * Common naming utility for unique test method identification.
  * 
- * @author: Aliaksei_Khursevich (hursevich@gmail.com)
+ * @author Aliaksei_Khursevich (hursevich@gmail.com)
  */
 public class TestNamingUtil
 {
