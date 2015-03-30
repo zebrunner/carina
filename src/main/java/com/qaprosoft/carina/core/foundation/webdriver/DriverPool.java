@@ -48,6 +48,11 @@ public class DriverPool
 
 		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; extra driver: " + driver);
 	}
+
+	public static WebDriver getDriverByThread()
+	{
+		return getDriverByThread(Thread.currentThread().getId());
+	}
 	
 	public static WebDriver getDriverByThread(long threadId)
 	{
