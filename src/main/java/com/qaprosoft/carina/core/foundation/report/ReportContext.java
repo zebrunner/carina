@@ -337,7 +337,7 @@ public class ReportContext
 	/**
 	 * Returns URL for test screenshot folder.
 	 * 
-	 * @param test
+	 * @param test test name
 	 * @return - URL for test screenshot folder.
 	 */
 	public static String getTestScreenshotsLink(String test)
@@ -359,7 +359,7 @@ public class ReportContext
 	/**
 	 * Returns URL for test log.
 	 * 
-	 * @param test
+	 * @param test test name
 	 * @return - URL to test log folder.
 	 */
 	public static String getTestLogLink(String test)
@@ -381,7 +381,7 @@ public class ReportContext
 	/**
 	 * Returns URL for test video record.
 	 * 
-	 * @param test
+	 * @param test test name
 	 * @return - URL to test log folder.
 	 */
 	public static String getTestVideoLink(String test)

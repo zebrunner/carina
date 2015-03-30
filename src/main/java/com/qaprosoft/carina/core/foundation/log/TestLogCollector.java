@@ -34,8 +34,7 @@ public class TestLogCollector
 
 	/**
 	 * Clears messages in driver session context.
-	 * @param SpecialKeywords.SESSION_ID
-	 */
+     */
 	public static void clearSessionLogs(String sessionId)
 	{
 		if (collector.containsKey(sessionId))
@@ -46,10 +45,9 @@ public class TestLogCollector
 	
 	/**
 	 * Adds message to test logs.
-	 * 
-	 * @param SpecialKeywords.SESSION_ID
-	 *            
-	 * @param msg
+	 *
+     * @param sessionId Session id
+	 * @param msg message
 	 *            
 	 */
 	public static synchronized void logToSession(String sessionId, String msg)
@@ -68,8 +66,6 @@ public class TestLogCollector
 	/**
 	 * Returns test log by webdriver session ID.
 	 * 
-	 * @param SpecialKeywords.SESSION_ID
-	 *            
 	 * @return test logs
 	 */
 	public static synchronized String getSessionLogs(String sessionId)
@@ -79,10 +75,9 @@ public class TestLogCollector
 
 	/**
 	 * Stores comment for screenshot.
-	 * 
-	 * @param screenId
-	 *            
-	 * @param msg
+	 *
+     * @param screenId screenId id
+     * @param msg message
 	 *            
 	 */
 	public static void addScreenshotComment(String screenId, String msg)
@@ -96,7 +91,7 @@ public class TestLogCollector
 	/**
 	 * Return comment for screenshot.
 	 * 
-	 * @param screenId
+	 * @param screenId Screen Id
 	 *            
 	 * @return screenshot comment
 	 */

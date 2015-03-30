@@ -73,10 +73,9 @@ public class MarshallerHelper {
 	/**
 	 * Create JAXBElement from Source
 	 * 
-	 * @param <T>
-	 * @param source
-	 * @param resultClazz
-	 * @return
+	 * @param <T> Generic
+	 * @param source Source
+	 * @param resultClazz expected class
 	 */
 	public static <T> T unmarshall(Source source, Class<T> resultClazz) {
 		return marshaller.unmarshall(source, resultClazz);
@@ -85,10 +84,9 @@ public class MarshallerHelper {
 	/**
 	 * Create JAXBElement from File
 	 * 
-	 * @param <T>
-	 * @param file
-	 * @param resultClazz
-	 * @return
+	 * @param <T> Generic
+	 * @param file File
+	 * @param resultClazz expected class
 	 */
 	public static <T> T unmarshall(File file, Class<T> resultClazz) {
 		return marshaller.unmarshall(file, resultClazz);
@@ -97,10 +95,9 @@ public class MarshallerHelper {
 	/**
 	 * Create JAXBElement from File
 	 * 
-	 * @param <T>
-	 * @param is
-	 * @param resultClazz
-	 * @return
+	 * @param <T> Generic
+	 * @param is  Input Stream
+	 * @param resultClazz expected class
 	 */
 	public static <T> T unmarshall(InputStream is, Class<T> resultClazz) {
 		return marshaller.unmarshall(is, resultClazz);
@@ -114,8 +111,8 @@ public class MarshallerHelper {
 	/**
 	 * Serializes JAXBElement into Writer
 	 * 
-	 * @param jaxbElement
-	 * @param writer
+	 * @param jaxbElement jaxbElement
+	 * @param writer writer
 	 */
 	public static void marshall(Object jaxbElement, Writer writer) {
 		marshaller.marshall(jaxbElement, writer);
