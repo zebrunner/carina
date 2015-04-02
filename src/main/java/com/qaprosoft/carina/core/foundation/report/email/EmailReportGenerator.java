@@ -193,7 +193,7 @@ public class EmailReportGenerator
 				}
 				else
 				{
-					result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze initializeServices log for details.");
+					result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze SYSTEM ISSUE log for details.");
 				}
 				
 				result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());

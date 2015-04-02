@@ -170,6 +170,13 @@ public abstract class AbstractTest // extends DriverHelper
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);
 			Jira.updateAfterTest(result);
 
+
+			//zafira
+			TestType testType = TestNamingUtil.getZafiraTest(Thread.currentThread().getId());
+			if (testType != null && jiraTickets.size() > 0) {
+				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
+			}
+			
 			// Populate Spira Steps
 			if (spiraSteps.size() == 0) { // it was not redefined in the test
 				spiraSteps = Spira.getSteps(result);
@@ -184,12 +191,6 @@ public abstract class AbstractTest // extends DriverHelper
 			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
 			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 
-			//ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-			
-			TestType testType = TestNamingUtil.getZafiraTest(Thread.currentThread().getId());
-			if (testType != null && jiraTickets.size() > 0) {
-				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
-			}
 			TestNamingUtil.releaseZafiraTest(Thread.currentThread().getId());
 
 			// clear jira tickets to be sure that next test is not affected.
