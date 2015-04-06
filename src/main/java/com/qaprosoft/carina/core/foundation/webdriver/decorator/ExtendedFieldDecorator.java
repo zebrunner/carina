@@ -117,7 +117,13 @@ public class ExtendedFieldDecorator implements FieldDecorator
 			return false;
 		}
 
-		if (!(ExtendedWebElement.class.equals(listType) || AbstractUIObject.class.isAssignableFrom((Class<?>) listType)))
+		try
+		{
+			if (!(ExtendedWebElement.class.equals(listType) || AbstractUIObject.class.isAssignableFrom((Class<?>) listType)))
+			{
+				return false;
+			}
+		} catch (ClassCastException e)
 		{
 			return false;
 		}
