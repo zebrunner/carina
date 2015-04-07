@@ -11,7 +11,6 @@
 
 package com.qaprosoft.carina.core.foundation.report.testrail.core;
  
-@SuppressWarnings("serial")
 public class APIException extends Exception
 {
 	public APIException(String message)
