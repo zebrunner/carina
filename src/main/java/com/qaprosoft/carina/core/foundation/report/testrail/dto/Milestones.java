@@ -17,7 +17,8 @@ public class Milestones {
 
 
 
-    public static Request addMilestone(int project_id, String name){
+    @SuppressWarnings("unchecked")
+	public static Request addMilestone(int project_id, String name){
         JSONObject obj=new JSONObject();
         obj.put("name",name);
         return new Request(obj,"add_milestone/"+project_id,"POST");
@@ -25,7 +26,8 @@ public class Milestones {
 
 
 
-    public static boolean isMilestoneExist(JSONArray jsonArray, String milestoneName){
+    @SuppressWarnings("unchecked")
+	public static boolean isMilestoneExist(JSONArray jsonArray, String milestoneName){
         for (Object o : jsonArray) {
             String nameValue = ((HashMap<String ,String>)o).get("name");
             if(nameValue.equals(milestoneName)){
