@@ -8,8 +8,7 @@ import org.json.simple.JSONObject;
  */
 public class Runs {
 
-    @SuppressWarnings("unchecked")
-	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID){
+    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID){
         JSONObject obj=new JSONObject();
         obj.put("suite_id",suite_id);
         obj.put("name",name);
@@ -17,9 +16,7 @@ public class Runs {
         obj.put("include_all",true);
         return new Request(obj,"add_run/"+projectID,"POST");
     }
-    
-    @SuppressWarnings("unchecked")
-	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId){
+    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId){
         JSONObject obj=new JSONObject();
         obj.put("suite_id",suite_id);
         obj.put("name",name);
