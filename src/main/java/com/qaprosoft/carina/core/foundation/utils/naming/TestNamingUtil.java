@@ -40,6 +40,8 @@ public class TestNamingUtil
 	private static INamingStrategy namingStrategy;
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	private static final ConcurrentHashMap<Long, String> threadId2CanonicTestName = new ConcurrentHashMap<Long, String>(); //map to store test names without configuration steps
+
 	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 	
 	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
@@ -72,7 +74,7 @@ public class TestNamingUtil
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
 	}
 	
-	public static synchronized String accociateTestInfo2Thread(String test, Long threadId)
+	public static synchronized String associateTestInfo2Thread(String test, Long threadId)
 	{
 		//introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid getInvocationCount() value
 		int count = 1;
@@ -117,7 +119,7 @@ public class TestNamingUtil
 		return testName2StartDate.get(test);
 	}
 	
-	public static synchronized void accociateZafiraTest(TestType zafiraTest, Long threadId)
+	public static synchronized void associateZafiraTest(TestType zafiraTest, Long threadId)
 	{
 		if (zafiraTest == null)
 			return;
@@ -133,4 +135,15 @@ public class TestNamingUtil
 	{
 		threadId2ZafiraTest.remove(threadId);
 	}
+	
+	
+	public static synchronized void associateCanonicTestName(String test, Long threadId)
+	{
+		threadId2CanonicTestName.put(threadId, test);
+	}
+	
+	public static String getCanonicTestNameByThread(Long threadId) {
+		return threadId2CanonicTestName.get(threadId);
+	}
+
 }

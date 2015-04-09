@@ -23,9 +23,8 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestResult;
-import com.qaprosoft.carina.core.foundation.performance.PerformanceTestRunner;
 import com.qaprosoft.carina.core.foundation.performance.PerformanceTestResult.Status;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
+import com.qaprosoft.carina.core.foundation.performance.PerformanceTestRunner;
 
 public abstract class PerformanceTest /*extends DriverHelper*/ implements Callable<PerformanceTestResult>
 {

@@ -183,7 +183,7 @@ public class ZafiraIntegrator {
 			String logUrl = ReportContext.getTestLogLink(test);
 
 			registeredTest = registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl);
-			TestNamingUtil.accociateZafiraTest(registeredTest, Thread.currentThread().getId());
+			TestNamingUtil.associateZafiraTest(registeredTest, Thread.currentThread().getId());
 
 		} catch (Exception e) {
 			isRegistered = false;
