@@ -82,6 +82,7 @@ public class CsvDataProvider extends BaseDataProvider {
         Object[][] args = new Object[listSize][argsList.size() + staticArgsList.size()];
         int rowIndex = 0;
         for (String[] strings : list) {
+        	String testName = context.getName();
 
             int i = 0;
             for (String arg : argsList) {
@@ -95,9 +96,14 @@ public class CsvDataProvider extends BaseDataProvider {
                 args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j),context,dsBean);
             }
 
+            // update testName adding UID values from DataSource arguments if any
+            testName = dsBean.setDataSorceUUID(testName, strings, mapper); //provide whole line from data provider for UUID generation
+            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); //provide organized args to generate valid hash
+            
             rowIndex++;
         }
 
+       
         return args;
     }
 
@@ -123,6 +129,9 @@ public class CsvDataProvider extends BaseDataProvider {
 
         return mapper;
     }
+    
+    
+    
 
 
 }
