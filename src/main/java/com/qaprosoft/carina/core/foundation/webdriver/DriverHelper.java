@@ -1201,6 +1201,7 @@ public class DriverHelper
 		builder.sendKeys(Keys.TAB).perform();
 	}
 
+	@Deprecated
 	public void sendKeys(String keys)
 	{
 		final String decryptedKeys = cryptoTool.decryptByPattern(keys, CRYPTO_PATTERN);
