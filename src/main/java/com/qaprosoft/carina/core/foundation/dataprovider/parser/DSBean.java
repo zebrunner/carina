@@ -23,9 +23,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 public class DSBean
 {
@@ -266,4 +266,39 @@ public class DSBean
 		
 		return testName;
 	}	
+	
+	public String setDataSorceUUID(String testName, Object[] params, Map<String, Integer> mapper)
+	{
+		//looks through the parameters for TUID or get column value by uidArgs parameter
+		Integer indexTUID = mapper.get(SpecialKeywords.TUID);
+		if (indexTUID != null) {
+			testName = params[indexTUID] + " - " + testName;				
+		}
+
+		if(!uidArgs.isEmpty())
+		{
+			String uidString = argsToString(uidArgs, params, mapper);
+			if (!uidString.isEmpty()){
+				testName = testName + " [" + uidString + "]";
+			}
+		}		
+		return testName;
+	}
+	
+	public String argsToString(List<String> args, Object[] params, Map<String, Integer> mapper)
+	{
+		if(args.size() == 0)
+		{
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		for(String arg : args)
+		{
+			Integer index = mapper.get(arg);
+			if (index != null) {
+				sb.append(String.format("%s=%s; ", arg, params[index].toString()));
+			}
+		}
+		return StringUtils.removeEnd(sb.toString(), "; ");
+	}
 }
