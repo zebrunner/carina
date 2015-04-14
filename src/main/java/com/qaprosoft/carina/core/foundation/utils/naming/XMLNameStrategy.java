@@ -74,13 +74,13 @@ public class XMLNameStrategy implements INamingStrategy
 			}
 		}
 		
-		String invocationID = "";
+		int invocationID = -1;
 		if (result.getMethod().getInvocationCount() > 1){
-			invocationID = String.valueOf(result.getMethod().getCurrentInvocationCount() + 1); 
+			invocationID = result.getMethod().getCurrentInvocationCount() + 1; 
 		}
 		
-		if (!invocationID.isEmpty()) {
-			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", invocationID));;
+		if (invocationID != -1) {
+			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", invocationID));
 		}
 		else {
 			testName = testName + " - " +  result.getMethod().getMethodName();
