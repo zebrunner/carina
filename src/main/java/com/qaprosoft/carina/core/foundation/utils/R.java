@@ -130,14 +130,14 @@ public enum R
 		String value = 
 				CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key) : propertiesHolder.get(resourceFile).getProperty(key);
 		// TODO: why we return empty instead of null?
-		return value != null ? decrypt(value) : StringUtils.EMPTY;
+		return value != null ? value : StringUtils.EMPTY;
 	}
 	
-	public String getSecured(String key)
+/*	public String getSecured(String key)
 	{
 		String value = get(key);
 		return value != null ? encrypt(value) : StringUtils.EMPTY;
-	}
+	}*/
 
 	public int getInt(String key)
 	{
