@@ -29,9 +29,10 @@ import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationExcept
 
 /**
  * R - loads properties from resource files.
- * 
- * @author Alexey Khursevich 
- * @email hursevich@gmail.com
+ *
+ * @author Aliaksei_Khursevich
+ *  <a href="mailto:hursevich@gmail.com">Aliaksei_Khursevich</a>
+ *
  */
 public enum R
 {
@@ -122,7 +123,7 @@ public enum R
 	 * Returns value either from systems properties or config properties context.
 	 * Systems properties have higher priority.
 	 * Decryption is performed if required.
-	 * @param key
+	 * @param key Requested key
 	 * @return config value
 	 */
 	public String get(String key)

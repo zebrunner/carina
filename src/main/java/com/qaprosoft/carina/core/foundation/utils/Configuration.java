@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  * Configuration utility.
  * 
  * @author Aliaksei_Khursevich
- * @email hursevich@gmail.com
+ * hursevich@gmail.com
  */
 public class Configuration
 {

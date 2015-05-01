@@ -27,7 +27,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
  * PDFUtil - utility for PDF file parsing.
  * 
  * @author Sergey Zagriychuk
- * @email szagriychuk@gmail.com
+ *  <a href="mailto:szagriychuk@gmail.com">Sergey Zagriychuk</a>
  *
  */
 public class PDFUtil
@@ -35,9 +35,8 @@ public class PDFUtil
 	/**
 	 * Reads PDF content in specified page range.
 	 * 
-	 * @param resourcePath
-	 * @param startPage
-	 * @param endPage
+	 * @param startPage Start Page
+	 * @param endPage End Page
 	 * @return PDF content
 	 */
 	public static String readTxtFromPDF(InputStream inputStream, int startPage, int endPage)
