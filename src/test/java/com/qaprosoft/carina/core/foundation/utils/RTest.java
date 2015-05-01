@@ -40,13 +40,14 @@ public class RTest
 	{
 		Assert.assertEquals(R.CONFIG.get("password"), "EncryptMe");
 		Assert.assertEquals(R.CONFIG.getSecured("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}");
-	}*/
+	}
 	
 	@Test
 	public void testPlaceholdersWithEncryption()
 	{
 		Assert.assertEquals(R.CONFIG.get("credentials"), "test@gmail.com/EncryptMe");
 	}
+*/
 	
 	@Test
 	public void testPlaceholdersInEmail()
