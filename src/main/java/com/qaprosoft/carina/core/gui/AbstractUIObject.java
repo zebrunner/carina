@@ -40,9 +40,8 @@ public abstract class AbstractUIObject extends DriverHelper
 	/**
 	 * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context
 	 * 
-	 * @param driver
-	 * @param locale
-	 */
+	 * @param driver WebDriver
+     */
 	public AbstractUIObject(WebDriver driver)
 	{
 		this(driver, null);
@@ -52,8 +51,8 @@ public abstract class AbstractUIObject extends DriverHelper
 	 * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context. Locale settings
 	 * are used during initialization
 	 * 
-	 * @param driver
-	 * @param locale
+	 * @param driver WebDriver
+	 * @param locale Locale
 	 */
 	public AbstractUIObject(WebDriver driver, Locale locale)
 	{
@@ -62,18 +61,16 @@ public abstract class AbstractUIObject extends DriverHelper
 
 	/**
 	 * Initializes UI object using {@link PageFactory}. Browser area for internal elements initialization is bordered by
-	 * SearchContext instance. <br/>
+	 * SearchContext instance.
 	 * If {@link WebDriver} object is used as search context then whole browser window will be used for initialization
-	 * of {@link ExtendedWebElement} fields inside. <br/>
+	 * of {@link ExtendedWebElement} fields inside.
 	 * 
 	 * Note: implement this constructor if you want your {@link AbstractUIObject} instances marked with {@link FindBy}
 	 * to be auto-initialized on {@link AbstractPage} inheritors
 	 * 
-	 * @param driver
-	 *            WebDriver instance to initialize UI Object fields using PageFactory
-	 * @param searchContext
-	 *            Window area that will be used for locating of internal elements
-	 * @param locale
+	 * @param driver WebDriver instance to initialize UI Object fields using PageFactory
+	 * @param searchContext Window area that will be used for locating of internal elements
+	 * @param locale Locale
 	 */
 	public AbstractUIObject(WebDriver driver, SearchContext searchContext, Locale locale)
 	{
@@ -85,14 +82,16 @@ public abstract class AbstractUIObject extends DriverHelper
 	}
 
 	/**
-	 * /** Verifies if root {@link WebElement} presents on page.<br/>
+	 *  Verifies if root {@link WebElement} presents on page.
+     *
 	 * If {@link AbstractUIObject} field on {@link AbstractPage} is marked with {@link FindBy} annotation then this
 	 * locator will be used to instantiate rootElement
 	 * 
 	 * @param timeout
 	 *            - max timeout for waiting until rootElement appear
 	 * 
-	 * @return true - if rootElement is enabled and visible on browser's screen;<br/>
+	 * @return true - if rootElement is enabled and visible on browser's screen;
+     *
 	 *         false - otherwise
 	 */
 	public boolean isUIObjectPresent(int timeout)

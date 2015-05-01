@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.report;
 /**
  * Test result type.
  * 
- * @author: Aliaksei_Khursevich (hursevich@gmail.com)
+ * @author Aliaksei_Khursevich (hursevich@gmail.com)
  */
 public enum TestResultType
 {
