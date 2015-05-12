@@ -54,306 +54,238 @@ public class TestCaseInfo {
     private String customExpected;
 
     /**
-     *
-     * @return
-     * The id
+     * @return The id
      */
     public Integer getId() {
         return id;
     }
 
     /**
-     *
-     * @param id
-     * The id
+     * @param id The id
      */
     public void setId(Integer id) {
         this.id = id;
     }
 
     /**
-     *
-     * @return
-     * The title
+     * @return The title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     *
-     * @param title
-     * The title
+     * @param title The title
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
-     *
-     * @return
-     * The sectionId
+     * @return The sectionId
      */
     public Integer getSectionId() {
         return sectionId;
     }
 
     /**
-     *
-     * @param sectionId
-     * The section_id
+     * @param sectionId The section_id
      */
     public void setSectionId(Integer sectionId) {
         this.sectionId = sectionId;
     }
 
     /**
-     *
-     * @return
-     * The typeId
+     * @return The typeId
      */
     public Integer getTypeId() {
         return typeId;
     }
 
     /**
-     *
-     * @param typeId
-     * The type_id
+     * @param typeId The type_id
      */
     public void setTypeId(Integer typeId) {
         this.typeId = typeId;
     }
 
     /**
-     *
-     * @return
-     * The priorityId
+     * @return The priorityId
      */
     public Integer getPriorityId() {
         return priorityId;
     }
 
     /**
-     *
-     * @param priorityId
-     * The priority_id
+     * @param priorityId The priority_id
      */
     public void setPriorityId(Integer priorityId) {
         this.priorityId = priorityId;
     }
 
     /**
-     *
-     * @return
-     * The milestoneId
+     * @return The milestoneId
      */
     public Object getMilestoneId() {
         return milestoneId;
     }
 
     /**
-     *
-     * @param milestoneId
-     * The milestone_id
+     * @param milestoneId The milestone_id
      */
     public void setMilestoneId(Object milestoneId) {
         this.milestoneId = milestoneId;
     }
 
     /**
-     *
-     * @return
-     * The refs
+     * @return The refs
      */
     public Object getRefs() {
         return refs;
     }
 
     /**
-     *
-     * @param refs
-     * The refs
+     * @param refs The refs
      */
     public void setRefs(Object refs) {
         this.refs = refs;
     }
 
     /**
-     *
-     * @return
-     * The createdBy
+     * @return The createdBy
      */
     public Integer getCreatedBy() {
         return createdBy;
     }
 
     /**
-     *
-     * @param createdBy
-     * The created_by
+     * @param createdBy The created_by
      */
     public void setCreatedBy(Integer createdBy) {
         this.createdBy = createdBy;
     }
 
     /**
-     *
-     * @return
-     * The createdOn
+     * @return The createdOn
      */
     public Integer getCreatedOn() {
         return createdOn;
     }
 
     /**
-     *
-     * @param createdOn
-     * The created_on
+     * @param createdOn The created_on
      */
     public void setCreatedOn(Integer createdOn) {
         this.createdOn = createdOn;
     }
 
     /**
-     *
-     * @return
-     * The updatedBy
+     * @return The updatedBy
      */
     public Integer getUpdatedBy() {
         return updatedBy;
     }
 
     /**
-     *
-     * @param updatedBy
-     * The updated_by
+     * @param updatedBy The updated_by
      */
     public void setUpdatedBy(Integer updatedBy) {
         this.updatedBy = updatedBy;
     }
 
     /**
-     *
-     * @return
-     * The updatedOn
+     * @return The updatedOn
      */
     public Integer getUpdatedOn() {
         return updatedOn;
     }
 
     /**
-     *
-     * @param updatedOn
-     * The updated_on
+     * @param updatedOn The updated_on
      */
     public void setUpdatedOn(Integer updatedOn) {
         this.updatedOn = updatedOn;
     }
 
     /**
-     *
-     * @return
-     * The estimate
+     * @return The estimate
      */
     public Object getEstimate() {
         return estimate;
     }
 
     /**
-     *
-     * @param estimate
-     * The estimate
+     * @param estimate The estimate
      */
     public void setEstimate(Object estimate) {
         this.estimate = estimate;
     }
 
     /**
-     *
-     * @return
-     * The estimateForecast
+     * @return The estimateForecast
      */
     public Object getEstimateForecast() {
         return estimateForecast;
     }
 
     /**
-     *
-     * @param estimateForecast
-     * The estimate_forecast
+     * @param estimateForecast The estimate_forecast
      */
     public void setEstimateForecast(Object estimateForecast) {
         this.estimateForecast = estimateForecast;
     }
 
     /**
-     *
-     * @return
-     * The suiteId
+     * @return The suiteId
      */
     public Integer getSuiteId() {
         return suiteId;
     }
 
     /**
-     *
-     * @param suiteId
-     * The suite_id
+     * @param suiteId The suite_id
      */
     public void setSuiteId(Integer suiteId) {
         this.suiteId = suiteId;
     }
 
     /**
-     *
-     * @return
-     * The customPreconds
+     * @return The customPreconds
      */
     public String getCustomPreconds() {
         return customPreconds;
     }
 
     /**
-     *
-     * @param customPreconds
-     * The custom_preconds
+     * @param customPreconds The custom_preconds
      */
     public void setCustomPreconds(String customPreconds) {
         this.customPreconds = customPreconds;
     }
 
     /**
-     *
-     * @return
-     * The customSteps
+     * @return The customSteps
      */
     public String getCustomSteps() {
         return customSteps;
     }
 
     /**
-     *
-     * @param customSteps
-     * The custom_steps
+     * @param customSteps The custom_steps
      */
     public void setCustomSteps(String customSteps) {
         this.customSteps = customSteps;
     }
 
     /**
-     *
-     * @return
-     * The customExpected
+     * @return The customExpected
      */
     public String getCustomExpected() {
         return customExpected;
     }
 
     /**
-     *
-     * @param customExpected
-     * The custom_expected
+     * @param customExpected The custom_expected
      */
     public void setCustomExpected(String customExpected) {
         this.customExpected = customExpected;
