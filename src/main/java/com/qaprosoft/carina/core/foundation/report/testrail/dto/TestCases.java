@@ -8,8 +8,8 @@ import org.json.simple.JSONObject;
  */
 public class TestCases {
 
-    public static Request getRe(int projectId, int suiteID) {
-        return new Request(new JSONObject(), "get_cases/" + projectId + "&suite_id=dd" + suiteID, "GET");
+    public static Request getSuiteTestCases(int projectId, int suiteID) {
+        return new Request(new JSONObject(), "get_cases/" + projectId + "&suite_id=" + suiteID, "GET");
 
     }
 }
