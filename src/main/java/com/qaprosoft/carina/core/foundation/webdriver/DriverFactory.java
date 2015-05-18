@@ -33,7 +33,6 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -229,7 +228,8 @@ public class DriverFactory
 		catch (Exception e)
 		{
 			LOGGER.debug("Unable to initialize driver. Test will be SKIPPED due to the\r\n", e);
-	    	throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
+			throw new RuntimeException(e);  
+	    	//throw new SkipException("Unable to initialize driver. Test will be SKIPPED due to the\r\n" + e.getMessage());
 		}
 		return driver;
 	}

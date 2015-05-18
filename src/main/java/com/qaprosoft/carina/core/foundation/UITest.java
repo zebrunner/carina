@@ -59,7 +59,7 @@ public class UITest extends AbstractTest
     private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
     private int adb_pid = 0;
     
-    Throwable init_throwable;
+    protected Throwable init_throwable;
 
 	
 	@Override
@@ -235,6 +235,8 @@ public class UITest extends AbstractTest
 			init_throwable = thr;
 
 		}    	
+		
+		DriverPool.registerExtraDriver2Thread(extraDriver, Thread.currentThread().getId());
 		return extraDriver;		
 	}
 	
@@ -249,7 +251,8 @@ public class UITest extends AbstractTest
 			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
 			extraDriver.quit();
 			extraDriver = null;
-		}
+			DriverPool.deregisterDriverByThread(Thread.currentThread().getId());
+		}		
 	}
 	
 	protected WebDriver getDriver() {
@@ -283,12 +286,12 @@ public class UITest extends AbstractTest
     			init = true;
     		}
     		catch (Throwable thr) {
-    			DevicePool.ignoreDevice();
+    			//DevicePool.ignoreDevice();
     			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
     			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
     			init_throwable = thr;
+    			pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
     		}
-    		pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
     	}
 
     	return init;

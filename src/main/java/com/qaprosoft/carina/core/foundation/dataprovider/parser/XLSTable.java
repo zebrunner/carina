@@ -61,7 +61,7 @@ public class XLSTable
 
 	public void addDataRow(Row row, Workbook wb, Sheet sheet)
 	{
-		if(executeColumn != null && executeValue != null && headers.contains(executeColumn))
+		if(executeColumn != null && executeValue != null && row != null && headers.contains(executeColumn))
 		{
 			if(!executeValue.equalsIgnoreCase(XLSParser.getCellValue(row.getCell(headers.indexOf(executeColumn)))))
 			{

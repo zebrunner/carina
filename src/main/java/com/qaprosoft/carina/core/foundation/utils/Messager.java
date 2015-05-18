@@ -29,38 +29,44 @@ import org.testng.Reporter;
  * @author akhursevich
  */
 
-//TODO: redesign logging and messager too
-
 public enum Messager {
 	TEST_STARTED(
 			"\r\n" +
 			"======================================================================================================================================\r\n" +
-			"INFO: TEST [%s] STARTED at [%s]"),
+			"INFO:%s TEST [%s] STARTED at [%s]"),
 
 	TEST_PASSED(
 			"\r\n" +
-			"INFO: TEST [%s] PASSED at [%s] \r\n" +
+			"INFO:%s TEST [%s] PASSED at [%s] \r\n" +
 			"======================================================================================================================================"),			
 
 	TEST_SKIPPED(
 			"\r\n" +
-			"INFO: TEST [%s] SKIPPED at [%s] - %s\r\n" +
+			"INFO:%s TEST [%s] SKIPPED at [%s] - %s\r\n" +
 			"======================================================================================================================================"),
 			
 	TEST_FAILED(
 			"\r\n" +
-			"INFO: TEST [%s] FAILED at [%s] - %s\r\n" +
-			"======================================================================================================================================"),
-			
-	CONFIGURATION_FAILED(
-			"\r\n" +
-			"INFO: CONFIGURATION [%s] FAILED at [%s] - %s\r\n" +
+			"INFO:%s TEST [%s] FAILED at [%s] - %s\r\n" +
 			"======================================================================================================================================"),
 
-	CONFIGURATION_SKIPPED(
+	RETRY_RETRY_FAILED(
 			"\r\n" +
-			"INFO: CONFIGURATION [%s] SKIPPED at [%s] - %s\r\n" +
-			"======================================================================================================================================"),
+			"INFO:%s TEST [%s] RETRY %s of %s FAILED - %s\r\n" +
+			"--------------------------------------------------------------------------------------------------------------------------------------"),
+
+	CONFIG_STARTED(
+			"INFO:%s CONFIG [%s] START at [%s]"),
+
+	CONFIG_PASSED(
+			"INFO:%s CONFIG [%s] PASS at [%s]"),
+
+	CONFIG_SKIPPED(
+			"INFO:%s CONFIG [%s] SKIP at [%s] - %s"),
+			
+	CONFIG_FAILED(
+			"INFO:%s CONFIG [%s] FAIL at [%s] - %s"),
+					
 	TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
 	OPEN_URL("INFO: url '%s' is opened."),

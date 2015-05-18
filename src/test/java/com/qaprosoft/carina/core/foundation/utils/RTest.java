@@ -35,7 +35,7 @@ public class RTest
 		Assert.assertEquals(R.CONFIG.get("url"), "http://localhost:8081");
 	}
 	
-	@Test
+/*	@Test
 	public void testEncryption()
 	{
 		Assert.assertEquals(R.CONFIG.get("password"), "EncryptMe");
@@ -47,10 +47,21 @@ public class RTest
 	{
 		Assert.assertEquals(R.CONFIG.get("credentials"), "test@gmail.com/EncryptMe");
 	}
+*/
 	
 	@Test
 	public void testPlaceholdersInEmail()
 	{
 		Assert.assertEquals(R.EMAIL.get("title"), "${test}");
+	}
+	
+	@Test
+	public void testOverride()
+	{
+		Assert.assertEquals(R.TESTDATA.get("key1"), "3");
+		Assert.assertEquals(R.TESTDATA.get("key2"), "2");
+		Assert.assertEquals(R.TESTDATA.get("key3"), "1");
+		Assert.assertEquals(R.TESTDATA.get("key4"), "3");
+		Assert.assertEquals(R.TESTDATA.get("key5"), "2");
 	}
 }

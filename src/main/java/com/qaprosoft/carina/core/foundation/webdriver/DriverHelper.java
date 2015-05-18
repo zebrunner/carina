@@ -29,7 +29,6 @@ import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -48,6 +47,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
@@ -1173,6 +1173,10 @@ public class DriverHelper
 
 	public void scrollTo(final ExtendedWebElement extendedWebElement)
 	{
+		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains("mobile")) {
+			LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
+			return;
+		}
 		try
 		{
 			Locatable locatableElement = (Locatable) extendedWebElement.getElement();
@@ -1180,7 +1184,9 @@ public class DriverHelper
 			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
 			
 			int y = locatableElement.getCoordinates().onScreen().getY();
-			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
+			if (y > 120) {
+				((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
+			}
 		}
 		catch (Exception e)
 		{
@@ -1195,6 +1201,7 @@ public class DriverHelper
 		builder.sendKeys(Keys.TAB).perform();
 	}
 
+	@Deprecated
 	public void sendKeys(String keys)
 	{
 		final String decryptedKeys = cryptoTool.decryptByPattern(keys, CRYPTO_PATTERN);
@@ -1405,25 +1412,7 @@ public class DriverHelper
 
 	public boolean isPageOpened(final AbstractPage page)
 	{
-		boolean result;
-		final WebDriver drv = getDriver();
-		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl());
-				}
-			});
-			result = true;
-		}
-		catch (Exception e)
-		{
-			result = false;
-		}
-		return result;
+		return isPageOpened(page, EXPLICIT_TIMEOUT);
 	}
 
 	public boolean isPageOpened(final AbstractPage page, long timeout)
