@@ -44,7 +44,7 @@ public class ReportContext
 	
 	public static final String TEMP_FOLDER = "temp";
 
-	private static File baseDirectory;
+	private static File baseDirectory = null;
 
 	private static File tempDirectory;
 	
@@ -62,6 +62,7 @@ public class ReportContext
 	{
 		if (baseDirectory == null)
 		{
+			removeOldReports();
 			File projectRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
 			if (!projectRoot.exists())
@@ -72,20 +73,25 @@ public class ReportContext
 					throw new RuntimeException("Folder not created: " + projectRoot.getAbsolutePath());
 				}
 			}
-
+			
 			rootID = System.currentTimeMillis();
 			String directory = String.format("%s/%s/%d", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), rootID);
-			baseDirectory = new File(directory);
-			boolean isCreated = baseDirectory.mkdir();
+			File baseDirectoryTmp = new File(directory);  
+			boolean isCreated = baseDirectoryTmp.mkdir();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
 			}
+			
+			baseDirectory = baseDirectoryTmp;
 		}
 		return baseDirectory;
 	}
 	
+	public static boolean isBaseDireCreated() {
+		return baseDirectory != null;
+	}
 	public static synchronized File getTempDir()
 	{
 		if (tempDirectory == null)
@@ -200,7 +206,7 @@ public class ReportContext
 	 * Removes emailable html report and oldest screenshots directories according to history size defined
 	 * in config.
 	 */
-	public static void removeOldReports()
+	private static void removeOldReports()
 	{
 		File baseDir = new File(String.format("%s/%s", System.getProperty("user.dir"),
 				Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
@@ -227,7 +233,7 @@ public class ReportContext
 			
 			int maxHistory = Configuration.getInt(Parameter.MAX_SCREENSHOOT_HISTORY);
 
-			if (screenshotFolders.size() > maxHistory && maxHistory != 0)
+			if (screenshotFolders.size() + 1 > maxHistory && maxHistory != 0)
 			{
 				Comparator<File> comp = new Comparator<File>()
 				{
@@ -240,6 +246,9 @@ public class ReportContext
 				Collections.sort(screenshotFolders, comp);
 				for (int i = maxHistory - 1; i < screenshotFolders.size(); i++)
 				{
+					if (screenshotFolders.get(i).getName().equals("gallery-lib")) {
+						continue;
+					}
 					try
 					{
 						FileUtils.deleteDirectory(screenshotFolders.get(i));
@@ -251,8 +260,6 @@ public class ReportContext
 				}
 			}
 		}
-		//create base dir and initialize rootID
-		getBaseDir();		
 	}
 
 	public static void removeTestReport(String test)
@@ -265,6 +272,27 @@ public class ReportContext
 		catch (IOException e)
 		{
 			LOGGER.error(e.getMessage());
+		}
+	}
+	
+	public static void removeTestScreenshots(String test)
+	{
+		try
+		{
+			// Lists all files in folder
+			File parentFolder = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			File fList[] = parentFolder.listFiles();
+			for (int i = 0; i < fList.length; i++) {
+			    if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".mp4") || fList[i].getName().endsWith(".html")) {
+			        fList[i].delete();
+			    }
+			}
+			File thumbnailsFolder = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_") + "/thumbnails");
+			thumbnailsFolder.delete();
+		}
+		catch (Exception e)
+		{
+			LOGGER.error("Exception dicsovered during screenshots/video removing! " + e.getMessage());
 		}
 	}
 	

@@ -113,19 +113,17 @@ public abstract class AbstractTest // extends DriverHelper
 
 		Logger root = Logger.getRootLogger();
 		Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-		// root.setLevel(Level.DEBUG);
 		while (allLoggers.hasMoreElements()) {
 			Category tmpLogger = (Category) allLoggers.nextElement();
 			if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
 				tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
 			}
 		}
-
+		
 		startDate = new Date().getTime();
 		LOGGER.info(Configuration.asString());
 		// Configuration.validateConfiguration();
 
-		ReportContext.removeOldReports();
 		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
 
 		if (!Configuration.isNull(Parameter.URL)) {
@@ -172,6 +170,13 @@ public abstract class AbstractTest // extends DriverHelper
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);
 			Jira.updateAfterTest(result);
 
+
+			//zafira
+			TestType testType = TestNamingUtil.getZafiraTest(Thread.currentThread().getId());
+			if (testType != null && jiraTickets.size() > 0) {
+				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
+			}
+			
 			// Populate Spira Steps
 			if (spiraSteps.size() == 0) { // it was not redefined in the test
 				spiraSteps = Spira.getSteps(result);
@@ -186,12 +191,7 @@ public abstract class AbstractTest // extends DriverHelper
 			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
 			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 
-			ZafiraIntegrator.finishTestMethod(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-			
-			TestType testType = TestNamingUtil.getZafiraTest(test);
-			if (testType != null && jiraTickets.size() > 0) {
-				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
-			}
+			TestNamingUtil.releaseZafiraTest(Thread.currentThread().getId());
 
 			// clear jira tickets to be sure that next test is not affected.
 			jiraTickets.clear();
@@ -260,8 +260,8 @@ public abstract class AbstractTest // extends DriverHelper
 
 			printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-			if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP)) {
-				Assert.fail("Skipped tests detected! Analyze logs to determine possible configuration issues.");
+			if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP_ALL)) {
+				Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
 			}
 
 		} catch (Exception e) {
@@ -369,8 +369,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 			for (int i = 0; i < staticArgs.length; i++) {
 				args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-						.getTestParams().get(staticArgs[i]), context
-						.getAttribute(SpecialKeywords.UUID).toString()); // zero
+						.getTestParams().get(staticArgs[i])); // zero
 																			// element
 																			// is
 																			// a
@@ -432,8 +431,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 			for (int i = 0; i < staticArgs.length; i++) {
 				args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-						.getTestParams().get(staticArgs[i]), context
-						.getAttribute(SpecialKeywords.UUID).toString()); // zero
+						.getTestParams().get(staticArgs[i])); // zero
 																			// element
 																			// is
 																			// a
@@ -502,13 +500,10 @@ public abstract class AbstractTest // extends DriverHelper
 				// read one line from xls and set to arguments from DataSource
 				if (dsBean.getArgs().contains(argNames[i])) {
 					args[rowIndex][i] = ParameterGenerator.process(xlsRow
-							.get(argNames[i]),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString());
+							.get(argNames[i]));
 				} else {
 					args[rowIndex][i] = ParameterGenerator.process(dsBean
-							.getTestParams().get(argNames[i]), context
-							.getAttribute(SpecialKeywords.UUID).toString());
+							.getTestParams().get(argNames[i]));
 				}
 			}
 			// update testName adding UID values from DataSource arguments if
@@ -548,13 +543,11 @@ public abstract class AbstractTest // extends DriverHelper
 				.info("**************** Test execution summary ****************");
 		int num = 1;
 		for (TestResultItem tri : tris) {
-			String reportLinks = !StringUtils.isEmpty(tri
-					.getLinkToScreenshots()) ? "screenshots="
-					+ tri.getLinkToScreenshots() + " | " : "";
-			reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log="
-					+ tri.getLinkToLog() : "";
-			Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri
-					.getResult().toString(), reportLinks);
+			if (!tri.isConfig()) {
+				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
+				reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
+				Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
+			}
 		}
 	}
 
@@ -651,26 +644,20 @@ public abstract class AbstractTest // extends DriverHelper
 
 				for (int i = 0; i < staticArgsList.size(); i++) {
 					args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-							.getTestParams().get(staticArgsList.get(i)),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString()); // zero element is a hashmap
+							.getTestParams().get(staticArgsList.get(i))); // zero element is a hashmap
 				}
 			} else {
 				int i = 0;
 				for (i = 0; i < argsList.size(); i++) {
 					args[rowIndex][i] = ParameterGenerator.process(xlsRow
-							.get(argsList.get(i)),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString());
+							.get(argsList.get(i)));
 
 				}
 				// populate the rest of items by static parameters from
 				// testParams
 				for (int j = 0; j < staticArgsList.size(); j++) {
 					args[rowIndex][i + j] = ParameterGenerator.process(dsBean
-							.getTestParams().get(staticArgsList.get(j)),
-							context.getAttribute(SpecialKeywords.UUID)
-									.toString());
+							.getTestParams().get(staticArgsList.get(j)));
 				}
 			}
 			// update testName adding UID values from DataSource arguments if

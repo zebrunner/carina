@@ -1,16 +1,18 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.Map;
+
+import org.testng.ITestContext;
+
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
-import org.testng.ITestContext;
-
-import java.lang.annotation.Annotation;
-import java.util.*;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -89,7 +91,7 @@ public class XlsDataProvider extends BaseDataProvider {
             		if (value == null)
             			continue;
         			
-            		Object param = ParameterGenerator.process(entry.getValue().toString(), context.getAttribute(SpecialKeywords.UUID).toString());
+            		Object param = ParameterGenerator.process(entry.getValue().toString());
         			if (param == null)
         				continue;
             		
@@ -106,9 +108,7 @@ public class XlsDataProvider extends BaseDataProvider {
                 int i;
                 for (i = 0; i < argsList.size(); i++) {
                     args[rowIndex][i] = ParameterGenerator.process(xlsRow
-                                    .get(argsList.get(i)),
-                            context.getAttribute(SpecialKeywords.UUID)
-                                    .toString());
+                                    .get(argsList.get(i)));
                 }
                 //populate the rest of items by static parameters from testParams
                 for (int j = 0; j < staticArgsList.size(); j++) {

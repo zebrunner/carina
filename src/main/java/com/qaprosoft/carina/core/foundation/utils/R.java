@@ -49,7 +49,7 @@ public enum R
 
 	private static final Logger LOGGER = Logger.getLogger(R.class);
 	
-	private static final String OVERRIDE_FORMAT = "_%s";
+	private static final String OVERRIDE_SIGN = "_";
 
 	private String resourceFile;
 
@@ -74,11 +74,13 @@ public enum R
 					LOGGER.info("Base properties loaded: " + resource.resourceFile);
 				}
 				
-				URL overrideResource = ClassLoader.getSystemResource(String.format(OVERRIDE_FORMAT, resource.resourceFile));
-				if(overrideResource != null)
+				URL overrideResource;
+				String resourceName = OVERRIDE_SIGN + resource.resourceFile;
+				while((overrideResource = ClassLoader.getSystemResource(resourceName)) != null)
 				{
 					properties.load(overrideResource.openStream());
-					LOGGER.info("Override properties loaded: " + String.format(OVERRIDE_FORMAT, resource.resourceFile));
+					LOGGER.info("Override properties loaded: " + resourceName);
+					resourceName = OVERRIDE_SIGN + resourceName;
 				}
 		
 				// TODO: may we skip the validation?
@@ -128,14 +130,14 @@ public enum R
 		String value = 
 				CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key) : propertiesHolder.get(resourceFile).getProperty(key);
 		// TODO: why we return empty instead of null?
-		return value != null ? decrypt(value) : StringUtils.EMPTY;
+		return value != null ? value : StringUtils.EMPTY;
 	}
 	
-	public String getSecured(String key)
+/*	public String getSecured(String key)
 	{
 		String value = get(key);
 		return value != null ? encrypt(value) : StringUtils.EMPTY;
-	}
+	}*/
 
 	public int getInt(String key)
 	{

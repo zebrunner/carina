@@ -40,9 +40,11 @@ public class TestNamingUtil
 	private static INamingStrategy namingStrategy;
 
 	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
-	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
-	private static final ConcurrentHashMap<String, TestType> testName2ZafiraTest = new ConcurrentHashMap<String, TestType>();
+	private static final ConcurrentHashMap<Long, String> threadId2CanonicTestName = new ConcurrentHashMap<Long, String>(); //map to store test names without configuration steps
+
+	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 	
+	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
 	
 	
@@ -72,7 +74,7 @@ public class TestNamingUtil
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
 	}
 	
-	public static synchronized String accociateTestInfo2Thread(String test, Long threadId)
+	public static synchronized String associateTestInfo2Thread(String test, Long threadId)
 	{
 		//introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid getInvocationCount() value
 		int count = 1;
@@ -117,20 +119,31 @@ public class TestNamingUtil
 		return testName2StartDate.get(test);
 	}
 	
-	public static synchronized void accociateZafiraTest(String test, TestType zafiraTest)
+	public static synchronized void associateZafiraTest(TestType zafiraTest, Long threadId)
 	{
 		if (zafiraTest == null)
 			return;
-		testName2ZafiraTest.put(test, zafiraTest);
+		threadId2ZafiraTest.put(threadId, zafiraTest);
 	}
 	
-	public static TestType getZafiraTest(String test)
+	public static TestType getZafiraTest(Long threadId)
 	{
-		return testName2ZafiraTest.get(test);
+		return threadId2ZafiraTest.get(threadId);
 	}
 	
-	public static synchronized void releaseZafiraTest(String test)
+	public static synchronized void releaseZafiraTest(Long threadId)
 	{
-		testName2ZafiraTest.remove(test);
+		threadId2ZafiraTest.remove(threadId);
 	}
+	
+	
+	public static synchronized void associateCanonicTestName(String test, Long threadId)
+	{
+		threadId2CanonicTestName.put(threadId, test);
+	}
+	
+	public static String getCanonicTestNameByThread(Long threadId) {
+		return threadId2CanonicTestName.get(threadId);
+	}
+
 }

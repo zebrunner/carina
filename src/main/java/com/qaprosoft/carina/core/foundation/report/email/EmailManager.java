@@ -68,6 +68,9 @@ public class EmailManager
 			if (!R.EMAIL.get("mail.smtp.socketFactory.class").isEmpty()){
 				props.put("mail.smtp.socketFactory.class", R.EMAIL.get("mail.smtp.socketFactory.class"));
 			}
+			if (!R.EMAIL.get("mail.smtp.starttls.enable").isEmpty()){
+				props.put("mail.smtp.starttls.enable", R.EMAIL.get("mail.smtp.starttls.enable"));
+			}				
 			
 			//session = Session.getDefaultInstance(props, new javax.mail.Authenticator()
 			session = Session.getInstance(props, new javax.mail.Authenticator()

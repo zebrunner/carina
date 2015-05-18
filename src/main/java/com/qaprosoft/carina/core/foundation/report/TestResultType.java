@@ -24,7 +24,9 @@ public enum TestResultType
 {
 	PASS("PASS"),
 	FAIL("FAIL"),
-	SKIP("SKIP");
+	SKIP("SKIP"),
+	SKIP_ALL("SKIP_ALL");
+
 
 	private String result;
 	
@@ -37,7 +39,7 @@ public enum TestResultType
 		this.result = result;
 	}
 	
-	TestResultType(String result, int passed, int failed, int skipped)
+	TestResultType(String result, int passed, int failed, int skipped, int service)
 	{
 		this.result = result;
 		this.passed = passed;
@@ -73,5 +75,4 @@ public enum TestResultType
 	public void setSkipped(int skipped) {
 		this.skipped = skipped;
 	}
-
 }

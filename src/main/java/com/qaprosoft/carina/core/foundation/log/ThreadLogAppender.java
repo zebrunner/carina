@@ -22,6 +22,15 @@ public class ThreadLogAppender extends AppenderSkeleton
 	@Override
 	public synchronized void append(LoggingEvent event)
 	{
+		int count = 0;
+		//wait 10 seconds until folder structure is create
+		while (!ReportContext.isBaseDireCreated() && ++count<10) {
+			pause(1);
+		}
+		if (!ReportContext.isBaseDireCreated()) {
+			System.out.println("Folder structure is not created yet!");
+			return;
+		}
 		try
 		{
 			String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
@@ -37,7 +46,11 @@ public class ThreadLogAppender extends AppenderSkeleton
 				fw = new BufferedWriter(new FileWriter(testLogFile));
 				test2file.put(test, fw);
 			}
-			fw.write(event.getMessage().toString());
+			if (event != null) {
+				fw.write(event.getMessage().toString());
+			} else {
+				fw.write("null");
+			}
 			fw.write("\n");
 			fw.flush();
 		} catch (IOException e)
@@ -81,5 +94,13 @@ public class ThreadLogAppender extends AppenderSkeleton
 	public boolean requiresLayout()
 	{
 		return false;
+	}
+	
+	private void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

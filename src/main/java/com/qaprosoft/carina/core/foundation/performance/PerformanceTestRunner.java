@@ -89,7 +89,6 @@ public class PerformanceTestRunner
 		LOG.info(Configuration.asString());
 		Configuration.validateConfiguration();
 		
-		ReportContext.removeOldReports();
 	}
 	
 	@SuppressWarnings("deprecation")
