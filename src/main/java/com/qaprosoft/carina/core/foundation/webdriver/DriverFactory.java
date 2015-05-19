@@ -53,7 +53,7 @@ public class DriverFactory {
     public static final String CHROME = "chrome";
     public static final String HTML_UNIT = "htmlunit";
     public static final String IOS = "iOS";
-    public static final String ANDROID = "Android";
+    public static final String ANDROID = SpecialKeywords.ANDROID;
     public static final String SAFARI = "safari";
     public static final String MOBILE = SpecialKeywords.MOBILE;
     public static final String MOBILE_GRID = SpecialKeywords.MOBILE_GRID;
@@ -143,7 +143,7 @@ public class DriverFactory {
                 capabilities = getInternetExplorerCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
             } else if (HTML_UNIT.equalsIgnoreCase(browser)) {
                 capabilities = getHtmlUnitCapabilities(testName);
-            } else if (MOBILE.equalsIgnoreCase(browser)) {
+/*            } else if (MOBILE.equalsIgnoreCase(browser)) {
                 if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
                     capabilities = getMobileWebCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
                             Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
@@ -153,7 +153,7 @@ public class DriverFactory {
                             Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
                             Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
                             Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-                }
+                }*/
             } else if (MOBILE_GRID.equalsIgnoreCase(browser)) {
                 if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
                     capabilities = getMobileWebCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
@@ -165,7 +165,7 @@ public class DriverFactory {
                             Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
                             Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
                 }
-            } else if (MOBILE_POOL.equalsIgnoreCase(browser)) {
+            } else if (MOBILE_POOL.equalsIgnoreCase(browser) || MOBILE.equalsIgnoreCase(browser)) {
                 // 1. parse mobile_devices
                 // 2. verify status for each selenium/appium server
                 // 3. !adjust thread count if possible or organize delays when all devices are busy
