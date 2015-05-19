@@ -83,6 +83,8 @@ public class Configuration
 		
 		ENV_ARG_RESOLVER("env_arg_resolver"),
 		
+		DEVELOP("develop"), 
+		
 		PLATFORM("platform"),
 
 		BROWSER("browser"),
@@ -220,6 +222,8 @@ public class Configuration
 		
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
+		
+		MOBILE_DEVICE_TYPE("mobile_device_type"),		
 		
 		DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
 		
