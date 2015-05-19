@@ -217,6 +217,8 @@ public class ZafiraIntegrator {
 		if (userName.equals("$BUILD_USER_ID"))
 			userName = ANONYMOUS_USER;
 
+		userName = userName.toLowerCase();
+		
 		String userDetails = "userName: %s, email: %s, firstName: %s, lastName: %s";
 		LOGGER.debug("User details for registration:" + String.format(userDetails, userName, email, firstName, lastName));
 		UserType regUser = new UserType(userName, email, firstName, lastName);
