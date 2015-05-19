@@ -1,9 +1,15 @@
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+
 //Motorola|ANDROID|4.4|T01130FJAD|http://localhost:4725/wd/hub;Samsung_S4|ANDROID|4.4.2|5ece160b|http://localhost:4729/wd/hub;
 public class Device {
 	
 	private String name;
+	private String type;
+
+
 	private String os;
 	private String osVersion;
 	private String udid;
@@ -11,14 +17,16 @@ public class Device {
 	
 	public Device() {
 		this.name = null;
+		this.type = null;
 		this.os = null;
 		this.osVersion = null;
 		this.udid = null;
 		this.seleniumServer = null;
 	}
 	
-	public Device(String name, String os, String osVersion, String udid, String seleniumServer) {
+	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer) {
 		this.name = name;
+		this.type = type;
 		this.os = os;
 		this.osVersion = osVersion;
 		this.udid = udid;
@@ -31,10 +39,11 @@ public class Device {
 		
 		//TODO: organize verification onto the params  count
 		this.name = params[0];
-		this.os = params[1];
-		this.osVersion = params[2];
-		this.udid = params[3];
-		this.seleniumServer = params[4];
+		this.type = params[1];
+		this.os = params[2];
+		this.osVersion = params[3];
+		this.udid = params[4];
+		this.seleniumServer = params[5];
 	}
 	
 	public String getName() {
@@ -77,4 +86,27 @@ public class Device {
 		this.seleniumServer = seleniumServer;
 	}
 
+	public boolean isPhone() {
+		return type.equalsIgnoreCase(SpecialKeywords.PHONE);
+	}
+	
+	public boolean isTablet() {
+		return type.equalsIgnoreCase(SpecialKeywords.TABLET);
+	}
+	
+	public Type getType() {
+		if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+			if (isTablet()) {
+				return Type.ANDROID_TABLET;
+			}
+			return Type.ANDROID_PHONE;
+		} else if (os.equalsIgnoreCase(SpecialKeywords.IOS)) {
+			if (isTablet()) {
+				return Type.IOS_TABLET;
+			}
+			return Type.IOS_PHONE;
+		}
+		throw new RuntimeException(
+				"Incorrect driver type. Please, check config file.");
+	}
 }

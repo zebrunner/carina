@@ -213,10 +213,7 @@ public class UITest extends AbstractTest
 		
 		try {
 			if (capabilities == null && selenium_host == null) {
-				Device device = null;
-				if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
-					device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
-				} 
+				Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
 				extraDriver = DriverFactory.create(driverName, device);	
 			}
 			else {
@@ -273,10 +270,8 @@ public class UITest extends AbstractTest
     	int count = 0;
     	while (!init & count++ < maxCount) {
     		try {
-    			Device device = null;
-    			if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
-    				device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
-    			}    			
+    			Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
+   			
 
     			WebDriver drv = DriverFactory.create(name, device);
     			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
