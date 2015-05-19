@@ -59,7 +59,7 @@ public class XMLNameStrategy implements INamingStrategy
 		
 		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
 				result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
-			//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
+			//AUTO-274 "Pass"ing status set on emailable report when a test step fails
 			String methodUID = "";
 			for (int i=0; i<result.getParameters().length; i++) {
 				  if (result.getParameters()[i] != null) {
