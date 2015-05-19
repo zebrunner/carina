@@ -407,6 +407,31 @@ public class DriverHelper
 		click(new ExtendedWebElement(control, controlInfo));
 	}
 	
+	public void clickAny(ExtendedWebElement... elements) {
+		clickAny(EXPLICIT_TIMEOUT, elements);
+	}
+
+	public void clickAny(long timeout, ExtendedWebElement... elements) {
+		// Method which quickly looks for any element and click during timeout
+		// sec
+		int index = 0;
+		boolean clicked = false;
+		int counts = 10;
+		while (!clicked && index++ < counts) {
+			for (int i = 0; i < elements.length; i++) {
+				clicked = clickIfPresent(elements[i], timeout / counts);
+				if (clicked) {
+					break;
+				}
+			}
+		}
+		if (!clicked) {
+			throw new RuntimeException(
+					"Unable to click onto any elements from array: "
+							+ elements.toString());
+		}
+	}
+		  
 	public boolean clickIfPresent(final ExtendedWebElement extWebElement)
 	{
 		return clickIfPresent(extWebElement, EXPLICIT_TIMEOUT);
@@ -424,14 +449,12 @@ public class DriverHelper
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					if (extWebElement.getElement().isDisplayed()){
-						String msg = Messager.ELEMENT_CLICKED.info(extWebElement.getName());
-						summary.log(msg);
-						extWebElement.getElement().click();
-					}
-					return true;
+					return extWebElement.getElement().isDisplayed();
 				}
 			});
+			extWebElement.getElement().click();
+			String msg = Messager.ELEMENT_CLICKED.info(extWebElement.getName());
+			summary.log(msg);
 			result = true;
 		}
 		catch (Exception e)
@@ -448,12 +471,11 @@ public class DriverHelper
 	 */
 	private void clickSafe(ExtendedWebElement extendedWebElement, long timeout, boolean startTimer)
 	{
+		boolean clicked = false;
+		Exception reason = null;
 		if (startTimer)
 		{
 			timer = System.currentTimeMillis();
-/*			if (!isElementPresent(extendedWebElement, timeout/5)) {
-				throw new RuntimeException("An element could not be located on the page using the given search parameters. " + extendedWebElement.getNameWithLocator());	
-			}*/
 		}
 		try
 		{
@@ -462,6 +484,7 @@ public class DriverHelper
 				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
 			}
 			extendedWebElement.getElement().click();
+			clicked = true;
 		}
 		catch (UnhandledAlertException e)
 		{
@@ -477,6 +500,10 @@ public class DriverHelper
 		{
 			LOGGER.debug(e.getMessage(), e.getCause());
 			scrollTo(extendedWebElement);
+			reason = e;
+		}
+		
+		if (!clicked) {
 			//repeat again until timeout achieved
 			if (System.currentTimeMillis() - timer < timeout * 1000)
 			{
@@ -486,9 +513,9 @@ public class DriverHelper
 			{
 				String msg = Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator());
 				summary.log(msg);			
-				throw new RuntimeException(msg, e); 			
+				throw new RuntimeException(msg, reason); 			
 			}
-		}
+		}		
 	}
 	
 	
