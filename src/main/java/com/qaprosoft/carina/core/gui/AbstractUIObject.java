@@ -76,7 +76,7 @@ public abstract class AbstractUIObject extends DriverHelper
 	{
 		super(driver);
 		this.locale = locale != null ? locale : Configuration.getLocale();
-		ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext, this.locale);
+		ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext);
 		PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
 		summary.setPrefix(this.getClass().getSimpleName());
 	}

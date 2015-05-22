@@ -46,7 +46,10 @@ public class CustomTypePageFactory {
 			LOGGER.info("Quantity of classes: " + setClasses.size() + "\n "
 					+ setClasses.toString());
 			throw new RuntimeException(
-					"There are more than 1 class that could be used as implementation of the page or it absent at all. Please, check config.");
+					"Quantity of classes: "
+							+ setClasses.size()
+							+ "! "
+							+ "Unable to initialize custom page as There are more than 1 class that could be used as implementation of the page or it absent at all. Please, check config.");
 		}
 
 		try {

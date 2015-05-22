@@ -136,7 +136,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 		InvocationHandler handler = new LocatingElementHandler(locator);
 		WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]
 		{ WebElement.class, WrapsElement.class, Locatable.class }, handler);
-		return new ExtendedWebElement(proxy, field.getName(), new LocalizedAnnotations(field, Configuration.getLocale()).buildBy());
+		return new ExtendedWebElement(proxy, field.getName(), new LocalizedAnnotations(field).buildBy());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -172,7 +172,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 	@SuppressWarnings("unchecked")
 	protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator)
 	{
-		InvocationHandler handler = new LocatingElementListHandler(locator, field.getName(), new LocalizedAnnotations(field, Configuration.getLocale()).buildBy());
+		InvocationHandler handler = new LocatingElementListHandler(locator, field.getName(), new LocalizedAnnotations(field).buildBy());
 		List<ExtendedWebElement> proxies = (List<ExtendedWebElement>) Proxy.newProxyInstance(loader, new Class[]
 		{ List.class }, handler);
 

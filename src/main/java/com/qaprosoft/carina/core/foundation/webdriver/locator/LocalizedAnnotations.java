@@ -16,85 +16,74 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.lang.reflect.Field;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 
 public class LocalizedAnnotations extends Annotations
 {
-	private Locale locale;
+	private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
+	
+	private static Matcher matcher;
 
-	private String xlsPath;
-
-	private String locatorKey;
-
-	public LocalizedAnnotations(Field field, Locale locale)
+	public LocalizedAnnotations(Field field)
 	{
 		super(field);
-		this.locale = locale;
-		this.xlsPath = getXLSPath(field);
-		this.locatorKey = field.getName();
 	}
 
-	private String getXLSPath(Field field)
-	{
-		String path = null;
-		try
-		{
-			ResourceBundle rb = ResourceBundle.getBundle("GUI.mapping");
-			path = "GUI/" + rb.getString(field.getDeclaringClass().getCanonicalName());
-		} catch (Exception e)
-		{
-			path = "GUI/" + StringUtils.replace(field.getDeclaringClass().getCanonicalName(), ".", "/") + ".xls";
-		}
-		return path;
-	}
 
 	@Override
-	protected By buildByFromDefault()
+	public By buildBy()
 	{
-		String value = XLSParser.parseValue(locatorKey, xlsPath, locale);
-		if (!StringUtils.isEmpty(value))
+		By by = super.buildBy();
+		String param = by.toString();
+		//replace by using localization pattern
+		matcher = L10N_PATTERN.matcher(param);
+		if (matcher.find())
 		{
-			return createBy(value);
-		} else
-		{
-			return super.buildByFromDefault();
+			int start = param.indexOf(SpecialKeywords.L10N+ ":") + 5;
+			int end = param.indexOf("}");
+			String key = param.substring(start, end);
+			by = createBy(StringUtils.replace(param, matcher.group(), L10N.getText(key)));
 		}
+
+		return by;
 	}
 
 	private By createBy(String locator)
 	{
-		if (locator.startsWith("id="))
-		{
+		if (locator.startsWith("id=")) {
 			return By.id(StringUtils.remove(locator, "id="));
-		}
-		if (locator.startsWith("name="))
-		{
+		} else if (locator.startsWith("name=")) {
 			return By.name(StringUtils.remove(locator, "name="));
-		}
-		if (locator.startsWith("xpath="))
-		{
+		} else if (locator.startsWith("xpath=")) {
 			return By.xpath(StringUtils.remove(locator, "xpath="));
-		}
-		if (locator.startsWith("linkText="))
-		{
+		} else if (locator.startsWith("linkText=")) {
 			return By.linkText(StringUtils.remove(locator, "linkText="));
-		}
-		if (locator.startsWith("css="))
-		{
+		} else if (locator.startsWith("css=")) {
 			return By.cssSelector(StringUtils.remove(locator, "css="));
-		}
-		if (locator.startsWith("tagName="))
-		{
+		} else if (locator.startsWith("tagName=")) {
 			return By.tagName(StringUtils.remove(locator, "tagName="));
+		} else if (locator.startsWith("By.id: ")) {
+			return By.id(StringUtils.remove(locator, "By.id: "));
+		} else if (locator.startsWith("By.name: ")) {
+			return By.name(StringUtils.remove(locator, "By.name: "));
+		} else if (locator.startsWith("By.xpath: ")) {
+			return By.xpath(StringUtils.remove(locator, "By.xpath: "));
+		} else if (locator.startsWith("By.linkText: ")) {
+			return By.linkText(StringUtils.remove(locator, "By.linkText: "));
+		} else if (locator.startsWith("By.css: ")) {
+			return By.cssSelector(StringUtils.remove(locator, "By.css: "));
+		} else if (locator.startsWith("By.tagName: ")) {
+			return By.tagName(StringUtils.remove(locator, "By.tagName: "));
 		}
-		// Fall through
-		return null;
+		
+		throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
 	}
 }
