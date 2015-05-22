@@ -53,6 +53,8 @@ public class HttpClient
 			break;
 		case DELETE:
 			response = request.delete(methodPath).asString();
+		case PATCH:
+			response = request.patch(methodPath).asString();
 		default:
 			throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
 		}
