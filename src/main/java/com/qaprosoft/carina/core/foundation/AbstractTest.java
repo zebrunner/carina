@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,14 @@ import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.L18n;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.zafira.client.model.TestType;
 
 /*
@@ -124,18 +126,29 @@ public abstract class AbstractTest // extends DriverHelper
 		LOGGER.info(Configuration.asString());
 		// Configuration.validateConfiguration();
 
-		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+		context.getCurrentXmlTest().getSuite()
+				.setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
 
 		if (!Configuration.isNull(Parameter.URL)) {
 			RestAssured.baseURI = Configuration.get(Parameter.URL);
 		}
 
 		try {
-			String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
-			String country = Configuration.get(Parameter.LOCALE).split("_")[1];
-			L18n.init("l18n.messages", new Locale(lang, country));
+			Locale locale = LocaleReader.init(Configuration
+					.get(Parameter.LOCALE));
+			L10N.init(locale);
 		} catch (Exception e) {
-			LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+			LOGGER.error(e.getMessage());
+			LOGGER.debug("L10N bundle is not initialized successfully!", e);
+		}
+		
+		try {
+			Locale locale = LocaleReader.init(Configuration
+					.get(Parameter.LANGUAGE));
+			I18N.init(locale);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			LOGGER.debug("I18N bundle is not initialized successfully!", e);
 		}
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));

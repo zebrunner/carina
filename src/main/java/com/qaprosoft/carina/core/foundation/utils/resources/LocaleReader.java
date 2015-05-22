@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qaprosoft.carina.core.foundation.utils;
+package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
-/**
- * Utility for localized messages
- * 
- * @author akhursevich
- */
-public class L18n
-{
-	private static ResourceBundle rb;
-	private static Locale locale;
+public class LocaleReader {
 
-	public static void init(String bundleName, Locale locale)
-	{
-		rb = ResourceBundle.getBundle(bundleName, locale);
+	public static Locale init(String locale) {
+
+		String[] localeSetttings = locale.split("_");
+		String lang, country = "";
+		lang = localeSetttings[0];
+		if (localeSetttings.length > 1) {
+			country = localeSetttings[1];
+		}
+
+		return new Locale(lang, country);
 	}
 
-	public static String getText(String key)
-	{
-		return rb.getString(key);
-	}
-
-	public static Locale getLocale()
-	{
-		return locale;
-	}
 }

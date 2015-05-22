@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.lang.reflect.Field;
-import java.util.Locale;
 
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -26,16 +25,13 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
 {
 	private final SearchContext searchContext;
 
-	private Locale locale;
-
-	public ExtendedElementLocatorFactory(SearchContext searchContext, Locale locale)
+	public ExtendedElementLocatorFactory(SearchContext searchContext)
 	{
 		this.searchContext = searchContext;
-		this.locale = locale;
 	}
 
 	public ElementLocator createLocator(Field field)
 	{
-		return new ExtendedElementLocator(searchContext, field, locale);
+		return new ExtendedElementLocator(searchContext, field);
 	}
 }

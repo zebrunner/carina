@@ -29,7 +29,12 @@ public class SpecialKeywords
 	public static final String GENERATEN = "\\{generaten:\\d*\\}";
 	public static final String TESTDATA = "\\{testdata:.*\\}";
 	public static final String ENV = "\\{env:.*\\}";
-	public static final String L18N = "\\{l18n:.*\\}";
+	
+	public static final String I18N = "I18N";
+	public static final String L10N = "L10N";
+	public static final String I18N_PATTERN = String.format("\\{%s:.*\\}", I18N);
+	public static final String L10N_PATTERN = String.format("\\{%s:.*\\}", L10N);
+	
 	public static final String EXCEL = "\\{excel:.*\\}";
 	public static final String CRYPT = "\\{crypt:[^\\{\\}]*\\}";
 	public static final String CRYPT_WRAPPER = "{crypt:%s}";

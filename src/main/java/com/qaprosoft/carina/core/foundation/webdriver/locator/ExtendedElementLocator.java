@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Locale;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -47,10 +46,10 @@ public class ExtendedElementLocator implements ElementLocator
 	 * @param field
 	 *            The field on the Page Object that will hold the located value
 	 */
-	public ExtendedElementLocator(SearchContext searchContext, Field field, Locale locale)
+	public ExtendedElementLocator(SearchContext searchContext, Field field)
 	{
 		this.searchContext = searchContext;
-		LocalizedAnnotations annotations = new LocalizedAnnotations(field, locale);
+		LocalizedAnnotations annotations = new LocalizedAnnotations(field);
 		shouldCache = annotations.isLookupCached();
 		by = annotations.buildBy();
 	}

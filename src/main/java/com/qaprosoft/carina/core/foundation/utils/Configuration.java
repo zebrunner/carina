@@ -140,7 +140,9 @@ public class Configuration
 		RETRY_COUNT("retry_count"),
 
 		LOCALE("locale"),
-
+		
+		LANGUAGE("language"),
+		
 		THREAD_COUNT("thread_count"),
 		
 		CORE_LOG_LEVEL("core_log_level"),
