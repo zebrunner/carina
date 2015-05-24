@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.gui;
 
-import java.util.Locale;
-
 import org.openqa.selenium.WebDriver;
 
 /**
@@ -29,11 +27,6 @@ public abstract class AbstractScreen extends AbstractUIObject
 	public AbstractScreen(WebDriver driver)
 	{
 		super(driver);
-	}
-	
-	public AbstractScreen(WebDriver driver, Locale locale)
-	{
-		super(driver, locale);
 	}
 	
 	public abstract boolean isOpened();

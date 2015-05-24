@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.gui;
 
-import java.util.Locale;
-
 import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -34,11 +32,6 @@ public abstract class AbstractPage extends AbstractUIObject
 	public AbstractPage(WebDriver driver)
 	{
 		super(driver);
-	}
-
-	public AbstractPage(WebDriver driver, Locale locale)
-	{
-		super(driver, locale);
 	}
 
 	/**
