@@ -15,12 +15,13 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
@@ -40,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.webdriver.appium.AppiumNativeDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 /**
@@ -112,8 +112,14 @@ public class DriverFactory {
         try {
             if (capabilities.getCapability("automationName") == null)
                 driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
-            else
-                driver = new AppiumNativeDriver(new URL(selenium_host), capabilities);
+            else {
+            	//TODO: analyze onto potential NPE for "platform"
+            	if (capabilities.getCapability("platform").toString().toLowerCase().equals("android"))
+                    driver = new AndroidDriver(new URL(selenium_host), capabilities);
+                else if (capabilities.getCapability("platform").toString().toLowerCase().equals("ios")) {
+                    driver = new IOSDriver(new URL(selenium_host), capabilities);
+                }
+            }
         } catch (Exception e) {
             LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
         }
@@ -143,17 +149,6 @@ public class DriverFactory {
                 capabilities = getInternetExplorerCapabilities(testName, Configuration.get(Parameter.BROWSER_VERSION));
             } else if (HTML_UNIT.equalsIgnoreCase(browser)) {
                 capabilities = getHtmlUnitCapabilities(testName);
-/*            } else if (MOBILE.equalsIgnoreCase(browser)) {
-                if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-                    capabilities = getMobileWebCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
-                            Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
-                            Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
-                } else {
-                    capabilities = getMobileAppCapabilities(false, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
-                            Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
-                            Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
-                            Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
-                }*/
             } else if (MOBILE_GRID.equalsIgnoreCase(browser)) {
                 if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
                     capabilities = getMobileWebCapabilities(true, testName, Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
@@ -196,10 +191,7 @@ public class DriverFactory {
                     driver = new AndroidDriver(new URL(selenium), capabilities);
                 else if (mobile_platform_name.toLowerCase().equals("ios")) {
                     driver = new IOSDriver(new URL(selenium), capabilities);
-                } else {
-                    driver = new AppiumNativeDriver(new URL(selenium), capabilities);
                 }
-
             } else {
                 driver = new RemoteWebDriver(new URL(selenium), capabilities);
             }
