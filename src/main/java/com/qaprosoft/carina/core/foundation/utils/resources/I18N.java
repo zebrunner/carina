@@ -57,6 +57,11 @@ public class I18N {
 			 * or 5th char from the end is "_". As designed :(
 			 */
 			String fileName = FilenameUtils.getBaseName(u.getPath());
+			if (u.getPath().endsWith("I18N.class") ||
+					u.getPath().endsWith("I18N$1.class")) {
+				//separate conditions to support core JUnit tests
+				continue;
+			}
 
 			if (fileName.lastIndexOf('_') == fileName.length() - 3
 					|| fileName.lastIndexOf('_') == fileName.length() - 5) {
@@ -94,9 +99,12 @@ public class I18N {
 								resource));
 			}
 		}
+		LOGGER.debug("init: I18N bundle size: " + resBoundles.size());
 	}
 
 	public static String getText(String key) {
+		LOGGER.debug("getText: I18N bundle size: " + resBoundles.size());
+		
 		Iterator<ResourceBundle> iter = resBoundles.iterator();
 		while (iter.hasNext()) {
 			ResourceBundle bundle = (ResourceBundle) iter.next();

@@ -58,6 +58,12 @@ public class L10N {
 			 */
 			String fileName = FilenameUtils.getBaseName(u.getPath());
 
+			if (u.getPath().endsWith("L10N.class") ||
+					u.getPath().endsWith("L10N$1.class")) {
+				//separate conditions to support core JUnit tests
+				continue;
+			}
+				
 			if (fileName.lastIndexOf('_') == fileName.length() - 3
 					|| fileName.lastIndexOf('_') == fileName.length() - 5) {
 				LOGGER.debug(String
@@ -65,7 +71,6 @@ public class L10N {
 								fileName));
 				continue;
 			}
-
 			/*
 			 * convert "file:
 			 * E:\pentaho\qa-automation\target\classes\L10N\messages.properties"
@@ -94,9 +99,12 @@ public class L10N {
 								resource));
 			}
 		}
+		
+		LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
 	}
 
 	public static String getText(String key) {
+		LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
 		Iterator<ResourceBundle> iter = resBoundles.iterator();
 		while (iter.hasNext()) {
 			ResourceBundle bundle = (ResourceBundle) iter.next();

@@ -15,15 +15,12 @@
  */
 package com.qaprosoft.carina.core.gui;
 
-import java.util.Locale;
-
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -31,8 +28,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLoc
 
 public abstract class AbstractUIObject extends DriverHelper
 {
-	protected Locale locale;
-
 	protected String name;
 
 	protected WebElement rootElement;
@@ -44,19 +39,7 @@ public abstract class AbstractUIObject extends DriverHelper
      */
 	public AbstractUIObject(WebDriver driver)
 	{
-		this(driver, null);
-	}
-
-	/**
-	 * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context. Locale settings
-	 * are used during initialization
-	 * 
-	 * @param driver WebDriver
-	 * @param locale Locale
-	 */
-	public AbstractUIObject(WebDriver driver, Locale locale)
-	{
-		this(driver, driver, locale);
+		this(driver, driver);
 	}
 
 	/**
@@ -72,10 +55,9 @@ public abstract class AbstractUIObject extends DriverHelper
 	 * @param searchContext Window area that will be used for locating of internal elements
 	 * @param locale Locale
 	 */
-	public AbstractUIObject(WebDriver driver, SearchContext searchContext, Locale locale)
+	public AbstractUIObject(WebDriver driver, SearchContext searchContext)
 	{
 		super(driver);
-		this.locale = locale != null ? locale : Configuration.getLocale();
 		ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext);
 		PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
 		summary.setPrefix(this.getClass().getSimpleName());
@@ -112,16 +94,6 @@ public abstract class AbstractUIObject extends DriverHelper
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	public Locale getLocale()
-	{
-		return locale;
-	}
-
-	public void setLocale(Locale locale)
-	{
-		this.locale = locale;
 	}
 
 	public WebElement getRootElement()
