@@ -28,6 +28,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
+@Deprecated
 public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScreen, Rotatable {
 
 	protected static final Logger LOGGER = Logger.getLogger(AppiumNativeDriver.class);
