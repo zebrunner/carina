@@ -21,7 +21,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.SearchContext;
@@ -29,12 +28,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingElementListHandler;
@@ -56,9 +55,10 @@ public class ExtendedFieldDecorator implements FieldDecorator
 
 	public Object decorate(ClassLoader loader, Field field)
 	{
-		if (!(ExtendedWebElement.class.isAssignableFrom(field.getType())
-				|| AbstractUIObject.class.isAssignableFrom(field.getType()) || isDecoratableList(field)))
+		if (!field.isAnnotationPresent(FindBy.class) /*Enable field decorator logic only in case of presence the FindBy annotation in the field*/ ||
+				!(ExtendedWebElement.class.isAssignableFrom(field.getType()) || AbstractUIObject.class.isAssignableFrom(field.getType()) || isDecoratableList(field)) /*also verify that it is ExtendedWebElement or derived from AbstractUIObject or DecoratableList*/)
 		{
+			// returning null is ok in this method.
 			return null;
 		}
 
@@ -150,8 +150,8 @@ public class ExtendedFieldDecorator implements FieldDecorator
 		T uiObject;
 		try
 		{
-			uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class, Locale.class).newInstance(
-					webDriver, proxy, Configuration.getLocale());
+			uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class).newInstance(
+					webDriver, proxy);
 		} catch (NoSuchMethodException e)
 		{
 			LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
