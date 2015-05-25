@@ -15,13 +15,21 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
+
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -37,6 +45,8 @@ public class ExtendedElementLocator implements ElementLocator
 	private final By by;
 	private WebElement cachedElement;
 	private List<WebElement> cachedElementList;
+	
+	private Boolean isPredicate;
 
 	/**
 	 * Creates a new element locator.
@@ -52,6 +62,11 @@ public class ExtendedElementLocator implements ElementLocator
 		LocalizedAnnotations annotations = new LocalizedAnnotations(field);
 		shouldCache = annotations.isLookupCached();
 		by = annotations.buildBy();
+		
+		isPredicate = false;
+        if (field.isAnnotationPresent(Predicate.class)) {
+        	isPredicate = field.getAnnotation(Predicate.class).enabled(); 
+        }
 	}
 
 	/**
@@ -64,12 +79,24 @@ public class ExtendedElementLocator implements ElementLocator
 			return cachedElement;
 		}
 
-		WebElement element = searchContext.findElement(by);
+		WebElement element = null;
+		if (!isPredicate) { 
+			element = searchContext.findElement(by);
+		} else {
+			WebDriver drv = DriverPool.getDriverByThread();
+			if (drv instanceof IOSDriver) {
+				element = ((IOSDriver) drv).findElementByIosUIAutomation(getLocator(by));	
+			} else if (drv instanceof AndroidDriver) {
+				element = ((AndroidDriver) drv).findElementByAndroidUIAutomator(getLocator(by));
+			} else {
+				throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
+			}
+		}
+		
 		if (shouldCache)
 		{
 			cachedElement = element;
-		}
-
+		}		
 		return element;
 	}
 
@@ -83,12 +110,59 @@ public class ExtendedElementLocator implements ElementLocator
 			return cachedElementList;
 		}
 
-		List<WebElement> elements = searchContext.findElements(by);
+		List<WebElement> elements = null;
+		if (!isPredicate) {
+			elements = searchContext.findElements(by);
+		}  else {
+			WebDriver drv = DriverPool.getDriverByThread();
+			if (drv instanceof IOSDriver) {
+				elements = ((IOSDriver) drv).findElementsByIosUIAutomation(getLocator(by));	
+			} else if (drv instanceof AndroidDriver) {
+				elements = ((AndroidDriver) drv).findElementsByAndroidUIAutomator(getLocator(by));
+			} else {
+				throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
+			}
+		}
+		
 		if (shouldCache)
 		{
 			cachedElementList = elements;
 		}
 
 		return elements;
+	}
+	
+	
+	private String getLocator(By by)
+	{
+		String locator = by.toString();
+		
+		if (locator.startsWith("id=")) {
+			return StringUtils.remove(locator, "id=");
+		} else if (locator.startsWith("name=")) {
+			return StringUtils.remove(locator, "name=");
+		} else if (locator.startsWith("xpath=")) {
+			return StringUtils.remove(locator, "xpath=");
+		} else if (locator.startsWith("linkText=")) {
+			return StringUtils.remove(locator, "linkText=");
+		} else if (locator.startsWith("css=")) {
+			return StringUtils.remove(locator, "css=");
+		} else if (locator.startsWith("tagName=")) {
+			return StringUtils.remove(locator, "tagName=");
+		} else if (locator.startsWith("By.id: ")) {
+			return StringUtils.remove(locator, "By.id: ");
+		} else if (locator.startsWith("By.name: ")) {
+			return StringUtils.remove(locator, "By.name: ");
+		} else if (locator.startsWith("By.xpath: ")) {
+			return StringUtils.remove(locator, "By.xpath: ");
+		} else if (locator.startsWith("By.linkText: ")) {
+			return StringUtils.remove(locator, "By.linkText: ");
+		} else if (locator.startsWith("By.css: ")) {
+			return StringUtils.remove(locator, "By.css: ");
+		} else if (locator.startsWith("By.tagName: ")) {
+			return StringUtils.remove(locator, "By.tagName: ");
+		}
+		
+		throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
 	}
 }
