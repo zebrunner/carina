@@ -33,6 +33,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
+//TODO: move those methods onto the static level...
 public class CryptoTool
 {
 	private String algorithm = R.CONFIG.get("crypto_algorithm");
