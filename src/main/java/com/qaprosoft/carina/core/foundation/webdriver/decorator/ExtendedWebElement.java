@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -321,7 +320,9 @@ public class ExtendedWebElement
 	 * @return element existence status.
 	 */
 	public boolean isElementNotPresent(long timeout) {
-		boolean result;
+		return !isElementPresent(timeout);
+		
+/*		boolean result;
 		final WebDriver drv = getDriver();
 		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
@@ -331,18 +332,18 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return !element.isDisplayed();
+					return element.isDisplayed();
 				}
 			});
-			result = true;
-		}
-		catch (Exception e)
-		{
 			result = false;
 			summary.log(Messager.UNEXPECTED_ELEMENT_PRESENT.error(getNameWithLocator()));
 		}
+		catch (Exception e)
+		{
+			result = true;
+		}
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-		return result;
+		return result;*/
 	}
 
 	/**
@@ -459,7 +460,7 @@ public class ExtendedWebElement
 		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
-	public ExtendedWebElement format(Object...objects) {
+/*	public ExtendedWebElement format(Object...objects) {
 		return format(IMPLICIT_TIMEOUT, objects);
 	}
 	public ExtendedWebElement format(long timeout, Object...objects) {
@@ -490,8 +491,41 @@ public class ExtendedWebElement
 			by =  By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
 		}
 		
-		return new ExtendedWebElement(null, getName(), by);
+		return new ExtendedWebElement(findWebElement(by, getName(), timeout), getName(), by);
 		
+	}
+
+	
+	private WebElement findWebElement(final By by, String name, long timeout) {
+		WebElement element;
+		final WebDriver drv = getDriver();
+		setImplicitTimeout(0);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !drv.findElements(by).isEmpty();
+				}
+			});
+			element = drv.findElement(by);
+			summary.log(Messager.ELEMENT_FOUND.info(name));
+		}
+		catch (Exception e)
+		{
+			element = null;
+			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			setImplicitTimeout(IMPLICIT_TIMEOUT);
+			throw new RuntimeException(e);
+		}
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
+		return element;
+	}	*/
+	
+	public void setImplicitTimeout(long implicit_wait){
+		getDriver().manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 	}
 
 	
@@ -697,15 +731,17 @@ public class ExtendedWebElement
 	private WebDriver getDriver() {
 		return DriverPool.getDriverByThread();
 	}
-
 	
-	/**
+/*	*//**
 	 * Hovers over element.
 	 *
-     */
+     *//*
 	public void hover() {
 		hover(null, null);
 	}
+	
+
+	
 	public void hover(Integer xOffset, Integer  yOffset)
 	{
 		WebDriver drv = getDriver();
@@ -752,7 +788,7 @@ public class ExtendedWebElement
 		{
 			summary.log(Messager.ELEMENT_NOT_HOVERED.error(getNameWithLocator()));
 		}
-	}
+	}*/
 	
 	/**
 	 * Selects text in specified select element.
