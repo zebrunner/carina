@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -32,6 +33,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -338,6 +340,75 @@ public class DriverHelper
 		doubleClick(new ExtendedWebElement(control, controlInfo));
 	}
 	
+	
+	/**
+	 * Sends enter to element.
+	 * 
+	 * @param extendedWebElement
+	 *            to send enter.
+	 */
+	public void pressEnter(final ExtendedWebElement extendedWebElement)
+	{
+		isElementPresent(extendedWebElement);
+		pressEnterSafe(extendedWebElement, true);
+		String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
+		summary.log(msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+	}
+
+	/**
+	 * Safe enter sending to specified element.
+	 * 
+	 * @param controlInfo controlInfo
+	 * @param control control
+	 */
+	@Deprecated
+	public void pressEnter(String controlInfo, WebElement control)
+	{
+		pressEnter(new ExtendedWebElement(control, controlInfo));
+	}
+
+	@Deprecated
+	private void pressEnterSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
+	{
+
+		if (startTimer)
+		{
+			timer = System.currentTimeMillis();
+		}
+		try
+		{
+			Thread.sleep(RETRY_TIME);
+			if (extendedWebElement.getElement() == null) {
+				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+			}
+			extendedWebElement.getElement().sendKeys(Keys.ENTER);
+		}
+		catch (UnhandledAlertException e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			getDriver().switchTo().alert().accept();
+		}
+		catch(StaleElementReferenceException e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
+		}		
+		catch (Exception e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
+			{
+				pressEnterSafe(extendedWebElement, false);
+			}
+			else
+			{
+				String msg = Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator());
+				summary.log(msg);			
+				throw new RuntimeException(msg, e); 			
+			}
+		}
+	}
 	/**
 	 * Check checkbox
 	 * 
@@ -617,11 +688,13 @@ public class DriverHelper
 	{
 		select(new ExtendedWebElement(control, controlInfo), index);
 	}
+	
+	//TODO: review why hover from ExtendedWelement doesn't work
 
-	/**
+/*	*//**
 	 * Hovers over element.
 	 *
-     */
+     *//*
 	public void hover(final ExtendedWebElement extendedWebElement) {
 		hover(extendedWebElement, null, null);
 	}
@@ -636,13 +709,89 @@ public class DriverHelper
 		hover(new ExtendedWebElement(control, controlInfo));
 	}
 
+	*//**
+	 * Hovers over element.
+	 * 
+	 * @param xpathLocator xpathLocator
+	 * @param elementName element name
+	 *//*
+	@Deprecated
+	public void hover(String elementName, String xpathLocator)
+	{
+		WebDriver drv = getDriver();
+		Actions action = new Actions(drv);
+		action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
+		String msg = Messager.HOVER_IMG.info(elementName);
+		summary.log(msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+	}*/
+	
+	/**
+	 * Hovers over element.
+	 *
+     */
+	public void hover(final ExtendedWebElement extendedWebElement) {
+		hover(extendedWebElement, null, null);
+	}
+	public void hover(final ExtendedWebElement extendedWebElement, Integer xOffset, Integer  yOffset)
+	{
+		WebDriver drv = getDriver();
+		if (isElementPresent(extendedWebElement))
+		{
+			
+			if (!drv.toString().contains("safari")) {
+				Actions action = new Actions(drv);
+				if (xOffset != null && yOffset != null) {
+					action.moveToElement(extendedWebElement.getElement(), xOffset, yOffset);
+				}
+				else {
+					action.moveToElement(extendedWebElement.getElement());
+				}
+
+				action.perform();				
+			}
+			else {
+				//https://code.google.com/p/selenium/issues/detail?id=4136
+				JavascriptExecutor js = (JavascriptExecutor) drv;
+				String locatorType = extendedWebElement.getBy().toString().substring(3);
+				String elem = "var elem = document;";
+				if (locatorType.startsWith("id")) {
+					elem = "var elem = document.getElementById(\""+locatorType.substring(4)+"\");";
+				}
+				else if (locatorType.startsWith("xpath")) {
+					String snippet = "document.getElementByXPath = function(sValue) { var a = this.evaluate(sValue, this, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null); if (a.snapshotLength > 0) { return a.snapshotItem(0); } }; ";
+					js.executeScript(snippet);
+					elem = "var elem = document.getElementByXPath(\""+locatorType.substring(7)+"\");";
+				}
+				else if (locatorType.startsWith("className")) {
+					elem = "var elem = document.getElementsByClassName(\""+locatorType.substring(14)+"\")[0];";
+				}
+				String mouseOverScript = elem + " if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false);" +
+						" elem.dispatchEvent(evObj);} else if(document.createEventObject) { elem.fireEvent('onmouseover');}";
+				js.executeScript(mouseOverScript);
+			}
+
+			String msg = Messager.HOVER_IMG.info(extendedWebElement.getName());
+			summary.log(msg);
+			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		}
+		else
+		{
+			summary.log(Messager.ELEMENT_NOT_HOVERED.error(extendedWebElement.getNameWithLocator()));
+		}
+	}
+
+	public void hover(String controlInfo, WebElement control)
+	{
+		hover(new ExtendedWebElement(control, controlInfo));
+	}
+
 	/**
 	 * Hovers over element.
 	 * 
 	 * @param xpathLocator xpathLocator
 	 * @param elementName element name
 	 */
-	@Deprecated
 	public void hover(String elementName, String xpathLocator)
 	{
 		WebDriver drv = getDriver();
@@ -1028,7 +1177,6 @@ public class DriverHelper
 	 * @param timeout Timeout to find
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
-	@Deprecated
 	public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		ExtendedWebElement element;
 		final WebDriver drv = getDriver();
@@ -1118,7 +1266,40 @@ public class DriverHelper
 		return format(IMPLICIT_TIMEOUT, element, objects);
 	}
 	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object...objects) {
-		return element.format(timeout, objects);
+		String locator = element.getBy().toString();
+		By by = null;
+		if (locator.startsWith("By.id: "))
+		{
+			by =  By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
+		}
+		if (locator.startsWith("By.name: "))
+		{
+			by =  By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
+		}
+		if (locator.startsWith("By.xpath: "))
+		{
+			by =  By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
+		}
+		if (locator.startsWith("linkText: "))
+		{
+			by =  By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
+		}
+		if (locator.startsWith("css: "))
+		{
+			by =  By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
+		}
+		if (locator.startsWith("tagName: "))
+		{
+			by =  By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
+		}
+		
+		ExtendedWebElement res = null;
+		try {
+			res = findExtendedWebElement(by, by.toString(), timeout); 
+		} catch (Exception e) {
+			res = new ExtendedWebElement(null, element.getName(), by);
+		}
+		return res;
 	}
 
 }    
