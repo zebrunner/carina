@@ -18,6 +18,8 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 public abstract class BaseDataProvider {
 
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+    
+    protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
     protected Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 	protected Map<String, String> spiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
@@ -35,9 +37,13 @@ public abstract class BaseDataProvider {
     }
 
     public Map<String, String> getTestNameArgsMap() {
-
         return testNameArgsMap;
     }
+    
+    public Map<String, String> getTestMethodOwnerArgsMap() {
+        return testMethodOwnerArgsMap;
+    }
+
 
     public Map<String, String> getJiraArgsMap() {
         return jiraArgsMap;
