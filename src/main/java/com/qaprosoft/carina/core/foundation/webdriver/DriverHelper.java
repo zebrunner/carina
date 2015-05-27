@@ -162,13 +162,11 @@ public class DriverHelper
 		return extWebElement.isElementPresent(timeout);
 	}
 
-	@Deprecated
 	public boolean isElementPresent(String controlInfo, final WebElement element)
 	{
 		return new ExtendedWebElement(element, controlInfo).isElementPresent();
 	}
 	
-	@Deprecated
 	public boolean isElementPresent(String controlInfo, final WebElement element, long timeout)
 	{
 		return new ExtendedWebElement(element, controlInfo).isElementPresent(timeout);
@@ -334,7 +332,6 @@ public class DriverHelper
 		extendedWebElement.doubleClick();
 	}
 
-	@Deprecated
 	public void doubleClick(String controlInfo, WebElement control)
 	{
 		doubleClick(new ExtendedWebElement(control, controlInfo));
@@ -655,7 +652,6 @@ public class DriverHelper
 		return extendedWebElement.select(values);
 	}
 
-	@Deprecated
 	public void select(String controlInfo, WebElement control, String selectText)
 	{
 		select(new ExtendedWebElement(control, controlInfo), selectText);
@@ -683,7 +679,6 @@ public class DriverHelper
 		return extendedWebElement.select(index);		
 	}
 
-	@Deprecated
 	public void select(String controlInfo, WebElement control, int index)
 	{
 		select(new ExtendedWebElement(control, controlInfo), index);
@@ -792,6 +787,7 @@ public class DriverHelper
 	 * @param xpathLocator xpathLocator
 	 * @param elementName element name
 	 */
+	@Deprecated
 	public void hover(String elementName, String xpathLocator)
 	{
 		WebDriver drv = getDriver();
@@ -1138,7 +1134,6 @@ public class DriverHelper
 	 * @param by Selenium By locator
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
-	@Deprecated
     public ExtendedWebElement findExtendedWebElement(By by) {
     	return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
     }
@@ -1150,7 +1145,6 @@ public class DriverHelper
 	 * @param timeout
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
-	@Deprecated
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
     	return findExtendedWebElement(by, by.toString(), timeout);
     }
@@ -1163,7 +1157,6 @@ public class DriverHelper
 	 * @param name Element name
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
-	@Deprecated
 	public ExtendedWebElement findExtendedWebElement(final By by, String name)
 	{
 		return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
@@ -1208,12 +1201,10 @@ public class DriverHelper
 	
 	
 	
-	@Deprecated
 	public List<ExtendedWebElement> findExtendedWebElements(By by) {
 		return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
 	}
 	
-	@Deprecated
 	public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout)
 	{
 		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
