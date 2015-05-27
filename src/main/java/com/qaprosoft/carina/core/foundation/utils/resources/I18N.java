@@ -39,6 +39,7 @@ public class I18N {
 		for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
 			public @Override
 			boolean accept(URL u) {
+				LOGGER.debug("I18N: file URL: " + u);
 				String s = u.getPath();
 				return s.contains(SpecialKeywords.I18N);
 			}
