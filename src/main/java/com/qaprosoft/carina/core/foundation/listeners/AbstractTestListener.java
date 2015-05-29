@@ -169,11 +169,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String uuid = StringGenerator.generateNumeric(8);
 		ParameterGenerator.setUUID(uuid);
 		
-		//dropbox client initialization 
+/*		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
-	    }
+	    }*/
 	    super.onStart(context);
 	}
 	

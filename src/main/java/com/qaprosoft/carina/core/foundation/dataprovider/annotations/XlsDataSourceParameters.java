@@ -29,4 +29,8 @@ public @interface XlsDataSourceParameters {
     String spiraColumn() default "";
     
     String testRailColumn() default "";
+    
+    String testMethodColumn() default "";
+    
+    String testMethodOwnerColumn() default "";
 }
