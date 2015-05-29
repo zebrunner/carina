@@ -24,9 +24,15 @@ import java.security.CodeSource;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 public class Resources {
+	
+	protected static final Logger LOGGER = Logger.getLogger(Resources.class);
+	
 	private static void collectURL(ResourceURLFilter f, Set<URL> s, URL u) {
 		if (f == null || f.accept(u)) {
+			LOGGER.debug("adding resource url by filter: " + u);
 			s.add(u);
 		}
 	}
@@ -41,8 +47,7 @@ public class Resources {
 				try {
 					collectURL(f, s, file.toURI().toURL());
 				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.debug(e);
 				}
 			}
 		}
@@ -71,11 +76,11 @@ public class Resources {
 		URLClassLoader ucl = (URLClassLoader) ClassLoader
 				.getSystemClassLoader();
 		for (URL url : ucl.getURLs()) {
+			LOGGER.debug("Iterate through class loader resource: " + url);
 			try {
 				iterateEntry(new File(url.toURI()), filter, collectedURLs);
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.debug(e);
 			}
 		}
 		return collectedURLs;
@@ -90,7 +95,7 @@ public class Resources {
 			iterateEntry(new File(src.getLocation().toURI()), filter,
 					collectedURLs);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			LOGGER.debug(e);
 		}
 		return collectedURLs;
 	}

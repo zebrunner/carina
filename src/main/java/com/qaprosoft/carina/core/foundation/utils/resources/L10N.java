@@ -28,6 +28,21 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
+
+/*
+ * QUALITY-1076:
+ * http://maven.apache.org/surefire/maven-surefire-plugin/examples/class-loading.html
+ * Need to set useSystemClassLoader=false for maven surefire plugin to receive access to classloader L10N files on CI
+ * 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<useSystemClassLoader>false</useSystemClassLoader>
+				</configuration>
+ 
+ */
+
 public class L10N {
 	protected static final Logger LOGGER = Logger.getLogger(L10N.class);
 
