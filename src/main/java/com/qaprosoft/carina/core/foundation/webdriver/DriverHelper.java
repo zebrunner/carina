@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -41,13 +40,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
@@ -167,13 +162,11 @@ public class DriverHelper
 		return extWebElement.isElementPresent(timeout);
 	}
 
-	@Deprecated
 	public boolean isElementPresent(String controlInfo, final WebElement element)
 	{
 		return new ExtendedWebElement(element, controlInfo).isElementPresent();
 	}
 	
-	@Deprecated
 	public boolean isElementPresent(String controlInfo, final WebElement element, long timeout)
 	{
 		return new ExtendedWebElement(element, controlInfo).isElementPresent(timeout);
@@ -246,11 +239,11 @@ public class DriverHelper
 	 * @return element non-existence status.
 	 */
 	public boolean isElementNotPresent(final ExtendedWebElement extWebElement) {
-		return isElementNotPresent(extWebElement.getName(), extWebElement.getBy(), EXPLICIT_TIMEOUT);
+		return isElementNotPresent(extWebElement, EXPLICIT_TIMEOUT);
 	}
 	public boolean isElementNotPresent(final ExtendedWebElement extWebElement, long timeout)
 	{
-		return isElementNotPresent(extWebElement.getName(), extWebElement.getBy(), timeout);
+		return extWebElement.isElementNotPresent(timeout);
 	}
 
 	public boolean isElementNotPresent(String controlInfo, final WebElement element)
@@ -258,34 +251,7 @@ public class DriverHelper
 		return isElementNotPresent(new ExtendedWebElement(element, controlInfo));
 	}
 
-	public boolean isElementNotPresent(String elementName, final By by) {
-		return isElementNotPresent(elementName, by, EXPLICIT_TIMEOUT);
-	}
 	
-	public boolean isElementNotPresent(String elementName, final By by, long timeout) {
-		boolean result;
-		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return drv.findElements(by).isEmpty();
-				}
-			});
-			result = true;
-		}
-		catch (Exception e)
-		{
-			result = false;
-			summary.log(Messager.UNEXPECTED_ELEMENT_PRESENT.error(elementName));
-		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-		return result;
-	}
 
 	/**
 	 * Types text to specified element.
@@ -363,18 +329,7 @@ public class DriverHelper
      */
 	
 	public void doubleClick(final ExtendedWebElement extendedWebElement) {
-		//isElementPresent(extendedWebElement);
-		doubleClickSafe(extendedWebElement, true);
-		String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(extendedWebElement.getName());
-		summary.log(msg);
-		try
-		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
-		}
-		catch (Exception e)
-		{
-			LOGGER.info(e.getMessage());
-		}
+		extendedWebElement.doubleClick();
 	}
 
 	public void doubleClick(String controlInfo, WebElement control)
@@ -382,59 +337,7 @@ public class DriverHelper
 		doubleClick(new ExtendedWebElement(control, controlInfo));
 	}
 	
-	/**
-	 * Safe doubleClick on element, used to reduce any problems with that action.
-	 * 
-	 * @param startTimer Start time
-	 */
-	private void doubleClickSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
-	{
-		WebDriver drv = getDriver();
-		Actions action = new Actions(drv);
-
-		if (startTimer)
-		{
-			timer = System.currentTimeMillis();
-		}
-		try
-		{
-			Thread.sleep(RETRY_TIME);
-			if (extendedWebElement.getElement() == null) {
-				extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
-			}
-			action.moveToElement(extendedWebElement.getElement()).doubleClick(extendedWebElement.getElement()).build().perform();
-		}
-		catch (UnhandledAlertException e)
-		{
-			LOGGER.debug(e.getMessage(), e.getCause());
-			drv.switchTo().alert().accept();
-		}
-		catch(StaleElementReferenceException e)
-		{
-			LOGGER.debug(e.getMessage(), e.getCause());
-			extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
-		}
-		catch (Exception e)
-		{
-			LOGGER.debug(e.getMessage(), e.getCause());
-			if (e.getMessage().contains("Element is not clickable"))
-			{
-				scrollTo(extendedWebElement);
-			}
-
-			if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000)
-			{
-				doubleClickSafe(extendedWebElement, false);
-			}
-			else
-			{
-				String msg = Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(extendedWebElement.getNameWithLocator());
-				summary.log(msg);			
-				throw new RuntimeException(msg, e); 			
-			}
-		}
-	}	
-
+	
 	/**
 	 * Sends enter to element.
 	 * 
@@ -455,13 +358,14 @@ public class DriverHelper
 	 * 
 	 * @param controlInfo controlInfo
 	 * @param control control
-	 */	
+	 */
+	@Deprecated
 	public void pressEnter(String controlInfo, WebElement control)
 	{
 		pressEnter(new ExtendedWebElement(control, controlInfo));
 	}
 
-
+	@Deprecated
 	private void pressEnterSafe(ExtendedWebElement extendedWebElement, boolean startTimer)
 	{
 
@@ -502,7 +406,6 @@ public class DriverHelper
 			}
 		}
 	}
-
 	/**
 	 * Check checkbox
 	 * 
@@ -510,11 +413,7 @@ public class DriverHelper
 	 */
 	public void check(ExtendedWebElement checkbox)
 	{
-		if (isElementPresent(checkbox) && !checkbox.getElement().isSelected())
-		{
-			click(checkbox);
-			logMakingScreen(Messager.CHECKBOX_CHECKED.info(checkbox.getName()));
-		}
+		checkbox.check();
 	}
 
 	/**
@@ -524,11 +423,7 @@ public class DriverHelper
 	 */
 	public void uncheck(ExtendedWebElement checkbox)
 	{
-		if (isElementPresent(checkbox) && checkbox.getElement().isSelected())
-		{
-			click(checkbox);
-			logMakingScreen(Messager.CHECKBOX_UNCHECKED.info(checkbox.getName()));
-		}
+		checkbox.uncheck();
 	}
 
 	/**
@@ -540,12 +435,7 @@ public class DriverHelper
 	 */
 	public boolean isChecked(final ExtendedWebElement checkbox)
 	{
-		assertElementPresent(checkbox);
-		boolean res = checkbox.getElement().isSelected();
-		if (checkbox.getElement().getAttribute("checked") != null ) {
-			res |= checkbox.getElement().getAttribute("checked").equalsIgnoreCase("true");
-		}
-		return res;
+		return checkbox.isChecked();
 	}
 
 	
@@ -557,30 +447,7 @@ public class DriverHelper
 	 */
 	public void attachFile(final ExtendedWebElement extendedWebElement, String filePath)
 	{
-		String msg;
-		final String decryptedFilePath = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
-		WebDriver drv = getDriver();
-		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return extendedWebElement.getElement().isDisplayed();
-				}
-			});
-			extendedWebElement.getElement().sendKeys(decryptedFilePath);
-			msg = Messager.FILE_ATTACHED.info(filePath);
-			summary.log(msg);
-		}
-		catch (Exception e)
-		{
-			msg = Messager.FILE_NOT_ATTACHED.error(filePath);
-			summary.log(msg);
-			throw new RuntimeException(msg, e); 			
-		}
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		extendedWebElement.attachFile(filePath);
 	}
 
 	/**
@@ -774,42 +641,7 @@ public class DriverHelper
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final String selectText)
 	{
-		boolean isSelected = false;
-		final String decryptedSelectText = cryptoTool.decryptByPattern(selectText, CRYPTO_PATTERN);
-		final Select s = new Select(extendedWebElement.getElement());
-		WebDriver drv = getDriver();
-		String msg = null;
-		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-
-					try
-					{
-						s.selectByVisibleText(decryptedSelectText);
-						return true;
-					}
-					catch (Exception e)
-					{
-					}
-					return false;
-				}
-			});
-			isSelected = true;
-			msg = Messager.SELECT_BY_TEXT_PERFORMED.info(selectText, extendedWebElement.getName());
-		}
-		catch (Exception e)
-		{
-			msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(selectText, extendedWebElement.getNameWithLocator());
-			e.printStackTrace();
-		}
-		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
-
-		return isSelected;
+		return extendedWebElement.select(selectText);
 	}
 
 	/**
@@ -817,17 +649,13 @@ public class DriverHelper
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final String[] values)
 	{
-		boolean result = true;
-		for (String value : values)
-		{
-			if (!select(extendedWebElement, value))
-			{
-				result = false;
-			}
-		}
-		return result;
+		return extendedWebElement.select(values);
 	}
 
+	public void select(String controlInfo, WebElement control, String selectText)
+	{
+		select(new ExtendedWebElement(control, controlInfo), selectText);
+	}
 	/**
 	 * Selects value according to text value matcher.
 	 *
@@ -837,55 +665,9 @@ public class DriverHelper
 	 */
 	public boolean selectByMatcher(final ExtendedWebElement extendedWebElement, final BaseMatcher<String> matcher)
 	{
-		boolean isSelected = false;
-		final Select s = new Select(extendedWebElement.getElement());
-		WebDriver drv = getDriver();
-		String msg = null;
-		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					try
-					{
-						String fullTextValue = null;
-						for (WebElement option : s.getOptions())
-						{
-							if (matcher.matches(option.getText()))
-							{
-								fullTextValue = option.getText();
-								break;
-							}
-						}
-						s.selectByVisibleText(fullTextValue);
-						return true;
-					}
-					catch (Exception e)
-					{
-					}
-					return false;
-				}
-			});
-			isSelected = true;
-			msg = Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(matcher.toString(), extendedWebElement.getName());
-		}
-		catch (Exception e)
-		{
-			msg = Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), extendedWebElement.getNameWithLocator());
-			e.printStackTrace();
-		}
-		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
-
-		return isSelected;
+		return extendedWebElement.selectByMatcher(matcher);
 	}
 
-	public void select(String controlInfo, WebElement control, String selectText)
-	{
-		select(new ExtendedWebElement(control, controlInfo), selectText);
-	}
 
 	/**
 	 * Selects item by index in specified select element.
@@ -894,48 +676,51 @@ public class DriverHelper
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final int index)
 	{
-		boolean isSelected = false;
-		final Select s = new Select(extendedWebElement.getElement());
-		WebDriver drv = getDriver();
-		String msg = null;
-		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-
-					try
-					{
-						s.selectByIndex(index);
-						return true;
-					}
-					catch (Exception e)
-					{
-					}
-					return false;
-				}
-			});
-			isSelected = true;
-			msg = Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), extendedWebElement.getName());
-		}
-		catch (Exception e)
-		{
-			msg = Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), extendedWebElement.getNameWithLocator());
-			e.printStackTrace();
-		}
-		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
-
-		return isSelected;
+		return extendedWebElement.select(index);		
 	}
 
 	public void select(String controlInfo, WebElement control, int index)
 	{
 		select(new ExtendedWebElement(control, controlInfo), index);
 	}
+	
+	//TODO: review why hover from ExtendedWelement doesn't work
 
+/*	*//**
+	 * Hovers over element.
+	 *
+     *//*
+	public void hover(final ExtendedWebElement extendedWebElement) {
+		hover(extendedWebElement, null, null);
+	}
+	public void hover(final ExtendedWebElement extendedWebElement, Integer xOffset, Integer  yOffset)
+	{
+		extendedWebElement.hover(xOffset, yOffset);
+	}
+
+	@Deprecated
+	public void hover(String controlInfo, WebElement control)
+	{
+		hover(new ExtendedWebElement(control, controlInfo));
+	}
+
+	*//**
+	 * Hovers over element.
+	 * 
+	 * @param xpathLocator xpathLocator
+	 * @param elementName element name
+	 *//*
+	@Deprecated
+	public void hover(String elementName, String xpathLocator)
+	{
+		WebDriver drv = getDriver();
+		Actions action = new Actions(drv);
+		action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
+		String msg = Messager.HOVER_IMG.info(elementName);
+		summary.log(msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+	}*/
+	
 	/**
 	 * Hovers over element.
 	 *
@@ -1002,6 +787,7 @@ public class DriverHelper
 	 * @param xpathLocator xpathLocator
 	 * @param elementName element name
 	 */
+	@Deprecated
 	public void hover(String elementName, String xpathLocator)
 	{
 		WebDriver drv = getDriver();
@@ -1010,30 +796,6 @@ public class DriverHelper
 		String msg = Messager.HOVER_IMG.info(elementName);
 		summary.log(msg);
 		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
-	}
-
-	public void scrollTo(final ExtendedWebElement extendedWebElement)
-	{
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains("mobile")) {
-			LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
-			return;
-		}
-		try
-		{
-			Locatable locatableElement = (Locatable) extendedWebElement.getElement();
-			//[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
-			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
-			
-			int y = locatableElement.getCoordinates().onScreen().getY();
-			if (y > 120) {
-				((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
-			}
-		}
-		catch (Exception e)
-		{
-			// TODO: calm error logging as it is too noisy
-			LOGGER.debug("Scroll to element: " + extendedWebElement.getName() + " not performed!" + e.getMessage());
-		}
 	}
 
 	public void pressTab()
@@ -1053,7 +815,7 @@ public class DriverHelper
 	/**
 	 * Close alert modal by JS.
 	 */
-	public void sielentAlert()
+	public void silentAlert()
 	{
 		WebDriver drv = getDriver();
 		if (!(drv instanceof HtmlUnitDriver))
@@ -1133,8 +895,7 @@ public class DriverHelper
 	 */
 	public String getSelectedValue(ExtendedWebElement select)
 	{
-		assertElementPresent(select);
-		return new Select(select.getElement()).getAllSelectedOptions().get(0).getText();
+		return select.getSelectedValue();
 	}
 
 	/**
@@ -1145,14 +906,7 @@ public class DriverHelper
 	 */
 	public List<String> getSelectedValues(ExtendedWebElement select)
 	{
-		assertElementPresent(select);
-		Select s = new Select(select.getElement());
-		List<String> values = new ArrayList<String>();
-		for (WebElement we : s.getAllSelectedOptions())
-		{
-			values.add(we.getText());
-		}
-		return values;
+		return select.getSelectedValues();
 	}
 
 	/**
@@ -1227,6 +981,7 @@ public class DriverHelper
 	// Methods from v1.0
 	// --------------------------------------------------------------------------
 
+	@Deprecated
 	public void setElementText(String controlInfo, String frame, String id, String text)
 	{
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
@@ -1238,6 +993,7 @@ public class DriverHelper
 		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
 	}
 
+	@Deprecated
 	public void setElementText(String controlInfo, String text)
 	{
 		final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
@@ -1345,44 +1101,6 @@ public class DriverHelper
 		drv.switchTo().window(newTab);
 	}
 
-	/**
-	 * Swipes mobile screen by coordinates.
-	 * @param startX start x
-	 * @param startY start y
-	 * @param endX end x
-	 * @param endY end y
-	 * @param duration duration
-	 */
-	public void swipe(double startX, double startY, double endX, double endY, double duration)
-	{
-		JavascriptExecutor js = (JavascriptExecutor) getDriver();
-		HashMap<String, Double> swipeObject = new HashMap<String, Double>();
-		swipeObject.put("startX", startX);
-		swipeObject.put("startY", startY);
-		swipeObject.put("endX", endX);
-		swipeObject.put("endY", endY);
-		swipeObject.put("duration", duration);
-		js.executeScript("mobile: swipe", swipeObject);
-	}
-	
-    public void swipe(ExtendedWebElement element, Double startX, Double startY, Double endX, Double endY, Double duration) {
-		LOGGER.info(String.format("Swipe on element %s. Start point (%s;%s), end point (%s;%s)", element.getNameWithLocator(), startX, startY, endX, endY));
-		isElementPresent(element);
-
-		
-		final JavascriptExecutor js = (JavascriptExecutor) getDriver();
-		final HashMap<String, String> swipeObject = new HashMap<String, String>();
-		swipeObject.put("startX", startX.toString());
-		swipeObject.put("startY", startY.toString());
-		swipeObject.put("endX", endX.toString());
-		swipeObject.put("endY", endY.toString());
-		swipeObject.put("element", ((RemoteWebElement) element.getElement()).getId());
-		swipeObject.put("duration", duration.toString());
-		LOGGER.info(String.format("Swipe object: %s", swipeObject));
-		js.executeScript("mobile: swipe", swipeObject);
-		
-    }	
-
 	// --------------------------------------------------------------------------
 	// Base UI validations
 	// --------------------------------------------------------------------------
@@ -1393,15 +1111,7 @@ public class DriverHelper
 
 	public void assertElementPresent(final ExtendedWebElement extWebElement, long timeout)
 	{
-		if (isElementPresent(extWebElement, timeout))
-		{
-			TestLogCollector
-					.addScreenshotComment(Screenshot.capture(getDriver()), Messager.ELEMENT_PRESENT.getMessage(extWebElement.toString()));
-		}
-		else
-		{
-			Assert.fail(Messager.ELEMENT_NOT_PRESENT.getMessage(extWebElement.getNameWithLocator()));
-		}
+		extWebElement.assertElementPresent(timeout);
 	}
 
 	public void assertElementWithTextPresent(final ExtendedWebElement extWebElement, final String text)
@@ -1411,27 +1121,35 @@ public class DriverHelper
 
 	public void assertElementWithTextPresent(final ExtendedWebElement extWebElement, final String text, long timeout)
 	{
-		if (isElementWithTextPresent(extWebElement, text, timeout))
-		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()),
-					Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(extWebElement.toString(), text));
-		}
-		else
-		{
-			Assert.fail(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(extWebElement.toString(), text));
-		}
+		extWebElement.assertElementWithTextPresent(text, timeout);
 	}
 
 	// --------------------------------------------------------------------------
 	// Helpers
 	// --------------------------------------------------------------------------
-	private void logMakingScreen(String msg)
-	{
-		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
-	}
-	
 
+	/**
+	 * Find Extended Web Element on page using By.
+	 * 
+	 * @param by Selenium By locator
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+    public ExtendedWebElement findExtendedWebElement(By by) {
+    	return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
+    }
+
+	/**
+	 * Find Extended Web Element on page using By.
+	 * 
+	 * @param by Selenium By locator
+	 * @param timeout
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+    public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
+    	return findExtendedWebElement(by, by.toString(), timeout);
+    }
+	
+	
 	/**
 	 * Find Extended Web Element on page using By.
 	 * 
@@ -1439,11 +1157,11 @@ public class DriverHelper
 	 * @param name Element name
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
-
 	public ExtendedWebElement findExtendedWebElement(final By by, String name)
 	{
 		return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
 	}
+	
 	/**
 	 * Find Extended Web Element on page using By.
 	 * 
@@ -1480,17 +1198,13 @@ public class DriverHelper
 		return element;
 	}	
     
-    public ExtendedWebElement findExtendedWebElement(By by) {
-    	return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
-    }
 	
-    public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
-    	return findExtendedWebElement(by, by.toString(), timeout);
-    }
+	
 	
 	public List<ExtendedWebElement> findExtendedWebElements(By by) {
 		return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
 	}
+	
 	public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout)
 	{
 		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
@@ -1572,7 +1286,7 @@ public class DriverHelper
 		
 		ExtendedWebElement res = null;
 		try {
-			res = findExtendedWebElement(by, timeout); 
+			res = findExtendedWebElement(by, by.toString(), timeout); 
 		} catch (Exception e) {
 			res = new ExtendedWebElement(null, element.getName(), by);
 		}

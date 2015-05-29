@@ -227,7 +227,7 @@ public class Configuration
 		
 		MOBILE_DEVICE_TYPE("mobile_device_type"),		
 		
-		DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
+		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
 		
 		VIDEO_RECORDING("video_recording"),
 		
