@@ -69,6 +69,9 @@ public class DriverPool
 		return drv;
 	}
 	
+	public static WebDriver getExtraDriverByThread() {
+		return getExtraDriverByThread(Thread.currentThread().getId());
+	}
 	public static WebDriver getExtraDriverByThread(long threadId)
 	{
 		WebDriver drv = null;

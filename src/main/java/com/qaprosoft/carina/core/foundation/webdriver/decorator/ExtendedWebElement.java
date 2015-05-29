@@ -729,7 +729,14 @@ public class ExtendedWebElement
 	}
 	
 	private WebDriver getDriver() {
-		return DriverPool.getDriverByThread();
+		WebDriver driver = DriverPool.getDriverByThread();
+		if (driver == null) {
+			driver = DriverPool.getExtraDriverByThread();
+		}
+		if (driver == null) {
+			throw new RuntimeException("Unable to find valid driver inside DriverPool including extraDriver!");
+		}
+		return driver;
 	}
 	
 /*	*//**
