@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.SearchContext;
@@ -28,7 +27,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
@@ -63,9 +61,9 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
 				T uiObject;
 				try
 				{
-					uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class, Locale.class)
+					uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
 							.newInstance(
-						webDriver, element, Configuration.getLocale());
+						webDriver, element);
 				} catch (NoSuchMethodException e)
 				{
 					LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
