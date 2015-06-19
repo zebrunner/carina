@@ -75,12 +75,9 @@ public class EmailReportGenerator
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
 	private static final int MESSAGE_LIMIT = 2048;
-	private static String INCLUDE_PASS_STR = R.EMAIL.get("include_pass");
-	private static String INCLUDE_FAIL_STR = R.EMAIL.get("include_fail");
-	private static String INCLUDE_SKIP_STR = R.EMAIL.get("include_skip");
-	private static boolean INCLUDE_PASS;
-	private static boolean INCLUDE_FAIL;
-	private static boolean INCLUDE_SKIP;
+	private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
+	private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
+	private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
 
 	private String emailBody = CONTAINER;
 	private StringBuilder testResults = null;
@@ -92,7 +89,6 @@ public class EmailReportGenerator
 	public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String elapsedTime, String ciTestJob,
 			List<TestResultItem> testResultItems, List<String> createdItems)
 	{
-		updateTestFlags();
 		emailBody = emailBody.replace(TITLE_PLACEHOLDER, title);
 		emailBody = emailBody.replace(ENV_PLACEHOLDER, url);
 		emailBody = emailBody.replace(DEVICE_PLACEHOLDER, device);
@@ -114,24 +110,6 @@ public class EmailReportGenerator
 		return emailBody;
 	}
 
-	private void updateTestFlags(){
-		if(INCLUDE_PASS_STR.isEmpty()){
-			INCLUDE_PASS = true;
-		}else{
-			INCLUDE_PASS = Boolean.valueOf(INCLUDE_PASS_STR);
-		}
-		if(INCLUDE_FAIL_STR.isEmpty()){
-			INCLUDE_FAIL = true;
-		}else{
-			INCLUDE_FAIL = Boolean.valueOf(INCLUDE_FAIL_STR);
-		}
-		if(INCLUDE_SKIP_STR.isEmpty()){
-			INCLUDE_SKIP = true;
-		}else{
-			INCLUDE_SKIP = Boolean.valueOf(INCLUDE_SKIP_STR);
-		}
-	}
-	
 	private String getTestResultsList(List<TestResultItem> testResultItems)
 	{
 		if (testResultItems.size() > 0)
