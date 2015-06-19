@@ -100,6 +100,8 @@ public class Configuration
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
+		
+		FAILURE_EMAIL_LIST("failure_email_list"),
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
