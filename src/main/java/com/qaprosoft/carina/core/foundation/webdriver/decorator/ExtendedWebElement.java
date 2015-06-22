@@ -110,7 +110,7 @@ public class ExtendedWebElement
 
 	public String getName()
 	{
-		return name !=null ? name : String.format(" (%s)", by);
+		return name != null ? name : String.format(" (%s)", by);
 	}
 	
 	public String getNameWithLocator()
@@ -123,14 +123,35 @@ public class ExtendedWebElement
 		this.name = name;
 	}
 	
-	public String getText()
-	{
-		return element != null ? element.getText() : null;
+	public String getText() {
+		String text = null;
+		if (element != null) {
+			try {
+				text = element.getText();
+			} catch (StaleElementReferenceException e) {
+				LOGGER.debug(e.getMessage(), e.getCause());
+				element = findStaleElement();
+				text = element.getText();
+			}
+		}
+
+		return text;
 	}
 
 	public String getAttribute(String attributeName)
 	{
-		return element != null ? element.getAttribute(attributeName) : null;
+		String attribute = null;
+		if (element != null) {
+			try {
+				attribute = element.getAttribute(attributeName);
+			} catch (StaleElementReferenceException e) {
+				LOGGER.debug(e.getMessage(), e.getCause());
+				element = findStaleElement();
+				attribute = element.getAttribute(attributeName);
+			}
+		}
+
+		return attribute;
 	}
 	
 	public By getBy()
@@ -240,12 +261,7 @@ public class ExtendedWebElement
 		catch(StaleElementReferenceException e)
 		{
 			LOGGER.debug(e.getMessage(), e.getCause());
-			if (!drv.findElements(by).isEmpty()) {
-				element = drv.findElement(by);
-				LOGGER.debug("Element was idenfified using By: " + by.toString());
-			} else {
-				throw new RuntimeException("Unable to identify element using By: " + by.toString());
-			}
+			element = findStaleElement();
 		}
 		catch (Exception e)
 		{
@@ -299,13 +315,18 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver drv)
 				{
-					return element.isDisplayed();
+					boolean res = element.isDisplayed();
+					if (!res) {
+						res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
+					}
+					return res;
 				}
 			});
 			result = true;
 		}
 		catch (Exception e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			result = false;
 		}
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
@@ -375,6 +396,7 @@ public class ExtendedWebElement
 					}
 					catch (Exception e)
 					{
+						LOGGER.debug(e.getMessage(), e.getCause());
 						return false;
 					}
 				}
@@ -384,6 +406,7 @@ public class ExtendedWebElement
 		}
 		catch (Exception e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			result = false;
 			summary.log(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.error(getNameWithLocator(), text));
 		}
@@ -417,6 +440,7 @@ public class ExtendedWebElement
 		}
 		catch (Exception e)
 		{
+			LOGGER.debug(e.getMessage(), e.getCause());
 			result = false;
 		}
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
@@ -565,13 +589,8 @@ public class ExtendedWebElement
 		}
 		catch(StaleElementReferenceException e)
 		{
+			element = findStaleElement();
 			LOGGER.debug(e.getMessage(), e.getCause());
-			if (!drv.findElements(by).isEmpty()) {
-				element = drv.findElement(by);
-				LOGGER.debug("Element was idenfified using By: " + by.toString());
-			} else {
-				throw new RuntimeException("Unable to identify element using By: " + by.toString());
-			}
 		}
 		catch (Exception e)
 		{
@@ -729,6 +748,8 @@ public class ExtendedWebElement
 	}
 	
 	private WebDriver getDriver() {
+		//each element has parent page. Inside page there is a driver. Need to implement funvtionality for getDriver from parent page
+		// as current implementation has limitations for extraDriver functionality
 		WebDriver driver = DriverPool.getDriverByThread();
 		if (driver == null) {
 			driver = DriverPool.getExtraDriverByThread();
@@ -894,6 +915,7 @@ public class ExtendedWebElement
 					}
 					catch (Exception e)
 					{
+						LOGGER.debug(e.getMessage(), e.getCause());
 					}
 					return false;
 				}
@@ -938,6 +960,7 @@ public class ExtendedWebElement
 					}
 					catch (Exception e)
 					{
+						LOGGER.debug(e.getMessage(), e.getCause());
 					}
 					return false;
 				}
@@ -993,5 +1016,135 @@ public class ExtendedWebElement
 		{
 			Assert.fail(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(getNameWithLocator(), text));
 		}
+	}
+	
+	
+	/**
+	 * Find Extended Web Element on page using By starting search from this object.
+	 * 
+	 * @param by Selenium By locator
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+    public ExtendedWebElement findExtendedWebElement(By by) {
+    	return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
+    }
+
+	/**
+	 * Find Extended Web Element on page using By starting search from this object.
+	 * 
+	 * @param by Selenium By locator
+	 * @param timeout
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+    public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
+    	return findExtendedWebElement(by, by.toString(), timeout);
+    }
+	
+	
+	/**
+	 * Find Extended Web Element on page using By starting search from this object.
+	 * 
+	 * @param by Selenium By locator
+	 * @param name Element name
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+	public ExtendedWebElement findExtendedWebElement(final By by, String name)
+	{
+		return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
+	}
+	
+	/**
+	 * Find Extended Web Element on page using By starting search from this object.
+	 * 
+	 * @param by Selenium By locator
+	 * @param name Element name
+	 * @param timeout Timeout to find
+	 * @return ExtendedWebElement if exists otherwise null.
+	 */
+	public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
+		ExtendedWebElement element;
+		final WebDriver drv = getDriver();
+		setImplicitTimeout(0);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !drv.findElements(by).isEmpty();
+				}
+			});
+			element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
+			summary.log(Messager.ELEMENT_FOUND.info(name));
+		}
+		catch (Exception e)
+		{
+			element = null;
+			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			setImplicitTimeout(IMPLICIT_TIMEOUT);
+			throw new RuntimeException(e);
+		}
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
+		return element;
+	}	
+    
+	
+	
+	
+	public List<ExtendedWebElement> findExtendedWebElements(By by) {
+		return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
+	}
+	
+	public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout)
+	{
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<WebElement> webElements = new ArrayList<WebElement> ();
+		
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					return !drv.findElements(by).isEmpty();
+				}
+			});
+			webElements = this.getElement().findElements(by);
+		}
+		catch (Exception e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			//do nothing
+		}
+		
+		for (WebElement element : webElements) {
+			String name = "undefined";
+			try {
+				name = element.getText();
+			} catch (Exception e) {
+				/* do nothing*/
+				LOGGER.debug(e.getMessage(), e.getCause());
+			}
+
+			extendedWebElements.add(new ExtendedWebElement(element, name));
+		}		
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		return extendedWebElements;
+	}
+	
+	private WebElement findStaleElement() {
+		WebElement el;
+		WebDriver drv = getDriver();
+		if (!drv.findElements(by).isEmpty()) {
+			el = drv.findElement(by);
+			LOGGER.debug("Element was idenfified using By: " + by.toString());
+		} else {
+			throw new RuntimeException("Unable to identify element using By: " + by.toString());
+		}
+		return el;
 	}
 }
