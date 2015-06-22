@@ -75,6 +75,9 @@ public class EmailReportGenerator
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
 	private static final int MESSAGE_LIMIT = 2048;
+	private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
+	private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
+	private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
 
 	private String emailBody = CONTAINER;
 	private StringBuilder testResults = null;
@@ -137,8 +140,9 @@ public class EmailReportGenerator
 		String result = "";
 		String failReason = "";
 		if (testResultItem.getResult().name().equalsIgnoreCase("FAIL")) {
-			if (testResultItem.isConfig()) {
-				result = testResultItem.getLinkToScreenshots() != null ? FAIL_CONFIG_LOG_DEMO_TR : FAIL_CONFIG_LOG_TR;
+			if(INCLUDE_FAIL){
+				if (testResultItem.isConfig()) {
+					result = testResultItem.getLinkToScreenshots() != null ? FAIL_CONFIG_LOG_DEMO_TR : FAIL_CONFIG_LOG_TR;
 				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 				
 				failReason = testResultItem.getFailReason();
@@ -167,40 +171,42 @@ public class EmailReportGenerator
 				{
 					result = result.replace(FAIL_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
 				}
-				
-				failCount++;
 			}			
 			
 			
 			result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
 			
-			if(testResultItem.getLinkToScreenshots() != null)
-			{
-				result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
-			}
-		}
-		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
-			if (!testResultItem.isConfig()) {
-				result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
-				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-				
-				failReason = testResultItem.getFailReason();
-				if (!StringUtils.isEmpty(failReason))
-				{
-					// Make description more compact for email report																																																											
-					failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
-					result = result.replace(SKIP_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
-				}
-				else
-				{
-					result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze SYSTEM ISSUE log for details or check dependency settings for the test.");
-				}
-				
-				result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-				
 				if(testResultItem.getLinkToScreenshots() != null)
 				{
 					result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+				}
+			}
+			failCount++;
+		}
+		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
+			if (!testResultItem.isConfig()) {
+				if(INCLUDE_SKIP) {
+					result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
+					result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
+					
+					failReason = testResultItem.getFailReason();
+					if (!StringUtils.isEmpty(failReason))
+					{
+						// Make description more compact for email report																																																											
+						failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
+						result = result.replace(SKIP_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
+					}
+					else
+					{
+						result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze SYSTEM ISSUE log for details or check dependency settings for the test.");
+					}
+					
+					result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
+					
+					if(testResultItem.getLinkToScreenshots() != null)
+					{
+						result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+					}
 				}
 				skipCount++;
 			}
@@ -208,14 +214,15 @@ public class EmailReportGenerator
 		if (testResultItem.getResult().name().equalsIgnoreCase("PASS")) {
 			if (!testResultItem.isConfig()) {
 				passCount++;
-
-				result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
-				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-				result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-				
-				if(testResultItem.getLinkToScreenshots() != null)
-				{
-					result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+				if(INCLUDE_PASS){
+					result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
+					result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
+					result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
+					
+					if(testResultItem.getLinkToScreenshots() != null)
+					{
+						result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
+					}
 				}
 			}
 		}
@@ -242,7 +249,7 @@ public class EmailReportGenerator
 
 		return result;
 	}
-
+	
 	private int getSuccessRate()
 	{
 		return passCount > 0 ? (int) (((double) passCount) / ((double) passCount + (double) failCount + (double) skipCount) * 100) : 0;
