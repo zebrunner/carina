@@ -51,4 +51,9 @@ public abstract class APITest extends AbstractTest
 		super.executeAfterTestMethod(result);    	
     }
 	
+    @Override
+    protected String getBrowser() {
+    	//ignore any settings in _config.properties and return empty String instead of browser name 
+    	return "";
+    }
 }
