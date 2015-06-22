@@ -28,4 +28,6 @@ public @interface CsvDataSourceParameters {
     String staticArgs() default "";
 
     String groupColumn() default "";
+    
+    String spiraColumn() default "";
 }

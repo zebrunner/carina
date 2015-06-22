@@ -98,8 +98,6 @@ public abstract class AbstractTest // extends DriverHelper
 	// 3rd party integrations
 	// Jira ticket(s)
 	private List<String> jiraTickets = new ArrayList<String>();
-	// Spira step(s)
-	private List<String> spiraSteps = new ArrayList<String>();
 	// TestRails case(s)
 	private List<String> testRailCases = new ArrayList<String>();
 
@@ -170,6 +168,7 @@ public abstract class AbstractTest // extends DriverHelper
 	public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
 			ITestContext context) throws Throwable {
 		// do nothing for now
+		Spira.registerStepsFromAnnotation(testMethod);
 	}
 
 	@AfterMethod(alwaysRun = true)
@@ -191,11 +190,8 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 			
 			// Populate Spira Steps
-			if (spiraSteps.size() == 0) { // it was not redefined in the test
-				spiraSteps = Spira.getSteps(result);
-			}
-			result.setAttribute(SpecialKeywords.SPIRA_STEPS_ID, spiraSteps);
 			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+			Spira.clear();
 
 			// Populate TestRail Cases
 			if (testRailCases.size() == 0) { // it was not redefined in the test
@@ -208,8 +204,9 @@ public abstract class AbstractTest // extends DriverHelper
 
 			// clear jira tickets to be sure that next test is not affected.
 			jiraTickets.clear();
-			spiraSteps.clear();
 			testRailCases.clear();
+			
+			
 
 			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if (tla != null) {
@@ -295,7 +292,7 @@ public abstract class AbstractTest // extends DriverHelper
 		return deviceName;
 	}
 
-	private String getBrowser() {
+	protected String getBrowser() {
 		String browser = Configuration.get(Parameter.BROWSER);
 		if (!browserVersion.isEmpty()) {
 			browser = browser + " " + browserVersion;
@@ -588,19 +585,7 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 	}
 
-	/**
-	 * Redefine SpiraTest steps from test.
-	 * 
-	 * @param steps
-	 *            to set
-	 */
-	protected void setSpiraStep(String... steps) {
-		for (String step : steps) {
-			spiraSteps.add(step);
-		}
-	}
-
-	/**
+/**
 	 * Redefine TestRails cases from test.
 	 * 
 	 * @param cases

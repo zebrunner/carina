@@ -74,15 +74,12 @@ public class SpecialKeywords
 	public static final String SPIRA_TESTCASE_ID = "SPIRA_TESTCASE_ID";
 	public static final String SPIRA_TESTSTEP_ID = "SPIRA_TESTSTEP_ID";
 	
-	public static final String SPIRA_STEPS_ID = "spiraSteps";
-	
 	public static final String HTML_REPORT = "emailable-report.html";
 	public static final String NULL = "NULL";
 
 	public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
 	public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";	
 	public static final String JIRA_ARGS_MAP = "jiraArgsMap";
-	public static final String SPIRA_ARGS_MAP = "spiraStepsArgsMap";
 	public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
 	public static final String TESTRAIL_CASES_ID = "testRailCases";
 	public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
