@@ -4,6 +4,8 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.qaprosoft.carina.core.foundation.report.spira.Spira;
+
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 
@@ -33,6 +35,8 @@ public class CsvDataProvider extends BaseDataProvider {
         executeValue = parameters.executeValue();
         separator = parameters.separator();
         quote = parameters.quote();
+        
+        String spiraColumn = parameters.spiraColumn();
 
         List<String> argsList = dsBean.getArgs();
         List<String> staticArgsList = dsBean.getStaticArgs();
@@ -99,6 +103,13 @@ public class CsvDataProvider extends BaseDataProvider {
             // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, strings, mapper); //provide whole line from data provider for UUID generation
             testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); //provide organized args to generate valid hash
+            
+            if (spiraColumn != null) {
+                if (!spiraColumn.isEmpty()) {
+                	//register Spira ID values from DataProvider
+                	Spira.setSteps(args[rowIndex][mapper.get(spiraColumn)].toString());
+                }
+            }  
             
             rowIndex++;
         }
