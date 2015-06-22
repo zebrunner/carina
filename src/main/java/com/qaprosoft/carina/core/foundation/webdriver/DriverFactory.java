@@ -113,11 +113,21 @@ public class DriverFactory {
             if (capabilities.getCapability("automationName") == null)
                 driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
             else {
-            	//TODO: analyze onto potential NPE for "platform"
-            	if (capabilities.getCapability("platform").toString().toLowerCase().equals("android"))
+            	String platform = "";
+            	if (capabilities.getCapability("platform") != null) {
+            		platform = capabilities.getCapability("platform").toString();
+            	} else if (capabilities.getCapability("platformName") != null) {
+            		platform = capabilities.getCapability("platformName").toString();
+            	} else {
+            		throw new RuntimeException("Unable to identify platform type using platform and platformName capabilities for test: " + testName);
+            	}
+            	
+            	if (platform.toLowerCase().equals("android")) {
                     driver = new AndroidDriver(new URL(selenium_host), capabilities);
-                else if (capabilities.getCapability("platform").toString().toLowerCase().equals("ios")) {
+            	} else if (platform.toLowerCase().equals("ios")) {
                     driver = new IOSDriver(new URL(selenium_host), capabilities);
+                } else {
+                	throw new RuntimeException("Undefined platform type for mobile driver test: " + testName);
                 }
             }
         } catch (Exception e) {
