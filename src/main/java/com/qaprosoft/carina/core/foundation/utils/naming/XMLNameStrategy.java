@@ -27,7 +27,6 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 public class XMLNameStrategy implements INamingStrategy
 {
-    private static final ThreadLocal<String> testLogId = new ThreadLocal<String>();
 	
 	@Override
 	public String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
@@ -95,15 +94,4 @@ public class XMLNameStrategy implements INamingStrategy
 		return result.getMethod().getRealClass().getPackage().getName();
 	}
 	
-    public static void startThread(String id) {
-        testLogId.set(id);
-    }
- 
-    public static String getThreadId() {
-        return testLogId.get();
-    }
- 
-    public static void endThread() {
-    	testLogId.remove();
-    }
 }
