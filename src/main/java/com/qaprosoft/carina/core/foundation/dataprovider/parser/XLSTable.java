@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,12 @@ public class XLSTable
 
 	public void addDataRow(Row row, Workbook wb, Sheet sheet)
 	{
+		if (row == null) {
+			//don't add any data row if it is null. It seems like there is empty row in xls file
+			return;
+		}
+
+		
 		if(executeColumn != null && executeValue != null && row != null && headers.contains(executeColumn))
 		{
 			if(!executeValue.equalsIgnoreCase(XLSParser.getCellValue(row.getCell(headers.indexOf(executeColumn)))))
@@ -76,8 +82,9 @@ public class XLSTable
 		for (int i = 0; i < headers.size(); i++)
 		{
 			String header = headers.get(i);
-			if(header.startsWith(FK_PREFIX))
+			if(header.startsWith(FK_PREFIX)) {
 				childRow = XLSParser.parseCellLinks(row.getCell(i), wb, sheet);
+			}
 				
 			synchronized (dataMap){ 
 				dataMap.put(header, XLSParser.getCellValue(row.getCell(i)));				

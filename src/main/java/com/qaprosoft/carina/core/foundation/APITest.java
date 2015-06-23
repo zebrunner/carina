@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,4 +51,9 @@ public abstract class APITest extends AbstractTest
 		super.executeAfterTestMethod(result);    	
     }
 	
+    @Override
+    protected String getBrowser() {
+    	//ignore any settings in _config.properties and return empty String instead of browser name 
+    	return "";
+    }
 }

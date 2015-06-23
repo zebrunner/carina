@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 public class XMLNameStrategy implements INamingStrategy
 {
-    private static final ThreadLocal<String> testLogId = new ThreadLocal<String>();
 	
 	@Override
 	public String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
@@ -59,7 +58,7 @@ public class XMLNameStrategy implements INamingStrategy
 		
 		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
 				result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
-			//LC - AUTO-274 "Pass"ing status set on emailable report when a test step fails
+			//AUTO-274 "Pass"ing status set on emailable report when a test step fails
 			String methodUID = "";
 			for (int i=0; i<result.getParameters().length; i++) {
 				  if (result.getParameters()[i] != null) {
@@ -95,15 +94,4 @@ public class XMLNameStrategy implements INamingStrategy
 		return result.getMethod().getRealClass().getPackage().getName();
 	}
 	
-    public static void startThread(String id) {
-        testLogId.set(id);
-    }
- 
-    public static String getThreadId() {
-        return testLogId.get();
-    }
- 
-    public static void endThread() {
-    	testLogId.remove();
-    }
 }

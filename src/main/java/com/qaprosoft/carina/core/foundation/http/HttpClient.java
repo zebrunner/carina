@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ public class HttpClient
 			break;
 		case DELETE:
 			response = request.delete(methodPath).asString();
+			break;
+		case PATCH:
+			response = request.patch(methodPath).asString();
+			break;
 		default:
 			throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
 		}
