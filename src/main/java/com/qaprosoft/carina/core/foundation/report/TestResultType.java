@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.report;
 /**
  * Test result type.
  * 
- * @author: Aliaksei_Khursevich (hursevich@gmail.com)
+ * @author Aliaksei_Khursevich (hursevich@gmail.com)
  */
 public enum TestResultType
 {

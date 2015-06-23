@@ -31,8 +31,8 @@ public class DataProviderFactory {
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context) {
     	
         Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+        Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
         Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
-        Map<String, String> spiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
         Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
         
 
@@ -69,8 +69,8 @@ public class DataProviderFactory {
     			if (object instanceof com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider) {
                     provider = ArrayUtils.addAll(provider, activeProvider.getDataProvider(annotation, context));
                     testNameArgsMap.putAll(activeProvider.getTestNameArgsMap());
+                    testMethodOwnerArgsMap.putAll(activeProvider.getTestMethodOwnerArgsMap());
                     jiraArgsMap.putAll(activeProvider.getJiraArgsMap());
-                    spiraArgsMap.putAll(activeProvider.getSpiraArgsMap());
                     testRailsArgsMap.putAll(activeProvider.getTestRailsArgsMap());
     			}
 
@@ -86,8 +86,8 @@ public class DataProviderFactory {
 		}
 
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
+        context.setAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP, testMethodOwnerArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
-        context.setAttribute(SpecialKeywords.SPIRA_ARGS_MAP, spiraArgsMap);
         context.setAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP, testRailsArgsMap);
 
         //clear group by settings

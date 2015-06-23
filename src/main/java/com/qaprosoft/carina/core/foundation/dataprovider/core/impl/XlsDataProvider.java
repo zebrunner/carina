@@ -11,6 +11,7 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByM
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
+import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
@@ -68,6 +69,14 @@ public class XlsDataProvider extends BaseDataProvider {
         if (!parameters.testRailColumn().isEmpty())
         	testRailsColumn = parameters.testRailColumn();
 
+        
+        String testMethodColumn = "";
+        if (!parameters.testMethodColumn().isEmpty())
+        	testMethodColumn = parameters.testMethodColumn();
+        
+        String testMethodOwnerColumn = "";
+        if (!parameters.testMethodOwnerColumn().isEmpty())
+        	testMethodOwnerColumn = parameters.testMethodOwnerColumn();
 
         int width = 0;
         if (argsList.size() == 0) {
@@ -119,17 +128,33 @@ public class XlsDataProvider extends BaseDataProvider {
             testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
 
-            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            if (testMethodColumn.isEmpty()) {
+                testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            } else {
+	            // add testName value from xls datasource to special hashMap
+	            addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            }
+            
+            // add testMethoOwner from xls datasource to special hashMap
+            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
 
             // add jira ticket from xls datasource to special hashMap
             addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
             
-            // add spira steps from xls datasource to special hashMap
-            addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            // // add spira steps from xls datasource to special hashMap
+            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            
+            if (spiraColumn != null) {
+                if (!spiraColumn.isEmpty()) {
+                	//register Spira ID values from DataProvider
+                	Spira.setSteps(xlsRow.get(spiraColumn));
+                }
+            }    	
+
             
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailsColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
-
+           
             rowIndex++;
         }
 
@@ -143,4 +168,5 @@ public class XlsDataProvider extends BaseDataProvider {
             }
         }    	
     }
+    
 }

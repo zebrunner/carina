@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,12 @@ public class SpecialKeywords
 	public static final String GENERATEN = "\\{generaten:\\d*\\}";
 	public static final String TESTDATA = "\\{testdata:.*\\}";
 	public static final String ENV = "\\{env:.*\\}";
-	public static final String L18N = "\\{l18n:.*\\}";
+	
+	public static final String I18N = "I18N";
+	public static final String L10N = "L10N";
+	public static final String I18N_PATTERN = String.format("\\{%s:.*\\}", I18N);
+	public static final String L10N_PATTERN = String.format("\\{%s:.*\\}", L10N);
+	
 	public static final String EXCEL = "\\{excel:.*\\}";
 	public static final String CRYPT = "\\{crypt:[^\\{\\}]*\\}";
 	public static final String CRYPT_WRAPPER = "{crypt:%s}";
@@ -69,14 +74,12 @@ public class SpecialKeywords
 	public static final String SPIRA_TESTCASE_ID = "SPIRA_TESTCASE_ID";
 	public static final String SPIRA_TESTSTEP_ID = "SPIRA_TESTSTEP_ID";
 	
-	public static final String SPIRA_STEPS_ID = "spiraSteps";
-	
 	public static final String HTML_REPORT = "emailable-report.html";
 	public static final String NULL = "NULL";
 
 	public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
+	public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";	
 	public static final String JIRA_ARGS_MAP = "jiraArgsMap";
-	public static final String SPIRA_ARGS_MAP = "spiraStepsArgsMap";
 	public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
 	public static final String TESTRAIL_CASES_ID = "testRailCases";
 	public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
@@ -87,5 +90,11 @@ public class SpecialKeywords
 	public static final String MOBILE = "mobile";
 	public static final String MOBILE_POOL = "mobile_pool";
 	public static final String MOBILE_GRID = "mobile_grid";
+	
+	public static final String ANDROID = "Android";
+	public static final String IOS = "IOS";
+
+	public static final String TABLET = "tablet";
+	public static final String PHONE = "phone";
 	
 }

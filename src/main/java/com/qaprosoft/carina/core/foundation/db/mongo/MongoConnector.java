@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
  * MongoConnector - factory for MongoDB client creation.
- * 
- * @author Alex Khursevich
- * @email hursevich@gmail.com
+ *
+ * @author Aliaksei_Khursevich
+ *  <a href="mailto:hursevich@gmail.com">Aliaksei_Khursevich</a>
+ *
  */
 public class MongoConnector
 {
@@ -63,7 +64,7 @@ public class MongoConnector
 	
 	/**
 	 * Creates client for DB specified by parameter.
-	 * @param database
+	 * @param database DB
 	 * @return MongoDB client
 	 * @throws NumberFormatException
 	 * @throws UnknownHostException

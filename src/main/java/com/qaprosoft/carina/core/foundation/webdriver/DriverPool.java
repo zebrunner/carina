@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,9 @@ public class DriverPool
 		return drv;
 	}
 	
+	public static WebDriver getExtraDriverByThread() {
+		return getExtraDriverByThread(Thread.currentThread().getId());
+	}
 	public static WebDriver getExtraDriverByThread(long threadId)
 	{
 		WebDriver drv = null;

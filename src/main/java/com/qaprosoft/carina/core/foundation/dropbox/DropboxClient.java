@@ -1,17 +1,17 @@
 package com.qaprosoft.carina.core.foundation.dropbox;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Locale;
-
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.DbxWriteMode;
+//import java.io.File;
+//import java.io.FileInputStream;
+//import java.util.Locale;
+//
+//import com.dropbox.core.DbxClient;
+//import com.dropbox.core.DbxEntry;
+//import com.dropbox.core.DbxException;
+//import com.dropbox.core.DbxRequestConfig;
+//import com.dropbox.core.DbxWriteMode;
 
 public class DropboxClient {
-	DbxClient client;
+/*	DbxClient client;
 
 	public DropboxClient(String accessToken) {
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString());
@@ -51,5 +51,5 @@ public class DropboxClient {
 			e.printStackTrace();
 			throw new RuntimeException("Unable to get shared link for: " + targetPath); 
 		}
-	}
+	}*/
 }

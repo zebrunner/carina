@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,14 @@ import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.L18n;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.zafira.client.model.TestType;
 
 /*
@@ -96,8 +98,6 @@ public abstract class AbstractTest // extends DriverHelper
 	// 3rd party integrations
 	// Jira ticket(s)
 	private List<String> jiraTickets = new ArrayList<String>();
-	// Spira step(s)
-	private List<String> spiraSteps = new ArrayList<String>();
 	// TestRails case(s)
 	private List<String> testRailCases = new ArrayList<String>();
 
@@ -124,18 +124,29 @@ public abstract class AbstractTest // extends DriverHelper
 		LOGGER.info(Configuration.asString());
 		// Configuration.validateConfiguration();
 
-		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+		context.getCurrentXmlTest().getSuite()
+				.setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
 
 		if (!Configuration.isNull(Parameter.URL)) {
 			RestAssured.baseURI = Configuration.get(Parameter.URL);
 		}
 
 		try {
-			String lang = Configuration.get(Parameter.LOCALE).split("_")[0];
-			String country = Configuration.get(Parameter.LOCALE).split("_")[1];
-			L18n.init("l18n.messages", new Locale(lang, country));
+			Locale locale = LocaleReader.init(Configuration
+					.get(Parameter.LOCALE));
+			L10N.init(locale);
 		} catch (Exception e) {
-			LOGGER.info("Localization bundle is not initialized, set locale configuration arg as 'lang_country' and create l18n/messages.properties file!");
+			LOGGER.error(e.getMessage());
+			LOGGER.debug("L10N bundle is not initialized successfully!", e);
+		}
+		
+		try {
+			Locale locale = LocaleReader.init(Configuration
+					.get(Parameter.LANGUAGE));
+			I18N.init(locale);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			LOGGER.debug("I18N bundle is not initialized successfully!", e);
 		}
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
@@ -157,6 +168,7 @@ public abstract class AbstractTest // extends DriverHelper
 	public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
 			ITestContext context) throws Throwable {
 		// do nothing for now
+		Spira.registerStepsFromAnnotation(testMethod);
 	}
 
 	@AfterMethod(alwaysRun = true)
@@ -178,11 +190,8 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 			
 			// Populate Spira Steps
-			if (spiraSteps.size() == 0) { // it was not redefined in the test
-				spiraSteps = Spira.getSteps(result);
-			}
-			result.setAttribute(SpecialKeywords.SPIRA_STEPS_ID, spiraSteps);
 			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+			Spira.clear();
 
 			// Populate TestRail Cases
 			if (testRailCases.size() == 0) { // it was not redefined in the test
@@ -195,8 +204,9 @@ public abstract class AbstractTest // extends DriverHelper
 
 			// clear jira tickets to be sure that next test is not affected.
 			jiraTickets.clear();
-			spiraSteps.clear();
 			testRailCases.clear();
+			
+			
 
 			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if (tla != null) {
@@ -255,6 +265,14 @@ public abstract class AbstractTest // extends DriverHelper
 					Configuration.get(Parameter.SENDER_EMAIL),
 					Configuration.get(Parameter.SENDER_PASSWORD));
 
+			String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
+			if(testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()){
+				EmailManager.send(title, emailContent,
+						failureEmailList,
+						Configuration.get(Parameter.SENDER_EMAIL),
+						Configuration.get(Parameter.SENDER_PASSWORD));
+			}
+			
 			// Store emailable report under emailable-report.html
 			ReportContext.generateHtmlReport(emailContent);
 
@@ -282,7 +300,7 @@ public abstract class AbstractTest // extends DriverHelper
 		return deviceName;
 	}
 
-	private String getBrowser() {
+	protected String getBrowser() {
 		String browser = Configuration.get(Parameter.BROWSER);
 		if (!browserVersion.isEmpty()) {
 			browser = browser + " " + browserVersion;
@@ -575,19 +593,7 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 	}
 
-	/**
-	 * Redefine SpiraTest steps from test.
-	 * 
-	 * @param steps
-	 *            to set
-	 */
-	protected void setSpiraStep(String... steps) {
-		for (String step : steps) {
-			spiraSteps.add(step);
-		}
-	}
-
-	/**
+/**
 	 * Redefine TestRails cases from test.
 	 * 
 	 * @param cases
