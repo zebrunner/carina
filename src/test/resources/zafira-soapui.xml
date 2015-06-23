@@ -41,7 +41,7 @@
     "jobId": 664,
     "buildNumber": 4,
     "workItem": "JIRA-2142",
-    "scmURL": "git@github.com:lc/zafira.git",
+    "scmURL": "git@github.com:demo/zafira.git",
     "scmBranch": "master",
     "scmCommit": "uk2s34f2s44s23hhjsfsdf",
     "configXML": "<config><arg><key>url</key><value>http://localhost:8080</value></arg></config>",
@@ -57,8 +57,8 @@
     "message": "Login failed!",
     "startTime": 1415746157780,
     "finishTime": 1415746154490,
-    "demoURL": "http://localhost:8080/lc/demo",
-    "logURL": "http://localhost:8080/lc/log",
+    "demoURL": "http://localhost:8080/demo",
+    "logURL": "http://localhost:8080/log",
     "workItems": ["JIRA-2342"]
 }]]></con:request><con:originalUri>http://localhost/zafira/tests</con:originalUri><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource><con:resource name="users" path="/users"><con:settings/><con:parameters/><con:method name="createUser" method="POST"><con:settings/><con:parameters/><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="RESPONSE"><con:mediaType>application/json;charset=UTF-8</con:mediaType><con:status>200</con:status><con:params/><con:element xmlns:user="http://localhost/zafira/users">user:Response</con:element></con:representation><con:request name="POST" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#zafira.baseURL}</con:endpoint><con:request>{
     "userName": "pkebets",

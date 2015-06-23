@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
  */
 package com.qaprosoft.carina.core.gui;
 
-import java.util.Locale;
-
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -31,8 +28,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLoc
 
 public abstract class AbstractUIObject extends DriverHelper
 {
-	protected Locale locale;
-
 	protected String name;
 
 	protected WebElement rootElement;
@@ -40,59 +35,45 @@ public abstract class AbstractUIObject extends DriverHelper
 	/**
 	 * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context
 	 * 
-	 * @param driver
-	 * @param locale
-	 */
+	 * @param driver WebDriver
+     */
 	public AbstractUIObject(WebDriver driver)
 	{
-		this(driver, null);
-	}
-
-	/**
-	 * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context. Locale settings
-	 * are used during initialization
-	 * 
-	 * @param driver
-	 * @param locale
-	 */
-	public AbstractUIObject(WebDriver driver, Locale locale)
-	{
-		this(driver, driver, locale);
+		this(driver, driver);
 	}
 
 	/**
 	 * Initializes UI object using {@link PageFactory}. Browser area for internal elements initialization is bordered by
-	 * SearchContext instance. <br/>
+	 * SearchContext instance.
 	 * If {@link WebDriver} object is used as search context then whole browser window will be used for initialization
-	 * of {@link ExtendedWebElement} fields inside. <br/>
+	 * of {@link ExtendedWebElement} fields inside.
 	 * 
 	 * Note: implement this constructor if you want your {@link AbstractUIObject} instances marked with {@link FindBy}
 	 * to be auto-initialized on {@link AbstractPage} inheritors
 	 * 
-	 * @param driver
-	 *            WebDriver instance to initialize UI Object fields using PageFactory
-	 * @param searchContext
-	 *            Window area that will be used for locating of internal elements
-	 * @param locale
+	 * @param driver WebDriver instance to initialize UI Object fields using PageFactory
+	 * @param searchContext Window area that will be used for locating of internal elements
+	 * @param locale Locale
 	 */
-	public AbstractUIObject(WebDriver driver, SearchContext searchContext, Locale locale)
+	public AbstractUIObject(WebDriver driver, SearchContext searchContext)
 	{
 		super(driver);
-		this.locale = locale != null ? locale : Configuration.getLocale();
-		ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext, this.locale);
+		ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext);
 		PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
 		summary.setPrefix(this.getClass().getSimpleName());
 	}
 
 	/**
-	 * /** Verifies if root {@link WebElement} presents on page.<br/>
+	 *  Verifies if root {@link WebElement} presents on page.
+     *
 	 * If {@link AbstractUIObject} field on {@link AbstractPage} is marked with {@link FindBy} annotation then this
 	 * locator will be used to instantiate rootElement
 	 * 
 	 * @param timeout
 	 *            - max timeout for waiting until rootElement appear
 	 * 
-	 * @return true - if rootElement is enabled and visible on browser's screen;<br/>
+	 * @return true - if rootElement is enabled and visible on browser's screen;
+     *
 	 *         false - otherwise
 	 */
 	public boolean isUIObjectPresent(int timeout)
@@ -113,16 +94,6 @@ public abstract class AbstractUIObject extends DriverHelper
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	public Locale getLocale()
-	{
-		return locale;
-	}
-
-	public void setLocale(Locale locale)
-	{
-		this.locale = locale;
 	}
 
 	public WebElement getRootElement()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ public enum HttpMethodType
 	GET(2, "GET"),
 	PUT(3, "PUT"),
 	POST(4, "POST"),
-	DELETE(5, "DELETE");
+	DELETE(5, "DELETE"),
+	PATCH(6, "PATCH");
 
 	private int code;
 	private String name;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,11 +169,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String uuid = StringGenerator.generateNumeric(8);
 		ParameterGenerator.setUUID(uuid);
 		
-		//dropbox client initialization 
+/*		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
 	    {
 	    	dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN));
-	    }
+	    }*/
 	    super.onStart(context);
 	}
 	
@@ -270,10 +270,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	/**
 	 * When the test is restarted this method cleans fail statistics in test
 	 * context.
-	 * 
-	 * @param test
-	 *            - test context.
-	 */
+	 *
+     */
 	public static void removeIncorrectlyFailedTests(ITestContext context)
 	{
 		ITestNGMethod[] methods = context.getAllTestMethods();
@@ -319,9 +317,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
 		testResultItem.setDescription(description);
-		if (!resultType.equals(TestResultType.PASS)) {
-			testResultItem.setJiraTickets(Jira.getTickets(result));
-		}
+		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
+		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira deature 
+		testResultItem.setJiraTickets(Jira.getTickets(result));
 		return testResultItem;
 	}
 	

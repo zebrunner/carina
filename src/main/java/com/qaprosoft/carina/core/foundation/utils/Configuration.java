@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  * Configuration utility.
  * 
  * @author Aliaksei_Khursevich
- * @email hursevich@gmail.com
+ * hursevich@gmail.com
  */
 public class Configuration
 {
@@ -83,6 +83,8 @@ public class Configuration
 		
 		ENV_ARG_RESOLVER("env_arg_resolver"),
 		
+		DEVELOP("develop"), 
+		
 		PLATFORM("platform"),
 
 		BROWSER("browser"),
@@ -98,6 +100,8 @@ public class Configuration
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
+		
+		FAILURE_EMAIL_LIST("failure_email_list"),
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
@@ -138,7 +142,9 @@ public class Configuration
 		RETRY_COUNT("retry_count"),
 
 		LOCALE("locale"),
-
+		
+		LANGUAGE("language"),
+		
 		THREAD_COUNT("thread_count"),
 		
 		CORE_LOG_LEVEL("core_log_level"),
@@ -221,7 +227,9 @@ public class Configuration
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
-		DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
+		MOBILE_DEVICE_TYPE("mobile_device_type"),		
+		
+		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
 		
 		VIDEO_RECORDING("video_recording"),
 		
