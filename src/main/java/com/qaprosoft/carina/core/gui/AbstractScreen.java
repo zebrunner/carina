@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.gui;
 
-import java.util.Locale;
-
 import org.openqa.selenium.WebDriver;
 
 /**
@@ -29,11 +27,6 @@ public abstract class AbstractScreen extends AbstractUIObject
 	public AbstractScreen(WebDriver driver)
 	{
 		super(driver);
-	}
-	
-	public AbstractScreen(WebDriver driver, Locale locale)
-	{
-		super(driver, locale);
 	}
 	
 	public abstract boolean isOpened();

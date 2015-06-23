@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,36 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
 {
 	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
 	
 	private static final ConcurrentHashMap<Long, Device> threadId2Device = new ConcurrentHashMap<Long, Device>();
-//	private static final ConcurrentHashMap<Long, List<Device>> threadId2IgnoredDevices = new ConcurrentHashMap<Long, List<Device>>();
 	private static List<Device> devices = new ArrayList<Device>();
 
+	public static synchronized void registerDevice() {
+		
+		String name = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
+		String type = Configuration.get(Parameter.MOBILE_DEVICE_TYPE);
+		String os = Configuration.get(Parameter.MOBILE_PLATFORM_NAME);
+		String osVersion = Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
+		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
+		String seleniumServer = Configuration.get(Parameter.SELENIUM_HOST);
+		
+		Device device = new Device(name, type, os, osVersion, udid, seleniumServer);
+		devices.add(device);
+		LOGGER.info("Adding single device into the DevicePool: " + device.getName());		
+	}
+	
 	public static synchronized void registerDevices() {
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+			registerDevice();
+			return;
+		}
 		String params = Configuration.get(Parameter.MOBILE_DEVICES);
 		if (params.isEmpty()) {
 			LOGGER.debug("Parameter.MOBILE_DEVICES is empty. Skip devices registration.");
@@ -52,13 +70,15 @@ public class DevicePool
 			}
 			Device device = new Device(devicesArgs[i]);
 			devices.add(device);
-			LOGGER.info("Adding new device into the list: " + device.getName());
+			LOGGER.info("Adding new device into the DevicePool: " + device.getName());
 		}
 	}
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-		if (Configuration.get(Parameter.MOBILE_DEVICES).isEmpty()) {
+		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+				!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+			//return null for non mobile/mobile_pool tests 
 			return null;
 		}
 		
@@ -95,7 +115,8 @@ public class DevicePool
 	
 	public static synchronized Device getDevice() {
 		Device device = null;
-		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+				!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			return null;
 		}
 		long threadId = Thread.currentThread().getId();
@@ -119,7 +140,8 @@ public class DevicePool
 
 	public static synchronized String getDeviceUdid() {
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
+				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			Device device = DevicePool.getDevice();
 			if (device == null) {
 				throw new RuntimeException("Unable to find device by thread!");
@@ -132,7 +154,8 @@ public class DevicePool
 	
 	public static synchronized String getDeviceName() {
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
+				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			Device device = DevicePool.getDevice();
 			if (device == null) {
 				throw new RuntimeException("Unable to find device by thread!");
@@ -158,4 +181,13 @@ public class DevicePool
 		}
 	}
 
+	public static Type getDeviceType() {
+		Type type = Type.DESKTOP; //default value if no device observed
+		
+		Device device = getDevice();
+		if (device != null) {
+			type = device.getType();
+		}
+		return type;
+	}
 }

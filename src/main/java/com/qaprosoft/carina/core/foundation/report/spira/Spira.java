@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
@@ -38,6 +36,8 @@ public class Spira
 	private static final Logger LOGGER = Logger.getLogger(Spira.class);
 	private static ISpiraUpdater updater;
 	private static boolean isInitialized = false;
+	
+	private static ThreadLocal<String> spiraSteps = new ThreadLocal<String>();
 	
 	static
 	{
@@ -90,59 +90,55 @@ public class Spira
 		}
 	}
 	
-	public synchronized static List<String> getSteps(ITestResult result)
+	public static void registerStepsFromAnnotation(Method testMethod)
 	{
-		List<String> steps = getStepsIdFromDataProvider(result); //higher priority
+		String testStepsId = "";
+		// Extract the SpiraTest test case id - if present
+		if (testMethod.isAnnotationPresent(SpiraTestSteps.class)) {
+			SpiraTestSteps methodAnnotation = testMethod
+					.getAnnotation(SpiraTestSteps.class);
+			testStepsId = methodAnnotation.testStepsId();
+		}
 		
-		if (steps.size() == 0)
-			steps = getStepsIdFromAnnotation(result); //lower priority
-
-		return steps;
+		spiraSteps.set(testStepsId);
 	}
 	
-	private static List<String> getStepsIdFromDataProvider(ITestResult result) {
-		List<String> steps = new ArrayList<String>();
-		@SuppressWarnings("unchecked")
-		Map<Object[], String> testNameSpiraMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.SPIRA_ARGS_MAP);
-		if (testNameSpiraMap != null) {
-			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));					
-			if (testNameSpiraMap.containsKey(testHash) && testNameSpiraMap.get(testHash) != null) {
-				steps = new ArrayList<String>(Arrays.asList(testNameSpiraMap.get(testHash).split(",")));
-			}
-		}
-		return steps;
-	}
-	private static List<String> getStepsIdFromAnnotation(ITestResult result) {
-		// Get a handle to the class and method
-		Class<?> testClass;
-		String testStepsId = "";
-		try {
-			testClass = Class.forName(result.getMethod().getTestClass()
-					.getName());
-
-			// We can't use getMethod() because we may have parameterized tests
-			// for which we won't know the matching signature
-			String methodName = result.getMethod().getMethodName();
-			Method testMethod = null;
-			Method[] possibleMethods = testClass.getMethods();
-			for (Method possibleMethod : possibleMethods) {
-				if (possibleMethod.getName().equals(methodName)) {
-					testMethod = possibleMethod;
-					break;
-				}
-			}
-			if (testMethod != null) {
-				// Extract the SpiraTest test case id - if present
-				if (testMethod.isAnnotationPresent(SpiraTestSteps.class)) {
-					SpiraTestSteps methodAnnotation = testMethod
-							.getAnnotation(SpiraTestSteps.class);
-					testStepsId = methodAnnotation.testStepsId();
-				}
-			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+	/**
+	 * Return current SpiraTest step(s) for Test Method.
+	 * 
+	 * @param steps
+	 *            to set
+	 */
+	
+	public synchronized static List<String> getSteps() {
+		List<String> stepList = new ArrayList<String>();
+		String steps = spiraSteps.get();
+		if (steps != null && !steps.isEmpty()) {
+			stepList = Arrays.asList(spiraSteps.get().split(","));
 		}
 		
-		return new ArrayList<String>(Arrays.asList(testStepsId.split(",")));
+		for (int i = 0; i < stepList.size(); i++) {
+			stepList.set(i, stepList.get(i).trim());
+		}
+
+		return stepList;
+	}
+	
+	/**
+	 * Set current Test Method SpiraTest step(s).
+	 * 
+	 * @param steps
+	 *            to set
+	 */
+	public static void setSteps(String steps) {
+		spiraSteps.set(steps);
+	}
+	
+	/**
+	 * Clear information about SpiraTest step(s).
+	 * 
+	 */
+	public static void clear() {
+		spiraSteps.remove();
 	}
 }

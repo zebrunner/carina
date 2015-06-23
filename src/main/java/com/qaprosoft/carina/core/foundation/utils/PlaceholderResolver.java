@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ public class PlaceholderResolver
 	
 	/**
 	 * Resolves value by placehodler recursivly.
-	 * @param properties
-	 * @param key
+	 * @param properties Properties
+	 * @param key Key
 	 * @return resolved value
 	 */
 	public static String resolve(Properties properties, String key)
@@ -67,7 +67,7 @@ public class PlaceholderResolver
 	
 	/**
 	 * Verifies that properties file contains all placeholder definitions and does not have infinit placeholder loops.
-	 * @param properties
+	 * @param properties Properties value
 	 * @return validation results
 	 */
 	public static boolean isValid(Properties properties)

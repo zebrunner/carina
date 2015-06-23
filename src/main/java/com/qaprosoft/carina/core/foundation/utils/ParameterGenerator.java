@@ -6,9 +6,11 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.listeners.TestArgsListener;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 
 public class ParameterGenerator {
 
@@ -20,7 +22,8 @@ public class ParameterGenerator {
 	private static Pattern GENERATEN_PATTERN = Pattern.compile(SpecialKeywords.GENERATEN);
 	private static Pattern TESTDATA_PATTERN = Pattern.compile(SpecialKeywords.TESTDATA);
 	private static Pattern ENV_PATTERN = Pattern.compile(SpecialKeywords.ENV);
-	private static Pattern L18N_PATTERN = Pattern.compile(SpecialKeywords.L18N);
+	private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
+	private static Pattern I18N_PATTERN = Pattern.compile(SpecialKeywords.I18N_PATTERN);
 	private static Pattern EXCEL_PATTERN = Pattern.compile(SpecialKeywords.EXCEL);
 
 	private static Matcher matcher;
@@ -95,13 +98,22 @@ public class ParameterGenerator {
 				return StringUtils.replace(param, matcher.group(), getValueFromXLS(key));
 			}
 			
-			matcher = L18N_PATTERN.matcher(param);
+			matcher = I18N_PATTERN.matcher(param);
 			if (matcher.find())
 			{
-				int start = param.indexOf(":") + 1;
+				int start = param.indexOf(SpecialKeywords.I18N + ":") + 5;
 				int end = param.indexOf("}");
 				String key = param.substring(start, end);
-				return StringUtils.replace(param, matcher.group(), L18n.getText(key));
+				return StringUtils.replace(param, matcher.group(), I18N.getText(key));
+			}
+			
+			matcher = L10N_PATTERN.matcher(param);
+			if (matcher.find())
+			{
+				int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
+				int end = param.indexOf("}");
+				String key = param.substring(start, end);
+				return StringUtils.replace(param, matcher.group(), L10N.getText(key));
 			}
 		}
 		catch (Exception e)

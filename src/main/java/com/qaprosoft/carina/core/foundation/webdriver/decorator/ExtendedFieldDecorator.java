@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.SearchContext;
@@ -29,12 +28,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingElementListHandler;
@@ -56,9 +55,10 @@ public class ExtendedFieldDecorator implements FieldDecorator
 
 	public Object decorate(ClassLoader loader, Field field)
 	{
-		if (!(ExtendedWebElement.class.isAssignableFrom(field.getType())
-				|| AbstractUIObject.class.isAssignableFrom(field.getType()) || isDecoratableList(field)))
+		if (!field.isAnnotationPresent(FindBy.class) /*Enable field decorator logic only in case of presence the FindBy annotation in the field*/ ||
+				!(ExtendedWebElement.class.isAssignableFrom(field.getType()) || AbstractUIObject.class.isAssignableFrom(field.getType()) || isDecoratableList(field)) /*also verify that it is ExtendedWebElement or derived from AbstractUIObject or DecoratableList*/)
 		{
+			// returning null is ok in this method.
 			return null;
 		}
 
@@ -136,7 +136,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 		InvocationHandler handler = new LocatingElementHandler(locator);
 		WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]
 		{ WebElement.class, WrapsElement.class, Locatable.class }, handler);
-		return new ExtendedWebElement(proxy, field.getName(), new LocalizedAnnotations(field, Configuration.getLocale()).buildBy());
+		return new ExtendedWebElement(proxy, field.getName(), new LocalizedAnnotations(field).buildBy());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -150,8 +150,8 @@ public class ExtendedFieldDecorator implements FieldDecorator
 		T uiObject;
 		try
 		{
-			uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class, Locale.class).newInstance(
-					webDriver, proxy, Configuration.getLocale());
+			uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class).newInstance(
+					webDriver, proxy);
 		} catch (NoSuchMethodException e)
 		{
 			LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
@@ -172,7 +172,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 	@SuppressWarnings("unchecked")
 	protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator)
 	{
-		InvocationHandler handler = new LocatingElementListHandler(locator, field.getName(), new LocalizedAnnotations(field, Configuration.getLocale()).buildBy());
+		InvocationHandler handler = new LocatingElementListHandler(locator, field.getName(), new LocalizedAnnotations(field).buildBy());
 		List<ExtendedWebElement> proxies = (List<ExtendedWebElement>) Proxy.newProxyInstance(loader, new Class[]
 		{ List.class }, handler);
 
