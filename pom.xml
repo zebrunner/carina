@@ -341,14 +341,7 @@
 			<version>${appium.version}</version>
 		</dependency>
 	</dependencies>
-
-	<!--distributionManagement>
-		<repository>
-			<id>maven-repository</id>
-			<url>${github.maven.repository}</url>
-		</repository>
-	</distributionManagement-->
-
+	
 	<distributionManagement>
 		<repository>
 			<id>deploymentRepo</id>
