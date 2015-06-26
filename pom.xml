@@ -342,11 +342,24 @@
 		</dependency>
 	</dependencies>
 
-	<distributionManagement>
+	<!--distributionManagement>
 		<repository>
 			<id>maven-repository</id>
 			<url>${github.maven.repository}</url>
 		</repository>
+	</distributionManagement-->
+
+	<distributionManagement>
+		<repository>
+			<id>deploymentRepo</id>
+			<name>Releases</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>deploymentRepo</id>
+			<name>Snapshots</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<build>
