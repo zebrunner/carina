@@ -350,12 +350,12 @@
 	
 	<distributionManagement>
 		<repository>
-			<id>releaseRepo</id>
+			<id>deploymentRepo</id>
 			<name>Qaprosoft Releases</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
-			<id>snapshotRepo</id>
+			<id>deploymentRepo</id>
 			<name>Qaprosoft Snapshots</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
