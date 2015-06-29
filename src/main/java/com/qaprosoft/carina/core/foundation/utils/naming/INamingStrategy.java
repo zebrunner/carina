@@ -25,6 +25,8 @@ public interface INamingStrategy
 	String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod);
 
 	String getCanonicalTestName(ITestResult result);
+	
+	String getCanonicalTestMethodName(ITestResult result);
 
 	String getPackageName(ITestResult result);
 }

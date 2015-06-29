@@ -60,7 +60,7 @@ public class ZafiraIntegrator {
 	private static Boolean isRegistered = false;
 
 	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
-
+	
 	public static void startSuite(ITestContext context, String suiteFileName) {
 		if (!isValid())
 			return;
@@ -161,11 +161,10 @@ public class ZafiraIntegrator {
 
 		TestType registeredTest = null;
 		try {
-
-			String test = TestNamingUtil.getCanonicalTestName(result);
-
 			String testClass = result.getMethod().getTestClass().getName();
-			String testMethod = result.getMethod().getMethodName();
+			
+			String test = TestNamingUtil.getCanonicalTestName(result);
+			String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
 
 			// if method owner is not specified then try to use suite owner. If
 			// both are not declared then ANONYMOUS will be used
