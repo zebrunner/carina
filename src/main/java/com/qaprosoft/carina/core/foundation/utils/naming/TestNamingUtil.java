@@ -69,6 +69,11 @@ public class TestNamingUtil
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getCanonicalTestName(result));
 	}
 
+	public static String getCanonicalTestMethodName(ITestResult result)
+	{
+		return StringEscapeUtils.escapeHtml4(namingStrategy.getCanonicalTestMethodName(result));
+	}
+	
 	public static String getPackageName(ITestResult result)
 	{
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
