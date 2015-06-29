@@ -106,8 +106,6 @@ public class Spira
 	/**
 	 * Return current SpiraTest step(s) for Test Method.
 	 * 
-	 * @param steps
-	 *            to set
 	 */
 	
 	public synchronized static List<String> getSteps() {

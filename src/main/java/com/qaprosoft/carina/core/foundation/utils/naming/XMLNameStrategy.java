@@ -87,6 +87,23 @@ public class XMLNameStrategy implements INamingStrategy
 
 		return testName;
 	}
+	
+	@Override
+	public String getCanonicalTestMethodName(ITestResult result)
+	{
+		String testMethodName = result.getMethod().getMethodName();
+		@SuppressWarnings("unchecked")
+		Map<Object[], String> testMethodNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP);
+		
+		if (testMethodNameMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
+			if (testMethodNameMap.containsKey(testHash)) {
+				testMethodName = testMethodNameMap.get(testHash);
+			}
+		}
+		
+		return testMethodName; 
+	}
 
 	@Override
 	public String getPackageName(ITestResult result)
