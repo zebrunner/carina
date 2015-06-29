@@ -13,7 +13,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<github.maven.repository>file:///${basedir}</github.maven.repository>
 
 		<source.version>1.7</source.version>
 		<target.version>1.7</target.version>
@@ -72,16 +71,23 @@
 
 	<repositories>
 		<repository>
-			<id>zafira-client</id>
-			<url>https://raw.github.com/qaprosoft/zafira-client/master</url>
-		</repository>
-		<!-- repository> <id>central</id> <name>Atlassian Public Repository</name> 
-			<layout>default</layout> <url>http://maven.atlassian.com/public</url> <snapshots> 
-			<enabled>false</enabled> </snapshots> </repository -->
-		<repository>
 			<id>maven_central</id>
 			<name>Maven Central</name>
 			<url>http://central.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<id>qaprosoft_releases</id>
+			<name>Qaprosoft Releases</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
+			<releases><enabled>true</enabled></releases>
+			<snapshots><enabled>false</enabled></snapshots>
+		</repository>
+		<repository>
+			<id>qaprosoft_shapshots</id>
+			<name>Qaprosoft Snapshots</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+			<releases><enabled>false</enabled></releases>
+			<snapshots><enabled>true</enabled></snapshots>
 		</repository>
 	</repositories>
 
@@ -344,13 +350,13 @@
 	
 	<distributionManagement>
 		<repository>
-			<id>deploymentRepo</id>
-			<name>Releases</name>
+			<id>releaseRepo</id>
+			<name>Qaprosoft Releases</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
-			<id>deploymentRepo</id>
-			<name>Snapshots</name>
+			<id>snapshotRepo</id>
+			<name>Qaprosoft Snapshots</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>

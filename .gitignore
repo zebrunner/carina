@@ -4,3 +4,5 @@ target
 /test-output
 /.settings
 /com
+/application.log
+/sql.log
