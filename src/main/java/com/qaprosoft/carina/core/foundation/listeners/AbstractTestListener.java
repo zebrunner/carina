@@ -23,7 +23,6 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -43,6 +42,7 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+//import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -50,7 +50,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 	
     // Dropbox client
-    DropboxClient dropboxClient;
+//    DropboxClient dropboxClient;
  
     private void startItem(ITestResult result, Messager messager){
 		
@@ -318,7 +318,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
 		testResultItem.setDescription(description);
 		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
-		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira deature 
+		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature 
 		testResultItem.setJiraTickets(Jira.getTickets(result));
 		return testResultItem;
 	}
