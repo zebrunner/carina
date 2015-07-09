@@ -139,7 +139,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		// do failure test cleanup in this place as right after the test context
 		// doesn't have up-to-date information. Latest test result is not
 		// available
-		removeIncorrectlyFailedTests(result.getTestContext());
+		//removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
     
@@ -263,7 +263,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onFinish(ITestContext context)
 	{
 		ZafiraIntegrator.finishSuite();		
-		removeIncorrectlyFailedTests(context);
+		//removeIncorrectlyFailedTests(context);
 		super.onFinish(context);
 	}
 
@@ -272,6 +272,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	 * context.
 	 *
      */
+	
+	//everything is commented as current implementation doesn't work correctly with DatProviders + retry
 	public static void removeIncorrectlyFailedTests(ITestContext context)
 	{
 		ITestNGMethod[] methods = context.getAllTestMethods();
@@ -294,7 +296,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 				}
 			}
 		}
-
 	}
 
 	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
