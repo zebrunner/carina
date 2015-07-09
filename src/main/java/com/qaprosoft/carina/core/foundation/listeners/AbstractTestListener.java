@@ -15,6 +15,13 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
@@ -139,6 +146,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		// do failure test cleanup in this place as right after the test context
 		// doesn't have up-to-date information. Latest test result is not
 		// available
+   		//[VD] temporary disabled it's execution in test purposes as removeIncorrectlyFailedTests updated completely 
 		//removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
@@ -263,7 +271,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onFinish(ITestContext context)
 	{
 		ZafiraIntegrator.finishSuite();		
-		//removeIncorrectlyFailedTests(context);
+		removeIncorrectlyFailedTests(context);
 		super.onFinish(context);
 	}
 
@@ -272,30 +280,50 @@ public abstract class AbstractTestListener extends TestArgsListener
 	 * context.
 	 *
      */
-	
-	//everything is commented as current implementation doesn't work correctly with DatProviders + retry
-	public static void removeIncorrectlyFailedTests(ITestContext context)
-	{
-		ITestNGMethod[] methods = context.getAllTestMethods();
-		int max = methods.length;
-		LOGGER.debug("number of all executed methods is: " + max);
-		for(int i=0;i<methods.length;i++){
-			LOGGER.debug("Analyzed method is: " + methods[i].getMethodName());
-			if(methods[i].getCurrentInvocationCount()>1){
-				LOGGER.debug("Analyzed method invocation count is: " + methods[i].getCurrentInvocationCount());
-				LOGGER.debug("Count of failed method is: " + context.getFailedTests().getResults(methods[i]).size());
-				LOGGER.debug("Count of passed method is: " + context.getPassedTests().getResults(methods[i]).size());
-				
-				if (context.getFailedTests().getResults(methods[i]).size() > 0 && 
-						context.getPassedTests().getResults(methods[i]).size() == 1){
-					int count = 0;
-					while (context.getFailedTests().getResults(methods[i]).size() > 0 && count++ < max) {
-						LOGGER.debug("Removing " + methods[i].getMethodName() + " from failed results as passed result determined.");
-						context.getFailedTests().removeResult(methods[i]);
-					}
-				}
+	public void removeIncorrectlyFailedTests(ITestContext context) {
+		// List of test results which we will delete later
+		List<ITestResult> testsToBeRemoved = new ArrayList<>();
+
+		// collect all id's from passed test
+		Set<Integer> passedTestIds = new HashSet<>();
+		for (ITestResult passedTest : context.getPassedTests().getAllResults()) {
+			passedTestIds.add(getMethodId(passedTest));
+		}
+
+		Set<Integer> failedTestIds = new HashSet<>();
+		for (ITestResult failedTest : context.getFailedTests().getAllResults()) {
+
+			// id = class + method + dataprovider
+			int failedTestId = getMethodId(failedTest);
+
+			// if we saw this test as a failed test before we mark as to be deleted
+			// or delete this failed test if there is at least one passed version
+			if (failedTestIds.contains(failedTestId)
+					|| passedTestIds.contains(failedTestId)) {
+				testsToBeRemoved.add(failedTest);
+			} else {
+				failedTestIds.add(failedTestId);
 			}
 		}
+
+		// finally delete all tests that are marked
+		for (Iterator<ITestResult> iterator = context.getFailedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			if (testsToBeRemoved.contains(testResult)) {
+				iterator.remove();
+			}
+		}
+	}
+	
+	private int getMethodId(ITestResult result) {
+		int id = result.getTestClass().getName().hashCode();
+		id = 31 * id + result.getMethod().getMethodName().hashCode();
+		id = 31
+				* id
+				+ (result.getParameters() != null ? Arrays.hashCode(result
+						.getParameters()) : 0);
+		return id;
 	}
 
 	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
