@@ -26,7 +26,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -285,23 +284,28 @@ public abstract class AbstractTestListener extends TestArgsListener
 		List<ITestResult> testsToBeRemoved = new ArrayList<>();
 
 		// collect all id's from passed test
-		Set<Integer> passedTestIds = new HashSet<>();
+		Set<Long> passedTestIds = new HashSet<>();
 		for (ITestResult passedTest : context.getPassedTests().getAllResults()) {
-			passedTestIds.add(getMethodId(passedTest));
+			//adding passed test
+			long passedTestId = getMethodId(passedTest);
+			LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
+			passedTestIds.add(passedTestId);
 		}
 
-		Set<Integer> failedTestIds = new HashSet<>();
+		Set<Long> failedTestIds = new HashSet<>();
 		for (ITestResult failedTest : context.getFailedTests().getAllResults()) {
 
 			// id = class + method + dataprovider
-			int failedTestId = getMethodId(failedTest);
+			long failedTestId = getMethodId(failedTest);
 
 			// if we saw this test as a failed test before we mark as to be deleted
 			// or delete this failed test if there is at least one passed version
 			if (failedTestIds.contains(failedTestId)
 					|| passedTestIds.contains(failedTestId)) {
+				LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
 				testsToBeRemoved.add(failedTest);
 			} else {
+				LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
 				failedTestIds.add(failedTestId);
 			}
 		}
@@ -311,18 +315,20 @@ public abstract class AbstractTestListener extends TestArgsListener
 				.getAllResults().iterator(); iterator.hasNext();) {
 			ITestResult testResult = iterator.next();
 			if (testsToBeRemoved.contains(testResult)) {
+				LOGGER.debug("Removing test from context: " + testResult.getName());
 				iterator.remove();
 			}
 		}
 	}
 	
-	private int getMethodId(ITestResult result) {
-		int id = result.getTestClass().getName().hashCode();
+	private long getMethodId(ITestResult result) {
+		long id = result.getTestClass().getName().hashCode();
 		id = 31 * id + result.getMethod().getMethodName().hashCode();
 		id = 31
 				* id
 				+ (result.getParameters() != null ? Arrays.hashCode(result
 						.getParameters()) : 0);
+		LOGGER.debug("Calculated id for " + result.getMethod().getMethodName() + " is " + id);
 		return id;
 	}
 
