@@ -292,6 +292,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 			passedTestIds.add(passedTestId);
 		}
 
+		LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
+		
 		Set<Long> failedTestIds = new HashSet<>();
 		for (ITestResult failedTest : context.getFailedTests().getAllResults()) {
 
@@ -309,8 +311,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 				failedTestIds.add(failedTestId);
 			}
 		}
-
-		// finally delete all tests that are marked
+		
+		LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
+		// finally delete all tests that are marked for removal
 		for (Iterator<ITestResult> iterator = context.getFailedTests()
 				.getAllResults().iterator(); iterator.hasNext();) {
 			ITestResult testResult = iterator.next();
@@ -318,6 +321,17 @@ public abstract class AbstractTestListener extends TestArgsListener
 				LOGGER.debug("Removing test from context: " + testResult.getName());
 				iterator.remove();
 			}
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED FAILURES -----------------------");
+		// print messages about all tests in context
+		for (Iterator<ITestResult> iterator = context.getFailedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long failedTestId = getMethodId(testResult);
+			LOGGER.debug("Failed test in context: " + failedTestId + "; " 
+						+ testResult.getName());
 		}
 	}
 	
