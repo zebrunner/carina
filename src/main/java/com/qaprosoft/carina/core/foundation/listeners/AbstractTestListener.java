@@ -142,9 +142,9 @@ public abstract class AbstractTestListener extends TestArgsListener
     @Override
     public void beforeConfiguration(ITestResult result) {
    		startItem(result, Messager.CONFIG_STARTED);
-		// do failure test cleanup in this place as right after the test context
-		// doesn't have up-to-date information. 
-   		// This context cleanup is required to start dependent steps if parent method passed from Nth retry!
+		// do failure test cleanup in this place as right after the test 
+		// context doesn't have up-to-date information. 
+   		// This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
 		removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
@@ -270,6 +270,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		ZafiraIntegrator.finishSuite();		
 		removeIncorrectlyFailedTests(context);
+		printContextTestsSummary(context);
 		super.onFinish(context);
 	}
 
@@ -278,7 +279,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	 * context.
 	 *
      */
-	public void removeIncorrectlyFailedTests(ITestContext context) {
+	private void removeIncorrectlyFailedTests(ITestContext context) {
 		// List of test results which we will delete later
 		List<ITestResult> testsToBeRemoved = new ArrayList<>();
 
@@ -322,14 +323,41 @@ public abstract class AbstractTestListener extends TestArgsListener
 			}
 		}
 		
-		LOGGER.debug("---------------- PRINT SUMMARIZED FAILURES -----------------------");
+
+	}
+	
+	private void printContextTestsSummary(ITestContext context) {
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED SUCCESS -----------------------");
+		// print messages about all tests in context
+		for (Iterator<ITestResult> iterator = context.getPassedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("Pass test in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED FAILURE -----------------------");
 		// print messages about all tests in context
 		for (Iterator<ITestResult> iterator = context.getFailedTests()
 				.getAllResults().iterator(); iterator.hasNext();) {
 			ITestResult testResult = iterator.next();
 			
-			long failedTestId = getMethodId(testResult);
-			LOGGER.debug("Failed test in context: " + failedTestId + "; " 
+			long testId = getMethodId(testResult);
+			LOGGER.debug("Failed test in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED SKIP -----------------------");
+		// print messages about all tests in context
+		for (Iterator<ITestResult> iterator = context.getSkippedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("Skipped test in context: " + testId + "; " 
 						+ testResult.getName());
 		}
 	}
@@ -341,7 +369,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 				* id
 				+ (result.getParameters() != null ? Arrays.hashCode(result
 						.getParameters()) : 0);
-		LOGGER.debug("Calculated id for " + result.getMethod().getMethodName() + " is " + id);
+		//LOGGER.debug("Calculated id for " + result.getMethod().getMethodName() + " is " + id);
 		return id;
 	}
 
