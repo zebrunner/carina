@@ -327,9 +327,10 @@ public abstract class AbstractTestListener extends TestArgsListener
 	}
 	
 	private void printContextTestsSummary(ITestContext context) {
-		
+		LOGGER.debug("getAllTestMethods length: " + context.getAllTestMethods().length);
 		LOGGER.debug("---------------- PRINT SUMMARIZED SUCCESS -----------------------");
 		// print messages about all tests in context
+		LOGGER.debug("passed tests size: " + context.getPassedTests().getAllResults().size());
 		for (Iterator<ITestResult> iterator = context.getPassedTests()
 				.getAllResults().iterator(); iterator.hasNext();) {
 			ITestResult testResult = iterator.next();
@@ -341,6 +342,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		LOGGER.debug("---------------- PRINT SUMMARIZED FAILURE -----------------------");
 		// print messages about all tests in context
+		LOGGER.debug("failed tests size: " + context.getFailedTests().getAllResults().size());
 		for (Iterator<ITestResult> iterator = context.getFailedTests()
 				.getAllResults().iterator(); iterator.hasNext();) {
 			ITestResult testResult = iterator.next();
@@ -352,12 +354,46 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		LOGGER.debug("---------------- PRINT SUMMARIZED SKIP -----------------------");
 		// print messages about all tests in context
+		LOGGER.debug("skipped tests size: " + context.getSkippedTests().getAllResults().size());
 		for (Iterator<ITestResult> iterator = context.getSkippedTests()
 				.getAllResults().iterator(); iterator.hasNext();) {
 			ITestResult testResult = iterator.next();
 			
 			long testId = getMethodId(testResult);
 			LOGGER.debug("Skipped test in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION SUCCESS -----------------------");
+		LOGGER.debug("passed configurations size: " + context.getPassedConfigurations().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getPassedConfigurations()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("passed configurations in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION FAILURE -----------------------");
+		LOGGER.debug("failed configurations size: " + context.getFailedConfigurations().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getFailedConfigurations()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("failed configurations in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION SKIP -----------------------");
+		LOGGER.debug("skipped configurations size: " + context.getSkippedConfigurations().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getSkippedConfigurations()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("failed configurations in context: " + testId + "; " 
 						+ testResult.getName());
 		}
 	}
