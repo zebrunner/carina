@@ -143,10 +143,9 @@ public abstract class AbstractTestListener extends TestArgsListener
     public void beforeConfiguration(ITestResult result) {
    		startItem(result, Messager.CONFIG_STARTED);
 		// do failure test cleanup in this place as right after the test context
-		// doesn't have up-to-date information. Latest test result is not
-		// available
-   		//[VD] temporary disabled it's execution in test purposes as removeIncorrectlyFailedTests updated completely 
-		//removeIncorrectlyFailedTests(result.getTestContext());
+		// doesn't have up-to-date information. 
+   		// This context cleanup is required to start dependent steps if parent method passed from Nth retry!
+		removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
     
