@@ -322,8 +322,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 				iterator.remove();
 			}
 		}
-		
-
 	}
 	
 	@SuppressWarnings("unused")
