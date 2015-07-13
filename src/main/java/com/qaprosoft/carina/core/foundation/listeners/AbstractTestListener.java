@@ -270,7 +270,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		ZafiraIntegrator.finishSuite();		
 		removeIncorrectlyFailedTests(context);
-		printContextTestsSummary(context);
+		//printContextTestsSummary(context);
 		super.onFinish(context);
 	}
 
@@ -326,6 +326,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 	}
 	
+	@SuppressWarnings("unused")
 	private void printContextTestsSummary(ITestContext context) {
 		LOGGER.debug("getAllTestMethods length: " + context.getAllTestMethods().length);
 		LOGGER.debug("---------------- PRINT SUMMARIZED SUCCESS -----------------------");
