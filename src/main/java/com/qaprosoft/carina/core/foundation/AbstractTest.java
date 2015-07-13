@@ -734,4 +734,14 @@ public abstract class AbstractTest // extends DriverHelper
 			e.printStackTrace();
 		}
 	}
+	
+    public String toString() {
+    	String res = TestNamingUtil.getCanonicTestNameByThread(Thread.currentThread().getId());
+    	if (res != null) {
+    		LOGGER.debug("AbstractTest.toString is found: " + res);
+    		return res;
+    	}
+    	LOGGER.debug("Unable to find getCanonicTestNameByThread. Empty value will be returned");
+        return "";
+    }
 }
