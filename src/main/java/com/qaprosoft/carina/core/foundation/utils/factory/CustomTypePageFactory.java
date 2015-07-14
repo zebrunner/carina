@@ -8,8 +8,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
 
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -20,9 +18,7 @@ public class CustomTypePageFactory {
 	private static Reflections reflections;
 
 	static {
-		reflections = new Reflections(
-			    ClasspathHelper.forClass(Object.class), 
-			    new SubTypesScanner(false));
+		reflections = new Reflections("");
 	}
 
 	protected static final Logger LOGGER = Logger
