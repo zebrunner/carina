@@ -27,10 +27,9 @@ public class CustomTypePageFactory {
 	public static <T extends AbstractPage> T initPage(WebDriver driver,
 			Class<T> parentClass) {
 
-		
 		Set<Class<? extends T>> setClasses = reflections
 				.getSubTypesOf(parentClass);
-		LOGGER.debug("Realives classes count:" + setClasses.size());
+		LOGGER.debug("Relatives classes count:" + setClasses.size());
 		Iterator<Class<? extends T>> iterator = setClasses.iterator();
 
 		Type screenType = DevicePool.getDeviceType();
