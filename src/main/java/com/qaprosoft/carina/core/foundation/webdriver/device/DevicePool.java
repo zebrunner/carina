@@ -187,6 +187,8 @@ public class DevicePool
 		Device device = getDevice();
 		if (device != null) {
 			type = device.getType();
+		} else {
+			LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
 		}
 		return type;
 	}
