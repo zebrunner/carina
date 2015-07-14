@@ -8,6 +8,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
 
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -18,7 +20,9 @@ public class CustomTypePageFactory {
 	private static Reflections reflections;
 
 	static {
-		reflections = new Reflections("");
+		reflections = new Reflections(
+			    ClasspathHelper.forClass(Object.class), 
+			    new SubTypesScanner(false));
 	}
 
 	protected static final Logger LOGGER = Logger
@@ -27,6 +31,7 @@ public class CustomTypePageFactory {
 	public static <T extends AbstractPage> T initPage(WebDriver driver,
 			Class<T> parentClass) {
 
+		
 		Set<Class<? extends T>> setClasses = reflections
 				.getSubTypesOf(parentClass);
 		Iterator<Class<? extends T>> iterator = setClasses.iterator();
@@ -34,12 +39,29 @@ public class CustomTypePageFactory {
 		Type screenType = DevicePool.getDeviceType();
 		while (iterator.hasNext()) {
 			Class<? extends T> clazz = iterator.next();
-			if ((clazz.getAnnotation(DeviceType.class) == null)
+			if (clazz.getAnnotation(DeviceType.class) == null) {
+				LOGGER.debug("Removing as there is no DeviceType annotation:" + iterator.getClass().getName());	
+				iterator.remove();
+			}
+			if (clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
+				LOGGER.debug("Removing as parentClass is not satisfied:" + iterator.getClass().getName());
+				LOGGER.debug("Expected parent class: " + parentClass.getName());
+				LOGGER.debug("Actual parent class: " + clazz.getAnnotation(DeviceType.class).parentClass().getName());
+				iterator.remove();				
+			}
+			if (!clazz.getAnnotation(DeviceType.class).pageType().equals(screenType)) {
+				iterator.remove();
+				LOGGER.debug("Removing as screenType is not satisifed:" + iterator.getClass().getName());
+				LOGGER.debug("Expected screenType: " + screenType);
+				LOGGER.debug("Actual screenType: " + clazz.getAnnotation(DeviceType.class).pageType());
+			}
+			/*if ((clazz.getAnnotation(DeviceType.class) == null)
 					|| (clazz.getAnnotation(DeviceType.class).parentClass() != parentClass)
 					|| !clazz.getAnnotation(DeviceType.class).pageType()
 							.equals(screenType)) {
 				iterator.remove();
-			}
+				LOGGER.debug("Removing " + iterator.getClass().getName());
+			}*/
 		}
 
 		if (setClasses.size() != 1) {
