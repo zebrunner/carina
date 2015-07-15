@@ -626,7 +626,7 @@ public class ExtendedWebElement
 			//[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
 			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
 			
-			int y = locatableElement.getCoordinates().onScreen().getY();
+			int y = locatableElement.getCoordinates().inViewPort().getY();
 			if (y > 120) {
 				((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
 			}
