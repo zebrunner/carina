@@ -625,11 +625,11 @@ public class ExtendedWebElement
 			Locatable locatableElement = (Locatable) getElement();
 			//[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
 			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
-			
+
+			//[CB] onPage -> inViewPort
+			//https://code.google.com/p/selenium/source/browse/java/client/src/org/openqa/selenium/remote/RemoteWebElement.java?r=abc64b1df10d5f5d72d11fba37fabf5e85644081
 			int y = locatableElement.getCoordinates().inViewPort().getY();
-			if (y > 120) {
-				((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
-			}
+			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + y + ");");
 		}
 		catch (Exception e)
 		{
