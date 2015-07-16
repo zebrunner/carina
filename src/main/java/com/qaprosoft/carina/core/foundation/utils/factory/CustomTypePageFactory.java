@@ -1,8 +1,6 @@
 package com.qaprosoft.carina.core.foundation.utils.factory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -30,56 +28,39 @@ public class CustomTypePageFactory {
 		Set<Class<? extends T>> setClasses = reflections
 				.getSubTypesOf(parentClass);
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
-		Iterator<Class<? extends T>> iterator = setClasses.iterator();
-
+		Class<? extends T> deviceClass = null, familyClass = null;
 		Type screenType = DevicePool.getDeviceType();
-		while (iterator.hasNext()) {
-			Class<? extends T> clazz = iterator.next();
-			if (clazz.getAnnotation(DeviceType.class) == null) {
-				LOGGER.debug("Removing as there is no DeviceType annotation:"
-						+ iterator.getClass().getName());
-				iterator.remove();
+		for (Class<? extends T> clazz : setClasses) {
+			if (clazz.getAnnotation(DeviceType.class) == null || clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
+				LOGGER.debug("Removing as parentClass is not satisfied or due to absence of @DeviceType annotation:"
+						+ clazz.getClass().getName());
+				continue;
 			}
-			if (clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
-				LOGGER.debug("Removing as parentClass is not satisfied:"
-						+ iterator.getClass().getName());
-				LOGGER.debug("Expected parent class: " + parentClass.getName());
-				LOGGER.debug("Actual parent class: "
-						+ clazz.getAnnotation(DeviceType.class).parentClass()
-								.getName());
-				iterator.remove();
-			}
-			if (!clazz.getAnnotation(DeviceType.class).pageType()
+			if (clazz.getAnnotation(DeviceType.class).pageType()
 					.equals(screenType)) {
-				iterator.remove();
-				LOGGER.debug("Removing as screenType is not satisifed:"
-						+ iterator.getClass().getName());
 				LOGGER.debug("Expected screenType: " + screenType);
 				LOGGER.debug("Actual screenType: "
 						+ clazz.getAnnotation(DeviceType.class).pageType());
+				deviceClass = clazz;
+				break;
 			}
-			/*
-			 * if ((clazz.getAnnotation(DeviceType.class) == null) ||
-			 * (clazz.getAnnotation(DeviceType.class).parentClass() !=
-			 * parentClass) || !clazz.getAnnotation(DeviceType.class).pageType()
-			 * .equals(screenType)) { iterator.remove();
-			 * LOGGER.debug("Removing " + iterator.getClass().getName()); }
-			 */
+			if (clazz.getAnnotation(DeviceType.class).pageType().getFamily()
+					.equals(screenType.getFamily())){
+				LOGGER.debug(String.format("Family class '%s' correspond to required page.", screenType.getFamily()));
+				familyClass = clazz;
+			}
+			
 		}
-
-		if (setClasses.size() != 1) {
-			LOGGER.info("Quantity of classes: " + setClasses.size() + "\n "
-					+ setClasses.toString());
-			throw new RuntimeException(
-					"Quantity of classes: "
-							+ setClasses.size()
-							+ "! "
-							+ "Unable to initialize custom page as There are more than 1 class that could be used as implementation of the page or it absent at all. Please, check config.");
-		}
-
+		
 		try {
-			return new ArrayList<>(setClasses).get(0)
-					.getConstructor(WebDriver.class).newInstance(driver);
+			if(deviceClass != null){
+				return deviceClass.getConstructor(WebDriver.class).newInstance(driver);
+			} 
+			if(familyClass != null){
+				return familyClass.getConstructor(WebDriver.class).newInstance(driver);
+			}
+			throw new RuntimeException(
+					String.format("There is no any class that satisfy to required conditions: [parent class - %s], [device type - %s]", parentClass.getName(), screenType));
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
