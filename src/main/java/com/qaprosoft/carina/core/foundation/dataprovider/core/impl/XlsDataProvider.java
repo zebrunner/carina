@@ -30,17 +30,8 @@ public class XlsDataProvider extends BaseDataProvider {
         DSBean dsBean = new DSBean(parameters, context
                 .getCurrentXmlTest().getAllParameters());
 
-        String executeColumn = "Execute";
-        String executeValue = "y";
-
-        if (!parameters.executeColumn().isEmpty())
-            executeColumn = parameters.executeColumn();
-
-        if (!parameters.executeValue().isEmpty())
-            executeValue = parameters.executeValue();
-
         XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(),
-                dsBean.getXlsSheet(), executeColumn, executeValue);
+                dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
 
         argsList = dsBean.getArgs();
         staticArgsList = dsBean.getStaticArgs();
