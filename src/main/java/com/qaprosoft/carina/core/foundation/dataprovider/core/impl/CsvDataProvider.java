@@ -44,8 +44,9 @@ public class CsvDataProvider extends BaseDataProvider {
 
         char separator, quote;
 
-        executeColumn = parameters.executeColumn();
-        executeValue = parameters.executeValue();
+        executeColumn = dsBean.getExecuteColumn();
+        executeValue = dsBean.getExecuteValue();
+        
         separator = parameters.separator();
         quote = parameters.quote();
         
