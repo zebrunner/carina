@@ -37,6 +37,9 @@ public class DSBean
 
 	private String dsFile;
 	private String xlsSheet;
+	
+	private String executeColumn;
+	private String executeValue;
 
 
 
@@ -85,6 +88,7 @@ public class DSBean
 		
 	}
 	
+	//TODO: Analyze DSBean for XLS and CSV DataProviders and remove code duplicates
 	public DSBean(XlsDataSourceParameters parameters, Map<String, String> testParams)
 	{
 		//initialize default Xls data source parameters from suite xml file
@@ -93,7 +97,6 @@ public class DSBean
 		String dsArgs = testParams.get(SpecialKeywords.EXCEL_DS_ARGS);
 		String dsUid = testParams.get(SpecialKeywords.EXCEL_DS_UID);
 		String dsStaticArgs = "";
-		
 		
 	    if (parameters != null) {
 	    	//reinitialize parameters from annotation if any
@@ -133,8 +136,27 @@ public class DSBean
 		{
 			staticArgs = Arrays.asList(dsStaticArgs.replace(",", ";").replace(" ", "").split(";"));
 		}
+		
+
+        this.executeColumn = "Execute";
+        this.executeValue = "y";
+		if(testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null)
+		{
+			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
+		}
+		
+		if(testParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null)
+		{
+			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
+		}
+        if (!parameters.executeColumn().isEmpty())
+        	this.executeColumn = parameters.executeColumn();
+
+        if (!parameters.executeValue().isEmpty())
+        	this.executeValue = parameters.executeValue();
 	}
 	
+	//TODO: Analyze DSBean for XLS and CSV DataProviders and remove code duplicates
 	public DSBean(CsvDataSourceParameters parameters, Map<String, String> testParams)
 	{
 		//initialize default Xls data source parameters from suite xml file
@@ -179,6 +201,24 @@ public class DSBean
 		{
 			staticArgs = Arrays.asList(dsStaticArgs.replace(",", ";").replace(" ", "").split(";"));
 		}
+		
+		
+        this.executeColumn = "Execute";
+        this.executeValue = "y";
+		if(testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null)
+		{
+			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
+		}
+		
+		if(testParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null)
+		{
+			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
+		}
+        if (!parameters.executeColumn().isEmpty())
+        	this.executeColumn = parameters.executeColumn();
+
+        if (!parameters.executeValue().isEmpty())
+        	this.executeValue = parameters.executeValue();
 	}
 	
 	public String getDsFile()
@@ -300,5 +340,13 @@ public class DSBean
 			}
 		}
 		return StringUtils.removeEnd(sb.toString(), "; ");
+	}
+	
+	public String getExecuteColumn() {
+		return executeColumn;
+	}
+
+	public String getExecuteValue() {
+		return executeValue;
 	}
 }

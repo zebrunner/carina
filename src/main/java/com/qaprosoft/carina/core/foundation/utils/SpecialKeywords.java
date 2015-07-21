@@ -60,6 +60,8 @@ public class SpecialKeywords
 	public static final String DS_JIRA = "{ds_jira}";
 	public static final String DS_FLAG = "{ds_flag}";
 	public static final String DS_FILE = "{ds_file}";
+	public static final String DS_EXECUTE_COLUMN = "{ds_execute_column}";
+	public static final String DS_EXECUTE_VALUE = "{ds_execute_value}";
 	public static final String TUID = "TUID";
 	
 	public static final String TEST_LOG_ID = "{test_log_id}";
