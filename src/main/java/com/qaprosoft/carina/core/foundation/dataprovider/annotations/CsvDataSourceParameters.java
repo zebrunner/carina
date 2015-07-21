@@ -21,9 +21,9 @@ public @interface CsvDataSourceParameters {
 
     String dsUid() default "";
 
-    String executeColumn() default "Execute";
+    String executeColumn() default "";
 
-    String executeValue() default "y";
+    String executeValue() default "";
 
     String staticArgs() default "";
 
