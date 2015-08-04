@@ -1076,12 +1076,12 @@ public class ExtendedWebElement
 				}
 			});
 			element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
-			summary.log(Messager.ELEMENT_FOUND.info(name));
+			//summary.log(Messager.ELEMENT_FOUND.info(name));
 		}
 		catch (Exception e)
 		{
 			element = null;
-			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			//summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
 			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
 		}
