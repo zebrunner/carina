@@ -59,7 +59,7 @@
 
 		<jira-client.version>0.4</jira-client.version>
 
-		<zafira-client.version>1.4.1</zafira-client.version>
+		<zafira-client.version>1.4.2</zafira-client.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<json-simple.version>1.1</json-simple.version>
@@ -384,6 +384,18 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
