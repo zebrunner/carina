@@ -353,10 +353,17 @@ public class ZafiraIntegrator {
 			Long startTime, Long finishTime, String demoURL, String logURL) {
 		
 		int retry = RetryCounter.getRunCount(name);
+
+		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, message: %s, startTime: %s, finishTime: %s, demoURL: %s, logURL: %s, retry: %i";
 		
 		//AUTO-1466; AUTO-1468
 		if (retry > 0) {
 			// delete previous test results from Zafira
+			LOGGER.debug("Test details for removal due to the retry:"
+					+ String.format(testDetails, name, status, testArgs, testRunId,
+							testCaseId, message, startTime, finishTime, demoURL,
+							logURL, retry));
+			
 			TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry - 1);
 			zc.deleteTestDuplicates(test);
 		}
@@ -364,19 +371,22 @@ public class ZafiraIntegrator {
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR,
 		// startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry);
-		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, message: %s, startTime: %s, finishTime: %s, demoURL: %s, logURL";
 		LOGGER.debug("Test details for registration:"
-				+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL));
+				+ String.format(testDetails, name, status, testArgs, testRunId,
+						testCaseId, message, startTime, finishTime, demoURL,
+						logURL, retry));
 
 		Response<TestType> response = zc.createTest(test);
 		test = response.getObject();
 		if (test == null) {
 			throw new RuntimeException("Unable to register test '"
-					+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL)
+					+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, retry)
 					+ "' for zafira service: " + zafiraUrl);
 		} else {
 			LOGGER.debug("Registered test details:"
-					+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL));
+					+ String.format(testDetails, name, status, testArgs, testRunId,
+							testCaseId, message, startTime, finishTime, demoURL,
+							logURL, retry));			
 		}
 		return test;
 	}
