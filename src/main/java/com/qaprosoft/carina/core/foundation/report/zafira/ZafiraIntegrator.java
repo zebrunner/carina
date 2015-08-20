@@ -353,6 +353,14 @@ public class ZafiraIntegrator {
 			Long startTime, Long finishTime, String demoURL, String logURL) {
 		
 		int retry = RetryCounter.getRunCount(name);
+		
+		//AUTO-1466; AUTO-1468
+		if (retry > 0) {
+			// delete previous test results from Zafira
+			TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry - 1);
+			zc.deleteTestDuplicates(test);
+		}
+		
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR,
 		// startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry);
