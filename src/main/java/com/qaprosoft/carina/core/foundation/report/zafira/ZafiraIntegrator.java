@@ -354,7 +354,7 @@ public class ZafiraIntegrator {
 		
 		int retry = RetryCounter.getRunCount(name);
 
-		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, message: %s, startTime: %s, finishTime: %s, demoURL: %s, logURL: %s, retry: %i";
+		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, message: %s, startTime: %s, finishTime: %s, demoURL: %s, logURL: %s, retry: %d";
 		
 		//AUTO-1466; AUTO-1468
 		if (retry > 0) {
