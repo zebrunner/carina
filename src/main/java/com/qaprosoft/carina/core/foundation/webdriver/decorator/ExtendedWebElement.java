@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -1134,6 +1135,15 @@ public class ExtendedWebElement
 		}		
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return extendedWebElements;
+	}
+	
+	public void tapWithCoordinates(double x, double y) {
+		HashMap<String, Double> tapObject = new HashMap<String, Double>();
+		tapObject.put("x", x);
+		tapObject.put("y", y);
+		final WebDriver drv = getDriver();
+		JavascriptExecutor js = (JavascriptExecutor) drv;
+		js.executeScript("mobile: tap", tapObject);
 	}
 	
 	private WebElement findStaleElement() {
