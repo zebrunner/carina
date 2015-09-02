@@ -128,6 +128,21 @@ public class DevicePool
 		return device;
 	}
 	
+	public static synchronized Device getDevice(String udid) {
+		Device device = null;
+		for (Device dev : devices) {
+			if (dev.getUdid().equalsIgnoreCase(udid)) {
+				device = dev;
+				break;
+			}
+		}
+		if (device == null) {
+			throw new RuntimeException("Unable to find device by udid: " + udid + "!");
+		}
+		return device;
+	}
+	
+	
 	public static synchronized void deregisterDeviceByThread(long threadId)
 	{
 		if (threadId2Device.containsKey(threadId)) {
@@ -148,20 +163,6 @@ public class DevicePool
 				throw new RuntimeException("Unable to find device by thread!");
 			}
 			udid = device.getUdid();
-		} 
-		
-		return udid;
-	}
-	
-	public static synchronized String getDeviceName() {
-		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
-				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			Device device = DevicePool.getDevice();
-			if (device == null) {
-				throw new RuntimeException("Unable to find device by thread!");
-			}
-			udid = device.getName();
 		} 
 		
 		return udid;
