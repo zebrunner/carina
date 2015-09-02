@@ -135,7 +135,14 @@ public abstract class AbstractTestListener extends TestArgsListener
     	Device device = DevicePool.getDevice();
     	if (device != null) {
     		deviceName = device.getName();
+    		String udid = device.getUdid();
+    		if (udid != null) {
+    			if (!udid.isEmpty()) {
+    				deviceName = deviceName + " - " + udid;
+    			}
+    		}
     	}
+    	
     	return deviceName;
     }
     
