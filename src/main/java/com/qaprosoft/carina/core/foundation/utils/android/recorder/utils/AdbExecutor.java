@@ -5,6 +5,7 @@ import java.io.Closeable;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,11 +67,14 @@ public class AdbExecutor {
     }
 
     public boolean isDeviceCorrect() {
+    	return isDeviceCorrect(DevicePool.getDeviceUdid());
+    }
+    public boolean isDeviceCorrect(String udid) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
         boolean correctDevice = false;
         try {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "getprop", "ro.build.version.sdk");
+            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "getprop", "ro.build.version.sdk");
             executor = new ProcessBuilderExecutor(cmd);
 
             Process process = executor.start();
@@ -95,9 +99,10 @@ public class AdbExecutor {
         return correctDevice;
     }
 
-    public void execute(String[] cmd){
+    public List<String> execute(String[] cmd){
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
+        List<String> output = new ArrayList<String> ();
 
         try {
             executor = new ProcessBuilderExecutor(cmd);
@@ -108,7 +113,7 @@ public class AdbExecutor {
 
 
             while ((line = in.readLine()) != null) {
-            	
+            	output.add(line);
                 LOGGER.debug(line);
             }
         } catch (Exception e) {
@@ -117,6 +122,8 @@ public class AdbExecutor {
             closeQuietly(in);
             ProcessBuilderExecutor.gcNullSafe(executor);
         }
+        
+        return output;
     }
 
     public int startRecording(String pathToFile) {
@@ -195,5 +202,91 @@ public class AdbExecutor {
     	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
     	execute(cmd);
     }
+    
+	private Boolean getScreenState(String udid) {
+		// determine current screen status
+		// adb -s <udid> shell dumpsys input_method | find "mScreenOn"
+		String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H",
+				ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "dumpsys",
+				"input_method");
+		List<String> output = execute(cmd);
+
+		Boolean screenState = null;
+		String line;
+		
+		Iterator<String> itr = output.iterator();
+		while (itr.hasNext()) {
+			line = itr.next();
+			if (line.contains("mScreenOn=true")) {
+				screenState = true;
+				break;
+			}
+			if (line.contains("mScreenOn=false")) {
+				screenState = false;
+				break;
+			}
+		}
+		
+		if (screenState == null) {
+			LOGGER.error(udid
+					+ ": Unable to determine existing device screen state!");
+		}
+
+		if (screenState) {
+			LOGGER.info(udid + ": screen is ON");
+		}
+
+		if (!screenState) {
+			LOGGER.info(udid + ": screen is OFF");
+		}
+
+		return screenState;
+	}
+
+	public void screenOff() {
+		screenOff(DevicePool.getDeviceUdid());
+	}
+
+	public void screenOff(String udid) {
+		if (!isDeviceCorrect(udid))
+			return;
+
+		Boolean screenState = getScreenState(udid);
+		if (screenState) {
+			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
+					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+					"input", "keyevent", "26");
+			execute(cmd);
+
+			// verify that screen is Off now
+			screenState = getScreenState(udid);
+			if (screenState) {
+				LOGGER.error(udid + ": screen is still ON!");
+			}
+		}
+	}
+
+	public void screenOn() {
+		screenOn(DevicePool.getDeviceUdid());
+	}
+
+	public void screenOn(String udid) {
+		if (!isDeviceCorrect(udid))
+			return;
+
+		Boolean screenState = getScreenState(udid);
+		if (!screenState) {
+			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
+					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+					"input", "keyevent", "26");
+			execute(cmd);
+
+			// verify that screen is Off now
+			screenState = getScreenState(udid);
+			if (!screenState) {
+				LOGGER.error(udid + ": screen is still OFF!");
+			}
+		}
+	}
     
 }

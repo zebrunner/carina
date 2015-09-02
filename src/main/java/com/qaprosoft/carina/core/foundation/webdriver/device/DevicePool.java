@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
@@ -182,7 +183,18 @@ public class DevicePool
 	}
 
 	public static Type getDeviceType() {
-		Type type = Type.DESKTOP; //default value if no device observed
+		//specify default value based on existing _config.properties parameters
+		Type type = Type.DESKTOP;		
+		
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
+				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+				type = Type.ANDROID_PHONE;
+			}
+			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) {
+				type = Type.IOS_PHONE;
+			}
+		}
 		
 		Device device = getDevice();
 		if (device != null) {
@@ -191,5 +203,17 @@ public class DevicePool
 			LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
 		}
 		return type;
+	}
+	
+	public static void screensOn(AdbExecutor executor) {
+		for (Device device : devices) {
+			executor.screenOn(device.getUdid());
+		}
+	}
+	
+	public static void screensOff(AdbExecutor executor) {
+		for (Device device : devices) {
+			executor.screenOff(device.getUdid());
+		}
 	}
 }
