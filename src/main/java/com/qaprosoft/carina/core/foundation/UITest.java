@@ -74,6 +74,7 @@ public class UITest extends AbstractTest
     	super.executeBeforeTestSuite(context);
     	
     	DevicePool.registerDevices();
+    	DevicePool.screensOn(executor);
     	DriverMode driverMode = Configuration.getDriverMode();
     	
 	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
@@ -193,6 +194,7 @@ public class UITest extends AbstractTest
 			quitDriver();
 			stopRecording(null);
 	    }
+	    DevicePool.screensOff(executor);
 	    
 		super.executeAfterTestSuite(context);	    
 	}
