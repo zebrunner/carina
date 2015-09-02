@@ -263,6 +263,10 @@ public class AdbExecutor {
 			if (screenState) {
 				LOGGER.error(udid + ": screen is still ON!");
 			}
+			
+			if (!screenState) {
+				LOGGER.info(udid + ": screen turned off.");
+			}
 		}
 	}
 
@@ -285,6 +289,10 @@ public class AdbExecutor {
 			screenState = getScreenState(udid);
 			if (!screenState) {
 				LOGGER.error(udid + ": screen is still OFF!");
+			}
+			
+			if (screenState) {
+				LOGGER.info(udid + ": screen turned on.");
 			}
 		}
 	}
