@@ -85,7 +85,7 @@ public class AdbExecutor {
             	int sdkVersion = Integer.parseInt(line);
             	correctDevice = sdkVersion >= 19;
             } else {
-            	LOGGER.error("SDK version for '" + DevicePool.getDevice().getName() + "' device is not recognized!");
+            	LOGGER.error("SDK version for '" + DevicePool.getDevice(udid).getName() + "' device is not recognized!");
             }
 
         } catch (Exception e) {
