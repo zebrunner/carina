@@ -257,6 +257,8 @@ public class AdbExecutor {
 					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
 					"input", "keyevent", "26");
 			execute(cmd);
+			
+			pause(5);
 
 			// verify that screen is Off now
 			screenState = getScreenState(udid);
@@ -285,6 +287,7 @@ public class AdbExecutor {
 					"input", "keyevent", "26");
 			execute(cmd);
 
+			pause(5);
 			// verify that screen is Off now
 			screenState = getScreenState(udid);
 			if (!screenState) {
@@ -296,5 +299,12 @@ public class AdbExecutor {
 			}
 		}
 	}
-    
+
+	public void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }
