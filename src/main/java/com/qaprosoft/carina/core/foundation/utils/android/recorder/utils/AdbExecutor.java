@@ -230,6 +230,7 @@ public class AdbExecutor {
 		if (screenState == null) {
 			LOGGER.error(udid
 					+ ": Unable to determine existing device screen state!");
+			return screenState; //no actions required if state is not recognized.
 		}
 
 		if (screenState) {
