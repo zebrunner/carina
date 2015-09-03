@@ -216,12 +216,14 @@ public class AdbExecutor {
 		
 		Iterator<String> itr = output.iterator();
 		while (itr.hasNext()) {
+			// mScreenOn - default value for the most of Android devices
+			// mInteractive - for Nexuses 
 			line = itr.next();
-			if (line.contains("mScreenOn=true")) {
+			if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
 				screenState = true;
 				break;
 			}
-			if (line.contains("mScreenOn=false")) {
+			if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
 				screenState = false;
 				break;
 			}
