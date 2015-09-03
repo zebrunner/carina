@@ -253,6 +253,9 @@ public class AdbExecutor {
 			return;
 
 		Boolean screenState = getScreenState(udid);
+		if (screenState == null) {
+			return;
+		}
 		if (screenState) {
 			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
 					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
@@ -282,6 +285,10 @@ public class AdbExecutor {
 			return;
 
 		Boolean screenState = getScreenState(udid);
+		if (screenState == null) {
+			return;
+		}
+		
 		if (!screenState) {
 			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
 					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
