@@ -227,7 +227,9 @@ public class Configuration
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
-		MOBILE_DEVICE_TYPE("mobile_device_type"),		
+		MOBILE_DEVICE_TYPE("mobile_device_type"),
+		
+		MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
 		
 		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
 		
