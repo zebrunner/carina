@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -251,8 +253,12 @@ public class AdbExecutor {
 	}
 
 	public void screenOff(String udid) {
-		if (!isDeviceCorrect(udid))
+		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
 			return;
+		}
+		if (!isDeviceCorrect(udid)) {
+			return;
+		}
 
 		Boolean screenState = getScreenState(udid);
 		if (screenState == null) {
@@ -283,8 +289,12 @@ public class AdbExecutor {
 	}
 
 	public void screenOn(String udid) {
-		if (!isDeviceCorrect(udid))
+		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
 			return;
+		}
+		if (!isDeviceCorrect(udid)) {
+			return;
+		}
 
 		Boolean screenState = getScreenState(udid);
 		if (screenState == null) {
