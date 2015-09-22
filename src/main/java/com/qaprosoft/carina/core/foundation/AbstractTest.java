@@ -192,7 +192,7 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 			
 			// Populate Spira Steps
-			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), jiraTickets);
 			Spira.clear();
 
 			// Populate TestRail Cases
