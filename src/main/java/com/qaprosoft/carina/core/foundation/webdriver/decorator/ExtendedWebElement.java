@@ -316,7 +316,12 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver drv)
 				{
-					boolean res = element.isDisplayed();
+					boolean res = false;
+					
+					if(element != null) {
+						res = element.isDisplayed();
+					}
+					
 					if (!res) {
 						res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
 					}
