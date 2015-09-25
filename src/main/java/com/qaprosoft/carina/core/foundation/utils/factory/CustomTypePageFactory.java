@@ -15,6 +15,8 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public class CustomTypePageFactory {
 
+	private static final String VERSION_SPLITTER = "\\.";
+	
 	private static Reflections reflections;
 
 	static {
@@ -34,9 +36,11 @@ public class CustomTypePageFactory {
 		Set<Class<? extends T>> setClasses = reflections
 				.getSubTypesOf(parentClass);
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
-		Class<? extends T> versionClass = null, deviceClass = null, familyClass = null;
+		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null;
 		Type screenType = DevicePool.getDeviceType();
 		String deviceVersion = DevicePool.getDevice().getOsVersion();
+		String majorVersionNumber = deviceVersion.split(VERSION_SPLITTER)[0];
+		LOGGER.debug("Major version of device OS: " + majorVersionNumber);
 		for (Class<? extends T> clazz : setClasses) {
 			if (clazz.getAnnotation(DeviceType.class) == null || clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
 				LOGGER.debug("Removing as parentClass is not satisfied or due to absence of @DeviceType annotation:"
@@ -48,12 +52,21 @@ public class CustomTypePageFactory {
 			if (dt.pageType().equals(screenType)) {
 				LOGGER.debug("Expected screenType: " + screenType);
 				LOGGER.debug("Actual screenType: " + dt.pageType());
-				if(Arrays.asList(dt.version()).contains(deviceVersion)){
+				if(Arrays.asList(dt.version()).contains(deviceVersion)) {
 					LOGGER.debug("Expected version: " + deviceVersion);
 					LOGGER.debug("Actual versions: " + dt.version());
 					versionClass = clazz;
 					break;
 				}
+				
+				for (String version : dt.version()) {
+					if(version.split(VERSION_SPLITTER)[0].equals(majorVersionNumber)) {
+						majorVersionClass = clazz;
+						LOGGER.debug("Class was chosen by major version number of device");
+						break;
+					}
+				}
+				
 				deviceClass = clazz;
 				continue;
 			}
@@ -68,6 +81,10 @@ public class CustomTypePageFactory {
 			if(versionClass != null){
 				LOGGER.info("Instance by version and platform will be created.");
 				return versionClass.getConstructor(WebDriver.class).newInstance(driver);
+			}
+			if(majorVersionClass != null){
+				LOGGER.info("Instance by major version and platform will be created.");
+				return majorVersionClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			if(deviceClass != null){
 				LOGGER.info("Instance by platform will be created.");
