@@ -36,5 +36,7 @@ public @interface DeviceType {
 	Type pageType() default Type.ANDROID_PHONE;
 
 	Class<?> parentClass();
+	
+	String[] version() default { "1.0" };
 
 }
