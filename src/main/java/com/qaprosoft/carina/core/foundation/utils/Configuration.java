@@ -273,7 +273,11 @@ public class Configuration
 		
 		GIT_COMMIT("git_commit"),
 		
-		GIT_URL("git_url");
+		GIT_URL("git_url"),
+
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
+
+
 		
 		private final String key;
 
