@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -253,6 +254,9 @@ public class AdbExecutor {
 	}
 
 	public void screenOff(String udid) {
+		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+			return;
+		}
 		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
 			return;
 		}
