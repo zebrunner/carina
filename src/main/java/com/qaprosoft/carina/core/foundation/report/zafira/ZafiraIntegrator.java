@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.report.zafira;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -58,6 +60,8 @@ public class ZafiraIntegrator {
 
 	private static final String ANONYMOUS_USER = "anonymous";
 	private static Boolean isRegistered = false;
+
+	private static List<String> uniqueKeys;
 
 	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
 	
@@ -427,8 +431,22 @@ public class ZafiraIntegrator {
 	private static ArgumentType getArgByParameter(Configuration.Parameter parameter) {
 		ArgumentType arg = new ArgumentType();
 		arg.setKey(parameter.getKey());
+		arg.setUnique(isUnique(parameter.getKey()));
 		arg.setValue(Configuration.get(parameter));
 		return arg;
+	}
+
+	private static boolean isUnique(String key){
+
+		if (uniqueKeys == null){
+			String uniqueParams = Configuration.get(Configuration.Parameter.UNIQUE_TESTRUN_FIELDS);
+			uniqueKeys = new ArrayList<>();
+			if (!uniqueParams.isEmpty()){
+				String[] split = uniqueParams.split(",");
+				uniqueKeys.addAll(Arrays.asList(split));
+			}
+		}
+		return uniqueKeys.contains(key);
 	}
 
 	@SuppressWarnings("unused")
