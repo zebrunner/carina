@@ -22,9 +22,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -63,6 +65,8 @@ public class DriverFactory {
 
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
     private static final Device nullDevice = new Device();
+
+	private static DesiredCapabilities staticCapabilities;
 
 
 /*	public static Object create(String className, Object[] args) {
@@ -203,6 +207,18 @@ public class DriverFactory {
                     driver = new IOSDriver(new URL(selenium), capabilities);
                 }
             } else {
+				String PROXY = Configuration.get(Parameter.PROXY_SERVER);
+				if (!StringUtils.EMPTY.equals(PROXY))
+				{
+					Proxy proxy = new Proxy();
+					proxy.setHttpProxy(PROXY).setFtpProxy(PROXY).setSslProxy(PROXY);
+					capabilities.setCapability(CapabilityType.PROXY, proxy);
+				}
+				if (staticCapabilities != null)
+				{
+					capabilities.merge(staticCapabilities);
+				}
+
                 driver = new RemoteWebDriver(new URL(selenium), capabilities);
             }
             LOGGER.debug("-------------------------------------- Driver Factory finish ---------------------------------");
@@ -417,4 +433,13 @@ public class DriverFactory {
         capabilities.setCapability("name", testName);
         return capabilities;
     }
+
+	public static void addCapability(String name, Object value)
+	{
+		if (staticCapabilities == null)
+		{
+			staticCapabilities = new DesiredCapabilities();
+		}
+		staticCapabilities.setCapability(name, value);
+	}
 }

@@ -275,9 +275,11 @@ public class Configuration
 		
 		GIT_URL("git_url"),
 
-		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
 
+		PROXY_SERVER("proxy_server"),
 
+		MARK_TEST_WITH_BUG("mark_test_with_bug");
 		
 		private final String key;
 
@@ -308,17 +310,35 @@ public class Configuration
 
 	public static int getInt(Parameter param)
 	{
-		return Integer.valueOf(get(param).trim());
+		try
+		{
+			return Integer.valueOf(get(param).trim());
+		} catch (NumberFormatException e)
+		{
+			throw new RuntimeException("Can't parse param '" + param.getKey() + "'", e);
+		}
 	}
 
 	public static long getLong(Parameter param)
 	{
-		return Long.valueOf(get(param).trim());
+		try
+		{
+			return Long.valueOf(get(param).trim());
+		} catch (NumberFormatException e)
+		{
+			throw new RuntimeException("Can't parse param '" + param.getKey() + "'", e);
+		}
 	}
 
 	public static double getDouble(Parameter param)
 	{
-		return Double.valueOf(get(param).trim());
+		try
+		{
+			return Double.valueOf(get(param).trim());
+		} catch (NumberFormatException e)
+		{
+			throw new RuntimeException("Can't parse param '" + param.getKey() + "'", e);
+		}
 	}
 
 	public static boolean getBoolean(Parameter param)
