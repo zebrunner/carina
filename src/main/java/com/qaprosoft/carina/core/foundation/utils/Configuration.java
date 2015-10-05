@@ -42,7 +42,8 @@ public class Configuration
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - + " + Configuration.get(Parameter.ENV_ARG_RESOLVER));
+				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - + "
+						+ Configuration.get(Parameter.ENV_ARG_RESOLVER), e);
 			}
 		}
 	}
