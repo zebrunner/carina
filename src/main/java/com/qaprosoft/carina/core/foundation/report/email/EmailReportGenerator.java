@@ -42,10 +42,12 @@ public class EmailReportGenerator
 	private static String PACKAGE_TR = R.EMAIL.get("package_tr");
 	private static String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
 	private static String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
+	private static String BUG_TEST_LOG_DEMO_TR = R.EMAIL.get("bug_test_log_demo_tr");
 	private static String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
 	private static String FAIL_CONFIG_LOG_DEMO_TR = R.EMAIL.get("fail_config_log_demo_tr");
 	private static String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
 	private static String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
+	private static String BUG_TEST_LOG_TR = R.EMAIL.get("bug_test_log_tr");
 	private static String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
 	private static String FAIL_CONFIG_LOG_TR = R.EMAIL.get("fail_config_log_tr");	
 	private static String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
@@ -156,8 +158,18 @@ public class EmailReportGenerator
 				{
 					result = result.replace(FAIL_CONFIG_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
 				}
-			} else {
-				result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
+				} else {
+					if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG)
+							&& (testResultItem.getDescription() != null)
+							&& testResultItem.getDescription().startsWith("JIRA#"))
+				{
+					result = testResultItem.getLinkToScreenshots() != null ? BUG_TEST_LOG_DEMO_TR : BUG_TEST_LOG_TR;
+				}
+				else
+				{
+					result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
+				}
+				
 				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 				
 				failReason = testResultItem.getFailReason();
