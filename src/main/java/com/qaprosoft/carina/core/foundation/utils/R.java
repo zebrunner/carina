@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,20 +69,40 @@ public enum R
 			{
 				Properties properties = new Properties();
 				
+				boolean isSystemResourceUsed;
 				URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
 				if(baseResource != null)
 				{
 					properties.load(baseResource.openStream());
 					LOGGER.info("Base properties loaded: " + resource.resourceFile);
+					isSystemResourceUsed = true;
+				} else
+				{
+					properties.load(Thread.currentThread().getContextClassLoader()
+							.getResourceAsStream(resource.resourceFile));
+					LOGGER.info("Base properties loaded: " + resource.resourceFile);
+					isSystemResourceUsed = false;
 				}
 				
-				URL overrideResource;
 				String resourceName = OVERRIDE_SIGN + resource.resourceFile;
-				while((overrideResource = ClassLoader.getSystemResource(resourceName)) != null)
+				if (isSystemResourceUsed)
 				{
-					properties.load(overrideResource.openStream());
-					LOGGER.info("Override properties loaded: " + resourceName);
-					resourceName = OVERRIDE_SIGN + resourceName;
+					URL overrideResource;
+					while ((overrideResource = ClassLoader.getSystemResource(resourceName)) != null)
+					{
+						properties.load(overrideResource.openStream());
+						LOGGER.info("Override properties loaded: " + resourceName);
+						resourceName = OVERRIDE_SIGN + resourceName;
+					}
+				} else
+				{
+					InputStream is;
+					while ((is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)) != null)
+					{
+						properties.load(is);
+						LOGGER.info("Override properties loaded: " + resourceName);
+						resourceName = OVERRIDE_SIGN + resourceName;
+					}
 				}
 		
 				// TODO: may we skip the validation?
