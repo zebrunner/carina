@@ -158,7 +158,7 @@ public class DriverFactory {
                     selenium = device.getSeleniumServer();
                     //[VD] workaround to the issue with multiply calls to the single apk files
                     File mobileAppFile = new File(Configuration.get(Parameter.MOBILE_APP));
-                    File appTempFile = new File(ReportContext.getTempDir().getAbsolutePath() + File.separator + device.getUdid() + mobileAppFile.getName());
+                    File appTempFile = new File(ReportContext.getTempDir().getAbsolutePath() + File.separator + device.getUdid() + "-" + mobileAppFile.getName());
                     
                     if (!appTempFile.exists()) {
                     	LOGGER.info("Temporary copy of the mobile app '" + appTempFile.getAbsolutePath() + "' file doesn't exist and will be created...");
