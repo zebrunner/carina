@@ -1,9 +1,6 @@
 package com.qaprosoft.carina.core.foundation.utils.configuration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 /**
  * Created by Patotsky on 04.12.2014.
@@ -14,6 +11,10 @@ public class ArgumentType {
 
 	@XmlElement(required = true)
 	protected String key;
+
+	@XmlAttribute(name = "unique")
+	protected boolean unique;
+
 	@XmlElement(required = true)
 	protected String value;
 
@@ -33,4 +34,11 @@ public class ArgumentType {
 		this.value = value;
 	}
 
+	public boolean getUnique() {
+		return unique;
+	}
+
+	public void setUnique(boolean value) {
+		this.unique = value;
+	}
 }
