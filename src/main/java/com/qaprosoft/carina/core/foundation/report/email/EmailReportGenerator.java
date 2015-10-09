@@ -28,6 +28,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
@@ -161,7 +162,7 @@ public class EmailReportGenerator
 				} else {
 					if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG)
 							&& (testResultItem.getDescription() != null)
-							&& testResultItem.getDescription().startsWith("JIRA#"))
+							&& testResultItem.getDescription().startsWith(SpecialKeywords.JIRA_TICKET))
 				{
 					result = testResultItem.getLinkToScreenshots() != null ? BUG_TEST_LOG_DEMO_TR : BUG_TEST_LOG_TR;
 				}
