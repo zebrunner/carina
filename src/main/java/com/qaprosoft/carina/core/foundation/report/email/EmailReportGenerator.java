@@ -77,7 +77,7 @@ public class EmailReportGenerator
 	private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
-	private static final int MESSAGE_LIMIT = 2048;
+	private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
 	private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
 	private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
 	private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
