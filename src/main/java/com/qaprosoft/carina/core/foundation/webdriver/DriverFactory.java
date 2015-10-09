@@ -18,10 +18,12 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
@@ -154,9 +156,24 @@ public class DriverFactory {
                             Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
                 } else {
                     selenium = device.getSeleniumServer();
+                    //[VD] workaround to the issue with multiply calls to the single apk files
+                    File appTempFile = new File(ReportContext.getTempDir().getAbsolutePath() + File.separator + device.getUdid());
+                    
+                    if (!appTempFile.exists()) {
+                    	LOGGER.info("Temporary copy of the mobile app '" + appTempFile.getAbsolutePath() + "' file doesn't exist and will be created...");
+	                    File mobileAppFile = new File(Configuration.get(Parameter.MOBILE_APP));
+	                    if (mobileAppFile.isDirectory()) {
+	                    	LOGGER.info(appTempFile.getName() + " will be copied as directory...");
+	                    	FileUtils.copyDirectory(mobileAppFile, appTempFile);
+	                    } else {
+	                    	LOGGER.info(appTempFile.getName() + " will be copied as file...");
+	                    	FileUtils.copyFile(mobileAppFile, appTempFile);
+	                    }
+                    }
+                    
                     capabilities = getMobileAppCapabilities(false, testName, device.getOs(), device.getOsVersion(),
                             device.getName(), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
-                            Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_APP),
+                            Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), appTempFile.getAbsolutePath(),
                             Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
                 }
             } else if (SAFARI.equalsIgnoreCase(browser)) {
