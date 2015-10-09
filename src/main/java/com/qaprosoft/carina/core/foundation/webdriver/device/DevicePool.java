@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
@@ -34,7 +33,7 @@ public class DevicePool
 	private static final ConcurrentHashMap<Long, Device> threadId2Device = new ConcurrentHashMap<Long, Device>();
 	private static List<Device> devices = new ArrayList<Device>();
 
-	public static synchronized void registerDevice() {
+	private static void registerDevice() {
 		
 		String name = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
 		String type = Configuration.get(Parameter.MOBILE_DEVICE_TYPE);
@@ -48,7 +47,7 @@ public class DevicePool
 		LOGGER.info("Adding single device into the DevicePool: " + device.getName());		
 	}
 	
-	public static synchronized void registerDevices() {
+	public static void registerDevices() {
 		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			registerDevice();
 			return;
@@ -114,7 +113,7 @@ public class DevicePool
 
 	}	
 	
-	public static synchronized Device getDevice() {
+	public static Device getDevice() {
 		Device device = null;
 		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 				!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
@@ -128,7 +127,7 @@ public class DevicePool
 		return device;
 	}
 	
-	public static synchronized Device getDevice(String udid) {
+	public static Device getDevice(String udid) {
 		Device device = null;
 		for (Device dev : devices) {
 			if (dev.getUdid().equalsIgnoreCase(udid)) {
@@ -143,7 +142,7 @@ public class DevicePool
 	}
 	
 	
-	public static synchronized void deregisterDeviceByThread(long threadId)
+	public static void deregisterDeviceByThread(long threadId)
 	{
 		if (threadId2Device.containsKey(threadId)) {
 			Device device = threadId2Device.get(threadId);
@@ -154,7 +153,7 @@ public class DevicePool
 	}
 
 
-	public static synchronized String getDeviceUdid() {
+	public static String getDeviceUdid() {
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
 				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
