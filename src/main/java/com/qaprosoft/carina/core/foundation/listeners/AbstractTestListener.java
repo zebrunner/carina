@@ -234,15 +234,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestFailure(ITestResult result)
 	{
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);		
-		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
-		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
 
-		IRetryAnalyzer retry=result.getMethod().getRetryAnalyzer();
-		if (count < maxCount && retry == null) {
-			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
-		}
-		
 		if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG) && (result.getMethod().getDescription() != null)
 				&& result.getMethod().getDescription().startsWith(SpecialKeywords.JIRA_TICKET))
 		{
@@ -250,6 +242,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 			{
 				RetryCounter.incrementRunCount(test);
 			}
+		}
+
+		int count = RetryCounter.getRunCount(test);		
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
+
+		IRetryAnalyzer retry=result.getMethod().getRetryAnalyzer();
+		if (count < maxCount && retry == null) {
+			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
 		}
 		
 		String errorMessage = "";
