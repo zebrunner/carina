@@ -267,7 +267,7 @@ public class UITest extends AbstractTest
 		webDrivers.set(driver);
 	}
     
-	protected synchronized boolean initDriver(String name, int maxCount) {
+	protected boolean initDriver(String name, int maxCount) {
     	boolean init = false;
     	int count = 0;
     	while (!init & count++ < maxCount) {

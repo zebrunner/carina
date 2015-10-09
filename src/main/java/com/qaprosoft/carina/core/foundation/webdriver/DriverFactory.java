@@ -79,35 +79,7 @@ public class DriverFactory {
 		return object;
 	}*/
 
-/*	public static synchronized WebDriver create(String testName, String browser)
-	{
-		WebDriver driver = null;
-		try {
-			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
-			{
-				driver = new FirefoxDriver();
-			}
-			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
-			{
-				driver = new InternetExplorerDriver();
-			}
-			else if (CHROME.equalsIgnoreCase(browser))
-			{
-				driver = new ChromeDriver();
-			}
-			else {
-				LOGGER.error("Unsupported extra local driver is requested: " + browser);
-			}
-		}
-		catch (Exception e)
-		{
-			LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
-		}		
-			
-		return driver;
-	}*/
-
-    public static synchronized WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
+    public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
         RemoteWebDriver driver = null;
         try {
             if (capabilities.getCapability("automationName") == null)
@@ -143,11 +115,11 @@ public class DriverFactory {
      * @param testName in which driver will be used
      * @return RemoteWebDriver instance
      */
-    public static synchronized WebDriver create(String testName) {
+    public static WebDriver create(String testName) {
         return create(testName, nullDevice);
     }
 
-    public static synchronized WebDriver create(String testName, Device device) {
+    public static WebDriver create(String testName, Device device) {
         RemoteWebDriver driver = null;
         DesiredCapabilities capabilities = null;
         String selenium = Configuration.get(Parameter.SELENIUM_HOST);
