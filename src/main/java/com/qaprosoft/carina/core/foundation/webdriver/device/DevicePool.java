@@ -206,7 +206,7 @@ public class DevicePool
 		return type;
 	}
 	
-	public static void screensOn(AdbExecutor executor) {
+/*	public static void screensOn(AdbExecutor executor) {
 		for (Device device : devices) {
 			executor.screenOn(device.getUdid());
 		}
@@ -216,5 +216,5 @@ public class DevicePool
 		for (Device device : devices) {
 			executor.screenOff(device.getUdid());
 		}
-	}
+	}*/
 }
