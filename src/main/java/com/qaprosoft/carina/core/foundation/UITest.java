@@ -176,14 +176,14 @@ public class UITest extends AbstractTest
     
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
+    	executor.screenOff();
 		quitExtraDriver();
 	    if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null)
 	    {
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
 			quitDriver();
 	    }
-    	
-	    executor.screenOff(DevicePool.getDeviceUdid());
+	    
 		super.executeAfterTestClass(context);    	
     }
    
@@ -197,7 +197,6 @@ public class UITest extends AbstractTest
 			quitDriver();
 			stopRecording(null);
 	    }
-	    executor.screenOff();
 	    
 		super.executeAfterTestSuite(context);	    
 	}
