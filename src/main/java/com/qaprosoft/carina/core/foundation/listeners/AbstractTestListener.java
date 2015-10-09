@@ -243,6 +243,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
 		}
 		
+		if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG) && (result.getMethod().getDescription() != null)
+				&& result.getMethod().getDescription().startsWith(SpecialKeywords.JIRA_TICKET))
+		{
+			while (RetryCounter.getRunCount(test) < RetryAnalyzer.getMaxRetryCountForTest(result))
+			{
+				RetryCounter.incrementRunCount(test);
+			}
+		}
+		
 		String errorMessage = "";
 		if (count < maxCount && retry != null)
 		{
