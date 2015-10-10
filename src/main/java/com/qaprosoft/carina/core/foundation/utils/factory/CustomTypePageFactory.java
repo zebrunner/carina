@@ -79,19 +79,19 @@ public class CustomTypePageFactory {
 		
 		try {
 			if(versionClass != null){
-				LOGGER.info("Instance by version and platform will be created.");
+				LOGGER.debug("Instance by version and platform will be created.");
 				return versionClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			if(majorVersionClass != null){
-				LOGGER.info("Instance by major version and platform will be created.");
+				LOGGER.debug("Instance by major version and platform will be created.");
 				return majorVersionClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			if(deviceClass != null){
-				LOGGER.info("Instance by platform will be created.");
+				LOGGER.debug("Instance by platform will be created.");
 				return deviceClass.getConstructor(WebDriver.class).newInstance(driver);
 			} 
 			if(familyClass != null){
-				LOGGER.info("Instance by family will be created.");
+				LOGGER.debug("Instance by family will be created.");
 				return familyClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			throw new RuntimeException(
