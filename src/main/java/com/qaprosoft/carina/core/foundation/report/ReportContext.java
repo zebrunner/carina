@@ -106,6 +106,14 @@ public class ReportContext
 		return tempDirectory;
 	}
 	
+	public static synchronized void removeTempDir()
+	{
+		if (tempDirectory != null)
+		{
+			tempDirectory.delete();
+		}
+	}
+	
 	public static synchronized File getArtifactsFolder()
 	{
 		if (artifactsDirectory == null)
