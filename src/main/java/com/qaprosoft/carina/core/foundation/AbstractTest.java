@@ -225,6 +225,7 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
 		try {
+			ReportContext.removeTempDir(); //clean temp artifacts directory
 			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
 			String browser = getBrowser();
