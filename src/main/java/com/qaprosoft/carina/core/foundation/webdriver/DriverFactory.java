@@ -156,25 +156,32 @@ public class DriverFactory {
                             Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), Configuration.get(Parameter.MOBILE_BROWSER_NAME));
                 } else {
                     selenium = device.getSeleniumServer();
-                    //[VD] workaround to the issue with multiply calls to the single apk files
-                    File mobileAppFile = new File(Configuration.get(Parameter.MOBILE_APP));
-                    File appTempFile = new File(ReportContext.getTempDir().getAbsolutePath() + File.separator + device.getUdid() + "-" + mobileAppFile.getName());
                     
-                    if (!appTempFile.exists()) {
-                    	LOGGER.info("Temporary copy of the mobile app '" + appTempFile.getAbsolutePath() + "' file doesn't exist and will be created...");
+                    String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+                    
+                    if (Configuration.getInt(Parameter.THREAD_COUNT) > 1) {
+	                    //[VD] workaround to the issue with multiply calls to the single apk files
+	                    File mobileAppFile = new File(Configuration.get(Parameter.MOBILE_APP));
+	                    File appTempFile = new File(ReportContext.getTempDir().getAbsolutePath() + File.separator + device.getUdid() + "-" + mobileAppFile.getName());
 	                    
-	                    if (mobileAppFile.isDirectory()) {
-	                    	LOGGER.info(appTempFile.getName() + " will be copied as directory...");
-	                    	FileUtils.copyDirectory(mobileAppFile, appTempFile);
-	                    } else {
-	                    	LOGGER.info(appTempFile.getName() + " will be copied as file...");
-	                    	FileUtils.copyFile(mobileAppFile, appTempFile);
+	                    if (!appTempFile.exists()) {
+	                    	LOGGER.info("Temporary copy of the mobile app '" + appTempFile.getAbsolutePath() + "' file doesn't exist and will be created...");
+		                    
+		                    if (mobileAppFile.isDirectory()) {
+		                    	LOGGER.info(appTempFile.getName() + " will be copied as directory...");
+		                    	FileUtils.copyDirectory(mobileAppFile, appTempFile);
+		                    } else {
+		                    	LOGGER.info(appTempFile.getName() + " will be copied as file...");
+		                    	FileUtils.copyFile(mobileAppFile, appTempFile);
+		                    }
 	                    }
+	                    
+	                    mobileAppPath = appTempFile.getAbsolutePath();
                     }
                     
                     capabilities = getMobileAppCapabilities(false, testName, device.getOs(), device.getOsVersion(),
                             device.getName(), Configuration.get(Parameter.MOBILE_AUTOMATION_NAME),
-                            Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), appTempFile.getAbsolutePath(),
+                            Configuration.get(Parameter.MOBILE_NEW_COMMAND_TIMEOUT), mobileAppPath,
                             Configuration.get(Parameter.MOBILE_APP_ACTIVITY), Configuration.get(Parameter.MOBILE_APP_PACKAGE));
                 }
             } else if (SAFARI.equalsIgnoreCase(browser)) {
