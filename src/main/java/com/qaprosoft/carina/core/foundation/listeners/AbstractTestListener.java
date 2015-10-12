@@ -43,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -89,10 +90,19 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String deviceName = getDeviceName();
 
     	//TODO: remove hard-coded text		
-    	if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
-   			messager.info(deviceName, test, DateUtils.now(), errorMessage);
-    		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));    		
-    	}
+		if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues."))
+		{
+			messager.info(deviceName, test, DateUtils.now(), errorMessage);
+			if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null)
+			{
+				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, result.getThrowable()
+						.getMessage(), result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));
+			} else
+			{
+				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result
+						.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));
+			}
+		}
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
