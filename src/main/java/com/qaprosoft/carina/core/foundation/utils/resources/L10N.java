@@ -133,5 +133,16 @@ public class L10N {
 		}
 		return key;
 	}
+	
+	/*
+	 * QUALITY-1282: This method helps when translating strings that have single quotes or other
+	 * special characters that get omitted.
+	 */
+	public static String formatString( String resource, String[] parameters ) {
+    for ( int i = 0; i < parameters.length; ++i ) {
+      resource = resource.replace( "{" + i + "}", parameters[i] );
+    }
+    return resource;
+  }
 
 }
