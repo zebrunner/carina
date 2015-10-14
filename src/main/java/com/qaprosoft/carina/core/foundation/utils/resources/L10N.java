@@ -24,23 +24,23 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-
 
 /*
  * QUALITY-1076:
  * http://maven.apache.org/surefire/maven-surefire-plugin/examples/class-loading.html
  * Need to set useSystemClassLoader=false for maven surefire plugin to receive access to classloader L10N files on CI
  * 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18.1</version>
-				<configuration>
-					<useSystemClassLoader>false</useSystemClassLoader>
-				</configuration>
- 
+ <groupId>org.apache.maven.plugins</groupId>
+ <artifactId>maven-surefire-plugin</artifactId>
+ <version>2.18.1</version>
+ <configuration>
+ <useSystemClassLoader>false</useSystemClassLoader>
+ </configuration>
+
  */
 
 public class L10N {
@@ -74,12 +74,12 @@ public class L10N {
 			 */
 			String fileName = FilenameUtils.getBaseName(u.getPath());
 
-			if (u.getPath().endsWith("L10N.class") ||
-					u.getPath().endsWith("L10N$1.class")) {
-				//separate conditions to support core JUnit tests
+			if (u.getPath().endsWith("L10N.class")
+					|| u.getPath().endsWith("L10N$1.class")) {
+				// separate conditions to support core JUnit tests
 				continue;
 			}
-				
+
 			if (fileName.lastIndexOf('_') == fileName.length() - 3
 					|| fileName.lastIndexOf('_') == fileName.length() - 5) {
 				LOGGER.debug(String
@@ -89,8 +89,8 @@ public class L10N {
 			}
 			/*
 			 * convert "file:
-			 * E:\pentaho\qa-automation\target\classes\L10N\messages.properties"
-			 * to "L10N.messages"
+			 * E:\pentaho\qa-automation\target\classes\L10N\messages
+			 * .properties" to "L10N.messages"
 			 */
 			String filePath = FilenameUtils.getPath(u.getPath());
 			String resource = filePath.substring(
@@ -115,7 +115,7 @@ public class L10N {
 								resource));
 			}
 		}
-		
+
 		LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
 	}
 
@@ -131,18 +131,45 @@ public class L10N {
 				// do nothing
 			}
 		}
-		return key;
+		return generateConcatForXPath(key);
 	}
-	
+
 	/*
-	 * QUALITY-1282: This method helps when translating strings that have single quotes or other
-	 * special characters that get omitted.
+	 * QUALITY-1282: This method helps when translating strings that have single
+	 * quotes or other special characters that get omitted.
 	 */
-	public static String formatString( String resource, String[] parameters ) {
-    for ( int i = 0; i < parameters.length; ++i ) {
-      resource = resource.replace( "{" + i + "}", parameters[i] );
-    }
-    return resource;
-  }
+	public static String formatString(String resource, String[] parameters) {
+		for (int i = 0; i < parameters.length; i++) {
+			resource = resource.replace("{" + i + "}", parameters[i]);
+		}
+		return generateConcatForXPath(resource);
+	}
+
+	private static String generateConcatForXPath(String xpathString) {
+		String returnString = "";
+		String searchString = xpathString;
+		char[] quoteChars = new char[] { '\'', '"' };
+
+		int quotePos = StringUtils.indexOfAny(searchString, quoteChars);
+		if (quotePos == -1) {
+			returnString = "'" + searchString + "'";
+		} else {
+			returnString = "concat(";
+			while (quotePos != -1) {
+				String subString = searchString.substring(0, quotePos);
+				returnString += "'" + subString + "', ";
+				if (searchString.substring(quotePos, quotePos + 1).equals("'")) {
+					returnString += "\"'\", ";
+				} else {
+					returnString += "'\"', ";
+				}
+				searchString = searchString.substring(quotePos + 1,
+						searchString.length());
+				quotePos = StringUtils.indexOfAny(searchString, quoteChars);
+			}
+			returnString += "'" + searchString + "')";
+		}
+		return returnString;
+	}
 
 }
