@@ -146,6 +146,11 @@ public class L10N {
 		return resource;
 	}
 
+	/*
+	 * Make sure you remove the single quotes around %s in xpath as string
+	 * returned will either have it added for you or single quotes won't be
+	 * added as concat() doesn't need them.
+	 */
 	public static String generateConcatForXPath(String xpathString) {
 		String returnString = "";
 		String searchString = xpathString;
@@ -174,7 +179,7 @@ public class L10N {
 			}
 			returnString += "'" + searchString + "')";
 			LOGGER.debug("Concatenation result: " + returnString);
-		}		
+		}
 		return returnString;
 	}
 
