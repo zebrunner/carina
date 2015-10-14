@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
@@ -88,7 +87,7 @@ public class DevicePool
 		Device freeDevice = null;
 		while (++count<100 && !found) {
 			for (Device device : devices) {
-				LOGGER.info("Check device status for registration: " + device.getName());
+				LOGGER.debug("Check device status for registration: " + device.getName());
 				if (!threadId2Device.containsValue(device)) {
 						//current thread doesn't have ignored devices
 						LOGGER.info("identified free non-ingnored device: " + device.getName());
