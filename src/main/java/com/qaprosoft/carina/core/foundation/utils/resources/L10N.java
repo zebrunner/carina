@@ -131,7 +131,7 @@ public class L10N {
 				// do nothing
 			}
 		}
-		return generateConcatForXPath(key);
+		return key;
 	}
 
 	/*
@@ -143,10 +143,10 @@ public class L10N {
 			resource = resource.replace("{" + i + "}", parameters[i]);
 			LOGGER.debug("Localized string value is: " + resource);
 		}
-		return generateConcatForXPath(resource);
+		return resource;
 	}
 
-	private static String generateConcatForXPath(String xpathString) {
+	public static String generateConcatForXPath(String xpathString) {
 		String returnString = "";
 		String searchString = xpathString;
 		char[] quoteChars = new char[] { '\'', '"' };
