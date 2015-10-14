@@ -141,6 +141,7 @@ public class L10N {
 	public static String formatString(String resource, String[] parameters) {
 		for (int i = 0; i < parameters.length; i++) {
 			resource = resource.replace("{" + i + "}", parameters[i]);
+			LOGGER.debug("Localized string value is: " + resource);
 		}
 		return generateConcatForXPath(resource);
 	}
@@ -155,20 +156,25 @@ public class L10N {
 			returnString = "'" + searchString + "'";
 		} else {
 			returnString = "concat(";
+			LOGGER.debug("Current concatenation: " + returnString);
 			while (quotePos != -1) {
 				String subString = searchString.substring(0, quotePos);
 				returnString += "'" + subString + "', ";
+				LOGGER.debug("Current concatenation: " + returnString);
 				if (searchString.substring(quotePos, quotePos + 1).equals("'")) {
 					returnString += "\"'\", ";
+					LOGGER.debug("Current concatenation: " + returnString);
 				} else {
 					returnString += "'\"', ";
+					LOGGER.debug("Current concatenation: " + returnString);
 				}
 				searchString = searchString.substring(quotePos + 1,
 						searchString.length());
 				quotePos = StringUtils.indexOfAny(searchString, quoteChars);
 			}
 			returnString += "'" + searchString + "')";
-		}
+			LOGGER.debug("Concatenation result: " + returnString);
+		}		
 		return returnString;
 	}
 
