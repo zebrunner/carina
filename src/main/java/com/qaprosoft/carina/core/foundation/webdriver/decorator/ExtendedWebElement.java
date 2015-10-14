@@ -349,9 +349,7 @@ public class ExtendedWebElement
 	 * @return element existence status.
 	 */
 	public boolean isElementNotPresent(long timeout) {
-		return !isElementPresent(timeout);
-		
-/*		boolean result;
+		boolean result;
 		final WebDriver drv = getDriver();
 		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
@@ -359,20 +357,31 @@ public class ExtendedWebElement
 		{
 			wait.until(new ExpectedCondition<Boolean>()
 			{
-				public Boolean apply(WebDriver dr)
+				public Boolean apply(WebDriver drv)
 				{
-					return element.isDisplayed();
+					boolean res = false;
+
+					if (element != null)
+					{
+						res = !element.isDisplayed();
+					}
+
+					if (!res)
+					{
+						res = drv.findElements(by).isEmpty();
+					}
+					return res;
 				}
 			});
-			result = false;
-			summary.log(Messager.UNEXPECTED_ELEMENT_PRESENT.error(getNameWithLocator()));
+			result = true;
 		}
 		catch (Exception e)
 		{
-			result = true;
+			LOGGER.debug(e.getMessage(), e.getCause());
+			result = false;
 		}
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-		return result;*/
+		return result;
 	}
 
 	/**
