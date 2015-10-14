@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
@@ -93,7 +94,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues."))
 		{
 			messager.info(deviceName, test, DateUtils.now(), errorMessage);
-			if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null)
+			if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null
+					&& result.getThrowable().getMessage() != null
+					&& !StringUtils.isEmpty(result.getThrowable().getMessage()))
 			{
 				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, result.getThrowable()
 						.getMessage(), result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));
