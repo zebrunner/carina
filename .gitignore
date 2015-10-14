@@ -6,3 +6,4 @@ target
 /com
 /application.log
 /sql.log
+*.checkstyle
