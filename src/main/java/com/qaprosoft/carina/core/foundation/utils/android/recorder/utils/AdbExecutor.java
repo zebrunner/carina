@@ -293,6 +293,10 @@ public class AdbExecutor {
 	}
 
 	public void screenOn(String udid) {
+		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+			return;
+		}
+		
 		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
 			return;
 		}
