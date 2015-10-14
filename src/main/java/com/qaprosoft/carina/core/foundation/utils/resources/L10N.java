@@ -131,7 +131,7 @@ public class L10N {
 				// do nothing
 			}
 		}
-		return generateConcatForXPath(key);
+		return key;
 	}
 
 	/*
@@ -143,10 +143,15 @@ public class L10N {
 			resource = resource.replace("{" + i + "}", parameters[i]);
 			LOGGER.debug("Localized string value is: " + resource);
 		}
-		return generateConcatForXPath(resource);
+		return resource;
 	}
 
-	private static String generateConcatForXPath(String xpathString) {
+	/*
+	 * Make sure you remove the single quotes around %s in xpath as string
+	 * returned will either have it added for you or single quotes won't be
+	 * added as concat() doesn't need them.
+	 */
+	public static String generateConcatForXPath(String xpathString) {
 		String returnString = "";
 		String searchString = xpathString;
 		char[] quoteChars = new char[] { '\'', '"' };
@@ -174,7 +179,7 @@ public class L10N {
 			}
 			returnString += "'" + searchString + "')";
 			LOGGER.debug("Concatenation result: " + returnString);
-		}		
+		}
 		return returnString;
 	}
 
