@@ -159,7 +159,7 @@ public class DriverFactory {
                     
                     String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
                     
-                    if (Configuration.getInt(Parameter.THREAD_COUNT) > 1) {
+                    if (Configuration.getInt(Parameter.THREAD_COUNT) > 1 && Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 	                    //[VD] workaround to the issue with multiply calls to the single apk files
 	                    File mobileAppFile = new File(Configuration.get(Parameter.MOBILE_APP));
 	                    File appTempFile = new File(ReportContext.getTempDir().getAbsolutePath() + File.separator + device.getUdid() + "-" + mobileAppFile.getName());
