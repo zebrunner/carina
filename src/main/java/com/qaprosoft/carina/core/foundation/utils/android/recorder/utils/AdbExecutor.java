@@ -250,10 +250,16 @@ public class AdbExecutor {
 	}
 
 	public void screenOff() {
-		screenOff(DevicePool.getDeviceUdid());
+		// do screen off only against valid device
+    	try {
+    		String udid = DevicePool.getDeviceUdid();
+    		screenOff(udid);
+    	} catch (Exception e) {
+    		LOGGER.warn("Unable to find device by thread!");
+    	}
 	}
 
-	public void screenOff(String udid) {
+	private void screenOff(String udid) {
 		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 			return;
 		}
@@ -289,10 +295,11 @@ public class AdbExecutor {
 	}
 
 	public void screenOn() {
+		// don't wrap into try/catch as if device is inaccessible we should generate exception obligatory
 		screenOn(DevicePool.getDeviceUdid());
 	}
 
-	public void screenOn(String udid) {
+	private void screenOn(String udid) {
 		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 			return;
 		}
