@@ -141,17 +141,12 @@ public class DSBean
         this.executeColumn = "Execute";
         this.executeValue = "y";
 		if(testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null)
-		{
 			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
-		}
-		
 		if(testParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null)
-		{
-			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
-		}
+			this.executeValue = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
+		
         if (!parameters.executeColumn().isEmpty())
         	this.executeColumn = parameters.executeColumn();
-
         if (!parameters.executeValue().isEmpty())
         	this.executeValue = parameters.executeValue();
 	}
@@ -206,17 +201,12 @@ public class DSBean
         this.executeColumn = "Execute";
         this.executeValue = "y";
 		if(testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null)
-		{
 			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
-		}
-		
 		if(testParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null)
-		{
-			this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
-		}
-        if (!parameters.executeColumn().isEmpty())
-        	this.executeColumn = parameters.executeColumn();
+			this.executeValue = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
 
+		if (!parameters.executeColumn().isEmpty())
+        	this.executeColumn = parameters.executeColumn();
         if (!parameters.executeValue().isEmpty())
         	this.executeValue = parameters.executeValue();
 	}
