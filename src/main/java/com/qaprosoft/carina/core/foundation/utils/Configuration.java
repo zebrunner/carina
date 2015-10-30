@@ -275,7 +275,14 @@ public class Configuration
 		
 		GIT_URL("git_url"),
 
-		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
+		
+		//Amazon
+		S3_BUCKET_NAME("s3_bucket_name"),
+		
+		ACCESS_KEY_ID("access_key_id"),
+		
+		SECRET_KEY("secret_key");
 
 
 		
