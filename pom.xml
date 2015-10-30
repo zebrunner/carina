@@ -67,6 +67,7 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
+		<aws-java-sdk.version>1.10.30</aws-java-sdk.version>
 	</properties>
 
 	<repositories>
@@ -345,6 +346,12 @@
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
 			<version>${appium.version}</version>
+		</dependency>
+		<!-- Amazon -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>${aws-java-sdk.version}</version>
 		</dependency>
 	</dependencies>
 	
