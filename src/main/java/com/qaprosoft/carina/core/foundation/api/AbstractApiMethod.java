@@ -207,7 +207,7 @@ public abstract class AbstractApiMethod extends HttpClient
 	public String call()
 	{
 		Response response = callAPI();
-		return response != null ? response.toString() : null;
+		return response != null ? response.asString() : null;
 	}
 	
 	public void expectInResponse(Matcher<?> matcher)
