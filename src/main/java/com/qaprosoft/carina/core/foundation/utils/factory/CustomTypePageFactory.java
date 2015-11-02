@@ -10,6 +10,7 @@ import org.reflections.Reflections;
 
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
@@ -38,7 +39,12 @@ public class CustomTypePageFactory {
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
 		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null;
 		Type screenType = DevicePool.getDeviceType();
-		String deviceVersion = DevicePool.getDevice().getOsVersion();
+		Device device = DevicePool.getDevice();
+		// default version in case if it is desktop driver
+		String deviceVersion = "1";
+		if (null != device) {
+			deviceVersion = device.getOsVersion();
+		}
 		String majorVersionNumber = deviceVersion.split(VERSION_SPLITTER)[0];
 		LOGGER.debug("Major version of device OS: " + majorVersionNumber);
 		for (Class<? extends T> clazz : setClasses) {
