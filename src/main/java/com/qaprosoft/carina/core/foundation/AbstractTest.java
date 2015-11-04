@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -73,7 +72,6 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.zafira.client.model.TestType;
 
 /*
@@ -134,18 +132,14 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 
 		try {
-			Locale locale = LocaleReader.init(Configuration
-					.get(Parameter.LOCALE));
-			L10N.init(locale);
+			L10N.init();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			LOGGER.debug("L10N bundle is not initialized successfully!", e);
 		}
 		
 		try {
-			Locale locale = LocaleReader.init(Configuration
-					.get(Parameter.LANGUAGE));
-			I18N.init(locale);
+			I18N.init();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			LOGGER.debug("I18N bundle is not initialized successfully!", e);
