@@ -133,7 +133,37 @@ public class L10N {
 		}
 		return key;
 	}
-
+	
+	/**
+	 * getText for specified locale and key. Actual workaround for uploading resources,
+	 * you should init new locale before use. 
+	 * Ex: L10N.init(new_locale)
+	 * 
+	 * @param key - String
+	 * @param locale - Locale
+	 * @return String
+	 */
+	public static String getText(String key, Locale locale) {
+		LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
+		Iterator<ResourceBundle> iter = resBoundles.iterator();
+		while (iter.hasNext()) {
+			ResourceBundle bundle = (ResourceBundle) iter.next();
+			try {
+				String value = bundle.getString(key);
+				LOGGER.debug("Looking for value for locale:'"+locale.getLanguage()+"' current iteration locale is: '"+bundle.getLocale().getLanguage()+"'.");
+				if (bundle.getLocale().equals(locale)) {
+					LOGGER.debug("Found locale:'"+locale.getLanguage()+"' and value is '"+value+"'.");
+					return value;
+				}
+			} catch (MissingResourceException e) {
+				// do nothing
+			}
+		}
+		return key;
+	}
+	
+	
+	
 	/*
 	 * QUALITY-1282: This method helps when translating strings that have single
 	 * quotes or other special characters that get omitted.
