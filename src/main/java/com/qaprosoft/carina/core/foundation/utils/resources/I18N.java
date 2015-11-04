@@ -26,7 +26,9 @@ import java.util.ResourceBundle;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * QUALITY-1076:
@@ -46,8 +48,11 @@ public class I18N {
 
 	private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 
-	public static void init(Locale locale) {
+	public static void init() {
 		List<String> loadedResources = new ArrayList<String>();
+		
+		List<Locale> locales = LocaleReader.init(Configuration
+				.get(Parameter.LANGUAGE));
 
 		for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
 			public @Override
@@ -101,7 +106,9 @@ public class I18N {
 				try {
 					LOGGER.debug(String.format("Adding '%s' resource...",
 							resource));
-					resBoundles.add(ResourceBundle.getBundle(resource, locale));
+					for (Locale locale : locales) {
+						resBoundles.add(ResourceBundle.getBundle(resource, locale));
+					}
 					LOGGER.debug(String
 							.format("Resource '%s' added.", resource));
 				} catch (MissingResourceException e) {
@@ -115,21 +122,61 @@ public class I18N {
 		}
 		LOGGER.debug("init: I18N bundle size: " + resBoundles.size());
 	}
-
-	public static String getText(String key) {
-		LOGGER.debug("getText: I18N bundle size: " + resBoundles.size());
+	
+	private static Locale getDefaultLanguage() {
+		List<Locale> locales = LocaleReader.init(Configuration
+				.get(Parameter.LANGUAGE));
 		
+		if (locales.size() == 0) {
+			throw new RuntimeException("Undefined default language specified! Review 'language' setting in _config.properties.");
+		}
+
+		return locales.get(0);
+	}
+	
+	/**
+	 * getText by key for default language.
+	 * 
+	 * @param key
+	 *            - String
+	 * @param locale
+	 *            - Locale
+	 * @return String
+	 */
+	public static String getText(String key) {
+		return getText(key, getDefaultLanguage());
+	}
+	
+	
+	/**
+	 * getText for specified language and key.
+	 * 
+	 * @param key
+	 *            - String
+	 * @param locale
+	 *            - Locale
+	 * @return String
+	 */
+	public static String getText(String key, Locale locale) {
+		LOGGER.debug("getText: I18N bundle size: " + resBoundles.size());
 		Iterator<ResourceBundle> iter = resBoundles.iterator();
 		while (iter.hasNext()) {
 			ResourceBundle bundle = (ResourceBundle) iter.next();
 			try {
 				String value = bundle.getString(key);
-				return value;
+				LOGGER.debug("Looking for value for language:'"
+						+ locale.getLanguage()
+						+ "' current iteration language is: '"
+						+ bundle.getLocale().getLanguage() + "'.");
+				if (bundle.getLocale().equals(locale)) {
+					LOGGER.debug("Found language:'" + locale.getLanguage()
+							+ "' and value is '" + value + "'.");
+					return value;
+				}
 			} catch (MissingResourceException e) {
 				// do nothing
 			}
 		}
 		return key;
 	}
-
 }
