@@ -15,20 +15,28 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class LocaleReader {
 
-	public static Locale init(String locale) {
+	public static List<Locale> init(String locale) {
 
-		String[] localeSetttings = locale.split("_");
-		String lang, country = "";
-		lang = localeSetttings[0];
-		if (localeSetttings.length > 1) {
-			country = localeSetttings[1];
+		List<Locale> locales = new ArrayList<Locale>();
+		String[] strLocales = locale.split(",");
+		
+		for (int i=0; i<strLocales.length; i++) {
+			String[] localeSetttings = strLocales[i].split("_");
+			String lang, country = "";
+			lang = localeSetttings[0];
+			if (localeSetttings.length > 1) {
+				country = localeSetttings[1];
+			}
+			locales.add(new Locale(lang, country));
 		}
 
-		return new Locale(lang, country);
+		return locales;
 	}
 
 }
