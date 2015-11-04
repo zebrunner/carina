@@ -168,7 +168,7 @@ public class I18N {
 						+ locale.getLanguage()
 						+ "' current iteration language is: '"
 						+ bundle.getLocale().getLanguage() + "'.");
-				if (bundle.getLocale().equals(locale)) {
+				if (bundle.getLocale().getLanguage().equals(locale.getLanguage())) {
 					LOGGER.debug("Found language:'" + locale.getLanguage()
 							+ "' and value is '" + value + "'.");
 					return value;

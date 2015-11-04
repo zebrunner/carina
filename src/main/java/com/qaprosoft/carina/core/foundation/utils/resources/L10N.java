@@ -171,7 +171,7 @@ public class L10N {
 						+ locale.getLanguage()
 						+ "' current iteration locale is: '"
 						+ bundle.getLocale().getLanguage() + "'.");
-				if (bundle.getLocale().equals(locale)) {
+				if (bundle.getLocale().getLanguage().equals(locale.getLanguage())) {
 					LOGGER.debug("Found locale:'" + locale.getLanguage()
 							+ "' and value is '" + value + "'.");
 					return value;
