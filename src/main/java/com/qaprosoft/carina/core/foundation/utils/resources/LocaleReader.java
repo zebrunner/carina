@@ -27,7 +27,7 @@ public class LocaleReader {
 		String[] strLocales = locale.split(",");
 		
 		for (int i=0; i<strLocales.length; i++) {
-			String[] localeSetttings = strLocales[i].split("_");
+			String[] localeSetttings = strLocales[i].trim().split("_");
 			String lang, country = "";
 			lang = localeSetttings[0];
 			if (localeSetttings.length > 1) {
