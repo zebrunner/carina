@@ -168,11 +168,11 @@ public class L10N {
 			try {
 				String value = bundle.getString(key);
 				LOGGER.debug("Looking for value for locale:'"
-						+ locale.getLanguage()
+						+ locale.toString()
 						+ "' current iteration locale is: '"
-						+ bundle.getLocale().getLanguage() + "'.");
-				if (bundle.getLocale().getLanguage().equals(locale.getLanguage())) {
-					LOGGER.debug("Found locale:'" + locale.getLanguage()
+						+ bundle.getLocale().toString() + "'.");
+				if (bundle.getLocale().toString().equals(locale.toString())) {
+					LOGGER.debug("Found locale:'" + locale.toString()
 							+ "' and value is '" + value + "'.");
 					return value;
 				}
