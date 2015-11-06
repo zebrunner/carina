@@ -74,6 +74,7 @@ public class UITest extends AbstractTest
     	super.executeBeforeTestSuite(context);
     	
     	DevicePool.registerDevices();
+    	//DevicePool.screensOn(executor);
     	DriverMode driverMode = Configuration.getDriverMode();
     	
 	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
@@ -107,6 +108,8 @@ public class UITest extends AbstractTest
 	    		throw init_throwable;
 	    	}
 	    }
+		
+		executor.screenOn();
     }
     
     @BeforeMethod(alwaysRun = true)
@@ -173,13 +176,14 @@ public class UITest extends AbstractTest
     
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
+    	executor.screenOff();
 		quitExtraDriver();
 	    if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null)
 	    {
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
 			quitDriver();
 	    }
-    	
+	    
 		super.executeAfterTestClass(context);    	
     }
    
@@ -265,7 +269,7 @@ public class UITest extends AbstractTest
 		webDrivers.set(driver);
 	}
     
-	protected synchronized boolean initDriver(String name, int maxCount) {
+	protected boolean initDriver(String name, int maxCount) {
     	boolean init = false;
     	int count = 0;
     	while (!init & count++ < maxCount) {

@@ -15,9 +15,8 @@
  */
 package com.qaprosoft.carina.core.foundation.http;
 
+import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.
@@ -26,36 +25,29 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  */
 public class HttpClient
 {
-	private static final boolean LOG_ALL = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
-
-	public static String send(RequestSpecification request, String methodPath, HttpMethodType methodType)
+	public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType)
 	{
-		String response = null;
-		if (LOG_ALL)
-		{
-			request.log().all();
-			request.expect().log().all();
-		}
+		Response response = null;
 
 		switch (methodType)
 		{
 		case HEAD:
-			response = request.head(methodPath).asString();
+			response = request.head(methodPath);
 			break;
 		case GET:
-			response = request.get(methodPath).asString();
+			response = request.get(methodPath);
 			break;
 		case PUT:
-			response = request.put(methodPath).asString();
+			response = request.put(methodPath);
 			break;
 		case POST:
-			response = request.post(methodPath).asString();
+			response = request.post(methodPath);
 			break;
 		case DELETE:
-			response = request.delete(methodPath).asString();
+			response = request.delete(methodPath);
 			break;
 		case PATCH:
-			response = request.patch(methodPath).asString();
+			response = request.patch(methodPath);
 			break;
 		default:
 			throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);

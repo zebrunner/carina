@@ -106,6 +106,18 @@ public class ReportContext
 		return tempDirectory;
 	}
 	
+	public static synchronized void removeTempDir()
+	{
+		if (tempDirectory != null)
+		{
+			try {
+				FileUtils.deleteDirectory(tempDirectory);
+			} catch (IOException e) {
+				LOGGER.error("Unable to remove artifacts temp directory!", e);
+			}
+		}
+	}
+	
 	public static synchronized File getArtifactsFolder()
 	{
 		if (artifactsDirectory == null)
