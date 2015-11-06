@@ -263,6 +263,10 @@ public class EmailReportGenerator
 		int skipped = 0;
 		for(TestResultItem ri : ris)
 		{
+			if (ri.isConfig()) {
+				continue;
+			}
+			
 			switch (ri.getResult()) {
 			case PASS:
 				passed++;

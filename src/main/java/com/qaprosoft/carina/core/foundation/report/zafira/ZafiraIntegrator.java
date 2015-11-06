@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.report.zafira;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -59,8 +61,10 @@ public class ZafiraIntegrator {
 	private static final String ANONYMOUS_USER = "anonymous";
 	private static Boolean isRegistered = false;
 
-	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
+	private static List<String> uniqueKeys;
 
+	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
+	
 	public static void startSuite(ITestContext context, String suiteFileName) {
 		if (!isValid())
 			return;
@@ -161,11 +165,10 @@ public class ZafiraIntegrator {
 
 		TestType registeredTest = null;
 		try {
-
-			String test = TestNamingUtil.getCanonicalTestName(result);
-
 			String testClass = result.getMethod().getTestClass().getName();
-			String testMethod = result.getMethod().getMethodName();
+			
+			String test = TestNamingUtil.getCanonicalTestName(result);
+			String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
 
 			// if method owner is not specified then try to use suite owner. If
 			// both are not declared then ANONYMOUS will be used
@@ -354,22 +357,40 @@ public class ZafiraIntegrator {
 			Long startTime, Long finishTime, String demoURL, String logURL) {
 		
 		int retry = RetryCounter.getRunCount(name);
+
+		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, message: %s, startTime: %s, finishTime: %s, demoURL: %s, logURL: %s, retry: %d";
+		
+		//AUTO-1466; AUTO-1468
+		if (retry > 0) {
+			// delete previous test results from Zafira
+			LOGGER.debug("Test details for removal due to the retry:"
+					+ String.format(testDetails, name, status, testArgs, testRunId,
+							testCaseId, message, startTime, finishTime, demoURL,
+							logURL, retry));
+			
+			TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry - 1);
+			zc.deleteTestDuplicates(test);
+		}
+		
 		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR,
 		// startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, null, retry);
-		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, message: %s, startTime: %s, finishTime: %s, demoURL: %s, logURL";
 		LOGGER.debug("Test details for registration:"
-				+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL));
+				+ String.format(testDetails, name, status, testArgs, testRunId,
+						testCaseId, message, startTime, finishTime, demoURL,
+						logURL, retry));
 
 		Response<TestType> response = zc.createTest(test);
 		test = response.getObject();
 		if (test == null) {
 			throw new RuntimeException("Unable to register test '"
-					+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL)
+					+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL, retry)
 					+ "' for zafira service: " + zafiraUrl);
 		} else {
 			LOGGER.debug("Registered test details:"
-					+ String.format(testDetails, name, status, testArgs, testRunId, testCaseId, message, startTime, finishTime, demoURL, logURL));
+					+ String.format(testDetails, name, status, testArgs, testRunId,
+							testCaseId, message, startTime, finishTime, demoURL,
+							logURL, retry));			
 		}
 		return test;
 	}
@@ -410,8 +431,22 @@ public class ZafiraIntegrator {
 	private static ArgumentType getArgByParameter(Configuration.Parameter parameter) {
 		ArgumentType arg = new ArgumentType();
 		arg.setKey(parameter.getKey());
+		arg.setUnique(isUnique(parameter.getKey()));
 		arg.setValue(Configuration.get(parameter));
 		return arg;
+	}
+
+	private static boolean isUnique(String key){
+
+		if (uniqueKeys == null){
+			String uniqueParams = Configuration.get(Configuration.Parameter.UNIQUE_TESTRUN_FIELDS);
+			uniqueKeys = new ArrayList<>();
+			if (!uniqueParams.isEmpty()){
+				String[] split = uniqueParams.split(",");
+				uniqueKeys.addAll(Arrays.asList(split));
+			}
+		}
+		return uniqueKeys.contains(key);
 	}
 
 	@SuppressWarnings("unused")

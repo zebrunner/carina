@@ -13,7 +13,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<github.maven.repository>file:///${basedir}</github.maven.repository>
 
 		<source.version>1.7</source.version>
 		<target.version>1.7</target.version>
@@ -25,8 +24,8 @@
 		<hamcrest-core.version>1.3</hamcrest-core.version>
 		<hamcrest-library.version>1.3</hamcrest-library.version>
 		<junit.version>4.11</junit.version>
-		<rest-assured.version>2.3.0</rest-assured.version>
-		<selenium-java.version>2.45.0</selenium-java.version>
+		<rest-assured.version>2.7.0</rest-assured.version>
+		<selenium-java.version>2.47.1</selenium-java.version>
 
 		<log4j.version>1.2.17</log4j.version>
 		<logback.version>1.0.6</logback.version>
@@ -60,28 +59,35 @@
 
 		<jira-client.version>0.4</jira-client.version>
 
-		<zafira-client.version>1.4.1</zafira-client.version>
+		<zafira-client.version>1.4.3</zafira-client.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<json-simple.version>1.1</json-simple.version>
 
 		<reflections.version>0.9.9-RC1</reflections.version>
-		<appium.version>2.2.0</appium.version>
+		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>zafira-client</id>
-			<url>https://raw.github.com/qaprosoft/zafira-client/master</url>
-		</repository>
-		<!-- repository> <id>central</id> <name>Atlassian Public Repository</name> 
-			<layout>default</layout> <url>http://maven.atlassian.com/public</url> <snapshots> 
-			<enabled>false</enabled> </snapshots> </repository -->
-		<repository>
 			<id>maven_central</id>
 			<name>Maven Central</name>
 			<url>http://central.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<id>qaprosoft_releases</id>
+			<name>Qaprosoft Releases</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
+			<releases><enabled>true</enabled></releases>
+			<snapshots><enabled>false</enabled></snapshots>
+		</repository>
+		<repository>
+			<id>qaprosoft_shapshots</id>
+			<name>Qaprosoft Snapshots</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+			<releases><enabled>false</enabled></releases>
+			<snapshots><enabled>true</enabled></snapshots>
 		</repository>
 	</repositories>
 
@@ -97,6 +103,12 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito-core.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -171,6 +183,16 @@
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path-assert</artifactId>
 			<version>${json-path.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-library</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -298,8 +320,8 @@
 			<version>${zafira-client.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.google.code.gson</groupId>
-					<artifactId>gson</artifactId>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -339,14 +361,26 @@
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
 			<version>${appium.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.gson</groupId>
+					<artifactId>gson</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
-
+	
 	<distributionManagement>
 		<repository>
-			<id>maven-repository</id>
-			<url>${github.maven.repository}</url>
+			<id>deploymentRepo</id>
+			<name>Qaprosoft Releases</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
 		</repository>
+		<snapshotRepository>
+			<id>deploymentRepo</id>
+			<name>Qaprosoft Snapshots</name>
+			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<build>
@@ -372,6 +406,18 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -5,12 +5,16 @@ import java.io.Closeable;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -66,11 +70,14 @@ public class AdbExecutor {
     }
 
     public boolean isDeviceCorrect() {
+    	return isDeviceCorrect(DevicePool.getDeviceUdid());
+    }
+    public boolean isDeviceCorrect(String udid) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
         boolean correctDevice = false;
         try {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "getprop", "ro.build.version.sdk");
+            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "getprop", "ro.build.version.sdk");
             executor = new ProcessBuilderExecutor(cmd);
 
             Process process = executor.start();
@@ -81,7 +88,7 @@ public class AdbExecutor {
             	int sdkVersion = Integer.parseInt(line);
             	correctDevice = sdkVersion >= 19;
             } else {
-            	LOGGER.error("SDK version for '" + DevicePool.getDevice().getName() + "' device is not recognized!");
+            	LOGGER.error("SDK version for '" + DevicePool.getDevice(udid).getName() + "' device is not recognized!");
             }
 
         } catch (Exception e) {
@@ -95,9 +102,10 @@ public class AdbExecutor {
         return correctDevice;
     }
 
-    public void execute(String[] cmd){
+    public List<String> execute(String[] cmd){
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
+        List<String> output = new ArrayList<String> ();
 
         try {
             executor = new ProcessBuilderExecutor(cmd);
@@ -108,7 +116,7 @@ public class AdbExecutor {
 
 
             while ((line = in.readLine()) != null) {
-            	
+            	output.add(line);
                 LOGGER.debug(line);
             }
         } catch (Exception e) {
@@ -117,6 +125,8 @@ public class AdbExecutor {
             closeQuietly(in);
             ProcessBuilderExecutor.gcNullSafe(executor);
         }
+        
+        return output;
     }
 
     public int startRecording(String pathToFile) {
@@ -196,4 +206,140 @@ public class AdbExecutor {
     	execute(cmd);
     }
     
+	private Boolean getScreenState(String udid) {
+		// determine current screen status
+		// adb -s <udid> shell dumpsys input_method | find "mScreenOn"
+		String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H",
+				ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "dumpsys",
+				"input_method");
+		List<String> output = execute(cmd);
+
+		Boolean screenState = null;
+		String line;
+		
+		Iterator<String> itr = output.iterator();
+		while (itr.hasNext()) {
+			// mScreenOn - default value for the most of Android devices
+			// mInteractive - for Nexuses 
+			line = itr.next();
+			if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
+				screenState = true;
+				break;
+			}
+			if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
+				screenState = false;
+				break;
+			}
+		}
+		
+		if (screenState == null) {
+			LOGGER.error(udid
+					+ ": Unable to determine existing device screen state!");
+			return screenState; //no actions required if state is not recognized.
+		}
+
+		if (screenState) {
+			LOGGER.info(udid + ": screen is ON");
+		}
+
+		if (!screenState) {
+			LOGGER.info(udid + ": screen is OFF");
+		}
+
+		return screenState;
+	}
+
+	public void screenOff() {
+		// do screen off only against valid device
+    	try {
+    		String udid = DevicePool.getDeviceUdid();
+    		screenOff(udid);
+    	} catch (Exception e) {
+    		LOGGER.warn("Unable to find device by thread!");
+    	}
+	}
+
+	private void screenOff(String udid) {
+		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+			return;
+		}
+		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
+			return;
+		}
+		if (!isDeviceCorrect(udid)) {
+			return;
+		}
+
+		Boolean screenState = getScreenState(udid);
+		if (screenState == null) {
+			return;
+		}
+		if (screenState) {
+			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
+					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+					"input", "keyevent", "26");
+			execute(cmd);
+			
+			pause(5);
+
+			// verify that screen is Off now
+			screenState = getScreenState(udid);
+			if (screenState) {
+				LOGGER.error(udid + ": screen is still ON!");
+			}
+			
+			if (!screenState) {
+				LOGGER.info(udid + ": screen turned off.");
+			}
+		}
+	}
+
+	public void screenOn() {
+		// don't wrap into try/catch as if device is inaccessible we should generate exception obligatory
+		screenOn(DevicePool.getDeviceUdid());
+	}
+
+	private void screenOn(String udid) {
+		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+			return;
+		}
+		
+		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
+			return;
+		}
+		if (!isDeviceCorrect(udid)) {
+			return;
+		}
+
+		Boolean screenState = getScreenState(udid);
+		if (screenState == null) {
+			return;
+		}
+		
+		if (!screenState) {
+			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
+					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+					"input", "keyevent", "26");
+			execute(cmd);
+
+			pause(5);
+			// verify that screen is Off now
+			screenState = getScreenState(udid);
+			if (!screenState) {
+				LOGGER.error(udid + ": screen is still OFF!");
+			}
+			
+			if (screenState) {
+				LOGGER.info(udid + ": screen turned on.");
+			}
+		}
+	}
+
+	public void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

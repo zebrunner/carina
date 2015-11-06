@@ -37,6 +37,12 @@ public class ClassMethodNameStategy implements INamingStrategy
 		String method = result.getMethod().getMethodName();
 		return String.format("%s.%s", clazz, method);
 	}
+	
+	@Override
+	public String getCanonicalTestMethodName(ITestResult result)
+	{
+		return result.getMethod().getMethodName();
+	}
 
 	@Override
 	public String getPackageName(ITestResult result)
