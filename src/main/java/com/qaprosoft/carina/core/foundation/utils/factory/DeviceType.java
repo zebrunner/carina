@@ -10,11 +10,33 @@ import java.lang.annotation.Target;
 public @interface DeviceType {
 
 	public enum Type {
-		DESKTOP, ANDROID_TABLET, ANDROID_PHONE, IOS_TABLET, IOS_PHONE
+
+		DESKTOP("desktop", "desktop"), ANDROID_TABLET("android_tablet",
+				"android"), ANDROID_PHONE("android_phone", "android"), IOS_TABLET(
+				"ios_tablet", "ios"), IOS_PHONE("ios_phone", "ios");
+
+		private String type;
+
+		private String family;
+
+		private Type(String type, String family) {
+			this.type = type;
+			this.family = family;
+		}
+		
+		public String getType(){
+			return type;
+		}
+
+		public String getFamily(){
+			return family;
+		}
 	}
 
 	Type pageType() default Type.ANDROID_PHONE;
 
 	Class<?> parentClass();
+	
+	String[] version() default { "1.0" };
 
 }

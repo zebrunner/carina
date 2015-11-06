@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -315,7 +316,12 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver drv)
 				{
-					boolean res = element.isDisplayed();
+					boolean res = false;
+					
+					if(element != null) {
+						res = element.isDisplayed();
+					}
+					
 					if (!res) {
 						res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
 					}
@@ -625,11 +631,11 @@ public class ExtendedWebElement
 			Locatable locatableElement = (Locatable) getElement();
 			//[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
 			//https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
-			
-			int y = locatableElement.getCoordinates().onScreen().getY();
-			if (y > 120) {
-				((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
-			}
+
+			//[CB] onPage -> inViewPort
+			//https://code.google.com/p/selenium/source/browse/java/client/src/org/openqa/selenium/remote/RemoteWebElement.java?r=abc64b1df10d5f5d72d11fba37fabf5e85644081
+			int y = locatableElement.getCoordinates().inViewPort().getY();
+			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
 		}
 		catch (Exception e)
 		{
@@ -1076,12 +1082,12 @@ public class ExtendedWebElement
 				}
 			});
 			element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
-			summary.log(Messager.ELEMENT_FOUND.info(name));
+			//summary.log(Messager.ELEMENT_FOUND.info(name));
 		}
 		catch (Exception e)
 		{
 			element = null;
-			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			//summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
 			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
 		}
@@ -1134,6 +1140,15 @@ public class ExtendedWebElement
 		}		
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return extendedWebElements;
+	}
+	
+	public void tapWithCoordinates(double x, double y) {
+		HashMap<String, Double> tapObject = new HashMap<String, Double>();
+		tapObject.put("x", x);
+		tapObject.put("y", y);
+		final WebDriver drv = getDriver();
+		JavascriptExecutor js = (JavascriptExecutor) drv;
+		js.executeScript("mobile: tap", tapObject);
 	}
 	
 	private WebElement findStaleElement() {

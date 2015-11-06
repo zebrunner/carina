@@ -15,15 +15,20 @@
  */
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -43,6 +48,7 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+//import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -50,7 +56,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 	
     // Dropbox client
-    DropboxClient dropboxClient;
+//    DropboxClient dropboxClient;
  
     private void startItem(ITestResult result, Messager messager){
 		
@@ -129,16 +135,23 @@ public abstract class AbstractTestListener extends TestArgsListener
     	Device device = DevicePool.getDevice();
     	if (device != null) {
     		deviceName = device.getName();
+    		String udid = device.getUdid();
+    		if (udid != null) {
+    			if (!udid.isEmpty()) {
+    				deviceName = deviceName + " - " + udid;
+    			}
+    		}
     	}
+    	
     	return deviceName;
     }
     
     @Override
     public void beforeConfiguration(ITestResult result) {
    		startItem(result, Messager.CONFIG_STARTED);
-		// do failure test cleanup in this place as right after the test context
-		// doesn't have up-to-date information. Latest test result is not
-		// available
+		// do failure test cleanup in this place as right after the test 
+		// context doesn't have up-to-date information. 
+   		// This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
 		removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
@@ -264,6 +277,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		ZafiraIntegrator.finishSuite();		
 		removeIncorrectlyFailedTests(context);
+		//printContextTestsSummary(context);
 		super.onFinish(context);
 	}
 
@@ -272,29 +286,133 @@ public abstract class AbstractTestListener extends TestArgsListener
 	 * context.
 	 *
      */
-	public static void removeIncorrectlyFailedTests(ITestContext context)
-	{
-		ITestNGMethod[] methods = context.getAllTestMethods();
-		int max = methods.length;
-		LOGGER.debug("number of all executed methods is: " + max);
-		for(int i=0;i<methods.length;i++){
-			LOGGER.debug("Analyzed method is: " + methods[i].getMethodName());
-			if(methods[i].getCurrentInvocationCount()>1){
-				LOGGER.debug("Analyzed method invocation count is: " + methods[i].getCurrentInvocationCount());
-				LOGGER.debug("Count of failed method is: " + context.getFailedTests().getResults(methods[i]).size());
-				LOGGER.debug("Count of passed method is: " + context.getPassedTests().getResults(methods[i]).size());
-				
-				if (context.getFailedTests().getResults(methods[i]).size() > 0 && 
-						context.getPassedTests().getResults(methods[i]).size() == 1){
-					int count = 0;
-					while (context.getFailedTests().getResults(methods[i]).size() > 0 && count++ < max) {
-						LOGGER.debug("Removing " + methods[i].getMethodName() + " from failed results as passed result determined.");
-						context.getFailedTests().removeResult(methods[i]);
-					}
-				}
-			}
+	private void removeIncorrectlyFailedTests(ITestContext context) {
+		// List of test results which we will delete later
+		List<ITestResult> testsToBeRemoved = new ArrayList<>();
+
+		// collect all id's from passed test
+		Set<Long> passedTestIds = new HashSet<>();
+		for (ITestResult passedTest : context.getPassedTests().getAllResults()) {
+			//adding passed test
+			long passedTestId = getMethodId(passedTest);
+			LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
+			passedTestIds.add(passedTestId);
 		}
 
+		LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
+		
+		Set<Long> failedTestIds = new HashSet<>();
+		for (ITestResult failedTest : context.getFailedTests().getAllResults()) {
+
+			// id = class + method + dataprovider
+			long failedTestId = getMethodId(failedTest);
+
+			// if we saw this test as a failed test before we mark as to be deleted
+			// or delete this failed test if there is at least one passed version
+			if (failedTestIds.contains(failedTestId)
+					|| passedTestIds.contains(failedTestId)) {
+				LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
+				testsToBeRemoved.add(failedTest);
+			} else {
+				LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
+				failedTestIds.add(failedTestId);
+			}
+		}
+		
+		LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
+		// finally delete all tests that are marked for removal
+		for (Iterator<ITestResult> iterator = context.getFailedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			if (testsToBeRemoved.contains(testResult)) {
+				LOGGER.debug("Removing test from context: " + testResult.getName());
+				iterator.remove();
+			}
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void printContextTestsSummary(ITestContext context) {
+		LOGGER.debug("getAllTestMethods length: " + context.getAllTestMethods().length);
+		LOGGER.debug("---------------- PRINT SUMMARIZED SUCCESS -----------------------");
+		// print messages about all tests in context
+		LOGGER.debug("passed tests size: " + context.getPassedTests().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getPassedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("Pass test in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED FAILURE -----------------------");
+		// print messages about all tests in context
+		LOGGER.debug("failed tests size: " + context.getFailedTests().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getFailedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("Failed test in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED SKIP -----------------------");
+		// print messages about all tests in context
+		LOGGER.debug("skipped tests size: " + context.getSkippedTests().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getSkippedTests()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("Skipped test in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION SUCCESS -----------------------");
+		LOGGER.debug("passed configurations size: " + context.getPassedConfigurations().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getPassedConfigurations()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("passed configurations in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION FAILURE -----------------------");
+		LOGGER.debug("failed configurations size: " + context.getFailedConfigurations().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getFailedConfigurations()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("failed configurations in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+		
+		LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION SKIP -----------------------");
+		LOGGER.debug("skipped configurations size: " + context.getSkippedConfigurations().getAllResults().size());
+		for (Iterator<ITestResult> iterator = context.getSkippedConfigurations()
+				.getAllResults().iterator(); iterator.hasNext();) {
+			ITestResult testResult = iterator.next();
+			
+			long testId = getMethodId(testResult);
+			LOGGER.debug("failed configurations in context: " + testId + "; " 
+						+ testResult.getName());
+		}
+	}
+	
+	private long getMethodId(ITestResult result) {
+		long id = result.getTestClass().getName().hashCode();
+		id = 31 * id + result.getMethod().getMethodName().hashCode();
+		id = 31
+				* id
+				+ (result.getParameters() != null ? Arrays.hashCode(result
+						.getParameters()) : 0);
+		//LOGGER.debug("Calculated id for " + result.getMethod().getMethodName() + " is " + id);
+		return id;
 	}
 
 	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
@@ -318,7 +436,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
 		testResultItem.setDescription(description);
 		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
-		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira deature 
+		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature 
 		testResultItem.setJiraTickets(Jira.getTickets(result));
 		return testResultItem;
 	}

@@ -53,18 +53,13 @@ public class Spira
 		}
 	}
 
-	public synchronized static void updateAfterTest(ITestResult result)
-	{
-		updateAfterTest(result, null);
-	}
-	
-	public synchronized static void updateAfterTest(ITestResult result, String errorMessage)
+	public synchronized static void updateAfterTest(ITestResult result, String errorMessage, List<String> jiraTickets)
 	{
 		if(isInitialized)
 		{
 			try
 			{
-				updater.updateAfterTest(result, errorMessage);
+				updater.updateAfterTest(result, errorMessage, jiraTickets);
 			}
 			catch(Exception e)
 			{
@@ -106,8 +101,6 @@ public class Spira
 	/**
 	 * Return current SpiraTest step(s) for Test Method.
 	 * 
-	 * @param steps
-	 *            to set
 	 */
 	
 	public synchronized static List<String> getSteps() {

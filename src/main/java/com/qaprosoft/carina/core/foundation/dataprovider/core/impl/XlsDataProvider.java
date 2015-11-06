@@ -30,17 +30,8 @@ public class XlsDataProvider extends BaseDataProvider {
         DSBean dsBean = new DSBean(parameters, context
                 .getCurrentXmlTest().getAllParameters());
 
-        String executeColumn = "Execute";
-        String executeValue = "y";
-
-        if (!parameters.executeColumn().isEmpty())
-            executeColumn = parameters.executeColumn();
-
-        if (!parameters.executeValue().isEmpty())
-            executeValue = parameters.executeValue();
-
         XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(),
-                dsBean.getXlsSheet(), executeColumn, executeValue);
+                dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
 
         argsList = dsBean.getArgs();
         staticArgsList = dsBean.getStaticArgs();
@@ -65,9 +56,9 @@ public class XlsDataProvider extends BaseDataProvider {
         if (!parameters.spiraColumn().isEmpty())
         	spiraColumn = parameters.spiraColumn();
         
-        String testRailsColumn = "";
+        String testRailColumn = "";
         if (!parameters.testRailColumn().isEmpty())
-        	testRailsColumn = parameters.testRailColumn();
+        	testRailColumn = parameters.testRailColumn();
 
         
         String testMethodColumn = "";
@@ -133,6 +124,7 @@ public class XlsDataProvider extends BaseDataProvider {
             } else {
 	            // add testName value from xls datasource to special hashMap
 	            addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+	            addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
             }
             
             // add testMethoOwner from xls datasource to special hashMap
@@ -141,6 +133,7 @@ public class XlsDataProvider extends BaseDataProvider {
             // add jira ticket from xls datasource to special hashMap
             addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
             
+            //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
             // // add spira steps from xls datasource to special hashMap
             // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
             
@@ -153,7 +146,7 @@ public class XlsDataProvider extends BaseDataProvider {
 
             
             // add testrails cases from xls datasource to special hashMap
-            addValueToSpecialMap(testRailsArgsMap, testRailsColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
            
             rowIndex++;
         }

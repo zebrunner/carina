@@ -21,13 +21,22 @@ public @interface CsvDataSourceParameters {
 
     String dsUid() default "";
 
-    String executeColumn() default "Execute";
+    String executeColumn() default "";
 
-    String executeValue() default "y";
+    String executeValue() default "";
 
     String staticArgs() default "";
 
     String groupColumn() default "";
     
+    String jiraColumn() default "";
+    
     String spiraColumn() default "";
+    
+    String testRailColumn() default "";
+    
+    String testMethodColumn() default "";
+    
+    String testMethodOwnerColumn() default "";
+
 }

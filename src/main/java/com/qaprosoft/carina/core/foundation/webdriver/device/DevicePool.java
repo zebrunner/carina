@@ -87,7 +87,7 @@ public class DevicePool
 		Device freeDevice = null;
 		while (++count<100 && !found) {
 			for (Device device : devices) {
-				LOGGER.info("Check device status for registration: " + device.getName());
+				LOGGER.debug("Check device status for registration: " + device.getName());
 				if (!threadId2Device.containsValue(device)) {
 						//current thread doesn't have ignored devices
 						LOGGER.info("identified free non-ingnored device: " + device.getName());
@@ -127,6 +127,21 @@ public class DevicePool
 		return device;
 	}
 	
+	public static synchronized Device getDevice(String udid) {
+		Device device = null;
+		for (Device dev : devices) {
+			if (dev.getUdid().equalsIgnoreCase(udid)) {
+				device = dev;
+				break;
+			}
+		}
+		if (device == null) {
+			throw new RuntimeException("Unable to find device by udid: " + udid + "!");
+		}
+		return device;
+	}
+	
+	
 	public static synchronized void deregisterDeviceByThread(long threadId)
 	{
 		if (threadId2Device.containsKey(threadId)) {
@@ -152,20 +167,6 @@ public class DevicePool
 		return udid;
 	}
 	
-	public static synchronized String getDeviceName() {
-		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
-				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			Device device = DevicePool.getDevice();
-			if (device == null) {
-				throw new RuntimeException("Unable to find device by thread!");
-			}
-			udid = device.getName();
-		} 
-		
-		return udid;
-	}
-	
 	/**
 	 * Pause for specified timeout.
 	 * 
@@ -182,12 +183,37 @@ public class DevicePool
 	}
 
 	public static Type getDeviceType() {
-		Type type = Type.DESKTOP; //default value if no device observed
+		//specify default value based on existing _config.properties parameters
+		Type type = Type.DESKTOP;		
+		
+		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
+				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+				type = Type.ANDROID_PHONE;
+			}
+			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) {
+				type = Type.IOS_PHONE;
+			}
+		}
 		
 		Device device = getDevice();
 		if (device != null) {
 			type = device.getType();
+		} else {
+			LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
 		}
 		return type;
 	}
+	
+/*	public static void screensOn(AdbExecutor executor) {
+		for (Device device : devices) {
+			executor.screenOn(device.getUdid());
+		}
+	}
+	
+	public static void screensOff(AdbExecutor executor) {
+		for (Device device : devices) {
+			executor.screenOff(device.getUdid());
+		}
+	}*/
 }
