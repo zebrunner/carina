@@ -94,6 +94,8 @@ public abstract class AbstractTest // extends DriverHelper
 
 	protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
 	protected static final String XML_SUITE_NAME = " (%s)";
+	
+	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 
 	// 3rd party integrations
 	// Jira ticket(s)
@@ -190,7 +192,7 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 			
 			// Populate Spira Steps
-			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), jiraTickets);
 			Spira.clear();
 
 			// Populate TestRail Cases
@@ -223,6 +225,7 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
 		try {
+			ReportContext.removeTempDir(); //clean temp artifacts directory
 			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
 			String browser = getBrowser();
@@ -361,7 +364,21 @@ public abstract class AbstractTest // extends DriverHelper
 		} else {
 			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
 		}
+		
+		String appender = getSuiteNameAppender();
+		if (appender != null && !appender.isEmpty()) {
+			suiteName = suiteName + " - " + appender;
+		}
+		
 		return suiteName;
+	}
+	
+	protected void setSuiteNameAppender(String appender) {
+		suiteNameAppender.set(appender);
+	}
+	
+	protected String getSuiteNameAppender() {
+		return suiteNameAppender.get();
 	}
 
 	// separate method to be able to retrieve information from different sheets

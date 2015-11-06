@@ -227,7 +227,9 @@ public class Configuration
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
-		MOBILE_DEVICE_TYPE("mobile_device_type"),		
+		MOBILE_DEVICE_TYPE("mobile_device_type"),
+		
+		MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
 		
 		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
 		
@@ -271,7 +273,11 @@ public class Configuration
 		
 		GIT_COMMIT("git_commit"),
 		
-		GIT_URL("git_url");
+		GIT_URL("git_url"),
+
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
+
+
 		
 		private final String key;
 

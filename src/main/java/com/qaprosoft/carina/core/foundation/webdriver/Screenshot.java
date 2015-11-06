@@ -64,6 +64,10 @@ public class Screenshot
 		
 		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
 		{
+			if (driver == null) {
+				LOGGER.warn("Unable to capture screenshot as driver is null.");
+				return null;
+			}
 			if (driver.toString().contains("null")) {
 				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 				return null;
