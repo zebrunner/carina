@@ -72,6 +72,29 @@ public class Configuration
 
 
 	}
+	
+	public enum S3Mode
+	{
+		OFF("off"),
+		
+		READ("read"),
+		
+		WRITE("write");
+		
+		private final String key;
+
+		private S3Mode(String key)
+		{
+			this.key = key;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+
+	}
+	
 	/**
 	 * All available configuration parameter keys along with default values.
 	 */
@@ -278,6 +301,10 @@ public class Configuration
 		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
 		
 		//Amazon
+		S3_MANAGER("s3_manager"),
+		
+		S3_MODE("s3_mode"),
+		
 		S3_BUCKET_NAME("s3_bucket_name"),
 		
 		ACCESS_KEY_ID("access_key_id"),
@@ -336,6 +363,11 @@ public class Configuration
 	public static DriverMode getDriverMode()
 	{
 		return DriverMode.valueOf(get(Parameter.DRIVER_MODE).trim().toUpperCase());
+	}
+	
+	public static S3Mode getS3Mode()
+	{
+		return S3Mode.valueOf(get(Parameter.S3_MODE).trim().toUpperCase());
 	}
 	
 	public static Locale getLocale()
