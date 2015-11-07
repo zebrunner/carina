@@ -108,6 +108,9 @@ public class Screenshot
 				FileUtils.copyFile(fullScreen, thumbScreen);
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT));
+
+				//TODO add S3 Uploader to key=TestRunID/TestID/???
+				//AmazonS3Manager.put(Configuration.get(Parameter.S3_BUCKET_NAME), key, fullScreenPath);
 			}
 			catch (IOException e)
 			{
