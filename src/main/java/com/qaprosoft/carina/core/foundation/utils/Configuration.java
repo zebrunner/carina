@@ -15,10 +15,10 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.Constructor;
 import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Configuration utility.
@@ -275,10 +275,13 @@ public class Configuration
 		
 		GIT_URL("git_url"),
 
-		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
+
+		DRIVER_TYPE("driver_type"),
+
+		CUSTOM_CAPABILITIES("custom_capabilities");
 
 
-		
 		private final String key;
 
 		private Parameter(String key)
