@@ -93,9 +93,13 @@ public class SpecialKeywords
 	public static final String MOBILE = "mobile";
 	public static final String MOBILE_POOL = "mobile_pool";
 	public static final String MOBILE_GRID = "mobile_grid";
-	
+
+	public static final String CUSTOM = "custom";
+
 	public static final String ANDROID = "Android";
 	public static final String IOS = "IOS";
+
+	public static final String NATIVE = "native";
 
 	public static final String TABLET = "tablet";
 	public static final String PHONE = "phone";

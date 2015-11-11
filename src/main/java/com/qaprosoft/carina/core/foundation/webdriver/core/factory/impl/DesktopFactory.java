@@ -1,0 +1,61 @@
+package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.*;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class DesktopFactory extends AbstractFactory {
+
+    @Override
+    public WebDriver create(String testName, Device device) {
+        RemoteWebDriver driver;
+        String selenium = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+        String browser = Configuration.get(Configuration.Parameter.BROWSER);
+        String browserVersion = Configuration.get(Configuration.Parameter.BROWSER_VERSION);
+        DesiredCapabilities capabilities = getCapabilities(testName, browserVersion, browser);
+
+        try {
+            driver = new RemoteWebDriver(new URL(selenium), capabilities);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Unable to create desktop driver");
+        }
+        return driver;
+    }
+
+
+    public DesiredCapabilities getCapabilities(String testName, String browserVersion, String browser) {
+        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
+            return new FirefoxCapabilities().getCapability(browserVersion, testName);
+        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
+            return new IECapabilities().getCapability(browserVersion, testName);
+        } else if (BrowserType.HTMLUNIT.equalsIgnoreCase(browser)) {
+            return new HTMLUnitCapabilities().getCapability(browserVersion, testName);
+        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
+            return new SafariCapabilities().getCapability(browserVersion, testName);
+        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
+            return new ChromeCapabilities().getCapability(browserVersion, testName);
+        } else if (SpecialKeywords.CUSTOM.equalsIgnoreCase(browser)) {
+            try {
+                return new CapabilitiesLoder(new FileInputStream(Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES))).loadCapabilities();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException("Unable read custom capabilities");
+            }
+        } else {
+
+            throw new RuntimeException("Unsupported driver");
+        }
+
+    }
+}
