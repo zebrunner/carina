@@ -61,7 +61,7 @@ public class Configuration
 		
 		private final String key;
 
-		private DriverMode(String key)
+		DriverMode(String key)
 		{
 			this.key = key;
 		}
@@ -284,7 +284,7 @@ public class Configuration
 
 		private final String key;
 
-		private Parameter(String key)
+		Parameter(String key)
 		{
 			this.key = key;
 		}

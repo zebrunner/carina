@@ -1104,7 +1104,7 @@ public class ExtendedWebElement
 	
 	public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout)
 	{
-		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
 		final WebDriver drv = getDriver();
