@@ -32,7 +32,7 @@ public class MarshallerHelper {
 
 	public static void marshall(Object jaxbElement, Result paramResult) {
 		marshaller.marshall(jaxbElement, paramResult);
-	};
+	}
 
 	/**
 	 * Serializes JAXBElement into File
@@ -44,7 +44,7 @@ public class MarshallerHelper {
 	 */
 	public static void marshall(Object jaxbElement, File resultFile) {
 		marshall(jaxbElement, new StreamResult(resultFile));
-	};
+	}
 
 	/**
 	 * Serializes JAXBElement to OutputStream
@@ -56,9 +56,9 @@ public class MarshallerHelper {
 	 */
 	public static void marshall(Object jaxbElement, OutputStream os) {
 		marshall(jaxbElement, new StreamResult(os));
-	};
+	}
 
-	
+
 	/**
 	 * Serializes JAXBElement to String
 	 * 
@@ -79,7 +79,7 @@ public class MarshallerHelper {
 	 */
 	public static <T> T unmarshall(Source source, Class<T> resultClazz) {
 		return marshaller.unmarshall(source, resultClazz);
-	};
+	}
 
 	/**
 	 * Create JAXBElement from File
@@ -90,7 +90,7 @@ public class MarshallerHelper {
 	 */
 	public static <T> T unmarshall(File file, Class<T> resultClazz) {
 		return marshaller.unmarshall(file, resultClazz);
-	};
+	}
 
 	/**
 	 * Create JAXBElement from File
@@ -101,12 +101,12 @@ public class MarshallerHelper {
 	 */
 	public static <T> T unmarshall(InputStream is, Class<T> resultClazz) {
 		return marshaller.unmarshall(is, resultClazz);
-	};
-	
+	}
+
 	public static <T> T unmarshall(String string, Class<T> resultClazz) {
 		return marshaller.unmarshall(string, resultClazz);
-	};
-	
+	}
+
 
 	/**
 	 * Serializes JAXBElement into Writer
@@ -116,5 +116,5 @@ public class MarshallerHelper {
 	 */
 	public static void marshall(Object jaxbElement, Writer writer) {
 		marshaller.marshall(jaxbElement, writer);
-	};
+	}
 }

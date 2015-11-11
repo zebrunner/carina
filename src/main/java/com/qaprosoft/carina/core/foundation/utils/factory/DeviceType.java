@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface DeviceType {
 
-	public enum Type {
+	enum Type {
 
 		DESKTOP("desktop", "desktop"), ANDROID_TABLET("android_tablet",
 				"android"), ANDROID_PHONE("android_phone", "android"), IOS_TABLET(
@@ -19,7 +19,7 @@ public @interface DeviceType {
 
 		private String family;
 
-		private Type(String type, String family) {
+		Type(String type, String family) {
 			this.type = type;
 			this.family = family;
 		}

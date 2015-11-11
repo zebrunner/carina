@@ -161,7 +161,7 @@ public class I18N {
 		LOGGER.debug("getText: I18N bundle size: " + resBoundles.size());
 		Iterator<ResourceBundle> iter = resBoundles.iterator();
 		while (iter.hasNext()) {
-			ResourceBundle bundle = (ResourceBundle) iter.next();
+			ResourceBundle bundle = iter.next();
 			try {
 				String value = bundle.getString(key);
 				LOGGER.debug("Looking for value for language:'"
