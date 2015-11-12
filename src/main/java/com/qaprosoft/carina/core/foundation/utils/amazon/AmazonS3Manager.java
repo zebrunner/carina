@@ -67,7 +67,7 @@ public class AmazonS3Manager
 	
 	public synchronized static void delete(String bucketName, String key)
 	{
-		
+		//TODO find 'retry' place for artifacts cleanup
 		if(isInitialized)
 		{
 			try
