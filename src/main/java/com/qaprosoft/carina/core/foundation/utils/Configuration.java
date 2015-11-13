@@ -147,6 +147,8 @@ public class Configuration
 		
 		THREAD_COUNT("thread_count"),
 		
+		DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
+		
 		CORE_LOG_LEVEL("core_log_level"),
 		
 		TEST_ID("test_id"),
