@@ -32,10 +32,11 @@ import com.qaprosoft.zafira.client.model.UserType;
 public class ZafiraIntegrator {
 	protected static final Logger LOGGER = Logger.getLogger(ZafiraIntegrator.class);
 
-	private static UserType user;
+	private static UserType user = null;
 	private static JobType job, parentJob;
-	private static TestSuiteType suite;
-	private static TestRunType run;
+	private static TestSuiteType suite = null;
+	private static TestRunType run = null;
+	private static ThreadLocal<TestType> test = new ThreadLocal<TestType>();
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
 
@@ -187,6 +188,8 @@ public class ZafiraIntegrator {
 
 			registeredTest = registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl);
 			TestNamingUtil.associateZafiraTest(registeredTest, Thread.currentThread().getId());
+			
+			setTestType(registeredTest);
 
 		} catch (Exception e) {
 			isRegistered = false;
@@ -201,6 +204,29 @@ public class ZafiraIntegrator {
 
 		Response<TestType> response = zc.createTestWorkItems(testId, workItems);
 		return response.getObject();
+	}
+	
+	public static long getRunId() {
+		if (run != null) {
+			return run.getId();	
+		}
+		return -1L;
+	}
+	
+	public static long getTestId() {
+		TestType testType = getTestType();
+		if (testType != null) {
+			return testType.getId();	
+		}
+		return -1L;
+	}
+	
+	private static TestType getTestType() {
+		return test.get();
+	}
+	
+	private static void setTestType(TestType testType) {
+		test.set(testType);
 	}
 
 	private static boolean isValid() {

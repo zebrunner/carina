@@ -52,6 +52,10 @@ public class ReportContext
 	
 	private static long rootID;
 
+	public static long getRootID() {
+		return rootID;
+	}
+
 	/**
 	 * Crates new screenshot directory at first call otherwise returns created
 	 * directory. Directory is specific for any new test suite launch.
