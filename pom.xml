@@ -67,7 +67,7 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
-		<aws-java-sdk.version>1.10.30</aws-java-sdk.version>
+		<aws-s3-manager.version>1.0.1</aws-s3-manager.version>
 	</properties>
 
 	<repositories>
@@ -80,15 +80,23 @@
 			<id>qaprosoft_releases</id>
 			<name>Qaprosoft Releases</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
-			<releases><enabled>true</enabled></releases>
-			<snapshots><enabled>false</enabled></snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>qaprosoft_shapshots</id>
 			<name>Qaprosoft Snapshots</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
-			<releases><enabled>false</enabled></releases>
-			<snapshots><enabled>true</enabled></snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
@@ -349,12 +357,12 @@
 		</dependency>
 		<!-- Amazon -->
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk</artifactId>
-			<version>${aws-java-sdk.version}</version>
+			<groupId>com.qaprosoft.amazon</groupId>
+			<artifactId>aws-s3-manager</artifactId>
+			<version>${aws-s3-manager.version}</version>
 		</dependency>
 	</dependencies>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>deploymentRepo</id>
