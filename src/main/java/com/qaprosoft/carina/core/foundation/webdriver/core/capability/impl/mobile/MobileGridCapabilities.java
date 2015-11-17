@@ -8,7 +8,7 @@ public class MobileGridCapabilities extends MobileCapabilies {
 
     @Override
     public DesiredCapabilities getCapability(String browserVersion, String testName) {
-        if (!Configuration.get(Configuration.Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
+        if (!Configuration.get(Configuration.Parameter.BROWSER).isEmpty()) {
             return new MobileWebCapabilities().getCapability(true);
         } else {
             return new MobileNativeCapabilities().getCapability(true);

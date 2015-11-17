@@ -279,17 +279,15 @@ public abstract class AbstractTest // extends DriverHelper
 	}
 
 	protected String getBrowser() {
-		String browser = Configuration.get(Parameter.BROWSER);
+		String browser = "";
+		if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
+			browser = Configuration.get(Parameter.BROWSER);
+		}
+
 		if (!browserVersion.isEmpty()) {
 			browser = browser + " " + browserVersion;
 		}
 
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
-			browser = "";
-			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
-			}
-		}
 		return browser;
 	}
 
