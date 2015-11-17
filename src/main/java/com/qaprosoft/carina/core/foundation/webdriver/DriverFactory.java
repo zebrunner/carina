@@ -15,21 +15,24 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.net.URL;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -108,6 +111,12 @@ public class DriverFactory {
     public static String getBrowserVersion(WebDriver driver) {
         Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
         return cap.getVersion().toString();
+    }
+    
+    @Deprecated
+    public static DesiredCapabilities getMobileWebCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName,
+            String automationName, String commandTimeout, String browserName) {
+    	return MobileCapabilies.getMobileCapabilities(gridMode, platform, platformVersion, deviceName, automationName, commandTimeout, browserName, "", "", "");
     }
 
 
