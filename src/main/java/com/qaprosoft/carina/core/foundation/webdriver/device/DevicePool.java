@@ -48,7 +48,7 @@ public class DevicePool
 	}
 	
 	public static synchronized void registerDevices() {
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			registerDevice();
 			return;
 		}

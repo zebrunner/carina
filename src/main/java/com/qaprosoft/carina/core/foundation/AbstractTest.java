@@ -269,7 +269,7 @@ public abstract class AbstractTest // extends DriverHelper
 	private String getDeviceName() {
 		String deviceName = "Desktop";
 		
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
 			//Samsung - Android 4.4.2; iPhone - iOS 7
 			String deviceTemplate = "%s - %s %s"; 
 			deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
