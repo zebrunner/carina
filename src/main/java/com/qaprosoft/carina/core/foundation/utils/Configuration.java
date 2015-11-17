@@ -277,8 +277,14 @@ public class Configuration
 		
 		GIT_URL("git_url"),
 
-		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
 
+		//For localization parser
+		ADD_NEW_LOCALIZATION("add_new_localization"), 
+		
+		ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
+		
+		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name");
 
 		
 		private final String key;

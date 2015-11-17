@@ -72,6 +72,7 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.zafira.client.model.TestType;
 
 /*
@@ -162,6 +163,13 @@ public abstract class AbstractTest // extends DriverHelper
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			LOGGER.debug("I18N bundle is not initialized successfully!", e);
+		}
+		
+		try {
+			L10Nparser.init();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			LOGGER.debug("L10Nparser bundle is not initialized successfully!", e);
 		}
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
