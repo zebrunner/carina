@@ -207,18 +207,24 @@ public class ZafiraIntegrator {
 	}
 	
 	public static long getRunId() {
+		long runId = -1L;
 		if (run != null) {
-			return run.getId();	
+			LOGGER.debug("Run is not null");
+			runId = run.getId();
 		}
-		return -1L;
+		LOGGER.debug("runId: " + runId);
+		return runId;
 	}
 	
 	public static long getTestId() {
 		TestType testType = getTestType();
+		long testId = -1L;
 		if (testType != null) {
-			return testType.getId();	
+			LOGGER.debug("TestType is not null");
+			testId = testType.getId();
 		}
-		return -1L;
+		LOGGER.debug("testId: " + testId);
+		return testId;
 	}
 	
 	private static TestType getTestType() {
