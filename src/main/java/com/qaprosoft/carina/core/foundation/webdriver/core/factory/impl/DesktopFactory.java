@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.*;
@@ -21,10 +22,8 @@ public class DesktopFactory extends AbstractFactory {
     @Override
     public WebDriver create(String testName, Device device) {
         RemoteWebDriver driver;
-        String selenium = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
-        String browser = Configuration.get(Configuration.Parameter.BROWSER);
-        String browserVersion = Configuration.get(Configuration.Parameter.BROWSER_VERSION);
-        DesiredCapabilities capabilities = getCapabilities(testName, browserVersion, browser);
+        String selenium = Configuration.get(Parameter.SELENIUM_HOST);
+        DesiredCapabilities capabilities = getCapabilities(testName);
 
         try {
             driver = new RemoteWebDriver(new URL(selenium), capabilities);
@@ -35,27 +34,37 @@ public class DesktopFactory extends AbstractFactory {
     }
 
 
-    public DesiredCapabilities getCapabilities(String testName, String browserVersion, String browser) {
-        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
-            return new FirefoxCapabilities().getCapability(browserVersion, testName);
-        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
-            return new IECapabilities().getCapability(browserVersion, testName);
-        } else if (BrowserType.HTMLUNIT.equalsIgnoreCase(browser)) {
-            return new HTMLUnitCapabilities().getCapability(browserVersion, testName);
-        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
-            return new SafariCapabilities().getCapability(browserVersion, testName);
-        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
-            return new ChromeCapabilities().getCapability(browserVersion, testName);
-        } else if (SpecialKeywords.CUSTOM.equalsIgnoreCase(browser)) {
-            try {
-                return new CapabilitiesLoder(new FileInputStream(Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES))).loadCapabilities();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException("Unable read custom capabilities");
-            }
-        } else {
-
-            throw new RuntimeException("Unsupported driver");
-        }
+    public DesiredCapabilities getCapabilities(String testName) {
+    	String driverType = Configuration.get(Parameter.DRIVER_TYPE);
+    	String browser = Configuration.get(Parameter.BROWSER);
+    	
+    	
+		if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
+			try {
+				return new CapabilitiesLoder(new FileInputStream(Configuration.get(Parameter.CUSTOM_CAPABILITIES)))
+						.loadCapabilities();
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(
+						"Unable read custom capabilities: " + Configuration.get(Parameter.CUSTOM_CAPABILITIES));
+			}
+		} else if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+			if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
+				return new FirefoxCapabilities().getCapability(testName);
+			} else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser)
+					|| browser.equalsIgnoreCase("ie")) {
+				return new IECapabilities().getCapability(testName);
+			} else if (BrowserType.HTMLUNIT.equalsIgnoreCase(browser)) {
+				return new HTMLUnitCapabilities().getCapability(testName);
+			} else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
+				return new SafariCapabilities().getCapability(testName);
+			} else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
+				return new ChromeCapabilities().getCapability(testName);
+			} else {
+				throw new RuntimeException("Unsupported browser: " + browser);
+			}
+		} else {
+			throw new RuntimeException("Unsupported driverType: " + driverType);
+		}
 
     }
 }

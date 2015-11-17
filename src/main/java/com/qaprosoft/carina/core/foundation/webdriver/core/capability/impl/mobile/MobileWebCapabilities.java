@@ -1,12 +1,13 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 public class MobileWebCapabilities extends MobileCapabilies {
 
 
-    public DesiredCapabilities getCapability(String browserVersion, String testName) {
+    public DesiredCapabilities getCapability(String testName) {
         return getCapability(false);
     }
 
