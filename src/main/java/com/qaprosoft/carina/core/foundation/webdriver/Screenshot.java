@@ -128,11 +128,11 @@ public class Screenshot
 	
 	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
 		Long runId = ZafiraIntegrator.getRunId();
-		Long testId = ZafiraIntegrator.getTestId();
 		String env = Configuration.get(Parameter.ENV).toUpperCase();
-		String key =  env + "/" + runId + "/" + testId + "/" + screenName;				
-		if (runId == -1 || testId == -1) {
-			key = env + "/LOCAL/" + ReportContext.getRootID() + "/" + ReportContext.getTestDir(test).getName() + "/" + screenName;
+		String testName = ReportContext.getTestDir(test).getName();
+		String key =  env + "/" + runId + "/" + testName + "/" + screenName;				
+		if (runId == -1) {
+			key = env + "/LOCAL/" + ReportContext.getRootID() + "/" + testName + "/" + screenName;
 		}
 		LOGGER.debug("Key: " + key);
 		LOGGER.debug("FullScreenPath: " + fullScreenPath);
