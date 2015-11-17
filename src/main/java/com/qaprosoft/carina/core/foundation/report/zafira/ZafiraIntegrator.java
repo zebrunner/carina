@@ -36,7 +36,6 @@ public class ZafiraIntegrator {
 	private static JobType job, parentJob;
 	private static TestSuiteType suite = null;
 	private static TestRunType run = null;
-	private static ThreadLocal<TestType> test = new ThreadLocal<TestType>();
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
 
@@ -189,8 +188,6 @@ public class ZafiraIntegrator {
 			registeredTest = registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl);
 			TestNamingUtil.associateZafiraTest(registeredTest, Thread.currentThread().getId());
 			
-			setTestType(registeredTest);
-
 		} catch (Exception e) {
 			isRegistered = false;
 			LOGGER.error("Undefined error during test case/method finish!", e);
@@ -215,26 +212,7 @@ public class ZafiraIntegrator {
 		LOGGER.debug("runId: " + runId);
 		return runId;
 	}
-	
-	public static long getTestId() {
-		TestType testType = getTestType();
-		long testId = -1L;
-		if (testType != null) {
-			LOGGER.debug("TestType is not null");
-			testId = testType.getId();
-		}
-		LOGGER.debug("testId: " + testId);
-		return testId;
-	}
-	
-	private static TestType getTestType() {
-		return test.get();
-	}
-	
-	private static void setTestType(TestType testType) {
-		test.set(testType);
-	}
-
+		
 	private static boolean isValid() {
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
