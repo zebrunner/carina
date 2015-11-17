@@ -134,6 +134,8 @@ public class Screenshot
 		if (runId == -1 || testId == -1) {
 			key = env + "/LOCAL/" + ReportContext.getRootID() + "/" + ReportContext.getTestDir(test).getName() + "/" + screenName;
 		}
+		LOGGER.debug("Key: " + key);
+		LOGGER.debug("FullScreenPath: " + fullScreenPath);
 		AmazonS3Manager.getInstance().put(key, fullScreenPath);
 	}
 	
