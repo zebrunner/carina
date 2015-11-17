@@ -9,9 +9,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public class IECapabilities extends AbstractCapabilities {
 
 
-    public DesiredCapabilities getCapability(String browserVersion, String testName) {
+    public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.IEXPLORE, browserVersion, testName);
+        capabilities = initBaseCapabilities(capabilities, BrowserType.IEXPLORE, testName);
         capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);

@@ -1,8 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import java.util.ArrayList;
+
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.net.PortProber;
@@ -10,21 +9,23 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.util.ArrayList;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class FirefoxCapabilities extends AbstractCapabilities {
 
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
-    public DesiredCapabilities getCapability(String browserVersion, String testName) {
+    public DesiredCapabilities getCapability(String testName) {
 
         FirefoxProfile profile = getDefaultFirefoxProfile();
-        return getCapability(testName, browserVersion, profile);
+        return getCapability(testName, profile);
     }
 
-    public DesiredCapabilities getCapability(String testName, String browserVersion, FirefoxProfile profile) {
+    public DesiredCapabilities getCapability(String testName, FirefoxProfile profile) {
         DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, browserVersion, testName);
+        capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, testName);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
         capabilities.setCapability(FirefoxDriver.PROFILE, profile);
         return capabilities;
