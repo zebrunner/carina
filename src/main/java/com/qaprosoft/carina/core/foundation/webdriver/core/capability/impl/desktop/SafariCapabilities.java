@@ -7,10 +7,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public class SafariCapabilities extends AbstractCapabilities {
 
 
-    public DesiredCapabilities getCapability(String browserVersion, String testName) {
+    public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = DesiredCapabilities.safari();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.SAFARI, browserVersion, testName);
-        capabilities.setCapability("name", testName);
+        capabilities = initBaseCapabilities(capabilities, BrowserType.SAFARI, testName);
         return capabilities;
     }
 }
