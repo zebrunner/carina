@@ -22,7 +22,7 @@ public class FirefoxCapabilities extends AbstractCapabilities {
         return getCapability(testName, browserVersion, profile);
     }
 
-    public DesiredCapabilities getCapability(String browserVersion, String testName, FirefoxProfile profile) {
+    public DesiredCapabilities getCapability(String testName, String browserVersion, FirefoxProfile profile) {
         DesiredCapabilities capabilities = DesiredCapabilities.firefox();
         capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, browserVersion, testName);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
