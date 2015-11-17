@@ -97,7 +97,12 @@ public class UITest extends AbstractTest {
             }
         }
 
-        executor.screenOn();
+        try {
+        	executor.screenOn();
+        } catch (Exception e) {
+        	//temporary workaround until factory branch is merged into the master
+        	e.printStackTrace();
+        }
     }
 
     @BeforeMethod(alwaysRun = true)
