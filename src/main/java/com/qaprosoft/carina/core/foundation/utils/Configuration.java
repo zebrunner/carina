@@ -210,8 +210,6 @@ public class Configuration
         
         MOBILE_PLATFORM_VERSION("mobile_platform_version"),
         
-        MOBILE_BROWSER_NAME("mobile_browser_name"),
-        
         MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Sendroid 
         
         MOBILE_APP("mobile_app"),
