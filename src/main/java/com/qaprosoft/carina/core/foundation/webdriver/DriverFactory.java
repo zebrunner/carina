@@ -24,6 +24,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
@@ -49,7 +50,8 @@ public class DriverFactory {
     private static final Device nullDevice = new Device();
 
 
-    public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
+    @SuppressWarnings("rawtypes")
+	public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
         RemoteWebDriver driver = null;
         try {
             if (capabilities.getCapability("automationName") == null)
@@ -91,10 +93,10 @@ public class DriverFactory {
 
     public static WebDriver create(String testName, Device device) {
         AbstractFactory factory;
-        String browserType = Configuration.get(Parameter.DRIVER_TYPE);
-        if (browserType.equalsIgnoreCase("desktop")) {
+        String driverType = Configuration.get(Parameter.DRIVER_TYPE);
+        if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
             factory = new DesktopFactory();
-        } else if (browserType.equalsIgnoreCase("mobile")) {
+        } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
             factory = new MobileFactory();
         } else {
             throw new RuntimeException("Unsupported browser type!");

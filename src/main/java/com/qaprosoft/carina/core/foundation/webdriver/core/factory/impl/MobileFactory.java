@@ -22,15 +22,8 @@ import java.net.URL;
 
 public class MobileFactory extends AbstractFactory {
 
-
-    public static final String MOBILE_GRID = SpecialKeywords.MOBILE_GRID;
-
-    public static final String MOBILE_POOL = SpecialKeywords.MOBILE_POOL;
-
-    public static final String MOBILE = SpecialKeywords.MOBILE;
-
-
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public WebDriver create(String testName, Device device) {
 
         String selenium = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
@@ -40,11 +33,9 @@ public class MobileFactory extends AbstractFactory {
         RemoteWebDriver driver = null;
         DesiredCapabilities capabilities = getCapabilities(testName, browser);
         try {
-
-            if (MOBILE_GRID.equalsIgnoreCase(browser)) {
-
+            if (SpecialKeywords.MOBILE_GRID.equalsIgnoreCase(browser)) {
                 driver = new RemoteWebDriver(new URL(selenium), capabilities);
-            } else if (MOBILE_POOL.equalsIgnoreCase(browser) || browser.equalsIgnoreCase(MOBILE)) {
+            } else if (SpecialKeywords.MOBILE_POOL.equalsIgnoreCase(browser) || SpecialKeywords.MOBILE.equalsIgnoreCase(browser)) {
                 if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID))
                     driver = new AndroidDriver(new URL(selenium), capabilities);
                 else if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
@@ -58,19 +49,19 @@ public class MobileFactory extends AbstractFactory {
                 throw new RuntimeException("Unsupported browser");
             }
         } catch (MalformedURLException e) {
+        	LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
             e.printStackTrace();
         }
-
 
         return driver;
     }
 
     public DesiredCapabilities getCapabilities(String testName, String browser) {
-        if (MOBILE_GRID.equalsIgnoreCase(browser)) {
+        if (SpecialKeywords.MOBILE_GRID.equalsIgnoreCase(browser)) {
             return new MobileGridCapabilities().getCapability(browser, testName);
-        } else if ((MOBILE_POOL.equalsIgnoreCase(browser) || MOBILE.equalsIgnoreCase(browser) && !Configuration.get(Configuration.Parameter.MOBILE_BROWSER_NAME).isEmpty())) {
+        } else if ((SpecialKeywords.MOBILE_POOL.equalsIgnoreCase(browser) || SpecialKeywords.MOBILE.equalsIgnoreCase(browser) && !Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
             return new MobileWebCapabilities().getCapability(testName, browser);
-        } else if ((MOBILE_POOL.equalsIgnoreCase(browser) || MOBILE.equalsIgnoreCase(browser) && Configuration.get(Configuration.Parameter.MOBILE_BROWSER_NAME).isEmpty())) {
+        } else if ((SpecialKeywords.MOBILE_POOL.equalsIgnoreCase(browser) || SpecialKeywords.MOBILE.equalsIgnoreCase(browser) && Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
             return new MobileNativeCapabilities().getCapability(testName, browser);
         } else if (SpecialKeywords.CUSTOM.equalsIgnoreCase(browser)) {
             try {
