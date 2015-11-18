@@ -45,6 +45,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.xml.XmlTest;
 
 import com.jayway.restassured.RestAssured;
+import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -169,7 +170,15 @@ public abstract class AbstractTest // extends DriverHelper
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
 		TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
-
+		
+		AmazonS3Manager.getInstance().setMode(
+				Configuration.get(Parameter.S3_MODE));
+		AmazonS3Manager.getInstance().initS3client(
+				Configuration.get(Parameter.ACCESS_KEY_ID),
+				Configuration.get(Parameter.SECRET_KEY));
+		AmazonS3Manager.getInstance().setBucket(
+				Configuration.get(Parameter.S3_BUCKET_NAME));
+		
 	}
 
 	@BeforeClass(alwaysRun = true)
