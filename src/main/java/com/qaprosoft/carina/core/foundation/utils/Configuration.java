@@ -72,6 +72,7 @@ public class Configuration
 
 
 	}
+	
 	/**
 	 * All available configuration parameter keys along with default values.
 	 */
@@ -276,8 +277,17 @@ public class Configuration
 		GIT_COMMIT("git_commit"),
 		
 		GIT_URL("git_url"),
-
+		
 		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
+		
+		//Amazon
+		S3_MODE("s3_mode"),
+		
+		S3_BUCKET_NAME("s3_bucket_name"),
+		
+		ACCESS_KEY_ID("access_key_id"),
+		
+		SECRET_KEY("secret_key");
 
 		//For localization parser
 		ADD_NEW_LOCALIZATION("add_new_localization"), 
