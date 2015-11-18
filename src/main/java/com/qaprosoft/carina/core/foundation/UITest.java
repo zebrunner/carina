@@ -15,6 +15,23 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import java.lang.reflect.Method;
+
+import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Listeners;
+import org.testng.xml.XmlTest;
+
 import com.qaprosoft.carina.core.foundation.listeners.UITestListener;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -27,16 +44,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.annotations.*;
-import org.testng.xml.XmlTest;
-
-import java.lang.reflect.Method;
 
 @Listeners({UITestListener.class})
 public class UITest extends AbstractTest {
@@ -99,7 +106,7 @@ public class UITest extends AbstractTest {
 
         try {
         	executor.screenOn();
-        } catch (Exception e) {
+        } catch (Throwable e) {
         	//temporary workaround until factory branch is merged into the master
         	e.printStackTrace();
         }
