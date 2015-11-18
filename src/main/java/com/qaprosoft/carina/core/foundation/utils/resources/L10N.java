@@ -127,7 +127,11 @@ public class L10N {
 		LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
 	}
 
-	private static Locale getDefaultLocale() {
+	/**
+	 * get Default Locale
+	 * @return Locale
+	 */
+	public static Locale getDefaultLocale() {
 		List<Locale> locales = LocaleReader.init(Configuration
 				.get(Parameter.LOCALE));
 		
@@ -137,6 +141,7 @@ public class L10N {
 
 		return locales.get(0);
 	}
+	
 	/**
 	 * getText by key for default locale.
 	 * 
