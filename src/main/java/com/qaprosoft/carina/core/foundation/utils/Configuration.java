@@ -287,7 +287,7 @@ public class Configuration
 		
 		ACCESS_KEY_ID("access_key_id"),
 		
-		SECRET_KEY("secret_key");
+		SECRET_KEY("secret_key"),
 
 		//For localization parser
 		ADD_NEW_LOCALIZATION("add_new_localization"), 
