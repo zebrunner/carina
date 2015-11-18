@@ -30,10 +30,12 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
+import com.qaprosoft.amazon.AmazonS3Manager;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -108,20 +110,33 @@ public class Screenshot
 				FileUtils.copyFile(fullScreen, thumbScreen);
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT));
+
+				// Uploading screenshot to Amazon S3
+				uploadToAmazonS3(test, fullScreenPath, screenName);
 			}
 			catch (IOException e)
 			{
-				LOGGER.error("Unable to capture screenshot due to the I/O issues!");
-//				e.printStackTrace();
+				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
 			}
 			catch (Exception e)
 			{
-//				LOGGER.error("Unable to capture screenshot!");
-				LOGGER.error("Unable to capture screenshot! " + e.getMessage());
-				e.printStackTrace();
+				LOGGER.error("Unable to capture screenshot!", e);
 			}
 		}
 		return screenName;
+	}
+	
+	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
+		Long runId = ZafiraIntegrator.getRunId();
+		String env = Configuration.get(Parameter.ENV).toUpperCase();
+		String testName = ReportContext.getTestDir(test).getName();
+		String key =  env + "/" + runId + "/" + testName + "/" + screenName;				
+		if (runId == -1) {
+			key = env + "/LOCAL/" + ReportContext.getRootID() + "/" + testName + "/" + screenName;
+		}
+		LOGGER.debug("Key: " + key);
+		LOGGER.debug("FullScreenPath: " + fullScreenPath);
+		AmazonS3Manager.getInstance().put(key, fullScreenPath);
 	}
 	
 	/**
