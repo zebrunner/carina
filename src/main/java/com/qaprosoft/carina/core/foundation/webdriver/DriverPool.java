@@ -15,13 +15,12 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DriverPool
 {

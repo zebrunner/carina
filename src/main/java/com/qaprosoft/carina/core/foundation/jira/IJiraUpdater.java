@@ -31,6 +31,6 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
  */
 public interface IJiraUpdater
 {
-	public void updateAfterTest(JiraClient jira, ITestResult result) throws Exception;
-	public void updateAfterSuite(JiraClient jira, ITestContext context, List<TestResultItem> results)  throws Exception;
+	void updateAfterTest(JiraClient jira, ITestResult result) throws Exception;
+	void updateAfterSuite(JiraClient jira, ITestContext context, List<TestResultItem> results)  throws Exception;
 }
