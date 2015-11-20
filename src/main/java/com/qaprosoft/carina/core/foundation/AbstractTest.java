@@ -15,35 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.DataProvider;
-import org.testng.xml.XmlTest;
-
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
@@ -65,16 +36,27 @@ import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.*;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.zafira.client.model.TestType;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
+import org.testng.xml.XmlTest;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -319,7 +301,7 @@ public abstract class AbstractTest // extends DriverHelper
 	private String getDeviceName() {
 		String deviceName = "Desktop";
 		
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
 			//Samsung - Android 4.4.2; iPhone - iOS 7
 			String deviceTemplate = "%s - %s %s"; 
 			deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
@@ -329,17 +311,15 @@ public abstract class AbstractTest // extends DriverHelper
 	}
 
 	protected String getBrowser() {
-		String browser = Configuration.get(Parameter.BROWSER);
+		String browser = "";
+		if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
+			browser = Configuration.get(Parameter.BROWSER);
+		}
+
 		if (!browserVersion.isEmpty()) {
 			browser = browser + " " + browserVersion;
 		}
 
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
-			browser = "";
-			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
-			}
-		}
 		return browser;
 	}
 
