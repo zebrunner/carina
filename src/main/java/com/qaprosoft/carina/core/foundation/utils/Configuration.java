@@ -15,10 +15,10 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.Constructor;
 import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Configuration utility.
@@ -61,7 +61,7 @@ public class Configuration
 		
 		private final String key;
 
-		private DriverMode(String key)
+		DriverMode(String key)
 		{
 			this.key = key;
 		}
@@ -94,7 +94,11 @@ public class Configuration
 
 		SELENIUM_HOST("selenium_host"),
 		
+		DRIVER_TYPE("driver_type"),
+		
 		DRIVER_MODE("driver_mode"),
+		
+		CUSTOM_CAPABILITIES("custom_capabilities"),
 		
 		APP_VERSION("app_version"),
 
@@ -213,8 +217,6 @@ public class Configuration
         
         MOBILE_PLATFORM_VERSION("mobile_platform_version"),
         
-        MOBILE_BROWSER_NAME("mobile_browser_name"),
-        
         MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Sendroid 
         
         MOBILE_APP("mobile_app"),
@@ -288,7 +290,7 @@ public class Configuration
 		ACCESS_KEY_ID("access_key_id"),
 		
 		SECRET_KEY("secret_key"),
-
+		
 		//For localization parser
 		ADD_NEW_LOCALIZATION("add_new_localization"), 
 		
@@ -296,10 +298,10 @@ public class Configuration
 		
 		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name");
 
-		
+
 		private final String key;
 
-		private Parameter(String key)
+		Parameter(String key)
 		{
 			this.key = key;
 		}
