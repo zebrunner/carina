@@ -15,25 +15,20 @@
  */
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
+import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.model.ExternalLinksTable;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.util.Log;
 
-import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class XLSParser
 {
@@ -221,7 +216,7 @@ public class XLSParser
 						if (childWb == null)  throw new DataLoadingException(String.format("WorkBook '%s' doesn't exist!",  link.getLinkedFileName()));
 						for(int i = 0; i < childWb.getNumberOfSheets(); i++)
 						{
-							XSSFSheet childSheet = (XSSFSheet) childWb.getSheetAt(i);
+							XSSFSheet childSheet = childWb.getSheetAt(i);
 							for (XSSFTable table : childSheet.getTables())
 							{
 								if(table.getName().equals(tableName))

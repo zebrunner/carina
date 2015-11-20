@@ -1,5 +1,12 @@
 package com.qaprosoft.carina.core.foundation.utils.android.recorder.utils;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStreamReader;
@@ -10,34 +17,26 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-
 /**
  * Created by YP.
  * Date: 8/19/2014
  * Time: 12:57 AM
  */
 public class AdbExecutor {
-	private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
-	private String ADB_HOST;
-	private String ADB_PORT;
+    private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
+    private String ADB_HOST;
+    private String ADB_PORT;
 
-	public AdbExecutor(String host, String port) {
+    public AdbExecutor(String host, String port) {
 
-		ADB_HOST="localhost";
-		if (host != null)
-			ADB_HOST = host;
-		
-		ADB_PORT="5037";
-		if (host != null)
-			ADB_PORT = port;		
-	}
+        ADB_HOST = "localhost";
+        if (host != null)
+            ADB_HOST = host;
+
+        ADB_PORT = "5037";
+        if (host != null)
+            ADB_PORT = port;
+    }
 
     public List<String> getAttachedDevices() {
         ProcessBuilderExecutor executor = null;
@@ -70,8 +69,9 @@ public class AdbExecutor {
     }
 
     public boolean isDeviceCorrect() {
-    	return isDeviceCorrect(DevicePool.getDeviceUdid());
+        return isDeviceCorrect(DevicePool.getDeviceUdid());
     }
+
     public boolean isDeviceCorrect(String udid) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
@@ -85,14 +85,14 @@ public class AdbExecutor {
             String line = in.readLine();
             LOGGER.debug("sdkVersion: " + line);
             if (line != null) {
-            	int sdkVersion = Integer.parseInt(line);
-            	correctDevice = sdkVersion >= 19;
+                int sdkVersion = Integer.parseInt(line);
+                correctDevice = sdkVersion >= 19;
             } else {
-            	LOGGER.error("SDK version for '" + DevicePool.getDevice(udid).getName() + "' device is not recognized!");
+                LOGGER.error("SDK version for '" + DevicePool.getDevice(udid).getName() + "' device is not recognized!");
             }
 
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             return correctDevice;
         } finally {
             closeQuietly(in);
@@ -102,10 +102,10 @@ public class AdbExecutor {
         return correctDevice;
     }
 
-    public List<String> execute(String[] cmd){
+    public List<String> execute(String[] cmd) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
-        List<String> output = new ArrayList<String> ();
+        List<String> output = new ArrayList<String>();
 
         try {
             executor = new ProcessBuilderExecutor(cmd);
@@ -116,7 +116,7 @@ public class AdbExecutor {
 
 
             while ((line = in.readLine()) != null) {
-            	output.add(line);
+                output.add(line);
                 LOGGER.debug(line);
             }
         } catch (Exception e) {
@@ -125,54 +125,55 @@ public class AdbExecutor {
             closeQuietly(in);
             ProcessBuilderExecutor.gcNullSafe(executor);
         }
-        
+
         return output;
     }
 
     public int startRecording(String pathToFile) {
-    	if (!isDeviceCorrect())
-    		return -1;
-    	
-    	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
+        if (!isDeviceCorrect())
+            return -1;
 
-    	try {
+
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
+
+        try {
             ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
 
             pb.start();
             return pb.getPID();
 
-    	} catch (ExecutorException e) {
-    		e.printStackTrace();
+        } catch (ExecutorException e) {
+            e.printStackTrace();
             return -1;
         }
     }
+
     public void stopRecording(int pid) {
-    	if (!isDeviceCorrect())
-    		return;
-    	
-    	if (pid != -1) {
-    		Platform.killProcesses(Arrays.asList(pid));
-    	}
+        if (!isDeviceCorrect())
+            return;
+
+        if (pid != -1) {
+            Platform.killProcesses(Arrays.asList(pid));
+        }
     }
 
-    
-    public void pullFile(String pathFrom, String pathTo){
-    	if (!isDeviceCorrect())
-    		return;
-    	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
-    	execute(cmd);
+
+    public void pullFile(String pathFrom, String pathTo) {
+        if (!isDeviceCorrect())
+            return;
+
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
+        execute(cmd);
     }
-    
-    public void dropFile(String pathToFile){
-    	if (!isDeviceCorrect())
-    		return;
-    	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
-    	execute(cmd);
+
+    public void dropFile(String pathToFile) {
+        if (!isDeviceCorrect())
+            return;
+
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
+        execute(cmd);
     }
-    
+
     private static void closeQuietly(Closeable closeable) {
         try {
             if (closeable != null) {
@@ -181,154 +182,155 @@ public class AdbExecutor {
         } catch (Exception e) {
         }
     }
-    
-    public void pressKey(int key){
-    	if (!isDeviceCorrect())
-    		return;
-    	
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
-    	execute(cmd);
+
+    public void pressKey(int key) {
+        if (!isDeviceCorrect())
+            return;
+
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
+        execute(cmd);
     }
-    
-    public void clearAppData(String app){
-    	if (!isDeviceCorrect())
-    		return;
-    	//adb -s UDID shell pm clear com.myfitnesspal.android
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
-    	execute(cmd);
+
+    public void clearAppData(String app) {
+        if (!isDeviceCorrect())
+            return;
+        //adb -s UDID shell pm clear com.myfitnesspal.android
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
+        execute(cmd);
     }
-    
-    public void uninstallApp(String app){
-    	if (!isDeviceCorrect())
-    		return;
-    	//adb -s UDID uninstall com.myfitnesspal.android 
-    	String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
-    	execute(cmd);
+
+    public void uninstallApp(String app) {
+        if (!isDeviceCorrect())
+            return;
+        //adb -s UDID uninstall com.myfitnesspal.android
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
+        execute(cmd);
     }
-    
-	private Boolean getScreenState(String udid) {
-		// determine current screen status
-		// adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-		String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H",
-				ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "dumpsys",
-				"input_method");
-		List<String> output = execute(cmd);
 
-		Boolean screenState = null;
-		String line;
-		
-		Iterator<String> itr = output.iterator();
-		while (itr.hasNext()) {
-			// mScreenOn - default value for the most of Android devices
-			// mInteractive - for Nexuses 
-			line = itr.next();
-			if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
-				screenState = true;
-				break;
-			}
-			if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
-				screenState = false;
-				break;
-			}
-		}
-		
-		if (screenState == null) {
-			LOGGER.error(udid
-					+ ": Unable to determine existing device screen state!");
-			return screenState; //no actions required if state is not recognized.
-		}
+    private Boolean getScreenState(String udid) {
+        // determine current screen status
+        // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H",
+                ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "dumpsys",
+                "input_method");
+        List<String> output = execute(cmd);
 
-		if (screenState) {
-			LOGGER.info(udid + ": screen is ON");
-		}
+        Boolean screenState = null;
+        String line;
 
-		if (!screenState) {
-			LOGGER.info(udid + ": screen is OFF");
-		}
+        Iterator<String> itr = output.iterator();
+        while (itr.hasNext()) {
+            // mScreenOn - default value for the most of Android devices
+            // mInteractive - for Nexuses
+            line = itr.next();
+            if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
+                screenState = true;
+                break;
+            }
+            if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
+                screenState = false;
+                break;
+            }
+        }
 
-		return screenState;
-	}
+        if (screenState == null) {
+            LOGGER.error(udid
+                    + ": Unable to determine existing device screen state!");
+            return screenState; //no actions required if state is not recognized.
+        }
 
-	public void screenOff() {
-		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-			return;
-		}
-		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
-			return;
-		}
-		
-		String udid = DevicePool.getDeviceUdid();
-		if (!isDeviceCorrect(udid)) {
-			return;
-		}
+        if (screenState) {
+            LOGGER.info(udid + ": screen is ON");
+        }
 
-		Boolean screenState = getScreenState(udid);
-		if (screenState == null) {
-			return;
-		}
-		if (screenState) {
-			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
-					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
-					"input", "keyevent", "26");
-			execute(cmd);
-			
-			pause(5);
+        if (!screenState) {
+            LOGGER.info(udid + ": screen is OFF");
+        }
 
-			// verify that screen is Off now
-			screenState = getScreenState(udid);
-			if (screenState) {
-				LOGGER.error(udid + ": screen is still ON!");
-			}
-			
-			if (!screenState) {
-				LOGGER.info(udid + ": screen turned off.");
-			}
-		}
-	}
+        return screenState;
+    }
 
-	public void screenOn() {
-		if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-			return;
-		}
-		
-		if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
-			return;
-		}
-		
-		String udid = DevicePool.getDeviceUdid();
-		if (!isDeviceCorrect(udid)) {
-			return;
-		}
 
-		Boolean screenState = getScreenState(udid);
-		if (screenState == null) {
-			return;
-		}
-		
-		if (!screenState) {
-			String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
-					"-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
-					"input", "keyevent", "26");
-			execute(cmd);
+    public void screenOff() {
+        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            return;
+        }
+        if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
+            return;
+        }
+        String udid = DevicePool.getDeviceUdid();
 
-			pause(5);
-			// verify that screen is Off now
-			screenState = getScreenState(udid);
-			if (!screenState) {
-				LOGGER.error(udid + ": screen is still OFF!");
-			}
-			
-			if (screenState) {
-				LOGGER.info(udid + ": screen turned on.");
-			}
-		}
-	}
+        if (!isDeviceCorrect(udid)) {
+            return;
+        }
 
-	public void pause(long timeout) {
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+        Boolean screenState = getScreenState(udid);
+        if (screenState == null) {
+            return;
+        }
+        if (screenState) {
+            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
+                    "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+                    "input", "keyevent", "26");
+            execute(cmd);
+
+            pause(5);
+
+            screenState = getScreenState(udid);
+            if (screenState) {
+                LOGGER.error(udid + ": screen is still ON!");
+            }
+
+            if (!screenState) {
+                LOGGER.info(udid + ": screen turned off.");
+            }
+        }
+    }
+
+
+    public void screenOn() {
+        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            return;
+        }
+
+        if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
+            return;
+        }
+
+        String udid = DevicePool.getDeviceUdid();
+        if (!isDeviceCorrect(udid)) {
+            return;
+        }
+
+        Boolean screenState = getScreenState(udid);
+        if (screenState == null) {
+            return;
+        }
+
+        if (!screenState) {
+            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
+                    "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+                    "input", "keyevent", "26");
+            execute(cmd);
+
+            pause(5);
+            // verify that screen is Off now
+            screenState = getScreenState(udid);
+            if (!screenState) {
+                LOGGER.error(udid + ": screen is still OFF!");
+            }
+
+            if (screenState) {
+                LOGGER.info(udid + ": screen turned on.");
+            }
+        }
+    }
+
+    public void pause(long timeout) {
+        try {
+            Thread.sleep(timeout * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
