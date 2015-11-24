@@ -11,7 +11,7 @@ public class IECapabilities extends AbstractCapabilities {
 
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.IEXPLORE, testName);
+        capabilities = initBaseCapabilities(capabilities, BrowserType.IE, testName);
         capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
