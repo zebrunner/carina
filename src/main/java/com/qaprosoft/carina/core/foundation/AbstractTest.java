@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import com.amazonaws.services.s3.model.S3Object;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
@@ -153,13 +154,9 @@ public abstract class AbstractTest // extends DriverHelper
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
 		TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
 		
-		AmazonS3Manager.getInstance().setMode(
-				Configuration.get(Parameter.S3_MODE));
 		AmazonS3Manager.getInstance().initS3client(
 				Configuration.get(Parameter.ACCESS_KEY_ID),
 				Configuration.get(Parameter.SECRET_KEY));
-		AmazonS3Manager.getInstance().setBucket(
-				Configuration.get(Parameter.S3_BUCKET_NAME));
 		
 	}
 
@@ -756,4 +753,17 @@ public abstract class AbstractTest // extends DriverHelper
 			e.printStackTrace();
 		}
 	}
+	
+	protected void putS3Artifact(String key, String path) {
+		AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
+	}
+	
+	protected S3Object getS3Artifact(String bucket, String key) {
+		return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);	
+	}
+	
+	protected S3Object getS3Artifact(String key) {
+		return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);	
+	}
+	
 }
