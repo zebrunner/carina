@@ -69,8 +69,6 @@ public class Configuration
 		public String getKey() {
 			return key;
 		}
-
-
 	}
 	
 	/**
@@ -285,13 +283,16 @@ public class Configuration
 		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
 		
 		//Amazon
-		S3_MODE("s3_mode"),
-		
 		S3_BUCKET_NAME("s3_bucket_name"),
 		
 		ACCESS_KEY_ID("access_key_id"),
 		
 		SECRET_KEY("secret_key"),
+		
+		//Amazon-Screenshot
+		S3_SCREENSHOT_BUCKET_NAME("s3_screenshot_bucket_name"),
+		
+		S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
 		
 		//For localization parser
 		ADD_NEW_LOCALIZATION("add_new_localization"), 
