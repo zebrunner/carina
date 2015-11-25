@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
@@ -55,15 +57,33 @@ public class DriverPool
 	
 	public static WebDriver getDriverByThread(long threadId)
 	{
+		if (threadId2Driver.size() == 0) {
+			// there is no sense to search driver if DriverPool is empty.
+			return null;
+		}
 		WebDriver drv = null;
+		DriverMode driverMode = Configuration.getDriverMode();
 		if (threadId2Driver.containsKey(threadId)) {
 			drv = threadId2Driver.get(threadId);
 			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
 		}
-		else if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
+		else if (driverMode == DriverMode.SUITE_MODE) {
 			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
 			//init our single driver variable
 			drv = single_driver;
+		} else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
+				&& Configuration.getInt(Parameter.THREAD_COUNT) == 1
+				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
+			Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
+			LOGGER.debug(
+					"Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
+			for (int i = 0; i < threads.length; i++) {
+				if (threadId2Driver.containsKey(threads[i].getId())) {
+					drv = threadId2Driver.get(threads[i].getId());
+					LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
+					break;
+				}
+			}
 		}
 		return drv;
 	}
@@ -108,5 +128,18 @@ public class DriverPool
 	public static WebDriver getSingleDriver() {
 		return single_driver;
 	}
-	
+
+	private static Thread[] getGroupThreads( final ThreadGroup group ) {
+	    if ( group == null )
+	        throw new NullPointerException( "Null thread group" );
+	    int nAlloc = group.activeCount( );
+	    int n = 0;
+	    Thread[] threads;
+	    do {
+	        nAlloc *= 2;
+	        threads = new Thread[ nAlloc ];
+	        n = group.enumerate( threads );
+	    } while ( n == nAlloc );
+	    return java.util.Arrays.copyOf( threads, n );
+	}
 }
