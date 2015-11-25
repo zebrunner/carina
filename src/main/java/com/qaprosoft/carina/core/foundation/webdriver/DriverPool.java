@@ -69,7 +69,7 @@ public class DriverPool
 			drv = single_driver;
 		} else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
 				&& Configuration.getInt(Parameter.THREAD_COUNT) == 1
-				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == 1) {
+				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
 			Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
 			LOGGER.debug(
 					"Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
