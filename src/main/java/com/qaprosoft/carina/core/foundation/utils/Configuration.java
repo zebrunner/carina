@@ -101,7 +101,9 @@ public class Configuration
 		CUSTOM_CAPABILITIES("custom_capabilities"),
 		
 		APP_VERSION("app_version"),
-
+		
+		PROXY("proxy"),
+		
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
