@@ -97,7 +97,9 @@ public class Configuration
 		DRIVER_MODE("driver_mode"),
 		
 		APP_VERSION("app_version"),
-
+		
+		PROXY("proxy"),
+		
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
