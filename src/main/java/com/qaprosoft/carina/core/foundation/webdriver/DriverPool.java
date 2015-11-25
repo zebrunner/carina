@@ -57,6 +57,10 @@ public class DriverPool
 	
 	public static WebDriver getDriverByThread(long threadId)
 	{
+		if (threadId2Driver.size() == 0) {
+			// there is no sense to search driver if DriverPool is empty.
+			return null;
+		}
 		WebDriver drv = null;
 		DriverMode driverMode = Configuration.getDriverMode();
 		if (threadId2Driver.containsKey(threadId)) {
