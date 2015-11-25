@@ -127,6 +127,10 @@ public class Screenshot
 	}
 	
 	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
+		if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
+			LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
+			return;
+		}
 		Long runId = ZafiraIntegrator.getRunId();
 		String env = Configuration.get(Parameter.ENV).toUpperCase();
 		String testName = ReportContext.getTestDir(test).getName();
@@ -136,7 +140,8 @@ public class Screenshot
 		}
 		LOGGER.debug("Key: " + key);
 		LOGGER.debug("FullScreenPath: " + fullScreenPath);
-		AmazonS3Manager.getInstance().put(key, fullScreenPath);
+		String screenshotBucket = Configuration.get(Parameter.S3_SCREENSHOT_BUCKET_NAME);
+		AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath);
 	}
 	
 	/**
