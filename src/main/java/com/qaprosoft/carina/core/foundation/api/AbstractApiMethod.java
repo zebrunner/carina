@@ -204,6 +204,10 @@ public abstract class AbstractApiMethod extends HttpClient
 		return HttpClient.send(request, methodPath, methodType);
 	}
 	
+	/**
+	 * @deprecated use {@link #callAPI()} instead.  
+	 */
+	@Deprecated
 	public String call()
 	{
 		Response response = callAPI();
