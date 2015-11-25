@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.http;
 
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.
@@ -28,7 +30,7 @@ public class HttpClient
 	public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType)
 	{
 		Response response = null;
-
+		setupProxy();
 		switch (methodType)
 		{
 		case HEAD:
@@ -54,5 +56,14 @@ public class HttpClient
 		}
 
 		return response;
+	}
+	
+	private static void setupProxy()
+	{
+		if (!Configuration.isNull(Parameter.PROXY)) {
+			String [] proxy = Configuration.get(Parameter.PROXY).split(":");
+			System.setProperty(String.format("%s.proxyHost", proxy[0]), proxy[1]);
+		    System.setProperty(String.format("%s.proxyPort", proxy[0]), proxy[2]);
+		}
 	}
 }
