@@ -15,6 +15,11 @@
  */
 package com.qaprosoft.carina.core.foundation.http;
 
+
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -27,6 +32,10 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  */
 public class HttpClient
 {
+	protected static final Logger LOGGER = Logger.getLogger(HttpClient.class);
+	
+	private static final String PROXY_PATTERN = ".+:.+:.+";
+	
 	public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType)
 	{
 		Response response = null;
@@ -60,10 +69,12 @@ public class HttpClient
 	
 	private static void setupProxy()
 	{
-		if (!Configuration.isNull(Parameter.PROXY)) {
+		if (!Configuration.isNull(Parameter.PROXY) && Pattern.matches(PROXY_PATTERN, Configuration.get(Parameter.PROXY))) 
+		{
 			String [] proxy = Configuration.get(Parameter.PROXY).split(":");
 			System.setProperty(String.format("%s.proxyHost", proxy[0]), proxy[1]);
 		    System.setProperty(String.format("%s.proxyPort", proxy[0]), proxy[2]);
+		    LOGGER.info(String.format("HTTP client will use proxy: %s://%s:%s", proxy[0], proxy[1], proxy[2]));
 		}
 	}
 }
