@@ -273,7 +273,7 @@ public abstract class AbstractTest // extends DriverHelper
 					Configuration.get(Parameter.SENDER_PASSWORD));
 
 			String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
-			if(testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()){
+			if((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL)) && !failureEmailList.isEmpty()){
 				EmailManager.send(title, emailContent,
 						failureEmailList,
 						Configuration.get(Parameter.SENDER_EMAIL),
