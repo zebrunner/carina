@@ -55,6 +55,7 @@
 		<xmlbeans.version>2.4.0</xmlbeans.version>
 		<bcprov-jdk16.version>1.45</bcprov-jdk16.version>
 		<jackson-mapper-asl.version>1.9.11</jackson-mapper-asl.version>
+		<jackson.version>2.4.3</jackson.version>
 		<guava.version>13.0.1</guava.version>
 
 		<jira-client.version>0.4</jira-client.version>
@@ -308,6 +309,16 @@
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>${jackson-mapper-asl.version}</version>
+		</dependency>
+		<dependency>
+ 			<groupId>com.fasterxml.jackson.core</groupId>
+ 			<artifactId>jackson-databind</artifactId>
+ 			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
