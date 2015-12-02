@@ -393,12 +393,6 @@
 			<groupId>com.qaprosoft.amazon</groupId>
 			<artifactId>aws-s3-manager</artifactId>
 			<version>${aws-s3-manager.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
