@@ -104,6 +104,16 @@
 	<dependencies>
 		<!-- Test utilities -->
 		<dependency>
+ 			<groupId>com.fasterxml.jackson.core</groupId>
+ 			<artifactId>jackson-databind</artifactId>
+ 			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testng.version}</version>
@@ -134,16 +144,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
-		</dependency>
-		<dependency>
- 			<groupId>com.fasterxml.jackson.core</groupId>
- 			<artifactId>jackson-databind</artifactId>
- 			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.jayway.restassured</groupId>
