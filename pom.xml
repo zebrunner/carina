@@ -24,7 +24,7 @@
 		<hamcrest-core.version>1.3</hamcrest-core.version>
 		<hamcrest-library.version>1.3</hamcrest-library.version>
 		<junit.version>4.11</junit.version>
-		<rest-assured.version>2.7.0</rest-assured.version>
+		<rest-assured.version>2.3.1</rest-assured.version>
 		<selenium-java.version>2.47.1</selenium-java.version>
 
 		<log4j.version>1.2.17</log4j.version>
@@ -55,7 +55,6 @@
 		<xmlbeans.version>2.4.0</xmlbeans.version>
 		<bcprov-jdk16.version>1.45</bcprov-jdk16.version>
 		<jackson-mapper-asl.version>1.9.11</jackson-mapper-asl.version>
-		<jackson.version>2.4.3</jackson.version>
 		<guava.version>13.0.1</guava.version>
 
 		<jira-client.version>0.4</jira-client.version>
@@ -68,7 +67,7 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
-		<aws-s3-manager.version>1.2.1</aws-s3-manager.version>
+		<aws-s3-manager.version>1.2.2</aws-s3-manager.version>
 	</properties>
 
 	<repositories>
@@ -103,16 +102,6 @@
 
 	<dependencies>
 		<!-- Test utilities -->
-		<dependency>
- 			<groupId>com.fasterxml.jackson.core</groupId>
- 			<artifactId>jackson-databind</artifactId>
- 			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
