@@ -12,6 +12,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileGridCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileNativeCapabilities;
@@ -56,19 +57,8 @@ public class MobileFactory extends AbstractFactory {
     }
 
 	public DesiredCapabilities getCapabilities(String testName) {
-		String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
-		
-		if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
-			return new MobileGridCapabilities().getCapability(testName);
-		} else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-						&& !Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
-			return new MobileWebCapabilities().getCapability(testName);
-		} else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-						&& Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
-			return new MobileNativeCapabilities().getCapability(testName);
-		} else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
+    	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+		if (!customCapabilities.isEmpty()) {
 			try {
 				return new CapabilitiesLoder(
 						new FileInputStream(Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES)))
@@ -76,10 +66,23 @@ public class MobileFactory extends AbstractFactory {
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException("Unable read custom capabilities: " + Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES));
 			}
+		} else {
+			String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
+			
+			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
+				return new MobileGridCapabilities().getCapability(testName);
+			} else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
+							&& !Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
+				return new MobileWebCapabilities().getCapability(testName);
+			} else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
+							&& Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
+				return new MobileNativeCapabilities().getCapability(testName);
+			} else {
+	            throw new RuntimeException("Unsupported driver type:" + driverType);
+	        }
 		}
-        {
-            throw new RuntimeException("Unsupported driver type:" + driverType);
-        }
 
     }
 
