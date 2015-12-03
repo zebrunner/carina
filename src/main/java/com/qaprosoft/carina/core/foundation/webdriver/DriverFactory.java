@@ -99,7 +99,7 @@ public class DriverFactory {
         } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
             factory = new MobileFactory();
         } else {
-            throw new RuntimeException("Unsupported browser type!");
+            throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
         }
         return factory.create(testName, device);
     }
