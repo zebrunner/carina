@@ -16,14 +16,11 @@ public class CapabilitiesLoder {
 
     private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoder.class);
 
-    private InputStream config;
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public DesiredCapabilities loadCapabilities(String fileName) {
 
-    public CapabilitiesLoder(InputStream config) {
-        this.config = config;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public DesiredCapabilities loadCapabilities()  {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream config = loader.getResourceAsStream(fileName);
 
         LOGGER.info("Loading capabilities:");
         DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -40,7 +37,7 @@ public class CapabilitiesLoder {
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
 
             String valueFromEnv = System.getenv(entry.getKey());
-            String value = (valueFromEnv != null) ? valueFromEnv:entry.getValue();
+            String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
 
             LOGGER.info(entry.getKey() + ": " + value);
             capabilities.setCapability(entry.getKey(), value);
