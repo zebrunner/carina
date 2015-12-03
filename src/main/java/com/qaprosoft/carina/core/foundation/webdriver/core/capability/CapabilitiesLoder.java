@@ -36,7 +36,12 @@ public class CapabilitiesLoder {
 
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
 
-            String valueFromEnv = System.getenv(entry.getKey());
+            String valueFromEnv = null;
+            if (!entry.getKey().equalsIgnoreCase("os")) {
+            	valueFromEnv = System.getenv(entry.getKey());
+            } else {
+            	LOGGER.warn("'os' capability can't be loaded from environment as it is default system variable!");
+            }
             String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
 
             LOGGER.info(entry.getKey() + ": " + value);
