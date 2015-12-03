@@ -1,32 +1,28 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileGridCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileNativeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileWebCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MobileFactory extends AbstractFactory {
 
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public WebDriver create(String testName, Device device) {
 
         String selenium = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
@@ -50,39 +46,33 @@ public class MobileFactory extends AbstractFactory {
                 throw new RuntimeException("Unsupported browser");
             }
         } catch (MalformedURLException e) {
-        	LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
+            LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
         }
 
         return driver;
     }
 
-	public DesiredCapabilities getCapabilities(String testName) {
-    	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-		if (!customCapabilities.isEmpty()) {
-			try {
-				return new CapabilitiesLoder(
-						new FileInputStream(Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES)))
-								.loadCapabilities();
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException("Unable read custom capabilities: " + Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES));
-			}
-		} else {
-			String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
-			
-			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
-				return new MobileGridCapabilities().getCapability(testName);
-			} else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-							&& !Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
-				return new MobileWebCapabilities().getCapability(testName);
-			} else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-							&& Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
-				return new MobileNativeCapabilities().getCapability(testName);
-			} else {
-	            throw new RuntimeException("Unsupported driver type:" + driverType);
-	        }
-		}
+    public DesiredCapabilities getCapabilities(String testName) {
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            return new CapabilitiesLoder().loadCapabilities(customCapabilities);
+        } else {
+            String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
+
+            if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
+                return new MobileGridCapabilities().getCapability(testName);
+            } else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+                    || driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
+                    && !Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
+                return new MobileWebCapabilities().getCapability(testName);
+            } else if ((driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+                    || driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
+                    && Configuration.get(Configuration.Parameter.BROWSER).isEmpty())) {
+                return new MobileNativeCapabilities().getCapability(testName);
+            } else {
+                throw new RuntimeException("Unsupported driver type:" + driverType);
+            }
+        }
 
     }
 
