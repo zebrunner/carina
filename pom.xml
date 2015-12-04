@@ -30,7 +30,7 @@
 		<log4j.version>1.2.17</log4j.version>
 		<logback.version>1.0.6</logback.version>
 
-		<apache-http.version>4.3.2</apache-http.version>
+		<apache-http.version>4.4</apache-http.version>
 		<ocap-api.version>1.2</ocap-api.version>
 		<json-rpc.version>1.0</json-rpc.version>
 		<json-path.version>0.8.1</json-path.version>
@@ -89,7 +89,7 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>qaprosoft_shapshots</id>
+			<id>qaprosoft_snapshots</id>
 			<name>Qaprosoft Snapshots</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
 			<releases>
