@@ -117,7 +117,7 @@ public class ReportContext
 			try {
 				FileUtils.deleteDirectory(tempDirectory);
 			} catch (IOException e) {
-				LOGGER.error("Unable to remove artifacts temp directory!", e);
+				LOGGER.debug("Unable to remove artifacts temp directory!", e);
 			}
 		}
 	}
