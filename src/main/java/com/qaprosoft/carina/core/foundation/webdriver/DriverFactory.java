@@ -91,18 +91,20 @@ public class DriverFactory {
         return create(testName, nullDevice);
     }
 
-    public static WebDriver create(String testName, Device device) {
-        AbstractFactory factory;
-        String driverType = Configuration.get(Parameter.DRIVER_TYPE);
-        if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
-            factory = new DesktopFactory();
-        } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-            factory = new MobileFactory();
-        } else {
-            throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
-        }
-        return factory.create(testName, device);
-    }
+	public static WebDriver create(String testName, Device device) {
+		AbstractFactory factory;
+		String driverType = Configuration.get(Parameter.DRIVER_TYPE);
+		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+			factory = new DesktopFactory();
+		} else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
+				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
+			factory = new MobileFactory();
+		} else {
+			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
+		}
+		return factory.create(testName, device);
+	}
 
 
     public static String getBrowserName(WebDriver driver) {
