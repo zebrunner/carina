@@ -113,12 +113,16 @@ public abstract class AbstractTest // extends DriverHelper
 		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
 		LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
 
-		// update DataProviderThreadCount if any property is provided
+		// update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
 		int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
 		if (count > 0) {
-			LOGGER.info("Updated 'data_provider_thread_count' from "
+			LOGGER.debug("Updated 'data_provider_thread_count' from "
 					+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
 			context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
+		} else {
+			LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+			R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
+			LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
 		}
 
 		LOGGER.debug("Default data_provider_thread_count="
