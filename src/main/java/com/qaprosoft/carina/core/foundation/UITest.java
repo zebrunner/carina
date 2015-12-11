@@ -146,8 +146,10 @@ public class UITest extends AbstractTest
 			startRecording();
     	}		    	
 
-    	if (browserVersion.isEmpty() && getDriver() != null)
-    		browserVersion = DriverFactory.getBrowserVersion(getDriver());
+		if (browserVersion.isEmpty() && getDriver() != null
+				&& !Configuration.get(Parameter.CUSTOM_CAPABILITIES).isEmpty()) {
+			browserVersion = DriverFactory.getBrowserVersion(getDriver());
+		}
 	}    
 
     @AfterMethod(alwaysRun = true)
