@@ -36,6 +36,8 @@ public class MobileFactory extends AbstractFactory {
         	selenium = device.getSeleniumServer();
         }
         
+        LOGGER.debug("selenium: " + selenium);
+        
         RemoteWebDriver driver = null;
         DesiredCapabilities capabilities = getCapabilities(testName, device);
         try {
