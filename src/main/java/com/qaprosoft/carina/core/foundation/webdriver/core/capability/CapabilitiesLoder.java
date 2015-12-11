@@ -9,7 +9,6 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
@@ -41,20 +40,15 @@ public class CapabilitiesLoder {
 
         Map<String, String> capabilitiesMap = new HashMap(props);
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            if (!entry.getKey().startsWith(SpecialKeywords.CORE)) {
+                String valueFromEnv = null;
+                if (!entry.getKey().equalsIgnoreCase("os")) {
+                	valueFromEnv = System.getenv(entry.getKey());
+                } else {
+                	LOGGER.warn("'os' capability can't be loaded from environment as it is default system variable!");
+                }
+                String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
 
-            String valueFromEnv = null;
-            if (!entry.getKey().equalsIgnoreCase("os")) {
-            	valueFromEnv = System.getenv(entry.getKey());
-            } else {
-            	LOGGER.warn("'os' capability can't be loaded from environment as it is default system variable!");
-            }
-            String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
-
-            if (entry.getKey().startsWith(SpecialKeywords.CORE)) {
-            	String key = entry.getKey().replaceAll(SpecialKeywords.CORE + ".", "");
-            	LOGGER.info("Set custom core property: " + key + "; value: " + value);
-            	R.CONFIG.put(key, value);
-            } else {
             	LOGGER.info("Set custom driver capability: " + entry.getKey() + "; value: " + value);
             	capabilities.setCapability(entry.getKey(), value);
             }
