@@ -73,6 +73,12 @@ public class UITest extends AbstractTest
     {
     	super.executeBeforeTestSuite(context);
     	
+    	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+        	//redefine core properties using custom capabilities file
+            Configuration.loadCoreProperties(customCapabilities);
+        }
+        
     	DevicePool.registerDevices();
     	DriverMode driverMode = Configuration.getDriverMode();
     	
