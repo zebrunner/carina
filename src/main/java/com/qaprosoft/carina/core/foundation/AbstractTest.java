@@ -157,10 +157,11 @@ public abstract class AbstractTest // extends DriverHelper
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
 		TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
-		
-		AmazonS3Manager.getInstance().initS3client(
-				Configuration.get(Parameter.ACCESS_KEY_ID),
-				Configuration.get(Parameter.SECRET_KEY));
+
+		if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+			AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
+					Configuration.get(Parameter.SECRET_KEY));
+		}
 		
 	}
 
