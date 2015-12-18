@@ -42,11 +42,7 @@ public class CapabilitiesLoder {
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             if (!entry.getKey().startsWith(SpecialKeywords.CORE)) {
                 String valueFromEnv = null;
-                if (!entry.getKey().equalsIgnoreCase("os")) {
-                	valueFromEnv = System.getenv(entry.getKey());
-                } else {
-                	LOGGER.warn("'os' capability can't be loaded from environment as it is default system variable!");
-                }
+                valueFromEnv = System.getProperty(entry.getKey());
                 String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
 
             	LOGGER.info("Set custom driver capability: " + entry.getKey() + "; value: " + value);
