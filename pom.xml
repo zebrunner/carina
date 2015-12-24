@@ -68,7 +68,7 @@
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
 		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
-		<api-tools.version>1.0.2</api-tools.version>
+		<api-tools.version>1.0.3</api-tools.version>
 	</properties>
 
 	<repositories>
