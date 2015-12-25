@@ -19,11 +19,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import com.jayway.restassured.response.Response;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
+import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod
@@ -130,7 +133,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod
 		return properties;
 	}
 
-	public void validateResponse(JSONCompareMode mode)
+	public void validateResponse(JSONCompareMode mode, String... validationFlags)
 	{
 		if (rsPath == null)
 		{
@@ -148,12 +151,23 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod
 		tm.setTemplatePath(rsPath);
 		tm.setPropertiesStorage(properties);
 		String expectedRs = tm.getMessageText();
-		JsonValidator.validateJson(expectedRs, actualRsBody, mode);
+		try
+		{
+			JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(mode, validationFlags));
+		} catch (JSONException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
-	public void validateResponse()
+	/**
+	 * @param validationFlags
+	 *            parameter that specifies how to validate JSON response. Currently only array validation flag is supported.
+	 *            Use JsonCompareKeywords.ARRAY_CONTAINS enum value for that
+	 */
+	public void validateResponse(String... validationFlags)
 	{
-		validateResponse(JSONCompareMode.STRICT);
+		validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
 	}
 
 	public void validateResponseAgainstJSONSchema(String schemaPath)
