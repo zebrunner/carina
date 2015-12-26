@@ -27,7 +27,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * QUALITY-1076:
@@ -48,7 +50,11 @@ public class L10N {
 
 	private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 
-	public static void init(Locale locale) {
+	public static void init() {
+		
+		List<Locale> locales = LocaleReader.init(Configuration
+				.get(Parameter.LOCALE));
+		
 		List<String> loadedResources = new ArrayList<String>();
 
 		for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
@@ -103,7 +109,9 @@ public class L10N {
 				try {
 					LOGGER.debug(String.format("Adding '%s' resource...",
 							resource));
-					resBoundles.add(ResourceBundle.getBundle(resource, locale));
+					for (Locale locale : locales) {
+						resBoundles.add(ResourceBundle.getBundle(resource, locale));
+					}
 					LOGGER.debug(String
 							.format("Resource '%s' added.", resource));
 				} catch (MissingResourceException e) {
@@ -119,14 +127,60 @@ public class L10N {
 		LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
 	}
 
+	/**
+	 * get Default Locale
+	 * @return Locale
+	 */
+	public static Locale getDefaultLocale() {
+		List<Locale> locales = LocaleReader.init(Configuration
+				.get(Parameter.LOCALE));
+		
+		if (locales.size() == 0) {
+			throw new RuntimeException("Undefined default locale specified! Review 'locale' setting in _config.properties.");
+		}
+
+		return locales.get(0);
+	}
+	
+	/**
+	 * getText by key for default locale.
+	 * 
+	 * @param key
+	 *            - String
+	 * @param locale
+	 *            - Locale
+	 * @return String
+	 */
 	public static String getText(String key) {
+		return getText(key, getDefaultLocale());
+	}
+	
+	
+	/**
+	 * getText for specified locale and key.
+	 * 
+	 * @param key
+	 *            - String
+	 * @param locale
+	 *            - Locale
+	 * @return String
+	 */
+	public static String getText(String key, Locale locale) {
 		LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
 		Iterator<ResourceBundle> iter = resBoundles.iterator();
 		while (iter.hasNext()) {
-			ResourceBundle bundle = (ResourceBundle) iter.next();
+			ResourceBundle bundle = iter.next();
 			try {
 				String value = bundle.getString(key);
-				return value;
+				LOGGER.debug("Looking for value for locale:'"
+						+ locale.toString()
+						+ "' current iteration locale is: '"
+						+ bundle.getLocale().toString() + "'.");
+				if (bundle.getLocale().toString().equals(locale.toString())) {
+					LOGGER.debug("Found locale:'" + locale.toString()
+							+ "' and value is '" + value + "'.");
+					return value;
+				}
 			} catch (MissingResourceException e) {
 				// do nothing
 			}
