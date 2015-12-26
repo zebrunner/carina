@@ -21,10 +21,10 @@ import com.sun.jna.win32.W32APITypeMapper;
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 interface W32API extends StdCallLibrary{
 
-    public static final int NO_ERROR               = 0;
-    public static final int ERROR_INVALID_FUNCTION = 1;
-    public static final int ERROR_FILE_NOT_FOUND   = 2;
-    public static final int ERROR_PATH_NOT_FOUND   = 3;
+    int NO_ERROR               = 0;
+    int ERROR_INVALID_FUNCTION = 1;
+    int ERROR_FILE_NOT_FOUND   = 2;
+    int ERROR_PATH_NOT_FOUND   = 3;
 
     /** Standard options to use the unicode version of a w32 API. */
 	Map UNICODE_OPTIONS = new HashMap() {
@@ -44,7 +44,7 @@ interface W32API extends StdCallLibrary{
 
     Map DEFAULT_OPTIONS = Boolean.getBoolean("w32.ascii") ? ASCII_OPTIONS : UNICODE_OPTIONS;
 
-    public class HANDLE extends PointerType {
+    class HANDLE extends PointerType {
         @Override
         public Object fromNative(Object nativeValue, FromNativeContext context) {
             Object o = super.fromNative(nativeValue, context);

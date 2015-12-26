@@ -622,7 +622,7 @@ public class ExtendedWebElement
 
 	public void scrollTo()
 	{
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains("mobile")) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
 			LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
 			return;
 		}
@@ -1104,7 +1104,7 @@ public class ExtendedWebElement
 	
 	public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout)
 	{
-		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
 		final WebDriver drv = getDriver();
