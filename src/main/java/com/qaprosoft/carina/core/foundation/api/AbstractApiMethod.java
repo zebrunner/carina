@@ -17,18 +17,23 @@ package com.qaprosoft.carina.core.foundation.api;
 
 import static com.jayway.restassured.RestAssured.given;
 
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.filter.log.RequestLoggingFilter;
+import com.jayway.restassured.filter.log.ResponseLoggingFilter;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.http.HttpResponseStatusType;
@@ -194,16 +199,35 @@ public abstract class AbstractApiMethod extends HttpClient
 	{
 		if (bodyContent.length() != 0)
 			request.body(bodyContent.toString());
-		
-		if(logRequest) 
-			request.log().all();
-		
-		if(logResponse) 
-			request.expect().log().all();
-		
-		return HttpClient.send(request, methodPath, methodType);
+
+		Response rs = null;
+
+		PrintStream ps = null;
+		if (logRequest || logResponse)
+		{
+			ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
+		}
+
+		if (logRequest)
+			request.filter(new RequestLoggingFilter(ps));
+
+		if (logResponse)
+			request.filter(new ResponseLoggingFilter(ps));
+		try
+		{
+			rs = HttpClient.send(request, methodPath, methodType);
+		} finally
+		{
+			if (ps != null)
+				ps.close();
+		}
+		return rs;
 	}
 	
+	/**
+	 * @deprecated use {@link #callAPI()} instead.  
+	 */
+	@Deprecated
 	public String call()
 	{
 		Response response = callAPI();

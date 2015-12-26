@@ -30,7 +30,7 @@
 		<log4j.version>1.2.17</log4j.version>
 		<logback.version>1.0.6</logback.version>
 
-		<apache-http.version>4.3.2</apache-http.version>
+		<apache-http.version>4.4</apache-http.version>
 		<ocap-api.version>1.2</ocap-api.version>
 		<json-rpc.version>1.0</json-rpc.version>
 		<json-path.version>0.8.1</json-path.version>
@@ -55,7 +55,7 @@
 		<xmlbeans.version>2.4.0</xmlbeans.version>
 		<bcprov-jdk16.version>1.45</bcprov-jdk16.version>
 		<jackson-mapper-asl.version>1.9.11</jackson-mapper-asl.version>
-		<guava.version>13.0.1</guava.version>
+		<guava.version>18.0</guava.version>
 
 		<jira-client.version>0.4</jira-client.version>
 
@@ -67,6 +67,8 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
+		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
+		<api-tools.version>1.0.5</api-tools.version>
 	</properties>
 
 	<repositories>
@@ -79,15 +81,23 @@
 			<id>qaprosoft_releases</id>
 			<name>Qaprosoft Releases</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
-			<releases><enabled>true</enabled></releases>
-			<snapshots><enabled>false</enabled></snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
-			<id>qaprosoft_shapshots</id>
+			<id>qaprosoft_snapshots</id>
 			<name>Qaprosoft Snapshots</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
-			<releases><enabled>false</enabled></releases>
-			<snapshots><enabled>true</enabled></snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
@@ -368,8 +378,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Amazon -->
+		<dependency>
+			<groupId>com.qaprosoft.amazon</groupId>
+			<artifactId>aws-s3-manager</artifactId>
+			<version>${aws-s3-manager.version}</version>
+		</dependency>
+		
+		<!-- api-tools -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>api-tools</artifactId>
+			<version>${api-tools.version}</version>
+		</dependency>
 	</dependencies>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>deploymentRepo</id>

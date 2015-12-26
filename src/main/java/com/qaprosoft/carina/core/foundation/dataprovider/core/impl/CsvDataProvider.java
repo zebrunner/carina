@@ -1,24 +1,17 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-
 import au.com.bytecode.opencsv.CSVReader;
-
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -93,7 +86,7 @@ public class CsvDataProvider extends BaseDataProvider {
         while (iter.hasNext()) {
             int index = mapper.get(executeColumn);
 
-            String[] line = (String[]) iter.next();
+            String[] line = iter.next();
             if (!line[index].equalsIgnoreCase(executeValue)) {
                 iter.remove();
             }
