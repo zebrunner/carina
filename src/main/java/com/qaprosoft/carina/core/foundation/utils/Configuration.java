@@ -15,10 +15,16 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 /**
  * Configuration utility.
@@ -28,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Configuration
 {
+    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
 	private static IEnvArgResolver envArgResolver;
 	
 	static
@@ -61,7 +68,7 @@ public class Configuration
 		
 		private final String key;
 
-		private DriverMode(String key)
+		DriverMode(String key)
 		{
 			this.key = key;
 		}
@@ -69,9 +76,8 @@ public class Configuration
 		public String getKey() {
 			return key;
 		}
-
-
 	}
+	
 	/**
 	 * All available configuration parameter keys along with default values.
 	 */
@@ -93,15 +99,23 @@ public class Configuration
 
 		SELENIUM_HOST("selenium_host"),
 		
+		DRIVER_TYPE("driver_type"),
+		
 		DRIVER_MODE("driver_mode"),
 		
+		CUSTOM_CAPABILITIES("custom_capabilities"),
+		
 		APP_VERSION("app_version"),
-
+		
+		PROXY("proxy"),
+		
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
 		
 		FAILURE_EMAIL_LIST("failure_email_list"),
+		
+		IGNORE_KNOWN_ISSUES("ignore_known_issues"),
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
@@ -146,6 +160,8 @@ public class Configuration
 		LANGUAGE("language"),
 		
 		THREAD_COUNT("thread_count"),
+		
+		DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 		
 		CORE_LOG_LEVEL("core_log_level"),
 		
@@ -210,8 +226,6 @@ public class Configuration
         
         MOBILE_PLATFORM_VERSION("mobile_platform_version"),
         
-        MOBILE_BROWSER_NAME("mobile_browser_name"),
-        
         MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Sendroid 
         
         MOBILE_APP("mobile_app"),
@@ -274,14 +288,32 @@ public class Configuration
 		GIT_COMMIT("git_commit"),
 		
 		GIT_URL("git_url"),
-
-		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields");
-
-
 		
+		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
+		
+		//Amazon
+		S3_BUCKET_NAME("s3_bucket_name"),
+		
+		ACCESS_KEY_ID("access_key_id"),
+		
+		SECRET_KEY("secret_key"),
+		
+		//Amazon-Screenshot
+		S3_SCREENSHOT_BUCKET_NAME("s3_screenshot_bucket_name"),
+		
+		S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
+		
+		//For localization parser
+		ADD_NEW_LOCALIZATION("add_new_localization"), 
+		
+		ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
+		
+		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name");
+
+
 		private final String key;
 
-		private Parameter(String key)
+		Parameter(String key)
 		{
 			this.key = key;
 		}
@@ -392,4 +424,42 @@ public class Configuration
 	{
 		return get(param) == null || SpecialKeywords.NULL.equalsIgnoreCase(get(param)); 
 	}
+	
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void loadCoreProperties(String fileName) {
+
+        LOGGER.info("Loading capabilities:");
+        Properties props = new Properties();
+        URL baseResource = ClassLoader.getSystemResource(fileName);
+		try {
+			if(baseResource != null)
+			{
+				props.load(baseResource.openStream());
+				LOGGER.info("Custom capabilities properties loaded: " + fileName);
+			} else {
+				throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");	
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
+		}
+
+        Map<String, String> propertiesMap = new HashMap(props);
+        for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
+            if (entry.getKey().startsWith(SpecialKeywords.CORE)) {
+            	
+                String valueFromEnv = null;
+                if (!entry.getKey().equalsIgnoreCase("os")) {
+                	valueFromEnv = System.getenv(entry.getKey());
+                } else {
+                	LOGGER.warn("'os' property can't be loaded from environment as it is default system variable!");
+                }
+                String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
+                
+            	String key = entry.getKey().replaceAll(SpecialKeywords.CORE + ".", "");
+            	LOGGER.info("Set custom core property: " + key + "; value: " + value);
+            	R.CONFIG.put(key, value);
+            }
+        }
+
+    }
 }

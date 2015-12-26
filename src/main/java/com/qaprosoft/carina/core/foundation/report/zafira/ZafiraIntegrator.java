@@ -32,10 +32,10 @@ import com.qaprosoft.zafira.client.model.UserType;
 public class ZafiraIntegrator {
 	protected static final Logger LOGGER = Logger.getLogger(ZafiraIntegrator.class);
 
-	private static UserType user;
+	private static UserType user = null;
 	private static JobType job, parentJob;
-	private static TestSuiteType suite;
-	private static TestRunType run;
+	private static TestSuiteType suite = null;
+	private static TestRunType run = null;
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
 
@@ -187,7 +187,7 @@ public class ZafiraIntegrator {
 
 			registeredTest = registerTest(test, status, testArgs, run.getId(), testCase.getId(), message, TestNamingUtil.getTestStartDate(test), new Date().getTime(), demoUrl, logUrl);
 			TestNamingUtil.associateZafiraTest(registeredTest, Thread.currentThread().getId());
-
+			
 		} catch (Exception e) {
 			isRegistered = false;
 			LOGGER.error("Undefined error during test case/method finish!", e);
@@ -202,7 +202,17 @@ public class ZafiraIntegrator {
 		Response<TestType> response = zc.createTestWorkItems(testId, workItems);
 		return response.getObject();
 	}
-
+	
+	public static long getRunId() {
+		long runId = -1L;
+		if (run != null) {
+			LOGGER.debug("Run is not null");
+			runId = run.getId();
+		}
+		LOGGER.debug("runId: " + runId);
+		return runId;
+	}
+		
 	private static boolean isValid() {
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}

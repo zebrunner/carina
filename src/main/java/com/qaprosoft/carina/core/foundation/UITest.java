@@ -73,8 +73,13 @@ public class UITest extends AbstractTest
     {
     	super.executeBeforeTestSuite(context);
     	
+    	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+        	//redefine core properties using custom capabilities file
+            Configuration.loadCoreProperties(customCapabilities);
+        }
+        
     	DevicePool.registerDevices();
-    	//DevicePool.screensOn(executor);
     	DriverMode driverMode = Configuration.getDriverMode();
     	
 	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
@@ -83,6 +88,7 @@ public class UITest extends AbstractTest
 	    	if (!initDriver(context.getSuite().getName(), driverInitCount)) {
 	    		throw init_throwable;
 	    	}
+	    	executor.screenOn();
 	    }
 
     }
@@ -107,9 +113,10 @@ public class UITest extends AbstractTest
 	    	if (!initDriver(this.getClass().getName(), driverInitCount)) {
 	    		throw init_throwable;
 	    	}
+	    	executor.screenOn();
 	    }
 		
-		executor.screenOn();
+		
     }
     
     @BeforeMethod(alwaysRun = true)
@@ -138,14 +145,17 @@ public class UITest extends AbstractTest
     		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
 	    	if (!initDriver(test, driverInitCount)) {
 	    		throw init_throwable;
-	    	}	    		
+	    	}
+	    	executor.screenOn();
     	}
     	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 			startRecording();
     	}		    	
 
-    	if (browserVersion.isEmpty() && getDriver() != null)
-    		browserVersion = DriverFactory.getBrowserVersion(getDriver());
+		if (browserVersion.isEmpty() && getDriver() != null
+				&& !Configuration.get(Parameter.CUSTOM_CAPABILITIES).isEmpty()) {
+			browserVersion = DriverFactory.getBrowserVersion(getDriver());
+		}
 	}    
 
     @AfterMethod(alwaysRun = true)
@@ -161,6 +171,8 @@ public class UITest extends AbstractTest
 	    	}
 	    	
 	    	if (driverMode == DriverMode.METHOD_MODE) {
+	    		//TODO: analyze necessity to turn off device display after each method
+	    		//executor.screenOff();
 	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
 				quitDriver();
 			}	    	
@@ -176,10 +188,11 @@ public class UITest extends AbstractTest
     
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
-    	executor.screenOff();
+    	
 		quitExtraDriver();
 	    if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null)
 	    {
+	    	executor.screenOff();
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
 			quitDriver();
 	    }
@@ -193,6 +206,7 @@ public class UITest extends AbstractTest
     	quitExtraDriver();
 	    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && getDriver() != null)
 	    {
+	    	executor.screenOff();
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterSuite.");
 			quitDriver();
 			stopRecording(null);

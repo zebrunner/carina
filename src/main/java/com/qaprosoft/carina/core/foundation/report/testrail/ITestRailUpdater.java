@@ -5,7 +5,7 @@ import org.testng.ITestResult;
 
 
 public interface ITestRailUpdater {
-	public void updateBeforeSuite(ITestContext context, String testClass, String title);
+	void updateBeforeSuite(ITestContext context, String testClass, String title);
 	
-	public void updateAfterTest(ITestResult result, String errorMessage);
+	void updateAfterTest(ITestResult result, String errorMessage);
 }

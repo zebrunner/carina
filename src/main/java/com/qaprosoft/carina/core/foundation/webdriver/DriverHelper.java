@@ -15,35 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
@@ -54,6 +25,27 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.AbstractPage;
+
+import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.*;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -171,6 +163,156 @@ public class DriverHelper
 	{
 		return new ExtendedWebElement(element, controlInfo).isElementPresent(timeout);
 	}
+	
+	 /**
+     * Method which quickly looks for all element and check that they present during EXPLICIT_TIMEOUT
+     *
+     * @param elements ExtendedWebElement...
+     * @return boolean return true only if all elements present.
+     */
+    public boolean allElementsPresent(ExtendedWebElement... elements) {
+        return allElementsPresent(EXPLICIT_TIMEOUT, elements);
+    }
+
+    /**
+     * Method which quickly looks for all element and check that they present during timeout sec
+     *
+     * @param timeout
+     * @param elements ExtendedWebElement...
+     * @return boolean return true only if all elements present.
+     */
+    public boolean allElementsPresent(long timeout, ExtendedWebElement... elements) {
+        int index = 0;
+        boolean present = true;
+        int counts = 1;
+        while (present && index++ < counts) {
+            for (int i = 0; i < elements.length; i++) {
+                present = isElementPresent(elements[i], timeout / counts);
+                if (!present) {
+                    LOGGER.error(elements[i].getNameWithLocator() + " is not present.");
+                }
+            }
+        }
+        return present;
+    }
+
+
+    /**
+     * Method which quickly looks for all element lists and check that they contain at least one element during IMPLICIT_TIMEOUT
+     *
+     * @param elements List<ExtendedWebElement>...
+     * @return boolean
+     */
+    public boolean allElementListsAreNotEmpty(List<ExtendedWebElement>... elements) {
+        return allElementListsAreNotEmpty(IMPLICIT_TIMEOUT, elements);
+    }
+
+    /**
+     * Method which quickly looks for all element lists and check that they contain at least one element during timeout
+     *
+     * @param timeout
+     * @param elements List<ExtendedWebElement>...
+     * @return boolean return true only if All Element lists contain at least one element
+     */
+    public boolean allElementListsAreNotEmpty(long timeout, List<ExtendedWebElement>... elements) {
+        boolean ret = true;
+        int counts = 3;
+        for (int i = 0; i < elements.length; i++) {
+            boolean present = false;
+            int index = 0;
+            while (!present && index++ < counts) {
+                try {
+                    present = isElementPresent(elements[i].get(0), (timeout / counts));
+                } catch (Exception e) {
+                    present = false;
+                }
+            }
+            ret = (elements[i].size() > 0);
+            if (!ret) {
+                LOGGER.error("List of elements[" + i + "] from elements " + elements.toString() + " is empty.");
+                return false;
+            }
+        }
+        return ret;
+    }
+
+
+    /**
+     * Method which quickly looks for any element presence during IMPLICIT_TIMEOUT
+     *
+     * @param elements
+     * @return true if any of elements was found.
+     */
+    public boolean isAnyElementPresent(ExtendedWebElement... elements) {
+        return isAnyElementPresent(IMPLICIT_TIMEOUT, elements);
+    }
+
+    /**
+     * Method which quickly looks for any element presence during timeout sec
+     *
+     * @param timeout
+     * @param elements ExtendedWebElement...
+     * @return true if any of elements was found.
+     */
+    public boolean isAnyElementPresent(long timeout, ExtendedWebElement... elements) {
+        int index = 0;
+        boolean present = false;
+        int counts = 10;
+        while (!present && index++ < counts) {
+            for (int i = 0; i < elements.length; i++) {
+                present = isElementPresent(elements[i], timeout / counts);
+                if (present) {
+                    LOGGER.debug(elements[i].getNameWithLocator() + " is present");
+                    return true;
+                }
+            }
+        }
+        if (!present) {
+            LOGGER.error("Unable to find any element from array: "
+                    + elements.toString());
+            return false;
+        }
+        return present;
+    }
+
+    /**
+     * return Any Present Element from the list which present during IMPLICIT_TIMEOUT
+     *
+     * @param elements
+     * @return ExtendedWebElement
+     */
+    public ExtendedWebElement returnAnyPresentElement(ExtendedWebElement... elements) {
+        return returnAnyPresentElement(IMPLICIT_TIMEOUT, elements);
+    }
+
+    /**
+     * return Any Present Element from the list which present during timeout sec
+     *
+     * @param timeout
+     * @param elements ExtendedWebElement...
+     * @return ExtendedWebElement
+     */
+    public ExtendedWebElement returnAnyPresentElement(long timeout, ExtendedWebElement... elements) {
+        int index = 0;
+        boolean present = false;
+        int counts = 10;
+        while (!present && index++ < counts) {
+            for (int i = 0; i < elements.length; i++) {
+                present = isElementPresent(elements[i], timeout / counts);
+                if (present) {
+                    LOGGER.debug(elements[i].getNameWithLocator() + " is present");
+                    return elements[i];
+                }
+            }
+        }
+        if (!present) {
+            LOGGER.error("All elements are not present");
+            throw new RuntimeException(
+                    "Unable to find any element from array: "
+                            + elements.toString());
+        }
+        return new ExtendedWebElement(null, null, null);
+    }
 	
 	@Deprecated
 	public boolean isElementPresent(String elementName, final By by, long timeout)
@@ -1088,7 +1230,7 @@ public class DriverHelper
 		}
 	}
 
-	public void switchWindow() throws NoSuchWindowException, NoSuchWindowException
+	public void switchWindow() throws NoSuchWindowException
 	{
 		WebDriver drv = getDriver();
 		Set<String> handles = drv.getWindowHandles();
@@ -1207,7 +1349,7 @@ public class DriverHelper
 	
 	public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout)
 	{
-		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
 		final WebDriver drv = getDriver();
