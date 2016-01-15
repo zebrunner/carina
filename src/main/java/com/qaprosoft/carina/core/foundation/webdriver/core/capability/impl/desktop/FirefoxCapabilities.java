@@ -67,6 +67,9 @@ public class FirefoxCapabilities extends AbstractCapabilities {
             profile.setPreference("plugin.scan.Acrobat", "99.0");
         }
 
+        profile.setAcceptUntrustedCertificates(true);
+        profile.setAssumeUntrustedCertificateIssuer(true);
+        
         return profile;
     }
 }
