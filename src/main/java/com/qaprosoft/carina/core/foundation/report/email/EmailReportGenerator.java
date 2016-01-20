@@ -298,7 +298,7 @@ public class EmailReportGenerator
 		TestResultType result;
 		if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
-		} else if (passed > 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
+		} else if (passed >= 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS_WITH_KNOWN_ISSUES;
 		} else if (passed == 0 && failed == 0 && skipped > 0){
 			result = TestResultType.SKIP_ALL;
