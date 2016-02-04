@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.rcarz.jiraclient.BasicCredentials;
-import net.rcarz.jiraclient.JiraClient;
-
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -31,8 +28,11 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+
+import net.rcarz.jiraclient.BasicCredentials;
+import net.rcarz.jiraclient.JiraClient;
 
 /*
  * Jira
@@ -47,6 +47,8 @@ public class Jira
 	private static boolean isInitialized = false;
 	private static CryptoTool cryptoTool;
 	private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+	
+	protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<List<String>>();
 
 	static
 	{
@@ -94,8 +96,18 @@ public class Jira
 			}
 		}
 	}
+	
+	public static void setTickets(List<String> tickets) {
+		jiraTickets.set(tickets);
+	}
+	
 	public synchronized static List<String> getTickets(ITestResult result)
 	{
+		//return any specified jira tickets by tests
+		if (jiraTickets.get() != null) {
+			return jiraTickets.get();
+		}
+		
 		List<String> tickets = new ArrayList<String>();
 		
 		if(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
@@ -117,4 +129,5 @@ public class Jira
 		}
 		return tickets;
 	}
+	
 }
