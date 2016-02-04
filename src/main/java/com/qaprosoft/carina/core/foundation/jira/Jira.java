@@ -97,8 +97,20 @@ public class Jira
 		}
 	}
 	
+	public static void clearTickets() {
+		jiraTickets.remove();
+	}
+	
 	public static void setTickets(List<String> tickets) {
 		jiraTickets.set(tickets);
+	}
+	
+	public static void setTickets(String...tickets) {
+		List<String> tempTickets = new ArrayList<String>();
+		for (String ticket : tickets) {
+			tempTickets.add(ticket);
+		}
+		setTickets(tempTickets);
 	}
 	
 	public synchronized static List<String> getTickets(ITestResult result)
