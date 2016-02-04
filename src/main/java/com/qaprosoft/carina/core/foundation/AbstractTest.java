@@ -209,7 +209,7 @@ public abstract class AbstractTest // extends DriverHelper
 			TestNamingUtil.releaseZafiraTest(Thread.currentThread().getId());
 
 			// clear jira tickets to be sure that next test is not affected.
-			Jira.setTickets(null);
+			Jira.clearTickets();
 			testRailCases.clear();
 			
 			
@@ -606,6 +606,7 @@ public abstract class AbstractTest // extends DriverHelper
 	 * @param tickets
 	 *            to set
 	 */
+	@Deprecated
 	protected void setJiraTicket(String... tickets) {
 		List<String> jiraTickets = new ArrayList<String>();
 		for (String ticket : tickets) {
