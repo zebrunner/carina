@@ -437,7 +437,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 		testResultItem.setDescription(description);
 		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
 		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
-		testResultItem.setJiraTickets((List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET));
+		List<String> tickets = new ArrayList<String>();
+		if (result.getAttribute(SpecialKeywords.JIRA_TICKET) != null) {
+			tickets = (List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET);
+		}
+		testResultItem.setJiraTickets(tickets);
 		return testResultItem;
 	}
 	
