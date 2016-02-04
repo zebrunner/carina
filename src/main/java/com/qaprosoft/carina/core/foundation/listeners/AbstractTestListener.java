@@ -29,7 +29,6 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -415,6 +414,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		return id;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
 	{
 		String group = TestNamingUtil.getPackageName(result);
@@ -436,8 +436,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
 		testResultItem.setDescription(description);
 		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
-		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature 
-		testResultItem.setJiraTickets(Jira.getTickets(result));
+		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
+		testResultItem.setJiraTickets((List<String>) result.getAttribute(SpecialKeywords.JIRA_TICKET));
 		return testResultItem;
 	}
 	
