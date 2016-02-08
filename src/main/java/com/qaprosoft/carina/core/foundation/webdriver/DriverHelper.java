@@ -257,7 +257,7 @@ public class DriverHelper
      * @return boolean return true only if All Element lists contain at least one element
      */
     public boolean allElementListsAreNotEmpty(long timeout, List<ExtendedWebElement>... elements) {
-		boolean ret = true;
+    	boolean ret = true;
         int counts = 3;
         for (int i = 0; i < elements.length; i++) {
             boolean present = false;
