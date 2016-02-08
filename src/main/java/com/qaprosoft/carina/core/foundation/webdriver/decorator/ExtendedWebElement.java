@@ -287,6 +287,75 @@ public class ExtendedWebElement
 	
 
 	/**
+	 * Mouse Right click to element. 
+	 * 
+	 * @return boolean true if there is no errors.
+	 */
+    public boolean rightClick() {
+        boolean res = false;
+        String msg = "Right Click";
+        try {
+        	WebDriver drv = getDriver();
+            Actions action = new Actions(drv);
+            action.moveToElement(getElement()).contextClick(getElement()).build().perform();
+
+    		msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
+    		summary.log(msg);
+    		
+            res = true;
+        } catch (Exception e) {
+    		msg = Messager.ELEMENT_NOT_RIGHT_CLICKED.info(getName());
+    		summary.log(msg);
+        	LOGGER.error(e.getMessage());
+        }
+        
+        try
+		{
+			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+		}
+		catch (Exception e)
+		{
+			LOGGER.info(e.getMessage());
+		}
+        
+        return res;
+    }
+	
+    /**
+     * Click Hidden Element.
+     * useful when element present in DOM but actually is not visible. 
+     * And can't be clicked by standard click.
+     * 
+     * @return boolean true if there is no errors.
+     */
+    public boolean clickHiddenElement() {
+    	String msg = "Hidden Element Click";
+    	boolean res = false;
+        try {
+            WebElement elem= getElement();
+            JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+            executor.executeScript("arguments[0].click();",elem);
+            
+    		msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
+    		summary.log(msg);
+    		res = true;
+        } catch (Exception e) {
+        	msg = Messager.HIDDEN_ELEMENT_NOT_CLICKED.info(getName());
+    		summary.log(msg);
+        	LOGGER.error(e.getMessage());
+        }
+        try
+		{
+			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+		}
+		catch (Exception e)
+		{
+			LOGGER.info(e.getMessage());
+		}
+        return res;
+    }
+	
+	/**
 	 * Check that element present.
 	 * 
 	 * @param extWebElement ExtendedWebElement
@@ -891,6 +960,17 @@ public class ExtendedWebElement
 	 *
 	 * @param matcher {@link} BaseMatcher
 	 * @return true if item selected, otherwise false.
+	 * 
+	 * Usage example:
+	 * BaseMatcher<String> match=new BaseMatcher<String>() {
+	 * 	@Override
+	 * 	public boolean matches(Object actual) {
+	 * 		return actual.toString().contains(RequiredText);
+	 * 					}
+	 * 	@Override
+	 * 		public void describeTo(Description description) {
+	 * 					}
+	 * 	};
 	 */
 	public boolean selectByMatcher(final BaseMatcher<String> matcher)
 	{
@@ -940,6 +1020,61 @@ public class ExtendedWebElement
 		return isSelected;
 	}
 	
+	
+	/**
+	 * Selects first value according to partial text value.
+	 *
+	 * @param partialSelectText select by partial text
+	 * @return true if item selected, otherwise false.
+	 */
+	public boolean selectByPartialText(final String partialSelectText)
+	{
+		boolean isSelected = false;
+		final Select s = new Select(getElement());
+		WebDriver drv = getDriver();
+		String msg = null;
+		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver dr)
+				{
+					try
+					{
+						String fullTextValue = null;
+						for (WebElement option : s.getOptions())
+						{
+							if (option.getText().contains(partialSelectText))
+							{
+								fullTextValue = option.getText();
+								break;
+							}
+						}
+						s.selectByVisibleText(fullTextValue);
+						return true;
+					}
+					catch (Exception e)
+					{
+						LOGGER.debug(e.getMessage(), e.getCause());
+					}
+					return false;
+				}
+			});
+			isSelected = true;
+			msg = Messager.SELECT_BY_TEXT_PERFORMED.info(partialSelectText, getName());
+		}
+		catch (Exception e)
+		{
+			msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator());
+			e.printStackTrace();
+		}
+		summary.log(msg);
+		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+
+		return isSelected;
+	}
+		
 	/**
 	 * Selects item by index in specified select element.
 	 * 
