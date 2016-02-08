@@ -309,12 +309,9 @@ public class ExtendedWebElement
         	LOGGER.error(e.getMessage());
         }
         
-        try
-		{
+		try {
 			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		}
         
