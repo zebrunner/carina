@@ -36,6 +36,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -74,6 +75,8 @@ public class DriverHelper
 	protected CryptoTool cryptoTool;
 
 	protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+
+	private List<ExtendedWebElement>[] elements;
 	
 	public DriverHelper()
 	{
@@ -128,6 +131,45 @@ public class DriverHelper
 		summary = new TestLogHelper(sessionId);
 	}
 
+	
+	/**
+	 * Wait for element to be clickable.
+	 * Alternative for isElementPresent with other condition.
+	 * 
+	 * @param extWebElement ExtendedWebElement
+	 * @return waitPeriod in seconds.
+	 */
+    protected boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
+        final WebDriver drv = getDriver();
+        By locator = element.getBy();
+        boolean res = true;
+        String msg = "Right Click";
+        try {
+            (new WebDriverWait(drv, waitPeriod)).until(ExpectedConditions.elementToBeClickable(locator));
+            msg = Messager.ELEMENT_BECOME_CLICKABLE.info(element.getName());
+    		summary.log(msg);
+        } catch (TimeoutException ex) {
+        	msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(element.getName());
+    		summary.log(msg);
+            LOGGER.error(ex);
+            res= false;
+        } catch (Exception e) {
+        	msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(element.getName());
+    		summary.log(msg);
+        	LOGGER.error(e);
+        	res= false;
+        }
+        try
+		{
+			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+		}
+		catch (Exception e)
+		{
+			LOGGER.info(e.getMessage());
+		}
+        return res;
+    }
+    
 	/**
 	 * Check that element present.
 	 * 
@@ -215,7 +257,7 @@ public class DriverHelper
      * @return boolean return true only if All Element lists contain at least one element
      */
     public boolean allElementListsAreNotEmpty(long timeout, List<ExtendedWebElement>... elements) {
-        boolean ret = true;
+		boolean ret = true;
         int counts = 3;
         for (int i = 0; i < elements.length; i++) {
             boolean present = false;
@@ -479,6 +521,25 @@ public class DriverHelper
 		doubleClick(new ExtendedWebElement(control, controlInfo));
 	}
 	
+	/**
+	 * Mouse Right click to element. 
+	 * 
+	 * @return boolean true if there is no errors.
+	 */
+	public boolean rightClick(final ExtendedWebElement extendedWebElement) {
+		return extendedWebElement.rightClick();
+	}
+	
+	/**
+     * Click Hidden Element.
+     * useful when element present in DOM but actually is not visible. 
+     * And can't be clicked by standard click.
+     * 
+     * @return boolean true if there is no errors.
+     */
+	public boolean clickHiddenElement(final ExtendedWebElement extendedWebElement) {
+		return extendedWebElement.clickHiddenElement();
+	}
 	
 	/**
 	 * Sends enter to element.
@@ -798,6 +859,7 @@ public class DriverHelper
 	{
 		select(new ExtendedWebElement(control, controlInfo), selectText);
 	}
+	
 	/**
 	 * Selects value according to text value matcher.
 	 *
@@ -810,6 +872,17 @@ public class DriverHelper
 		return extendedWebElement.selectByMatcher(matcher);
 	}
 
+	/**
+	 * Selects first value according to partial text value.
+	 * 
+     * @param extendedWebElement Element
+	 * @param partialSelectText select by partial text
+	 * @return true if item selected, otherwise false.
+	 */
+	public boolean selectByPartialText(final ExtendedWebElement extendedWebElement, final String partialSelectText )
+	{
+		return extendedWebElement.selectByPartialText(partialSelectText);
+	}
 
 	/**
 	 * Selects item by index in specified select element.
