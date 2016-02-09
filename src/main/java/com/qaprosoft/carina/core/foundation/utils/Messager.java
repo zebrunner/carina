@@ -104,6 +104,10 @@ public enum Messager {
 	UNEXPECTED_ELEMENT_PRESENT("FAIL: unexpected element '%s' presents!"),
 
 	UNEXPECTED_ELEMENT_WITH_TEXT_PRESENT("FAIL: unexpected element '%s' with text '%s' presents!"),
+	
+	ELEMENT_BECOME_CLICKABLE("PASS: element '%s' become clickable."),
+
+	ELEMENT_NOT_BECOME_CLICKABLE("FAIL: element '%s' is not become clickable before timeout!"),
 
 	ELEMENT_CLICKED("PASS: element '%s' is clicked."),
 
@@ -116,7 +120,15 @@ public enum Messager {
 	ELEMENT_DOUBLE_CLICKED("PASS: element '%s' is double clicked."),
 
 	ELEMENT_NOT_DOUBLE_CLICKED("FAIL: element '%s' is not double clicked!"),
+	
+	ELEMENT_RIGHT_CLICKED("PASS: element '%s' is right clicked."),
 
+	ELEMENT_NOT_RIGHT_CLICKED("FAIL: element '%s' is not right clicked!"),
+
+	HIDDEN_ELEMENT_CLICKED("PASS: hidden element '%s' is clicked."),
+
+	HIDDEN_ELEMENT_NOT_CLICKED("FAIL: hidden element '%s' is not clicked!"),
+	
 	ELEMENT_HOVERED("PASS: element '%s' is hovered."),
 
 	ELEMENT_NOT_HOVERED("FAIL: element '%s' is not hovered!"),
