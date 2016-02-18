@@ -30,6 +30,12 @@ public class ChromeCapabilities extends AbstractCapabilities {
 	        chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
 	        chromePrefs.put("safebrowsing.enabled", "true");
 	        
+	        // QUALITY-1475 Disable 'Chrome PDF Viewer'
+	        HashMap<String, Object> plugin = new HashMap<String, Object>();
+			plugin.put("enabled", false);
+			plugin.put("name", "Chrome PDF Viewer");
+
+			chromePrefs.put("plugins.plugins_list", Arrays.asList(plugin));	
 	        options.setExperimentalOption("prefs", chromePrefs);
         }
         
