@@ -81,8 +81,6 @@ public abstract class AbstractTest // extends DriverHelper
 	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 
 	// 3rd party integrations
-	// Jira ticket(s)
-	private List<String> jiraTickets = new ArrayList<String>();
 	// TestRails case(s)
 	private List<String> testRailCases = new ArrayList<String>();
 
@@ -186,22 +184,19 @@ public abstract class AbstractTest // extends DriverHelper
 	public void executeAfterTestMethod(ITestResult result) {
 		try {
 			String test = TestNamingUtil.getCanonicalTestName(result);
-			// Populate JIRA ID
-			if (jiraTickets.size() == 0) { // it was not redefined in the test
-				jiraTickets = Jira.getTickets(result);
-			}
-			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);
+			List<String> tickets = Jira.getTickets(result);
+			result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
 			Jira.updateAfterTest(result);
 
 
 			//zafira
 			TestType testType = TestNamingUtil.getZafiraTest(Thread.currentThread().getId());
-			if (testType != null && jiraTickets.size() > 0) {
-				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
+			if (testType != null && tickets.size() > 0) {
+				ZafiraIntegrator.registerWorkItems(testType.getId(), tickets);
 			}
 			
 			// Populate Spira Steps
-			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), jiraTickets);
+			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), tickets);
 			Spira.clear();
 
 			// Populate TestRail Cases
@@ -214,7 +209,7 @@ public abstract class AbstractTest // extends DriverHelper
 			TestNamingUtil.releaseZafiraTest(Thread.currentThread().getId());
 
 			// clear jira tickets to be sure that next test is not affected.
-			jiraTickets.clear();
+			Jira.clearTickets();
 			testRailCases.clear();
 			
 			
@@ -611,10 +606,13 @@ public abstract class AbstractTest // extends DriverHelper
 	 * @param tickets
 	 *            to set
 	 */
+	@Deprecated
 	protected void setJiraTicket(String... tickets) {
+		List<String> jiraTickets = new ArrayList<String>();
 		for (String ticket : tickets) {
 			jiraTickets.add(ticket);
 		}
+		Jira.setTickets(jiraTickets);
 	}
 
 /**

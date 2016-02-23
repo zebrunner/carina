@@ -266,7 +266,7 @@ public class UITest extends AbstractTest
 			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
 			extraDriver.quit();
 			extraDriver = null;
-			DriverPool.deregisterDriverByThread(Thread.currentThread().getId());
+			//DriverPool.deregisterDriverByThread(Thread.currentThread().getId());
 		}		
 	}
 	
