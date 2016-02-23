@@ -69,6 +69,7 @@
 		<opencsv.version>1.7</opencsv.version>
 		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
 		<api-tools.version>1.0.5</api-tools.version>
+		<monte-repack.version>1.0</monte-repack.version>
 	</properties>
 
 	<repositories>
@@ -390,6 +391,12 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>api-tools</artifactId>
 			<version>${api-tools.version}</version>
+		</dependency>
+		<!-- monte-repack video recording  -->
+		<dependency>
+			<groupId>com.pojosontheweb</groupId>
+			<artifactId>monte-repack</artifactId>
+			<version>${monte-repack.version}</version>
 		</dependency>
 	</dependencies>
 
