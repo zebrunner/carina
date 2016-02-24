@@ -45,6 +45,12 @@ public class AndroidUtils {
 	}
 
 	/**
+	 * Useful Android utilities. For usage: import
+	 * com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+	 * 
+	 */
+
+	/**
 	 * execute Key Event
 	 * 
 	 * @param keyCode
@@ -324,8 +330,9 @@ public class AndroidUtils {
 		} catch (Exception e) {
 			LOGGER.error("Exception occurred when "
 					+ "element.swipe(SwipeElementDirection."
-					+ direction.toString() + ", "+duration+")  "
-					+ "was provided in tapAndSwipe functionality. Error: " + e);
+					+ direction.toString() + ", " + duration + ")  "
+					+ "was provided in tapAndSwipe functionality. Error: "
+					+ e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -338,26 +345,6 @@ public class AndroidUtils {
 	 */
 	public static void swipeUp(By elem, int time) {
 		swipe(elem, SwipeElementDirection.UP, time);
-	}
-
-	/**
-	 * swipe
-	 *
-	 * @param by
-	 * @param direction
-	 * @param time
-	 */
-	public static void swipe(By by, SwipeElementDirection direction, int time) {
-		MobileElement element;
-		WebDriver driver = DriverPool.getDriverByThread();
-		try {
-			element = (MobileElement) driver.findElement(by);
-			element.swipe(direction, time);
-		} catch (Exception e) {
-			LOGGER.error(String.format(
-					"Exception occured during swipe%s. Error: %s",
-					direction.toString(), e.getLocalizedMessage()));
-		}
 	}
 
 	/**
@@ -450,8 +437,7 @@ public class AndroidUtils {
 	 * @param extendedWebElement
 	 * @return boolean
 	 */
-	public static boolean scrollToBtn(
-			final ExtendedWebElement extendedWebElement) {
+	public static boolean scrollTo(final ExtendedWebElement extendedWebElement) {
 		int i = 0;
 		try {
 			WebDriver driver = DriverPool.getDriverByThread();
