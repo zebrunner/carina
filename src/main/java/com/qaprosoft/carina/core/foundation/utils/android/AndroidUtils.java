@@ -344,7 +344,7 @@ public class AndroidUtils {
 	 * @param time
 	 */
 	public static void swipeUp(By elem, int time) {
-		swipe(elem, SwipeElementDirection.UP, time);
+		tapAndSwipe(elem, SwipeElementDirection.UP, time);
 	}
 
 	/**
