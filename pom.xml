@@ -70,6 +70,7 @@
 		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
 		<api-tools.version>1.0.5</api-tools.version>
 		<monte-repack.version>1.0</monte-repack.version>
+		
 	</properties>
 
 	<repositories>
@@ -398,6 +399,14 @@
 			<artifactId>monte-repack</artifactId>
 			<version>${monte-repack.version}</version>
 		</dependency>
+		
+		<!-- monte-repack video recording  -->
+	    <dependency>
+			<groupId>com.pojosontheweb</groupId>
+			<artifactId>monte-repack</artifactId>
+			<version>${monte-repack.version}</version>
+ 	    </dependency>
+		
 	</dependencies>
 
 	<distributionManagement>
