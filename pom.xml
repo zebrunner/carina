@@ -57,7 +57,7 @@
 		<jackson-mapper-asl.version>1.9.11</jackson-mapper-asl.version>
 		<guava.version>18.0</guava.version>
 
-		<jira-client.version>0.4</jira-client.version>
+		<jira-client.version>0.5</jira-client.version>
 
 		<zafira-client.version>1.4.3</zafira-client.version>
 
