@@ -243,8 +243,14 @@ public abstract class AbstractTestListener extends TestArgsListener
 			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
 		}
 		
+		boolean ignoreKnownIssue = Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES);
+		int knownIssuesCount = Jira.getTickets(result).size();
+		
+		// [VD] QUALITY-1408 disable retry test execution if ignore_known_issues is enabled and jira ticket(s) provided
+		boolean disableRetryForKnownIssues = ignoreKnownIssue & (knownIssuesCount > 0); 
+		
 		String errorMessage = "";
-		if (count < maxCount && retry != null)
+		if (count < maxCount && retry != null && !disableRetryForKnownIssues)
 		{
 			TestNamingUtil.decreaseRetryCounter(test);
 			errorMessage = failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
