@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -28,7 +29,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 
     public boolean retry(ITestResult result) {
         String test = TestNamingUtil.getCanonicalTestName(result);
-        if (RetryCounter.getRunCount(test) < getMaxRetryCountForTest(result)) {
+        if (RetryCounter.getRunCount(test) < getMaxRetryCountForTest(result) && !Jira.isRetryDisabled(result)) {
             RetryCounter.incrementRunCount(test);
             return true;
         }
