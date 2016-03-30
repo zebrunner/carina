@@ -244,7 +244,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 		
 		String errorMessage = "";
-		if (count < maxCount && retry != null)
+		if (count < maxCount && retry != null && !Jira.isRetryDisabled(result))
 		{
 			TestNamingUtil.decreaseRetryCounter(test);
 			errorMessage = failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
