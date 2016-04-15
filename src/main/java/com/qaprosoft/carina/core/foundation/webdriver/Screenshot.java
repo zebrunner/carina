@@ -15,6 +15,8 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.awt.AWTException;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -51,6 +53,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 public class Screenshot
 {
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
+	
+	private static boolean isRoboScreenshotTaken;
 
 	public static String capture(WebDriver driver)
 	{
@@ -101,33 +105,27 @@ public class Screenshot
 			augmentedDriver = new DriverAugmenter().augment(driver);
 		    } 
 
-		    boolean alertPresentFlag = false;
+		    isRoboScreenshotTaken = false;
+		    
 		    File fullScreen = null;
-		    BufferedImage image = null;
 		    
 		    try {
 			driver.switchTo().alert();
-			alertPresentFlag = true;
-			image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-			fullScreen = new File(fullScreenPath);
-			ImageIO.write(image, "png", fullScreen);
+			fullScreen = makeRoboScreenshot(fullScreenPath);
 		    } catch (NoAlertPresentException noAlertPresentException) {
-
 		    } catch (NoSuchWindowException noSuchWindowException) {
-
+			fullScreen = makeRoboScreenshot(fullScreenPath);
 		    }
 
-		    if(!alertPresentFlag) {
-			fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);   
+		    if(!isRoboScreenshotTaken) {
+			fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);  
 		    }
-
-		    //File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 
 		    if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1 && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
 			resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
 		    }
 
-		    if(!alertPresentFlag) {
+		    if(!isRoboScreenshotTaken) {
 			FileUtils.copyFile(fullScreen, new File(fullScreenPath));
 		    }
 
@@ -150,6 +148,14 @@ public class Screenshot
 		}
 	    }
 	    return screenName;
+	}
+	
+	private static File makeRoboScreenshot(String fullScreenPath) throws IOException, HeadlessException, AWTException {
+	    BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+	    File fullScreen = new File(fullScreenPath);
+	    ImageIO.write(image, "png", fullScreen);
+	    isRoboScreenshotTaken = true;
+	    return fullScreen;
 	}
 	
 	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
