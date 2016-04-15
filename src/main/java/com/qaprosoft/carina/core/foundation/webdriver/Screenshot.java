@@ -28,20 +28,19 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
+import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.amazon.AmazonS3Manager;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -155,7 +154,7 @@ public class Screenshot
 	
 	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
 		if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
-			LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
+			LOGGER.debug("There is no sense to continue as saving screenshots onto S3 is disabled");
 			return;
 		}
 		Long runId = ZafiraIntegrator.getRunId();
