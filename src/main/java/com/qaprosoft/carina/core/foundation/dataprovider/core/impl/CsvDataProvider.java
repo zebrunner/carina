@@ -1,24 +1,17 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-
 import au.com.bytecode.opencsv.CSVReader;
-
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -86,14 +79,16 @@ public class CsvDataProvider extends BaseDataProvider {
         }
         List<String> headers = Arrays.asList((String[]) list.get(0));
 
+        // handle empty argsList inside initMapper
         mapper = initMapper(argsList, headers);
         list.remove(0);
 
+        //exclude those lines which don't satisfy executeColumn/executeValue filter
         Iterator<String[]> iter = list.iterator();
         while (iter.hasNext()) {
             int index = mapper.get(executeColumn);
 
-            String[] line = (String[]) iter.next();
+            String[] line = iter.next();
             if (!line[index].equalsIgnoreCase(executeValue)) {
                 iter.remove();
             }
@@ -101,18 +96,39 @@ public class CsvDataProvider extends BaseDataProvider {
 
         int listSize = list.size();
 
-        Object[][] args = new Object[listSize][argsList.size() + staticArgsList.size()];
+        int width = 0;
+        if (argsList.size() == 0) {
+        	//first element is dynamic HashMap<String, String>
+            width = staticArgsList.size() + 1;
+        } else {
+            width = argsList.size() + staticArgsList.size();
+        }
+        
+        Object[][] args = new Object[listSize][width];
         int rowIndex = 0;
         for (String[] strings : list) {
         	String testName = context.getName();
 
             int i = 0;
-            for (String arg : argsList) {
-                int index = mapper.get(arg);
-                args[rowIndex][i] = strings[index];
-                i++;
-            }
+        	if (argsList.size() == 0) {
+                //read all csv data into the single HashMap<String, String> object
+        		HashMap<String, String> dynamicAttrs = new HashMap<String, String> ();
+        		
+                for (String header : headers) {
+                	int index = mapper.get(header);
+                	dynamicAttrs.put(header,  strings[index]);
+                	
+                	args[rowIndex][0] = dynamicAttrs;
+                }
 
+                i++;
+            } else {
+                for (String arg : argsList) {
+                    int index = mapper.get(arg);
+                    args[rowIndex][i] = strings[index];
+                    i++;
+                }
+            }
 
             for (int j = 0; j < staticArgsList.size(); j++) {
                 args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j),context,dsBean);
@@ -167,9 +183,19 @@ public class CsvDataProvider extends BaseDataProvider {
      * */
     private Map<String, Integer> initMapper(List<String> argsList, List<String> headers) {
         Map<String, Integer> mapper = new HashMap<String, Integer>();
-        for (String arg : argsList) {
-        	mapper.put(arg, getIndex(arg, headers));
+        
+        if (argsList.size() == 0) {
+        	// read all columns and put their name into the mapper
+            for (String arg : headers) {
+            	mapper.put(arg, getIndex(arg, headers));
+            }
+        } else {
+            for (String arg : argsList) {
+            	mapper.put(arg, getIndex(arg, headers));
+            }
         }
+
+        
 
     	mapper.put(executeColumn, getIndex(executeColumn, headers));
     	mapper.put(jiraColumn, getIndex(jiraColumn, headers));

@@ -24,13 +24,13 @@
 		<hamcrest-core.version>1.3</hamcrest-core.version>
 		<hamcrest-library.version>1.3</hamcrest-library.version>
 		<junit.version>4.11</junit.version>
-		<rest-assured.version>2.3.0</rest-assured.version>
-		<selenium-java.version>2.45.0</selenium-java.version>
+		<rest-assured.version>2.7.0</rest-assured.version>
+		<selenium-java.version>2.51.0</selenium-java.version>
 
 		<log4j.version>1.2.17</log4j.version>
 		<logback.version>1.0.6</logback.version>
 
-		<apache-http.version>4.3.2</apache-http.version>
+		<apache-http.version>4.4</apache-http.version>
 		<ocap-api.version>1.2</ocap-api.version>
 		<json-rpc.version>1.0</json-rpc.version>
 		<json-path.version>0.8.1</json-path.version>
@@ -55,9 +55,9 @@
 		<xmlbeans.version>2.4.0</xmlbeans.version>
 		<bcprov-jdk16.version>1.45</bcprov-jdk16.version>
 		<jackson-mapper-asl.version>1.9.11</jackson-mapper-asl.version>
-		<guava.version>13.0.1</guava.version>
+		<guava.version>18.0</guava.version>
 
-		<jira-client.version>0.4</jira-client.version>
+		<jira-client.version>0.5</jira-client.version>
 
 		<zafira-client.version>1.4.3</zafira-client.version>
 
@@ -67,6 +67,10 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
+		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
+		<api-tools.version>1.0.5</api-tools.version>
+		<monte-repack.version>1.0</monte-repack.version>
+		
 	</properties>
 
 	<repositories>
@@ -79,15 +83,23 @@
 			<id>qaprosoft_releases</id>
 			<name>Qaprosoft Releases</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
-			<releases><enabled>true</enabled></releases>
-			<snapshots><enabled>false</enabled></snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
-			<id>qaprosoft_shapshots</id>
+			<id>qaprosoft_snapshots</id>
 			<name>Qaprosoft Snapshots</name>
 			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
-			<releases><enabled>false</enabled></releases>
-			<snapshots><enabled>true</enabled></snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
@@ -103,6 +115,12 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito-core.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -177,6 +195,16 @@
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path-assert</artifactId>
 			<version>${json-path.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-library</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -304,8 +332,8 @@
 			<version>${zafira-client.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.google.code.gson</groupId>
-					<artifactId>gson</artifactId>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -345,9 +373,36 @@
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
 			<version>${appium.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.gson</groupId>
+					<artifactId>gson</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<!-- Amazon -->
+		<dependency>
+			<groupId>com.qaprosoft.amazon</groupId>
+			<artifactId>aws-s3-manager</artifactId>
+			<version>${aws-s3-manager.version}</version>
+		</dependency>
+		
+		<!-- api-tools -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>api-tools</artifactId>
+			<version>${api-tools.version}</version>
+		</dependency>
+		
+		<!-- monte-repack video recording  -->
+	    <dependency>
+			<groupId>com.pojosontheweb</groupId>
+			<artifactId>monte-repack</artifactId>
+			<version>${monte-repack.version}</version>
+ 	    </dependency>
+		
 	</dependencies>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>deploymentRepo</id>

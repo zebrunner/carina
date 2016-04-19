@@ -15,37 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.DataProvider;
-import org.testng.xml.XmlTest;
-
+import com.amazonaws.services.s3.model.S3Object;
 import com.jayway.restassured.RestAssured;
+import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -65,16 +37,27 @@ import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.*;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.zafira.client.model.TestType;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
+import org.testng.xml.XmlTest;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -98,8 +81,6 @@ public abstract class AbstractTest // extends DriverHelper
 	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 
 	// 3rd party integrations
-	// Jira ticket(s)
-	private List<String> jiraTickets = new ArrayList<String>();
 	// TestRails case(s)
 	private List<String> testRailCases = new ArrayList<String>();
 
@@ -126,34 +107,60 @@ public abstract class AbstractTest // extends DriverHelper
 		LOGGER.info(Configuration.asString());
 		// Configuration.validateConfiguration();
 
-		context.getCurrentXmlTest().getSuite()
-				.setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+		LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+		LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+
+		// update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
+		int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+		if (count > 0) {
+			LOGGER.debug("Updated 'data_provider_thread_count' from "
+					+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
+			context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
+		} else {
+			LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+			R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
+			LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+		}
+
+		LOGGER.debug("Default data_provider_thread_count="
+				+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+		LOGGER.debug("Updated data_provider_thread_count="
+				+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
 
 		if (!Configuration.isNull(Parameter.URL)) {
 			RestAssured.baseURI = Configuration.get(Parameter.URL);
 		}
 
 		try {
-			Locale locale = LocaleReader.init(Configuration
-					.get(Parameter.LOCALE));
-			L10N.init(locale);
+			L10N.init();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			LOGGER.debug("L10N bundle is not initialized successfully!", e);
 		}
 		
 		try {
-			Locale locale = LocaleReader.init(Configuration
-					.get(Parameter.LANGUAGE));
-			I18N.init(locale);
+			I18N.init();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			LOGGER.debug("I18N bundle is not initialized successfully!", e);
+		}
+		
+		try {
+			L10Nparser.init();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			LOGGER.debug("L10Nparser bundle is not initialized successfully!", e);
 		}
 
 		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
 		TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
 
+		if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+			AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
+					Configuration.get(Parameter.SECRET_KEY));
+		}
+		
 	}
 
 	@BeforeClass(alwaysRun = true)
@@ -177,22 +184,19 @@ public abstract class AbstractTest // extends DriverHelper
 	public void executeAfterTestMethod(ITestResult result) {
 		try {
 			String test = TestNamingUtil.getCanonicalTestName(result);
-			// Populate JIRA ID
-			if (jiraTickets.size() == 0) { // it was not redefined in the test
-				jiraTickets = Jira.getTickets(result);
-			}
-			result.setAttribute(SpecialKeywords.JIRA_TICKET, jiraTickets);
+			List<String> tickets = Jira.getTickets(result);
+			result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
 			Jira.updateAfterTest(result);
 
 
 			//zafira
 			TestType testType = TestNamingUtil.getZafiraTest(Thread.currentThread().getId());
-			if (testType != null && jiraTickets.size() > 0) {
-				ZafiraIntegrator.registerWorkItems(testType.getId(), jiraTickets);
+			if (testType != null && tickets.size() > 0) {
+				ZafiraIntegrator.registerWorkItems(testType.getId(), tickets);
 			}
 			
 			// Populate Spira Steps
-			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), jiraTickets);
+			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), tickets);
 			Spira.clear();
 
 			// Populate TestRail Cases
@@ -205,7 +209,7 @@ public abstract class AbstractTest // extends DriverHelper
 			TestNamingUtil.releaseZafiraTest(Thread.currentThread().getId());
 
 			// clear jira tickets to be sure that next test is not affected.
-			jiraTickets.clear();
+			Jira.clearTickets();
 			testRailCases.clear();
 			
 			
@@ -225,6 +229,7 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
 		try {
+			ReportContext.removeTempDir(); //clean temp artifacts directory
 			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
 			String browser = getBrowser();
@@ -268,7 +273,7 @@ public abstract class AbstractTest // extends DriverHelper
 					Configuration.get(Parameter.SENDER_PASSWORD));
 
 			String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
-			if(testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()){
+			if((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL)) && !failureEmailList.isEmpty()){
 				EmailManager.send(title, emailContent,
 						failureEmailList,
 						Configuration.get(Parameter.SENDER_EMAIL),
@@ -293,7 +298,7 @@ public abstract class AbstractTest // extends DriverHelper
 	private String getDeviceName() {
 		String deviceName = "Desktop";
 		
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
 			//Samsung - Android 4.4.2; iPhone - iOS 7
 			String deviceTemplate = "%s - %s %s"; 
 			deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
@@ -303,17 +308,15 @@ public abstract class AbstractTest // extends DriverHelper
 	}
 
 	protected String getBrowser() {
-		String browser = Configuration.get(Parameter.BROWSER);
+		String browser = "";
+		if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
+			browser = Configuration.get(Parameter.BROWSER);
+		}
+
 		if (!browserVersion.isEmpty()) {
 			browser = browser + " " + browserVersion;
 		}
 
-		if (Configuration.get(Parameter.BROWSER).toLowerCase().contains(SpecialKeywords.MOBILE)) {
-			browser = "";
-			if (!Configuration.get(Parameter.MOBILE_BROWSER_NAME).isEmpty()) {
-				browser = Configuration.get(Parameter.MOBILE_BROWSER_NAME);
-			}
-		}
 		return browser;
 	}
 
@@ -603,10 +606,13 @@ public abstract class AbstractTest // extends DriverHelper
 	 * @param tickets
 	 *            to set
 	 */
+	@Deprecated
 	protected void setJiraTicket(String... tickets) {
+		List<String> jiraTickets = new ArrayList<String>();
 		for (String ticket : tickets) {
 			jiraTickets.add(ticket);
 		}
+		Jira.setTickets(jiraTickets);
 	}
 
 /**
@@ -750,4 +756,17 @@ public abstract class AbstractTest // extends DriverHelper
 			e.printStackTrace();
 		}
 	}
+	
+	protected void putS3Artifact(String key, String path) {
+		AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
+	}
+	
+	protected S3Object getS3Artifact(String bucket, String key) {
+		return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);	
+	}
+	
+	protected S3Object getS3Artifact(String key) {
+		return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);	
+	}
+	
 }
