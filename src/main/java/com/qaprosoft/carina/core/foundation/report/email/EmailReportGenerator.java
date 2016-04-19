@@ -194,7 +194,12 @@ public class EmailReportGenerator
 					result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 				}
 			}
-			failCount++;
+			
+			if (Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES) && !testResultItem.getJiraTickets().isEmpty())
+			{
+				// do nothing
+			} else
+				failCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
 			if (!testResultItem.isConfig()) {
