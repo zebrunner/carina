@@ -15,6 +15,12 @@
  */
 package com.qaprosoft.carina.core.foundation.http;
 
+
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+
+import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -26,41 +32,49 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  */
 public class HttpClient
 {
-	private static final boolean LOG_ALL = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
-
-	public static String send(RequestSpecification request, String methodPath, HttpMethodType methodType)
+	protected static final Logger LOGGER = Logger.getLogger(HttpClient.class);
+	
+	private static final String PROXY_PATTERN = ".+:.+:.+";
+	
+	public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType)
 	{
-		String response = null;
-		if (LOG_ALL)
-		{
-			request.log().all();
-			request.expect().log().all();
-		}
-
+		Response response = null;
+		setupProxy();
 		switch (methodType)
 		{
 		case HEAD:
-			response = request.head(methodPath).asString();
+			response = request.head(methodPath);
 			break;
 		case GET:
-			response = request.get(methodPath).asString();
+			response = request.get(methodPath);
 			break;
 		case PUT:
-			response = request.put(methodPath).asString();
+			response = request.put(methodPath);
 			break;
 		case POST:
-			response = request.post(methodPath).asString();
+			response = request.post(methodPath);
 			break;
 		case DELETE:
-			response = request.delete(methodPath).asString();
+			response = request.delete(methodPath);
 			break;
 		case PATCH:
-			response = request.patch(methodPath).asString();
+			response = request.patch(methodPath);
 			break;
 		default:
 			throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
 		}
 
 		return response;
+	}
+	
+	private static void setupProxy()
+	{
+		if (!Configuration.isNull(Parameter.PROXY) && Pattern.matches(PROXY_PATTERN, Configuration.get(Parameter.PROXY))) 
+		{
+			String [] proxy = Configuration.get(Parameter.PROXY).split(":");
+			System.setProperty(String.format("%s.proxyHost", proxy[0]), proxy[1]);
+		    System.setProperty(String.format("%s.proxyPort", proxy[0]), proxy[2]);
+		    LOGGER.info(String.format("HTTP client will use proxy: %s://%s:%s", proxy[0], proxy[1], proxy[2]));
+		}
 	}
 }

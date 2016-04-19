@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
@@ -49,7 +48,7 @@ public class DevicePool
 	}
 	
 	public static synchronized void registerDevices() {
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			registerDevice();
 			return;
 		}
@@ -77,8 +76,8 @@ public class DevicePool
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
-				!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			//return null for non mobile/mobile_pool tests 
 			return null;
 		}
@@ -88,7 +87,7 @@ public class DevicePool
 		Device freeDevice = null;
 		while (++count<100 && !found) {
 			for (Device device : devices) {
-				LOGGER.info("Check device status for registration: " + device.getName());
+				LOGGER.debug("Check device status for registration: " + device.getName());
 				if (!threadId2Device.containsValue(device)) {
 						//current thread doesn't have ignored devices
 						LOGGER.info("identified free non-ingnored device: " + device.getName());
@@ -116,8 +115,8 @@ public class DevicePool
 	
 	public static synchronized Device getDevice() {
 		Device device = null;
-		if (!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
-				!Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			return null;
 		}
 		long threadId = Thread.currentThread().getId();
@@ -156,8 +155,8 @@ public class DevicePool
 
 	public static synchronized String getDeviceUdid() {
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
-				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
+				Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			Device device = DevicePool.getDevice();
 			if (device == null) {
 				throw new RuntimeException("Unable to find device by thread!");
@@ -187,8 +186,8 @@ public class DevicePool
 		//specify default value based on existing _config.properties parameters
 		Type type = Type.DESKTOP;		
 		
-		if (Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
-				Configuration.get(Parameter.BROWSER).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
+				Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 				type = Type.ANDROID_PHONE;
 			}
@@ -206,7 +205,7 @@ public class DevicePool
 		return type;
 	}
 	
-	public static void screensOn(AdbExecutor executor) {
+/*	public static void screensOn(AdbExecutor executor) {
 		for (Device device : devices) {
 			executor.screenOn(device.getUdid());
 		}
@@ -216,5 +215,5 @@ public class DevicePool
 		for (Device device : devices) {
 			executor.screenOff(device.getUdid());
 		}
-	}
+	}*/
 }

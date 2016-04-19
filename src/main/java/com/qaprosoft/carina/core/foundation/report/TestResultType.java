@@ -23,6 +23,7 @@ package com.qaprosoft.carina.core.foundation.report;
 public enum TestResultType
 {
 	PASS("PASS"),
+	PASS_WITH_KNOWN_ISSUES("PASS (KNOWN ISSUES)"),
 	FAIL("FAIL"),
 	SKIP("SKIP"),
 	SKIP_ALL("SKIP_ALL");
