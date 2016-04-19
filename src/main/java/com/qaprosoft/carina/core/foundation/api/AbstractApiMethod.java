@@ -17,18 +17,28 @@ package com.qaprosoft.carina.core.foundation.api;
 
 import static com.jayway.restassured.RestAssured.given;
 
+import java.io.PrintStream;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.filter.log.RequestLoggingFilter;
+import com.jayway.restassured.filter.log.ResponseLoggingFilter;
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public abstract class AbstractApiMethod extends HttpClient
@@ -39,6 +49,8 @@ public abstract class AbstractApiMethod extends HttpClient
 	protected HttpMethodType methodType = null;
 	protected Object response;
 	public RequestSpecification request;
+	private boolean logRequest = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
+	private boolean logResponse = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
 
 	public AbstractApiMethod()
 	{
@@ -123,6 +135,16 @@ public abstract class AbstractApiMethod extends HttpClient
 			addBodyParameter(key, value);
 		}
 	}
+	
+	public void addCookie(String key, String value)
+	{
+		request.given().cookie(key, value);
+	}
+	
+	public void addCookies(Map<String, String> cookies)
+	{
+		request.given().cookies(cookies);
+	}
 
 	public void replaceUrlPlaceholder(String placeholder, String value)
 	{
@@ -172,14 +194,44 @@ public abstract class AbstractApiMethod extends HttpClient
 	{
 		request.expect().body(HasXPath.hasXPath(xPath));
 	}
-
-	public String call()
+	
+	public Response callAPI()
 	{
 		if (bodyContent.length() != 0)
-		{
 			request.body(bodyContent.toString());
+
+		Response rs = null;
+
+		PrintStream ps = null;
+		if (logRequest || logResponse)
+		{
+			ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
 		}
-		return HttpClient.send(request, methodPath, methodType);
+
+		if (logRequest)
+			request.filter(new RequestLoggingFilter(ps));
+
+		if (logResponse)
+			request.filter(new ResponseLoggingFilter(ps));
+		try
+		{
+			rs = HttpClient.send(request, methodPath, methodType);
+		} finally
+		{
+			if (ps != null)
+				ps.close();
+		}
+		return rs;
+	}
+	
+	/**
+	 * @deprecated use {@link #callAPI()} instead.  
+	 */
+	@Deprecated
+	public String call()
+	{
+		Response response = callAPI();
+		return response != null ? response.asString() : null;
 	}
 	
 	public void expectInResponse(Matcher<?> matcher)
@@ -211,5 +263,15 @@ public abstract class AbstractApiMethod extends HttpClient
 	public RequestSpecification getRequest()
 	{
 		return request;
+	}
+
+	public void setLogRequest(boolean logRequest)
+	{
+		this.logRequest = logRequest;
+	}
+
+	public void setLogResponse(boolean logResponse)
+	{
+		this.logResponse = logResponse;
 	}
 }

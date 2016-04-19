@@ -1,17 +1,12 @@
 package com.qaprosoft.carina.core.foundation.webdriver.appium;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.collect.ImmutableMap;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Rotatable;
-import org.openqa.selenium.ScreenOrientation;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.HasTouchScreen;
 import org.openqa.selenium.interactions.TouchScreen;
 import org.openqa.selenium.remote.DriverCommand;
@@ -22,11 +17,11 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.collect.ImmutableMap;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Deprecated
 public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScreen, Rotatable {
@@ -123,7 +118,7 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 	
 	public List<ExtendedWebElement> findElementsByIosUIAutomation(final String using, long timeout)
 	{
-		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();;
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
 		manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);

@@ -10,6 +10,7 @@ import org.reflections.Reflections;
 
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
@@ -38,7 +39,12 @@ public class CustomTypePageFactory {
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
 		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null;
 		Type screenType = DevicePool.getDeviceType();
-		String deviceVersion = DevicePool.getDevice().getOsVersion();
+		Device device = DevicePool.getDevice();
+		// default version in case if it is desktop driver
+		String deviceVersion = "1";
+		if (null != device) {
+			deviceVersion = device.getOsVersion();
+		}
 		String majorVersionNumber = deviceVersion.split(VERSION_SPLITTER)[0];
 		LOGGER.debug("Major version of device OS: " + majorVersionNumber);
 		for (Class<? extends T> clazz : setClasses) {
@@ -79,19 +85,19 @@ public class CustomTypePageFactory {
 		
 		try {
 			if(versionClass != null){
-				LOGGER.info("Instance by version and platform will be created.");
+				LOGGER.debug("Instance by version and platform will be created.");
 				return versionClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			if(majorVersionClass != null){
-				LOGGER.info("Instance by major version and platform will be created.");
+				LOGGER.debug("Instance by major version and platform will be created.");
 				return majorVersionClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			if(deviceClass != null){
-				LOGGER.info("Instance by platform will be created.");
+				LOGGER.debug("Instance by platform will be created.");
 				return deviceClass.getConstructor(WebDriver.class).newInstance(driver);
 			} 
 			if(familyClass != null){
-				LOGGER.info("Instance by family will be created.");
+				LOGGER.debug("Instance by family will be created.");
 				return familyClass.getConstructor(WebDriver.class).newInstance(driver);
 			}
 			throw new RuntimeException(

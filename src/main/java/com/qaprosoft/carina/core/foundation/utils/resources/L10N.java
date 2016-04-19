@@ -24,23 +24,25 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * QUALITY-1076:
  * http://maven.apache.org/surefire/maven-surefire-plugin/examples/class-loading.html
  * Need to set useSystemClassLoader=false for maven surefire plugin to receive access to classloader L10N files on CI
  * 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18.1</version>
-				<configuration>
-					<useSystemClassLoader>false</useSystemClassLoader>
-				</configuration>
- 
+ <groupId>org.apache.maven.plugins</groupId>
+ <artifactId>maven-surefire-plugin</artifactId>
+ <version>2.18.1</version>
+ <configuration>
+ <useSystemClassLoader>false</useSystemClassLoader>
+ </configuration>
+
  */
 
 public class L10N {
@@ -48,7 +50,11 @@ public class L10N {
 
 	private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 
-	public static void init(Locale locale) {
+	public static void init() {
+		
+		List<Locale> locales = LocaleReader.init(Configuration
+				.get(Parameter.LOCALE));
+		
 		List<String> loadedResources = new ArrayList<String>();
 
 		for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
@@ -74,12 +80,12 @@ public class L10N {
 			 */
 			String fileName = FilenameUtils.getBaseName(u.getPath());
 
-			if (u.getPath().endsWith("L10N.class") ||
-					u.getPath().endsWith("L10N$1.class")) {
-				//separate conditions to support core JUnit tests
+			if (u.getPath().endsWith("L10N.class")
+					|| u.getPath().endsWith("L10N$1.class")) {
+				// separate conditions to support core JUnit tests
 				continue;
 			}
-				
+
 			if (fileName.lastIndexOf('_') == fileName.length() - 3
 					|| fileName.lastIndexOf('_') == fileName.length() - 5) {
 				LOGGER.debug(String
@@ -89,8 +95,8 @@ public class L10N {
 			}
 			/*
 			 * convert "file:
-			 * E:\pentaho\qa-automation\target\classes\L10N\messages.properties"
-			 * to "L10N.messages"
+			 * E:\pentaho\qa-automation\target\classes\L10N\messages
+			 * .properties" to "L10N.messages"
 			 */
 			String filePath = FilenameUtils.getPath(u.getPath());
 			String resource = filePath.substring(
@@ -103,7 +109,9 @@ public class L10N {
 				try {
 					LOGGER.debug(String.format("Adding '%s' resource...",
 							resource));
-					resBoundles.add(ResourceBundle.getBundle(resource, locale));
+					for (Locale locale : locales) {
+						resBoundles.add(ResourceBundle.getBundle(resource, locale));
+					}
 					LOGGER.debug(String
 							.format("Resource '%s' added.", resource));
 				} catch (MissingResourceException e) {
@@ -115,23 +123,118 @@ public class L10N {
 								resource));
 			}
 		}
-		
+
 		LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
 	}
 
+	/**
+	 * get Default Locale
+	 * @return Locale
+	 */
+	public static Locale getDefaultLocale() {
+		List<Locale> locales = LocaleReader.init(Configuration
+				.get(Parameter.LOCALE));
+		
+		if (locales.size() == 0) {
+			throw new RuntimeException("Undefined default locale specified! Review 'locale' setting in _config.properties.");
+		}
+
+		return locales.get(0);
+	}
+	
+	/**
+	 * getText by key for default locale.
+	 * 
+	 * @param key
+	 *            - String
+	 * @param locale
+	 *            - Locale
+	 * @return String
+	 */
 	public static String getText(String key) {
+		return getText(key, getDefaultLocale());
+	}
+	
+	
+	/**
+	 * getText for specified locale and key.
+	 * 
+	 * @param key
+	 *            - String
+	 * @param locale
+	 *            - Locale
+	 * @return String
+	 */
+	public static String getText(String key, Locale locale) {
 		LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
 		Iterator<ResourceBundle> iter = resBoundles.iterator();
 		while (iter.hasNext()) {
-			ResourceBundle bundle = (ResourceBundle) iter.next();
+			ResourceBundle bundle = iter.next();
 			try {
 				String value = bundle.getString(key);
-				return value;
+				LOGGER.debug("Looking for value for locale:'"
+						+ locale.toString()
+						+ "' current iteration locale is: '"
+						+ bundle.getLocale().toString() + "'.");
+				if (bundle.getLocale().toString().equals(locale.toString())) {
+					LOGGER.debug("Found locale:'" + locale.toString()
+							+ "' and value is '" + value + "'.");
+					return value;
+				}
 			} catch (MissingResourceException e) {
 				// do nothing
 			}
 		}
 		return key;
+	}
+
+	/*
+	 * QUALITY-1282: This method helps when translating strings that have single
+	 * quotes or other special characters that get omitted.
+	 */
+	public static String formatString(String resource, String[] parameters) {
+		for (int i = 0; i < parameters.length; i++) {
+			resource = resource.replace("{" + i + "}", parameters[i]);
+			LOGGER.debug("Localized string value is: " + resource);
+		}
+		return resource;
+	}
+
+	/*
+	 * Make sure you remove the single quotes around %s in xpath as string
+	 * returned will either have it added for you or single quotes won't be
+	 * added as concat() doesn't need them.
+	 */
+	public static String generateConcatForXPath(String xpathString) {
+		String returnString = "";
+		String searchString = xpathString;
+		char[] quoteChars = new char[] { '\'', '"' };
+
+		int quotePos = StringUtils.indexOfAny(searchString, quoteChars);
+		if (quotePos == -1) {
+			returnString = "'" + searchString + "'";
+		} else {
+			returnString = "concat(";
+			LOGGER.debug("Current concatenation: " + returnString);
+			while (quotePos != -1) {
+				String subString = searchString.substring(0, quotePos);
+				returnString += "'" + subString + "', ";
+				LOGGER.debug("Current concatenation: " + returnString);
+				if (searchString.substring(quotePos, quotePos + 1).equals("'")) {
+					returnString += "\"'\", ";
+					LOGGER.debug("Current concatenation: " + returnString);
+				} else {
+					returnString += "'\"', ";
+					LOGGER.debug("Current concatenation: " + returnString);
+				}
+				searchString = searchString.substring(quotePos + 1,
+						searchString.length());
+				quotePos = StringUtils.indexOfAny(searchString, quoteChars);
+			}
+			returnString += "'" + searchString + "')";
+			LOGGER.debug("Concatenation result: " + returnString);
+		}
+		return returnString;
 	}
 
 }

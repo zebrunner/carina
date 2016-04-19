@@ -6,3 +6,8 @@ target
 /com
 /application.log
 /sql.log
+*.checkstyle
+.idea
+*.iml
+test-output
+*.log
