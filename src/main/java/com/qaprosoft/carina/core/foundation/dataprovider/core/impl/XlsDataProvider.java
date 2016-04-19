@@ -157,7 +157,12 @@ public class XlsDataProvider extends BaseDataProvider {
     private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Map<String,String> xlsRow) {
         if (column != null) {
             if (!column.isEmpty()) {
-            	map.put(hashCode, xlsRow.get(column));
+            	if (xlsRow.get(column) != null) {
+	            	if (!xlsRow.get(column).isEmpty()) {
+	            		//put into the args only non empty jira tickets
+	            		map.put(hashCode, xlsRow.get(column));
+	            	}
+            	}
             }
         }    	
     }

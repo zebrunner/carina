@@ -273,6 +273,7 @@ public class EmailReportGenerator
 	{
 		int passed = 0;
 		int failed = 0;
+		int failedKnownIssue = 0;
 		int skipped = 0;
 		for(TestResultItem ri : ris)
 		{
@@ -285,7 +286,16 @@ public class EmailReportGenerator
 				passed++;
 				break;
 			case FAIL:
-				failed++;
+				if (Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES)) {
+					if (ri.getJiraTickets().size() > 0) {
+						// increment known issue counter
+						failedKnownIssue++;
+					} else {
+						failed++;
+					}
+				} else {
+					failed++;
+				}
 				break;
 			case SKIP:
 				skipped++;
@@ -293,11 +303,16 @@ public class EmailReportGenerator
 			case SKIP_ALL:
 				//do nothing
 				break;
+			default:
+				//do nothing
+				break;
 			}
 		}
 		TestResultType result;
-		if (passed > 0 && failed == 0 && skipped == 0) {
+		if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
+		} else if (passed >= 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
+			result = TestResultType.PASS_WITH_KNOWN_ISSUES;
 		} else if (passed == 0 && failed == 0 && skipped > 0){
 			result = TestResultType.SKIP_ALL;
 		} else if (passed >= 0 && failed == 0 && skipped > 0){
@@ -306,7 +321,7 @@ public class EmailReportGenerator
 			result = TestResultType.FAIL;
 		}
 		result.setPassed(passed);
-		result.setFailed(failed);
+		result.setFailed(failed + failedKnownIssue);
 		result.setSkipped(skipped);
 		
 		return result;

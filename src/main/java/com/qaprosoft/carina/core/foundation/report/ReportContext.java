@@ -52,6 +52,10 @@ public class ReportContext
 	
 	private static long rootID;
 
+	public static long getRootID() {
+		return rootID;
+	}
+
 	/**
 	 * Crates new screenshot directory at first call otherwise returns created
 	 * directory. Directory is specific for any new test suite launch.
@@ -104,6 +108,18 @@ public class ReportContext
 			}
 		}
 		return tempDirectory;
+	}
+	
+	public static synchronized void removeTempDir()
+	{
+		if (tempDirectory != null)
+		{
+			try {
+				FileUtils.deleteDirectory(tempDirectory);
+			} catch (IOException e) {
+				LOGGER.debug("Unable to remove artifacts temp directory!", e);
+			}
+		}
 	}
 	
 	public static synchronized File getArtifactsFolder()

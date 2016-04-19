@@ -68,7 +68,7 @@ public class Resources {
 	// class was loaded, provide the getResourseURLs method with the root-class
 	@SuppressWarnings("rawtypes")
 	public static Set<URL> getResourceURLs(Class rootClass) {
-		return getResourceURLs(rootClass, (ResourceURLFilter) null);
+		return getResourceURLs(rootClass, null);
 	}
 
 	public static Set<URL> getResourceURLs(ResourceURLFilter filter) {

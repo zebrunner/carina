@@ -267,7 +267,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 		
 		String errorMessage = "";
-		if (count < maxCount && retry != null)
+		if (count < maxCount && retry != null && !Jira.isRetryDisabled(result))
 		{
 			TestNamingUtil.decreaseRetryCounter(test);
 			errorMessage = failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
@@ -459,7 +459,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
 		testResultItem.setDescription(description);
 		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
-		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature 
+		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
 		testResultItem.setJiraTickets(Jira.getTickets(result));
 		return testResultItem;
 	}
