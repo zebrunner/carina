@@ -137,33 +137,34 @@ public class CsvDataProvider extends BaseDataProvider {
             // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, strings, mapper); //provide whole line from data provider for UUID generation
             
+            HashMap<String,String> csvRow = (HashMap<String, String>) args[rowIndex][0];
             
             if (testMethodColumn.isEmpty()) {
             	testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); //provide organized args to generate valid hash
             } else {
 	            // add testName value from csv datasource to special hashMap
-	            addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
-	            addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+	            addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
+	            addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             }
 
             // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
             // add jira ticket from xls datasource to special hashMap
-            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             
             //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
             // // add spira steps from xls datasource to special hashMap
-            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
             
             if (!spiraColumn.isEmpty()) {
             	//register Spira ID values from DataProvider
-            	Spira.setSteps(args[rowIndex][mapper.get(spiraColumn)].toString());
+            	Spira.setSteps(csvRow.get(spiraColumn));
             }
             
             // add testrails cases from xls datasource to special hashMap
-            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             
             rowIndex++;
         }
@@ -219,14 +220,12 @@ public class CsvDataProvider extends BaseDataProvider {
 	    return index;
     }
     
-    private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Object[] csvRow) {
+    private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Map<String,String> csvRow) {
         if (column != null) {
             if (!column.isEmpty()) {
-            	map.put(hashCode, csvRow[mapper.get(column)].toString());
+            	map.put(hashCode, csvRow.get(column));
             }
         }    	
     }    
-    
-
 
 }
