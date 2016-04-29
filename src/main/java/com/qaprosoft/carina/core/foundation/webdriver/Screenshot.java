@@ -15,6 +15,11 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.awt.AWTException;
+import java.awt.HeadlessException;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,17 +30,20 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
+import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.amazon.AmazonS3Manager;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -46,6 +54,8 @@ import com.qaprosoft.amazon.AmazonS3Manager;
 public class Screenshot
 {
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
+	
+	private static boolean isRoboScreenshotTaken;
 
 	public static String capture(WebDriver driver)
 	{
@@ -62,73 +72,110 @@ public class Screenshot
 	 */
 	public static synchronized String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
-		String screenName = "";
-		
-		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
-		{
-			if (driver == null) {
-				LOGGER.warn("Unable to capture screenshot as driver is null.");
-				return null;
-			}
-			if (driver.toString().contains("null")) {
-				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
-				return null;
-			}
-			
-			try
-			{
-				// Define test screenshot root
-				String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
-				if (test == null || StringUtils.isEmpty(test)) {
-					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
-					return null;
-				}
-				File testScreenRootDir = ReportContext.getTestDir(test);
+	    String screenName = "";
 
-				// Capture full page screenshot and resize
-				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
-				screenName = fileID + ".png";
-				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
-				
-				WebDriver augmentedDriver = driver;
-				if (!driver.toString().contains("AppiumNativeDriver")) {
-					//do not augment for Appium 1.x anymore
-					augmentedDriver = new DriverAugmenter().augment(driver);
-				} 
-				
-				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
-				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-				
-				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1 && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1){
-					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
-				}
-				FileUtils.copyFile(fullScreen, new File(fullScreenPath));
-
-				// Create screenshot thumbnail
-				String thumbScreenPath = fullScreenPath.replace(screenName, "/thumbnails/" + screenName);
-				File thumbScreen = new File(thumbScreenPath);
-				FileUtils.copyFile(fullScreen, thumbScreen);
-				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT));
-
-				// Uploading screenshot to Amazon S3
-				uploadToAmazonS3(test, fullScreenPath, screenName);
-			}
-			catch (IOException e)
-			{
-				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-			}
-			catch (Exception e)
-			{
-				LOGGER.error("Unable to capture screenshot!", e);
-			}
+	    if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER)))
+	    {
+		if (driver == null) {
+		    LOGGER.warn("Unable to capture screenshot as driver is null");
+		    return null;
 		}
-		return screenName;
+		if (driver.toString().contains("null")) {
+		    LOGGER.warn("Unable to capture screenshot as driver is not valid anymore");
+		    return null;
+		}
+
+		try
+		{
+		    // Define test screenshot root
+		    String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
+		    if (test == null || StringUtils.isEmpty(test)) {
+			LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
+			return null;
+		    }
+		    File testScreenRootDir = ReportContext.getTestDir(test);
+
+		    // Capture full page screenshot and resize
+		    String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+		    screenName = fileID + ".png";
+		    String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+
+		    WebDriver augmentedDriver = driver;
+		    if (!driver.toString().contains("AppiumNativeDriver")) {
+			//do not augment for Appium 1.x anymore
+			augmentedDriver = new DriverAugmenter().augment(driver);
+		    }
+		    
+		    isRoboScreenshotTaken = false;
+		    
+		    File fullScreen = null;
+		    
+		    try {
+			if(!Configuration.get(Parameter.DRIVER_TYPE).contains("mobile")) {
+			    driver.switchTo().alert();
+			    if(Configuration.getBoolean(Parameter.MAKE_ROBOSCREENSHOTS)) {
+				fullScreen = makeRoboScreenshot(fullScreenPath);
+			    } else {
+				return null;
+			    }
+			}
+		    } catch (NoAlertPresentException noAlertPresentException) {
+			// screenshot will be taken in a standard way -> ((TakesScreenshot) augmentedDriver).getScreenshotAs
+		    } catch (NoSuchWindowException noSuchWindowException) {
+			// for cases, when an active window was closed, but Web Driver has not switched to a new window 
+			if(Configuration.getBoolean(Parameter.MAKE_ROBOSCREENSHOTS)) {
+			    fullScreen = makeRoboScreenshot(fullScreenPath);
+			} else {
+			    return null; 
+			}
+		    } catch (WebDriverException webDriverException) {
+			webDriverException.printStackTrace();
+		    }
+
+		    if(!isRoboScreenshotTaken) {
+			fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);  
+		    }
+
+		    if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1 && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+			resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
+		    }
+
+		    if(!isRoboScreenshotTaken) {
+			FileUtils.copyFile(fullScreen, new File(fullScreenPath));
+		    }
+
+		    // Create screenshot thumbnail
+		    String thumbScreenPath = fullScreenPath.replace(screenName, "/thumbnails/" + screenName);
+		    File thumbScreen = new File(thumbScreenPath);
+		    FileUtils.copyFile(fullScreen, thumbScreen);
+		    resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH), Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT));
+
+		    // Uploading screenshot to Amazon S3
+		    uploadToAmazonS3(test, fullScreenPath, screenName);
+		}
+		catch (IOException e)
+		{
+		    LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+		}
+		catch (Exception e)
+		{
+		    LOGGER.error("Unable to capture screenshot!", e);
+		}
+	    }
+	    return screenName;
+	}
+	
+	private static File makeRoboScreenshot(String fullScreenPath) throws IOException, HeadlessException, AWTException {
+	    BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+	    File fullScreen = new File(fullScreenPath);
+	    ImageIO.write(image, "png", fullScreen);
+	    isRoboScreenshotTaken = true;
+	    return fullScreen;
 	}
 	
 	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
 		if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
-			LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
+			LOGGER.debug("There is no sense to continue as saving screenshots onto S3 is disabled");
 			return;
 		}
 		Long runId = ZafiraIntegrator.getRunId();
