@@ -35,6 +35,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -103,18 +104,32 @@ public class Screenshot
 		    if (!driver.toString().contains("AppiumNativeDriver")) {
 			//do not augment for Appium 1.x anymore
 			augmentedDriver = new DriverAugmenter().augment(driver);
-		    } 
-
+		    }
+		    
 		    isRoboScreenshotTaken = false;
 		    
 		    File fullScreen = null;
 		    
 		    try {
-			driver.switchTo().alert();
-			fullScreen = makeRoboScreenshot(fullScreenPath);
+			if(!Configuration.get(Parameter.DRIVER_TYPE).contains("mobile")) {
+			    driver.switchTo().alert();
+			    if(Configuration.getBoolean(Parameter.MAKE_ROBOSCREENSHOTS)) {
+				fullScreen = makeRoboScreenshot(fullScreenPath);
+			    } else {
+				return null;
+			    }
+			}
 		    } catch (NoAlertPresentException noAlertPresentException) {
+			// screenshot will be taken in a standard way -> ((TakesScreenshot) augmentedDriver).getScreenshotAs
 		    } catch (NoSuchWindowException noSuchWindowException) {
-			fullScreen = makeRoboScreenshot(fullScreenPath);
+			// for cases, when an active window was closed, but Web Driver has not switched to a new window 
+			if(Configuration.getBoolean(Parameter.MAKE_ROBOSCREENSHOTS)) {
+			    fullScreen = makeRoboScreenshot(fullScreenPath);
+			} else {
+			    return null; 
+			}
+		    } catch (WebDriverException webDriverException) {
+			webDriverException.printStackTrace();
 		    }
 
 		    if(!isRoboScreenshotTaken) {
