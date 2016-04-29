@@ -119,6 +119,8 @@ public class Configuration
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
+		MAKE_ROBOSCREENSHOTS("make_roboscreenshots"),
+		
 		IMPLICIT_TIMEOUT("implicit_timeout"),
 
 		EXPLICIT_TIMEOUT("explicit_timeout"),
