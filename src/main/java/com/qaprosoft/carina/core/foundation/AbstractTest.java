@@ -293,6 +293,10 @@ public abstract class AbstractTest // extends DriverHelper
 			LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
 			e.printStackTrace();
 		}
+		finally
+		{
+			ZafiraIntegrator.finishSuite();
+		}
 	}
 
 	private String getDeviceName() {
