@@ -69,12 +69,12 @@ public class HttpClient
 	
 	private static void setupProxy()
 	{
-		if (!Configuration.isNull(Parameter.PROXY) && Pattern.matches(PROXY_PATTERN, Configuration.get(Parameter.PROXY))) 
-		{
-			String [] proxy = Configuration.get(Parameter.PROXY).split(":");
+		if (!Configuration.isNull(Parameter.PROXY) && !Configuration.get(Parameter.PROXY).isEmpty()
+				&& Pattern.matches(PROXY_PATTERN, Configuration.get(Parameter.PROXY))) {
+			String[] proxy = Configuration.get(Parameter.PROXY).split(":");
 			System.setProperty(String.format("%s.proxyHost", proxy[0]), proxy[1]);
-		    System.setProperty(String.format("%s.proxyPort", proxy[0]), proxy[2]);
-		    LOGGER.info(String.format("HTTP client will use proxy: %s://%s:%s", proxy[0], proxy[1], proxy[2]));
+			System.setProperty(String.format("%s.proxyPort", proxy[0]), proxy[2]);
+			LOGGER.info(String.format("HTTP client will use proxy: %s://%s:%s", proxy[0], proxy[1], proxy[2]));
 		}
 	}
 }
