@@ -34,10 +34,29 @@ public abstract class AbstractCapabilities {
 		if (!Configuration.isNull(Parameter.PROXY) && !Configuration.get(Parameter.PROXY).isEmpty()) {
 			String PROXY = Configuration.get(Parameter.PROXY);
 			if (Pattern.matches(PROXY_PATTERN, Configuration.get(Parameter.PROXY))) {
+
+				String[] proxies = Configuration.get(Parameter.PROXY).split(":");
+				System.setProperty(String.format("%s.proxyHost", proxies[0]), proxies[1]);
+				System.setProperty(String.format("%s.proxyPort", proxies[0]), proxies[2]);
+				LOGGER.info(
+						String.format("WebDriver will use proxy: %s://%s:%s", proxies[0], proxies[1], proxies[2]));
+
 				org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
-				proxy.setHttpProxy(PROXY).setFtpProxy(PROXY).setSslProxy(PROXY);
+				switch (proxies[0]) {
+				case "http":
+					proxy.setHttpProxy(String.format("%s:%s", proxies[1], proxies[2]));
+					break;
+				case "https":
+					proxy.setSslProxy(String.format("%s:%s", proxies[1], proxies[2]));
+					break;
+				case "ftp":
+					proxy.setFtpProxy(String.format("%s:%s", proxies[1], proxies[2]));
+					break;
+				default:
+					Assert.fail("Unsupported proxy protocol specified: " + proxies[0]);
+				}
+				// proxy.setHttpProxy(PROXY).setFtpProxy(PROXY).setSslProxy(PROXY);
 				capabilities.setCapability(CapabilityType.PROXY, proxy);
-				LOGGER.info("WebDriver/Browser will use proxy: " + PROXY);
 			} else {
 				Assert.fail("Invalid proxy is specified: " + PROXY);
 			}
