@@ -107,7 +107,9 @@ public class Configuration
 		
 		APP_VERSION("app_version"),
 		
-		PROXY("proxy"),
+		PROXY_HOST("proxy_host"),
+		
+		PROXY_PORT("proxy_port"),
 		
 		REPORT_URL("report_url"),
 
