@@ -114,6 +114,10 @@ public class CustomTypePageFactory {
 	                    String.format("There is no any class that satisfy to required conditions: [parent class - %s], [device type - %s]", 
 	                            parentClass.getName(), screenType));
 			}
+			// handle cases where we have only WebDriver as ctor parameter
+			if (parameters.length == 0) {
+				parameters = new Object[] { driver };
+			}
 			ctor = getConstructorByParams(requiredClass, parameters);
 			return ctor.newInstance(parameters);
 		} catch (InstantiationException | IllegalAccessException
