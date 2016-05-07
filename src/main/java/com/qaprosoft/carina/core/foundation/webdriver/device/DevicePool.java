@@ -200,7 +200,9 @@ public class DevicePool
 		if (device != null) {
 			type = device.getType();
 		} else {
-			LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
+			if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+				LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
+			}
 		}
 		return type;
 	}
