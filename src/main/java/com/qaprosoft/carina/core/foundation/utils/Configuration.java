@@ -310,7 +310,17 @@ public class Configuration
 		
 		ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
 		
-		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name");
+		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
+
+		//For cucumber tests
+		CUCUMBER_TESTS("cucumber_tests"),
+
+		CUCUMBER_TESTS_APP_VERSION("cucumber_tests_app_version"),
+
+		CUCUMBER_TESTS_NAME("cucumber_tests_name"),
+
+		CUCUMBER_TESTS_RESULTS_IMAGE_RESIZE("cucumber_tests_results_image_resize")
+		;
 
 
 		private final String key;
