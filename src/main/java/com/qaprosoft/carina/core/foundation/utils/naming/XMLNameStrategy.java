@@ -53,8 +53,9 @@ public class XMLNameStrategy implements INamingStrategy
 			}
 		}
 		
-		if (testName == null)
+		if (testName.isEmpty()) {
 			testName = result.getTestContext().getCurrentXmlTest().getName();
+		}
 		
 		
 		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
