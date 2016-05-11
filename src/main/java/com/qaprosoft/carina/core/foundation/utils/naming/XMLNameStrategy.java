@@ -37,10 +37,11 @@ public class XMLNameStrategy implements INamingStrategy
 	@Override
 	public String getCanonicalTestName(ITestResult result) {
 		//verify if testName is already registered with thread then return it back
-		String testName = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
-		if (testName != null) {
-			return testName;
+		if (TestNamingUtil.isTestNameRegistered()) {
+			return TestNamingUtil.getTestNameByThread();
 		}
+		
+		String testName = ""; 
 		
 		@SuppressWarnings("unchecked")
 		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);

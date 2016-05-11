@@ -78,7 +78,7 @@ public class Screenshot
 			try
 			{
 				// Define test screenshot root
-				String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
+				String test = TestNamingUtil.getTestNameByThread();
 				if (test == null || StringUtils.isEmpty(test)) {
 					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
 					return null;

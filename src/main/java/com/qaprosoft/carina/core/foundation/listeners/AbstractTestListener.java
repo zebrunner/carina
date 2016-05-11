@@ -79,7 +79,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_PASSED)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
     }
     
     private String failItem(ITestResult result, Messager messager){
@@ -95,7 +95,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     	}
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
 		
 		return errorMessage;
     }
@@ -109,7 +109,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
 		
 		return errorMessage;
     }    
@@ -125,7 +125,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_SKIPPED)));
 		
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
 		
 		return errorMessage;
     }
@@ -226,7 +226,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getTestNameByThread();
 		TestNamingUtil.associateCanonicTestName(test, Thread.currentThread().getId()); //valid testname without configuration details
 		
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
 	}
 
@@ -259,7 +259,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		//register test details for zafira data population
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		
-		TestNamingUtil.releaseTestInfoByThread(threadId);
+		TestNamingUtil.releaseTestInfoByThread();
 		super.onTestFailure(result);
 	}
 	
@@ -268,7 +268,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSkipped(result);
 	}
 	
