@@ -114,9 +114,17 @@ public class TestNamingUtil
 		testName2StartDate.remove(threadId);
 	}
 	
+	public static String getTestNameByThread() {
+		return getTestNameByThread(Thread.currentThread().getId());
+	}
+	
 	public static String getTestNameByThread(Long threadId)
 	{
-		return threadId2TestName.get(threadId);
+		String test = threadId2TestName.get(threadId);
+		if (test == null) {
+			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+		}
+		return test;
 	}
 	
 	public static Long getTestStartDate(String test)
