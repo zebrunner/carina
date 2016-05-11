@@ -108,23 +108,25 @@ public class TestNamingUtil
 		}
 	}
 	
-	public static synchronized void releaseTestInfoByThread(Long threadId)
+	public static synchronized void releaseTestInfoByThread()
 	{
+		long threadId = Thread.currentThread().getId();
 		threadId2TestName.remove(threadId);
 		testName2StartDate.remove(threadId);
 	}
 	
-	public static String getTestNameByThread() {
-		return getTestNameByThread(Thread.currentThread().getId());
+	public static boolean isTestNameRegistered() {
+		return threadId2TestName.get(Thread.currentThread().getId()) != null;
 	}
 	
-	public static String getTestNameByThread(Long threadId)
-	{
+	public static String getTestNameByThread() {
+		long threadId = Thread.currentThread().getId();
+		
 		String test = threadId2TestName.get(threadId);
 		if (test == null) {
 			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
 		}
-		return test;
+		return threadId2TestName.get(threadId);
 	}
 	
 	public static Long getTestStartDate(String test)
