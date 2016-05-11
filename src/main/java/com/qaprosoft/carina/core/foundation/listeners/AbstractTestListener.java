@@ -70,7 +70,7 @@ public abstract class AbstractTestListener extends TestArgsListener
      }
     
     private void passItem(ITestResult result, Messager messager){
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
 
 		String deviceName = getDeviceName();
 		
@@ -83,7 +83,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     }
     
     private String failItem(ITestResult result, Messager messager){
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = TestNamingUtil.getTestNameByThread();
 
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
@@ -101,7 +101,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     }
     
     private String failRetryItem(ITestResult result, Messager messager, int count, int maxCount){
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = TestNamingUtil.getTestNameByThread();
 
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
@@ -115,7 +115,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     }    
  
     private String skipItem(ITestResult result, Messager messager){
-    	String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = TestNamingUtil.getTestNameByThread();
 
 		String errorMessage = getFailureReason(result);
 		String deviceName = getDeviceName();
@@ -171,7 +171,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     @Override
     public void onConfigurationFailure(ITestResult result) {
     	failItem(result, Messager.CONFIG_FAILED);
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
 		closeLogAppender(test);
 		super.onConfigurationFailure(result);
     }
@@ -223,7 +223,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		passItem(result, Messager.TEST_PASSED);
 
 		ZafiraIntegrator.finishTestMethod(result, null);
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
 		TestNamingUtil.associateCanonicTestName(test, Thread.currentThread().getId()); //valid testname without configuration details
 		
 		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
@@ -233,7 +233,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
 		int count = RetryCounter.getRunCount(test);		
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
@@ -417,7 +417,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
 	{
 		String group = TestNamingUtil.getPackageName(result);
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
 		String linkToLog = ReportContext.getTestLogLink(test);
 		String linkToVideo = ReportContext.getTestVideoLink(test);
 		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
