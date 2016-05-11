@@ -223,9 +223,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 		passItem(result, Messager.TEST_PASSED);
 
 		ZafiraIntegrator.finishTestMethod(result, null);
-		String test = TestNamingUtil.getTestNameByThread();
-		TestNamingUtil.associateCanonicTestName(test, Thread.currentThread().getId()); //valid testname without configuration details
-		
 		TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
 	}
@@ -252,9 +249,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 			errorMessage = failItem(result, Messager.TEST_FAILED);
 			closeLogAppender(test);
 		}
-
-		long threadId = Thread.currentThread().getId();
-    	TestNamingUtil.associateCanonicTestName(test, threadId); //valid testname without configuration details
 
 		//register test details for zafira data population
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
