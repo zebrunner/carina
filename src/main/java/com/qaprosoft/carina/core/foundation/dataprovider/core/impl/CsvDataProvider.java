@@ -223,7 +223,12 @@ public class CsvDataProvider extends BaseDataProvider {
     private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Map<String,String> csvRow) {
         if (column != null) {
             if (!column.isEmpty()) {
-            	map.put(hashCode, csvRow.get(column));
+            	if (csvRow.get(column) != null) {
+	            	if (!csvRow.get(column).isEmpty()) {
+	            		//put into the args only non empty jira tickets
+	            		map.put(hashCode, csvRow.get(column));
+	            	}
+            	}
             }
         }    	
     }    
