@@ -33,7 +33,7 @@ public class ThreadLogAppender extends AppenderSkeleton
 		}
 		try
 		{
-			String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
+			String test = TestNamingUtil.getTestNameByThread();
 			if(test == null)
 			{
 				return;
