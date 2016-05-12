@@ -13,6 +13,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ArgumentType;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ConfigurationBin;
 import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
@@ -36,8 +37,11 @@ public class ZafiraIntegrator {
 	private static JobType job, parentJob;
 	private static TestSuiteType suite = null;
 	private static TestRunType run = null;
+	
+	private static TestType[] tests = null;
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
+	private static final Long zafiraRunId = Configuration.getLong(Parameter.ZAFIRA_RUN_ID);
 
 	private static final String ciUrl = Configuration.get(Parameter.CI_URL);
 	private static final String ciBuild = Configuration.get(Parameter.CI_BUILD);
@@ -98,27 +102,37 @@ public class ZafiraIntegrator {
 
 			String configXML = getConfiguration();
 
+			
+			UserType anonymousUser = null;
+			
 			if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
 				// register/retrieve anonymous
-				UserType anonymousUser = registerUser(ANONYMOUS_USER);
+				anonymousUser = registerUser(ANONYMOUS_USER);
 				// register parentJob
 				parentJob = registerJob(ciParentUrl, anonymousUser.getId());
-
-				run = registerTestRunUPSTREAM_JOB(suite.getId(), gitUrl,
-						gitBranch, gitCommit, configXML, job.getId(),
-						parentJob.getId(), parentBuild, build,
-						Initiator.UPSTREAM_JOB, workItem);
-			} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
-				run = registerTestRunBySCHEDULER(suite.getId(), gitUrl,
-						gitBranch, gitCommit, configXML, job.getId(), build,
-						Initiator.SCHEDULER, workItem);
-			} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
-				run = registerTestRunByHUMAN(suite.getId(), user.getId(),
-						gitUrl, gitBranch, gitCommit, configXML, job.getId(),
-						build, Initiator.HUMAN, workItem);
+			}
+			
+			if (zafiraRunId != -1) {
+				run = zc.getTestRun(zafiraRunId).getObject();
+				tests = zc.getTestRunResults(zafiraRunId).getObject();
 			} else {
-				throw new RuntimeException("Unable to register test run for zafira service: "
-								+ zafiraUrl + " due to the misses build cause: '" + ciBuildCause + "'");
+				if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
+					run = registerTestRunUPSTREAM_JOB(suite.getId(), gitUrl,
+							gitBranch, gitCommit, configXML, job.getId(),
+							parentJob.getId(), parentBuild, build,
+							Initiator.UPSTREAM_JOB, workItem);
+				} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
+					run = registerTestRunBySCHEDULER(suite.getId(), gitUrl,
+							gitBranch, gitCommit, configXML, job.getId(), build,
+							Initiator.SCHEDULER, workItem);
+				} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
+					run = registerTestRunByHUMAN(suite.getId(), user.getId(),
+							gitUrl, gitBranch, gitCommit, configXML, job.getId(),
+							build, Initiator.HUMAN, workItem);
+				} else {
+					throw new RuntimeException("Unable to register test run for zafira service: "
+									+ zafiraUrl + " due to the misses build cause: '" + ciBuildCause + "'");
+				}
 			}
 
 			if (run == null) {
@@ -211,6 +225,25 @@ public class ZafiraIntegrator {
 		}
 		LOGGER.debug("runId: " + runId);
 		return runId;
+	}
+	
+	public static boolean isRerun() {
+		return zafiraRunId != -1;
+	}
+	public static boolean isPassed() {
+		boolean res = false;
+		
+		String testName = TestNamingUtil.getTestNameByThread();
+		for (TestType test : tests) {
+			if (testName.equals(test.getName())) {
+				if (test.getStatus().equals(SpecialKeywords.PASSED)) {
+					res = true;
+				}
+				break;
+			}
+		}
+		
+		return res;
 	}
 		
 	private static boolean isValid() {

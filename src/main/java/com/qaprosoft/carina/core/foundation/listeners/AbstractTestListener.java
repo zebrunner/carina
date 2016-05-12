@@ -29,6 +29,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.qaprosoft.carina.core.foundation.exception.AlreadyPassedException;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -190,6 +191,12 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		super.onTestStart(result);
 		
+		//Analyze Zafira results for re-run
+		if (ZafiraIntegrator.isRerun() && ZafiraIntegrator.isPassed()) {
+			//generate already passed exception
+			throw new AlreadyPassedException();
+		}
+		
 		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
 				result.getParameters().length > 0) //set parameters from XLS only if test contains any parameter at all)
 		{
@@ -225,6 +232,12 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
+		
+		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
+		if (result.getThrowable().getMessage().equals(SpecialKeywords.ALREADY_PASSED)) {
+			return;
+		}
+		
 		String test = TestNamingUtil.getTestNameByThread();
 		int count = RetryCounter.getRunCount(test);		
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
