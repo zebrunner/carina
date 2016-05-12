@@ -111,7 +111,9 @@ public class TestNamingUtil
 	{
 		long threadId = Thread.currentThread().getId();
 		threadId2TestName.remove(threadId);
-		testName2StartDate.remove(threadId);
+		
+		String test = getTestNameByThread();
+		testName2StartDate.remove(test);
 	}
 	
 	public static boolean isTestNameRegistered() {
@@ -130,7 +132,11 @@ public class TestNamingUtil
 	
 	public static Long getTestStartDate(String test)
 	{
-		return testName2StartDate.get(test);
+		Long startDate = testName2StartDate.get(test);
+		if (startDate == null) {
+			LOGGER.warn("Unable to find start date for test: '" + test + "'!");
+		}
+		return startDate;
 	}
 	
 	public static synchronized void associateZafiraTest(TestType zafiraTest, Long threadId)
