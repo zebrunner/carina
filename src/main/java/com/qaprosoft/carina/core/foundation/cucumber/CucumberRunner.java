@@ -21,6 +21,8 @@ import java.util.List;
 public abstract class CucumberRunner extends UITest {
     private TestNGCucumberRunner testNGCucumberRunner;
 
+    public static final String CUCUMBER_REPORT_FOLDER = "CucumberReport";
+
     protected static final Logger LOGGER = Logger.getLogger(CucumberRunner.class);
 
     public CucumberRunner() {
@@ -88,7 +90,7 @@ public abstract class CucumberRunner extends UITest {
                     app_version = Configuration.get(Configuration.Parameter.APP_VERSION);
                 }
             } else {
-                app_version = "1.0";
+                app_version = "1";
             }
         }
 
@@ -118,7 +120,8 @@ public abstract class CucumberRunner extends UITest {
             //String RootDir = System.getProperty("user.dir");
             File file = ReportContext.getArtifactsFolder();
 
-            File reportOutputDirectory = new File(file, "/CucumberReport");
+            File reportOutputDirectory = new File(String.format("%s/%s", file, CUCUMBER_REPORT_FOLDER));
+            //File reportOutputDirectory = new File(file, "/CucumberReport");
 
             File dir = new File("target/");
 
@@ -134,6 +137,9 @@ public abstract class CucumberRunner extends UITest {
                 LOGGER.info("Report json: " + fl.getName());
                 list.add("target/" + fl.getName());
             }
+
+            //buildNumber should be parsable Integer
+            buildNumber= buildNumber.replace(".","").replace(",","");
 
 
             if (list.size() > 0) {
@@ -171,7 +177,7 @@ public abstract class CucumberRunner extends UITest {
         }
     }
 
-    public boolean isCucumberTest() {
+    public static boolean isCucumberTest() {
         boolean ret = false;
         if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_TESTS)) {
             if (Configuration.get(Configuration.Parameter.CUCUMBER_TESTS).toLowerCase().contains("true")) {
@@ -184,7 +190,56 @@ public abstract class CucumberRunner extends UITest {
         return ret;
     }
 
-    public String getCucumberAppVersion() {
+
+    /**
+     * Check that CucumberReport Folder exists.
+     * @return boolean
+     */
+    public static boolean isCucumberReportFolderExists() {
+        try {
+            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getArtifactsFolder(), CUCUMBER_REPORT_FOLDER));
+            if (reportOutputDirectory.exists() && reportOutputDirectory.isDirectory()) {
+                if(reportOutputDirectory.list().length>0){
+                    LOGGER.debug("Cucumber Report Folder is not empty!");
+                    return true;
+                }else{
+                    LOGGER.error("Cucumber Report Folder is empty!");
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Error happen during checking that CucumberReport Folder exists or not. Error: "+e.getMessage());
+        }
+        return false;
+    }
+
+
+    /**
+     * Returns URL for cucumber report.
+     *
+     * @return - URL to test log folder.
+     */
+    public static String getCucumberReportResultLink()
+    {
+        String link = "";
+
+/*
+        if (!Configuration.get(Configuration.Parameter.REPORT_URL).isEmpty()) {
+            //remove report url and make link relative
+            link = String.format("%s/%s/feature-overview.html", Configuration.get(Configuration.Parameter.REPORT_URL), ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
+        }
+        else {
+            link = String.format("file://%s/feature-overview.html", ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
+        }
+*/
+        link=ReportContext.getCucumberReportLink(CUCUMBER_REPORT_FOLDER);
+
+        LOGGER.info("Cucumber Report link: "+link);
+
+        return link;
+    }
+
+    private String getCucumberAppVersion() {
         String ret = "";
         try {
             if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_TESTS_APP_VERSION)) {
@@ -200,7 +255,11 @@ public abstract class CucumberRunner extends UITest {
         return ret;
     }
 
-    public String getCucumberTestName() {
+    /**
+     * getCucumberTestName
+     * @return String
+     */
+    private String getCucumberTestName() {
         String ret = "";
         try {
             if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_TESTS_NAME)) {
@@ -213,6 +272,26 @@ public abstract class CucumberRunner extends UITest {
             LOGGER.error(e.getMessage());
         }
         LOGGER.info("Cucumber Test Name=" + ret);
+        return ret;
+    }
+
+    /**
+     * useJSinCucumberReport
+     * @return boolean
+     */
+    public static boolean useJSinCucumberReport() {
+        boolean ret = false;
+        try {
+            if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_USE_JS_IN_REPORT)) {
+                if (!Configuration.get(Configuration.Parameter.CUCUMBER_USE_JS_IN_REPORT).isEmpty()) {
+                    LOGGER.debug("Get Cucumber Test Name from config");
+                    if (Configuration.get(Configuration.Parameter.CUCUMBER_USE_JS_IN_REPORT).toLowerCase().contains("true"))
+                        return true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
         return ret;
     }
 }
