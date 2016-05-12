@@ -14,8 +14,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<source.version>1.8</source.version>
-		<target.version>1.8</target.version>
+		<source.version>1.7</source.version>
+		<target.version>1.7</target.version>
 
 		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
 
