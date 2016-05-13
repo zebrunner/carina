@@ -191,12 +191,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		super.onTestStart(result);
 		
-		//Analyze Zafira results for re-run
-		if (ZafiraIntegrator.isRerun() && ZafiraIntegrator.isPassed()) {
-			//generate already passed exception
-			throw new AlreadyPassedException();
-		}
-		
 		if (!result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
 				result.getParameters().length > 0) //set parameters from XLS only if test contains any parameter at all)
 		{
@@ -215,6 +209,12 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		RetryCounter.initCounter(test);
+		
+		//Analyze Zafira results for re-run
+		if (ZafiraIntegrator.isRerun() && ZafiraIntegrator.isPassed()) {
+			//generate already passed exception
+			throw new AlreadyPassedException();
+		}
 
 		startItem(result, Messager.TEST_STARTED);
 	}
