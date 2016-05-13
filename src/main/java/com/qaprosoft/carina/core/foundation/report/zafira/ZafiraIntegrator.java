@@ -233,22 +233,19 @@ public class ZafiraIntegrator {
 	public static boolean isRerun() {
 		return zafiraRunId != -1;
 	}
-	public static boolean isPassed() {
-		boolean res = false;
-		
+
+	public static TestType getTestType() {
 		String testName = TestNamingUtil.getTestNameByThread();
+		TestType res = null;
 		for (TestType test : tests) {
 			if (testName.equals(test.getName())) {
-				if (test.getStatus().equals(SpecialKeywords.PASSED)) {
-					res = true;
-				}
-				break;
+				res = test;
 			}
 		}
-		
+
 		return res;
 	}
-		
+
 	private static boolean isValid() {
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
