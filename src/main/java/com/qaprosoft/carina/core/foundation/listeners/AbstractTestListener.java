@@ -210,13 +210,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		RetryCounter.initCounter(test);
 		
+		startItem(result, Messager.TEST_STARTED);
+		
 		//Analyze Zafira results for re-run
 		if (ZafiraIntegrator.isRerun() && ZafiraIntegrator.isPassed()) {
 			//generate already passed exception
 			throw new AlreadyPassedException();
 		}
-
-		startItem(result, Messager.TEST_STARTED);
 	}
 
 	@Override
