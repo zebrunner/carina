@@ -285,7 +285,7 @@ public class Configuration
 		//zafira
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
-		ZAFIRA_RUN_ID("zafira_run_id"),
+		RERUN_FAILURES("rerun_failures"),
 		
 		GIT_BRANCH("git_branch"),
 		
