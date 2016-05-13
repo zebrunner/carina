@@ -229,6 +229,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 				} else {
 					// unregister Zafira test result
 					// testType.remove();
+					
+					//decrease counter because current one will be re-executed
+					TestNamingUtil.decreaseRetryCounter(test);
 				}
 			} else {
 				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
