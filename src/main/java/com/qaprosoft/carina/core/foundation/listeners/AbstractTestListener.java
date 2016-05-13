@@ -281,7 +281,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
 		if (result.getThrowable().getMessage().equals(SpecialKeywords.ALREADY_PASSED)) {
-			TestNamingUtil.releaseTestInfoByThread();
+			// [VD] it is prohibited to release TestInfoByThread in this place.!
 			return;
 		}
 		
