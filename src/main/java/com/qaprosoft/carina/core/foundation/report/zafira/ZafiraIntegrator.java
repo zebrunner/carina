@@ -40,7 +40,7 @@ public class ZafiraIntegrator {
 	private static TestType[] tests = null;
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
-	private static final Long zafiraRunId = Configuration.getLong(Parameter.ZAFIRA_RUN_ID);
+	private static final Boolean rerunFailures = Configuration.getBoolean(Parameter.RERUN_FAILURES);
 
 	private static final String ciUrl = Configuration.get(Parameter.CI_URL);
 	private static final String ciBuild = Configuration.get(Parameter.CI_BUILD);
@@ -111,36 +111,32 @@ public class ZafiraIntegrator {
 				parentJob = registerJob(ciParentUrl, anonymousUser.getId());
 			}
 			
-			if (zafiraRunId != -1) {
-				// [VD] handle negative scenarios when invalid id is provided
-				// I suppose re-run should be disable in this case, i.e. we have
-				// to reset zafiraRunId=-1 and write error message into the log
-				run = zc.getTestRun(zafiraRunId).getObject();
-				tests = zc.getTestRunResults(zafiraRunId).getObject();
+			if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
+				run = registerTestRunUPSTREAM_JOB(suite.getId(), gitUrl,
+						gitBranch, gitCommit, configXML, job.getId(),
+						parentJob.getId(), parentBuild, build,
+						Initiator.UPSTREAM_JOB, workItem);
+			} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
+				run = registerTestRunBySCHEDULER(suite.getId(), gitUrl,
+						gitBranch, gitCommit, configXML, job.getId(), build,
+						Initiator.SCHEDULER, workItem);
+			} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
+				run = registerTestRunByHUMAN(suite.getId(), user.getId(),
+						gitUrl, gitBranch, gitCommit, configXML, job.getId(),
+						build, Initiator.HUMAN, workItem);
 			} else {
-				if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
-					run = registerTestRunUPSTREAM_JOB(suite.getId(), gitUrl,
-							gitBranch, gitCommit, configXML, job.getId(),
-							parentJob.getId(), parentBuild, build,
-							Initiator.UPSTREAM_JOB, workItem);
-				} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
-					run = registerTestRunBySCHEDULER(suite.getId(), gitUrl,
-							gitBranch, gitCommit, configXML, job.getId(), build,
-							Initiator.SCHEDULER, workItem);
-				} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
-					run = registerTestRunByHUMAN(suite.getId(), user.getId(),
-							gitUrl, gitBranch, gitCommit, configXML, job.getId(),
-							build, Initiator.HUMAN, workItem);
-				} else {
-					throw new RuntimeException("Unable to register test run for zafira service: "
-									+ zafiraUrl + " due to the misses build cause: '" + ciBuildCause + "'");
-				}
+				throw new RuntimeException("Unable to register test run for zafira service: "
+								+ zafiraUrl + " due to the misses build cause: '" + ciBuildCause + "'");
 			}
 
 			if (run == null) {
 				throw new RuntimeException("Unable to register test run for zafira service: " + zafiraUrl);
 			}
 			isRegistered = true;
+			
+			if (rerunFailures) {
+				tests = zc.getTestRunResults(run.getId()).getObject();
+			}
 		} catch (Exception e) {
 			isRegistered = false;
 			LOGGER.error("Undefined error during test run registration!", e);
@@ -230,7 +226,7 @@ public class ZafiraIntegrator {
 	}
 	
 	public static boolean isRerun() {
-		return zafiraRunId != -1;
+		return rerunFailures;
 	}
 
 	public static TestType getTestType() {
@@ -242,10 +238,12 @@ public class ZafiraIntegrator {
 				break;
 			}
 		}
-
 		return res;
 	}
 
+	public static void deleteTest(long id) {
+		zc.deleteTest(id);
+	}
 	private static boolean isValid() {
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
@@ -325,6 +323,8 @@ public class ZafiraIntegrator {
 		String testRunDetails = "testSuiteId: %s, userId: %s, scmURL: %s, scmBranch: %s, scmCommit: %s, jobId: %s, buildNumber: %s, startedBy: %s, workItem";
 		LOGGER.debug("Test Run details for registration:" + String.format(testRunDetails, testSuiteId, userId, scmURL,
 						scmBranch, scmCommit, jobId, buildNumber, startedBy, workItem));
+		
+		testRun.setRerun(rerunFailures);
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		testRun = response.getObject();
 		if (testRun == null) {
@@ -344,6 +344,7 @@ public class ZafiraIntegrator {
 		LOGGER.debug("Test Run details for registration:" + String.format(testRunDetails, testSuiteId, scmURL, scmBranch,
 						scmCommit, jobId, buildNumber, startedBy, workItem));
 
+		testRun.setRerun(rerunFailures);
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		testRun = response.getObject();
 		if (testRun == null) {
@@ -365,6 +366,7 @@ public class ZafiraIntegrator {
 		LOGGER.debug("Test Run details for registration:"
 				+ String.format(testRunDetails, testSuiteId, scmURL, scmBranch, scmCommit, jobId, parentJobId, parentBuildNumber, buildNumber, startedBy, workItem));
 
+		testRun.setRerun(rerunFailures);
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		testRun = response.getObject();
 		if (testRun == null) {
