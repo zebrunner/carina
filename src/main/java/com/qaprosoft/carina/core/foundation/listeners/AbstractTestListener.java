@@ -228,7 +228,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 					throw new SkipException(SpecialKeywords.ALREADY_PASSED);
 				} else {
 					// unregister Zafira test result
-					// testType.remove();
+					ZafiraIntegrator.deleteTest(testType.getId());
 				}
 			} else {
 				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
