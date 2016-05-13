@@ -13,7 +13,6 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ArgumentType;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ConfigurationBin;
 import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
@@ -240,6 +239,7 @@ public class ZafiraIntegrator {
 		for (TestType test : tests) {
 			if (testName.equals(test.getName())) {
 				res = test;
+				break;
 			}
 		}
 
