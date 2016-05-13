@@ -113,6 +113,9 @@ public class ZafiraIntegrator {
 			}
 			
 			if (zafiraRunId != -1) {
+				// [VD] handle negative scenarios when invalid id is provided
+				// I suppose re-run should be disable in this case, i.e. we have
+				// to reset zafiraRunId=-1 and write error message into the log
 				run = zc.getTestRun(zafiraRunId).getObject();
 				tests = zc.getTestRunResults(zafiraRunId).getObject();
 			} else {
