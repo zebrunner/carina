@@ -49,6 +49,7 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.zafira.client.model.TestType;
 //import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 
 @SuppressWarnings("deprecation")
@@ -212,10 +213,25 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		startItem(result, Messager.TEST_STARTED);
 		
-		//Analyze Zafira results for re-run
-		if (ZafiraIntegrator.isRerun() && ZafiraIntegrator.isPassed()) {
-			//generate already passed exception
-			throw new AlreadyPassedException();
+		// Analyze Zafira results for re-run
+		if (ZafiraIntegrator.isRerun()) {
+			// Analyze TestResult status obligatory inside isrerun if operator because
+			// some modifications in Zafira results needed.
+			// FAILED status will be removed/unregistered from Zafira database
+			TestType testType = ZafiraIntegrator.getTestType();
+			
+			// if null it means that new test appeared in comparison with registered result
+			if (testType != null) {
+				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
+					// generate already passed exception
+					throw new AlreadyPassedException();
+				} else {
+					// unregister Zafira test result
+					// testType.remove();
+				}
+			} else {
+				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
+			}
 		}
 	}
 
