@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.exception.AlreadyPassedException;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -223,8 +223,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 			// if null it means that new test appeared in comparison with registered result
 			if (testType != null) {
 				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
-					// generate already passed exception
-					throw new AlreadyPassedException();
+					// generate already passed exception. Regular eception
+					// doesn't work as it stop DataProvider execution etc
+					throw new SkipException(SpecialKeywords.ALREADY_PASSED);
 				} else {
 					// unregister Zafira test result
 					// testType.remove();
@@ -248,12 +249,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		
-		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
-		if (result.getThrowable().getMessage().equals(SpecialKeywords.ALREADY_PASSED)) {
-			return;
-		}
-		
 		String test = TestNamingUtil.getTestNameByThread();
 		int count = RetryCounter.getRunCount(test);		
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
@@ -284,6 +279,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
+		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
+		if (result.getThrowable().getMessage().equals(SpecialKeywords.ALREADY_PASSED)) {
+			return;
+		}
+		
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		TestNamingUtil.releaseTestInfoByThread();
