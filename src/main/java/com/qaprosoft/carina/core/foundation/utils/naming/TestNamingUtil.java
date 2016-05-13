@@ -109,10 +109,9 @@ public class TestNamingUtil
 	
 	public static synchronized void releaseTestInfoByThread()
 	{
+		String test = getTestNameByThread();
 		long threadId = Thread.currentThread().getId();
 		threadId2TestName.remove(threadId);
-		
-		String test = getTestNameByThread();
 		testName2StartDate.remove(test);
 	}
 	
