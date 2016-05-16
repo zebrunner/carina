@@ -51,7 +51,7 @@ public class EmailReportItemCollector
 	
 	public static synchronized TestResultItem pull(ITestResult result)
 	{
-		return testResultsMap.get(TestNamingUtil.getCanonicalTestName(result));
+		return testResultsMap.get(TestNamingUtil.getTestNameByThread());
 	}
 
 	public static List<TestResultItem> getTestResults()

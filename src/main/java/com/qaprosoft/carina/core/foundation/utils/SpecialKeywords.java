@@ -107,4 +107,12 @@ public class SpecialKeywords
 	
 	public static final String CORE = "core";
 	
+	public static final String PASSED = "PASSED";
+	public static final String FAILED = "FAILED";
+	public static final String SKIPPED = "SKIPPED";
+	
+	public static final String ALREADY_PASSED = "ALREADY_PASSED";
+	
+	
+	
 }
