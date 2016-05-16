@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -39,7 +40,9 @@ public class TestNamingUtil
 	
 	private static INamingStrategy namingStrategy;
 
-	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	
+	//private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
 
 	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 	
@@ -90,10 +93,17 @@ public class TestNamingUtil
 		
 		if (count > 1) {
 			//test = test + " (InvCount=" + count + ")";
-			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", count));
+			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", count));
 		}
 		
-		threadId2TestName.put(threadId, test);
+		Stack<String> stack = new Stack<String>();
+		
+		if (threadId2TestName.containsKey(threadId)) {
+			// not the first time
+			stack = threadId2TestName.get(threadId);
+		}
+		stack.push(test);
+		threadId2TestName.put(threadId, stack);
 		testName2StartDate.put(test, new Date().getTime());
 		return test;
 	}
@@ -109,9 +119,14 @@ public class TestNamingUtil
 	
 	public static synchronized void releaseTestInfoByThread()
 	{
-		String test = getTestNameByThread();
 		long threadId = Thread.currentThread().getId();
-		threadId2TestName.remove(threadId);
+		
+		Stack<String> stack = threadId2TestName.get(threadId);
+		String test = stack.pop();	
+		
+		if (stack.isEmpty()) {
+			threadId2TestName.remove(threadId);
+		}
 		testName2StartDate.remove(test);
 	}
 	
@@ -122,11 +137,14 @@ public class TestNamingUtil
 	public static String getTestNameByThread() {
 		long threadId = Thread.currentThread().getId();
 		
-		String test = threadId2TestName.get(threadId);
+		Stack<String> stack = threadId2TestName.get(threadId);
+		String test = stack.get(stack.size());		
+		
 		if (test == null) {
 			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
 		}
-		return threadId2TestName.get(threadId);
+		
+		return test;
 	}
 	
 	public static Long getTestStartDate(String test)
