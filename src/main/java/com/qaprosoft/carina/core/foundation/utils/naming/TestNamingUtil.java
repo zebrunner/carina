@@ -120,6 +120,10 @@ public class TestNamingUtil
 	public static synchronized void releaseTestInfoByThread()
 	{
 		long threadId = Thread.currentThread().getId();
+		if (!isTestNameRegistered()) {
+			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+		}
+		
 		
 		Stack<String> stack = threadId2TestName.get(threadId);
 		String test = stack.pop();	
@@ -138,10 +142,13 @@ public class TestNamingUtil
 		long threadId = Thread.currentThread().getId();
 		
 		Stack<String> stack = threadId2TestName.get(threadId);
-		String test = stack.get(stack.size());		
-		
-		if (test == null) {
+		if (stack == null) {
 			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+		}
+		
+		String test = stack.get(stack.size());		
+		if (test == null) {
+			throw new RuntimeException("Unable to find registered test name for threadId from stack: " + threadId);
 		}
 		
 		return test;
