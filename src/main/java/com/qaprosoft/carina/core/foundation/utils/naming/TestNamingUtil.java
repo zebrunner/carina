@@ -146,12 +146,11 @@ public class TestNamingUtil
 			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
 		}
 		
-		String test = stack.get(stack.size());		
-		if (test == null) {
+		if (stack.size() == 0) {
 			throw new RuntimeException("Unable to find registered test name for threadId from stack: " + threadId);
 		}
 		
-		return test;
+		return stack.get(stack.size() - 1);		
 	}
 	
 	public static Long getTestStartDate(String test)
