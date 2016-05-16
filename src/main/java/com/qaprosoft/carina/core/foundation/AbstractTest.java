@@ -397,6 +397,10 @@ public abstract class AbstractTest // extends DriverHelper
 		int num = 1;
 		for (TestResultItem tri : tris) {
 			String failReason = tri.getFailReason();
+			if (failReason == null) {
+				failReason = "";
+			}
+				
 			if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)) {
 				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
 				reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
