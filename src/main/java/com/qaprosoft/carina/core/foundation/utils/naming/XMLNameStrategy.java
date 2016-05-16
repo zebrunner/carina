@@ -81,7 +81,7 @@ public class XMLNameStrategy implements INamingStrategy
 		}
 		
 		if (invocationID != -1) {
-			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", invocationID));
+			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
 		}
 		else {
 			testName = testName + " - " +  result.getMethod().getMethodName();
