@@ -180,8 +180,7 @@ public class Jira
 				try
 				{
 					Issue bug = jira.getIssue(id);
-					return String.format("Bug <a href=\"%s\">%s</a> (%s) with status '%s' associated", bugUrl, id, bug.getSummary(), bug.getStatus()
-							.getName());
+					return String.format("Bug %s \"%s\" with status \"%s\" associated", bugUrl, bug.getSummary(), bug.getStatus().getName());
 				} catch (Exception e)
 				{
 					LOG.error("Exception during retrieving bug info", e);
