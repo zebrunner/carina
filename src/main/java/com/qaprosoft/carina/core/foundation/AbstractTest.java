@@ -187,7 +187,7 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterMethod(alwaysRun = true)
 	public void executeAfterTestMethod(ITestResult result) {
 		try {
-			String test = TestNamingUtil.getCanonicTestNameByThread();
+			String test = TestNamingUtil.getCanonicalTestName(result);
 			List<String> tickets = Jira.getTickets(result);
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
 			Jira.updateAfterTest(result);
