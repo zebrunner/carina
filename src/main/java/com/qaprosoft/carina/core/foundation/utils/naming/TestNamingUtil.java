@@ -132,7 +132,7 @@ public class TestNamingUtil
 		if (stack.isEmpty()) {
 			threadId2TestName.remove(threadId);
 		}
-		testName2StartDate.remove(test);
+		//testName2StartDate.remove(test);
 	}
 	
 	public static boolean isTestNameRegistered() {
@@ -144,7 +144,7 @@ public class TestNamingUtil
 		
 		Stack<String> stack = threadId2TestName.get(threadId);
 		if (stack == null) {
-			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
 		}
 		
 		if (stack.size() == 0) {
