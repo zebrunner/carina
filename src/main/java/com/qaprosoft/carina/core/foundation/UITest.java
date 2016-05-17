@@ -167,7 +167,7 @@ public class UITest extends AbstractTest
     		DriverMode driverMode = Configuration.getDriverMode();
 			
 	    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
-				stopRecording(TestNamingUtil.getCanonicTestNameByThread());
+	    		stopRecording(TestNamingUtil.getCanonicalTestName(result));
 	    	}
 	    	
 	    	if (driverMode == DriverMode.METHOD_MODE) {
