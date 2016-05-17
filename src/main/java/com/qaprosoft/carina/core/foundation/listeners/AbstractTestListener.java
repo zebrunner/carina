@@ -215,6 +215,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		startItem(result, Messager.TEST_STARTED);
 		
+		TestNamingUtil.associateCanonicTestName(test);
+		
 		// Analyze Zafira results for re-run
 		if (ZafiraIntegrator.isRerun()) {
 			// Analyze TestResult status obligatory inside isrerun if operator because
@@ -241,11 +243,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		String test = TestNamingUtil.getTestNameByThread();
 		passItem(result, Messager.TEST_PASSED);
 
 		ZafiraIntegrator.finishTestMethod(result, null);
-		TestNamingUtil.associateCanonicTestName(test);
 		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
 	}
@@ -274,7 +274,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 			closeLogAppender(test);
 		}
 		
-		TestNamingUtil.associateCanonicTestName(test);
 		//register test details for zafira data population
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		
@@ -291,8 +290,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 			return;
 		}
 		
-		String test = TestNamingUtil.getTestNameByThread();
-		TestNamingUtil.associateCanonicTestName(test);
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		//TestNamingUtil.releaseTestInfoByThread();
