@@ -122,12 +122,13 @@ public class TestNamingUtil
 	{
 		long threadId = Thread.currentThread().getId();
 		if (!isTestNameRegistered()) {
-			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+			LOGGER.warn("There is no TestInfo for release in threadId: " + threadId);
+			return;
 		}
 		
-		
 		Stack<String> stack = threadId2TestName.get(threadId);
-		String test = stack.pop();	
+		String test = stack.pop();
+		LOGGER.debug("Releasing information about test: " + test);
 		
 		if (stack.isEmpty()) {
 			threadId2TestName.remove(threadId);
