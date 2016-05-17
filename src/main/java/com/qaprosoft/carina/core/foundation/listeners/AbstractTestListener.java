@@ -241,10 +241,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
+		String test = TestNamingUtil.getTestNameByThread();
 		passItem(result, Messager.TEST_PASSED);
 
 		ZafiraIntegrator.finishTestMethod(result, null);
-		TestNamingUtil.associateCanonicTestName();
+		TestNamingUtil.associateCanonicTestName(test);
 		TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
 	}
@@ -252,7 +253,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
+		//String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);		
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
@@ -271,8 +273,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 			errorMessage = failItem(result, Messager.TEST_FAILED);
 			closeLogAppender(test);
 		}
-
-		TestNamingUtil.associateCanonicTestName();
+		
+		TestNamingUtil.associateCanonicTestName(test);
 		//register test details for zafira data population
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		
@@ -289,7 +291,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 			return;
 		}
 		
-		TestNamingUtil.associateCanonicTestName();
+		String test = TestNamingUtil.getTestNameByThread();
+		TestNamingUtil.associateCanonicTestName(test);
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		TestNamingUtil.releaseTestInfoByThread();
