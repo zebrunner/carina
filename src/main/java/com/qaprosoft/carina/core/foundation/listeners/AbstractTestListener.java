@@ -158,14 +158,12 @@ public abstract class AbstractTestListener extends TestArgsListener
     @Override
     public void onConfigurationSuccess(ITestResult result) {
    		passItem(result, Messager.CONFIG_PASSED);
-   		TestNamingUtil.releaseTestInfoByThread();
    		super.onConfigurationSuccess(result);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
    		skipItem(result, Messager.CONFIG_SKIPPED);
-   		TestNamingUtil.releaseTestInfoByThread();
    		super.onConfigurationSkip(result);
     }
 
@@ -174,7 +172,6 @@ public abstract class AbstractTestListener extends TestArgsListener
     	failItem(result, Messager.CONFIG_FAILED);
     	String test = TestNamingUtil.getCanonicalTestName(result);
 		closeLogAppender(test);
-		TestNamingUtil.releaseTestInfoByThread();
 		super.onConfigurationFailure(result);
     }
     
