@@ -241,6 +241,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		passItem(result, Messager.TEST_PASSED);
 
+		TestNamingUtil.associateCanonicTestName();
 		ZafiraIntegrator.finishTestMethod(result, null);
 		TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
@@ -269,6 +270,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			closeLogAppender(test);
 		}
 
+		TestNamingUtil.associateCanonicTestName();
 		//register test details for zafira data population
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		
@@ -285,6 +287,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			return;
 		}
 		
+		TestNamingUtil.associateCanonicTestName();
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		TestNamingUtil.releaseTestInfoByThread();
