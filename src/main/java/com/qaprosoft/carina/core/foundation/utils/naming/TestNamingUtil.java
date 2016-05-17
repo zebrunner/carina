@@ -180,9 +180,9 @@ public class TestNamingUtil
 		threadId2ZafiraTest.remove(threadId);
 	}
 	
-	public static synchronized void associateCanonicTestName()
+	public static synchronized void associateCanonicTestName(String test)
 	{
-		threadId2CanonicTestName.put(Thread.currentThread().getId(), getTestNameByThread());
+		threadId2CanonicTestName.put(Thread.currentThread().getId(), test);
 	}
 	
 	public static String getCanonicTestNameByThread() {
