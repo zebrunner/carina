@@ -71,7 +71,7 @@ public class UITest extends AbstractTest
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
-    	//super.executeBeforeTestSuite(context);
+    	super.executeBeforeTestSuite(context); //do not remove super otherwise functionality from AbstractTest is not launched at all.
     	
     	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
@@ -95,7 +95,7 @@ public class UITest extends AbstractTest
     
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
-    	//super.executeBeforeTestClass(context);
+    	super.executeBeforeTestClass(context);
     	
     	DriverMode driverMode = Configuration.getDriverMode();
 
@@ -122,7 +122,7 @@ public class UITest extends AbstractTest
     @BeforeMethod(alwaysRun = true)
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
-		//super.executeBeforeTestMethod(xmlTest, testMethod, context);
+		super.executeBeforeTestMethod(xmlTest, testMethod, context);
 		quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
 		
 		DriverMode driverMode = Configuration.getDriverMode();
@@ -183,7 +183,7 @@ public class UITest extends AbstractTest
 		    e.printStackTrace();
 		}
     	
-		//super.executeAfterTestMethod(result);    	
+		super.executeAfterTestMethod(result);    	
     }
     
     @AfterClass(alwaysRun = true)
@@ -197,7 +197,7 @@ public class UITest extends AbstractTest
 			quitDriver();
 	    }
 	    
-		//super.executeAfterTestClass(context);    	
+		super.executeAfterTestClass(context);    	
     }
    
     @AfterSuite(alwaysRun = true)
@@ -212,7 +212,7 @@ public class UITest extends AbstractTest
 			stopRecording(null);
 	    }
 	    
-		//super.executeAfterTestSuite(context);	    
+		super.executeAfterTestSuite(context);	    
 	}
     
 	
