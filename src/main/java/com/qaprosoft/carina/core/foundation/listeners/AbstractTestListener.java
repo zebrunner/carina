@@ -152,19 +152,19 @@ public abstract class AbstractTestListener extends TestArgsListener
 		// context doesn't have up-to-date information. 
    		// This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
 		removeIncorrectlyFailedTests(result.getTestContext());
-   		super.beforeConfiguration(result);
+   		//super.beforeConfiguration(result);
     }
     
     @Override
     public void onConfigurationSuccess(ITestResult result) {
    		passItem(result, Messager.CONFIG_PASSED);
-   		super.onConfigurationSuccess(result);
+   		//super.onConfigurationSuccess(result);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
    		skipItem(result, Messager.CONFIG_SKIPPED);
-   		super.onConfigurationSkip(result);
+   		//super.onConfigurationSkip(result);
     }
 
     @Override
@@ -172,7 +172,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     	failItem(result, Messager.CONFIG_FAILED);
     	String test = TestNamingUtil.getCanonicalTestName(result);
 		closeLogAppender(test);
-		super.onConfigurationFailure(result);
+		//super.onConfigurationFailure(result);
     }
     
 	@Override
