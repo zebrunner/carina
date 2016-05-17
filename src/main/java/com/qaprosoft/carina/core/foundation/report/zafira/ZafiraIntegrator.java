@@ -179,7 +179,7 @@ public class ZafiraIntegrator {
 		try {
 			String testClass = result.getMethod().getTestClass().getName();
 			
-			String test = TestNamingUtil.getTestNameByThread();
+			String test = TestNamingUtil.getCanonicTestNameByThread();
 			String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
 
 			// if method owner is not specified then try to use suite owner. If
