@@ -43,6 +43,7 @@ public class TestNamingUtil
 	
 	//private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
 	private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
+	private static final ConcurrentHashMap<Long, String> threadId2CanonicTestName = new ConcurrentHashMap<Long, String>(); //map to store test names without configuration steps
 
 	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 	
@@ -177,5 +178,14 @@ public class TestNamingUtil
 	public static synchronized void releaseZafiraTest(Long threadId)
 	{
 		threadId2ZafiraTest.remove(threadId);
+	}
+	
+	public static synchronized void associateCanonicTestName()
+	{
+		threadId2CanonicTestName.put(Thread.currentThread().getId(), getTestNameByThread());
+	}
+	
+	public static String getCanonicTestNameByThread() {
+		return threadId2CanonicTestName.get(Thread.currentThread().getId());
 	}
 }
