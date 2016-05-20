@@ -15,11 +15,11 @@ public abstract class AbstractCapabilities {
 
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
+    	
         String platform = Configuration.get(Configuration.Parameter.PLATFORM);
         if (!platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }
-        
         
         capabilities.setBrowserName(browser);
         capabilities.setVersion(Configuration.get(Parameter.BROWSER_VERSION));
@@ -46,9 +46,20 @@ public abstract class AbstractCapabilities {
 			proxy.setFtpProxy(proxyAddress);
 			capabilities.setCapability(CapabilityType.PROXY, proxy);
 
-
 			LOGGER.info(String.format("WebDriver will use http/https/ftp proxies: %s:%s", proxyHost, proxyPort));
 		}
+		
+		//handle variant with extra capabilities from external property file
+    	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
+    	DesiredCapabilities extraCapabilities = null;
+    	if (!extraCapabilitiesFile.isEmpty()) {
+    		extraCapabilities = new CapabilitiesLoder().loadCapabilities(extraCapabilitiesFile);
+    	}
+    	
+    	if (extraCapabilities != null) {
+    		LOGGER.info("Append extra Capabilities from '" + extraCapabilitiesFile + "' to desired capabilities");
+    		capabilities.merge(extraCapabilities);
+    	}
 		
         return capabilities;
     }
