@@ -448,6 +448,21 @@ public abstract class AbstractTestListener extends TestArgsListener
 		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
 
+		if (TestResultType.FAIL.equals(resultType))
+		{
+			String bugInfo = Jira.processBug(result);
+			if (bugInfo != null)
+			{
+				if (failReason != null)
+				{
+					failReason = bugInfo.concat("\n").concat(failReason);
+				} else
+				{
+					failReason = bugInfo;
+				}
+			}
+		}
+
 		if(!FileUtils.listFiles(ReportContext.getTestDir(test), new String[]{"png"}, false).isEmpty()){
 			if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
 				//remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve cooperation with CI tools
