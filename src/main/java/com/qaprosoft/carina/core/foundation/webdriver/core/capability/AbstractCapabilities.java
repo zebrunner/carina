@@ -50,18 +50,25 @@ public abstract class AbstractCapabilities {
 		}
 		
 		//handle variant with extra capabilities from external property file
-    	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
-    	DesiredCapabilities extraCapabilities = null;
-    	if (!extraCapabilitiesFile.isEmpty()) {
-    		extraCapabilities = new CapabilitiesLoder().loadCapabilities(extraCapabilitiesFile);
-    	}
-    	
+    	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
+    			
     	if (extraCapabilities != null) {
-    		LOGGER.info("Append extra Capabilities from '" + extraCapabilitiesFile + "' to desired capabilities");
     		capabilities.merge(extraCapabilities);
     	}
 		
         return capabilities;
+    }
+    
+    protected DesiredCapabilities getExtraCapabilities() {
+		//handle variant with extra capabilities from external property file
+    	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
+    	DesiredCapabilities extraCapabilities = null;
+    	if (!extraCapabilitiesFile.isEmpty()) {
+    		LOGGER.info("Append extra Capabilities from '" + extraCapabilitiesFile + "' to desired capabilities");
+    		extraCapabilities = new CapabilitiesLoder().loadCapabilities(extraCapabilitiesFile);
+    	}
+    	
+    	return extraCapabilities;
     }
     
 }
