@@ -7,7 +7,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public abstract class MobileCapabilies extends AbstractCapabilities {
 
 
-    public static DesiredCapabilities getMobileCapabilities(boolean gridMode, String platform, String platformVersion, String deviceName,
+    public DesiredCapabilities getMobileCapabilities(boolean gridMode, String platform, String platformVersion, String deviceName,
                                                         String automationName, String commandTimeout, String browserName, String app, String appActivity, String appPackage) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("platformName", platform);
@@ -40,6 +40,14 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
             if (appPackage != null)
                 capabilities.setCapability("appPackage", appPackage);
         }
+        
+		//handle variant with extra capabilities from external property file
+    	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
+    			
+    	if (extraCapabilities != null) {
+    		capabilities.merge(extraCapabilities);
+    	}
+    	
 
         return capabilities;
     }
