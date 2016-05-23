@@ -77,7 +77,6 @@
 		<cucumber.picocontainer.version>1.2.4</cucumber.picocontainer.version>
 		<picocontainer.version>2.15</picocontainer.version>
 
-		
 	</properties>
 
 	<repositories>
