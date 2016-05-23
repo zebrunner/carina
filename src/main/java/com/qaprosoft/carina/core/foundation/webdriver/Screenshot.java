@@ -78,10 +78,14 @@ public class Screenshot
 			try
 			{
 				// Define test screenshot root
-				String test = TestNamingUtil.getTestNameByThread();
+				String test = TestNamingUtil.getCanonicTestNameByThread();
 				if (test == null || StringUtils.isEmpty(test)) {
-					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
-					return null;
+					if (TestNamingUtil.isTestNameRegistered()) {
+						test = TestNamingUtil.getTestNameByThread();
+					} else {
+						LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
+						return null;
+					}
 				}
 				File testScreenRootDir = ReportContext.getTestDir(test);
 
