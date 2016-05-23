@@ -43,6 +43,7 @@ public class TestNamingUtil
 	
 	//private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
 	private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
+	private static final ConcurrentHashMap<Long, String> threadId2CanonicTestName = new ConcurrentHashMap<Long, String>(); //map to store test names without configuration steps
 
 	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 	
@@ -121,17 +122,18 @@ public class TestNamingUtil
 	{
 		long threadId = Thread.currentThread().getId();
 		if (!isTestNameRegistered()) {
-			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+			LOGGER.warn("There is no TestInfo for release in threadId: " + threadId);
+			return;
 		}
 		
-		
 		Stack<String> stack = threadId2TestName.get(threadId);
-		String test = stack.pop();	
+		String test = stack.pop();
+		LOGGER.debug("Releasing information about test: " + test);
 		
 		if (stack.isEmpty()) {
 			threadId2TestName.remove(threadId);
 		}
-		testName2StartDate.remove(test);
+		//testName2StartDate.remove(test);
 	}
 	
 	public static boolean isTestNameRegistered() {
@@ -143,7 +145,7 @@ public class TestNamingUtil
 		
 		Stack<String> stack = threadId2TestName.get(threadId);
 		if (stack == null) {
-			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId);
+			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
 		}
 		
 		if (stack.size() == 0) {
@@ -177,5 +179,14 @@ public class TestNamingUtil
 	public static synchronized void releaseZafiraTest(Long threadId)
 	{
 		threadId2ZafiraTest.remove(threadId);
+	}
+	
+	public static synchronized void associateCanonicTestName(String test)
+	{
+		threadId2CanonicTestName.put(Thread.currentThread().getId(), test);
+	}
+	
+	public static String getCanonicTestNameByThread() {
+		return threadId2CanonicTestName.get(Thread.currentThread().getId());
 	}
 }
