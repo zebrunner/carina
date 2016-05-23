@@ -73,7 +73,9 @@
 
 		<cucumber.testng.version>1.2.4</cucumber.testng.version>
 		<cucumber.java.version>1.2.4</cucumber.java.version>
-		<cucumber.reporting>2.2.0</cucumber.reporting>
+		<cucumber.reporting>2.3.0</cucumber.reporting>
+		<cucumber.picocontainer.version>1.2.4</cucumber.picocontainer.version>
+		<picocontainer.version>2.15</picocontainer.version>
 
 		
 	</properties>
@@ -423,6 +425,18 @@
 			<groupId>net.masterthought</groupId>
 			<artifactId>cucumber-reporting</artifactId>
 			<version>${cucumber.reporting}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-picocontainer</artifactId>
+			<version>${cucumber.picocontainer.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.picocontainer</groupId>
+			<artifactId>picocontainer</artifactId>
+			<version>${picocontainer.version}</version>
 		</dependency>
 
 	</dependencies>
