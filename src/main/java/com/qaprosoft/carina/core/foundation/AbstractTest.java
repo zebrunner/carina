@@ -328,7 +328,7 @@ public abstract class AbstractTest // extends DriverHelper
 		return browser;
 	}
 
-	private String getTitle(ITestContext context) {
+	protected String getTitle(ITestContext context) {
 		String browser = getBrowser();
 		if (!browser.isEmpty()) {
 			browser = " " + browser; //insert the space before
@@ -364,7 +364,7 @@ public abstract class AbstractTest // extends DriverHelper
 		return fileName;
 	}
 
-	private String getSuiteName(ITestContext context) {
+	protected String getSuiteName(ITestContext context) {
 
 		String suiteName = "";
 
