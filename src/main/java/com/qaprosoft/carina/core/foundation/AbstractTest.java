@@ -15,14 +15,34 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.DataProvider;
+import org.testng.xml.XmlTest;
+
 import com.amazonaws.services.s3.model.S3Object;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
@@ -37,27 +57,15 @@ import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.*;
+import com.qaprosoft.carina.core.foundation.utils.DateUtils;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.zafira.client.model.TestType;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.annotations.*;
-import org.testng.xml.XmlTest;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.*;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -66,10 +74,6 @@ import java.util.*;
  */
 public abstract class AbstractTest // extends DriverHelper
 {
-	@Deprecated
-	private Map<String, String> testNameMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
-	@Deprecated	private Map<String, String> jiraTicketsMappedToArgs = Collections.synchronizedMap(new HashMap<String, String>());
-
 	protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
 	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
@@ -387,204 +391,17 @@ public abstract class AbstractTest // extends DriverHelper
 		return suiteNameAppender.get();
 	}
 
-	// separate method to be able to retrieve information from different sheets
-	// in the same java test.
-	@Deprecated
-	public Object[][] createTestArgSets(String xlsFile, String xlsSheet,
-			String dsArgs, String dsUids, ITestContext context,
-			String executeColumn, String executeValue, String... staticArgs) {
-		DSBean dsBean = new DSBean(xlsFile, xlsSheet, dsArgs, dsUids);
-
-		XLSTable dsData = XLSParser.parseSpreadSheet(xlsFile, xlsSheet,
-				executeColumn, executeValue);
-		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
-
-		String jiraColumnName = context.getCurrentXmlTest().getParameter(
-				SpecialKeywords.EXCEL_DS_JIRA);
-
-		int rowIndex = 0;
-		for (Map<String, String> xlsRow : dsData.getDataRows()) {
-			String testName = context.getName();
-
-			args[rowIndex][0] = xlsRow;
-
-			for (int i = 0; i < staticArgs.length; i++) {
-				args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-						.getTestParams().get(staticArgs[i])); // zero
-																			// element
-																			// is
-																			// a
-																			// hashmap
-			}
-			// update testName adding UID values from DataSource arguments if
-			// any
-			testName = dsBean.setDataSorceUUID(testName, xlsRow);
-
-			testNameMappedToArgs.put(
-					String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
-
-			// add jira ticket from xls datasource to special hashMap
-			if (jiraColumnName != null) {
-				if (!jiraColumnName.isEmpty()) {
-					jiraTicketsMappedToArgs.put(
-							String.valueOf(Arrays.hashCode(args[rowIndex])),
-							xlsRow.get(jiraColumnName));
-				}
-			}
-
-			rowIndex++;
-		}
-
-		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP,
-				testNameMappedToArgs);
-		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP,
-				jiraTicketsMappedToArgs);
-		return args;
-	}
-
-	@Deprecated
-	public Object[][] createTestArgSets(String xlsSheet, String dsArgs,
-			String dsUids, ITestContext context, String executeColumn,
-			String executeValue, String... staticArgs) {
-		DSBean dsBean = new DSBean(context);
-		return createTestArgSets(dsBean.getDsFile(), xlsSheet, dsArgs, dsUids,
-				context, executeColumn, executeValue, staticArgs);
-	}
-
-	// separate method to be able to retrieve information from different sheets
-	// in the same java test.
-	@Deprecated
-	public Object[][] createTestArgSets2(String sheet, ITestContext context,
-			String executeColumn, String executeValue, String... staticArgs) {
-		DSBean dsBean = new DSBean(context);
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(), sheet,
-				executeColumn, executeValue);
-		Object[][] args = new Object[dsData.getDataRows().size()][staticArgs.length + 1];
-
-		String jiraColumnName = context.getCurrentXmlTest().getParameter(
-				SpecialKeywords.EXCEL_DS_JIRA);
-
-		int rowIndex = 0;
-		for (Map<String, String> xlsRow : dsData.getDataRows()) {
-			String testName = context.getName();
-
-			args[rowIndex][0] = xlsRow;
-
-			for (int i = 0; i < staticArgs.length; i++) {
-				args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-						.getTestParams().get(staticArgs[i])); // zero
-																			// element
-																			// is
-																			// a
-																			// hashmap
-			}
-			// update testName adding UID values from DataSource arguments if
-			// any
-			testName = dsBean.setDataSorceUUID(testName, xlsRow);
-
-			testNameMappedToArgs.put(
-					String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
-
-			// add jira ticket from xls datasource to special hashMap
-			if (jiraColumnName != null) {
-				if (!jiraColumnName.isEmpty()) {
-					jiraTicketsMappedToArgs.put(
-							String.valueOf(Arrays.hashCode(args[rowIndex])),
-							xlsRow.get(jiraColumnName));
-				}
-			}
-
-			rowIndex++;
-		}
-
-		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP,
-				testNameMappedToArgs);
-		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP,
-				jiraTicketsMappedToArgs);
-		return args;
-	}
-
-	@Deprecated
-	public Object[][] createTestArgSets2(ITestContext context,
-			String executeColumn, String executeValue, String... staticArgs) {
-		DSBean dsBean = new DSBean(context);
-		return createTestArgSets2(dsBean.getXlsSheet(), context, executeColumn,
-				executeValue, staticArgs);
-
-	}
-
-	@Deprecated
-	@DataProvider(name = "excel_ds2")
-	public Object[][] readDataFromXLS2(ITestContext context) {
-		return createTestArgSets2(context, "Execute", "Y");
-	}
-
-	@Deprecated
-	public Object[][] createTestArgSets(ITestContext context,
-			String executeColumn, String executeValue, String... staticArgs) {
-		String[] argNames = ArrayUtils.addAll(context.getCurrentXmlTest()
-				.getParameter(SpecialKeywords.EXCEL_DS_ARGS).split(";"),
-				staticArgs);
-		DSBean dsBean = new DSBean(context);
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(),
-				dsBean.getXlsSheet(), executeColumn, executeValue);
-		Object[][] args = new Object[dsData.getDataRows().size()][argNames.length];
-
-		String jiraColumnName = context.getCurrentXmlTest().getParameter(
-				SpecialKeywords.EXCEL_DS_JIRA);
-
-		int rowIndex = 0;
-		for (Map<String, String> xlsRow : dsData.getDataRows()) {
-			String testName = context.getName();
-
-			for (int i = 0; i < argNames.length; i++) {
-				// read one line from xls and set to arguments from DataSource
-				if (dsBean.getArgs().contains(argNames[i])) {
-					args[rowIndex][i] = ParameterGenerator.process(xlsRow
-							.get(argNames[i]));
-				} else {
-					args[rowIndex][i] = ParameterGenerator.process(dsBean
-							.getTestParams().get(argNames[i]));
-				}
-			}
-			// update testName adding UID values from DataSource arguments if
-			// any
-			testName = dsBean.setDataSorceUUID(testName, xlsRow);
-			testNameMappedToArgs.put(
-					String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
-
-			// add jira ticket from xls datasource to special hashMap
-			if (jiraColumnName != null) {
-				if (!jiraColumnName.isEmpty()) {
-					jiraTicketsMappedToArgs.put(
-							String.valueOf(Arrays.hashCode(args[rowIndex])),
-							xlsRow.get(jiraColumnName));
-				}
-			}
-
-			rowIndex++;
-		}
-
-		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP,
-				testNameMappedToArgs);
-		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP,
-				jiraTicketsMappedToArgs);
-
-		return args;
-	}
-
-	@Deprecated
-	@DataProvider(name = "excel_ds")
-	public Object[][] readDataFromXLS(ITestContext context) {
-		return createTestArgSets(context, "Execute", "Y");
-	}
-
 	private void printExecutionSummary(List<TestResultItem> tris) {
 		Messager.INROMATION
 				.info("**************** Test execution summary ****************");
 		int num = 1;
 		for (TestResultItem tri : tris) {
-			if (!tri.isConfig()) {
+			String failReason = tri.getFailReason();
+			if (failReason == null) {
+				failReason = "";
+			}
+				
+			if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)) {
 				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
 				reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
 				Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
@@ -629,94 +446,6 @@ public abstract class AbstractTest // extends DriverHelper
 		for (String _case : cases) {
 			testRailCases.add(_case);
 		}
-	}
-
-	@Deprecated
-	@DataProvider(name = "XLSDataProvider", parallel = true)
-	public Object[][] getDataFromXlsFile(final Method testMethod,
-			ITestContext context) {
-
-		XlsDataSourceParameters parameters = testMethod
-				.getAnnotation(XlsDataSourceParameters.class);
-		DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest()
-				.getAllParameters());
-
-		String executeColumn = "Execute";
-		String executeValue = "y";
-
-		if (!parameters.executeColumn().isEmpty())
-			executeColumn = parameters.executeColumn();
-
-		if (!parameters.executeValue().isEmpty())
-			executeValue = parameters.executeValue();
-
-		XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(),
-				dsBean.getXlsSheet(), executeColumn, executeValue);
-
-		List<String> argsList = dsBean.getArgs();
-		List<String> staticArgsList = dsBean.getStaticArgs();
-
-		String jiraColumnName = context.getCurrentXmlTest().getParameter(
-				SpecialKeywords.EXCEL_DS_JIRA);
-
-		int width = 0;
-		if (argsList.size() == 0) {
-			width = staticArgsList.size() + 1;
-		} else {
-			width = argsList.size() + staticArgsList.size();
-		}
-		Object[][] args = new Object[dsData.getDataRows().size()][width];
-
-		int rowIndex = 0;
-		for (Map<String, String> xlsRow : dsData.getDataRows()) {
-			String testName = context.getName();
-
-			if (argsList.size() == 0) {
-				args[rowIndex][0] = xlsRow;
-
-				for (int i = 0; i < staticArgsList.size(); i++) {
-					args[rowIndex][i + 1] = ParameterGenerator.process(dsBean
-							.getTestParams().get(staticArgsList.get(i))); // zero element is a hashmap
-				}
-			} else {
-				int i = 0;
-				for (i = 0; i < argsList.size(); i++) {
-					args[rowIndex][i] = ParameterGenerator.process(xlsRow
-							.get(argsList.get(i)));
-
-				}
-				// populate the rest of items by static parameters from
-				// testParams
-				for (int j = 0; j < staticArgsList.size(); j++) {
-					args[rowIndex][i + j] = ParameterGenerator.process(dsBean
-							.getTestParams().get(staticArgsList.get(j)));
-				}
-			}
-			// update testName adding UID values from DataSource arguments if
-			// any
-			testName = dsBean.setDataSorceUUID(testName, xlsRow);
-
-			testNameMappedToArgs.put(
-					String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
-
-			// add jira ticket from xls datasource to special hashMap
-			if (jiraColumnName != null) {
-				if (!jiraColumnName.isEmpty()) {
-					jiraTicketsMappedToArgs.put(
-							String.valueOf(Arrays.hashCode(args[rowIndex])),
-							xlsRow.get(jiraColumnName));
-				}
-			}
-
-			rowIndex++;
-		}
-
-		context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP,
-				testNameMappedToArgs);
-		context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP,
-				jiraTicketsMappedToArgs);
-
-		return args;
 	}
 
 	@DataProvider(name = "DataProvider", parallel = true)
