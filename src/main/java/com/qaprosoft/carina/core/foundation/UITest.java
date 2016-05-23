@@ -71,7 +71,7 @@ public class UITest extends AbstractTest
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
-    	super.executeBeforeTestSuite(context);
+    	super.executeBeforeTestSuite(context); //do not remove super otherwise functionality from AbstractTest is not launched at all.
     	
     	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
@@ -167,7 +167,7 @@ public class UITest extends AbstractTest
     		DriverMode driverMode = Configuration.getDriverMode();
 			
 	    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
-				stopRecording(TestNamingUtil.getCanonicalTestName(result));
+	    		stopRecording(TestNamingUtil.getCanonicalTestName(result));
 	    	}
 	    	
 	    	if (driverMode == DriverMode.METHOD_MODE) {

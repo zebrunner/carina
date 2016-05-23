@@ -105,6 +105,8 @@ public class Configuration
 		
 		CUSTOM_CAPABILITIES("custom_capabilities"),
 		
+		EXTRA_CAPABILITIES("extra_capabilities"),
+		
 		APP_VERSION("app_version"),
 		
 		PROXY_HOST("proxy_host"),
@@ -284,6 +286,8 @@ public class Configuration
 		
 		//zafira
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
+		
+		RERUN_FAILURES("rerun_failures"),
 		
 		GIT_BRANCH("git_branch"),
 		

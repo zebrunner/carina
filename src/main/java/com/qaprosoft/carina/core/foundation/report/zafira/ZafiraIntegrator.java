@@ -36,8 +36,11 @@ public class ZafiraIntegrator {
 	private static JobType job, parentJob;
 	private static TestSuiteType suite = null;
 	private static TestRunType run = null;
+	
+	private static TestType[] tests = null;
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
+	private static final Boolean rerunFailures = Configuration.getBoolean(Parameter.RERUN_FAILURES);
 
 	private static final String ciUrl = Configuration.get(Parameter.CI_URL);
 	private static final String ciBuild = Configuration.get(Parameter.CI_BUILD);
@@ -98,12 +101,17 @@ public class ZafiraIntegrator {
 
 			String configXML = getConfiguration();
 
+			
+			UserType anonymousUser = null;
+			
 			if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
 				// register/retrieve anonymous
-				UserType anonymousUser = registerUser(ANONYMOUS_USER);
+				anonymousUser = registerUser(ANONYMOUS_USER);
 				// register parentJob
 				parentJob = registerJob(ciParentUrl, anonymousUser.getId());
-
+			}
+			
+			if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
 				run = registerTestRunUPSTREAM_JOB(suite.getId(), gitUrl,
 						gitBranch, gitCommit, configXML, job.getId(),
 						parentJob.getId(), parentBuild, build,
@@ -125,6 +133,10 @@ public class ZafiraIntegrator {
 				throw new RuntimeException("Unable to register test run for zafira service: " + zafiraUrl);
 			}
 			isRegistered = true;
+			
+			if (rerunFailures) {
+				tests = zc.getTestRunResults(run.getId()).getObject();
+			}
 		} catch (Exception e) {
 			isRegistered = false;
 			LOGGER.error("Undefined error during test run registration!", e);
@@ -212,7 +224,26 @@ public class ZafiraIntegrator {
 		LOGGER.debug("runId: " + runId);
 		return runId;
 	}
-		
+	
+	public static boolean isRerun() {
+		return rerunFailures;
+	}
+
+	public static TestType getTestType() {
+		String testName = TestNamingUtil.getTestNameByThread();
+		TestType res = null;
+		for (TestType test : tests) {
+			if (testName.equals(test.getName())) {
+				res = test;
+				break;
+			}
+		}
+		return res;
+	}
+
+	public static void deleteTest(long id) {
+		zc.deleteTest(id);
+	}
 	private static boolean isValid() {
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
@@ -292,6 +323,8 @@ public class ZafiraIntegrator {
 		String testRunDetails = "testSuiteId: %s, userId: %s, scmURL: %s, scmBranch: %s, scmCommit: %s, jobId: %s, buildNumber: %s, startedBy: %s, workItem";
 		LOGGER.debug("Test Run details for registration:" + String.format(testRunDetails, testSuiteId, userId, scmURL,
 						scmBranch, scmCommit, jobId, buildNumber, startedBy, workItem));
+		
+		testRun.setRerun(rerunFailures);
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		testRun = response.getObject();
 		if (testRun == null) {
@@ -311,6 +344,7 @@ public class ZafiraIntegrator {
 		LOGGER.debug("Test Run details for registration:" + String.format(testRunDetails, testSuiteId, scmURL, scmBranch,
 						scmCommit, jobId, buildNumber, startedBy, workItem));
 
+		testRun.setRerun(rerunFailures);
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		testRun = response.getObject();
 		if (testRun == null) {
@@ -332,6 +366,7 @@ public class ZafiraIntegrator {
 		LOGGER.debug("Test Run details for registration:"
 				+ String.format(testRunDetails, testSuiteId, scmURL, scmBranch, scmCommit, jobId, parentJobId, parentBuildNumber, buildNumber, startedBy, workItem));
 
+		testRun.setRerun(rerunFailures);
 		Response<TestRunType> response = zc.createTestRun(testRun);
 		testRun = response.getObject();
 		if (testRun == null) {

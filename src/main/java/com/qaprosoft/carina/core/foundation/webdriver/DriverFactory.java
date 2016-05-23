@@ -24,9 +24,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
@@ -116,12 +115,5 @@ public class DriverFactory {
         Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
         return cap.getVersion().toString();
     }
-    
-    @Deprecated
-    public static DesiredCapabilities getMobileWebCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName,
-            String automationName, String commandTimeout, String browserName) {
-    	return MobileCapabilies.getMobileCapabilities(gridMode, platform, platformVersion, deviceName, automationName, commandTimeout, browserName, "", "", "");
-    }
-
 
 }
