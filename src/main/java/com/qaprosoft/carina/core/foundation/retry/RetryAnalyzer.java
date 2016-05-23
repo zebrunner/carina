@@ -28,7 +28,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     public static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
 
     public boolean retry(ITestResult result) {
-        String test = TestNamingUtil.getTestNameByThread();
+    	String test = TestNamingUtil.getCanonicalTestName(result);
         if (RetryCounter.getRunCount(test) < getMaxRetryCountForTest(result) && !Jira.isRetryDisabled(result)) {
             RetryCounter.incrementRunCount(test);
             return true;
