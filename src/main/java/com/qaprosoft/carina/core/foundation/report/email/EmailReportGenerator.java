@@ -28,6 +28,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.*;
 import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
@@ -197,12 +198,12 @@ public class EmailReportGenerator
 			failCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
-			if (!testResultItem.isConfig()) {
+			failReason = testResultItem.getFailReason();
+			if (!testResultItem.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)) {
 				if(INCLUDE_SKIP) {
 					result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
 					result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 					
-					failReason = testResultItem.getFailReason();
 					if (!StringUtils.isEmpty(failReason))
 					{
 						// Make description more compact for email report																																																											
