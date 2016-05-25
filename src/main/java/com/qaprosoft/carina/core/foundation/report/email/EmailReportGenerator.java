@@ -30,6 +30,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.*;
+import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
+
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
  * 
@@ -75,6 +78,12 @@ public class EmailReportGenerator
 	private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
+
+	//Cucumber section
+	private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
+	private static final String CUCUMBER_JS_PLACEHOLDER ="${js_placeholder}";
+
+
 	private static final int MESSAGE_LIMIT = 2048;
 	private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
 	private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
@@ -104,6 +113,10 @@ public class EmailReportGenerator
 		emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
 		emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
 		emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
+
+		//Cucumber section
+		emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResults());
+		emailBody = emailBody.replace(CUCUMBER_JS_PLACEHOLDER, getCucumberJavaScript());
 	}
 
 	public String getEmailBody()
@@ -340,6 +353,38 @@ public class EmailReportGenerator
 			reasonText = reasonText.replace("\n", "<br/>");
 		}
 		return reasonText;
+	}
+
+	public String getCucumberResults() {
+		String result="";
+
+		if ((isArtifactsFolderExists()) && (isCucumberTest()) && (isCucumberReportFolderExists())) {
+
+			String link = getCucumberReportResultLink();
+			String feature1 = "";
+			if (useJSinCucumberReport()) {
+				feature1 = String.format("%s %n %s %n %s %n %s %n %s %n %s"
+						, "<input class='hide' id='hd-1' type='checkbox'>"
+						, "<label for='hd-1'>Show Cucumber Results</label> "
+						, "<div>"
+						, "<iframe name='frm' id='mainframe' src='" + link + "' scrolling='no'  width='90%'height='100%' align='center' frameborder='0' allowtransparency='no' target='_self' >"
+						, "</iframe>"
+						, "</div><br/>"
+				);
+			}
+			result = String.format("<br/><b><a href='%s' style='color: green;' target='_blank'> Open Cucumber Report in new Window </a></b><br/>%s",link,feature1);
+			LOGGER.info("Cucumber result: "+result);
+		}
+
+		return result;
+	}
+
+	private String getCucumberJavaScript() {
+		String result="";
+		if ((isArtifactsFolderExists()) && (isCucumberTest()) && (isCucumberReportFolderExists()) && (useJSinCucumberReport())) {
+			result="<link rel=\"stylesheet\" type=\"text/css\" href=\"gallery-lib/cucumber.css\">";
+		}
+		return result;
 	}
 	
 }
