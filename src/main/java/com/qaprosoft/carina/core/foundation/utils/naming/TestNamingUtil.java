@@ -187,6 +187,10 @@ public class TestNamingUtil
 	}
 	
 	public static String getCanonicTestNameByThread() {
-		return threadId2CanonicTestName.get(Thread.currentThread().getId());
+		return getCanonicTestNameByThread(Thread.currentThread().getId());
+	}
+	
+	public static String getCanonicTestNameByThread(long threadId) {
+		return threadId2CanonicTestName.get(threadId);
 	}
 }
