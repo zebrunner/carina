@@ -135,7 +135,23 @@ public class ReportContext
 		}
 		return artifactsDirectory;
 	}
-	
+
+	/**
+	 * Check that Artifacts Folder exists.
+	 * @return boolean
+     */
+	public static boolean isArtifactsFolderExists() {
+		try {
+			File f = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), ARTIFACTS_FOLDER));
+			if (f.exists() && f.isDirectory()) {
+				return true;
+			}
+		} catch (Exception e) {
+			LOGGER.debug("Error happen during checking that Artifactory Folder exists or not. Error: "+e.getMessage());
+		}
+		return false;
+	}
+
 	public static List<File> getAllArtifacts()
 	{
 		return Arrays.asList(getArtifactsFolder().listFiles());
@@ -308,7 +324,7 @@ public class ReportContext
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Exception dicsovered during screenshots/video removing! " + e.getMessage());
+			LOGGER.error("Exception discovered during screenshots/video removing! " + e.getMessage());
 		}
 	}
 	
@@ -434,4 +450,28 @@ public class ReportContext
 		
 		return link;
 	}
+
+
+	/**
+	 * Returns URL for cucumber report.
+	 * @param CucumberReportFolderName
+	 * @return - URL to test log folder.
+	 */
+
+	public static String getCucumberReportLink(String CucumberReportFolderName)
+	{
+
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+			//remove report url and make link relative
+			//link = String.format("./%d/report.html", rootID);
+			link=String.format("%s/%d/%s/%s/feature-overview.html", Configuration.get(Parameter.REPORT_URL), rootID, ARTIFACTS_FOLDER, CucumberReportFolderName);
+		}
+		else {
+			link = String.format("file://%s/%s/feature-overview.html", artifactsDirectory, CucumberReportFolderName);
+		}
+
+		return link;
+	}
+
 }
