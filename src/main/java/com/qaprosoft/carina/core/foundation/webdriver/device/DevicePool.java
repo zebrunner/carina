@@ -122,7 +122,7 @@ public class DevicePool
 
 	}	
 	
-	public static synchronized Device getDevice() {
+	public static Device getDevice() {
 		Device device = null;
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
