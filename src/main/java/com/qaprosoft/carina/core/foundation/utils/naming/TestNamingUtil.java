@@ -137,7 +137,10 @@ public class TestNamingUtil
 	}
 	
 	public static boolean isTestNameRegistered() {
-		return threadId2TestName.get(Thread.currentThread().getId()) != null;
+		if (threadId2TestName.get(Thread.currentThread().getId()) != null) {
+			return threadId2TestName.get(Thread.currentThread().getId()).size() != 0;
+		}
+		return false;
 	}
 	
 	public static String getTestNameByThread() {
