@@ -288,15 +288,19 @@ public class UITest extends AbstractTest
     	int count = 0;
     	while (!init & count++ < maxCount) {
     		try {
+    			LOGGER.debug("intiDriver start...");
     			Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
    			
 
+    			LOGGER.debug("DriverFactory start...");
     			WebDriver drv = DriverFactory.create(name, device);
+    			LOGGER.debug("DriverFactory finish...");
     			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
     			
     			driver = drv;
     			setDriver(drv);
     			init = true;
+    			LOGGER.debug("intiDriver finish...");
     		}
     		catch (Throwable thr) {
     			//DevicePool.ignoreDevice();
