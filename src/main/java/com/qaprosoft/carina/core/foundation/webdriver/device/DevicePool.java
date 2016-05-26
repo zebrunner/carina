@@ -137,7 +137,7 @@ public class DevicePool
 		return device;
 	}
 	
-	public static synchronized Device getDevice(String udid) {
+	public static Device getDevice(String udid) {
 		Device device = null;
 		for (Device dev : devices) {
 			if (dev.getUdid().equalsIgnoreCase(udid)) {
@@ -163,7 +163,7 @@ public class DevicePool
 	}
 
 
-	public static synchronized String getDeviceUdid() {
+	public static String getDeviceUdid() {
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
 				Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
