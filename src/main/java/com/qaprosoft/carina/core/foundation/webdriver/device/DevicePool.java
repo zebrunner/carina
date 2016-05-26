@@ -78,7 +78,7 @@ public class DevicePool
 	{
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			//return null for non mobile/mobile_pool tests 
+			LOGGER.debug("return null for non mobile/mobile_pool tests");
 			return null;
 		}
 		
