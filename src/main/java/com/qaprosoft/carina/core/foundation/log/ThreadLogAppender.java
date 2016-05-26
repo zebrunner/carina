@@ -38,10 +38,10 @@ public class ThreadLogAppender extends AppenderSkeleton
 			}
 			String test = TestNamingUtil.getTestNameByThread();
 			if (test == null) {
-				System.out.println("TestNamingUtil.getTestNameByThread returned test=null!");
+				//System.out.println("TestNamingUtil.getTestNameByThread returned test=null!");
 				return;
 			} else {
-				System.out.println("test: " + test);
+				//System.out.println("test: " + test);
 			}
 			BufferedWriter fw = test2file.get(test);
 			if (fw == null)
