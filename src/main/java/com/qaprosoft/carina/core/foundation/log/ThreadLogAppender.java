@@ -41,9 +41,6 @@ public class ThreadLogAppender extends AppenderSkeleton
 				return;
 			}
 			String test = TestNamingUtil.getTestNameByThread();
-			if (test == null) {
-				return;
-			}
 			BufferedWriter fw = test2file.get(test);
 			if (fw == null)
 			{
