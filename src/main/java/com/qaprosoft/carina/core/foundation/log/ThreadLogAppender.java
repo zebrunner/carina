@@ -45,6 +45,8 @@ public class ThreadLogAppender extends AppenderSkeleton
 			if (test == null) {
 				System.out.println("TestNamingUtil.getTestNameByThread returned test=null!");
 				return;
+			} else {
+				System.out.println("test: " + test);
 			}
 			BufferedWriter fw = test2file.get(test);
 			if (fw == null)
@@ -58,11 +60,15 @@ public class ThreadLogAppender extends AppenderSkeleton
 				//append time, thread, class name and device name if any
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/mm/dd hh:mm:ss"); //2016-05-26 04:39:16
 				String time = dateFormat.format(event.getTimeStamp());
+				System.out.println("time: " + time);
 				
 				String thread = event.getThreadName();
+				System.out.println("thread: " + thread);
 				String className = event.getLocationInformation().getClassName();
+				System.out.println("className: " + className);
 				
 				Device device = DevicePool.getDevice();
+				System.out.println("device: " + device.getName());
 				String deviceName = "";
 				if (device != null) {
 					deviceName = " [" + device.getName() + "] ";
