@@ -131,7 +131,8 @@ public class DevicePool
 		long threadId = Thread.currentThread().getId();
 		if (threadId2Device.containsKey(threadId)) {
 			device = threadId2Device.get(threadId);
-			LOGGER.debug("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
+			System.out.println("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
+			//LOGGER.debug("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
 		}
 		return device;
 	}
