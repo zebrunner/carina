@@ -79,8 +79,7 @@ public class DevicePool
 		System.out.println("registerDevice2Thread start...");
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			//LOGGER.debug("return null for non mobile/mobile_pool tests");
-			System.out.println("return null for non mobile/mobile_pool tests");
+			//System.out.println("return null for non mobile/mobile_pool tests");
 			return null;
 		}
 		
@@ -89,12 +88,10 @@ public class DevicePool
 		Device freeDevice = null;
 		while (++count<100 && !found) {
 			for (Device device : devices) {
-				System.out.println("Check device status for registration: " + device.getName());
-				//LOGGER.debug("Check device status for registration: " + device.getName());
+				//System.out.println("Check device status for registration: " + device.getName());
 				if (!threadId2Device.containsValue(device)) {
 						//current thread doesn't have ignored devices
-						System.out.println("identified free non-ingnored device: " + device.getName());
-						//LOGGER.info("identified free non-ingnored device: " + device.getName());
+						//System.out.println("identified free non-ingnored device: " + device.getName());
 						freeDevice = device;
 						found = true;
 						break;						
@@ -102,21 +99,19 @@ public class DevicePool
 			}
 			if (!found) {
 				int sec = Configuration.getInt(Parameter.INIT_RETRY_INTERVAL);
-				System.out.println("There is no free device, wating " + sec + " sec... attempt: " + count);
-				//LOGGER.warn("There is no free device, wating " + sec + " sec... attempt: " + count);
+				//System.out.println("There is no free device, wating " + sec + " sec... attempt: " + count);
 				pause(sec);
 			}
 		}
 		
 		if (freeDevice != null) {
 			threadId2Device.put(threadId, freeDevice);
-			System.out.println("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
-			//LOGGER.info("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
+			//System.out.println("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
 		} else {
 			throw new RuntimeException("Unable to find available device after '" + count + "' attempts!");	
 		}
 		
-		System.out.println("registerDevice2Thread finish...");
+		//System.out.println("registerDevice2Thread finish...");
 		
 		return freeDevice;
 
@@ -131,8 +126,7 @@ public class DevicePool
 		long threadId = Thread.currentThread().getId();
 		if (threadId2Device.containsKey(threadId)) {
 			device = threadId2Device.get(threadId);
-			System.out.println("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
-			//LOGGER.debug("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
+			//System.out.println("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
 		}
 		return device;
 	}
