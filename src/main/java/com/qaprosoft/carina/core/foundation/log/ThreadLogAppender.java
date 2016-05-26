@@ -58,23 +58,27 @@ public class ThreadLogAppender extends AppenderSkeleton
 			}
 			if (event != null) {
 				//append time, thread, class name and device name if any
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/mm/dd hh:mm:ss"); //2016-05-26 04:39:16
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss"); //2016-05-26 04:39:16
 				String time = dateFormat.format(event.getTimeStamp());
-				System.out.println("time: " + time);
+				//System.out.println("time: " + time);
 				
-				String thread = event.getThreadName();
-				System.out.println("thread: " + thread);
-				String className = event.getLocationInformation().getClassName();
-				System.out.println("className: " + className);
+				long threadId = Thread.currentThread().getId();
+				//System.out.println("thread: " + threadId);
+				String fileName = event.getLocationInformation().getFileName();
+				//System.out.println("fileName: " + fileName);
+				
+				String logLevel = event.getLevel().toString();
 				
 				Device device = DevicePool.getDevice();
-				System.out.println("device: " + device.getName());
+
 				String deviceName = "";
 				if (device != null) {
 					deviceName = " [" + device.getName() + "] ";
+					//System.out.println("device: " + device.getName());
 				}
-				String message = "[%s] [%s] [%s]%s %s";
-				fw.write(String.format(message, time, thread, className, deviceName, event.getMessage().toString()));
+				
+				String message = "[%s] [%s] [%s] [%s]%s %s";
+				fw.write(String.format(message, time, fileName, threadId, logLevel, deviceName, event.getMessage().toString()));
 			} else {
 				fw.write("null");
 			}
