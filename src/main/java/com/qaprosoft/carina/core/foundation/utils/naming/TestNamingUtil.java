@@ -145,11 +145,13 @@ public class TestNamingUtil
 		
 		Stack<String> stack = threadId2TestName.get(threadId);
 		if (stack == null) {
-			throw new RuntimeException("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
+			LOGGER.error("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
+			return null;
 		}
 		
 		if (stack.size() == 0) {
-			throw new RuntimeException("Unable to find registered test name for threadId from stack: " + threadId);
+			LOGGER.error("Unable to find registered test name for threadId from stack: " + threadId);
+			return null;
 		}
 		
 		return stack.get(stack.size() - 1);		
