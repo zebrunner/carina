@@ -1,6 +1,9 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.annotations;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
 @Target(ElementType.METHOD)
@@ -33,4 +36,6 @@ public @interface XlsDataSourceParameters {
     String testMethodColumn() default "";
     
     String testMethodOwnerColumn() default "";
+
+	String bugColumn() default "";
 }
