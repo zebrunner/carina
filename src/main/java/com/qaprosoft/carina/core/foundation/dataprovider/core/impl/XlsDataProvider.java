@@ -69,6 +69,10 @@ public class XlsDataProvider extends BaseDataProvider {
         if (!parameters.testMethodOwnerColumn().isEmpty())
         	testMethodOwnerColumn = parameters.testMethodOwnerColumn();
 
+		String bugColumn = "";
+		if (!parameters.bugColumn().isEmpty())
+			bugColumn = parameters.bugColumn();
+
         int width = 0;
         if (argsList.size() == 0) {
             width = staticArgsList.size() + 1;
@@ -133,6 +137,9 @@ public class XlsDataProvider extends BaseDataProvider {
             // add jira ticket from xls datasource to special hashMap
             addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
             
+			// add bug id from xls datasource to special hashMap
+			addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+
             //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
             // // add spira steps from xls datasource to special hashMap
             // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);

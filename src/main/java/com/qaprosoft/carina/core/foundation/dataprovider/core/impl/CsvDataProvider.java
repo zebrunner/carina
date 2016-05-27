@@ -1,17 +1,24 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+
 import au.com.bytecode.opencsv.CSVReader;
+
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.*;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -28,6 +35,7 @@ public class CsvDataProvider extends BaseDataProvider {
     private String testRailColumn;
     private String testMethodColumn;
     private String testMethodOwnerColumn;
+	private String bugColumn;
     
     @SuppressWarnings("unchecked")
 	@Override
@@ -48,6 +56,7 @@ public class CsvDataProvider extends BaseDataProvider {
         testRailColumn = parameters.testRailColumn();
         testMethodColumn = parameters.testMethodColumn();
         testMethodOwnerColumn = parameters.testMethodOwnerColumn();
+		bugColumn = parameters.bugColumn();
 
         List<String> argsList = dsBean.getArgs();
         List<String> staticArgsList = dsBean.getStaticArgs();
@@ -153,6 +162,9 @@ public class CsvDataProvider extends BaseDataProvider {
             // add jira ticket from xls datasource to special hashMap
             addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             
+			// add bug id from csv datasource to special hashMap
+			addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
+
             //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
             // // add spira steps from xls datasource to special hashMap
             // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
@@ -204,6 +216,7 @@ public class CsvDataProvider extends BaseDataProvider {
     	mapper.put(testRailColumn, getIndex(testRailColumn, headers));
     	mapper.put(testMethodColumn, getIndex(testMethodColumn, headers));
     	mapper.put(testMethodOwnerColumn, getIndex(testMethodOwnerColumn, headers));
+		mapper.put(bugColumn, getIndex(bugColumn, headers));
     	
         return mapper;
     }

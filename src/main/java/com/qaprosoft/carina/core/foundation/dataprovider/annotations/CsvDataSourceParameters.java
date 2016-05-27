@@ -39,4 +39,6 @@ public @interface CsvDataSourceParameters {
     
     String testMethodOwnerColumn() default "";
 
+	String bugColumn() default "";
+
 }
