@@ -35,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 /*
  * Jira
@@ -170,16 +171,40 @@ public class Jira
 				LOG.error("Exception during test name getting", e);
 				return null;
 			}
-			if (m.isAnnotationPresent(Bug.class))
+			/* priority 1: bug set from test code */
+			String test = TestNamingUtil.getTestNameByThread();
+			String bugId = TestNamingUtil.getBug(test);
+			/* priority 2: bug set from data provider */
+			if (bugId == null)
 			{
-				Bug annotation = m.getAnnotation(Bug.class);
-				String id = annotation.id();
-				String bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + id;
+				Map<Object[], String> testnameBugMap = (Map<Object[], String>) result.getTestContext().getAttribute(
+						SpecialKeywords.BUG_ARGS_MAP);
+				if (testnameBugMap != null)
+				{
+					String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+					if (testnameBugMap.containsKey(testHash))
+					{
+						bugId = testnameBugMap.get(testHash);
+					}
+				}
+			}
+			/* priority 3: bug set from @Bug annotation */
+			if (bugId == null)
+			{
+				if (m.isAnnotationPresent(Bug.class))
+				{
+					Bug annotation = m.getAnnotation(Bug.class);
+					bugId = annotation.id();
+				}
+			}
+			if (bugId != null)
+			{
+				String bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + bugId;
 				LOG.info("Bug URL retrieved: " + bugUrl);
 
 				try
 				{
-					Issue bug = jira.getIssue(id);
+					Issue bug = jira.getIssue(bugId);
 					return String.format("Bug %s \"%s\" with status \"%s\" associated", bugUrl, bug.getSummary(), bug.getStatus().getName());
 				} catch (Exception e)
 				{

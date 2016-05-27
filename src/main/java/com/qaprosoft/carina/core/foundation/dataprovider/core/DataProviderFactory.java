@@ -35,6 +35,7 @@ public class DataProviderFactory {
         Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
         Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
         Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+		Map<String, String> bugArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
         
 
         Object[][] provider = new Object[][]{};
@@ -74,6 +75,7 @@ public class DataProviderFactory {
                     testMethodOwnerArgsMap.putAll(activeProvider.getTestMethodOwnerArgsMap());
                     jiraArgsMap.putAll(activeProvider.getJiraArgsMap());
                     testRailsArgsMap.putAll(activeProvider.getTestRailsArgsMap());
+					bugArgsMap.putAll(activeProvider.getBugArgsMap());
     			}
 
         	}
@@ -92,6 +94,7 @@ public class DataProviderFactory {
         context.setAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP, testMethodOwnerArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
         context.setAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP, testRailsArgsMap);
+		context.setAttribute(SpecialKeywords.BUG_ARGS_MAP, bugArgsMap);
 
         //clear group by settings
         GroupByMapper.getInstanceInt().clear();
