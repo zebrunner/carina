@@ -13,12 +13,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -125,7 +126,7 @@ public class CsvDataProvider extends BaseDataProvider {
         		
                 for (String header : headers) {
                 	int index = mapper.get(header);
-                	dynamicAttrs.put(header,  strings[index]);
+                	dynamicAttrs.put(header, ParameterGenerator.process(strings[index]).toString());
                 	
                 	args[rowIndex][0] = dynamicAttrs;
                 }
@@ -134,7 +135,7 @@ public class CsvDataProvider extends BaseDataProvider {
             } else {
                 for (String arg : argsList) {
                     int index = mapper.get(arg);
-                    args[rowIndex][i] = strings[index];
+                    args[rowIndex][i] = ParameterGenerator.process(strings[index]).toString();
                     i++;
                 }
             }
