@@ -50,6 +50,7 @@ public class TestNamingUtil
 	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
 	
+	private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
 	
 	static
 	{
@@ -202,5 +203,15 @@ public class TestNamingUtil
 	
 	public static String getCanonicTestNameByThread(long threadId) {
 		return threadId2CanonicTestName.get(threadId);
+	}
+
+	public static synchronized void associateBug(String testName, String id)
+	{
+		testName2Bug.put(testName, id);
+	}
+
+	public static synchronized String getBug(String testName)
+	{
+		return testName2Bug.get(testName);
 	}
 }

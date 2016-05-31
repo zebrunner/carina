@@ -25,6 +25,7 @@ public abstract class BaseDataProvider {
     protected Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 	protected Map<String, String> spiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
     protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+	protected Map<String, String> bugArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
 	protected List<String> argsList;
     protected List<String> staticArgsList;
@@ -62,5 +63,9 @@ public abstract class BaseDataProvider {
 		return testRailsArgsMap;
 	}
 
+	public Map<String, String> getBugArgsMap()
+	{
+		return bugArgsMap;
+	}
 
 }
