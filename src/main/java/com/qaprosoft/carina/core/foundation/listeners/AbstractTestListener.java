@@ -272,10 +272,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		} else {
 			errorMessage = failItem(result, Messager.TEST_FAILED);
 			closeLogAppender(test);
+			//register test details for zafira data population only after finishing retries
+	    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		}
-		
-		//register test details for zafira data population
-    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		
 		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestFailure(result);
