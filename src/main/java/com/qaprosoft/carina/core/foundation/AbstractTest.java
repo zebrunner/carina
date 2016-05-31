@@ -502,4 +502,10 @@ public abstract class AbstractTest // extends DriverHelper
 		return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);	
 	}
 	
+	protected void setBug(String id)
+	{
+		String test = TestNamingUtil.getTestNameByThread();
+		TestNamingUtil.associateBug(test, id);
+	}
+
 }
