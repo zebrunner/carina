@@ -47,6 +47,12 @@ public class DevicePool
 		LOGGER.info("Adding single device into the DevicePool: " + device.getName());		
 	}
 	
+	public static synchronized void unregisterDevice(Device device) {
+		devices.remove(device);
+		LOGGER.info("Removing device from the DevicePool: " + device.getName());		
+	}
+	
+
 	public static synchronized void registerDevices() {
 		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			registerDevice();
