@@ -32,7 +32,6 @@ public class ThreadLogAppender extends AppenderSkeleton
 		try
 		{
 			if (!TestNamingUtil.isTestNameRegistered()) {
-				System.out.println("don't write any message into the log if thread is not associated anymore with test");
 				//don't write any message into the log if thread is not associated anymore with test 
 				return;
 			}
