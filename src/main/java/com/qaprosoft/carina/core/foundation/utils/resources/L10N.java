@@ -100,11 +100,12 @@ public class L10N {
 			 */
 			String filePath = FilenameUtils.getPath(u.getPath());
 			int index = filePath.indexOf(SpecialKeywords.L10N);
-
-			if (filePath.length() <= index) {
-				LOGGER.warn("Empty file path for " + u.getPath() + " resource!");
+			
+			if (index == -1) {
+				LOGGER.warn("Unable to find L10N pattern for " + u.getPath() + " resource!");
 				continue;
 			}
+
 			String resource = filePath.substring(
 					filePath.indexOf(SpecialKeywords.L10N))
 					.replaceAll("/", ".")
