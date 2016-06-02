@@ -99,6 +99,12 @@ public class L10N {
 			 * .properties" to "L10N.messages"
 			 */
 			String filePath = FilenameUtils.getPath(u.getPath());
+			int index = filePath.indexOf(SpecialKeywords.L10N);
+
+			if (filePath.length() <= index) {
+				LOGGER.warn("Empty file path for " + u.getPath() + " resource!");
+				continue;
+			}
 			String resource = filePath.substring(
 					filePath.indexOf(SpecialKeywords.L10N))
 					.replaceAll("/", ".")
