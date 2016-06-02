@@ -82,7 +82,7 @@ public class DevicePool
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-		System.out.println("registerDevice2Thread start...");
+		//System.out.println("registerDevice2Thread start...");
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			//System.out.println("return null for non mobile/mobile_pool tests");
@@ -193,39 +193,25 @@ public class DevicePool
 	}
 
 	public static Type getDeviceType() {
-		//specify default value based on existing _config.properties parameters
-		Type type = Type.DESKTOP;		
-		
-		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
-				Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-				type = Type.ANDROID_PHONE;
-			}
-			if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) {
-				type = Type.IOS_PHONE;
-			}
-		}
-		
+		// specify default value based on existing _config.properties parameters
+		Type type = Type.DESKTOP;
+
 		Device device = getDevice();
 		if (device != null) {
 			type = device.getType();
 		} else {
-			if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+					type = Type.ANDROID_PHONE;
+				}
+				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) {
+					type = Type.IOS_PHONE;
+				}
+			} else {
 				LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
 			}
 		}
 		return type;
 	}
-	
-/*	public static void screensOn(AdbExecutor executor) {
-		for (Device device : devices) {
-			executor.screenOn(device.getUdid());
-		}
-	}
-	
-	public static void screensOff(AdbExecutor executor) {
-		for (Device device : devices) {
-			executor.screenOff(device.getUdid());
-		}
-	}*/
 }
