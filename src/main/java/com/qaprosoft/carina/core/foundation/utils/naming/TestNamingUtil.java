@@ -94,7 +94,7 @@ public class TestNamingUtil
 		testName2Counter.put(test, count);
 		
 		if (count > 1) {
-			//test = test + " (InvCount=" + count + ")";
+			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
 			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", count));
 		}
 		
