@@ -230,7 +230,7 @@ public class ZafiraIntegrator {
 	}
 
 	public static TestType getTestType() {
-		String testName = TestNamingUtil.getTestNameByThread();
+		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		TestType res = null;
 		for (TestType test : tests) {
 			if (testName.equals(test.getName())) {
