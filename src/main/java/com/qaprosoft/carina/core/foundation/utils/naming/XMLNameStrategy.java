@@ -81,6 +81,7 @@ public class XMLNameStrategy implements INamingStrategy
 		}
 		
 		if (invocationID != -1) {
+			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time 
 			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
 		}
 		else {
