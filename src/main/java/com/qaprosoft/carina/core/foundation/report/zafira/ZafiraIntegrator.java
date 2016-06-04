@@ -42,7 +42,7 @@ public class ZafiraIntegrator {
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
 	private static final Boolean rerunFailures = Configuration.getBoolean(Parameter.RERUN_FAILURES);
 
-	private static final String ciUrl = Configuration.get(Parameter.CI_URL);
+	private static String ciUrl = Configuration.get(Parameter.CI_URL);
 	private static final String ciBuild = Configuration.get(Parameter.CI_BUILD);
 	private static final String ciBuildCause = Configuration.get(Parameter.CI_BUILD_CAUSE);
 
@@ -75,6 +75,16 @@ public class ZafiraIntegrator {
 			return;
 
 		try {
+			// remove slash at the end of ciUrl if any to register data in zafira without double slashing:
+			// http://jenkins:8080/job/my_job//10
+			// ->
+			// http://jenkins:8080/job/my_job/10
+			if (ciUrl.length() > 1) {
+				if (ciUrl.endsWith("/")) {
+					ciUrl = ciUrl.substring(0, ciUrl.length() - 1);
+					LOGGER.debug("Updated ciUrl wihtout slash at end: " + ciUrl);
+				}
+			}
 			user = registerUser(ciUserId, ciUserEmail, ciUserFirstName, ciUserLastName);
 
 			job = registerJob(ciUrl, user.getId());
