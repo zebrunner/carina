@@ -18,4 +18,12 @@ public class MobileWebCapabilities extends MobileCapabilies {
                 Configuration.get(Configuration.Parameter.BROWSER), null, null, null);
         return capabilities;
     }
+    
+	public DesiredCapabilities getCapability(boolean gridMode, String platform, String platformVersion,
+			String deviceName, String automationName, String commandTimeout, String browserName) {
+
+		return getMobileCapabilities(gridMode, platform, platformVersion, deviceName, automationName, commandTimeout,
+				browserName, null, null, null);
+	}
+
 }
