@@ -291,6 +291,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 			return;
 		}
 		
+		//handle AbstractTest->SkipExecution
+		if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
+			// [VD] it is prohibited to release TestInfoByThread in this place.!
+			return;
+		}
+		
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		//TestNamingUtil.releaseTestInfoByThread();
