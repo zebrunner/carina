@@ -289,10 +289,17 @@ public abstract class AbstractTest // extends DriverHelper
 
 			printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-			if (EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults()).equals(TestResultType.SKIP_ALL)) {
+			TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
+			switch (suiteResult) {
+			case SKIP_ALL:
 				Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
+				break;
+			case SKIP_ALL_ALREADY_PASSED:
+				LOGGER.info("Nothing was executed in rerun mode because all tests already passed and registered in Zafira Repoting Service!");
+				break;
+			default:
+				//do nothing
 			}
-
 		} catch (Exception e) {
 			LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
 			e.printStackTrace();
