@@ -30,6 +30,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -133,7 +134,9 @@ public abstract class AbstractTest // extends DriverHelper
 				+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
 
 		if (!Configuration.isNull(Parameter.URL)) {
-			RestAssured.baseURI = Configuration.get(Parameter.URL);
+			if (!Configuration.get(Parameter.URL).isEmpty()) {
+				RestAssured.baseURI = Configuration.get(Parameter.URL);
+			}
 		}
 
 		try {
@@ -513,6 +516,10 @@ public abstract class AbstractTest // extends DriverHelper
 	{
 		String test = TestNamingUtil.getTestNameByThread();
 		TestNamingUtil.associateBug(test, id);
+	}
+	
+	protected void skipExecution(String message) {
+		throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
 	}
 
 }
