@@ -199,26 +199,25 @@ public class EmailReportGenerator
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
 			failReason = testResultItem.getFailReason();
-			if (!testResultItem.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)) {
-				if(INCLUDE_SKIP) {
+			if (!testResultItem.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
+					&& !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
+				if (INCLUDE_SKIP) {
 					result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
 					result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-					
-					if (!StringUtils.isEmpty(failReason))
-					{
-						// Make description more compact for email report																																																											
-						failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
+
+					if (!StringUtils.isEmpty(failReason)) {
+						// Make description more compact for email report
+						failReason = failReason.length() > MESSAGE_LIMIT
+								? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
 						result = result.replace(SKIP_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
+					} else {
+						result = result.replace(SKIP_REASON_PLACEHOLDER,
+								"Analyze SYSTEM ISSUE log for details or check dependency settings for the test.");
 					}
-					else
-					{
-						result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze SYSTEM ISSUE log for details or check dependency settings for the test.");
-					}
-					
+
 					result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-					
-					if(testResultItem.getLinkToScreenshots() != null)
-					{
+
+					if (testResultItem.getLinkToScreenshots() != null) {
 						result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 					}
 				}
@@ -301,10 +300,14 @@ public class EmailReportGenerator
 				}
 				break;
 			case SKIP:
-				if (!ri.getFailReason().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-					skipped++;
-				} else {
+				if (ri.getFailReason().startsWith(SpecialKeywords.ALREADY_PASSED)) {
 					skipped_already_passed++;
+				} else if (ri.getFailReason().startsWith(SpecialKeywords.SKIP_EXECUTION)) { 
+					// don't calculate such message at all as it shouldn't be
+					// included into the report at all
+				}
+				else {
+					skipped++;
 				}
 				break;
 			case SKIP_ALL:

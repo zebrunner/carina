@@ -411,10 +411,13 @@ public abstract class AbstractTest // extends DriverHelper
 				failReason = "";
 			}
 				
-			if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)) {
-				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots()) ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
+			if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
+					&& !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
+				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots())
+						? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
 				reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
-				Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(), reportLinks);
+				Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(),
+						reportLinks);
 			}
 		}
 	}
