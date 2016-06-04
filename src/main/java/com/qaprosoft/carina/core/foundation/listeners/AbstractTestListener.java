@@ -209,7 +209,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 			}
 		}				
-
+		// obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in onTestSkipped method
+		TestNamingUtil.releaseTestInfoByThread();
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		RetryCounter.initCounter(test);
 		
@@ -229,7 +230,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
 					// generate already passed exception. Regular eception
 					// doesn't work as it stop DataProvider execution etc
-					throw new SkipException(SpecialKeywords.ALREADY_PASSED);
+					throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
 				} else {
 					// unregister Zafira test result
 					ZafiraIntegrator.deleteTest(testType.getId());
@@ -285,7 +286,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
 		if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-				&& result.getThrowable().getMessage().equals(SpecialKeywords.ALREADY_PASSED)) {
+				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
 			// [VD] it is prohibited to release TestInfoByThread in this place.!
 			return;
 		}
