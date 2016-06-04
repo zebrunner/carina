@@ -51,6 +51,9 @@ public class L10N {
 	private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 
 	public static void init() {
+		if (!Configuration.getBoolean(Parameter.ENABLE_L10N)) {
+			return;
+		}
 		
 		List<Locale> locales = LocaleReader.init(Configuration
 				.get(Parameter.LOCALE));
