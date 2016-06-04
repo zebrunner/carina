@@ -49,6 +49,10 @@ public class I18N {
 	private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 
 	public static void init() {
+		if (!Configuration.getBoolean(Parameter.ENABLE_I18N)) {
+			return;
+		}
+		
 		List<String> loadedResources = new ArrayList<String>();
 		
 		List<Locale> locales = LocaleReader.init(Configuration

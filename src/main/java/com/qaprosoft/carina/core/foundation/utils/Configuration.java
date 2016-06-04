@@ -159,7 +159,11 @@ public class Configuration
 		
 		RETRY_COUNT("retry_count"),
 
+		ENABLE_L10N("enable_l10n"),
+		
 		LOCALE("locale"),
+		
+		ENABLE_I18N("enable_i18n"),
 		
 		LANGUAGE("language"),
 		
