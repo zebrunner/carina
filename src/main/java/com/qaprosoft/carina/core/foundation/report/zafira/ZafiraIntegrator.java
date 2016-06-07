@@ -242,6 +242,10 @@ public class ZafiraIntegrator {
 	public static TestType getTestType() {
 		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		TestType res = null;
+		if (tests == null) {
+			return res;
+		}
+			
 		for (TestType test : tests) {
 			if (testName.equals(test.getName())) {
 				res = test;
