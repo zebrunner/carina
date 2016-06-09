@@ -218,7 +218,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestNamingUtil.associateCanonicTestName(test);
 		
 		// Analyze Zafira results for re-run
-		if (ZafiraIntegrator.isRerun()) {
+		if (ZafiraIntegrator.isRerunFailures()) {
 			// Analyze TestResult status obligatory inside isrerun if operator because
 			// some modifications in Zafira results needed.
 			// FAILED status will be removed/unregistered from Zafira database
