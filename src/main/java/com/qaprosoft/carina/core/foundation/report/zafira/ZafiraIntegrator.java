@@ -457,7 +457,7 @@ public class ZafiraIntegrator {
 		
 		TestType test = new TestType(testType.getId(), status, message, finishTime);
 		LOGGER.debug("Test details for registration:"
-				+ String.format(testDetails, status, message, finishTime));
+				+ String.format(testDetails, status, testType.getName(), message, finishTime));
 
 		Response<TestType> response = zc.finishTest(test);
 		test = response.getObject();
