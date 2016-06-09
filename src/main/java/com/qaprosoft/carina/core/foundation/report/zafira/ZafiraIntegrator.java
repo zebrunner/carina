@@ -40,7 +40,8 @@ public class ZafiraIntegrator {
 	private static TestType[] tests = null;
 
 	private static final String zafiraUrl = Configuration.get(Parameter.ZAFIRA_SERVICE_URL);
-	private static final Boolean rerunFailures = Configuration.getBoolean(Parameter.RERUN_FAILURES);
+	private static Boolean rerunFailures = Configuration.getBoolean(Parameter.RERUN_FAILURES);
+	private static Boolean rerun = false;
 
 	private static String ciRunId = Configuration.get(Parameter.CI_RUN_ID);
 	private static String ciUrl = Configuration.get(Parameter.CI_URL);
@@ -122,28 +123,41 @@ public class ZafiraIntegrator {
 				parentJob = registerJob(ciParentUrl, anonymousUser.getId());
 			}
 			
+			Response<TestRunType> response = zc.getTestRunByCiRunId(ciRunId);
+			run = response.getObject();
 			
-			if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
-				run = registerTestRunUPSTREAM_JOB(suite.getId(), configXML, job.getId(),
-						parentJob.getId(), parentBuild, build,
-						Initiator.UPSTREAM_JOB, workItem);
-			} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
-				run = registerTestRunBySCHEDULER(suite.getId(), configXML, job.getId(), build,
-						Initiator.SCHEDULER, workItem);
-			} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
-				run = registerTestRunByHUMAN(suite.getId(), user.getId(), configXML, job.getId(),
-						build, Initiator.HUMAN, workItem);
+			if (run != null) {
+				// already discovered run with the same ciRunId. it is re-run functionality!
+				rerun = true;
 			} else {
-				throw new RuntimeException("Unable to register test run for zafira service: "
-								+ zafiraUrl + " due to the misses build cause: '" + ciBuildCause + "'");
+				if (rerunFailures) {
+					LOGGER.error("Unable to find data in Zafira Reporting Service with ciRunId: '" + ciRunId + "'.\n" + "Rerun failures featrure will be disabled!");
+					rerunFailures = false;
+				}
+				// register new TestRun
+				if (ciBuildCause.toUpperCase().contains("UPSTREAMTRIGGER")) {
+					run = registerTestRunUPSTREAM_JOB(suite.getId(), configXML, job.getId(),
+							parentJob.getId(), parentBuild, build,
+							Initiator.UPSTREAM_JOB, workItem);
+				} else if (ciBuildCause.toUpperCase().contains("TIMERTRIGGER")) {
+					run = registerTestRunBySCHEDULER(suite.getId(), configXML, job.getId(), build,
+							Initiator.SCHEDULER, workItem);
+				} else if (ciBuildCause.toUpperCase().contains("MANUALTRIGGER")) {
+					run = registerTestRunByHUMAN(suite.getId(), user.getId(), configXML, job.getId(),
+							build, Initiator.HUMAN, workItem);
+				} else {
+					throw new RuntimeException("Unable to register test run for zafira service: "
+									+ zafiraUrl + " due to the misses build cause: '" + ciBuildCause + "'");
+				}
 			}
-
+			
 			if (run == null) {
 				throw new RuntimeException("Unable to register test run for zafira service: " + zafiraUrl);
 			}
 			isRegistered = true;
 			
-			if (rerunFailures) {
+			if (rerun) {
+				//read all test results from Zafira
 				tests = zc.getTestRunResults(run.getId()).getObject();
 			}
 		} catch (Exception e) {
@@ -187,12 +201,21 @@ public class ZafiraIntegrator {
 				throw new RuntimeException("Unable to register tetscase '" + testMethod + "' for zafira service: " + zafiraUrl);
 			}
 
-			String testArgs = result.getParameters().toString();
+			if (rerun) {
+				startedTest = getTestType(); // search already registered test!
+				if (startedTest == null) {
+					LOGGER.warn("Unable to find test in Zafira. It will be registered from scratch.");
+				}
+			}
 			
-			String demoUrl = ReportContext.getTestScreenshotsLink(test);
-			String logUrl = ReportContext.getTestLogLink(test);
-			
-			startedTest = startTest(test, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
+			if (startedTest == null) {
+				String testArgs = result.getParameters().toString();
+
+				String demoUrl = ReportContext.getTestScreenshotsLink(test);
+				String logUrl = ReportContext.getTestLogLink(test);
+
+				startedTest = startTest(test, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
+			}
 			TestNamingUtil.associateZafiraTest(startedTest, Thread.currentThread().getId());
 			
 		} catch (Exception e) {
@@ -252,10 +275,15 @@ public class ZafiraIntegrator {
 		return runId;
 	}
 	
-	public static boolean isRerun() {
-		return rerunFailures;
+	public static boolean isRerunFailures() {
+		return rerun && rerunFailures; //rerun failures is enabled only when both properties are true!
 	}
 
+	
+	public static boolean isRerun() {
+		return rerun;
+	}
+	
 	public static TestType getTestType() {
 		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		TestType res = null;
