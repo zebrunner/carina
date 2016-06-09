@@ -50,7 +50,6 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.client.model.TestType;
-//import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -239,6 +238,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
 			}
 		}
+		
+		int retry = RetryCounter.getRunCount(test);
+		if (retry == 0) {
+			// register test on startup for 0 retry only!
+			ZafiraIntegrator.startTestMethod(result);
+		}
+		
 	}
 
 	@Override
