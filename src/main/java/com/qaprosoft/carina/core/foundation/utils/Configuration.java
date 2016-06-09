@@ -193,6 +193,8 @@ public class Configuration
 		
 		SUITE_NAME("suite_name"),
 
+		CI_RUN_ID("ci_run_id"),
+		
 		CI_URL("ci_url"),
 		
 		CI_BUILD("ci_build"),		
