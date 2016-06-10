@@ -202,9 +202,18 @@ public class ZafiraIntegrator {
 				throw new RuntimeException("Unable to register tetscase '" + testMethod + "' for zafira service: " + zafiraUrl);
 			}
 
+			String demoUrl = ReportContext.getTestScreenshotsLink(test);
+			String logUrl = ReportContext.getTestLogLink(test);
+
 			if (rerun) {
 				startedTest = getTestType(); // search already registered test!
 				if (startedTest != null) {
+					startedTest.setDemoURL(demoUrl);
+					startedTest.setLogURL(logUrl);
+					
+					startedTest.setFinishTime(null);
+					startedTest.setStartTime(new Date().getTime());
+					
 					restartTest(startedTest);
 				} else {
 					LOGGER.warn("Unable to find test in Zafira. It will be registered from scratch.");					
@@ -214,9 +223,6 @@ public class ZafiraIntegrator {
 			if (startedTest == null) {
 				//new test run registration
 				String testArgs = result.getParameters().toString();
-
-				String demoUrl = ReportContext.getTestScreenshotsLink(test);
-				String logUrl = ReportContext.getTestLogLink(test);
 
 				startedTest = startTest(test, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
 			}
@@ -462,7 +468,7 @@ public class ZafiraIntegrator {
 
 		String testDetails = "name: %s, status: %s, testArgs: %s, testRunId: %s, testCaseId: %s, startTime: %s, demoURL: %s, logURL: %s, retry: %d";
 
-		// TODO: update configXML with device
+		// TODO: update configXML with device. Maybe inside getConfiguration method
 		String configXML = getConfiguration();
 
 		TestType test = new TestType(name, status, testArgs, testRunId, testCaseId, startTime, demoURL, logURL, null,
@@ -484,9 +490,6 @@ public class ZafiraIntegrator {
 	}
 
 	private static TestType restartTest(TestType test) {
-		Long startTime = new Date().getTime();
-		test.setFinishTime(null);
-		test.setStartTime(startTime);
 		String testName = test.getName();
 		Response<TestType> response = zc.startTest(test);
 		test = response.getObject();
@@ -494,11 +497,11 @@ public class ZafiraIntegrator {
 			throw new RuntimeException(
 					"Unable to register test '" + testName + "' restart for zafira service: " + zafiraUrl);
 		} else {
-			LOGGER.debug("Registered test restart details:'" + testName + "'; startTime: " + startTime);
+			LOGGER.debug("Registered test restart details:'" + testName + "'; startTime: " + test.getStartTime());
 		}
 		return test;
 	}
-
+	
 	private static TestType finishTest(Status status, String message, Long finishTime) {
 
 		long threadId = Thread.currentThread().getId();
