@@ -231,8 +231,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 					// doesn't work as it stop DataProvider execution etc
 					throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
 				} else {
+					// Do not remove test data as it should reuse already registered test and update it
 					// unregister Zafira test result
-					ZafiraIntegrator.deleteTest(testType.getId());
+					//ZafiraIntegrator.deleteTest(testType.getId());
 				}
 			} else {
 				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
