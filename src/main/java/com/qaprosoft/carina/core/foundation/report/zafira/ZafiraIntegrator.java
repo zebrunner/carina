@@ -229,7 +229,6 @@ public class ZafiraIntegrator {
 			TestNamingUtil.associateZafiraTest(startedTest, Thread.currentThread().getId());
 			
 		} catch (Exception e) {
-			isRegistered = false;
 			LOGGER.error("Undefined error during test case/method start!", e);
 		}
 		return startedTest;
@@ -260,7 +259,6 @@ public class ZafiraIntegrator {
 			finishedTest = finishTest(status, message, new Date().getTime());
 			TestNamingUtil.associateZafiraTest(finishedTest, Thread.currentThread().getId());
 		} catch (Exception e) {
-			isRegistered = false;
 			LOGGER.error("Undefined error during test case/method finish!", e);
 		}
 
