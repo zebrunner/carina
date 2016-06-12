@@ -213,7 +213,8 @@ public abstract class AbstractTest // extends DriverHelper
 			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
 			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 
-			TestNamingUtil.releaseZafiraTest();
+			//we shouldn't deregister info here as all retries will not work 
+			//TestNamingUtil.releaseZafiraTest();
 
 			// clear jira tickets to be sure that next test is not affected.
 			Jira.clearTickets();
