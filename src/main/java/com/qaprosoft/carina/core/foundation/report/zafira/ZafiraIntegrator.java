@@ -504,21 +504,22 @@ public class ZafiraIntegrator {
 
 		long threadId = Thread.currentThread().getId();
 		TestType test = TestNamingUtil.getZafiraTest(threadId);
-		String testName = "";
-		if (test != null) {
-			test.getName();
-		} else {
-			testName = TestNamingUtil.getCanonicTestNameByThread();
-		}
+
+		String testName = TestNamingUtil.getCanonicTestNameByThread();
+		LOGGER.debug("testName registered with current thread is: " + testName);
 		
-		String testDetails = "name: %s; thread: %s; status: %s, finishTime: %s \n message: %s";
 		if (test == null) {
-			throw new RuntimeException(
-					"Unable to register test '" + String.format(testDetails, testName, threadId, status, finishTime, message)
-							+ "' finish for zafira service: " + zafiraUrl);
+			throw new RuntimeException("Unable to find TestType result to mark test as finished! name: '" + testName + "'; threadId: " + threadId);
 		}
-		LOGGER.debug("Test details for finish registration:"
-				+ String.format(testDetails, testName, threadId, status, finishTime, message));
+
+		testName = test.getName();
+		long testId = test.getId();
+		long testCaseId = test.getTestCaseId();
+		long testRunId = test.getTestRunId();
+		String testDetails = "testId: %d; testCaseId: %d; testRunId: %d; name: %s; thread: %s; status: %s, finishTime: %s \n message: %s";
+		String logMessage = String.format(testDetails, testId, testCaseId, testRunId, testName, threadId, status, finishTime, message);
+		
+		LOGGER.debug("Test details to finish registration:" + logMessage);
 
 		test.setStatus(status);
 		test.setMessage(message);
@@ -529,11 +530,10 @@ public class ZafiraIntegrator {
 		test = response.getObject();
 		if (test == null) {
 			throw new RuntimeException(
-					"Unable to register test '" + String.format(testDetails, threadId, status, message, finishTime)
-							+ "' for zafira service: " + zafiraUrl);
+					"Unable to register test '" + logMessage + "' for zafira service: " + zafiraUrl);
 		} else {
 			LOGGER.debug(
-					"Registered test details:" + String.format(testDetails, threadId, status, message, finishTime));
+					"Registered test details:" + logMessage);
 		}
 		return test;
 	}
