@@ -504,14 +504,21 @@ public class ZafiraIntegrator {
 
 		long threadId = Thread.currentThread().getId();
 		TestType test = TestNamingUtil.getZafiraTest(threadId);
-		String testDetails = "thread: %s; status: %s, message: %s, finishTime: %s";
+		String testName = "";
+		if (test != null) {
+			test.getName();
+		} else {
+			testName = TestNamingUtil.getCanonicTestNameByThread();
+		}
+		
+		String testDetails = "name: %s; thread: %s; status: %s, finishTime: %s \n message: %s";
 		if (test == null) {
 			throw new RuntimeException(
-					"Unable to register test '" + String.format(testDetails, threadId, status, message, finishTime)
+					"Unable to register test '" + String.format(testDetails, testName, threadId, status, finishTime, message)
 							+ "' finish for zafira service: " + zafiraUrl);
 		}
 		LOGGER.debug("Test details for finish registration:"
-				+ String.format(testDetails, threadId, status, message, finishTime));
+				+ String.format(testDetails, testName, threadId, status, finishTime, message));
 
 		test.setStatus(status);
 		test.setMessage(message);
