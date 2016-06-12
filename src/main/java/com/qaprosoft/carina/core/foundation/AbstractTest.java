@@ -197,7 +197,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 
 			//zafira
-			TestType testType = TestNamingUtil.getZafiraTest(Thread.currentThread().getId());
+			TestType testType = TestNamingUtil.getZafiraTest();
 			if (testType != null && tickets.size() > 0) {
 				ZafiraIntegrator.registerWorkItems(testType.getId(), tickets);
 			}
@@ -213,7 +213,7 @@ public abstract class AbstractTest // extends DriverHelper
 			result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
 			TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
 
-			TestNamingUtil.releaseZafiraTest(Thread.currentThread().getId());
+			TestNamingUtil.releaseZafiraTest();
 
 			// clear jira tickets to be sure that next test is not affected.
 			Jira.clearTickets();

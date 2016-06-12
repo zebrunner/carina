@@ -175,20 +175,31 @@ public class TestNamingUtil
 		return startDate;
 	}
 	
-	public static synchronized void associateZafiraTest(TestType zafiraTest, Long threadId)
+	public static synchronized void associateZafiraTest(TestType zafiraTest)
 	{
-		if (zafiraTest == null)
+		long threadId = Thread.currentThread().getId();
+		if (zafiraTest == null) {
+			LOGGER.error("NULL ZafiraTest is registered for thread: " + threadId);
 			return;
+		}
+		LOGGER.debug("Associate ZafiraTest id: " + zafiraTest.getId() + "; name: " + zafiraTest.getName() + " with thread: " +threadId);
 		threadId2ZafiraTest.put(threadId, zafiraTest);
 	}
 	
-	public static TestType getZafiraTest(Long threadId)
+	public static TestType getZafiraTest()
 	{
-		return threadId2ZafiraTest.get(threadId);
+		return threadId2ZafiraTest.get(Thread.currentThread().getId());
 	}
 	
-	public static synchronized void releaseZafiraTest(Long threadId)
+	public static synchronized void releaseZafiraTest()
 	{
+		long threadId = Thread.currentThread().getId();
+		TestType zafiraTest = threadId2ZafiraTest.get(threadId);
+		if (zafiraTest != null) {
+			LOGGER.debug("Releasing ZafiraTest id: " + zafiraTest.getId() + "; name: " + zafiraTest.getName() + " from thread: " +threadId);
+		} else {
+			LOGGER.error("Unable to release ZafiraTest by threadId: " + threadId);
+		}
 		threadId2ZafiraTest.remove(threadId);
 	}
 	
