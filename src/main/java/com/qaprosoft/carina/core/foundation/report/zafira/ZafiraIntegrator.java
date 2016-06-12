@@ -214,7 +214,7 @@ public class ZafiraIntegrator {
 					startedTest.setFinishTime(null);
 					startedTest.setStartTime(new Date().getTime());
 					
-					restartTest(startedTest);
+					startedTest = restartTest(startedTest);
 				} else {
 					LOGGER.warn("Unable to find test in Zafira. It will be registered from scratch.");					
 				}
@@ -226,7 +226,7 @@ public class ZafiraIntegrator {
 
 				startedTest = startTest(test, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
 			}
-			TestNamingUtil.associateZafiraTest(startedTest, Thread.currentThread().getId());
+			TestNamingUtil.associateZafiraTest(startedTest);
 			
 		} catch (Exception e) {
 			LOGGER.error("Undefined error during test case/method start!", e);
@@ -257,7 +257,7 @@ public class ZafiraIntegrator {
 		TestType finishedTest = null;
 		try {
 			finishedTest = finishTest(status, message, new Date().getTime());
-			TestNamingUtil.associateZafiraTest(finishedTest, Thread.currentThread().getId());
+			TestNamingUtil.associateZafiraTest(finishedTest);
 		} catch (Exception e) {
 			LOGGER.error("Undefined error during test case/method finish!", e);
 		}
@@ -503,7 +503,7 @@ public class ZafiraIntegrator {
 	private static TestType finishTest(Status status, String message, Long finishTime) {
 
 		long threadId = Thread.currentThread().getId();
-		TestType test = TestNamingUtil.getZafiraTest(threadId);
+		TestType test = TestNamingUtil.getZafiraTest();
 
 		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		LOGGER.debug("testName registered with current thread is: " + testName);
