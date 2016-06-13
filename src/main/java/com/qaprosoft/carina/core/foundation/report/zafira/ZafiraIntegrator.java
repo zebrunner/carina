@@ -123,8 +123,11 @@ public class ZafiraIntegrator {
 				parentJob = registerJob(ciParentUrl, anonymousUser.getId());
 			}
 			
-			Response<TestRunType> response = zc.getTestRunByCiRunId(ciRunId);
-			run = response.getObject();
+			if (!ciRunId.isEmpty()) {
+				// do not search for run in case of ampty value
+				Response<TestRunType> response = zc.getTestRunByCiRunId(ciRunId);
+				run = response.getObject();
+			}
 			
 			if (run != null) {
 				// already discovered run with the same ciRunId. it is re-run functionality!
