@@ -30,6 +30,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
@@ -76,6 +77,13 @@ public class DriverFactory {
         } catch (Exception e) {
             LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
         }
+        
+		if (driver == null) {
+			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
+			Device device = DevicePool.getDevice();
+		    DevicePool.unregisterDevice(device);
+			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
+		}
 
         return driver;
     }
