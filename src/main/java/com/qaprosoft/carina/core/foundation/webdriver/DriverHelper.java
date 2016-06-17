@@ -1337,10 +1337,14 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
+		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {
-			driver = DriverPool.getDriverByThread(Thread.currentThread().getId());
+			driver = DriverPool.getDriverByThread(currentThreadId);
 		}
-
+		if (driver == null) {
+			LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
+			throw new RuntimeException("Driver isn't initialized.");
+		}
 		return driver;
 	}
 
