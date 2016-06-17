@@ -47,6 +47,11 @@ public class CustomTypePageFactory {
 	public static <T extends AbstractPage> T initPage(WebDriver driver,
 			Class<T> parentClass, Object... parameters) {
 
+		if (driver == null) {
+			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
+			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
+		}
+		
 		Set<Class<? extends T>> setClasses = reflections
 				.getSubTypesOf(parentClass);
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
