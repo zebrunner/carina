@@ -54,13 +54,13 @@ public class Screenshot
 	
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images
-	 * to specified sceenshots location.
+	 * to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
 	 * @return screenshot name.
 	 */
-	public static synchronized String capture(WebDriver driver, boolean isTakeScreenshot)
+	public static String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
 		String screenName = "";
 		
