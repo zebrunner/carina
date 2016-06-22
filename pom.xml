@@ -68,7 +68,7 @@
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
 		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
-		<api-tools.version>1.0.5</api-tools.version>
+		<api-tools.version>1.0.7</api-tools.version>
 		<monte-repack.version>1.0</monte-repack.version>
 
 		<cucumber.testng.version>1.2.4</cucumber.testng.version>
