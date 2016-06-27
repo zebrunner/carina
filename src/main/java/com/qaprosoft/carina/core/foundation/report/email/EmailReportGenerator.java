@@ -257,6 +257,9 @@ public class EmailReportGenerator
 		    	LOGGER.error("Current implementation doesn't support email report generation with several Jira Tickets fo single test!");
 		    }
 		}
+		if (bugId == null) {
+			bugId = "N/A";
+		}
 	    result = result.replace(BUG_ID_PLACEHOLDER, bugId);
 	    result = result.replace(BUG_URL_PLACEHOLDER, bugUrl);
 
