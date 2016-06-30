@@ -242,8 +242,8 @@ public class EmailReportGenerator
 		
 		List<String> jiraTickets = testResultItem.getJiraTickets();
 		
-		String bugId = "N/A";
-		String bugUrl = "#";
+		String bugId = null;
+		String bugUrl = null;
 		
 		if (jiraTickets.size() > 0)
 		{
@@ -259,6 +259,10 @@ public class EmailReportGenerator
 		}
 		if (bugId == null) {
 			bugId = "N/A";
+		}
+		
+		if (bugUrl == null) {
+			bugUrl = "#";
 		}
 	    result = result.replace(BUG_ID_PLACEHOLDER, bugId);
 	    result = result.replace(BUG_URL_PLACEHOLDER, bugUrl);
