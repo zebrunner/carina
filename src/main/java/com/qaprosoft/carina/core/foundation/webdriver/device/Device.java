@@ -94,10 +94,17 @@ public class Device {
 		return type.equalsIgnoreCase(SpecialKeywords.TABLET);
 	}
 	
+	public boolean isTv() {
+		return type.equalsIgnoreCase(SpecialKeywords.TV);
+	}
+	
 	public Type getType() {
 		if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 			if (isTablet()) {
 				return Type.ANDROID_TABLET;
+			}
+			if (isTv()) {
+				return Type.ANDROID_TV;
 			}
 			return Type.ANDROID_PHONE;
 		} else if (os.equalsIgnoreCase(SpecialKeywords.IOS)) {
