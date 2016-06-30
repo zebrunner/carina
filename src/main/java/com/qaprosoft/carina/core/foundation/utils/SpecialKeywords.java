@@ -105,6 +105,7 @@ public class SpecialKeywords
 
 	public static final String TABLET = "tablet";
 	public static final String PHONE = "phone";
+	public static final String TV = "tv";
 	
 	public static final String CORE = "core";
 	
