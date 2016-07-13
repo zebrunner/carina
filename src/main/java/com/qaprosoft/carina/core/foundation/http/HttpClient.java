@@ -77,6 +77,9 @@ public class HttpClient
 
 			System.setProperty("ftp.proxyHost", proxyHost);
 			System.setProperty("ftp.proxyPort", proxyPort);
+			
+			System.setProperty("socksProxyHost", proxyHost);
+			System.setProperty("socksProxyPort", proxyPort);
 
 			LOGGER.info(String.format("HTTP client will use http/https/ftp proxies: %s:%s", proxyHost, proxyPort));
 		}
