@@ -39,6 +39,9 @@ public abstract class AbstractCapabilities {
 			System.setProperty("ftp.proxyHost", proxyHost);
 			System.setProperty("ftp.proxyPort", proxyPort);
 			
+			System.setProperty("socksProxyHost", proxyHost);
+			System.setProperty("socksProxyPort", proxyPort);
+			
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
 			String proxyAddress = String.format("%s:%s", proxyHost, proxyPort);
 			proxy.setHttpProxy(proxyAddress);
