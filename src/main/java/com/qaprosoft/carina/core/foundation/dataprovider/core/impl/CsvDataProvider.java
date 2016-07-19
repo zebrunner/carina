@@ -126,7 +126,11 @@ public class CsvDataProvider extends BaseDataProvider {
         		
                 for (String header : headers) {
                 	int index = mapper.get(header);
-                	dynamicAttrs.put(header, ParameterGenerator.process(strings[index]).toString());
+                	if (ParameterGenerator.process(strings[index]) != null) {
+                		dynamicAttrs.put(header, ParameterGenerator.process(strings[index]).toString());
+                	} else {
+                		dynamicAttrs.put(header, null);
+                	}
                 	
                 	args[rowIndex][0] = dynamicAttrs;
                 }
@@ -135,7 +139,11 @@ public class CsvDataProvider extends BaseDataProvider {
             } else {
                 for (String arg : argsList) {
                     int index = mapper.get(arg);
-                    args[rowIndex][i] = ParameterGenerator.process(strings[index]).toString();
+                	if (ParameterGenerator.process(strings[index]) != null) {
+                		args[rowIndex][i] = ParameterGenerator.process(strings[index]).toString();
+                	} else {
+                		args[rowIndex][i] = null;
+                	}
                     i++;
                 }
             }
