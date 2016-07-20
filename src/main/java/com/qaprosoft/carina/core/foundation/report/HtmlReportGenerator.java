@@ -140,6 +140,7 @@ public class HtmlReportGenerator
 			}
 			imgNames.remove("thumbnails");
 			imgNames.remove("test.log");
+			imgNames.remove("sql.log");
 			if(imgNames.size() == 0) return;
 			
 			Collections.sort(imgNames);
