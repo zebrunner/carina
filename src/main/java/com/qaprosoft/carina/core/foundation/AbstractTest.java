@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -40,7 +41,11 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.xml.XmlTest;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.Download;
+import com.amazonaws.services.s3.transfer.TransferManager;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
@@ -516,6 +521,27 @@ public abstract class AbstractTest // extends DriverHelper
 		return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);	
 	}
 	
+	/**
+	 * Method to download file from s3 to local file system
+	 * @param bucketName
+	 * @param key (example: android/apkFolder/ApkName.apk)
+	 * @param file (local file name)
+	 */
+	protected void downloadS3ToLocal(final String bucketName, final String key, final File file) {
+		LOGGER.info("App will be downloaded from s3.");
+		LOGGER.info(String.format("[Bucket name: %s] [Key: %s] [File: %s]", bucketName, key, file.getAbsolutePath()));
+		DefaultAWSCredentialsProviderChain credentialProviderChain = new DefaultAWSCredentialsProviderChain();
+		TransferManager tx = new TransferManager(
+		               credentialProviderChain.getCredentials());
+		Download appDownload = tx.download(bucketName, key, file);
+		try {
+			appDownload.waitForCompletion();
+		} catch (AmazonClientException
+				| InterruptedException e) {
+			throw new RuntimeException("File wasn't downloaded from s3. See log: ".concat(e.getMessage()));
+		}
+	}
+	 
 	protected void setBug(String id)
 	{
 		String test = TestNamingUtil.getTestNameByThread();
