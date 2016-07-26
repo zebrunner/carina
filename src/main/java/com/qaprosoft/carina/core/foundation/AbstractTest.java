@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Category;
@@ -84,9 +86,11 @@ public abstract class AbstractTest // extends DriverHelper
 
 	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
 	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-
+	
 	protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
 	protected static final String XML_SUITE_NAME = " (%s)";
+	
+	private static final Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
 	
 	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 
@@ -172,6 +176,8 @@ public abstract class AbstractTest // extends DriverHelper
 			AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
 					Configuration.get(Parameter.SECRET_KEY));
 		}
+		
+		updateS3AppPath();
 		
 	}
 
@@ -540,6 +546,25 @@ public abstract class AbstractTest // extends DriverHelper
 				| InterruptedException e) {
 			throw new RuntimeException("File wasn't downloaded from s3. See log: ".concat(e.getMessage()));
 		}
+	}
+	
+	/**
+	 * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
+	 */
+	protected void updateS3AppPath() {
+		// get app path to be sure that we need(do not need) to download app from s3 bucket
+    	String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+        Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+    	if (matcher.find()) {
+    		String bucketName = matcher.group(1);
+    		String key = matcher.group(2);
+    		String[] array = mobileAppPath.split("/");
+    		String fileName = array[array.length - 1];
+    		File file = new File(fileName);
+    		LOGGER.info(String.format("Following data was extracted: %s, %s, %s", bucketName, key, file.getAbsolutePath()));
+    		downloadS3ToLocal(bucketName, key, new File(fileName));
+    		R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+    	}
 	}
 	
 	protected void setBug(String id)
