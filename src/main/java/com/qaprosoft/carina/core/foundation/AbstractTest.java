@@ -541,7 +541,7 @@ public abstract class AbstractTest // extends DriverHelper
 			throw new RuntimeException("File wasn't downloaded from s3. See log: ".concat(e.getMessage()));
 		}
 	}
-	
+	 
 	protected void setBug(String id)
 	{
 		String test = TestNamingUtil.getTestNameByThread();
