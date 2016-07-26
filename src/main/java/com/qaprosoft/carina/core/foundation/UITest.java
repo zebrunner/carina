@@ -15,7 +15,10 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
@@ -37,6 +40,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -48,7 +52,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 @Listeners({ UITestListener.class })
 public class UITest extends AbstractTest
 {
+	
     private static final Logger LOGGER = Logger.getLogger(UITest.class);
+    private static final Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
     private static int driverInitCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; //1 - is default run without retry
     
     protected WebDriver driver;
@@ -72,6 +78,20 @@ public class UITest extends AbstractTest
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
     	super.executeBeforeTestSuite(context); //do not remove super otherwise functionality from AbstractTest is not launched at all.
+    	
+    	// get app path to be sure that we need(do not need) to download app from s3 bucket
+    	String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+        Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+    	if (matcher.find()) {
+    		String bucketName = matcher.group(1);
+    		String key = matcher.group(2);
+    		String[] array = mobileAppPath.split("/");
+    		String fileName = array[array.length - 1];
+    		File file = new File(fileName);
+    		LOGGER.info(String.format("Following data was extracted: %s, %s, %s", bucketName, key, file.getAbsolutePath()));
+    		downloadS3ToLocal(bucketName, key, new File(fileName));
+    		R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+    	}
     	
     	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
