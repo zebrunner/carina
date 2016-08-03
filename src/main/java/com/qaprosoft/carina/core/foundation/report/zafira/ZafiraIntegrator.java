@@ -71,11 +71,16 @@ public class ZafiraIntegrator {
 	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
 	
 	public static void startSuite(ITestContext context, String suiteFileName) {
+		if (Configuration.getBoolean(Parameter.DEVELOP)) {
+			//do not update Zafira in develop mode
+			return;
+		}
+
 		if (!isValid())
 			return;
 		if (isRegistered) // AUTO-731 jobs with several test classes are not registered in zafira reporting service
 			return;
-
+		
 		try {
 			// remove slash at the end of ciUrl if any to register data in zafira without double slashing:
 			// http://jenkins:8080/job/my_job//10
