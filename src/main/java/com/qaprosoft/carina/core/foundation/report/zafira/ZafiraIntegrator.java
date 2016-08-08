@@ -68,7 +68,7 @@ public class ZafiraIntegrator {
 
 	private static List<String> uniqueKeys;
 
-	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl);
+	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl, Configuration.get(Parameter.ZAFIRA_USERNAME), Configuration.get(Parameter.ZAFIRA_PASSWORD));
 	
 	public static void startSuite(ITestContext context, String suiteFileName) {
 		if (Configuration.getBoolean(Parameter.DEVELOP)) {
