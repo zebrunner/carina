@@ -26,7 +26,7 @@ public class ZafiraClientTest
 	private TestSuiteType testSuite;
 	TestRunType testRun;
 	
-	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
+	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira", "admin", "admin");
 	
 	@Test(enabled=ENABLED)
 	public void testStatus()
