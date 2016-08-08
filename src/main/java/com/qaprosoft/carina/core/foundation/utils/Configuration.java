@@ -293,6 +293,10 @@ public class Configuration
 		//zafira
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
+		ZAFIRA_USERNAME("zafira_username"),
+		
+		ZAFIRA_PASSWORD("zafira_password"),
+		
 		RERUN_FAILURES("rerun_failures"),
 		
 		GIT_BRANCH("git_branch"),
