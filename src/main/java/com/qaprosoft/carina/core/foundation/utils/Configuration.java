@@ -335,7 +335,9 @@ public class Configuration
 
 		CUCUMBER_TESTS_RESULTS_IMAGE_RESIZE("cucumber_tests_results_image_resize"),
 
-		CUCUMBER_USE_JS_IN_REPORT("cucumber_user_js_in_report")
+		CUCUMBER_USE_JS_IN_REPORT("cucumber_user_js_in_report"),
+
+		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder")
 		;
 
 
