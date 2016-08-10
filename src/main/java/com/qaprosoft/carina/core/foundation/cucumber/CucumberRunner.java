@@ -232,7 +232,13 @@ public abstract class CucumberRunner extends UITest {
             link = String.format("file://%s/feature-overview.html", ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
         }
 */
-        link=ReportContext.getCucumberReportLink(CUCUMBER_REPORT_FOLDER);
+        //cucumber-html-reports
+        String subfolder = "";
+        if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_REPORT_SUBFOLDER)) {
+            subfolder = Configuration.get(Configuration.Parameter.CUCUMBER_REPORT_SUBFOLDER);
+        }
+
+        link=ReportContext.getCucumberReportLink(CUCUMBER_REPORT_FOLDER,subfolder);
 
         LOGGER.info("Cucumber Report link: "+link);
 
