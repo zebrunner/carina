@@ -451,24 +451,39 @@ public class ReportContext
 		return link;
 	}
 
+    /**
+     * Returns URL for cucumber report.
+     * @param CucumberReportFolderName String
+     * @return - URL to test log folder.
+     */
+    public static String getCucumberReportLink(String CucumberReportFolderName)
+    {
+      return getCucumberReportLink(CucumberReportFolderName,"");
+    }
 
 	/**
 	 * Returns URL for cucumber report.
-	 * @param CucumberReportFolderName
+	 * @param CucumberReportFolderName String
+     * @param subfolder String. Add subfolder if it required.
 	 * @return - URL to test log folder.
 	 */
-
-	public static String getCucumberReportLink(String CucumberReportFolderName)
+	public static String getCucumberReportLink(String CucumberReportFolderName, String subfolder)
 	{
 
 		String link = "";
+        //String subfolder = "cucumber-html-reports";
 		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
 			//remove report url and make link relative
 			//link = String.format("./%d/report.html", rootID);
-			link=String.format("%s/%d/%s/%s/feature-overview.html", Configuration.get(Parameter.REPORT_URL), rootID, ARTIFACTS_FOLDER, CucumberReportFolderName);
+			String report_url = Configuration.get(Parameter.REPORT_URL);
+			if (report_url.contains("n/a")) {
+                LOGGER.error("Contains n/a. Replace it.");
+                report_url = report_url.replace("n/a","");
+			}
+			link=String.format("%s/%d/%s/%s/%s/feature-overview.html", report_url , rootID, ARTIFACTS_FOLDER, CucumberReportFolderName, subfolder);
 		}
 		else {
-			link = String.format("file://%s/%s/feature-overview.html", artifactsDirectory, CucumberReportFolderName);
+			link = String.format("file://%s/%s/%s/feature-overview.html", artifactsDirectory, CucumberReportFolderName, subfolder);
 		}
 
 		return link;
