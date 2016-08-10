@@ -128,13 +128,24 @@ public class DriverHelper {
 		summary = new TestLogHelper(sessionId);
 	}
 
+
+    /**
+     *
+     * @param element ExtendedWebElement
+     * @param waitPeriod long in seconds.
+     * @return true if element become clickable
+     */
+    protected boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
+     return  waitForElementToBeClickable(element,(int)waitPeriod);
+    }
 	/**
 	 * Wait for element to be clickable. Alternative for isElementPresent with
 	 * other condition.
 	 * 
 	 * @param element
 	 *            ExtendedWebElement
-	 * @return waitPeriod in seconds.
+	 * @param waitPeriod int in seconds.
+     * @return true if element become clickable
 	 */
 	protected boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
 		final WebDriver drv = getDriver();

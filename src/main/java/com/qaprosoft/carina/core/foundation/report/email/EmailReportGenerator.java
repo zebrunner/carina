@@ -385,7 +385,7 @@ public class EmailReportGenerator
 						, "<input class='hide' id='hd-1' type='checkbox'>"
 						, "<label for='hd-1'>Show Cucumber Results</label> "
 						, "<div>"
-						, "<iframe name='frm' id='mainframe' src='" + link + "' scrolling='no'  width='90%'height='100%' align='center' frameborder='0' allowtransparency='no' target='_self' >"
+						, "<iframe name='frm' id='mainframe' src='" + link + "' scrolling='yes'  width='90%'height='100%' align='center' frameborder='0' allowtransparency='no' target='_self' >"
 						, "</iframe>"
 						, "</div><br/>"
 				);
