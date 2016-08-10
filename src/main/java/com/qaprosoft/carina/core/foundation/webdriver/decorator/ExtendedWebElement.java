@@ -354,8 +354,6 @@ public class ExtendedWebElement
 	
 	/**
 	 * Check that element present.
-	 * 
-	 * @param extWebElement ExtendedWebElement
 	 * @return element existence status.
 	 */
 	public boolean isElementPresent()
@@ -373,6 +371,11 @@ public class ExtendedWebElement
 	public boolean isElementPresent(long timeout)
 	{
 		boolean result;
+		if (timeout<=0) {
+			LOGGER.error("Timeout should be bigger than 0.");
+			timeout = 1;
+		}
+
 		final WebDriver drv = getDriver();
 		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
