@@ -372,7 +372,7 @@ public class ExtendedWebElement
 	{
 		boolean result;
 		if (timeout<=0) {
-			LOGGER.error("Timeout should be bigger than 0.");
+			LOGGER.warn("Timeout should be bigger than 0.");
 			timeout = 1;
 		}
 
