@@ -113,6 +113,8 @@ public class Configuration
 		
 		PROXY_PORT("proxy_port"),
 		
+		PROXY_PROTOCOLS("proxy_protocols"),
+		
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
