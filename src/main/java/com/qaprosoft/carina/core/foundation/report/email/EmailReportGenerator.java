@@ -15,6 +15,12 @@
  */
 package com.qaprosoft.carina.core.foundation.report.email;
 
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.getCucumberReportResultLink;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberReportFolderExists;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberTest;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.useJSinCucumberReport;
+import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -78,6 +84,12 @@ public class EmailReportGenerator
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
 	private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
+
+	//Cucumber section
+	private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
+	private static final String CUCUMBER_JS_PLACEHOLDER ="${js_placeholder}";
+
+
 	private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
 	private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
 	private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
@@ -106,6 +118,10 @@ public class EmailReportGenerator
 		emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
 		emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
 		emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
+
+		//Cucumber section
+		emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResults());
+		emailBody = emailBody.replace(CUCUMBER_JS_PLACEHOLDER, getCucumberJavaScript());
 	}
 
 	public String getEmailBody()
@@ -202,27 +218,26 @@ public class EmailReportGenerator
 				failCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
-			if (!testResultItem.isConfig()) {
-				if(INCLUDE_SKIP) {
+			failReason = testResultItem.getFailReason();
+			if (!testResultItem.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
+					&& !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
+				if (INCLUDE_SKIP) {
 					result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
 					result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-					
-					failReason = testResultItem.getFailReason();
-					if (!StringUtils.isEmpty(failReason))
-					{
-						// Make description more compact for email report																																																											
-						failReason = failReason.length() > MESSAGE_LIMIT ? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
+
+					if (!StringUtils.isEmpty(failReason)) {
+						// Make description more compact for email report
+						failReason = failReason.length() > MESSAGE_LIMIT
+								? (failReason.substring(0, MESSAGE_LIMIT) + "...") : failReason;
 						result = result.replace(SKIP_REASON_PLACEHOLDER, formatFailReasonAsHtml(failReason));
+					} else {
+						result = result.replace(SKIP_REASON_PLACEHOLDER,
+								"Analyze SYSTEM ISSUE log for details or check dependency settings for the test.");
 					}
-					else
-					{
-						result = result.replace(SKIP_REASON_PLACEHOLDER, "Analyze SYSTEM ISSUE log for details or check dependency settings for the test.");
-					}
-					
+
 					result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
-					
-					if(testResultItem.getLinkToScreenshots() != null)
-					{
+
+					if (testResultItem.getLinkToScreenshots() != null) {
 						result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 					}
 				}
@@ -247,8 +262,8 @@ public class EmailReportGenerator
 		
 		List<String> jiraTickets = testResultItem.getJiraTickets();
 		
-		String bugId = "N/A";
-		String bugUrl = "#";
+		String bugId = null;
+		String bugUrl = null;
 		
 		if (jiraTickets.size() > 0)
 		{
@@ -261,6 +276,13 @@ public class EmailReportGenerator
 		    if (jiraTickets.size() > 1) {
 		    	LOGGER.error("Current implementation doesn't support email report generation with several Jira Tickets fo single test!");
 		    }
+		}
+		if (bugId == null) {
+			bugId = "N/A";
+		}
+		
+		if (bugUrl == null) {
+			bugUrl = "#";
 		}
 	    result = result.replace(BUG_ID_PLACEHOLDER, bugId);
 	    result = result.replace(BUG_URL_PLACEHOLDER, bugUrl);
@@ -280,6 +302,8 @@ public class EmailReportGenerator
 		int failed = 0;
 		int failedKnownIssue = 0;
 		int skipped = 0;
+		int skipped_already_passed = 0;
+		
 		for(TestResultItem ri : ris)
 		{
 			if (ri.isConfig()) {
@@ -303,7 +327,15 @@ public class EmailReportGenerator
 				}
 				break;
 			case SKIP:
-				skipped++;
+				if (ri.getFailReason().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+					skipped_already_passed++;
+				} else if (ri.getFailReason().startsWith(SpecialKeywords.SKIP_EXECUTION)) { 
+					// don't calculate such message at all as it shouldn't be
+					// included into the report at all
+				}
+				else {
+					skipped++;
+				}
 				break;
 			case SKIP_ALL:
 				//do nothing
@@ -314,7 +346,9 @@ public class EmailReportGenerator
 			}
 		}
 		TestResultType result;
-		if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
+		if (passed == 0 && failed == 0 && skipped == 0 && skipped_already_passed > 0){
+			result = TestResultType.SKIP_ALL_ALREADY_PASSED; //it was re-run of the suite where all tests passed during previous run
+		} else if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS;
 		} else if (passed >= 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
 			result = TestResultType.PASS_WITH_KNOWN_ISSUES;
@@ -357,6 +391,38 @@ public class EmailReportGenerator
 			reasonText = reasonText.replace("\n", "<br/>");
 		}
 		return reasonText;
+	}
+
+	public String getCucumberResults() {
+		String result="";
+
+		if ((isArtifactsFolderExists()) && (isCucumberTest()) && (isCucumberReportFolderExists())) {
+
+			String link = getCucumberReportResultLink();
+			String feature1 = "";
+			if (useJSinCucumberReport()) {
+				feature1 = String.format("%s %n %s %n %s %n %s %n %s %n %s"
+						, "<input class='hide' id='hd-1' type='checkbox'>"
+						, "<label for='hd-1'>Show Cucumber Results</label> "
+						, "<div>"
+						, "<iframe name='frm' id='mainframe' src='" + link + "' scrolling='yes'  width='90%'height='100%' align='center' frameborder='0' allowtransparency='no' target='_self' >"
+						, "</iframe>"
+						, "</div><br/>"
+				);
+			}
+			result = String.format("<br/><b><a href='%s' style='color: green;' target='_blank'> Open Cucumber Report in new Window </a></b><br/>%s",link,feature1);
+			LOGGER.info("Cucumber result: "+result);
+		}
+
+		return result;
+	}
+
+	private String getCucumberJavaScript() {
+		String result="";
+		if ((isArtifactsFolderExists()) && (isCucumberTest()) && (isCucumberReportFolderExists()) && (useJSinCucumberReport())) {
+			result="<link rel=\"stylesheet\" type=\"text/css\" href=\"gallery-lib/cucumber.css\">";
+		}
+		return result;
 	}
 	
 }

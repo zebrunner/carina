@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -39,7 +40,9 @@ public class TestNamingUtil
 	
 	private static INamingStrategy namingStrategy;
 
-	private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	
+	//private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
+	private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
 	private static final ConcurrentHashMap<Long, String> threadId2CanonicTestName = new ConcurrentHashMap<Long, String>(); //map to store test names without configuration steps
 
 	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
@@ -47,6 +50,7 @@ public class TestNamingUtil
 	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
 	
+	private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
 	
 	static
 	{
@@ -90,11 +94,18 @@ public class TestNamingUtil
 		testName2Counter.put(test, count);
 		
 		if (count > 1) {
-			//test = test + " (InvCount=" + count + ")";
-			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", count));
+			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
+			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", count));
 		}
 		
-		threadId2TestName.put(threadId, test);
+		Stack<String> stack = new Stack<String>();
+		
+		if (threadId2TestName.containsKey(threadId)) {
+			// not the first time
+			stack = threadId2TestName.get(threadId);
+		}
+		stack.push(test);
+		threadId2TestName.put(threadId, stack);
 		testName2StartDate.put(test, new Date().getTime());
 		return test;
 	}
@@ -108,47 +119,110 @@ public class TestNamingUtil
 		}
 	}
 	
-	public static synchronized void releaseTestInfoByThread(Long threadId)
+	public static synchronized void releaseTestInfoByThread()
 	{
-		threadId2TestName.remove(threadId);
-		testName2StartDate.remove(threadId);
+		long threadId = Thread.currentThread().getId();
+		if (!isTestNameRegistered()) {
+			LOGGER.warn("There is no TestInfo for release in threadId: " + threadId);
+			return;
+		}
+		
+		Stack<String> stack = threadId2TestName.get(threadId);
+		String test = stack.pop();
+		LOGGER.debug("Releasing information about test: " + test);
+		
+		if (stack.isEmpty()) {
+			threadId2TestName.remove(threadId);
+		}
+		//testName2StartDate.remove(test);
 	}
 	
-	public static String getTestNameByThread(Long threadId)
-	{
-		return threadId2TestName.get(threadId);
+	public static boolean isTestNameRegistered() {
+		long threadId = Thread.currentThread().getId();
+		if (threadId2TestName.get(threadId) != null) {
+			Stack<String> stack = threadId2TestName.get(threadId);
+			if (stack.size() > 0) {
+				String test = stack.get(stack.size() - 1);
+				return test != null;
+			}
+		}
+		return false;
+	}
+	
+	public static String getTestNameByThread() {
+		long threadId = Thread.currentThread().getId();
+		
+		Stack<String> stack = threadId2TestName.get(threadId);
+		if (stack == null) {
+			LOGGER.error("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
+			return null;
+		}
+		
+		if (stack.size() == 0) {
+			LOGGER.error("Unable to find registered test name for threadId from stack: " + threadId);
+			return null;
+		}
+		
+		return stack.get(stack.size() - 1);		
 	}
 	
 	public static Long getTestStartDate(String test)
 	{
-		return testName2StartDate.get(test);
+		Long startDate = testName2StartDate.get(test);
+		if (startDate == null) {
+			LOGGER.warn("Unable to find start date for test: '" + test + "'!");
+		}
+		return startDate;
 	}
 	
-	public static synchronized void associateZafiraTest(TestType zafiraTest, Long threadId)
+	public static synchronized void associateZafiraTest(TestType zafiraTest)
 	{
-		if (zafiraTest == null)
+		long threadId = Thread.currentThread().getId();
+		if (zafiraTest == null) {
+			LOGGER.error("NULL ZafiraTest is registered for thread: " + threadId);
 			return;
+		}
+		LOGGER.debug("Associate ZafiraTest id: " + zafiraTest.getId() + "; name: " + zafiraTest.getName() + " with thread: " +threadId);
 		threadId2ZafiraTest.put(threadId, zafiraTest);
 	}
 	
-	public static TestType getZafiraTest(Long threadId)
+	public static TestType getZafiraTest()
 	{
-		return threadId2ZafiraTest.get(threadId);
+		return threadId2ZafiraTest.get(Thread.currentThread().getId());
 	}
 	
-	public static synchronized void releaseZafiraTest(Long threadId)
+	public static synchronized void releaseZafiraTest()
 	{
+		long threadId = Thread.currentThread().getId();
+		TestType zafiraTest = threadId2ZafiraTest.get(threadId);
+		if (zafiraTest != null) {
+			LOGGER.debug("Releasing ZafiraTest id: " + zafiraTest.getId() + "; name: " + zafiraTest.getName() + " from thread: " +threadId);
+		} else {
+			LOGGER.error("Unable to release ZafiraTest by threadId: " + threadId);
+		}
 		threadId2ZafiraTest.remove(threadId);
 	}
 	
-	
-	public static synchronized void associateCanonicTestName(String test, Long threadId)
+	public static synchronized void associateCanonicTestName(String test)
 	{
-		threadId2CanonicTestName.put(threadId, test);
+		threadId2CanonicTestName.put(Thread.currentThread().getId(), test);
 	}
 	
-	public static String getCanonicTestNameByThread(Long threadId) {
+	public static String getCanonicTestNameByThread() {
+		return getCanonicTestNameByThread(Thread.currentThread().getId());
+	}
+	
+	public static String getCanonicTestNameByThread(long threadId) {
 		return threadId2CanonicTestName.get(threadId);
 	}
 
+	public static synchronized void associateBug(String testName, String id)
+	{
+		testName2Bug.put(testName, id);
+	}
+
+	public static synchronized String getBug(String testName)
+	{
+		return testName2Bug.get(testName);
+	}
 }

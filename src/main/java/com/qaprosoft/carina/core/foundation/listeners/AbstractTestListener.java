@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
@@ -50,7 +51,7 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-//import com.qaprosoft.carina.core.foundation.dropbox.DropboxClient;
+import com.qaprosoft.zafira.client.model.TestType;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -72,7 +73,7 @@ public abstract class AbstractTestListener extends TestArgsListener
      }
     
     private void passItem(ITestResult result, Messager messager){
-		String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String deviceName = getDeviceName();
 		
@@ -81,7 +82,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_PASSED)));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		TestNamingUtil.releaseTestInfoByThread();
     }
     
     private String failItem(ITestResult result, Messager messager){
@@ -108,8 +109,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		}
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
-		
+		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
     }
     
@@ -122,8 +122,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
-		
+		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
     }    
  
@@ -138,8 +137,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_SKIPPED)));
 		
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
-		
+		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
     }
     
@@ -184,7 +182,7 @@ public abstract class AbstractTestListener extends TestArgsListener
     @Override
     public void onConfigurationFailure(ITestResult result) {
     	failItem(result, Messager.CONFIG_FAILED);
-		String test = TestNamingUtil.getCanonicalTestName(result);
+    	String test = TestNamingUtil.getCanonicalTestName(result);
 		closeLogAppender(test);
 		super.onConfigurationFailure(result);
     }
@@ -223,11 +221,44 @@ public abstract class AbstractTestListener extends TestArgsListener
 
 			}
 		}				
-
+		// obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in onTestSkipped method
+		TestNamingUtil.releaseTestInfoByThread();
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		RetryCounter.initCounter(test);
-
+		
 		startItem(result, Messager.TEST_STARTED);
+		
+		TestNamingUtil.associateCanonicTestName(test);
+		
+		// Analyze Zafira results for re-run
+		if (ZafiraIntegrator.isRerunFailures()) {
+			// Analyze TestResult status obligatory inside isrerun if operator because
+			// some modifications in Zafira results needed.
+			// FAILED status will be removed/unregistered from Zafira database
+			TestType testType = ZafiraIntegrator.getTestType();
+			
+			// if null it means that new test appeared in comparison with registered result
+			if (testType != null) {
+				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
+					// generate already passed exception. Regular eception
+					// doesn't work as it stop DataProvider execution etc
+					throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
+				} else {
+					// Do not remove test data as it should reuse already registered test and update it
+					// unregister Zafira test result
+					//ZafiraIntegrator.deleteTest(testType.getId());
+				}
+			} else {
+				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
+			}
+		}
+		
+		int retry = RetryCounter.getRunCount(test);
+		if (retry == 0) {
+			// register test on startup for 0 retry only!
+			ZafiraIntegrator.startTestMethod(result);
+		}
+		
 	}
 
 	@Override
@@ -236,17 +267,15 @@ public abstract class AbstractTestListener extends TestArgsListener
 		passItem(result, Messager.TEST_PASSED);
 
 		ZafiraIntegrator.finishTestMethod(result, null);
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		TestNamingUtil.associateCanonicTestName(test, Thread.currentThread().getId()); //valid testname without configuration details
-		
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
+		String test = TestNamingUtil.getTestNameByThread();
+		// String test = TestNamingUtil.getCanonicalTestName(result);
 
 		if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG) && (result.getMethod().getDescription() != null)
 				&& result.getMethod().getDescription().startsWith(SpecialKeywords.JIRA_TICKET))
@@ -274,31 +303,40 @@ public abstract class AbstractTestListener extends TestArgsListener
 		} else {
 			errorMessage = failItem(result, Messager.TEST_FAILED);
 			closeLogAppender(test);
+			//register test details for zafira data population only after finishing retries
+	    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		}
-
-		long threadId = Thread.currentThread().getId();
-    	TestNamingUtil.associateCanonicTestName(test, threadId); //valid testname without configuration details
-
-		//register test details for zafira data population
-    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		
-		TestNamingUtil.releaseTestInfoByThread(threadId);
+		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestFailure(result);
 	}
 	
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
+		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
+		if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+			// [VD] it is prohibited to release TestInfoByThread in this place.!
+			return;
+		}
+		
+		//handle AbstractTest->SkipExecution
+		if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
+			// [VD] it is prohibited to release TestInfoByThread in this place.!
+			return;
+		}
+		
 		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
-		TestNamingUtil.releaseTestInfoByThread(Thread.currentThread().getId());
+		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSkipped(result);
 	}
 	
 	@Override
 	public void onFinish(ITestContext context)
 	{
-		ZafiraIntegrator.finishSuite();		
 		removeIncorrectlyFailedTests(context);
 		//printContextTestsSummary(context);
 		super.onFinish(context);
@@ -446,6 +484,21 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String linkToVideo = ReportContext.getTestVideoLink(test);
 		//String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
 		String linkToScreenshots = null;
+
+		if (TestResultType.FAIL.equals(resultType))
+		{
+			String bugInfo = Jira.processBug(result);
+			if (bugInfo != null)
+			{
+				if (failReason != null)
+				{
+					failReason = bugInfo.concat("\n").concat(failReason);
+				} else
+				{
+					failReason = bugInfo;
+				}
+			}
+		}
 
 		if(!FileUtils.listFiles(ReportContext.getTestDir(test), new String[]{"png"}, false).isEmpty()){
 			if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {

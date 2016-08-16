@@ -1,13 +1,17 @@
 package com.qaprosoft.carina.core.foundation.utils.factory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
 
+import com.qaprosoft.carina.core.foundation.exception.RequiredCtorNotFoundException;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -18,6 +22,15 @@ public class CustomTypePageFactory {
 
 	private static final String VERSION_SPLITTER = "\\.";
 	
+	private static final String INTEGER_STR = "class java.lang.Integer";
+    private static final String INT_STR = "int";
+    
+    private static final String LONG_OBJ_STR = "class java.lang.Long";
+    private static final String LONG_STR = "long";
+    
+    private static final String DOUBLE_OBJ_STR = "class java.lang.Double";
+    private static final String DOUBLE_STR = "double";
+	
 	private static Reflections reflections;
 
 	static {
@@ -27,17 +40,22 @@ public class CustomTypePageFactory {
 	protected static final Logger LOGGER = Logger
 			.getLogger(CustomTypePageFactory.class);
 
-	public static <T extends AbstractPage> T initPage(Class<T> parentClass){
-		return initPage(DriverPool.getDriverByThread(), parentClass);
+	public static <T extends AbstractPage> T initPage(Class<T> parentClass, Object... parameters){
+		return initPage(DriverPool.getDriverByThread(), parentClass, parameters);
 	}
 	
 	public static <T extends AbstractPage> T initPage(WebDriver driver,
-			Class<T> parentClass) {
+			Class<T> parentClass, Object... parameters) {
 
+		if (driver == null) {
+			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
+			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
+		}
+		
 		Set<Class<? extends T>> setClasses = reflections
 				.getSubTypesOf(parentClass);
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
-		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null;
+		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
 		Type screenType = DevicePool.getDeviceType();
 		Device device = DevicePool.getDevice();
 		// default version in case if it is desktop driver
@@ -82,30 +100,118 @@ public class CustomTypePageFactory {
 			}
 			
 		}
-		
+		Constructor<? extends T> ctor;
 		try {
 			if(versionClass != null){
 				LOGGER.debug("Instance by version and platform will be created.");
-				return versionClass.getConstructor(WebDriver.class).newInstance(driver);
-			}
-			if(majorVersionClass != null){
+				requiredClass = versionClass;
+			} else if(majorVersionClass != null){
 				LOGGER.debug("Instance by major version and platform will be created.");
-				return majorVersionClass.getConstructor(WebDriver.class).newInstance(driver);
-			}
-			if(deviceClass != null){
+				requiredClass = majorVersionClass;
+			} else if(deviceClass != null){
 				LOGGER.debug("Instance by platform will be created.");
-				return deviceClass.getConstructor(WebDriver.class).newInstance(driver);
-			} 
-			if(familyClass != null){
+				requiredClass = deviceClass;
+			} else if(familyClass != null){
 				LOGGER.debug("Instance by family will be created.");
-				return familyClass.getConstructor(WebDriver.class).newInstance(driver);
+				requiredClass = familyClass;
+			} else {
+			    throw new RuntimeException(
+	                    String.format("There is no any class that satisfy to required conditions: [parent class - %s], [device type - %s]", 
+	                            parentClass.getName(), screenType));
 			}
-			throw new RuntimeException(
-					String.format("There is no any class that satisfy to required conditions: [parent class - %s], [device type - %s]", parentClass.getName(), screenType));
+			// handle cases where we have only WebDriver as ctor parameter
+			if (parameters.length == 0) {
+				parameters = new Object[] { driver };
+			}
+			ctor = getConstructorByParams(requiredClass, parameters);
+			return ctor.newInstance(parameters);
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+				| SecurityException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
+	
+	/**
+     * Get constructor from clazz that satisfy specific range of parameters (using Reflection)
+     * @param clazz
+     * @param parameters
+     * @return constructor
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz,
+            Object... parameters) {
+        LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + parameters.toString());
+        Class<?>[] parametersTypes;
+        List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
+        for (Object param : parameters) {
+            parametersTypesList.add(param.getClass());
+        }
+        parametersTypes = parametersTypesList.toArray(new Class<?>[parametersTypesList.size()]);
+        Constructor<?> requiredCtor = null;
+        Constructor<?>[] ctors = clazz.getDeclaredConstructors();
+        LOGGER.debug(String.format("Class %s contains %d ctors ", clazz.toString(), ctors.length));
+        for (Constructor<?> constructor : ctors) {
+            LOGGER.debug("Constructor: ".concat(constructor.toString()));
+        }
+        for (Constructor<?> constructor : ctors) {
+            Class<?>[] ctorTypes = constructor.getParameterTypes();
+            
+            // Check if passed parameters quantity satisfy to constructor's parameters size
+            if (parametersTypes.length != ctorTypes.length) {
+                LOGGER.debug(String.format("Ctors quantity doesn't satisfy to requirements. "
+                        + "Expected: %d. Actual: %d", parametersTypes.length, ctorTypes.length));
+                continue;
+            }
+            if (parametersTypes.length == 0) {
+                requiredCtor = constructor;
+                break;
+            }
+            int foundParams = 0;
+            
+            // comparison logic for passed parameters type and ctor' parameters type
+            for (Class<?> ctorType : ctorTypes) {
+                for (Class<?> paramType : parametersTypes) {
+                    if (paramType.isInstance(ctorType) || ctorType.isAssignableFrom(paramType) || comparePrimitives(ctorType, paramType)) {
+                        foundParams++;
+                        break;
+                    }
+                }
+            }
+
+            if (foundParams == ctorTypes.length) {
+                requiredCtor = constructor;;
+            }
+
+        }
+
+        if (null == requiredCtor) {
+            throw new RequiredCtorNotFoundException();
+        }
+        
+        return (Constructor<? extends T>) requiredCtor;
+    }
+    
+    
+    /**
+     * Method to compare primitives with corresponding wrappers
+     * @param obj1
+     * @param obj2
+     * @return 
+     */
+    private static boolean comparePrimitives(Object obj1, Object obj2) {
+        
+        switch(obj1.toString()) {
+            case INT_STR:
+            case INTEGER_STR:
+                return INTEGER_STR.equalsIgnoreCase(obj2.toString()) || obj2.toString().equalsIgnoreCase(INT_STR);
+            case LONG_OBJ_STR:
+            case LONG_STR:
+                return LONG_OBJ_STR.equalsIgnoreCase(obj2.toString()) || obj2.toString().equalsIgnoreCase(LONG_STR);
+            case DOUBLE_OBJ_STR:
+            case DOUBLE_STR:
+                return DOUBLE_OBJ_STR.equalsIgnoreCase(obj2.toString()) || obj2.toString().equalsIgnoreCase(DOUBLE_STR);
+        }
+        return false;
+    }
 }

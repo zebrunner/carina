@@ -1,17 +1,25 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import au.com.bytecode.opencsv.CSVReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.*;
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -28,6 +36,7 @@ public class CsvDataProvider extends BaseDataProvider {
     private String testRailColumn;
     private String testMethodColumn;
     private String testMethodOwnerColumn;
+	private String bugColumn;
     
     @SuppressWarnings("unchecked")
 	@Override
@@ -48,6 +57,7 @@ public class CsvDataProvider extends BaseDataProvider {
         testRailColumn = parameters.testRailColumn();
         testMethodColumn = parameters.testMethodColumn();
         testMethodOwnerColumn = parameters.testMethodOwnerColumn();
+		bugColumn = parameters.bugColumn();
 
         List<String> argsList = dsBean.getArgs();
         List<String> staticArgsList = dsBean.getStaticArgs();
@@ -116,7 +126,11 @@ public class CsvDataProvider extends BaseDataProvider {
         		
                 for (String header : headers) {
                 	int index = mapper.get(header);
-                	dynamicAttrs.put(header,  strings[index]);
+                	if (ParameterGenerator.process(strings[index]) != null) {
+                		dynamicAttrs.put(header, ParameterGenerator.process(strings[index]).toString());
+                	} else {
+                		dynamicAttrs.put(header, null);
+                	}
                 	
                 	args[rowIndex][0] = dynamicAttrs;
                 }
@@ -125,7 +139,11 @@ public class CsvDataProvider extends BaseDataProvider {
             } else {
                 for (String arg : argsList) {
                     int index = mapper.get(arg);
-                    args[rowIndex][i] = strings[index];
+                	if (ParameterGenerator.process(strings[index]) != null) {
+                		args[rowIndex][i] = ParameterGenerator.process(strings[index]).toString();
+                	} else {
+                		args[rowIndex][i] = null;
+                	}
                     i++;
                 }
             }
@@ -137,33 +155,37 @@ public class CsvDataProvider extends BaseDataProvider {
             // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, strings, mapper); //provide whole line from data provider for UUID generation
             
+            HashMap<String,String> csvRow = (HashMap<String, String>) args[rowIndex][0];
             
             if (testMethodColumn.isEmpty()) {
             	testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); //provide organized args to generate valid hash
             } else {
 	            // add testName value from csv datasource to special hashMap
-	            addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
-	            addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+	            addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
+	            addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             }
 
             // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
             // add jira ticket from xls datasource to special hashMap
-            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             
+			// add bug id from csv datasource to special hashMap
+			addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
+
             //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
             // // add spira steps from xls datasource to special hashMap
-            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
             
             if (!spiraColumn.isEmpty()) {
             	//register Spira ID values from DataProvider
-            	Spira.setSteps(args[rowIndex][mapper.get(spiraColumn)].toString());
+            	Spira.setSteps(csvRow.get(spiraColumn));
             }
             
             // add testrails cases from xls datasource to special hashMap
-            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), args[rowIndex]);
+            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             
             rowIndex++;
         }
@@ -203,6 +225,7 @@ public class CsvDataProvider extends BaseDataProvider {
     	mapper.put(testRailColumn, getIndex(testRailColumn, headers));
     	mapper.put(testMethodColumn, getIndex(testMethodColumn, headers));
     	mapper.put(testMethodOwnerColumn, getIndex(testMethodOwnerColumn, headers));
+		mapper.put(bugColumn, getIndex(bugColumn, headers));
     	
         return mapper;
     }
@@ -219,14 +242,17 @@ public class CsvDataProvider extends BaseDataProvider {
 	    return index;
     }
     
-    private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Object[] csvRow) {
+    private void addValueToSpecialMap(Map<String,String> map, String column, String hashCode, Map<String,String> csvRow) {
         if (column != null) {
             if (!column.isEmpty()) {
-            	map.put(hashCode, csvRow[mapper.get(column)].toString());
+            	if (csvRow.get(column) != null) {
+	            	if (!csvRow.get(column).isEmpty()) {
+	            		//put into the args only non empty jira tickets
+	            		map.put(hashCode, csvRow.get(column));
+	            	}
+            	}
             }
         }    	
     }    
-    
-
 
 }

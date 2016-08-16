@@ -11,9 +11,9 @@ public @interface DeviceType {
 
 	enum Type {
 
-		DESKTOP("desktop", "desktop"), ANDROID_TABLET("android_tablet",
-				"android"), ANDROID_PHONE("android_phone", "android"), IOS_TABLET(
-				"ios_tablet", "ios"), IOS_PHONE("ios_phone", "ios");
+		DESKTOP("desktop", "desktop"), ANDROID_TABLET("android_tablet", "android"), ANDROID_PHONE("android_phone",
+				"android"), ANDROID_TV("android_tv", "android"), IOS_TABLET("ios_tablet", "ios"), IOS_PHONE("ios_phone",
+						"ios");
 
 		private String type;
 

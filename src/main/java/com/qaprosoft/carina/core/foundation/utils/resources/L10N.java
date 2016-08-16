@@ -51,6 +51,9 @@ public class L10N {
 	private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 
 	public static void init() {
+		if (!Configuration.getBoolean(Parameter.ENABLE_L10N)) {
+			return;
+		}
 		
 		List<Locale> locales = LocaleReader.init(Configuration
 				.get(Parameter.LOCALE));
@@ -99,6 +102,13 @@ public class L10N {
 			 * .properties" to "L10N.messages"
 			 */
 			String filePath = FilenameUtils.getPath(u.getPath());
+			int index = filePath.indexOf(SpecialKeywords.L10N);
+			
+			if (index == -1) {
+				LOGGER.warn("Unable to find L10N pattern for " + u.getPath() + " resource!");
+				continue;
+			}
+
 			String resource = filePath.substring(
 					filePath.indexOf(SpecialKeywords.L10N))
 					.replaceAll("/", ".")
