@@ -15,11 +15,16 @@
  */
 package com.qaprosoft.carina.core.foundation.jira;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import net.rcarz.jiraclient.BasicCredentials;
+import net.rcarz.jiraclient.Issue;
+import net.rcarz.jiraclient.JiraClient;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
@@ -30,9 +35,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-
-import net.rcarz.jiraclient.BasicCredentials;
-import net.rcarz.jiraclient.JiraClient;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 /*
  * Jira
@@ -152,4 +155,65 @@ public class Jira
 		return disableRetryForKnownIssues;
 	}
 	
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
+	public synchronized static String processBug(ITestResult result)
+	{
+		if (isInitialized)
+		{
+			Class clazz = result.getMethod().getRealClass();
+			Method m;
+			try
+			{
+				m = clazz.getMethod(result.getMethod().getMethodName(), result.getMethod().getConstructorOrMethod().getMethod().getParameterTypes());
+			} catch (Exception e)
+			{
+				LOG.error("Exception during test name getting", e);
+				return null;
+			}
+			/* priority 1: bug set from test code */
+			String test = TestNamingUtil.getTestNameByThread();
+			String bugId = TestNamingUtil.getBug(test);
+			/* priority 2: bug set from data provider */
+			if (bugId == null)
+			{
+				Map<Object[], String> testnameBugMap = (Map<Object[], String>) result.getTestContext().getAttribute(
+						SpecialKeywords.BUG_ARGS_MAP);
+				if (testnameBugMap != null)
+				{
+					String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+					if (testnameBugMap.containsKey(testHash))
+					{
+						bugId = testnameBugMap.get(testHash);
+					}
+				}
+			}
+			/* priority 3: bug set from @Bug annotation */
+			if (bugId == null)
+			{
+				if (m.isAnnotationPresent(Bug.class))
+				{
+					Bug annotation = m.getAnnotation(Bug.class);
+					bugId = annotation.id();
+				}
+			}
+			if (bugId != null)
+			{
+				String bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + bugId;
+				LOG.info("Bug URL retrieved: " + bugUrl);
+
+				try
+				{
+					Issue bug = jira.getIssue(bugId);
+					return String.format("Bug %s \"%s\" with status \"%s\" associated", bugUrl, bug.getSummary(), bug.getStatus().getName());
+				} catch (Exception e)
+				{
+					LOG.error("Exception during retrieving bug info", e);
+					return null;
+				}
+			}
+		}
+		return null;
+	}
+
 }

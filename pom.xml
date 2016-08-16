@@ -48,7 +48,7 @@
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 
 		<jcommon.version>1.0.15</jcommon.version>
-		<commons-lang3.version>3.1</commons-lang3.version>
+		<commons-lang3.version>3.4</commons-lang3.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<apache-poi.version>3.11-beta3</apache-poi.version>
 		<commons-cli.version>1.2</commons-cli.version>
@@ -59,7 +59,7 @@
 
 		<jira-client.version>0.5</jira-client.version>
 
-		<zafira-client.version>1.4.3</zafira-client.version>
+		<zafira-client.version>1.7.4</zafira-client.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<json-simple.version>1.1</json-simple.version>
@@ -68,9 +68,15 @@
 		<appium.version>3.2.0</appium.version>
 		<opencsv.version>1.7</opencsv.version>
 		<aws-s3-manager.version>1.2.3</aws-s3-manager.version>
-		<api-tools.version>1.0.5</api-tools.version>
+		<api-tools.version>1.0.7</api-tools.version>
 		<monte-repack.version>1.0</monte-repack.version>
-		
+
+		<cucumber.testng.version>1.2.4</cucumber.testng.version>
+		<cucumber.java.version>1.2.4</cucumber.java.version>
+		<cucumber.reporting>2.6.3</cucumber.reporting>
+		<cucumber.picocontainer.version>1.2.4</cucumber.picocontainer.version>
+		<picocontainer.version>2.15</picocontainer.version>
+
 	</properties>
 
 	<repositories>
@@ -393,14 +399,45 @@
 			<artifactId>api-tools</artifactId>
 			<version>${api-tools.version}</version>
 		</dependency>
-		
+
 		<!-- monte-repack video recording  -->
-	    <dependency>
+		<dependency>
 			<groupId>com.pojosontheweb</groupId>
 			<artifactId>monte-repack</artifactId>
 			<version>${monte-repack.version}</version>
- 	    </dependency>
-		
+		</dependency>
+
+		<!-- Cucumber -->
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-testng</artifactId>
+			<version>${cucumber.testng.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>${cucumber.java.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.masterthought</groupId>
+			<artifactId>cucumber-reporting</artifactId>
+			<version>${cucumber.reporting}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-picocontainer</artifactId>
+			<version>${cucumber.picocontainer.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.picocontainer</groupId>
+			<artifactId>picocontainer</artifactId>
+			<version>${picocontainer.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<distributionManagement>

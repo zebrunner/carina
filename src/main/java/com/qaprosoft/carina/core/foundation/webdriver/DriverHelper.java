@@ -24,6 +24,8 @@ import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
@@ -75,8 +77,6 @@ public class DriverHelper {
 
 	protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
-	private List<ExtendedWebElement>[] elements;
-
 	public DriverHelper() {
 		try {
 			cryptoTool = new CryptoTool();
@@ -91,7 +91,12 @@ public class DriverHelper {
 		this.driver = driver;
 
 		if (driver == null) {
-			throw new RuntimeException("WebDriver not initialized, check log files for details!");
+			Device device = DevicePool.getDevice();
+			if (device != null) {
+				throw new RuntimeException("[" + device.getName() + "] WebDriver not initialized, check log files for details!");
+			} else {
+				throw new RuntimeException("WebDriver not initialized, check log files for details!");
+			}
 		}
 		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		initSummary(driver);
@@ -123,13 +128,24 @@ public class DriverHelper {
 		summary = new TestLogHelper(sessionId);
 	}
 
+
+    /**
+     *
+     * @param element ExtendedWebElement
+     * @param waitPeriod long in seconds.
+     * @return true if element become clickable
+     */
+    protected boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
+     return  waitForElementToBeClickable(element,(int)waitPeriod);
+    }
 	/**
 	 * Wait for element to be clickable. Alternative for isElementPresent with
 	 * other condition.
 	 * 
-	 * @param extWebElement
+	 * @param element
 	 *            ExtendedWebElement
-	 * @return waitPeriod in seconds.
+	 * @param waitPeriod int in seconds.
+     * @return true if element become clickable
 	 */
 	protected boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
 		final WebDriver drv = getDriver();
@@ -209,7 +225,7 @@ public class DriverHelper {
 	 * Method which quickly looks for all element and check that they present
 	 * during timeout sec
 	 *
-	 * @param timeout
+	 * @param timeout long
 	 * @param elements
 	 *            ExtendedWebElement...
 	 * @return boolean return true only if all elements present.
@@ -217,16 +233,18 @@ public class DriverHelper {
 	public boolean allElementsPresent(long timeout, ExtendedWebElement... elements) {
 		int index = 0;
 		boolean present = true;
+		boolean ret = true;
 		int counts = 1;
 		while (present && index++ < counts) {
 			for (int i = 0; i < elements.length; i++) {
 				present = isElementPresent(elements[i], timeout / counts);
 				if (!present) {
 					LOGGER.error(elements[i].getNameWithLocator() + " is not present.");
+					ret=false;
 				}
 			}
 		}
-		return present;
+		return ret;
 	}
 
 	/**
@@ -245,14 +263,14 @@ public class DriverHelper {
 	 * Method which quickly looks for all element lists and check that they
 	 * contain at least one element during timeout
 	 *
-	 * @param timeout
+	 * @param timeout long
 	 * @param elements
 	 *            List<ExtendedWebElement>...
 	 * @return boolean return true only if All Element lists contain at least
 	 *         one element
 	 */
 	public boolean allElementListsAreNotEmpty(long timeout, List<ExtendedWebElement>... elements) {
-		boolean ret = true;
+		boolean ret;
 		int counts = 3;
 		for (int i = 0; i < elements.length; i++) {
 			boolean present = false;
@@ -270,14 +288,14 @@ public class DriverHelper {
 				return false;
 			}
 		}
-		return ret;
+		return true;
 	}
 
 	/**
 	 * Method which quickly looks for any element presence during
 	 * IMPLICIT_TIMEOUT
 	 *
-	 * @param elements
+	 * @param elements ExtendedWebElement...
 	 * @return true if any of elements was found.
 	 */
 	public boolean isAnyElementPresent(ExtendedWebElement... elements) {
@@ -287,7 +305,7 @@ public class DriverHelper {
 	/**
 	 * Method which quickly looks for any element presence during timeout sec
 	 *
-	 * @param timeout
+	 * @param timeout long
 	 * @param elements
 	 *            ExtendedWebElement...
 	 * @return true if any of elements was found.
@@ -316,7 +334,7 @@ public class DriverHelper {
 	 * return Any Present Element from the list which present during
 	 * IMPLICIT_TIMEOUT
 	 *
-	 * @param elements
+	 * @param elements ExtendedWebElement...
 	 * @return ExtendedWebElement
 	 */
 	public ExtendedWebElement returnAnyPresentElement(ExtendedWebElement... elements) {
@@ -326,7 +344,7 @@ public class DriverHelper {
 	/**
 	 * return Any Present Element from the list which present during timeout sec
 	 *
-	 * @param timeout
+	 * @param timeout long
 	 * @param elements
 	 *            ExtendedWebElement...
 	 * @return ExtendedWebElement
@@ -1332,10 +1350,14 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
+		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {
-			driver = DriverPool.getDriverByThread(Thread.currentThread().getId());
+			driver = DriverPool.getDriverByThread(currentThreadId);
 		}
-
+		if (driver == null) {
+			LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
+			throw new RuntimeException("Driver isn't initialized.");
+		}
 		return driver;
 	}
 

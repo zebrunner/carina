@@ -26,7 +26,8 @@ public enum TestResultType
 	PASS_WITH_KNOWN_ISSUES("PASS (KNOWN ISSUES)"),
 	FAIL("FAIL"),
 	SKIP("SKIP"),
-	SKIP_ALL("SKIP_ALL");
+	SKIP_ALL("SKIP_ALL"),
+	SKIP_ALL_ALREADY_PASSED("SKIP_ALL_ALREADY_PASSED");
 
 
 	private String result;
@@ -40,14 +41,6 @@ public enum TestResultType
 		this.result = result;
 	}
 	
-	TestResultType(String result, int passed, int failed, int skipped, int service)
-	{
-		this.result = result;
-		this.passed = passed;
-		this.failed = failed;
-		this.skipped = skipped;
-	}
-
 	public String getName()
 	{
 		return result;
