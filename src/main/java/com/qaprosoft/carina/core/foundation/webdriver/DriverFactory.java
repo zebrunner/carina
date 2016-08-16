@@ -29,11 +29,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -77,6 +77,13 @@ public class DriverFactory {
         } catch (Exception e) {
             LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
         }
+        
+		if (driver == null) {
+			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
+			Device device = DevicePool.getDevice();
+		    DevicePool.unregisterDevice(device);
+			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
+		}
 
         return driver;
     }
@@ -116,12 +123,5 @@ public class DriverFactory {
         Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
         return cap.getVersion().toString();
     }
-    
-    @Deprecated
-    public static DesiredCapabilities getMobileWebCapabilities(boolean gridMode, String testName, String platform, String platformVersion, String deviceName,
-            String automationName, String commandTimeout, String browserName) {
-    	return MobileCapabilies.getMobileCapabilities(gridMode, platform, platformVersion, deviceName, automationName, commandTimeout, browserName, "", "", "");
-    }
-
 
 }

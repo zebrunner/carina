@@ -1,13 +1,5 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.SwipeElementDirection;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDeviceActionShortcuts;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.AppiumDriver;
-
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +17,13 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+
+import io.appium.java_client.MobileDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.SwipeElementDirection;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDeviceActionShortcuts;
+import io.appium.java_client.android.AndroidDriver;
 
 public class AndroidUtils {
 
@@ -125,6 +124,62 @@ public class AndroidUtils {
 						+ String.format("Scrolling to text '%s'", text));
 				scrolled = false;
 			}
+		}
+		return scrolled;
+	}
+	
+	/**
+	 * scrollTo specified text using findElementByAndroidUIAutomator solution
+	 *
+	 * @param text
+	 *            - String
+	 * @return boolean
+	 */
+	public static boolean scrollTo1(final String text) {
+		boolean scrolled = false;
+		int repeat = 1;
+		int tries = 3;
+		// TODO: investigate how to:
+		// AndroidUIAutomator("setMaxSearchSwipes(200)");
+		do {
+			try {
+				LOGGER.info("Scroll to '" + text + "' using findElementByAndroidUIAutomator.");
+				((AndroidDriver<?>) DriverPool.getDriverByThread())
+						.findElementByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\""
+								+ text + "\").instance(0))");
+				scrolled = true;
+			} catch (Exception e) {
+				LOGGER.warn("Exception occurred for scroll operation!  "
+						+ String.format(
+								"For try #'%s'. Scrolling to text '%s'",
+								repeat, text));
+				repeat++;
+				scrolled = false;
+			}
+		} while (!scrolled && repeat < tries);
+
+		return scrolled;
+	}
+
+	
+	/**
+	 * scrollTo specified text
+	 *
+	 * @param text
+	 *            - String
+	 * @return boolean
+	 */
+	public static boolean scrollTo2(final String text) {
+		boolean scrolled = false;
+
+		try {
+			LOGGER.info("Scroll to '" + text + "' using AndroidDriver default solution.");
+			((AndroidDriver<?>) DriverPool.getDriverByThread()).scrollTo(text);
+			scrolled = true;
+		} catch (Exception e) {
+			LOGGER.warn("Exception occurred for scroll operation using Solution 2.  "
+					+ String.format("Scrolling to text '%s'", text));
+			scrolled = false;
 		}
 		return scrolled;
 	}

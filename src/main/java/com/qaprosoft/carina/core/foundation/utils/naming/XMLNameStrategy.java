@@ -37,10 +37,11 @@ public class XMLNameStrategy implements INamingStrategy
 	@Override
 	public String getCanonicalTestName(ITestResult result) {
 		//verify if testName is already registered with thread then return it back
-		String testName = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
-		if (testName != null) {
-			return testName;
+		if (TestNamingUtil.isTestNameRegistered()) {
+			return TestNamingUtil.getTestNameByThread();
 		}
+		
+		String testName = ""; 
 		
 		@SuppressWarnings("unchecked")
 		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
@@ -52,8 +53,9 @@ public class XMLNameStrategy implements INamingStrategy
 			}
 		}
 		
-		if (testName == null)
+		if (testName.isEmpty()) {
 			testName = result.getTestContext().getCurrentXmlTest().getName();
+		}
 		
 		
 		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
@@ -79,7 +81,8 @@ public class XMLNameStrategy implements INamingStrategy
 		}
 		
 		if (invocationID != -1) {
-			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%03d", invocationID));
+			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time 
+			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
 		}
 		else {
 			testName = testName + " - " +  result.getMethod().getMethodName();

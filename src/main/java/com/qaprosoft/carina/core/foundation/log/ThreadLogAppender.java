@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -11,6 +12,8 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
  *  This appender logs groups test outputs by test method so they don't mess up each other even they runs in parallel.
@@ -22,21 +25,22 @@ public class ThreadLogAppender extends AppenderSkeleton
 	@Override
 	public synchronized void append(LoggingEvent event)
 	{
-		int count = 0;
-		//wait 10 seconds until folder structure is create
-		while (!ReportContext.isBaseDireCreated() && ++count<10) {
-			pause(1);
-		}
 		if (!ReportContext.isBaseDireCreated()) {
 			System.out.println("Folder structure is not created yet!");
 			return;
 		}
 		try
 		{
-			String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
-			if(test == null)
-			{
+			if (!TestNamingUtil.isTestNameRegistered()) {
+				//don't write any message into the log if thread is not associated anymore with test 
 				return;
+			}
+			String test = TestNamingUtil.getTestNameByThread();
+			if (test == null) {
+				//System.out.println("TestNamingUtil.getTestNameByThread returned test=null!");
+				return;
+			} else {
+				//System.out.println("test: " + test);
 			}
 			BufferedWriter fw = test2file.get(test);
 			if (fw == null)
@@ -47,7 +51,28 @@ public class ThreadLogAppender extends AppenderSkeleton
 				test2file.put(test, fw);
 			}
 			if (event != null) {
-				fw.write(event.getMessage().toString());
+				//append time, thread, class name and device name if any
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss"); //2016-05-26 04:39:16
+				String time = dateFormat.format(event.getTimeStamp());
+				//System.out.println("time: " + time);
+				
+				long threadId = Thread.currentThread().getId();
+				//System.out.println("thread: " + threadId);
+				String fileName = event.getLocationInformation().getFileName();
+				//System.out.println("fileName: " + fileName);
+				
+				String logLevel = event.getLevel().toString();
+				
+				Device device = DevicePool.getDevice();
+
+				String deviceName = "";
+				if (device != null) {
+					deviceName = " [" + device.getName() + "] ";
+					//System.out.println("device: " + device.getName());
+				}
+				
+				String message = "[%s] [%s] [%s] [%s]%s %s";
+				fw.write(String.format(message, time, fileName, threadId, logLevel, deviceName, event.getMessage().toString()));
 			} else {
 				fw.write("null");
 			}
@@ -94,13 +119,5 @@ public class ThreadLogAppender extends AppenderSkeleton
 	public boolean requiresLayout()
 	{
 		return false;
-	}
-	
-	private void pause(long timeout) {
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 }

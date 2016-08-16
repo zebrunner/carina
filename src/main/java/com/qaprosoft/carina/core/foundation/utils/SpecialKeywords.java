@@ -87,6 +87,7 @@ public class SpecialKeywords
 	public static final String TESTRAIL_CASES_ID = "testRailCases";
 	public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
 	public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
+	public static final String BUG_ARGS_MAP = "bugArgsMap";
 	
 	
 	public static final String INVOCATION_COUNTER = " (InvCount=%s)";
@@ -104,7 +105,16 @@ public class SpecialKeywords
 
 	public static final String TABLET = "tablet";
 	public static final String PHONE = "phone";
+	public static final String TV = "tv";
 	
 	public static final String CORE = "core";
+	
+	public static final String PASSED = "PASSED";
+	public static final String FAILED = "FAILED";
+	public static final String SKIPPED = "SKIPPED";
+	
+	public static final String ALREADY_PASSED = "ALREADY_PASSED";
+	public static final String SKIP_EXECUTION = "SKIP_EXECUTION";
+	
 	
 }
