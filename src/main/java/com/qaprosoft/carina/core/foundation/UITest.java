@@ -71,7 +71,7 @@ public class UITest extends AbstractTest
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable
     {
-    	super.executeBeforeTestSuite(context);
+    	super.executeBeforeTestSuite(context); //do not remove super otherwise functionality from AbstractTest is not launched at all.
     	
     	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
@@ -167,7 +167,7 @@ public class UITest extends AbstractTest
     		DriverMode driverMode = Configuration.getDriverMode();
 			
 	    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
-				stopRecording(TestNamingUtil.getCanonicalTestName(result));
+	    		stopRecording(TestNamingUtil.getCanonicalTestName(result));
 	    	}
 	    	
 	    	if (driverMode == DriverMode.METHOD_MODE) {
@@ -288,15 +288,19 @@ public class UITest extends AbstractTest
     	int count = 0;
     	while (!init & count++ < maxCount) {
     		try {
+    			LOGGER.debug("initDriver start...");
     			Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
    			
 
+    			LOGGER.debug("DriverFactory start...");
     			WebDriver drv = DriverFactory.create(name, device);
+    			LOGGER.debug("DriverFactory finish...");
     			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
     			
     			driver = drv;
     			setDriver(drv);
     			init = true;
+    			LOGGER.debug("initDriver finish...");
     		}
     		catch (Throwable thr) {
     			//DevicePool.ignoreDevice();
@@ -354,5 +358,4 @@ public class UITest extends AbstractTest
 		}	
 	}
 	
-
 }

@@ -3,6 +3,7 @@ package com.qaprosoft.carina.core.foundation.zafira;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,7 +26,7 @@ public class ZafiraClientTest
 	private TestSuiteType testSuite;
 	TestRunType testRun;
 	
-	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
+	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira", "admin", "admin");
 	
 	@Test(enabled=ENABLED)
 	public void testStatus()
@@ -64,27 +65,27 @@ public class ZafiraClientTest
 	@Test(enabled=ENABLED)
 	public void testCreateTestRunByHUMAN()
 	{
-		// testSuiteId:R, userId:R, scmURL:NR, scmBranch:NR, scmCommit:NR, configXML:NR, jobId:R, buildNumber:R, startedBy:R, workItems:NR
-		testRun = new TestRunType(testSuite.getId(), user.getId(), "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", job.getId(), 10, Initiator.HUMAN, null/*"JIRA-1234"*/);
-		Response<TestRunType> response = zc.createTestRun(testRun);
+		String uid = UUID.randomUUID().toString();
+		testRun = new TestRunType(uid, testSuite.getId(), user.getId(), "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", job.getId(), 10, Initiator.HUMAN, null/*"JIRA-1234"*/);
+		Response<TestRunType> response = zc.startTestRun(testRun);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
 	
 	@Test(enabled=ENABLED)
 	public void testCreateTestRunByUPSTREAM_JOB()
 	{
-		// testSuiteId:R, scmURL:NR, scmBranch:NR, scmCommit:NR, configXML:NR, jobId:R, upstreamJobId:R, upstreamJobBuildNumber:R, buildNumber:R, startedBy:R, workItems:NR
-		testRun = new TestRunType(testSuite.getId(), "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", job.getId(), job.getId(), 20, 11, Initiator.UPSTREAM_JOB, "JIRA-1234");
-		Response<TestRunType> response = zc.createTestRun(testRun);
+		String uid = UUID.randomUUID().toString();
+		testRun = new TestRunType(uid, testSuite.getId(), "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", job.getId(), job.getId(), 20, 11, Initiator.UPSTREAM_JOB, "JIRA-1234");
+		Response<TestRunType> response = zc.startTestRun(testRun);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
 	
 	@Test(enabled=ENABLED)
 	public void testCreateTestRunBySCHEDULER()
 	{
-		// testSuiteId:R, scmURL:NR, scmBranch:NR, scmCommit:NR, configXML:NR, jobId:R, buildNumber:R, startedBy:R, workItems:NR
-		testRun = new TestRunType(testSuite.getId(), "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", job.getId(), 30, Initiator.SCHEDULER, "JIRA-1234");
-		Response<TestRunType> response = zc.createTestRun(testRun);
+		String uid = UUID.randomUUID().toString();
+		testRun = new TestRunType(uid, testSuite.getId(), "http://localhost:8081", "master", "sdfs232fs3rwf34f5", "<config></config>", job.getId(), 30, Initiator.SCHEDULER, "JIRA-1234");
+		Response<TestRunType> response = zc.startTestRun(testRun);
 		Assert.assertEquals(response.getStatus(), 200);
 	}
 	
@@ -96,13 +97,18 @@ public class ZafiraClientTest
 	}
 
 	@Test(enabled=ENABLED)
-	public void testCreateTest()
+	public void testRegisterTest()
 	{
-		// name:R, status:R, testArgs:NR, testRunId:R, testCaseId:R, message:NR, startTime:NR, finishTime:NR, demoURL:NR, logURL:NR, workItems:NR
 		List<String> workItems = new ArrayList<String>();
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, "Hello!", new Date().getTime(), new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems, 2);
-		Response<TestType> response = zc.createTest(test);
+		
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.client.model.TestType.Status.PASSED, "<config></config>", 1L, 1L, new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems, 2, null);
+		Response<TestType> response = zc.startTest(test);
 		Assert.assertEquals(response.getStatus(), 200);
+		
+		test = response.getObject();
+		response = zc.finishTest(test);
+		Assert.assertEquals(response.getStatus(), 200);
+		
 	}
 	
 	@Test(enabled=ENABLED)

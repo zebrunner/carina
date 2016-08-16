@@ -54,13 +54,13 @@ public class Screenshot
 	
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images
-	 * to specified sceenshots location.
+	 * to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
 	 * @return screenshot name.
 	 */
-	public static synchronized String capture(WebDriver driver, boolean isTakeScreenshot)
+	public static String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
 		String screenName = "";
 		
@@ -78,11 +78,18 @@ public class Screenshot
 			try
 			{
 				// Define test screenshot root
-				String test = TestNamingUtil.getTestNameByThread(Thread.currentThread().getId());
+				String test = "";
+				if (TestNamingUtil.isTestNameRegistered()) {
+					test = TestNamingUtil.getTestNameByThread();
+				} else {
+					test = TestNamingUtil.getCanonicTestNameByThread();
+				}
+					
 				if (test == null || StringUtils.isEmpty(test)) {
 					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
 					return null;
 				}
+				
 				File testScreenRootDir = ReportContext.getTestDir(test);
 
 				// Capture full page screenshot and resize

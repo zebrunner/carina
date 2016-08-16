@@ -106,12 +106,20 @@ public class Configuration
 		
 		CUSTOM_CAPABILITIES("custom_capabilities"),
 		
+		EXTRA_CAPABILITIES("extra_capabilities"),
+		
 		APP_VERSION("app_version"),
 		
 		PROXY("proxy"),
 
 		PROXY_SERVER("proxy_server"),
 
+		PROXY_HOST("proxy_host"),
+		
+		PROXY_PORT("proxy_port"),
+		
+		PROXY_PROTOCOLS("proxy_protocols"),
+		
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
@@ -160,7 +168,11 @@ public class Configuration
 		
 		RETRY_COUNT("retry_count"),
 
+		ENABLE_L10N("enable_l10n"),
+		
 		LOCALE("locale"),
+		
+		ENABLE_I18N("enable_i18n"),
 		
 		LANGUAGE("language"),
 		
@@ -189,6 +201,8 @@ public class Configuration
 		CRYPTO_KEY_PATH("crypto_key_path"),
 		
 		SUITE_NAME("suite_name"),
+
+		CI_RUN_ID("ci_run_id"),
 		
 		CI_URL("ci_url"),
 		
@@ -288,6 +302,14 @@ public class Configuration
 		//zafira
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
+		ZAFIRA_USERNAME("zafira_username"),
+		
+		ZAFIRA_PASSWORD("zafira_password"),
+		
+		ZAFIRA_PROJECT("zafira_project"),
+		
+		RERUN_FAILURES("rerun_failures"),
+		
 		GIT_BRANCH("git_branch"),
 		
 		GIT_COMMIT("git_commit"),
@@ -313,7 +335,21 @@ public class Configuration
 		
 		ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
 		
-		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name");
+		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
+
+		//For cucumber tests
+		CUCUMBER_TESTS("cucumber_tests"),
+
+		CUCUMBER_TESTS_APP_VERSION("cucumber_tests_app_version"),
+
+		CUCUMBER_TESTS_NAME("cucumber_tests_name"),
+
+		CUCUMBER_TESTS_RESULTS_IMAGE_RESIZE("cucumber_tests_results_image_resize"),
+
+		CUCUMBER_USE_JS_IN_REPORT("cucumber_user_js_in_report"),
+
+		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder")
+		;
 
 		private final String key;
 
