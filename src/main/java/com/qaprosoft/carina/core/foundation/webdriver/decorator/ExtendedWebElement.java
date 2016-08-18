@@ -804,7 +804,7 @@ public class ExtendedWebElement
 	}
 	
 	private WebDriver getDriver() {
-		//each element has parent page. Inside page there is a driver. Need to implement funñtionality for getDriver from parent page
+		//each element has parent page. Inside page there is a driver. Need to implement functionality for getDriver from parent page
 		// as current implementation has limitations for extraDriver functionality
 		WebDriver driver = DriverPool.getDriverByThread();
 		if (driver == null) {
