@@ -34,25 +34,8 @@ public class AdbExecutor {
     
     private static String[] cmdInit;
     
-    // TODO: Outdated logic. Can be uncommented when adb server issues will be fixed
-//    private String ADB_HOST;
-//    private String ADB_PORT;
-
-    public static void main(String[] args) { 
-        AdbExecutor ae = new AdbExecutor();
-        System.out.println(ae.getAttachedDevices());
-    } 
-    
     public AdbExecutor(String host, String port) {
     	initDefaultCmd();
-    	// TODO temporary outdated logic: no matter what host and port values will be used for now
-//    	ADB_HOST = "localhost";
-//        if (host != null)
-//            ADB_HOST = host;
-//
-//        ADB_PORT = "5037";
-//        if (host != null)
-//            ADB_PORT = port;
     }
 
     public AdbExecutor() {
