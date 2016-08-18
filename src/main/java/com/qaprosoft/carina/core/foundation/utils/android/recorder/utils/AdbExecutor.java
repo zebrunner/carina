@@ -1,21 +1,25 @@
 package com.qaprosoft.carina.core.foundation.utils.android.recorder.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import org.apache.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * Created by YP.
@@ -24,27 +28,55 @@ import java.util.regex.Pattern;
  */
 public class AdbExecutor {
     private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
-    private String ADB_HOST;
-    private String ADB_PORT;
-
+    
+    private static final String DEFAULT_SSH_USERNAME = "build";
+    private static final String REMOTE_ADB_EXECUTION_CMD = "ssh %s@%s /Users/build/android-sdk-macosx/platform-tools/";
+    
+    private static String[] cmdInit;
+    
     public AdbExecutor(String host, String port) {
-
-        ADB_HOST = "localhost";
-        if (host != null)
-            ADB_HOST = host;
-
-        ADB_PORT = "5037";
-        if (host != null)
-            ADB_PORT = port;
+    	initDefaultCmd();
     }
 
+    public AdbExecutor() {
+    	initDefaultCmd();
+    }
+    
+    private void initDefaultCmd() {
+    	String tempCmd = "";
+    	if (DevicePool.isSystemDistributed()) {
+    		// check if device server value equals to IP of the PC where tests were launched.
+    		// adb can be executed locally in this case.
+    		String currentIP = "'fail during extaction'";
+    		try {
+    			currentIP = InetAddress.getLocalHost().getHostAddress();
+			} catch (UnknownHostException e) {
+				LOGGER.debug("Error during ip extraction: ".concat(e.getMessage()));
+			}
+    		LOGGER.debug("Local IP: ".concat(currentIP));
+    		String remoteServer = DevicePool.getServer();
+    		if (!remoteServer.equals(currentIP)){
+    			String login = Configuration.get(Parameter.SSH_USERNAME);
+        		if (StringUtils.isEmpty(login)) {
+        			login = DEFAULT_SSH_USERNAME;
+        		}
+        		// TODO handler for different adb PATH
+        		tempCmd = String.format(REMOTE_ADB_EXECUTION_CMD, login, remoteServer);
+    		}
+    	}
+    	
+    	// TODO: it can be slightly modified 
+    	// when issues with remote adb execution will be resolved: "concat("-H ADB_HOST -P ADB_PORT")"
+    	cmdInit = tempCmd.concat("adb").split(" ");
+    }
+    
     public List<String> getAttachedDevices() {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
 
         try {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "devices");
-            executor = new ProcessBuilderExecutor(cmd);
+        	String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "devices");
+        	executor = new ProcessBuilderExecutor(cmd);
 
             Process process = executor.start();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -77,8 +109,8 @@ public class AdbExecutor {
         BufferedReader in = null;
         boolean correctDevice = false;
         try {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "getprop", "ro.build.version.sdk");
-            executor = new ProcessBuilderExecutor(cmd);
+        	String[] cmd = CmdLine.insertCommandsAfter(cmdInit , "-s", udid, "shell", "getprop", "ro.build.version.sdk");
+        	executor = new ProcessBuilderExecutor(cmd);
 
             Process process = executor.start();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -133,8 +165,7 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return -1;
 
-
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
 
         try {
             ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
@@ -161,16 +192,14 @@ public class AdbExecutor {
     public void pullFile(String pathFrom, String pathTo) {
         if (!isDeviceCorrect())
             return;
-
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
         execute(cmd);
     }
 
     public void dropFile(String pathToFile) {
         if (!isDeviceCorrect())
             return;
-
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
         execute(cmd);
     }
 
@@ -187,7 +216,7 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return;
 
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
         execute(cmd);
     }
 
@@ -195,7 +224,7 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return;
         //adb -s UDID shell pm clear com.myfitnesspal.android
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
         execute(cmd);
     }
 
@@ -203,15 +232,14 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return;
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H", ADB_HOST, "-P", ADB_PORT, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
         execute(cmd);
     }
 
     private Boolean getScreenState(String udid) {
         // determine current screen status
         // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-H",
-                ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell", "dumpsys",
+    	 String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", udid, "shell", "dumpsys",
                 "input_method");
         List<String> output = execute(cmd);
 
@@ -269,8 +297,7 @@ public class AdbExecutor {
             return;
         }
         if (screenState) {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
-                    "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+        	 String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", udid, "shell",
                     "input", "keyevent", "26");
             execute(cmd);
 
@@ -308,8 +335,7 @@ public class AdbExecutor {
         }
 
         if (!screenState) {
-            String[] cmd = CmdLine.createPlatformDependentCommandLine("adb",
-                    "-H", ADB_HOST, "-P", ADB_PORT, "-s", udid, "shell",
+        	 String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", udid, "shell",
                     "input", "keyevent", "26");
             execute(cmd);
 

@@ -18,6 +18,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -29,6 +31,8 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 public class DevicePool
 {
 	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
+	
+	private static final Pattern HOST_PATTERN = Pattern.compile(".*http:\\/\\/(.*):.*");
 	
 	private static final ConcurrentHashMap<Long, Device> threadId2Device = new ConcurrentHashMap<Long, Device>();
 	private static List<Device> devices = new ArrayList<Device>();
@@ -214,4 +218,34 @@ public class DevicePool
 		}
 		return type;
 	}
+	
+	/**
+	 * Check if system is distributed (devices are connected to different servers)
+	 * @return
+	 */
+	public static boolean isSystemDistributed() {
+		boolean result = false;
+		for (int i = 0; i < devices.size() - 1; i++) {
+			if (!getServer(devices.get(i).getSeleniumServer()).equals(getServer(devices.get(i + 1).getSeleniumServer()))) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public static String getServer(final String server) {
+		Matcher matcher = HOST_PATTERN.matcher(server);
+		String serverValue;
+		if (matcher.find()) {
+			serverValue = matcher.group(1);
+		} else {
+			serverValue = server.split(":")[0];
+		}
+		return serverValue;
+	}
+	
+	public static String getServer() {
+		return getServer(getDevice().getSeleniumServer());
+	}
+	
 }
