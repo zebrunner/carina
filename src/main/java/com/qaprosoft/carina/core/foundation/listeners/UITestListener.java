@@ -48,12 +48,22 @@ public class UITestListener extends AbstractTestListener {
 
 	private String takeScreenshot(ITestResult result) {
 		String screenId = "";
-		long threadId = Thread.currentThread().getId();
-		WebDriver driver = DriverPool.getDriverByThread(threadId) != null ? DriverPool.getDriverByThread(threadId) : DriverPool.getExtraDriverByThread(threadId);
-		
+		WebDriver driver = DriverPool.getDriverByThread();
+
 		if (driver != null) {
 			screenId = Screenshot.capture(driver, true); // in case of failure
-															// make screenshot by default
+															// make screenshot
+															// by default
+		}
+		// repeat the same actions for extraDriver if any
+		driver = DriverPool.getExtraDriverByThread();
+
+		if (driver != null) {
+			screenId = Screenshot.capture(driver, true); // in case of failure
+															// make screenshot
+															// by default for
+															// extra driver as
+															// well
 		}
 
 		return screenId;
