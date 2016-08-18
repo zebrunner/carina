@@ -66,8 +66,6 @@ public class ExtendedWebElement
 	private CryptoTool cryptoTool;
 
 	private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-
-	
 	
 	private WebElement element;
 	private String name;
@@ -171,23 +169,6 @@ public class ExtendedWebElement
 		return name;
 	}
 	
-	
-/*	public boolean isPresent() {
-		WebDriver drv = DriverPool.getDriverByThread(); 
-		
-		if (!isPredicate) {
-			return !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
-		} else {
-			if (drv instanceof IOSDriver) {
-				return !((IOSDriver) drv).findElementsByIosUIAutomation(getLocator(by)).isEmpty();	
-			} else if (drv instanceof AndroidDriver) {
-				return !((AndroidDriver) drv).findElementsByAndroidUIAutomator(getLocator(by)).isEmpty();
-			} else {
-				throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
-			}			
-		}
-	}*/
-
 	/**
 	 * Clicks on element.
 	 *
@@ -823,7 +804,7 @@ public class ExtendedWebElement
 	}
 	
 	private WebDriver getDriver() {
-		//each element has parent page. Inside page there is a driver. Need to implement funvtionality for getDriver from parent page
+		//each element has parent page. Inside page there is a driver. Need to implement funñtionality for getDriver from parent page
 		// as current implementation has limitations for extraDriver functionality
 		WebDriver driver = DriverPool.getDriverByThread();
 		if (driver == null) {
