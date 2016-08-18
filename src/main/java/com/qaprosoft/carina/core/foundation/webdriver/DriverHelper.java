@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,6 +86,15 @@ public class DriverHelper {
 
 	protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
+	public DriverHelper() {
+		try {
+			cryptoTool = new CryptoTool();
+		} catch (Exception e) {
+			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
+		}
+		summary = new TestLogHelper(UUID.randomUUID().toString());
+	}
+	
 	public DriverHelper(WebDriver driver) {
 		try {
 			cryptoTool = new CryptoTool();
