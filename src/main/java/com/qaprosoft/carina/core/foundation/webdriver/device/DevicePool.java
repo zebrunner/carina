@@ -52,6 +52,10 @@ public class DevicePool
 	}
 	
 	public static synchronized void unregisterDevice(Device device) {
+		if (device == null) {
+			LOGGER.error("Unable to unregister null device");
+			return;
+		}
 		devices.remove(device);
 		LOGGER.info("Removing device from the DevicePool: " + device.getName());		
 	}
