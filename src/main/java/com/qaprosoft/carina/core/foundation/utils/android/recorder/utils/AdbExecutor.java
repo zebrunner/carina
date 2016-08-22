@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -29,8 +28,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 public class AdbExecutor {
     private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
     
-    private static final String DEFAULT_SSH_USERNAME = "build";
-    private static final String DEFAULT_ADB_PATH = "/Users/build/android-sdk-macosx/platform-tools/";
     private static final String REMOTE_ADB_EXECUTION_CMD = "ssh %s@%s %s";
     
     private static String[] cmdInit;
@@ -57,9 +54,8 @@ public class AdbExecutor {
     		LOGGER.debug("Local IP: ".concat(currentIP));
     		String remoteServer = DevicePool.getServer();
     		if (!remoteServer.equals(currentIP)){
-    			String login = getSshUser();
-    			String adbPath = getAdbPath();
-        		// TODO handler for different adb PATH
+    			String login = Configuration.get(Parameter.SSH_USERNAME);
+    			String adbPath = Configuration.get(Parameter.ADB_PATH);
         		tempCmd = String.format(REMOTE_ADB_EXECUTION_CMD, login, remoteServer, adbPath);
     		}
     	}
@@ -67,22 +63,6 @@ public class AdbExecutor {
     	// TODO: it can be slightly modified 
     	// when issues with remote adb execution will be resolved: "concat("-H ADB_HOST -P ADB_PORT")"
     	cmdInit = tempCmd.concat("adb").split(" ");
-    }
-    
-    private String getSshUser() {
-    	String login = Configuration.get(Parameter.SSH_USERNAME);
-		if (StringUtils.isEmpty(login)) {
-			login = DEFAULT_SSH_USERNAME;
-		}
-		return login;
-    }
-    
-    private String getAdbPath() {
-    	String path = Configuration.get(Parameter.ADB_PATH);
-		if (StringUtils.isEmpty(path)) {
-			path = DEFAULT_ADB_PATH;
-		}
-		return path;
     }
     
     public List<String> getAttachedDevices() {
