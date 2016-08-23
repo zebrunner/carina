@@ -343,7 +343,9 @@ public class Configuration
 
 		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder"),
 		
-		SSH_USERNAME("ssh_username")
+		SSH_USERNAME("ssh_username"),
+		
+		ADB_PATH("adb_path")
 		;
 
 
