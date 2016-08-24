@@ -18,9 +18,15 @@ package com.qaprosoft.carina.core.foundation.api;
 import static com.jayway.restassured.RestAssured.given;
 
 import java.io.PrintStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hamcrest.Matcher;
@@ -28,12 +34,16 @@ import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.config.RestAssuredConfig;
+import com.jayway.restassured.config.SSLConfig;
 import com.jayway.restassured.filter.log.RequestLoggingFilter;
 import com.jayway.restassured.filter.log.ResponseLoggingFilter;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
+import com.qaprosoft.carina.core.foundation.api.ssl.NullHostnameVerifier;
+import com.qaprosoft.carina.core.foundation.api.ssl.NullX509TrustManager;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.http.HttpResponseStatusType;
@@ -41,6 +51,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractApiMethod extends HttpClient
 {
 	protected static final Logger LOGGER = Logger.getLogger(AbstractApiMethod.class);
@@ -273,5 +284,34 @@ public abstract class AbstractApiMethod extends HttpClient
 	public void setLogResponse(boolean logResponse)
 	{
 		this.logResponse = logResponse;
+	}
+
+	public void ignoreSSLCerts()
+	{
+		SSLContext sslContext = null;
+		try
+		{
+			sslContext = SSLContext.getInstance("TLS");
+		} catch (NoSuchAlgorithmException e)
+		{
+			throw new RuntimeException(e);
+		}
+		TrustManager[] trustManagerArray = { new NullX509TrustManager() };
+		try
+		{
+			sslContext.init(null, trustManagerArray, null);
+		} catch (KeyManagementException e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext, new NullHostnameVerifier());
+		SSLConfig sslConfig = new SSLConfig();
+		sslConfig = sslConfig.sslSocketFactory(socketFactory);
+		sslConfig = sslConfig.x509HostnameVerifier(new NullHostnameVerifier());
+
+		RestAssuredConfig cfg = new RestAssuredConfig();
+		cfg = cfg.sslConfig(sslConfig);
+		request = request.config(cfg);
 	}
 }
