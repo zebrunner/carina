@@ -133,6 +133,16 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod
 		return properties;
 	}
 
+	/**
+	 * Validates JSON response using custom options
+	 * 
+	 * @param mode
+	 *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
+	 *            arrays comparison
+	 * @param validationFlags
+	 *            - used for JSON arrays validation when we need to check presence of some array items in result array.
+	 *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+	 */
 	public void validateResponse(JSONCompareMode mode, String... validationFlags)
 	{
 		if (rsPath == null)
