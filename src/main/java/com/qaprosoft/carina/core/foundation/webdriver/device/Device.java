@@ -9,11 +9,12 @@ public class Device {
 	private String name;
 	private String type;
 
-
 	private String os;
 	private String osVersion;
 	private String udid;
 	private String seleniumServer;
+	
+	private String testId;
 	
 	public Device() {
 		this.name = null;
@@ -98,6 +99,14 @@ public class Device {
 		return type.equalsIgnoreCase(SpecialKeywords.TV);
 	}
 	
+	public String getTestId() {
+		return testId;
+	}
+
+	public void setTestId(String testId) {
+		this.testId = testId;
+	}
+
 	public Type getType() {
 		if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 			if (isTablet()) {
