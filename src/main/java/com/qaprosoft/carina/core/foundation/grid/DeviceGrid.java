@@ -23,9 +23,10 @@ public class DeviceGrid {
 	String[] udid = {""};
 	final StringBuilder udid2 = new StringBuilder("");
 	
+	
 	public synchronized String findDevice(final String testId, List<String> deviceModels) {
 		
-		
+		final StringBuilder udid3 = new StringBuilder("");
 		final ObjectMapper mapper = new ObjectMapper();
 		
 		Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
@@ -56,6 +57,8 @@ public class DeviceGrid {
 								udid2.setLength(0);
 								udid2.append(rs.getSerial());
 								System.out.println("4");
+								udid3.setLength(0);
+								udid3.append(rs.getSerial());
 							}
 						} catch (Exception e) {
 							System.out.println("5");
@@ -83,6 +86,7 @@ public class DeviceGrid {
 			//Thread.sleep(1000 * 15);
 			System.out.println(udid[0]);
 			System.out.println(udid2.toString());
+			System.out.println(udid3.toString());
 			new FluentWait<String>(udid2.toString()).withTimeout(1, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
 			.until(new Function<String, Boolean>() {
 				@Override
