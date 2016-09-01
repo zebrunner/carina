@@ -16,27 +16,38 @@
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.pubnub.api.PubnubException;
+import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
 {
+	
+	public static void main(String[] args) throws PubnubException {
+		registerDevice2Thread(Thread.currentThread().getId());
+	}
+	
 	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
 	
 	private static final Pattern HOST_PATTERN = Pattern.compile(".*http:\\/\\/(.*):.*");
 	
 	private static final ConcurrentHashMap<Long, Device> threadId2Device = new ConcurrentHashMap<Long, Device>();
 	private static List<Device> devices = new ArrayList<Device>();
-
+	
 	public static synchronized void registerDevice() {
 		
 		String name = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
@@ -88,13 +99,39 @@ public class DevicePool
 		}
 	}
 	
+
+	/*for (Device device : devices) {
+		if (device.getUdid().equalsIgnoreCase(udid[0])) {
+			device.setTestId(testId);
+			return device;
+		}
+	}*/
+	
+	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-		//System.out.println("registerDevice2Thread start...");
-		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+		//TODO: uncomment befoe commit :)
+		
+/*		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			//System.out.println("return null for non mobile/mobile_pool tests");
 			return null;
+		}
+*/		
+		
+		System.out.println(R.CONFIG.get("platform"));
+		if (Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED)) {
+			String testId = UUID.randomUUID().toString();
+			String udid = new DeviceGrid().findDevice(testId, Arrays.asList("HTC One"));
+			if (!StringUtils.isEmpty(udid)) {
+				for (Device device : devices) {
+					if (device.getUdid().equalsIgnoreCase(udid)) {
+						device.setTestId(testId);
+						return device;
+					}
+				}
+			}
+			throw new RuntimeException("Unable to find device using Zafira Grid and STF!");
 		}
 		
 		int count = 0;
