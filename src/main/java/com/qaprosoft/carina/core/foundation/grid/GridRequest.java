@@ -7,10 +7,24 @@ public class GridRequest
 {
 	private String testId;
 	private String serial;
-	private List<String> tags = new ArrayList<>();
 	private List<String> models = new ArrayList<>();
 	private Operation operation;
 	
+	public GridRequest(String testId, List<String> models, Operation operation)
+	{
+		this.testId = testId;
+		this.models = models;
+		this.operation = operation;
+	}
+	
+
+	public GridRequest(String testId, String serial, Operation operation)
+	{
+		this.testId = testId;
+		this.serial = serial;
+		this.operation = operation;
+	}
+
 	public String getTestId()
 	{
 		return testId;
@@ -29,16 +43,6 @@ public class GridRequest
 	public void setModels(List<String> models)
 	{
 		this.models = models;
-	}
-
-	public List<String> getTags()
-	{
-		return tags;
-	}
-
-	public void setTags(List<String> tags)
-	{
-		this.tags = tags;
 	}
 	
 	public Operation getOperation()
