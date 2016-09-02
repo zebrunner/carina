@@ -16,11 +16,22 @@ import com.qaprosoft.carina.core.foundation.grid.GridRequest.Operation;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
+/**
+ * DeviceGrid communicates over PubNub with grid queue and provides connect/diconnect device functionality.
+ * 
+ * @author Alex Khursevich
+ */
 public class DeviceGrid {
 	
 	private static final Logger LOGGER = Logger.getLogger(DeviceGrid.class);
 	
-	public static String findDevice(final String testId, List<String> deviceModels) 
+	/**
+	 * Connect to remote mobile device.
+	 * @param testId - unique test id generated bu UUID
+	 * @param deviceModels - list of possible devices to get from STF
+	 * @return device udid
+	 */
+	public static String connectDevice(String testId, List<String> deviceModels) 
 	{
 		Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
 		GridCallback gridCallback = new GridCallback(testId);
@@ -48,6 +59,23 @@ public class DeviceGrid {
 		}
 		
 		return gridCallback.getUdid();
+	}
+	
+	/**
+	 * Disconnects from remote device.
+	 * @param testId - unique test id generated bu UUID
+	 * @param udid - device udid to disconnect from
+	 */
+	public static void disconnectDevice(final String testId, String udid) 
+	{
+		try
+		{
+			GridRequest rq = new GridRequest(testId, udid, Operation.DISCONNECT);
+			Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
+			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(new ObjectMapper().writeValueAsString(rq)), new Callback() {});
+		} catch(Exception e) {
+			LOGGER.error(e.getMessage(), e);
+		}
 	}
 	
 	public static class GridCallback extends Callback
