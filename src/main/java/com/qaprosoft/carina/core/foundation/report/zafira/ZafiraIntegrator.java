@@ -13,11 +13,14 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ArgumentType;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ConfigurationBin;
 import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.client.ZafiraClient;
 import com.qaprosoft.zafira.client.ZafiraClient.Response;
 import com.qaprosoft.zafira.client.model.JobType;
@@ -62,6 +65,12 @@ public class ZafiraIntegrator {
 
 	private static final String VIEW_PATTERN = "/view/";
 	private static final String JOB_PATTERN = "/job/";
+	
+	private static final String DEVICE = "device";
+	private static final String OS = "os";
+	private static final String OS_VERSION = "os_version";
+	private static final String PLATFORM = "platform";
+	private static final String PLATFORM_VERSION = "platform_version";
 
 	private static final String ANONYMOUS_USER = "anonymous";
 	private static Boolean isRegistered = false;
@@ -575,6 +584,19 @@ public class ZafiraIntegrator {
 		for (Configuration.Parameter parameter : Configuration.Parameter.values()) {
 			conf.getArg().add(getArgByParameter(parameter));
 		}
+		
+		//TODO: analyze if adding empty/null key values could be a problem
+		// add custom arguments from browserStack
+		conf.getArg().add(getArgByParameterName(PLATFORM, OS));
+		conf.getArg().add(getArgByParameterName(PLATFORM_VERSION, OS_VERSION));
+
+		// add custom arguments from current mobile device
+		Device device = DevicePool.getDevice();
+		if (device != null) {
+			conf.getArg().add(getArgByValue(DEVICE, device.getName()));
+			conf.getArg().add(getArgByValue(PLATFORM, device.getOs()));
+			conf.getArg().add(getArgByValue(PLATFORM_VERSION, device.getOsVersion()));
+		}
 
 		return MarshallerHelper.marshall(conf);
 	}
@@ -584,6 +606,22 @@ public class ZafiraIntegrator {
 		arg.setKey(parameter.getKey());
 		arg.setUnique(isUnique(parameter.getKey()));
 		arg.setValue(Configuration.get(parameter));
+		return arg;
+	}
+	
+	private static ArgumentType getArgByParameterName(String keyName, String parameterName) {
+		ArgumentType arg = new ArgumentType();
+		arg.setKey(keyName);
+		arg.setUnique(false);
+		arg.setValue(R.CONFIG.get(parameterName));
+		return arg;
+	}
+	
+	private static ArgumentType getArgByValue(String keyName, String parameterValue) {
+		ArgumentType arg = new ArgumentType();
+		arg.setKey(keyName);
+		arg.setUnique(false);
+		arg.setValue(parameterValue);
 		return arg;
 	}
 
@@ -599,7 +637,7 @@ public class ZafiraIntegrator {
 		}
 		return uniqueKeys.contains(key);
 	}
-
+	
 	@SuppressWarnings("unused")
 	private static void setConfiguration(String configXML) {
 		ConfigurationBin conf = MarshallerHelper.unmarshall(configXML, ConfigurationBin.class);
