@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +43,7 @@ public class DevicePool
 	private static final Map<Long, Device> THREAD_2_DEVICE_MAP = Collections.synchronizedMap(new HashMap<Long, Device>());
 	
 	private static final List<Device> DEVICES = Collections.synchronizedList(new ArrayList<Device>());
+	private static final List<String> DEVICE_MODELS = Collections.synchronizedList(new ArrayList<String>());
 	
 	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
 	
@@ -56,6 +56,7 @@ public class DevicePool
 				                   Configuration.get(Parameter.MOBILE_DEVICE_UDID), 
 				                   Configuration.get(Parameter.SELENIUM_HOST));
 		DEVICES.add(device);
+		DEVICE_MODELS.add(device.getName());
 		LOGGER.info("Adding single device into the DevicePool: " + device.getName());		
 	}
 	
@@ -99,22 +100,24 @@ public class DevicePool
 			}
 			Device device = new Device(args);
 			DEVICES.add(device);
-			LOGGER.info("Adding new device into the DevicePool: " + device.getName());
+			DEVICE_MODELS.add(device.getName());
+			LOGGER.info("Added new device into the DevicePool: " + device.getName());
 		}
 	}
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-//		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
-//			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
-//		{
-//			return null;
-//		}
+		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+		{
+			return null;
+		}
 		
+		Device freeDevice = null;
 		if (GRID_ENABLED) 
 		{
 			final String testId = UUID.randomUUID().toString();
-			final String udid = DeviceGrid.connectDevice(testId, Arrays.asList("HTC One"));
+			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
 			if (!StringUtils.isEmpty(udid)) 
 			{
 				for (Device device : DEVICES) 
@@ -122,17 +125,16 @@ public class DevicePool
 					if (device.getUdid().equalsIgnoreCase(udid)) 
 					{
 						device.setTestId(testId);
-						return device;
+						freeDevice = device;
+						break;
 					}
 				}
 			}
-			throw new RuntimeException("Unable to find device using Zafira Grid and STF!");
 		}
 		else
 		{
 			int count = 0;
 			boolean found = false;
-			Device freeDevice = null;
 			while (++count<100 && !found) {
 				for (Device device : DEVICES) {
 					//System.out.println("Check device status for registration: " + device.getName());
@@ -150,18 +152,17 @@ public class DevicePool
 					pause(sec);
 				}
 			}
-			
-			if (freeDevice != null) {
-				THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
-				//System.out.println("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
-			} else {
-				throw new RuntimeException("Unable to find available device after '" + count + "' attempts!");	
-			}
-			
-			//System.out.println("registerDevice2Thread finish...");
-			
-			return freeDevice;
 		}
+
+		if (freeDevice != null) {
+			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
+		} else {
+			//TODO: improve loggers about device type, family etc 
+			throw new RuntimeException("Unable to find available device after!");	
+		}
+		
+		return freeDevice;
+
 	}	
 	
 	public static Device getDevice() 
@@ -208,7 +209,7 @@ public class DevicePool
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
-			LOGGER.info("Deregistering device '" + device.getName() + "' with thread '" + threadId + "'");
+			LOGGER.info("Deregistered device '" + device.getName() + "' with thread '" + threadId + "'");
 		}
 	}
 
