@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
@@ -47,6 +48,8 @@ public class CapabilitiesLoder {
 
             	LOGGER.info("Set custom driver capability: " + entry.getKey() + "; value: " + value);
             	capabilities.setCapability(entry.getKey(), value);
+            	//add each custom capability to properties generating new key-value pair to be able to change some env specific data later
+            	R.CONFIG.put(entry.getKey(), value);
             }
         }
 
