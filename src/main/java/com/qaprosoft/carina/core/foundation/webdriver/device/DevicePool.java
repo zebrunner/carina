@@ -57,7 +57,7 @@ public class DevicePool
 				                   Configuration.get(Parameter.SELENIUM_HOST));
 		DEVICES.add(device);
 		DEVICE_MODELS.add(device.getName());
-		LOGGER.info("Adding single device into the DevicePool: " + device.getName());		
+		LOGGER.info("Registered single device into the DevicePool: " + device.getName());		
 	}
 	
 	public static synchronized void unregisterDevice(Device device) 
@@ -68,7 +68,8 @@ public class DevicePool
 			return;
 		}
 		DEVICES.remove(device);
-		LOGGER.info("Removing device from the DevicePool: " + device.getName());		
+		DEVICE_MODELS.remove(device.getName());
+		LOGGER.info("Removed device from the DevicePool: " + device.getName());		
 	}
 	
 
