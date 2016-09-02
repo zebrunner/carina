@@ -30,15 +30,15 @@ public class DeviceGrid {
 			GridRequest rq = new GridRequest(testId, deviceModels, Operation.CONNECT);
 			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(new ObjectMapper().writeValueAsString(rq)), new Callback() {});
 			
-			new FluentWait<String>(gridCallback.getUdid())
+			new FluentWait<GridCallback>(gridCallback)
 				.withTimeout(10, TimeUnit.MINUTES)
 				.pollingEvery(10, TimeUnit.SECONDS)
-				.until(new Function<String, Boolean>() 
+				.until(new Function<GridCallback, Boolean>() 
 				{
 					@Override
-					public Boolean apply(String udid) 
+					public Boolean apply(GridCallback callback) 
 					{
-						return !StringUtils.isEmpty(udid);
+						return !StringUtils.isEmpty(callback.getUdid());
 					}
 				});
 		} catch (Exception e) {
