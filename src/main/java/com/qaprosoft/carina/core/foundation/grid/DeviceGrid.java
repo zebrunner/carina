@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -20,95 +19,72 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 public class DeviceGrid {
 	
 	private static final Logger LOGGER = Logger.getLogger(DeviceGrid.class);
-	String[] udid = {""};
-	final StringBuilder udid2 = new StringBuilder("");
 	
-	
-	public synchronized String findDevice(final String testId, List<String> deviceModels) {
-		
-		final StringBuilder udid3 = new StringBuilder("");
-		final ObjectMapper mapper = new ObjectMapper();
-		
+	public static String findDevice(final String testId, List<String> deviceModels) 
+	{
 		Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
+		GridCallback gridCallback = new GridCallback(testId);
 		try {
-			punub.subscribe(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new Callback() {
-				/*@Override
-				public void failedCallback(String channel, Object message) {
-				}*/
-				@Override
-				public void successCallback(String channel, Object message) {
-					System.out.println(message.toString());
-					/*if ( message instanceof JSONArray) {
-						System.out.println("wtf");
-					}
-					if(!(message instanceof JSONObject))
-						return;*/
-					String json = ((JSONObject) message).toString();
-					if (json.contains(testId) && json.contains("connected")) {
-						try {
-							System.out.println("1");
-							GridResponse rs = mapper.readValue(json, GridResponse.class);
-							System.out.println("2");
-							if(rs.isConnected())
-							{
-								System.out.println("3");
-								System.out.println(rs.getSerial());
-								udid[0] = rs.getSerial();
-								udid2.setLength(0);
-								udid2.append(rs.getSerial());
-								System.out.println("4");
-								udid3.setLength(0);
-								udid3.append(rs.getSerial());
-							}
-						} catch (Exception e) {
-							System.out.println("5");
-							LOGGER.error(e.getMessage(), e);
-						}
-					}
-				};
-			});
+			punub.subscribe(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), gridCallback);
 
-			GridRequest rq = new GridRequest();
-			rq.setTestId(testId);
-			rq.setModels(deviceModels);
-			rq.setOperation(Operation.CONNECT);
-			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(mapper.writeValueAsString(rq)), new Callback() { });
-
-/*			Thread.sleep(1000 * 15);
+			GridRequest rq = new GridRequest(testId, deviceModels, Operation.CONNECT);
+			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(new ObjectMapper().writeValueAsString(rq)), new Callback() {});
 			
-			int i = 0;
-			boolean found = false;
-			while (i++ < 100 && !found) {
-				found = !StringUtils.isEmpty(udid[0]);
-				found = !StringUtils.isEmpty(udid2);
-				Thread.sleep(1000 * 10);
-			}*/
-			//Thread.sleep(1000 * 15);
-			System.out.println(udid[0]);
-			System.out.println(udid2.toString());
-			System.out.println(udid3.toString());
-			new FluentWait<String>(udid2.toString()).withTimeout(1, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
-			.until(new Function<String, Boolean>() {
-				@Override
-				public Boolean apply(String udid) {
-					return !StringUtils.isEmpty(udid);
-				}
-			});
-			
-			
+			new FluentWait<String>(gridCallback.getUdid())
+				.withTimeout(10, TimeUnit.MINUTES)
+				.pollingEvery(10, TimeUnit.SECONDS)
+				.until(new Function<String, Boolean>() 
+				{
+					@Override
+					public Boolean apply(String udid) 
+					{
+						return !StringUtils.isEmpty(udid);
+					}
+				});
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
 			punub.unsubscribeAll();
 		}
-
-		if(!StringUtils.isEmpty(udid2.toString())) {
-			LOGGER.info("Free deice udid from grid: " + udid2.toString());
-		}
 		
-		if(!StringUtils.isEmpty(udid[0])) {
-			LOGGER.info("Free deice udid from grid: " + udid[0]);
+		return gridCallback.getUdid();
+	}
+	
+	public static class GridCallback extends Callback
+	{
+		private String udid;
+		private String testId;
+		
+		public GridCallback(String testId)
+		{
+			this.testId = testId;
 		}
-		return udid[0];
+
+		@Override
+		public void successCallback(String channel, Object message)
+		{
+
+			String json = ((JSONObject) message).toString();
+			if (json.contains(testId) && json.contains("connected"))
+			{
+				try
+				{
+					GridResponse rs = new ObjectMapper().readValue(json, GridResponse.class);
+					if (rs.isConnected())
+					{
+						udid = rs.getSerial();
+						LOGGER.info("Device found in grid by UDID: " + udid);
+					}
+				} catch (Exception e)
+				{
+					LOGGER.error(e.getMessage(), e);
+				}
+			}
+		}
+
+		public String getUdid()
+		{
+			return udid;
+		}
 	}
 }

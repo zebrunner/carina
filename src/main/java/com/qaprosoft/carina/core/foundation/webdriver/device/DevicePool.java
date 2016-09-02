@@ -122,7 +122,7 @@ public class DevicePool
 		System.out.println(R.CONFIG.get("platform"));
 		if (Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED)) {
 			String testId = UUID.randomUUID().toString();
-			String udid = new DeviceGrid().findDevice(testId, Arrays.asList("HTC One"));
+			String udid = DeviceGrid.findDevice(testId, Arrays.asList("HTC One"));
 			if (!StringUtils.isEmpty(udid)) {
 				for (Device device : devices) {
 					if (device.getUdid().equalsIgnoreCase(udid)) {
