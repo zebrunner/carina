@@ -105,11 +105,11 @@ public class DevicePool
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
-			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
-		{
-			return null;
-		}
+//		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
+//			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+//		{
+//			return null;
+//		}
 		
 		if (GRID_ENABLED) 
 		{
