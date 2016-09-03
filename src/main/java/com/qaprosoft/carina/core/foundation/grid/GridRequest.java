@@ -5,24 +5,37 @@ import java.util.List;
 
 public class GridRequest
 {
+	private String gridSessionId;
 	private String testId;
 	private String serial;
 	private List<String> models = new ArrayList<>();
 	private Operation operation;
 	
-	public GridRequest(String testId, List<String> models, Operation operation)
+	public GridRequest(String gridSessionId, String testId, List<String> models, Operation operation)
 	{
+		this.gridSessionId = gridSessionId;
 		this.testId = testId;
 		this.models = models;
 		this.operation = operation;
 	}
 	
 
-	public GridRequest(String testId, String serial, Operation operation)
+	public GridRequest(String gridSessionId, String testId, String serial, Operation operation)
 	{
+		this.gridSessionId = gridSessionId;
 		this.testId = testId;
 		this.serial = serial;
 		this.operation = operation;
+	}
+	
+	public String getGridSessionId()
+	{
+		return gridSessionId;
+	}
+
+	public void setGridSessionId(String gridSessionId)
+	{
+		this.gridSessionId = gridSessionId;
 	}
 
 	public String getTestId()
