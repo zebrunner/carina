@@ -42,7 +42,7 @@ public class DeviceGrid {
 		Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
 		GridCallback gridCallback = new GridCallback(testId);
 		try {
-//			startHeartBeat();
+			startHeartBeat();
 			punub.subscribe(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), gridCallback);
 			
 			GridRequest rq = new GridRequest(GRID_SESSION_ID, testId, deviceModels, Operation.CONNECT);
