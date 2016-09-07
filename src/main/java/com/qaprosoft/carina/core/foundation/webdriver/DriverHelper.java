@@ -15,6 +15,35 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
@@ -29,26 +58,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -85,9 +94,13 @@ public class DriverHelper {
 		}
 		summary = new TestLogHelper(UUID.randomUUID().toString());
 	}
-
+	
 	public DriverHelper(WebDriver driver) {
-		this();
+		try {
+			cryptoTool = new CryptoTool();
+		} catch (Exception e) {
+			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
+		}
 		this.driver = driver;
 
 		if (driver == null) {
@@ -99,7 +112,9 @@ public class DriverHelper {
 			}
 		}
 		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-		initSummary(driver);
+		
+		// Initializes test log container dedicated to WebDriver instance.
+		summary = new TestLogHelper(driver);
 	}
 
 	// --------------------------------------------------------------------------
@@ -113,21 +128,6 @@ public class DriverHelper {
 	public long getImplicitTimeout() {
 		return IMPLICIT_TIMEOUT;
 	}
-
-	/**
-	 * Initializes test log container dedicated to WebDriver instance.
-	 * 
-	 * @param driver
-	 *            WebDriver
-	 */
-	protected void initSummary(WebDriver driver) {
-		summary = new TestLogHelper(driver);
-	}
-
-	protected void initSummary(String sessionId) {
-		summary = new TestLogHelper(sessionId);
-	}
-
 
     /**
      *
