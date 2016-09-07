@@ -23,6 +23,7 @@ package com.qaprosoft.carina.core.foundation.http;
 public enum HttpResponseStatusType
 {
 	OK_200(200, "OK"),
+	CREATED_201(201, "Created"),
 	ACCEPTED_202(202, "Accepted"),
 	NO_CONTENT_204(204, "No Content"),
 	BAD_REQUEST_400(400, "Bad Request"),
