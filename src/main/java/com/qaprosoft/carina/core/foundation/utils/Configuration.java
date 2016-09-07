@@ -348,7 +348,11 @@ public class Configuration
 
 		CUCUMBER_USE_JS_IN_REPORT("cucumber_user_js_in_report"),
 
-		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder")
+		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder"),
+		
+		SSH_USERNAME("ssh_username"),
+		
+		ADB_PATH("adb_path")
 		;
 
 		private final String key;
