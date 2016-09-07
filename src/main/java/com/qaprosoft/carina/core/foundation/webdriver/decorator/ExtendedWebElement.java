@@ -631,6 +631,9 @@ public class ExtendedWebElement
 				if (!drv.findElements(by).isEmpty()) {
 					element = drv.findElement(by);
 					LOGGER.debug("Element was idenfified using By: " + by.toString());
+				} else if (getElement() != null){
+					element = getElement().findElement(by);
+					LOGGER.debug("Element was idenfified using existing element and By: " + by.toString());
 				} else {
 					throw new RuntimeException("Unable to identify element using By: " + by.toString());
 				}
@@ -1194,7 +1197,13 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return !drv.findElements(by).isEmpty();
+					//try to search starting from existing webElement and using driver directly
+					if(!drv.findElements(by).isEmpty()) {
+						return true;
+					} else if (getElement() != null) {
+						return !getElement().findElements(by).isEmpty();
+					}
+					return false;
 				}
 			});
 			element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
@@ -1232,7 +1241,16 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return !drv.findElements(by).isEmpty();
+					//return !drv.findElements(by).isEmpty();
+					
+					//try to search starting from existing webElement and using driver directly
+					if(!drv.findElements(by).isEmpty()) {
+						return true;
+					} else if (getElement() != null) {
+						return !getElement().findElements(by).isEmpty();
+					}
+					return false;
+					
 				}
 			});
 			webElements = this.getElement().findElements(by);
