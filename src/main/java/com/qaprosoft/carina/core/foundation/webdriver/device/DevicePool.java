@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2016 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
@@ -34,126 +40,160 @@ public class DevicePool
 	
 	private static final Pattern HOST_PATTERN = Pattern.compile(".*http:\\/\\/(.*):.*");
 	
-	private static final ConcurrentHashMap<Long, Device> threadId2Device = new ConcurrentHashMap<Long, Device>();
-	private static List<Device> devices = new ArrayList<Device>();
-
-	public static synchronized void registerDevice() {
-		
-		String name = Configuration.get(Parameter.MOBILE_DEVICE_NAME);
-		String type = Configuration.get(Parameter.MOBILE_DEVICE_TYPE);
-		String os = Configuration.get(Parameter.MOBILE_PLATFORM_NAME);
-		String osVersion = Configuration.get(Parameter.MOBILE_PLATFORM_VERSION);
-		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		String seleniumServer = Configuration.get(Parameter.SELENIUM_HOST);
-		
-		Device device = new Device(name, type, os, osVersion, udid, seleniumServer);
-		devices.add(device);
-		LOGGER.info("Adding single device into the DevicePool: " + device.getName());		
+	private static final Map<Long, Device> THREAD_2_DEVICE_MAP = Collections.synchronizedMap(new HashMap<Long, Device>());
+	
+	private static final List<Device> DEVICES = Collections.synchronizedList(new ArrayList<Device>());
+	private static final List<String> DEVICE_MODELS = Collections.synchronizedList(new ArrayList<String>());
+	
+	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
+	
+	public static synchronized void registerDevice() 
+	{
+		Device device = new Device(Configuration.get(Parameter.MOBILE_DEVICE_NAME), 
+				                   Configuration.get(Parameter.MOBILE_DEVICE_TYPE), 
+				                   Configuration.get(Parameter.MOBILE_PLATFORM_NAME), 
+				                   Configuration.get(Parameter.MOBILE_PLATFORM_VERSION), 
+				                   Configuration.get(Parameter.MOBILE_DEVICE_UDID), 
+				                   Configuration.get(Parameter.SELENIUM_HOST));
+		DEVICES.add(device);
+		DEVICE_MODELS.add(device.getName());
+		LOGGER.info("Registered single device into the DevicePool: " + device.getName());		
 	}
 	
-	public static synchronized void unregisterDevice(Device device) {
-		if (device == null) {
+	public static synchronized void unregisterDevice(Device device) 
+	{
+		if (device == null) 
+		{
 			LOGGER.error("Unable to unregister null device");
 			return;
 		}
-		devices.remove(device);
-		LOGGER.info("Removing device from the DevicePool: " + device.getName());		
+		DEVICES.remove(device);
+		DEVICE_MODELS.remove(device.getName());
+		LOGGER.info("Removed device from the DevicePool: " + device.getName());		
 	}
 	
 
-	public static synchronized void registerDevices() {
-		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+	public static synchronized void registerDevices() 
+	{
+		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+		{
 			registerDevice();
 			return;
 		}
+		
+		if (!CollectionUtils.isEmpty(DEVICES)) 
+		{
+			LOGGER.info("devices are already registered. Count is: " + DEVICES.size());
+			return;
+		}
+		
 		String params = Configuration.get(Parameter.MOBILE_DEVICES);
-		if (params.isEmpty()) {
+		if (params.isEmpty()) 
+		{
 			LOGGER.debug("Parameter.MOBILE_DEVICES is empty. Skip devices registration.");
 			return;
 		}
-		if (devices.size() > 0) {
-			//already registered
-			LOGGER.info("devices are already registered. Count is: " + devices.size());
-			return;
-		}
 		//TODO: implement 1) device status verification; 2) adjustments of thread numbers
-		String[] devicesArgs = params.split(";");
-		for (int i=0; i<devicesArgs.length; i++) {
-			if (devicesArgs[i].isEmpty()) {
+		for(String args : params.split(";")) {
+			if(args.isEmpty()) 
+			{
 				continue;
 			}
-			Device device = new Device(devicesArgs[i]);
-			devices.add(device);
-			LOGGER.info("Adding new device into the DevicePool: " + device.getName());
+			Device device = new Device(args);
+			DEVICES.add(device);
+			DEVICE_MODELS.add(device.getName());
+			LOGGER.info("Added new device into the DevicePool: " + device.getName());
 		}
 	}
 	
 	public static synchronized Device registerDevice2Thread(Long threadId)
 	{
-		//System.out.println("registerDevice2Thread start...");
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
-				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			//System.out.println("return null for non mobile/mobile_pool tests");
+			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+		{
 			return null;
 		}
 		
-		int count = 0;
-		boolean found = false;
 		Device freeDevice = null;
-		while (++count<100 && !found) {
-			for (Device device : devices) {
-				//System.out.println("Check device status for registration: " + device.getName());
-				if (!threadId2Device.containsValue(device)) {
-						//current thread doesn't have ignored devices
-						//System.out.println("identified free non-ingnored device: " + device.getName());
+		if (GRID_ENABLED) 
+		{
+			final String testId = UUID.randomUUID().toString();
+			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
+			if (!StringUtils.isEmpty(udid)) 
+			{
+				for (Device device : DEVICES) 
+				{
+					if (device.getUdid().equalsIgnoreCase(udid)) 
+					{
+						device.setTestId(testId);
 						freeDevice = device;
-						found = true;
-						break;						
+						break;
+					}
 				}
 			}
-			if (!found) {
-				int sec = Configuration.getInt(Parameter.INIT_RETRY_INTERVAL);
-				//System.out.println("There is no free device, wating " + sec + " sec... attempt: " + count);
-				pause(sec);
+		}
+		else
+		{
+			int count = 0;
+			boolean found = false;
+			while (++count<100 && !found) {
+				for (Device device : DEVICES) {
+					//System.out.println("Check device status for registration: " + device.getName());
+					if (!THREAD_2_DEVICE_MAP.containsValue(device)) {
+							//current thread doesn't have ignored devices
+							//System.out.println("identified free non-ingnored device: " + device.getName());
+							freeDevice = device;
+							found = true;
+							break;						
+					}
+				}
+				if (!found) {
+					int sec = Configuration.getInt(Parameter.INIT_RETRY_INTERVAL);
+					//System.out.println("There is no free device, wating " + sec + " sec... attempt: " + count);
+					pause(sec);
+				}
 			}
 		}
-		
+
 		if (freeDevice != null) {
-			threadId2Device.put(threadId, freeDevice);
-			//System.out.println("Registering device '" + freeDevice.getName() + "' with thread '" + threadId + "'");
+			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
 		} else {
-			throw new RuntimeException("Unable to find available device after '" + count + "' attempts!");	
+			//TODO: improve loggers about device type, family etc 
+			throw new RuntimeException("Unable to find available device after!");	
 		}
-		
-		//System.out.println("registerDevice2Thread finish...");
 		
 		return freeDevice;
 
 	}	
 	
-	public static Device getDevice() {
+	public static Device getDevice() 
+	{
 		Device device = null;
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
-				!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+		    !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+		{
 			return null;
 		}
 		long threadId = Thread.currentThread().getId();
-		if (threadId2Device.containsKey(threadId)) {
-			device = threadId2Device.get(threadId);
-			//System.out.println("Getting device '" + device.getName() + "' by thread '" + threadId + "'");
+		if (THREAD_2_DEVICE_MAP.containsKey(threadId)) 
+		{
+			device = THREAD_2_DEVICE_MAP.get(threadId);
 		}
 		return device;
 	}
 	
 	public static Device getDevice(String udid) {
 		Device device = null;
-		for (Device dev : devices) {
-			if (dev.getUdid().equalsIgnoreCase(udid)) {
+		for (Device dev : DEVICES) 
+		{
+			if (dev.getUdid().equalsIgnoreCase(udid)) 
+			{
 				device = dev;
 				break;
 			}
 		}
-		if (device == null) {
+		if (device == null) 
+		{
 			throw new RuntimeException("Unable to find device by udid: " + udid + "!");
 		}
 		return device;
@@ -162,61 +202,59 @@ public class DevicePool
 	
 	public static synchronized void deregisterDeviceByThread(long threadId)
 	{
-		if (threadId2Device.containsKey(threadId)) {
-			Device device = threadId2Device.get(threadId);
-			
-			threadId2Device.remove(threadId);
-			LOGGER.info("Deregistering device '" + device.getName() + "' with thread '" + threadId + "'");
+		if (THREAD_2_DEVICE_MAP.containsKey(threadId)) 
+		{
+			Device device = THREAD_2_DEVICE_MAP.get(threadId);
+			if(GRID_ENABLED)
+			{
+				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
+			}
+			THREAD_2_DEVICE_MAP.remove(threadId);
+			LOGGER.info("Deregistered device '" + device.getName() + "' with thread '" + threadId + "'");
 		}
 	}
 
 
-	public static String getDeviceUdid() {
+	public static String getDeviceUdid() 
+	{
 		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) ||
-				Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+				Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+		{
 			Device device = DevicePool.getDevice();
 			if (device == null) {
 				throw new RuntimeException("Unable to find device by thread!");
 			}
 			udid = device.getUdid();
 		} 
-		
 		return udid;
 	}
 	
-	/**
-	 * Pause for specified timeout.
-	 * 
-	 * @param timeout
-	 *            in seconds.
-	 */
 
-	private static void pause(long timeout) {
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
 
-	public static Type getDeviceType() {
+	public static Type getDeviceType() 
+	{
 		// specify default value based on existing _config.properties parameters
 		Type type = Type.DESKTOP;
-
 		Device device = getDevice();
 		if (device != null) {
 			type = device.getType();
-		} else {
+		} 
+		else 
+		{
 			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
+			{
+				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) 
+				{
 					type = Type.ANDROID_PHONE;
 				}
-				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) {
+				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) 
+				{
 					type = Type.IOS_PHONE;
 				}
-			} else {
+			} else 
+			{
 				LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
 			}
 		}
@@ -227,10 +265,13 @@ public class DevicePool
 	 * Check if system is distributed (devices are connected to different servers)
 	 * @return
 	 */
-	public static boolean isSystemDistributed() {
+	public static boolean isSystemDistributed() 
+	{
 		boolean result = false;
-		for (int i = 0; i < devices.size() - 1; i++) {
-			if (!getServer(devices.get(i).getSeleniumServer()).equals(getServer(devices.get(i + 1).getSeleniumServer()))) {
+		for (int i = 0; i < DEVICES.size() - 1; i++) 
+		{
+			if (!getServer(DEVICES.get(i).getSeleniumServer()).equals(getServer(DEVICES.get(i + 1).getSeleniumServer()))) 
+			{
 				result = true;
 			}
 		}
@@ -252,4 +293,18 @@ public class DevicePool
 		return getServer(getDevice().getSeleniumServer());
 	}
 	
+	/**
+	 * Pause for specified timeout.
+	 * 
+	 * @param timeout
+	 *            in seconds.
+	 */
+	private static void pause(long timeout) 
+	{
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }
