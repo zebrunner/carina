@@ -30,6 +30,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
+import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.listeners.UITestListener;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -232,6 +233,7 @@ public class UITest extends AbstractTest
     	while (!init & count++ < maxCount) {
     		try {
     			LOGGER.debug("initDriver start...");
+    			
     			Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
    			
 
