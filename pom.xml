@@ -76,6 +76,8 @@
 		<cucumber.reporting>2.6.3</cucumber.reporting>
 		<cucumber.picocontainer.version>1.2.4</cucumber.picocontainer.version>
 		<picocontainer.version>2.15</picocontainer.version>
+		
+		<pubnub.version>3.7.10</pubnub.version>
 
 	</properties>
 
@@ -187,11 +189,12 @@
 			<artifactId>ocap-api</artifactId>
 			<version>${ocap-api.version}</version>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>com.metaparadigm</groupId>
 			<artifactId>json-rpc</artifactId>
 			<version>${json-rpc.version}</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
@@ -438,6 +441,12 @@
 			<version>${picocontainer.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.pubnub</groupId>
+			<artifactId>pubnub</artifactId>
+			<version>${pubnub.version}</version>
+		</dependency>
+	
 	</dependencies>
 
 	<distributionManagement>
