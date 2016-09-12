@@ -175,12 +175,6 @@ public class Configuration
 		
 		CORE_LOG_LEVEL("core_log_level"),
 		
-		TEST_ID("test_id"),
-		
-		IS_TESTEXECUTER("is_testexecuter"),
-		
-		TESTEXECUTER_URL("testexecuter_url"),
-		
 		LOG_ALL_JSON("log_all_json"),
 
 		DATE_FORMAT("date_format"),
@@ -293,6 +287,14 @@ public class Configuration
 		SPIRA_TESTSET_ID("spira_testset_id"),
 		
 		//zafira
+		ZAFIRA_GRID_ENABLED("zafira_grid_enabled"),
+		
+		ZAFIRA_GRID_PKEY("zafira_grid_pkey"),
+		
+		ZAFIRA_GRID_SKEY("zafira_grid_skey"),
+		
+		ZAFIRA_GRID_CHANNEL("zafira_grid_channel"),
+		
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
 		ZAFIRA_USERNAME("zafira_username"),
