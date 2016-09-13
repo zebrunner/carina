@@ -347,7 +347,10 @@ public class Configuration
 		
 		SSH_USERNAME("ssh_username"),
 		
-		ADB_PATH("adb_path")
+		ADB_PATH("adb_path"),
+
+		// TLS
+		TLS_KEYSECURE_LOCATION("tls_keysecure_location")
 		;
 
 
