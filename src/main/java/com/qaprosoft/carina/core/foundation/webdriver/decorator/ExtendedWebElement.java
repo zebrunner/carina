@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -32,11 +33,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
+import com.google.common.base.Function;
+import com.mapmyfitness.constant.TimeConstant;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
@@ -1295,5 +1299,35 @@ public class ExtendedWebElement
 			throw new RuntimeException("Unable to identify element using By: " + by.toString());
 		}
 		return el;
+	}
+	
+	
+	public void waitUntilElementNotPresent(final ExtendedWebElement element, final long timeout) {
+		LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
+
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try {
+			wait.until(new ExpectedCondition<Boolean>() {
+				public Boolean apply(WebDriver dr) {
+					boolean result = drv.findElements(element.getBy()).size() == 0;
+					if (!result) {
+						LOGGER.debug(drv.getPageSource());
+						LOGGER.info(String.format("Element %s is still present. Wait until it dissappear.",
+								element.getName()));
+					}
+					return result;
+
+				}
+			});
+		} catch (Exception e) {
+			LOGGER.debug(e.getMessage(), e.getCause());
+			// do nothing
+		}
+
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+
 	}
 }
