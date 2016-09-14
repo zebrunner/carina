@@ -28,14 +28,16 @@ import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.SessionNotFoundException;
 
+import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -120,6 +122,13 @@ public class Screenshot
 
 				// Uploading screenshot to Amazon S3
 				uploadToAmazonS3(test, fullScreenPath, screenName);
+			}
+			catch (SessionNotFoundException e) {
+				// [VD] handle the case when STF abort connection and close session due to the max timeout (30 min)
+				LOGGER.error("Driver session is lost! Deregistering current driver/device.", e);
+				long threadId = Thread.currentThread().getId();
+				DevicePool.deregisterDeviceByThread(threadId);
+				DriverPool.deregisterDriverByThread(threadId);
 			}
 			catch (IOException e)
 			{
