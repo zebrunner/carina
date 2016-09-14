@@ -1297,10 +1297,11 @@ public class ExtendedWebElement
 		return el;
 	}
 	
-	
-	public void waitUntilElementNotPresent(final ExtendedWebElement element, final long timeout) {
+	public void waitUntilElementNotPresent(final long timeout) {
+		final ExtendedWebElement element = this;
+		
 		LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
-
+		
 		final WebDriver drv = getDriver();
 		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 
@@ -1326,4 +1327,5 @@ public class ExtendedWebElement
 		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 
 	}
+	
 }
