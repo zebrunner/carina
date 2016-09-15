@@ -80,8 +80,6 @@ public class Screenshot
 			
 			try
 			{
-				driver.manage().timeouts().implicitlyWait(Configuration.getLong(Parameter.IMPLICIT_TIMEOUT), TimeUnit.SECONDS);
-				
 				// Define test screenshot root
 				String test = "";
 				if (TestNamingUtil.isTestNameRegistered()) {
