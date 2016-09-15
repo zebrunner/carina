@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -79,6 +80,8 @@ public class Screenshot
 			
 			try
 			{
+				driver.manage().timeouts().implicitlyWait(Configuration.getLong(Parameter.IMPLICIT_TIMEOUT), TimeUnit.SECONDS);
+				
 				// Define test screenshot root
 				String test = "";
 				if (TestNamingUtil.isTestNameRegistered()) {
@@ -104,6 +107,8 @@ public class Screenshot
 					//do not augment for Appium 1.x anymore
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				} 
+				
+				
 				
 				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
 				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
