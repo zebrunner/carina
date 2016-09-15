@@ -106,7 +106,7 @@ public class DevicePool
 		}
 	}
 	
-	public static synchronized Device registerDevice2Thread(Long threadId)
+	public static Device registerDevice2Thread(Long threadId)
 	{
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
@@ -205,7 +205,7 @@ public class DevicePool
 	}
 	
 	
-	public static synchronized void deregisterDeviceByThread(long threadId)
+	public static void deregisterDeviceByThread(long threadId)
 	{
 		if (THREAD_2_DEVICE_MAP.containsKey(threadId)) 
 		{
