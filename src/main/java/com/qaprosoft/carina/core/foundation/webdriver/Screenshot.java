@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 

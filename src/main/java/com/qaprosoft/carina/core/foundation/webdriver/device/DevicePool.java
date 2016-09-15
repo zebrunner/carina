@@ -118,6 +118,7 @@ public class DevicePool
 		if (GRID_ENABLED) 
 		{
 			final String testId = UUID.randomUUID().toString();
+			//TODO: handle the case when STF returned device which is already used and exists in THREAD_2_DEVICE_MAP 
 			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
 			if (!StringUtils.isEmpty(udid)) 
 			{
@@ -125,8 +126,12 @@ public class DevicePool
 				{
 					if (device.getUdid().equalsIgnoreCase(udid)) 
 					{
+						if (THREAD_2_DEVICE_MAP.containsValue(device)) {
+							LOGGER.error("STF grid returned busy device as it exists in THREAD_2_DEVICE_MAP!");
+						}
 						device.setTestId(testId);
 						freeDevice = device;
+						LOGGER.info("Found free device: " + device.getName());
 						break;
 					}
 				}
@@ -159,7 +164,7 @@ public class DevicePool
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
 		} else {
 			//TODO: improve loggers about device type, family etc 
-			throw new RuntimeException("Unable to find available device after!");	
+			throw new RuntimeException("Unable to find free device!");	
 		}
 		
 		return freeDevice;
