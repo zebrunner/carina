@@ -57,14 +57,15 @@ public class DevicePool
 				                   Configuration.get(Parameter.SELENIUM_HOST));
 		DEVICES.add(device);
 		DEVICE_MODELS.add(device.getName());
-		LOGGER.info("Registered single device into the DevicePool: " + device.getName());		
+		String msg = "Registered single device into the DevicePool: %s - %s";
+		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));		
 	}
 	
 	public static synchronized void unregisterDevice(Device device) 
 	{
 		if (device == null) 
 		{
-			LOGGER.error("Unable to unregister null device");
+			LOGGER.error("Unable to unregister NULL device!");
 			return;
 		}
 		DEVICES.remove(device);
@@ -83,7 +84,7 @@ public class DevicePool
 		
 		if (!CollectionUtils.isEmpty(DEVICES)) 
 		{
-			LOGGER.info("devices are already registered. Count is: " + DEVICES.size());
+			LOGGER.info("Devices are already registered. Count is: " + DEVICES.size());
 			return;
 		}
 		
@@ -102,22 +103,24 @@ public class DevicePool
 			Device device = new Device(args);
 			DEVICES.add(device);
 			DEVICE_MODELS.add(device.getName());
-			LOGGER.info("Added new device into the DevicePool: " + device.getName());
+			String msg = "Added device into the DevicePool: %s - %s. Devices count: %s";
+			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), DEVICES.size()));
 		}
 	}
 	
-	public static Device registerDevice2Thread(Long threadId)
+	public static Device registerDevice2Thread()
 	{
+		Long threadId = Thread.currentThread().getId();
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL) &&
 			!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) 
 		{
 			return null;
 		}
-		
+
+		final String testId = UUID.randomUUID().toString();
 		Device freeDevice = null;
 		if (GRID_ENABLED) 
 		{
-			final String testId = UUID.randomUUID().toString();
 			//TODO: handle the case when STF returned device which is already used and exists in THREAD_2_DEVICE_MAP 
 			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
 			if (!StringUtils.isEmpty(udid)) 
@@ -127,11 +130,11 @@ public class DevicePool
 					if (device.getUdid().equalsIgnoreCase(udid)) 
 					{
 						if (THREAD_2_DEVICE_MAP.containsValue(device)) {
-							LOGGER.error("STF grid returned busy device as it exists in THREAD_2_DEVICE_MAP!");
+							String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
+							throw new RuntimeException(String.format(msg,  device.getName(), device.getUdid()));
 						}
 						device.setTestId(testId);
 						freeDevice = device;
-						LOGGER.info("Found free device: " + device.getName());
 						break;
 					}
 				}
@@ -143,10 +146,9 @@ public class DevicePool
 			boolean found = false;
 			while (++count<100 && !found) {
 				for (Device device : DEVICES) {
-					//System.out.println("Check device status for registration: " + device.getName());
 					if (!THREAD_2_DEVICE_MAP.containsValue(device)) {
 							//current thread doesn't have ignored devices
-							//System.out.println("identified free non-ingnored device: " + device.getName());
+							device.setTestId(testId);
 							freeDevice = device;
 							found = true;
 							break;						
@@ -162,9 +164,12 @@ public class DevicePool
 
 		if (freeDevice != null) {
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
+			String msg = "found device %s-%s for test %s";
+			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid(), testId));
 		} else {
-			//TODO: improve loggers about device type, family etc 
-			throw new RuntimeException("Unable to find free device!");	
+			//TODO: improve loggers about device type, family etc
+			String msg = "Not found free device for thread: %s among registered pool of %s devices!";
+			throw new RuntimeException(String.format(msg, threadId, DEVICES.size()));	
 		}
 		
 		return freeDevice;
@@ -199,14 +204,16 @@ public class DevicePool
 		}
 		if (device == null) 
 		{
-			throw new RuntimeException("Unable to find device by udid: " + udid + "!");
+			String msg = "Not found device by udid among registered pool of %s devices!";
+			throw new RuntimeException(String.format(msg, udid, DEVICES.size()));
 		}
 		return device;
 	}
 	
 	
-	public static void deregisterDeviceByThread(long threadId)
+	public static void deregisterDeviceFromThread()
 	{
+		Long threadId = Thread.currentThread().getId();
 		if (THREAD_2_DEVICE_MAP.containsKey(threadId)) 
 		{
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
@@ -215,7 +222,8 @@ public class DevicePool
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
-			LOGGER.info("Deregistered device '" + device.getName() + "' with thread '" + threadId + "'");
+			String msg = "Disconnected device '%s - %s' for test '%s'; thread '%s'"; 
+			LOGGER.info(String.format(msg,  device.getName(), device.getUdid(), device.getTestId(), threadId));
 		}
 	}
 
