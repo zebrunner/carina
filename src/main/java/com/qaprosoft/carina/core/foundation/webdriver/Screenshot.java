@@ -129,7 +129,7 @@ public class Screenshot
 				// [VD] handle the case when STF abort connection and close session due to the max timeout (30 min)
 				LOGGER.error("Driver session is lost! Deregistering current driver/device.", e);
 				long threadId = Thread.currentThread().getId();
-				DevicePool.deregisterDeviceByThread(threadId);
+				DevicePool.deregisterDeviceFromThread();
 				DriverPool.deregisterDriverByThread(threadId);
 			}
 			catch (IOException e)

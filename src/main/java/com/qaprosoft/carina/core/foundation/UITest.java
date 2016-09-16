@@ -30,7 +30,6 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
-import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.listeners.UITestListener;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -234,7 +233,7 @@ public class UITest extends AbstractTest
     		try {
     			LOGGER.debug("initDriver start...");
     			
-    			Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
+    			Device device = DevicePool.registerDevice2Thread();
    			
 
     			LOGGER.debug("DriverFactory start...");
@@ -249,7 +248,7 @@ public class UITest extends AbstractTest
     		}
     		catch (Throwable thr) {
     			//DevicePool.ignoreDevice();
-    			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
+    			DevicePool.deregisterDeviceFromThread();
     			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
     			init_throwable = thr;
     			pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
@@ -270,7 +269,7 @@ public class UITest extends AbstractTest
 
 			LOGGER.debug("Driver exiting..." + drv);
 	    	DriverPool.deregisterDriverByThread(threadId);
-	    	DevicePool.deregisterDeviceByThread(threadId);
+	    	DevicePool.deregisterDeviceFromThread();
 			drv.quit();
 	    	LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
