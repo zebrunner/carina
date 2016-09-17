@@ -114,6 +114,8 @@ public class DevicePool
 		final String testId = UUID.randomUUID().toString();
 		Device freeDevice = null;
 		if (GRID_ENABLED) {
+			String allModels = StringUtils.join(DEVICE_MODELS, "+");
+			LOGGER.info("Looking for available device among: " + allModels + " using " + Configuration.getBoolean(Parameter.ZAFIRA_SERVICE_URL));
 			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
 			if (!StringUtils.isEmpty(udid)) {
 				for (Device device : DEVICES) {
