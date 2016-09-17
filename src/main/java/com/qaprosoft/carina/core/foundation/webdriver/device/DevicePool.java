@@ -155,8 +155,9 @@ public class DevicePool
 			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid(), testId));
 		} else {
 			// TODO: improve loggers about device type, family etc
-			String msg = "Not found free device for thread: %s among registered pool of %s devices!";
-			throw new RuntimeException(String.format(msg, threadId, DEVICES.size()));
+			String allModels = StringUtils.join(DEVICE_MODELS, "+");
+			String msg = "Not found free device among %s devices for 10 minutes!";
+			throw new RuntimeException(String.format(msg, allModels));
 		}
 
 		return freeDevice;
