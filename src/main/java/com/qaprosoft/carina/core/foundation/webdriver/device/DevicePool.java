@@ -115,7 +115,7 @@ public class DevicePool
 		Device freeDevice = null;
 		if (GRID_ENABLED) {
 			String allModels = StringUtils.join(DEVICE_MODELS, "+");
-			LOGGER.info("Looking for available device among: " + allModels + " using " + Configuration.get(Parameter.ZAFIRA_SERVICE_URL));
+			LOGGER.info("Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
 			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
 			if (!StringUtils.isEmpty(udid)) {
 				for (Device device : DEVICES) {
