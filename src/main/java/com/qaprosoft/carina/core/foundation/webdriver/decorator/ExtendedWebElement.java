@@ -1327,6 +1327,7 @@ public class ExtendedWebElement
 	 * @param timeout in seconds
 	 * @return boolean - false if element still present after wait - otherwise true if it disappear
 	 */
+	public boolean isElementNotPresentAfterWait(final long timeout) {
 		final ExtendedWebElement element = this;
 
 		LOGGER.info(String.format("Check element %s not presence after wait.", element.getName()));
