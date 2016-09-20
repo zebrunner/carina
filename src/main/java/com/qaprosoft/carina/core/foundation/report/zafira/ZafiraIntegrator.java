@@ -333,17 +333,17 @@ public class ZafiraIntegrator {
 		zc.deleteTest(id);
 	}
 	private static boolean isValid() {
-		if (!zafiraUrl.isEmpty()) {
+		if (zafiraUrl.isEmpty()) {
 			LOGGER.warn("zafira_service_url is empty. Integration with zafira will be disabled.");
 			return false;
 		}
 		
-		if (!ciUrl.isEmpty()) {
+		if (ciUrl.isEmpty()) {
 			LOGGER.warn("ci_url is empty. Integration with zafira will be disabled.");
 			return false;
 		}
 		
-		if (zc.isAvailable()) {
+		if (!zc.isAvailable()) {
 			LOGGER.warn("Unable to ping Zafira Reporting Service: " + zafiraUrl + " . Integration with zafira will be disabled.");
 		}
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
