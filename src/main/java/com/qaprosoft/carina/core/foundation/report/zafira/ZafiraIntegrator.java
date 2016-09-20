@@ -138,7 +138,7 @@ public class ZafiraIntegrator {
 			}
 			
 			if (!ciRunId.isEmpty()) {
-				// do not search for run in case of ampty value
+				// do not search for run in case of empty value
 				Response<TestRunType> response = zc.getTestRunByCiRunId(ciRunId);
 				run = response.getObject();
 			}
@@ -146,6 +146,10 @@ public class ZafiraIntegrator {
 			if (run != null) {
 				// already discovered run with the same ciRunId. it is re-run functionality!
 				rerun = true;
+				
+				//re-register test run to reset status onto in progress
+				Response<TestRunType> response = zc.startTestRun(run);
+				run = response.getObject();
 			} else {
 				if (rerunFailures) {
 					LOGGER.error("Unable to find data in Zafira Reporting Service with ciRunId: '" + ciRunId + "'.\n" + "Rerun failures featrure will be disabled!");
@@ -329,6 +333,19 @@ public class ZafiraIntegrator {
 		zc.deleteTest(id);
 	}
 	private static boolean isValid() {
+		if (!zafiraUrl.isEmpty()) {
+			LOGGER.warn("zafira_service_url is empty. Integration with zafira will be disabled.");
+			return false;
+		}
+		
+		if (!ciUrl.isEmpty()) {
+			LOGGER.warn("ci_url is empty. Integration with zafira will be disabled.");
+			return false;
+		}
+		
+		if (zc.isAvailable()) {
+			LOGGER.warn("Unable to ping Zafira Reporting Service: " + zafiraUrl + " . Integration with zafira will be disabled.");
+		}
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
 
