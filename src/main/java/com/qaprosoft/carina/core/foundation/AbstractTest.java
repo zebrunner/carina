@@ -112,6 +112,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 	@BeforeSuite(alwaysRun = true)
 	public void executeBeforeTestSuite(ITestContext context) throws Throwable {
+		
 		// Set log4j properties
 		PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
 		// Set SoapUI log4j properties
@@ -539,7 +540,7 @@ public abstract class AbstractTest // extends DriverHelper
 		
 		try {
 			if (capabilities == null && selenium_host == null) {
-				Device device = DevicePool.registerDevice2Thread(Thread.currentThread().getId());
+				Device device = DevicePool.registerDevice2Thread();
 				extraDriver = DriverFactory.create(driverName, device);	
 			}
 			else {
@@ -553,7 +554,7 @@ public abstract class AbstractTest // extends DriverHelper
 		catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()), thr);
-			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
+			DevicePool.deregisterDeviceFromThread();
 			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()));
 			init_throwable = thr;
 
@@ -571,10 +572,10 @@ public abstract class AbstractTest // extends DriverHelper
 
 	protected void quitExtraDriver() {
 		if (extraDriver != null) {
-			DevicePool.deregisterDeviceByThread(Thread.currentThread().getId());
+			DevicePool.deregisterDeviceFromThread();
 			extraDriver.quit();
 			extraDriver = null;
-			//DriverPool.deregisterDriverByThread(Thread.currentThread().getId());
+			//DriverPool.deregisterDriverByThread();
 		}		
 	}
 	protected void putS3Artifact(String key, String path) {
