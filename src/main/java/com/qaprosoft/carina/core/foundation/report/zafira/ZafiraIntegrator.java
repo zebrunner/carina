@@ -548,7 +548,6 @@ public class ZafiraIntegrator {
 		}
 
 		test.setTestMetrics(Timer.readAllRecords());
-		Timer.clear();
 		
 		testName = test.getName();
 		long testId = test.getId();
@@ -564,6 +563,8 @@ public class ZafiraIntegrator {
 		test.setFinishTime(finishTime);
 
 		Response<TestType> response = zc.finishTest(test);
+		
+		Timer.clear();
 
 		test = response.getObject();
 		if (test == null) {
