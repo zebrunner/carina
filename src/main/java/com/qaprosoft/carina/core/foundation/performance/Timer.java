@@ -63,6 +63,11 @@ public class Timer
 		return testMertrics;
 	}
 	
+	public static synchronized void clear()
+	{
+		getTestMetrics().clear();
+	}
+	
 	private static Map<String, Long> getTestMetrics()
 	{
 		ConcurrentHashMap<String, Long> testMetrics = metrics.get();
