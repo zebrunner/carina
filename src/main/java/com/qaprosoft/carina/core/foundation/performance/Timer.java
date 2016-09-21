@@ -48,7 +48,7 @@ public class Timer
 		testMertrics.put(operation.getKey(), Calendar.getInstance().getTimeInMillis() - testMertrics.get(operation.getKey()));
 	}
 	
-	public static synchronized Map<String, Long> readAllRecords()
+	public static synchronized Map<String, Long> readAndClear()
 	{
 		Map<String, Long> testMertrics = getTestMetrics();
 		for(String key : testMertrics.keySet())
@@ -60,7 +60,11 @@ public class Timer
 				LOGGER.error("Timer not stopped for operation: " + key);
 			}
 		}
-		return testMertrics;
+		
+		Map<String, Long> returnMetrics = new ConcurrentHashMap<>(testMertrics);
+		//clear 
+		testMertrics.clear();
+		return returnMetrics;
 	}
 	
 	public static synchronized void clear()
