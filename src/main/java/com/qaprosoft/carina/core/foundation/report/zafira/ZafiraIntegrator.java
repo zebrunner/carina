@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -538,7 +539,7 @@ public class ZafiraIntegrator {
 
 		long threadId = Thread.currentThread().getId();
 		TestType test = TestNamingUtil.getZafiraTest();
-
+		
 		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		LOGGER.debug("testName registered with current thread is: " + testName);
 		
@@ -546,6 +547,8 @@ public class ZafiraIntegrator {
 			throw new RuntimeException("Unable to find TestType result to mark test as finished! name: '" + testName + "'; threadId: " + threadId);
 		}
 
+		test.setTestMetrics(Timer.readAllRecords());
+		
 		testName = test.getName();
 		long testId = test.getId();
 		long testCaseId = test.getTestCaseId();
