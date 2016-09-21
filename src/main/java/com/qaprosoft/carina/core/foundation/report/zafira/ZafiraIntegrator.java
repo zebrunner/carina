@@ -547,7 +547,7 @@ public class ZafiraIntegrator {
 			throw new RuntimeException("Unable to find TestType result to mark test as finished! name: '" + testName + "'; threadId: " + threadId);
 		}
 
-		test.setTestMetrics(Timer.readAllRecords());
+		test.setTestMetrics(Timer.readAndClear());
 		
 		testName = test.getName();
 		long testId = test.getId();
@@ -564,8 +564,6 @@ public class ZafiraIntegrator {
 
 		Response<TestType> response = zc.finishTest(test);
 		
-		Timer.clear();
-
 		test = response.getObject();
 		if (test == null) {
 			throw new RuntimeException(
