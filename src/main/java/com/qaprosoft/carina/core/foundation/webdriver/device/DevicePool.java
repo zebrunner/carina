@@ -237,7 +237,11 @@ public class DevicePool
 				}
 				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS)) 
 				{
-					type = Type.IOS_PHONE;
+					if (Configuration.get(Parameter.MOBILE_DEVICE_TYPE).equalsIgnoreCase(SpecialKeywords.TABLET)) {
+						type = Type.IOS_TABLET;
+					} else {
+						type = Type.IOS_PHONE;
+					}
 				}
 			} else 
 			{
