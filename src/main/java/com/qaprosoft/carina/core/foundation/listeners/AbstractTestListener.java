@@ -40,6 +40,7 @@ import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -227,9 +228,23 @@ public abstract class AbstractTestListener extends TestArgsListener
 			// if null it means that new test appeared in comparison with registered result
 			if (testType != null) {
 				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
-					// generate already passed exception. Regular eception
+					//for class_mode verify also that test classname is different as all testclass should be re-executed
+					boolean generateSkipException = true;
+					if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
+						if (result.getClass().toString().equalsIgnoreCase(testType.getClass().toString())) {
+							//do not generate skip exception as all test class should be executed again 
+							generateSkipException = false;
+						}
+					}
+					
+					// generate already passed exception. Regular exception
 					// doesn't work as it stop DataProvider execution etc
-					throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
+					if (generateSkipException) {
+						LOGGER.info(String.format("Reexecution for test '%s' is skipped as test already passed.", testType.getName()));
+						throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
+					} else {
+						LOGGER.info(String.format("Reexecution for test '%s' will be started soon.", testType.getName()));
+					}
 				} else {
 					// Do not remove test data as it should reuse already registered test and update it
 					// unregister Zafira test result
