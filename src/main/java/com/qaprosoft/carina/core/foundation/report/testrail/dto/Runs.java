@@ -53,4 +53,11 @@ public class Runs {
         obj.put("run_id",run_id);
         return new Request(obj,"delete_run/"+run_id,"POST");
     }
+    
+    @SuppressWarnings("unchecked")
+	public static Request closeRun(int run_id){
+        JSONObject obj=new JSONObject();
+        obj.put("run_id",run_id);
+        return new Request(obj,"close_run/"+run_id,"POST");
+    }
 }
