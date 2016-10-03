@@ -240,7 +240,7 @@ public class ZafiraIntegrator {
 			String logUrl = ReportContext.getTestLogLink(test);
 
 			if (rerun) {
-				startedTest = getTestType(); // search already registered test!
+				startedTest = getTestType(test); // search already registered test!
 				if (startedTest != null) {
 					startedTest.setDemoURL(demoUrl);
 					startedTest.setLogURL(logUrl);
@@ -326,8 +326,7 @@ public class ZafiraIntegrator {
 		return rerun;
 	}
 	
-	public static TestType getTestType() {
-		String testName = TestNamingUtil.getCanonicTestNameByThread();
+	public static TestType getTestType(String testName) {
 		TestType res = null;
 		if (tests == null) {
 			return res;
