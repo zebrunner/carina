@@ -223,7 +223,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			// Analyze TestResult status obligatory inside isrerun if operator because
 			// some modifications in Zafira results needed.
 			// FAILED status will be removed/unregistered from Zafira database
-			TestType testType = ZafiraIntegrator.getTestType();
+			TestType testType = ZafiraIntegrator.getTestType(test);
 			
 			// if null it means that new test appeared in comparison with registered result
 			if (testType != null) {
