@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
@@ -101,6 +102,19 @@ public class DevicePool
 			DEVICE_MODELS.add(device.getName());
 			String msg = "Added device into the DevicePool: %s - %s. Devices count: %s";
 			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), DEVICES.size()));
+		}
+		
+		// if pool has single device then redefine device name/version etc parameter instead of abstract DevicesPool and Android 5-6...
+		if (DEVICES.size() == 1) {
+			//-Dmobile_device_name=DevicesPool
+			//-Dmobile_platform_name=Android
+			//-Dmobile_platform_version=5-6
+			Device device = DEVICES.get(0);
+			LOGGER.info(String.format("Redefine mobile device settings using single device data: %s %s-%s", device.getName(), device.getOs(), device.getOsVersion()));
+
+			R.CONFIG.put("mobile_device_name", device.getName());
+			R.CONFIG.put("mobile_platform_name", device.getOs());
+			R.CONFIG.put("mobile_platform_version", device.getOsVersion());
 		}
 	}
 	
