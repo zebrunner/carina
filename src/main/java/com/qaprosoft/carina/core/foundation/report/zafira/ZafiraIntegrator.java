@@ -149,6 +149,8 @@ public class ZafiraIntegrator {
 				// already discovered run with the same ciRunId. it is re-run functionality!
 				rerun = true;
 				
+				//reset build number for re-run to map to the latest rerun build 
+				run.setBuildNumber(build);
 				//re-register test run to reset status onto in progress
 				Response<TestRunType> response = zc.startTestRun(run);
 				run = response.getObject();
@@ -187,7 +189,7 @@ public class ZafiraIntegrator {
 				if (rerunFailures) {
 					for (TestType test : tests) {
 						if (test.getName().contains(SpecialKeywords.INV_COUNT)) {
-							LOGGER.error("Test run contains non unique test methods. Rerun failures featrure will be disabled!");
+							LOGGER.error("Test run contains non unique test methods. Rerun failures feature will be disabled!");
 							rerunFailures = false;
 							break;
 						}
