@@ -52,7 +52,7 @@ public class AndroidUtils {
 	/**
 	 * execute Key Event
 	 * 
-	 * @param keyCode
+	 * @param keyCode int
 	 */
 
 	public static void executeKeyEvent(int keyCode) {
@@ -68,8 +68,8 @@ public class AndroidUtils {
 	/**
 	 * press Key Code
 	 * 
-	 * @param keyCode
-	 * @return
+	 * @param keyCode int
+	 * @return boolean
 	 */
 	protected boolean pressKeyCode(int keyCode) {
 		try {
@@ -206,7 +206,7 @@ public class AndroidUtils {
 			x = scrSize.width / 2;
 			y = scrSize.height / 2;
 			((AndroidDriver<?>) driver).swipe(x, y, x, y / 2, 500);
-			LOGGER.info("Swipe was executed. Attemps remain: " + swipeTimes);
+			LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
 			isPresent = element.isElementPresent(1);
 			LOGGER.info("Result: " + isPresent);
 		}
@@ -219,7 +219,7 @@ public class AndroidUtils {
 				x = scrSize.width / 2;
 				y = scrSize.height / 2;
 				((AndroidDriver<?>) driver).swipe(x, y / 2, x, y, 500);
-				LOGGER.info("Swipe was executed. Attemps remain: " + swipeTimes);
+				LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
 				isPresent = element.isElementPresent(1);
 				LOGGER.info("Result: " + isPresent);
 			}
@@ -326,7 +326,7 @@ public class AndroidUtils {
 					}
 				}
 			} catch (Exception e) {
-				LOGGER.error("Error happend during call JavascriptExecutor executor : "
+				LOGGER.error("Error happened during call JavascriptExecutor executor : "
 						+ e);
 				scrolled = false;
 			}
@@ -395,8 +395,8 @@ public class AndroidUtils {
 	/**
 	 * swipe Up
 	 *
-	 * @param elem
-	 * @param time
+	 * @param elem By
+	 * @param time int
 	 */
 	public static void swipeUp(By elem, int time) {
 		tapAndSwipe(elem, SwipeElementDirection.UP, time);
@@ -489,7 +489,7 @@ public class AndroidUtils {
 	/**
 	 * Quick solution for scrolling To Button or element.
 	 * 
-	 * @param extendedWebElement
+	 * @param extendedWebElement ExtendedWebElement
 	 * @return boolean
 	 */
 	public static boolean scrollTo(final ExtendedWebElement extendedWebElement) {
@@ -499,29 +499,28 @@ public class AndroidUtils {
 			int x = driver.manage().window().getSize().getWidth();
 			int y = driver.manage().window().getSize().getHeight();
 			LOGGER.info("Swipe down");
-			while (!extendedWebElement.isElementPresent(1) && ++i < 10) {
-				LOGGER.debug("Swipe down");
+			while (!extendedWebElement.isElementPresent(1) && ++i <= 10) {
+				LOGGER.debug("Swipe down. Attempt #"+i);
 				((AndroidDriver<?>) driver)
 						.swipe((int) (x * 0.1), (int) (y * 0.9),
 								(int) (x * 0.1), (int) (y * 0.2), 2000);
-				i++;
+
 			}
 			if (!extendedWebElement.isElementPresent(1)) {
 				LOGGER.info("Swipe up");
 				i = 0;
 				x = driver.manage().window().getSize().getWidth();
 				y = driver.manage().window().getSize().getHeight();
-				while (!extendedWebElement.isElementPresent(1) && ++i < 10) {
-					LOGGER.debug("Swipe up");
+				while (!extendedWebElement.isElementPresent(1) && ++i <= 10) {
+					LOGGER.debug("Swipe up. Attempt #"+i);
 					((AndroidDriver<?>) driver).swipe((int) (x * 0.1),
 							(int) (y * 0.2), (int) (x * 0.1), (int) (y * 0.9),
 							2000);
-					i++;
 				}
 			}
 			return extendedWebElement.isElementPresent(1);
 		} catch (Exception e) {
-			LOGGER.info("Error happen during scrollToBtn: " + e);
+			LOGGER.info("Error happen during scrollTo ExtendedWebElement: " + e);
 			return true;
 		}
 	}
@@ -529,11 +528,11 @@ public class AndroidUtils {
 	/**
 	 * swipe Coordinates
 	 * 
-	 * @param startX
-	 * @param startY
-	 * @param endX
-	 * @param endY
-	 * @param duration
+	 * @param startX int
+	 * @param startY int
+	 * @param endX int
+	 * @param endY int
+	 * @param duration int
 	 */
 	public static void swipeCoord(int startX, int startY, int endX, int endY,
 			int duration) {
@@ -544,10 +543,10 @@ public class AndroidUtils {
 	/**
 	 * swipe Coordinates
 	 * 
-	 * @param startX
-	 * @param startY
-	 * @param endX
-	 * @param endY
+	 * @param startX int
+	 * @param startY int
+	 * @param endX int
+	 * @param endY int
 	 */
 	public static void swipeCoord(int startX, int startY, int endX, int endY) {
 		swipeCoord(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
@@ -600,24 +599,22 @@ public class AndroidUtils {
 				oppositeDirection = Direction.DOWN;
 			}
 
-			while (!extendedWebElement.isElementPresent(1) && ++i < times) {
+			while (!extendedWebElement.isElementPresent(1) && ++i <= times) {
 				LOGGER.debug("Swipe " + direction.toString());
 				swipeInContainer(container, 1, direction, duration);
-				i++;
 			}
 			if (!extendedWebElement.isElementPresent(1) && bothWay) {
 				LOGGER.info("Swipe in opposite direction");
 				i = 0;
 
-				while (!extendedWebElement.isElementPresent(1) && ++i < times) {
+				while (!extendedWebElement.isElementPresent(1) && ++i <= times) {
 					LOGGER.debug("Swipe " + direction.toString());
 					swipeInContainer(container, 1, oppositeDirection, duration);
-					i++;
 				}
 			}
 			return extendedWebElement.isElementPresent(1);
 		} catch (Exception e) {
-			LOGGER.info("Error happen during swipe in container for element: "
+			LOGGER.info("Error happened during swipe in container for element: "
 					+ e);
 			return true;
 		}
