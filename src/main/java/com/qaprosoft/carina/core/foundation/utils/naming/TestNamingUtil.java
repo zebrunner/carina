@@ -223,6 +223,9 @@ public class TestNamingUtil
 
 	public static synchronized String getBug(String testName)
 	{
+		if (testName == null) {
+			return null;
+		}
 		return testName2Bug.get(testName);
 	}
 }
