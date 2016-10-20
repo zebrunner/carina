@@ -117,5 +117,7 @@ public class SpecialKeywords
 	public static final String ALREADY_PASSED = "ALREADY_PASSED";
 	public static final String SKIP_EXECUTION = "SKIP_EXECUTION";
 	
+	public static final String ZAFIRA_PROJECT = "zafira_project";
+	
 	
 }
