@@ -79,7 +79,7 @@ public class ZafiraIntegrator {
 
 	private static List<String> uniqueKeys;
 
-	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl, Configuration.get(Parameter.ZAFIRA_USERNAME), Configuration.get(Parameter.ZAFIRA_PASSWORD)).setProject(Configuration.get(Parameter.ZAFIRA_PROJECT));
+	private static ZafiraClient zc = new ZafiraClient(zafiraUrl, Configuration.get(Parameter.ZAFIRA_USERNAME), Configuration.get(Parameter.ZAFIRA_PASSWORD));
 	
 	public static void startSuite(ITestContext context, String suiteFileName) {
 		if (Configuration.getBoolean(Parameter.DEVELOP)) {
@@ -91,6 +91,14 @@ public class ZafiraIntegrator {
 			return;
 		if (isRegistered) // AUTO-731 jobs with several test classes are not registered in zafira reporting service
 			return;
+		
+		String zafiraProject = Configuration.get(Parameter.ZAFIRA_PROJECT);
+		String project = context.getSuite().getParameter(SpecialKeywords.ZAFIRA_PROJECT);
+		if (project != null) {
+			zafiraProject = project;
+		}
+		
+		zc.setProject(zafiraProject);
 		
 		try {
 			// remove slash at the end of ciUrl if any to register data in zafira without double slashing:
@@ -347,6 +355,11 @@ public class ZafiraIntegrator {
 		zc.deleteTest(id);
 	}
 	private static boolean isValid() {
+		if (zc == null ) {
+			LOGGER.warn("Zafira Client was not initialized. Integration with zafira will be disabled.");
+			return false;
+		}
+			
 		if (zafiraUrl.isEmpty()) {
 			LOGGER.warn("zafira_service_url is empty. Integration with zafira will be disabled.");
 			return false;
