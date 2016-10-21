@@ -241,7 +241,7 @@ public class ZafiraIntegrator {
 			String owner = !Ownership.getMethodOwner(result).isEmpty() ? Ownership.getMethodOwner(result) : Ownership.getSuiteOwner(result.getTestContext());
 			UserType methodOwner = registerUser(owner);
 
-			TestCaseType testCase = registerTestCase(testClass, testMethod, "", suite.getId(), methodOwner.getId());
+			TestCaseType testCase = registerTestCase(result);
 			if (testCase == null) {
 				throw new RuntimeException("Unable to register tetscase '" + testMethod + "' for zafira service: " + zafiraUrl);
 			}
@@ -300,7 +300,7 @@ public class ZafiraIntegrator {
 
 		TestType finishedTest = null;
 		try {
-			finishedTest = finishTest(status, message, new Date().getTime());
+			finishedTest = finishTest(result, status, message, new Date().getTime());
 			TestNamingUtil.associateZafiraTest(finishedTest);
 		} catch (Exception e) {
 			LOGGER.error("Undefined error during test case/method finish!", e);
@@ -501,7 +501,7 @@ public class ZafiraIntegrator {
 		return testRun;
 	}
 
-	private static TestCaseType registerTestCase(String testClass, String testMethod, String info, Long testSuiteId, Long userId) {
+/*	private static TestCaseType registerTestCase(String testClass, String testMethod, String info, Long testSuiteId, Long userId) {
 		TestCaseType testCase = new TestCaseType(testClass, testMethod, info, testSuiteId, userId);
 		String testCaseDetails = "testClass: %s, testMethod: %s, info: %s, testSuiteId: %s, userId: %s";
 		LOGGER.debug("Test Case details for registration:"
@@ -517,7 +517,7 @@ public class ZafiraIntegrator {
 					+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId));
 		}
 		return testCase;
-	}
+	}*/
 	
 	private static TestType startTest(String name, Status status, String testArgs, Long testRunId, Long testCaseId,
 			String demoURL, String logURL) {
@@ -561,10 +561,11 @@ public class ZafiraIntegrator {
 		return test;
 	}
 	
-	private static TestType finishTest(Status status, String message, Long finishTime) {
+	private static TestType finishTest(ITestResult result, Status status, String message, Long finishTime) {
 
 		long threadId = Thread.currentThread().getId();
 		TestType test = TestNamingUtil.getZafiraTest();
+		
 		
 		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		LOGGER.debug("testName registered with current thread is: " + testName);
@@ -573,6 +574,26 @@ public class ZafiraIntegrator {
 			throw new RuntimeException("Unable to find TestType result to mark test as finished! name: '" + testName + "'; threadId: " + threadId);
 		}
 
+		
+		//QAA-1213
+		//Analyze if current result.getName() present in recorded zafira test.
+		if (!testName.contains(result.getName())) {
+			// release information about parent test
+			TestNamingUtil.releaseTestInfoByThread();
+			
+			testName = TestNamingUtil.getCanonicalTestName(result);
+			
+			//if not start new test as it is skipped dependent test method
+			TestCaseType testCase = registerTestCase(result);
+			String testArgs = result.getParameters().toString();
+			
+			String demoUrl = ReportContext.getTestScreenshotsLink(testName);
+			String logUrl = ReportContext.getTestLogLink(testName);
+
+			test = startTest(testName, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
+		}
+		
+		
 		test.setTestMetrics(Timer.readAndClear());
 		
 		testName = test.getName();
@@ -599,6 +620,35 @@ public class ZafiraIntegrator {
 					"Registered test details:" + logMessage);
 		}
 		return test;
+	}
+	
+	private static TestCaseType registerTestCase(ITestResult result) {
+		
+		String testClass = result.getMethod().getTestClass().getName();
+		
+		String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
+
+		// if method owner is not specified then try to use suite owner. If
+		// both are not declared then ANONYMOUS will be used
+		String owner = !Ownership.getMethodOwner(result).isEmpty() ? Ownership.getMethodOwner(result) : Ownership.getSuiteOwner(result.getTestContext());
+		UserType methodOwner = registerUser(owner);
+
+		
+		TestCaseType testCase = new TestCaseType(testClass, testMethod, "", suite.getId(), methodOwner.getId());
+		String testCaseDetails = "testClass: %s, testMethod: %s, info: %s, testSuiteId: %s, userId: %s";
+		LOGGER.debug("Test Case details for registration:"
+				+ String.format(testCaseDetails, testClass, testMethod, "", suite.getId(), methodOwner.getId()));
+		Response<TestCaseType> response = zc.createTestCase(testCase);
+		testCase = response.getObject();
+		if (testCase == null) {
+			throw new RuntimeException("Unable to register test case '"
+					+ String.format(testCaseDetails, testClass, testMethod, "", suite.getId(), methodOwner.getId())
+					+ "' for zafira service: " + zafiraUrl);
+		} else {
+			LOGGER.debug("Registered test case details:"
+					+ String.format(testCaseDetails, testClass, testMethod, "", suite.getId(), methodOwner.getId()));
+		}
+		return testCase;
 	}
 
 	private static TestRunType finishTestRun() {
