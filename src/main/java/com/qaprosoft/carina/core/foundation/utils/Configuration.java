@@ -119,6 +119,8 @@ public class Configuration
 
 		EMAIL_LIST("email_list"),
 		
+		TEMP_EMAIL_LIST("temp_email_list"),
+		
 		FAILURE_EMAIL_LIST("failure_email_list"),
 		
 		IGNORE_KNOWN_ISSUES("ignore_known_issues"),
