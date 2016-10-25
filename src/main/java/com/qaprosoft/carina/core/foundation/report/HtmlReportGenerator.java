@@ -153,7 +153,7 @@ public class HtmlReportGenerator
 				
 				image = image.replace("${image}", imgNames.get(i).toString());
 				image = image.replace("${thumbnail}", imgNames.get(i).toString());
-				image = image.replace("${alt}", imgNames.get(i).toString());
+				//image = image.replace("${alt}", imgNames.get(i).toString());
 				String title = TestLogCollector.getScreenshotComment(imgNames.get(i));
 				if (title == null) {
 					title = "";
