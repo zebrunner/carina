@@ -231,8 +231,6 @@ public class ZafiraIntegrator {
 		
 		TestType startedTest = null;
 		try {
-			String testClass = result.getMethod().getTestClass().getName();
-			
 			String test = TestNamingUtil.getCanonicalTestName(result);
 			String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
 
@@ -240,6 +238,7 @@ public class ZafiraIntegrator {
 			// both are not declared then ANONYMOUS will be used
 			String owner = !Ownership.getMethodOwner(result).isEmpty() ? Ownership.getMethodOwner(result) : Ownership.getSuiteOwner(result.getTestContext());
 			UserType methodOwner = registerUser(owner);
+			LOGGER.debug("methodOwner: " + methodOwner);
 
 			TestCaseType testCase = registerTestCase(result);
 			if (testCase == null) {
@@ -354,6 +353,15 @@ public class ZafiraIntegrator {
 	public static void deleteTest(long id) {
 		zc.deleteTest(id);
 	}
+	
+	
+	//TODO: add support for include pass/fail/skip tests for email generator
+	public static String sendEmailReport(String email_list) {
+		Response<String> response = zc.sendTestRunReport(run.getId(), email_list);
+		return response.getObject(); //null in case of any issue
+	}
+	
+	
 	private static boolean isValid() {
 		if (zc == null ) {
 			LOGGER.warn("Zafira Client was not initialized. Integration with zafira will be disabled.");
@@ -501,24 +509,6 @@ public class ZafiraIntegrator {
 		return testRun;
 	}
 
-/*	private static TestCaseType registerTestCase(String testClass, String testMethod, String info, Long testSuiteId, Long userId) {
-		TestCaseType testCase = new TestCaseType(testClass, testMethod, info, testSuiteId, userId);
-		String testCaseDetails = "testClass: %s, testMethod: %s, info: %s, testSuiteId: %s, userId: %s";
-		LOGGER.debug("Test Case details for registration:"
-				+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId));
-		Response<TestCaseType> response = zc.createTestCase(testCase);
-		testCase = response.getObject();
-		if (testCase == null) {
-			throw new RuntimeException("Unable to register test case '"
-					+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId)
-					+ "' for zafira service: " + zafiraUrl);
-		} else {
-			LOGGER.debug("Registered test case details:"
-					+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId));
-		}
-		return testCase;
-	}*/
-	
 	private static TestType startTest(String name, Status status, String testArgs, Long testRunId, Long testCaseId,
 			String demoURL, String logURL) {
 
