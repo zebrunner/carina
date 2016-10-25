@@ -310,7 +310,7 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 			
 			//generate and send email report by Zafira to test group of people
-			ZafiraIntegrator.sendEmailReport(R.CONFIG.get("temp_email_list"));
+			ZafiraIntegrator.sendEmailReport(Configuration.get(Parameter.TEMP_EMAIL_LIST));
 			
 			// Store emailable report under emailable-report.html
 			ReportContext.generateHtmlReport(emailContent);
