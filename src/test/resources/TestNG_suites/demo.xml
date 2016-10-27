@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite verbose="1" name="Selenium Demo Tests"
+	skipfailedinvocationcounts="false" junit="false" parallel="methods"
+	data-provider-thread-count="50" annotations="JDK"> 
+
+	<test verbose="1" name="Grid tests">
+		<classes>
+			<class name="com.qaprosoft.carina.core.foundation.grid.DeviceGridTest" />
+		</classes>
+	</test>
+	
+</suite>

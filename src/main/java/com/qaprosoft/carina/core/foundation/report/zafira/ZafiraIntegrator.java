@@ -9,11 +9,13 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ArgumentType;
 import com.qaprosoft.carina.core.foundation.utils.configuration.ConfigurationBin;
 import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
@@ -77,7 +79,7 @@ public class ZafiraIntegrator {
 
 	private static List<String> uniqueKeys;
 
-	private static final ZafiraClient zc = new ZafiraClient(zafiraUrl, Configuration.get(Parameter.ZAFIRA_USERNAME), Configuration.get(Parameter.ZAFIRA_PASSWORD)).setProject(Configuration.get(Parameter.ZAFIRA_PROJECT));
+	private static ZafiraClient zc = new ZafiraClient(zafiraUrl, Configuration.get(Parameter.ZAFIRA_USERNAME), Configuration.get(Parameter.ZAFIRA_PASSWORD));
 	
 	public static void startSuite(ITestContext context, String suiteFileName) {
 		if (Configuration.getBoolean(Parameter.DEVELOP)) {
@@ -89,6 +91,14 @@ public class ZafiraIntegrator {
 			return;
 		if (isRegistered) // AUTO-731 jobs with several test classes are not registered in zafira reporting service
 			return;
+		
+		String zafiraProject = Configuration.get(Parameter.ZAFIRA_PROJECT);
+		String project = context.getSuite().getParameter(SpecialKeywords.ZAFIRA_PROJECT);
+		if (project != null) {
+			zafiraProject = project;
+		}
+		
+		zc.setProject(zafiraProject);
 		
 		try {
 			// remove slash at the end of ciUrl if any to register data in zafira without double slashing:
@@ -103,11 +113,11 @@ public class ZafiraIntegrator {
 			}
 			user = registerUser(ciUserId, ciUserEmail, ciUserFirstName, ciUserLastName);
 
-			job = registerJob(ciUrl, user.getId());
-
 			// register suiteOwner
 			UserType suiteOwner = registerUser(Ownership.getSuiteOwner(context));
 			suite = registerTestSuite(context.getSuite().getName(), suiteFileName, suiteOwner.getId());
+			
+			job = registerJob(ciUrl, suiteOwner.getId());
 
 			String workItem = !Configuration.get(Parameter.JIRA_SUITE_ID).isEmpty() ? Configuration.get(Parameter.JIRA_SUITE_ID) : null;
 
@@ -138,7 +148,7 @@ public class ZafiraIntegrator {
 			}
 			
 			if (!ciRunId.isEmpty()) {
-				// do not search for run in case of ampty value
+				// do not search for run in case of empty value
 				Response<TestRunType> response = zc.getTestRunByCiRunId(ciRunId);
 				run = response.getObject();
 			}
@@ -146,6 +156,12 @@ public class ZafiraIntegrator {
 			if (run != null) {
 				// already discovered run with the same ciRunId. it is re-run functionality!
 				rerun = true;
+				
+				//reset build number for re-run to map to the latest rerun build 
+				run.setBuildNumber(build);
+				//re-register test run to reset status onto in progress
+				Response<TestRunType> response = zc.startTestRun(run);
+				run = response.getObject();
 			} else {
 				if (rerunFailures) {
 					LOGGER.error("Unable to find data in Zafira Reporting Service with ciRunId: '" + ciRunId + "'.\n" + "Rerun failures featrure will be disabled!");
@@ -176,6 +192,17 @@ public class ZafiraIntegrator {
 			if (rerun) {
 				//read all test results from Zafira
 				tests = zc.getTestRunResults(run.getId()).getObject();
+				
+				//analyze test results and disable rerun_failures feature if tests contains non-unique test methods from DataProvider
+				if (rerunFailures) {
+					for (TestType test : tests) {
+						if (test.getName().contains(SpecialKeywords.INV_COUNT)) {
+							LOGGER.error("Test run contains non unique test methods. Rerun failures feature will be disabled!");
+							rerunFailures = false;
+							break;
+						}
+					}
+				}
 			}
 		} catch (Exception e) {
 			isRegistered = false;
@@ -204,8 +231,6 @@ public class ZafiraIntegrator {
 		
 		TestType startedTest = null;
 		try {
-			String testClass = result.getMethod().getTestClass().getName();
-			
 			String test = TestNamingUtil.getCanonicalTestName(result);
 			String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
 
@@ -213,8 +238,9 @@ public class ZafiraIntegrator {
 			// both are not declared then ANONYMOUS will be used
 			String owner = !Ownership.getMethodOwner(result).isEmpty() ? Ownership.getMethodOwner(result) : Ownership.getSuiteOwner(result.getTestContext());
 			UserType methodOwner = registerUser(owner);
+			LOGGER.debug("methodOwner: " + methodOwner);
 
-			TestCaseType testCase = registerTestCase(testClass, testMethod, "", suite.getId(), methodOwner.getId());
+			TestCaseType testCase = registerTestCase(result);
 			if (testCase == null) {
 				throw new RuntimeException("Unable to register tetscase '" + testMethod + "' for zafira service: " + zafiraUrl);
 			}
@@ -223,7 +249,7 @@ public class ZafiraIntegrator {
 			String logUrl = ReportContext.getTestLogLink(test);
 
 			if (rerun) {
-				startedTest = getTestType(); // search already registered test!
+				startedTest = getTestType(test); // search already registered test!
 				if (startedTest != null) {
 					startedTest.setDemoURL(demoUrl);
 					startedTest.setLogURL(logUrl);
@@ -273,7 +299,7 @@ public class ZafiraIntegrator {
 
 		TestType finishedTest = null;
 		try {
-			finishedTest = finishTest(status, message, new Date().getTime());
+			finishedTest = finishTest(result, status, message, new Date().getTime());
 			TestNamingUtil.associateZafiraTest(finishedTest);
 		} catch (Exception e) {
 			LOGGER.error("Undefined error during test case/method finish!", e);
@@ -309,8 +335,7 @@ public class ZafiraIntegrator {
 		return rerun;
 	}
 	
-	public static TestType getTestType() {
-		String testName = TestNamingUtil.getCanonicTestNameByThread();
+	public static TestType getTestType(String testName) {
 		TestType res = null;
 		if (tests == null) {
 			return res;
@@ -328,7 +353,45 @@ public class ZafiraIntegrator {
 	public static void deleteTest(long id) {
 		zc.deleteTest(id);
 	}
+	
+	
+	//TODO: add support for include pass/fail/skip tests for email generator
+	public static String sendEmailReport(String email_list) {
+		if (!isValid() || !isRegistered)
+			return null;
+		
+		boolean includePass = R.EMAIL.getBoolean("include_pass");
+		boolean includeFail = R.EMAIL.getBoolean("include_fail");
+		boolean includeSkip = R.EMAIL.getBoolean("include_skip");
+
+		boolean showOnlyFailures = false;
+		if (!includePass && (includeFail || includeSkip)) {
+			showOnlyFailures = true;
+		}
+		Response<String> response = zc.sendTestRunReport(run.getId(), email_list, showOnlyFailures);
+		return response.getObject(); //null in case of any issue
+	}
+	
+	
 	private static boolean isValid() {
+		if (zc == null ) {
+			LOGGER.warn("Zafira Client was not initialized. Integration with zafira will be disabled.");
+			return false;
+		}
+			
+		if (zafiraUrl.isEmpty()) {
+			LOGGER.warn("zafira_service_url is empty. Integration with zafira will be disabled.");
+			return false;
+		}
+		
+		if (ciUrl.isEmpty()) {
+			LOGGER.warn("ci_url is empty. Integration with zafira will be disabled.");
+			return false;
+		}
+		
+		if (!zc.isAvailable()) {
+			LOGGER.warn("Unable to ping Zafira Reporting Service: " + zafiraUrl + " . Integration with zafira will be disabled.");
+		}
 		return !zafiraUrl.isEmpty() && !ciUrl.isEmpty() && zc.isAvailable();
 	}
 
@@ -457,24 +520,6 @@ public class ZafiraIntegrator {
 		return testRun;
 	}
 
-	private static TestCaseType registerTestCase(String testClass, String testMethod, String info, Long testSuiteId, Long userId) {
-		TestCaseType testCase = new TestCaseType(testClass, testMethod, info, testSuiteId, userId);
-		String testCaseDetails = "testClass: %s, testMethod: %s, info: %s, testSuiteId: %s, userId: %s";
-		LOGGER.debug("Test Case details for registration:"
-				+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId));
-		Response<TestCaseType> response = zc.createTestCase(testCase);
-		testCase = response.getObject();
-		if (testCase == null) {
-			throw new RuntimeException("Unable to register test case '"
-					+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId)
-					+ "' for zafira service: " + zafiraUrl);
-		} else {
-			LOGGER.debug("Registered test case details:"
-					+ String.format(testCaseDetails, testClass, testMethod, info, testSuiteId, userId));
-		}
-		return testCase;
-	}
-	
 	private static TestType startTest(String name, Status status, String testArgs, Long testRunId, Long testCaseId,
 			String demoURL, String logURL) {
 
@@ -517,11 +562,12 @@ public class ZafiraIntegrator {
 		return test;
 	}
 	
-	private static TestType finishTest(Status status, String message, Long finishTime) {
+	private static TestType finishTest(ITestResult result, Status status, String message, Long finishTime) {
 
 		long threadId = Thread.currentThread().getId();
 		TestType test = TestNamingUtil.getZafiraTest();
-
+		
+		
 		String testName = TestNamingUtil.getCanonicTestNameByThread();
 		LOGGER.debug("testName registered with current thread is: " + testName);
 		
@@ -529,6 +575,28 @@ public class ZafiraIntegrator {
 			throw new RuntimeException("Unable to find TestType result to mark test as finished! name: '" + testName + "'; threadId: " + threadId);
 		}
 
+		
+		//QAA-1213
+		//Analyze if current result.getName() present in recorded zafira test.
+		if (!testName.contains(result.getName())) {
+			// release information about parent test
+			TestNamingUtil.releaseTestInfoByThread();
+			
+			testName = TestNamingUtil.getCanonicalTestName(result);
+			
+			//if not start new test as it is skipped dependent test method
+			TestCaseType testCase = registerTestCase(result);
+			String testArgs = result.getParameters().toString();
+			
+			String demoUrl = ReportContext.getTestScreenshotsLink(testName);
+			String logUrl = ReportContext.getTestLogLink(testName);
+
+			test = startTest(testName, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
+		}
+		
+		
+		test.setTestMetrics(Timer.readAndClear());
+		
 		testName = test.getName();
 		long testId = test.getId();
 		long testCaseId = test.getTestCaseId();
@@ -543,7 +611,7 @@ public class ZafiraIntegrator {
 		test.setFinishTime(finishTime);
 
 		Response<TestType> response = zc.finishTest(test);
-
+		
 		test = response.getObject();
 		if (test == null) {
 			throw new RuntimeException(
@@ -553,6 +621,35 @@ public class ZafiraIntegrator {
 					"Registered test details:" + logMessage);
 		}
 		return test;
+	}
+	
+	private static TestCaseType registerTestCase(ITestResult result) {
+		
+		String testClass = result.getMethod().getTestClass().getName();
+		
+		String testMethod = TestNamingUtil.getCanonicalTestMethodName(result);
+
+		// if method owner is not specified then try to use suite owner. If
+		// both are not declared then ANONYMOUS will be used
+		String owner = !Ownership.getMethodOwner(result).isEmpty() ? Ownership.getMethodOwner(result) : Ownership.getSuiteOwner(result.getTestContext());
+		UserType methodOwner = registerUser(owner);
+
+		
+		TestCaseType testCase = new TestCaseType(testClass, testMethod, "", suite.getId(), methodOwner.getId());
+		String testCaseDetails = "testClass: %s, testMethod: %s, info: %s, testSuiteId: %s, userId: %s";
+		LOGGER.debug("Test Case details for registration:"
+				+ String.format(testCaseDetails, testClass, testMethod, "", suite.getId(), methodOwner.getId()));
+		Response<TestCaseType> response = zc.createTestCase(testCase);
+		testCase = response.getObject();
+		if (testCase == null) {
+			throw new RuntimeException("Unable to register test case '"
+					+ String.format(testCaseDetails, testClass, testMethod, "", suite.getId(), methodOwner.getId())
+					+ "' for zafira service: " + zafiraUrl);
+		} else {
+			LOGGER.debug("Registered test case details:"
+					+ String.format(testCaseDetails, testClass, testMethod, "", suite.getId(), methodOwner.getId()));
+		}
+		return testCase;
 	}
 
 	private static TestRunType finishTestRun() {

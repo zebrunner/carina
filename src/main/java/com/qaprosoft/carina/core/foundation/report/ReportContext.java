@@ -329,9 +329,13 @@ public class ReportContext
 	}
 	
 	public static void generateHtmlReport(String content) {
+		generateHtmlReport(content, SpecialKeywords.HTML_REPORT);
+	}
+	
+	public static void generateHtmlReport(String content, String emailableReport) {
 		try {
 			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
-					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
+					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), emailableReport));
 
 			// if file doesnt exists, then create it
 			if (!reportFile.exists()) {

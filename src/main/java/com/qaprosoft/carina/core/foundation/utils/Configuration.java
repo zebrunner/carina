@@ -124,6 +124,8 @@ public class Configuration
 
 		EMAIL_LIST("email_list"),
 		
+		TEMP_EMAIL_LIST("temp_email_list"),
+		
 		FAILURE_EMAIL_LIST("failure_email_list"),
 		
 		IGNORE_KNOWN_ISSUES("ignore_known_issues"),
@@ -181,12 +183,6 @@ public class Configuration
 		DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 		
 		CORE_LOG_LEVEL("core_log_level"),
-		
-		TEST_ID("test_id"),
-		
-		IS_TESTEXECUTER("is_testexecuter"),
-		
-		TESTEXECUTER_URL("testexecuter_url"),
 		
 		LOG_ALL_JSON("log_all_json"),
 
@@ -300,6 +296,14 @@ public class Configuration
 		SPIRA_TESTSET_ID("spira_testset_id"),
 		
 		//zafira
+		ZAFIRA_GRID_ENABLED("zafira_grid_enabled"),
+		
+		ZAFIRA_GRID_PKEY("zafira_grid_pkey"),
+		
+		ZAFIRA_GRID_SKEY("zafira_grid_skey"),
+		
+		ZAFIRA_GRID_CHANNEL("zafira_grid_channel"),
+		
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
 		ZAFIRA_USERNAME("zafira_username"),
@@ -352,7 +356,10 @@ public class Configuration
 		
 		SSH_USERNAME("ssh_username"),
 		
-		ADB_PATH("adb_path")
+		ADB_PATH("adb_path"),
+
+		// TLS
+		TLS_KEYSECURE_LOCATION("tls_keysecure_location")
 		;
 
 		private final String key;
