@@ -357,6 +357,9 @@ public class ZafiraIntegrator {
 	
 	//TODO: add support for include pass/fail/skip tests for email generator
 	public static String sendEmailReport(String email_list) {
+		if (!isValid() || !isRegistered)
+			return null;
+		
 		boolean includePass = R.EMAIL.getBoolean("include_pass");
 		boolean includeFail = R.EMAIL.getBoolean("include_fail");
 		boolean includeSkip = R.EMAIL.getBoolean("include_skip");
