@@ -257,11 +257,13 @@ public enum Messager {
 		try {
 			// Changes symbols to '*' if starts with 'crypto_'
 			for (int i = 0; i < args.length; i++) {
-				Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
-				if (args[i] != null && matcher.find()) {
-					int start = args[i].indexOf(":") + 1;
-					int end = args[i].indexOf("}");
-					args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
+				if (args[i] != null) {
+					Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
+					if (matcher.find()) {
+						int start = args[i].indexOf(":") + 1;
+						int end = args[i].indexOf("}");
+						args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
+					}
 				}
 			}
 			message = String.format(pattern, (Object[]) args);

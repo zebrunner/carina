@@ -1,7 +1,8 @@
 package com.qaprosoft.carina.core.foundation.report.testrail.dto;
 
-import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 import org.json.simple.JSONObject;
+
+import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 
 /**
  * Created by Patotsky on 13.01.2015.
@@ -29,7 +30,8 @@ public class Runs {
     }
 
 
-    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, String desc){
+    @SuppressWarnings("unchecked")
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, String desc){
         JSONObject obj=new JSONObject();
         obj.put("suite_id",suite_id);
         obj.put("name",name);
@@ -43,5 +45,19 @@ public class Runs {
     public static Request getRun(int run_id){
         return new Request(new JSONObject(),"get_run/"+run_id,"GET");
 
+    }
+    
+    @SuppressWarnings("unchecked")
+	public static Request deleteRun(int run_id){
+        JSONObject obj=new JSONObject();
+        obj.put("run_id",run_id);
+        return new Request(obj,"delete_run/"+run_id,"POST");
+    }
+    
+    @SuppressWarnings("unchecked")
+	public static Request closeRun(int run_id){
+        JSONObject obj=new JSONObject();
+        obj.put("run_id",run_id);
+        return new Request(obj,"close_run/"+run_id,"POST");
     }
 }
