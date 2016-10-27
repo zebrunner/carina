@@ -44,6 +44,7 @@ import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullHostnameVerifier;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullX509TrustManager;
+import com.qaprosoft.carina.core.foundation.api.ssl.SSLContextBuilder;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.http.HttpResponseStatusType;
@@ -314,4 +315,21 @@ public abstract class AbstractApiMethod extends HttpClient
 		cfg = cfg.sslConfig(sslConfig);
 		request = request.config(cfg);
 	}
+
+	public void setSSLContext(SSLContext sslContext)
+	{
+		SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext);
+		SSLConfig sslConfig = new SSLConfig();
+		sslConfig = sslConfig.sslSocketFactory(socketFactory);
+
+		RestAssuredConfig cfg = new RestAssuredConfig();
+		cfg = cfg.sslConfig(sslConfig);
+		request = request.config(cfg);
+	}
+
+	public void setDefaultTLSSupport()
+	{
+		setSSLContext(new SSLContextBuilder(true).createSSLContext());
+	}
+
 }
