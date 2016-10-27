@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -33,11 +34,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
+import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
@@ -642,6 +645,9 @@ public class ExtendedWebElement
 				if (!drv.findElements(by).isEmpty()) {
 					element = drv.findElement(by);
 					LOGGER.debug("Element was idenfified using By: " + by.toString());
+				} else if (getElement() != null){
+					element = getElement().findElement(by);
+					LOGGER.debug("Element was idenfified using existing element and By: " + by.toString());
 				} else {
 					throw new RuntimeException("Unable to identify element using By: " + by.toString());
 				}
@@ -744,8 +750,8 @@ public class ExtendedWebElement
 	
 	/**
 	 * Check checkbox
-	 * 
-	 * @param checkbox Element
+	 *
+	 * for checkbox Element
 	 */
 	public void check()
 	{
@@ -761,7 +767,7 @@ public class ExtendedWebElement
 	/**
 	 * Uncheck checkbox
 	 * 
-	 * @param checkbox Element
+	 * for checkbox Element
 	 */
 	public void uncheck()
 	{
@@ -1209,7 +1215,13 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return !drv.findElements(by).isEmpty();
+					//try to search starting from existing webElement and using driver directly
+					if(!drv.findElements(by).isEmpty()) {
+						return true;
+					} else if (getElement() != null) {
+						return !getElement().findElements(by).isEmpty();
+					}
+					return false;
 				}
 			});
 			element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
@@ -1247,7 +1259,16 @@ public class ExtendedWebElement
 			{
 				public Boolean apply(WebDriver dr)
 				{
-					return !drv.findElements(by).isEmpty();
+					//return !drv.findElements(by).isEmpty();
+					
+					//try to search starting from existing webElement and using driver directly
+					if(!drv.findElements(by).isEmpty()) {
+						return true;
+					} else if (getElement() != null) {
+						return !getElement().findElements(by).isEmpty();
+					}
+					return false;
+					
 				}
 			});
 			webElements = this.getElement().findElements(by);
@@ -1293,4 +1314,69 @@ public class ExtendedWebElement
 		}
 		return el;
 	}
+	
+	public void waitUntilElementNotPresent(final long timeout) {
+		final ExtendedWebElement element = this;
+		
+		LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
+		
+		final WebDriver drv = getDriver();
+		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try {
+			wait.until(new ExpectedCondition<Boolean>() {
+				public Boolean apply(WebDriver dr) {
+					boolean result = drv.findElements(element.getBy()).size() == 0;
+					if (!result) {
+						LOGGER.debug(drv.getPageSource());
+						LOGGER.info(String.format("Element %s is still present. Wait until it disappear.",
+								element.getName()));
+					}
+					return result;
+
+				}
+			});
+		} catch (Exception e) {
+			LOGGER.debug(e.getMessage(), e.getCause());
+			// do nothing
+		}
+
+		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+
+	}
+
+	/**
+	 * is Element Not Present After Wait
+	 *
+	 * @param timeout in seconds
+	 * @return boolean - false if element still present after wait - otherwise true if it disappear
+	 */
+	public boolean isElementNotPresentAfterWait(final long timeout) {
+		final ExtendedWebElement element = this;
+
+		LOGGER.info(String.format("Check element %s not presence after wait.", element.getName()));
+
+		Wait<WebDriver> wait =
+				new FluentWait<WebDriver>(getDriver()).withTimeout(timeout, TimeUnit.SECONDS).pollingEvery(1,
+						TimeUnit.SECONDS).ignoring(NoSuchElementException.class);
+		try {
+			return wait.until(new Function<WebDriver, Boolean>() {
+				public Boolean apply(WebDriver driver) {
+					boolean result = driver.findElements(element.getBy()).isEmpty();
+					if (!result) {
+						LOGGER.info(String.format("Element '%s' is still present. Wait until it disappear.", element
+								.getNameWithLocator()));
+					}
+					return result;
+				}
+			});
+		} catch (Exception e) {
+			LOGGER.error("Error happened: " + e.getMessage(), e.getCause());
+			LOGGER.warn("Return standard element not presence method");
+			return !element.isElementPresent();
+		}
+
+	}
+	
 }
