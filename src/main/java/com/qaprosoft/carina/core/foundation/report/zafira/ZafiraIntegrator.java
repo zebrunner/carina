@@ -113,11 +113,11 @@ public class ZafiraIntegrator {
 			}
 			user = registerUser(ciUserId, ciUserEmail, ciUserFirstName, ciUserLastName);
 
-			job = registerJob(ciUrl, user.getId());
-
 			// register suiteOwner
 			UserType suiteOwner = registerUser(Ownership.getSuiteOwner(context));
 			suite = registerTestSuite(context.getSuite().getName(), suiteFileName, suiteOwner.getId());
+			
+			job = registerJob(ciUrl, suiteOwner.getId());
 
 			String workItem = !Configuration.get(Parameter.JIRA_SUITE_ID).isEmpty() ? Configuration.get(Parameter.JIRA_SUITE_ID) : null;
 
