@@ -98,7 +98,7 @@ public class CryptoConsole
 						outFile.delete();
 					}
 					outFile.createNewFile();
-					FileUtils.writeStringToFile(outFile, crypto.encryptByPatternAndWrap(FileUtils.readFileToString(inFile), CRYPTO_PATTERN, "{crypt:%s}"));
+					FileUtils.writeByteArrayToFile(outFile, crypto.encryptByPatternAndWrap(new String(FileUtils.readFileToByteArray(inFile)), CRYPTO_PATTERN, "{crypt:%s}").getBytes());
 					LOG.info("Encrypted file saved: " + outFile.getAbsolutePath());
 				}
 				else if(line.hasOption(STRING_ARG))
@@ -127,7 +127,7 @@ public class CryptoConsole
 						outFile.delete();
 					}
 					outFile.createNewFile();
-					FileUtils.writeStringToFile(outFile, crypto.decryptByPatternAndWrap(FileUtils.readFileToString(inFile), CRYPTO_PATTERN, "{crypt:%s}"));
+					FileUtils.writeByteArrayToFile(outFile, crypto.decryptByPatternAndWrap(new String(FileUtils.readFileToByteArray(inFile)), CRYPTO_PATTERN, "{crypt:%s}").getBytes());
 					LOG.info("Decrypted file saved: " + outFile.getAbsolutePath());
 				}
 				else if(line.hasOption(STRING_ARG))
