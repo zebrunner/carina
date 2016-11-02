@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -245,8 +246,11 @@ public class ZafiraIntegrator {
 				throw new RuntimeException("Unable to register tetscase '" + testMethod + "' for zafira service: " + zafiraUrl);
 			}
 
-			String demoUrl = ReportContext.getTestScreenshotsLink(test);
-			String logUrl = ReportContext.getTestLogLink(test);
+			//String demoUrl = ReportContext.getTestScreenshotsLink(test);
+			//String logUrl = ReportContext.getTestLogLink(test);
+			
+			String demoUrl = null;
+			String logUrl = null;
 
 			if (rerun) {
 				startedTest = getTestType(test); // search already registered test!
@@ -284,13 +288,13 @@ public class ZafiraIntegrator {
 		Status status = null;
 		switch (result.getStatus()) {
 		case ITestResult.SUCCESS:
-			status = com.qaprosoft.zafira.client.model.TestType.Status.PASSED;
+			status = Status.PASSED;
 			break;
 		case ITestResult.SKIP:
-			status = com.qaprosoft.zafira.client.model.TestType.Status.SKIPPED;
+			status = Status.SKIPPED;
 			break;
 		case ITestResult.FAILURE:
-			status = com.qaprosoft.zafira.client.model.TestType.Status.FAILED;
+			status = Status.FAILED;
 			break;
 		default:
 			new RuntimeException("Undefined test result status! " + result.getStatus());
@@ -588,13 +592,24 @@ public class ZafiraIntegrator {
 			TestCaseType testCase = registerTestCase(result);
 			String testArgs = result.getParameters().toString();
 			
-			String demoUrl = ReportContext.getTestScreenshotsLink(testName);
-			String logUrl = ReportContext.getTestLogLink(testName);
-
-			test = startTest(testName, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
+			test = startTest(testName, status, testArgs, run.getId(), testCase.getId(), null, null);
 		}
 		
-		
+
+		String logUrl = ReportContext.getTestLogLink(testName);
+		String demoUrl = ReportContext.getTestScreenshotsLink(testName);
+
+		// TODO: remove code duplicates with AbstractTestListener
+		if (FileUtils.listFiles(ReportContext.getTestDir(testName), new String[] { "png" }, false).isEmpty()) {
+			demoUrl = null;
+		}
+
+		if (status.equals(Status.PASSED) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
+			demoUrl = null;
+		}
+
+		test.setDemoURL(demoUrl);
+		test.setLogURL(logUrl);
 		test.setTestMetrics(Timer.readAndClear());
 		
 		testName = test.getName();
@@ -607,6 +622,11 @@ public class ZafiraIntegrator {
 		LOGGER.debug("Test details to finish registration:" + logMessage);
 
 		test.setStatus(status);
+
+		// add default message for skipped dependent methods
+		if (status.equals(Status.SKIPPED) && message == null) {
+			message = "Analyze SYSTEM ISSUE log for details or check dependency settings for the test.";
+		}
 		test.setMessage(message);
 		test.setFinishTime(finishTime);
 
