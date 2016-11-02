@@ -23,14 +23,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
-import com.qaprosoft.carina.core.foundation.performance.TestStatistics;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZipManager;
@@ -42,78 +39,6 @@ public class HtmlReportGenerator
 	private static final String REPORT_NAME = "/report.html";
 	private static final String GALLERY_ZIP = "gallery-lib.zip";
 	private static final String TITLE = "Test steps demo";
-	
-	private static final String PERF_REPORT = R.REPORT.get("perf_report");
-	private static final String TIME_GRAPH_DATA = "${time_graph_data}";
-	private static final String SUCCESS_GRAPH_DATA = "${success_rate_data}";
-	private static final String PERF_TABLE_DATA = "${perf_table_data}";
-	
-	private static final String PERF_TABLE = R.REPORT.get("perf_table");
-	private static final String PERF_TITLE = "${title}";
-	private static final String PERF_ENV = "${env}";
-	private static final String PERF_FINISH_DATE = "${finish_date}";
-	private static final String REPORT_URL = "${report_url}";
-	private static final String PERF_DATA = "${result_rows}";
-	private static final String PERF_TITLE_ROW = R.REPORT.get("perf_title_row");
-	private static final String PERF_DATA_ROW = R.REPORT.get("perf_data_row");
-	
-	public synchronized static String generatePerformanceReport(String rootDir, List<TestStatistics> testStatistics)
-	{
-		String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
-		String perfTable = PERF_TABLE.replace(PERF_TITLE, "Performance report")
-								      .replace(PERF_ENV, env)
-								      .replace(PERF_FINISH_DATE, DateUtils.now())
-								      .replace(REPORT_URL, ReportContext.getPerformanceReportLink());
-		
-		StringBuilder tableData = new StringBuilder();
-		StringBuilder timeGraphData = new StringBuilder();
-		StringBuilder successRateGraphData = new StringBuilder();
-		
-		// Generate graph headers
-		if(testStatistics != null && testStatistics.size() > 0)
-		{
-			TestStatistics ts = testStatistics.get(0);
-			StringBuilder headers = new StringBuilder("['Configuration', ");
-			headers.append(String.format("'%s', ", StringUtils.substringAfterLast(ts.getName(), ".")));
-			successRateGraphData.append(StringUtils.removeEnd(headers.toString(), ",") + "], ");
-			for(TestStatistics sts : ts.getSubTestStatistics().values())
-			{
-				headers.append(String.format("'-- %s', ", sts.getName()));
-			}
-			timeGraphData.append(StringUtils.removeEnd(headers.toString(), ",") + "], ");
-		}
-		
-		if(testStatistics != null)
-		{
-			for(TestStatistics ts : testStatistics)
-			{
-				tableData.append(String.format(PERF_TITLE_ROW, ts.getUsers(), ts.getLoop()));
-				
-				tableData.append(String.format(PERF_DATA_ROW, StringUtils.substringAfterLast(ts.getName(), "."), 
-						ts.getTestsCount(), ts.getFailuresCount(), ts.getSuccessRate(), ts.getAverageTime(), ts.getMinTime(), ts.getMaxTime()));
-				
-				timeGraphData.append(String.format("['%d | %d | %d', %d, ",  ts.getUsers(), ts.getLoop(), ts.getRumpup(), ts.getAverageTime()));
-				successRateGraphData.append(String.format("['%d | %d | %d', %d], ",  ts.getUsers(), ts.getLoop(), ts.getRumpup(), ts.getSuccessRate()));
-				
-				for(TestStatistics sts : ts.getSubTestStatistics().values())
-				{
-					tableData.append(String.format(PERF_DATA_ROW, "-- " + sts.getName(), sts.getTestsCount(), sts.getFailuresCount(), 
-							sts.getSuccessRate(), sts.getAverageTime(), sts.getMinTime(), sts.getMaxTime()));
-					
-					timeGraphData.append(String.format("%d, ", sts.getAverageTime()));
-				}
-				timeGraphData = new StringBuilder(StringUtils.removeEnd(timeGraphData.toString(), ",") + "], ");
-			}
-		}
-		
-		perfTable = perfTable.replace(PERF_DATA, tableData.toString());
-		
-		String perfReport = PERF_REPORT.replace(PERF_TABLE_DATA, perfTable);
-		perfReport = perfReport.replace(SUCCESS_GRAPH_DATA, StringUtils.removeEnd(successRateGraphData.toString(), ", "));
-		perfReport = perfReport.replace(TIME_GRAPH_DATA, StringUtils.removeEnd(timeGraphData.toString(), ", "));
-		FileManager.createFileWithContent(rootDir + REPORT_NAME, perfReport);
-		return perfTable;
-	}
 
 	public static void generate(String rootDir)
 	{
