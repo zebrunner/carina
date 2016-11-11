@@ -37,7 +37,7 @@ public class APITestListener extends AbstractTestListener
 	@Override
 	public void onTestSuccess(ITestResult result)
 	{
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), false));
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 		super.onTestSuccess(result);
 	}
 
@@ -46,7 +46,7 @@ public class APITestListener extends AbstractTestListener
 	{
 		String errorMessage = getFailureReason(result);
 
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription(), false));
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
 		super.onTestFailure(result);
 	}
 	
@@ -55,7 +55,7 @@ public class APITestListener extends AbstractTestListener
 	{
 		String errorMessage = getFailureReason(result);
 
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), false));		
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));		
 		super.onTestSkipped(result);
 	}
 }
