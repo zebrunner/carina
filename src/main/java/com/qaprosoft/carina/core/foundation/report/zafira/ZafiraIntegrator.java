@@ -246,11 +246,11 @@ public class ZafiraIntegrator {
 				throw new RuntimeException("Unable to register tetscase '" + testMethod + "' for zafira service: " + zafiraUrl);
 			}
 
-			//String demoUrl = ReportContext.getTestScreenshotsLink(test);
-			//String logUrl = ReportContext.getTestLogLink(test);
+			String demoUrl = ReportContext.getTestScreenshotsLink(test);
+			String logUrl = ReportContext.getTestLogLink(test);
 			
-			String demoUrl = null;
-			String logUrl = null;
+			//String demoUrl = null;
+			//String logUrl = null;
 
 			if (rerun) {
 				startedTest = getTestType(test); // search already registered test!
