@@ -22,10 +22,10 @@ package com.qaprosoft.carina.core.foundation.report;
  */
 public enum TestResultType
 {
-	PASS("PASS"),
-	PASS_WITH_KNOWN_ISSUES("PASS (KNOWN ISSUES)"),
-	FAIL("FAIL"),
-	SKIP("SKIP"),
+	PASS("PASSED"),
+	PASS_WITH_KNOWN_ISSUES("PASSED (known issues)"),
+	FAIL("FAILED"),
+	SKIP("SKIPPED"),
 	SKIP_ALL("SKIP_ALL"),
 	SKIP_ALL_ALREADY_PASSED("SKIP_ALL_ALREADY_PASSED");
 
