@@ -446,7 +446,14 @@
 			<artifactId>pubnub</artifactId>
 			<version>${pubnub.version}</version>
 		</dependency>
-	
+
+		<!--iText for pdf-->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.0.6</version>
+		</dependency>
+
 	</dependencies>
 
 	<distributionManagement>
