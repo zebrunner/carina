@@ -87,7 +87,7 @@ public abstract class AbstractPage extends AbstractUIObject
 		return isPageOpened(this, timeout);
 	}
 
-	public String savePageAsPdf(boolean shouldBeScaled) throws IOException, DocumentException {
+	public String savePageAsPdf(boolean scaled) throws IOException, DocumentException {
 		String pdfName = "";
 
 		// Define test screenshot root
@@ -104,14 +104,15 @@ public abstract class AbstractPage extends AbstractUIObject
 		}
 
 		File testRootDir = ReportContext.getTestDir(test);
+		File artifactsFolder = ReportContext.getArtifactsFolder();
 
 		String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
 		pdfName = fileID + ".pdf";
 
-		String fullPdfPath = testRootDir.getAbsolutePath() + "/" + pdfName;
+		String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
 		Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.capture(driver, true));
 		Document document = null;
-		if (shouldBeScaled) {
+		if (scaled) {
 			document = new Document(PageSize.A4, 10, 10 ,10, 10);
 			if (image.getHeight() > (document.getPageSize().getHeight() - 20) || image.getScaledWidth() > (document.getPageSize().getWidth() - 20)) {
 				image.scaleToFit(document.getPageSize().getWidth() - 20, document.getPageSize().getHeight() - 20);
@@ -124,5 +125,9 @@ public abstract class AbstractPage extends AbstractUIObject
 		document.add(image);
 		document.close();
 		return fullPdfPath;
+	}
+
+	public String savePageAsPdf() throws IOException, DocumentException {
+		return savePageAsPdf(true);
 	}
 }
