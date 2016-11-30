@@ -64,8 +64,6 @@ public abstract class AbstractTestListener extends TestArgsListener
  
     private void startItem(ITestResult result, Messager messager){
 		
- 		ReportContext.getBaseDir(); //create directory for logging as soon as possible
- 		
      	String test = TestNamingUtil.getCanonicalTestName(result);
  		test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId());
  		
@@ -225,6 +223,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String uuid = StringGenerator.generateNumeric(8);
 		ParameterGenerator.setUUID(uuid);
+		
+ 		ReportContext.getBaseDir(); //create directory for logging as soon as possible
 		
 /*		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
