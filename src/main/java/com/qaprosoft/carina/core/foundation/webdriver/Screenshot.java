@@ -70,6 +70,20 @@ public class Screenshot
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
+	 * @param comment
+	 * @return screenshot name.
+	 */
+	public static String capture(WebDriver driver, String comment)
+	{
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment);
+	}
+	
+	/**
+	 * Captures web-browser screenshot, creates thumbnail and copies both images
+	 * to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
 	 * @param isTakeScreenshot
 	 * 			  perform actual capture or not
 	 * @return screenshot name.
@@ -86,6 +100,9 @@ public class Screenshot
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
+	 * @param isTakeScreenshot
+	 * 			  perform actual capture or not
+	 * @param comment
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)

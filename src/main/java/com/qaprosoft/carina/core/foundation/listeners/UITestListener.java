@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -35,23 +34,23 @@ public class UITestListener extends AbstractTestListener {
 	@Override
 	public void onConfigurationFailure(ITestResult result) {
 		String errorMessage = getFailureReason(result);
-		TestLogCollector.addScreenshotComment(takeScreenshot(result), "CONFIGURATION FAILED - " + errorMessage);
+		takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
 		super.onConfigurationFailure(result);
 	}
 	
 	@Override
 	public void onTestFailure(ITestResult result) {
 		String errorMessage = getFailureReason(result);
-		TestLogCollector.addScreenshotComment(takeScreenshot(result), "TEST FAILED - " + errorMessage);
+		takeScreenshot(result, "TEST FAILED - " + errorMessage);
 		super.onTestFailure(result);		
 	}
 
-	private String takeScreenshot(ITestResult result) {
+	private String takeScreenshot(ITestResult result, String msg) {
 		String screenId = "";
 		WebDriver driver = DriverPool.getDriverByThread();
 
 		if (driver != null) {
-			screenId = Screenshot.capture(driver, true); // in case of failure
+			screenId = Screenshot.capture(driver, true, msg); // in case of failure
 															// make screenshot
 															// by default
 		}
@@ -59,7 +58,7 @@ public class UITestListener extends AbstractTestListener {
 		driver = DriverPool.getExtraDriverByThread();
 
 		if (driver != null) {
-			screenId = Screenshot.capture(driver, true); // in case of failure
+			screenId = Screenshot.capture(driver, true, msg); // in case of failure
 															// make screenshot
 															// by default for
 															// extra driver as
