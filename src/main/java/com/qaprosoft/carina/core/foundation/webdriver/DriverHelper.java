@@ -120,12 +120,12 @@ public class DriverHelper {
 	// Base UI interaction operations
 	// --------------------------------------------------------------------------
 
-	public void setImplicitTimeout(long implicit_wait) {
-		getDriver().manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-	}
-
 	public long getImplicitTimeout() {
 		return IMPLICIT_TIMEOUT;
+	}
+	
+	public void setImplicitTimeout(long implicit_wait) {
+		getDriver().manage().timeouts().implicitlyWait(implicit_wait, TimeUnit.SECONDS);
 	}
 
     /**
