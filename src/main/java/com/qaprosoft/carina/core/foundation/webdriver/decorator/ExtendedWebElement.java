@@ -21,17 +21,26 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Function;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
+import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -182,7 +191,7 @@ public class ExtendedWebElement
 		summary.log(msg);
 		try
 		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		}
 		catch (Exception e)
 		{
@@ -201,7 +210,7 @@ public class ExtendedWebElement
 		summary.log(msg);
 		try
 		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		}
 		catch (Exception e)
 		{
@@ -284,7 +293,7 @@ public class ExtendedWebElement
         }
         
 		try {
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		}
@@ -317,7 +326,7 @@ public class ExtendedWebElement
         }
         try
 		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		}
 		catch (Exception e)
 		{
@@ -530,7 +539,7 @@ public class ExtendedWebElement
 			summary.log(msg);			
 			throw new RuntimeException(msg, e); 			
 		}
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 	}
 
 /*	public ExtendedWebElement format(Object...objects) {
@@ -720,7 +729,7 @@ public class ExtendedWebElement
 			summary.log(msg);
 			throw new RuntimeException(msg, e); 			
 		}
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 	}
 	
 	/**
@@ -735,7 +744,7 @@ public class ExtendedWebElement
 			click();
 			String msg = Messager.CHECKBOX_CHECKED.info(getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		}
 	}
 
@@ -751,7 +760,7 @@ public class ExtendedWebElement
 			click();
 			String msg = Messager.CHECKBOX_UNCHECKED.info(getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		}
 	}
 	
@@ -862,7 +871,7 @@ public class ExtendedWebElement
 
 			String msg = Messager.HOVER_IMG.info(getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+			Screenshot.capture(drv, msg);
 		}
 		else
 		{
@@ -911,7 +920,7 @@ public class ExtendedWebElement
 			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 
 		return isSelected;
 	}
@@ -992,7 +1001,7 @@ public class ExtendedWebElement
 			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 
 		return isSelected;
 	}
@@ -1047,7 +1056,7 @@ public class ExtendedWebElement
 			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 
 		return isSelected;
 	}
@@ -1092,7 +1101,7 @@ public class ExtendedWebElement
 			e.printStackTrace();
 		}
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 
 		return isSelected;
 	}
@@ -1109,8 +1118,7 @@ public class ExtendedWebElement
 	{
 		if (isElementPresent(timeout))
 		{
-			TestLogCollector
-					.addScreenshotComment(Screenshot.capture(getDriver()), Messager.ELEMENT_PRESENT.getMessage(getName()));
+			Screenshot.capture(getDriver(), Messager.ELEMENT_PRESENT.getMessage(getName()));
 		}
 		else
 		{
@@ -1127,8 +1135,7 @@ public class ExtendedWebElement
 	{
 		if (isElementWithTextPresent(text, timeout))
 		{
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()),
-					Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(getName(), text));
+			Screenshot.capture(getDriver(), Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(getName(), text));
 		}
 		else
 		{

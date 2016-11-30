@@ -45,7 +45,6 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -168,7 +167,7 @@ public class DriverHelper {
 			res = false;
 		}
 		try {
-			TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+			Screenshot.capture(getDriver(), msg);
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		}
@@ -540,7 +539,7 @@ public class DriverHelper {
 		pressEnterSafe(extendedWebElement, true);
 		String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(getDriver()), msg);
+		Screenshot.capture(getDriver(), msg);
 	}
 
 	/**
@@ -656,7 +655,7 @@ public class DriverHelper {
 
 		String msg = Messager.OPEN_URL.info(url);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(driver), msg);
+		Screenshot.capture(driver, msg);
 	}
 
 	/**
@@ -872,7 +871,7 @@ public class DriverHelper {
 	 * WebDriver drv = getDriver(); Actions action = new Actions(drv);
 	 * action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
 	 * String msg = Messager.HOVER_IMG.info(elementName); summary.log(msg);
-	 * TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg); }
+	 * Screenshot.capture(drv, msg); }
 	 */
 
 	/**
@@ -918,7 +917,7 @@ public class DriverHelper {
 
 			String msg = Messager.HOVER_IMG.info(extendedWebElement.getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+			Screenshot.capture(drv, msg);
 		} else {
 			summary.log(Messager.ELEMENT_NOT_HOVERED.error(extendedWebElement.getNameWithLocator()));
 		}
@@ -943,7 +942,7 @@ public class DriverHelper {
 		action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
 		String msg = Messager.HOVER_IMG.info(elementName);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 	}
 
 	public void pressTab() {
@@ -1001,7 +1000,7 @@ public class DriverHelper {
 
 			String msg = Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+			Screenshot.capture(drv, msg);
 		} else {
 			summary.log(Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(),
 					to.getNameWithLocator()));
@@ -1026,7 +1025,7 @@ public class DriverHelper {
 			String msg = Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX),
 					String.valueOf(moveY));
 			summary.log(msg);
-			TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+			Screenshot.capture(drv, msg);
 		} else {
 			summary.log(Messager.SLIDER_NOT_MOVED.error(slider.getNameWithLocator(), String.valueOf(moveX),
 					String.valueOf(moveY)));
@@ -1120,7 +1119,7 @@ public class DriverHelper {
 				decryptedText));
 		String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 	}
 
 	@Deprecated
@@ -1133,7 +1132,7 @@ public class DriverHelper {
 								decryptedText));
 		String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
 		summary.log(msg);
-		TestLogCollector.addScreenshotComment(Screenshot.capture(drv), msg);
+		Screenshot.capture(drv, msg);
 	}
 
 	public boolean isPageOpened(final AbstractPage page) {
