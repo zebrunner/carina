@@ -50,7 +50,6 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.client.model.TestType;
 
@@ -59,13 +58,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 {
 	private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 	
+	protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
+
     // Dropbox client
 //    DropboxClient dropboxClient;
  
     private void startItem(ITestResult result, Messager messager){
 		
- 		ReportContext.getBaseDir(); //create directory for logging as soon as possible
- 		
      	String test = TestNamingUtil.getCanonicalTestName(result);
  		test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId());
  		
@@ -80,7 +79,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		
 		messager.info(deviceName, test, DateUtils.now());
 		
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_PASSED)));
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		
 		TestNamingUtil.releaseTestInfoByThread();
@@ -100,12 +99,11 @@ public abstract class AbstractTestListener extends TestArgsListener
 					&& result.getThrowable().getMessage() != null
 					&& !StringUtils.isEmpty(result.getThrowable().getMessage()))
 			{
-				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, result.getThrowable()
-						.getMessage(), result.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));
+				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, result.getThrowable().getMessage(), result.getMethod().getDescription()));
 			} else
 			{
 				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result
-						.getMethod().getDescription(), messager.equals(Messager.CONFIG_FAILED)));
+						.getMethod().getDescription()));
 			}
 		}
 
@@ -129,13 +127,51 @@ public abstract class AbstractTestListener extends TestArgsListener
  
     private String skipItem(ITestResult result, Messager messager){
     	String test = TestNamingUtil.getCanonicalTestName(result);
-
+    	
 		String errorMessage = getFailureReason(result);
+		if (errorMessage.isEmpty()) {
+	    	// identify is it due to the dependent failure or exception in before suite/class/method
+	    	String[] methods = result.getMethod().getMethodsDependedUpon();
+	    	
+	    	//find if any parent method failed/skipped
+	    	boolean dependentMethod = false;
+	    	String dependentMethodName = "";
+			for (ITestResult failedTest : result.getTestContext().getFailedTests().getAllResults()) {
+		    	for (int i=0; i<methods.length; i++) {
+		    		if (methods[i].contains(failedTest.getName())) {
+		    			dependentMethodName = failedTest.getName();
+		    			dependentMethod = true;
+		    			break;
+		    		}
+		    	}
+			}
+			
+			for (ITestResult skippedTest : result.getTestContext().getSkippedTests().getAllResults()) {
+		    	for (int i=0; i<methods.length; i++) {
+		    		if (methods[i].contains(skippedTest .getName())) {
+		    			dependentMethodName = skippedTest .getName();
+		    			dependentMethod = true;
+		    			break;
+		    		}
+		    	}
+			}
+			
+			if (dependentMethod) {
+				errorMessage = "Test skipped due to the dependency from: " + dependentMethodName;
+			} else {
+				// Try to find error details from last configuration failure in this thread
+				TestResultItem resultItem = getConfigFailure();
+				if (resultItem != null) {
+					errorMessage = resultItem.getFailReason();
+				}
+			}
+		}
+		
 		String deviceName = getDeviceName();
 		
 		messager.info(deviceName, test, DateUtils.now(), errorMessage);
 		
-		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription(), messager.equals(Messager.CONFIG_SKIPPED)));
+		EmailReportItemCollector.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 		
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread();
@@ -143,48 +179,49 @@ public abstract class AbstractTestListener extends TestArgsListener
     }
     
     private String getDeviceName() {
-    	String deviceName = "";
-    	Device device = DevicePool.getDevice();
-    	if (device != null) {
-    		deviceName = device.getName();
-    		String udid = device.getUdid();
-    		if (udid != null) {
-    			if (!udid.isEmpty()) {
-    				deviceName = deviceName + " - " + udid;
-    			}
-    		}
-    	}
+    	String deviceName = DevicePool.getDevice().getName();
+    	String deviceUdid = DevicePool.getDevice().getUdid();
+    	
+    	
+		if (!deviceName.isEmpty() && !deviceUdid.isEmpty()) {
+			deviceName = deviceName + " - " + deviceUdid;
+		}
     	
     	return deviceName;
     }
     
     @Override
     public void beforeConfiguration(ITestResult result) {
-   		startItem(result, Messager.CONFIG_STARTED);
-		// do failure test cleanup in this place as right after the test 
-		// context doesn't have up-to-date information. 
-   		// This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
+//   		startItem(result, Messager.CONFIG_STARTED);
+//		// do failure test cleanup in this place as right after the test 
+//		// context doesn't have up-to-date information. 
+//   		// This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
 		removeIncorrectlyFailedTests(result.getTestContext());
    		super.beforeConfiguration(result);
     }
     
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-   		passItem(result, Messager.CONFIG_PASSED);
+   		//passItem(result, Messager.CONFIG_PASSED);
    		super.onConfigurationSuccess(result);
     }
     
     @Override
     public void onConfigurationSkip(ITestResult result) {
-   		skipItem(result, Messager.CONFIG_SKIPPED);
+   		//skipItem(result, Messager.CONFIG_SKIPPED);
    		super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-    	failItem(result, Messager.CONFIG_FAILED);
-    	String test = TestNamingUtil.getCanonicalTestName(result);
-		closeLogAppender(test);
+//    	failItem(result, Messager.CONFIG_FAILED);
+//    	String test = TestNamingUtil.getCanonicalTestName(result);
+//		closeLogAppender(test);
+		
+		String errorMessage = getFailureReason(result);
+		TestResultItem resultItem = createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription());
+   		setConfigFailure(resultItem);
+    		
 		super.onConfigurationFailure(result);
     }
     
@@ -193,6 +230,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		String uuid = StringGenerator.generateNumeric(8);
 		ParameterGenerator.setUUID(uuid);
+		
+ 		ReportContext.getBaseDir(); //create directory for logging as soon as possible
 		
 /*		//dropbox client initialization 
 	    if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty())
@@ -343,7 +382,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			return;
 		}
 		
-		String errorMessage= skipItem(result, Messager.TEST_SKIPPED);
+		String errorMessage = skipItem(result, Messager.TEST_SKIPPED);
     	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSkipped(result);
@@ -491,7 +530,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		return id;
 	}
 
-	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description, boolean config)
+	protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason, String description)
 	{
 		String group = TestNamingUtil.getPackageName(result);
 		String test = TestNamingUtil.getCanonicalTestName(result);
@@ -524,7 +563,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 				linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
 			}
 		}
-		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason, config);
+		TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linkToVideo, failReason);
 		testResultItem.setDescription(description);
 		//AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
 		//jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
@@ -574,5 +613,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 			LOGGER.error("close log appender was not successful.");
 			e.printStackTrace();
 		}
+	}
+	
+	private TestResultItem getConfigFailure() {
+		return configFailures.get();
+	}
+	 
+	protected void setConfigFailure(TestResultItem resultItem) {
+		configFailures.set(resultItem);
 	}
 }

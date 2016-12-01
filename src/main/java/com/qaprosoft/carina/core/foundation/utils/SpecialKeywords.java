@@ -119,5 +119,7 @@ public class SpecialKeywords
 	
 	public static final String ZAFIRA_PROJECT = "zafira_project";
 	
+	public static final String COMMENT = "comment";
+	
 	
 }
