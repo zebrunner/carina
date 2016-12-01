@@ -40,10 +40,10 @@ public class Device {
 	public Device(String args) {
 		//Samsung_S4|ANDROID|4.4.2|5ece160b|4729|4730|http://localhost:4725/wd/hub
 		LOGGER.debug("mobile_device_args: " + args);
-		args = args.replaceAll("&#124;", "|");
+		args = args.replaceAll("&#124", "|");
 		LOGGER.debug("mobile_device_args: " + args);
 		
-		String[] params = args.replaceAll("&#124;", "|").split("\\|");
+		String[] params = args.split("\\|");
 		
 		//TODO: organize verification onto the params  count
 		this.name = params[0];
