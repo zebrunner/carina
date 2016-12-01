@@ -49,8 +49,7 @@ public class Configuration
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - + "
-						+ Configuration.get(Parameter.ENV_ARG_RESOLVER), e);
+				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - + " + Configuration.get(Parameter.ENV_ARG_RESOLVER), e);
 			}
 		}
 	}
@@ -110,10 +109,6 @@ public class Configuration
 		
 		APP_VERSION("app_version"),
 		
-		PROXY("proxy"),
-
-		PROXY_SERVER("proxy_server"),
-
 		PROXY_HOST("proxy_host"),
 		
 		PROXY_PORT("proxy_port"),
@@ -391,35 +386,17 @@ public class Configuration
 
 	public static int getInt(Parameter param)
 	{
-		try
-		{
-			return Integer.valueOf(get(param).trim());
-		} catch (NumberFormatException e)
-		{
-			throw new RuntimeException("Can't parse param '" + param.getKey() + "'", e);
-		}
+		return Integer.valueOf(get(param).trim());
 	}
 
 	public static long getLong(Parameter param)
 	{
-		try
-		{
-			return Long.valueOf(get(param).trim());
-		} catch (NumberFormatException e)
-		{
-			throw new RuntimeException("Can't parse param '" + param.getKey() + "'", e);
-		}
+		return Long.valueOf(get(param).trim());
 	}
 
 	public static double getDouble(Parameter param)
 	{
-		try
-		{
-			return Double.valueOf(get(param).trim());
-		} catch (NumberFormatException e)
-		{
-			throw new RuntimeException("Can't parse param '" + param.getKey() + "'", e);
-		}
+		return Double.valueOf(get(param).trim());
 	}
 
 	public static boolean getBoolean(Parameter param)
