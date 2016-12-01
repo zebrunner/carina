@@ -63,12 +63,11 @@ public class ThreadLogAppender extends AppenderSkeleton
 				
 				String logLevel = event.getLevel().toString();
 				
-				Device device = DevicePool.getDevice();
+				
 
-				String deviceName = "";
-				if (device != null) {
-					deviceName = " [" + device.getName() + "] ";
-					//System.out.println("device: " + device.getName());
+				String deviceName = DevicePool.getDevice().getName();
+				if (!deviceName.isEmpty()) {
+					deviceName = " [" + deviceName + "] ";
 				}
 				
 				String message = "[%s] [%s] [%s] [%s]%s %s";

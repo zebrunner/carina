@@ -709,7 +709,7 @@ public class ZafiraIntegrator {
 
 		// add custom arguments from current mobile device
 		Device device = DevicePool.getDevice();
-		if (device != null) {
+		if (!device.getName().isEmpty()) {
 			conf.getArg().add(getArgByValue(DEVICE, device.getName()));
 			conf.getArg().add(getArgByValue(PLATFORM, device.getOs()));
 			conf.getArg().add(getArgByValue(PLATFORM_VERSION, device.getOsVersion()));

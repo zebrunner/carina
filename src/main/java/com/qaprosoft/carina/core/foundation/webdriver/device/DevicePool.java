@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
@@ -48,6 +48,8 @@ public class DevicePool
 	private static final List<String> DEVICE_MODELS = Collections.synchronizedList(new ArrayList<String>());
 
 	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
+	
+	private static final Device nullDevice = new Device("", "", "", "", "", "");
 
 	public static synchronized void registerDevice() 
 	{
@@ -63,8 +65,12 @@ public class DevicePool
 		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));	
 	}
 	
+	public static synchronized void unregisterDevice() {
+		unregisterDevice(getDevice());
+	}
+	
 	public static synchronized void unregisterDevice(Device device) {
-		if (device == null) {
+		if (device == nullDevice) {
 			LOGGER.error("Unable to unregister NULL device!");
 			return;
 		}
@@ -179,11 +185,8 @@ public class DevicePool
 	}
 
 	public static Device getDevice() {
-		Device device = null;
-		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			return null;
-		}
+		Device device = nullDevice;
+
 		long threadId = Thread.currentThread().getId();
 		if (THREAD_2_DEVICE_MAP.containsKey(threadId)) {
 			device = THREAD_2_DEVICE_MAP.get(threadId);
@@ -192,14 +195,14 @@ public class DevicePool
 	}
 	
 	public static Device getDevice(String udid) {
-		Device device = null;
+		Device device = nullDevice;
 		for (Device dev : DEVICES) {
 			if (dev.getUdid().equalsIgnoreCase(udid)) {
 				device = dev;
 				break;
 			}
 		}
-		if (device == null) {
+		if (device == nullDevice) {
 			String msg = "Not found device by udid among registered pool of %s devices!";
 			throw new RuntimeException(String.format(msg, udid, DEVICES.size()));
 		}
@@ -220,25 +223,17 @@ public class DevicePool
 	}
 
 	public static String getDeviceUdid() {
-		String udid = Configuration.get(Parameter.MOBILE_DEVICE_UDID);
-		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-				|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			Device device = DevicePool.getDevice();
-			if (device == null) {
-				throw new RuntimeException("Unable to find device by thread!");
-			}
-			udid = device.getUdid();
-		}
-		return udid;
+		return (getDevice() != nullDevice) ? getDevice().getUdid() : Configuration.get(Parameter.MOBILE_DEVICE_UDID);
 	}
 	
 	public static Type getDeviceType() 
 	{
 		// specify default value based on existing _config.properties parameters
 		Type type = Type.DESKTOP;
-		Device device = getDevice();
-		if (device != null) {
-			type = device.getType();
+		
+		
+		if (getDevice() != nullDevice) {
+			type = getDevice().getType();
 		} 
 		else 
 		{
