@@ -57,10 +57,11 @@ public class CustomTypePageFactory {
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
 		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
 		Type screenType = DevicePool.getDeviceType();
+		
 		Device device = DevicePool.getDevice();
 		// default version in case if it is desktop driver
 		String deviceVersion = "1";
-		if (null != device) {
+		if (!device.getOsVersion().isEmpty()) {
 			deviceVersion = device.getOsVersion();
 		}
 		String majorVersionNumber = deviceVersion.split(VERSION_SPLITTER)[0];
