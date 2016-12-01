@@ -52,7 +52,6 @@ import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
@@ -103,12 +102,7 @@ public class DriverHelper {
 		this.driver = driver;
 
 		if (driver == null) {
-			Device device = DevicePool.getDevice();
-			if (device != null) {
-				throw new RuntimeException("[" + device.getName() + "] WebDriver not initialized, check log files for details!");
-			} else {
-				throw new RuntimeException("WebDriver not initialized, check log files for details!");
-			}
+			throw new RuntimeException("[" + DevicePool.getDevice().getName() + "] WebDriver not initialized, check log files for details!");
 		}
 		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		
