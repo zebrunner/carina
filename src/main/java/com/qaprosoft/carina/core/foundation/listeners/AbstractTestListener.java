@@ -168,17 +168,13 @@ public abstract class AbstractTestListener extends TestArgsListener
     }
     
     private String getDeviceName() {
-    	String deviceName = "";
-    	Device device = DevicePool.getDevice();
-    	if (device != null) {
-    		deviceName = device.getName();
-    		String udid = device.getUdid();
-    		if (udid != null) {
-    			if (!udid.isEmpty()) {
-    				deviceName = deviceName + " - " + udid;
-    			}
-    		}
-    	}
+    	String deviceName = DevicePool.getDevice().getName();
+    	String deviceUdid = DevicePool.getDevice().getUdid();
+    	
+    	
+		if (!deviceName.isEmpty() && !deviceUdid.isEmpty()) {
+			deviceName = deviceName + " - " + deviceUdid;
+		}
     	
     	return deviceName;
     }
