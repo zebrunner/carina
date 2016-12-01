@@ -15,9 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-
 import java.net.URL;
 
 import org.apache.log4j.Logger;
@@ -34,6 +31,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopF
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
