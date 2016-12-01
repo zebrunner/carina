@@ -1,10 +1,13 @@
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
+import org.apache.log4j.Logger;
+
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 //Motorola|ANDROID|4.4|T01130FJAD|http://localhost:4725/wd/hub;Samsung_S4|ANDROID|4.4.2|5ece160b|http://localhost:4729/wd/hub;
 public class Device {
+	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
 	
 	private String name;
 	private String type;
@@ -36,11 +39,17 @@ public class Device {
 
 	public Device(String args) {
 		//Samsung_S4|ANDROID|4.4.2|5ece160b|4729|4730|http://localhost:4725/wd/hub
+		LOGGER.debug("mobile_device_args: " + args);
+		args = args.replaceAll("&#124;", "|");
+		LOGGER.debug("mobile_device_args: " + args);
+		
 		String[] params = args.replaceAll("&#124;", "|").split("\\|");
 		
 		//TODO: organize verification onto the params  count
 		this.name = params[0];
+		LOGGER.debug("mobile_device_name: " + params[0]);
 		this.type = params[1];
+		LOGGER.debug("mobile_device_type: " + params[1]);
 		this.os = params[2];
 		this.osVersion = params[3];
 		this.udid = params[4];
