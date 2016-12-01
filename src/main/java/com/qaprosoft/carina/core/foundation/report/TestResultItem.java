@@ -33,7 +33,7 @@ public class TestResultItem
 	
 	private boolean config = false;
 
-	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo, String failReason, boolean config)
+	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo, String failReason)
 	{
 		this.pack = group;
 		this.test = test;
@@ -42,7 +42,6 @@ public class TestResultItem
 		this.linkToScreenshots = linkToScreenshots;
 		this.linkToVideo = linkToVideo;
 		this.failReason = failReason;
-		this.config = config;
 	}
 	public String getPack()
 	{

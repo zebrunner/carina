@@ -28,16 +28,17 @@ import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.SessionNotFoundException;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -49,6 +50,15 @@ public class Screenshot
 {
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
+	
+	/**
+	 * Captures web-browser screenshot, creates thumbnail and copies both images
+	 * to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @return screenshot name.
+	 */
 	public static String capture(WebDriver driver)
 	{
 		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT));
@@ -60,9 +70,42 @@ public class Screenshot
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
+	 * @param comment
+	 * @return screenshot name.
+	 */
+	public static String capture(WebDriver driver, String comment)
+	{
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment);
+	}
+	
+	/**
+	 * Captures web-browser screenshot, creates thumbnail and copies both images
+	 * to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param isTakeScreenshot
+	 * 			  perform actual capture or not
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, boolean isTakeScreenshot)
+	{
+		return capture(driver, isTakeScreenshot, "");
+		
+	}
+	
+	/**
+	 * Captures web-browser screenshot, creates thumbnail and copies both images
+	 * to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param isTakeScreenshot
+	 * 			  perform actual capture or not
+	 * @param comment
+	 * @return screenshot name.
+	 */
+	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)
 	{
 		String screenName = "";
 		
@@ -105,8 +148,6 @@ public class Screenshot
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				} 
 				
-				
-				
 				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
 				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				
@@ -121,16 +162,13 @@ public class Screenshot
 				FileUtils.copyFile(fullScreen, thumbScreen);
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT));
-
+				
 				// Uploading screenshot to Amazon S3
-				uploadToAmazonS3(test, fullScreenPath, screenName);
-			}
-			catch (SessionNotFoundException e) {
-				// [VD] handle the case when STF abort connection and close session due to the max timeout (30 min)
-				LOGGER.error("Driver session is lost! Deregistering current driver/device.", e);
-				long threadId = Thread.currentThread().getId();
-				DevicePool.deregisterDeviceFromThread();
-				DriverPool.deregisterDriverByThread(threadId);
+				uploadToAmazonS3(test, fullScreenPath, screenName, comment);
+				
+				//add screenshot comment to collector
+				TestLogCollector.addScreenshotComment(screenName, comment);
+
 			}
 			catch (IOException e)
 			{
@@ -144,22 +182,27 @@ public class Screenshot
 		return screenName;
 	}
 	
-	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName) {
+	private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName, String comment) {
 		if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
 			LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
 			return;
 		}
 		Long runId = ZafiraIntegrator.getRunId();
-		String env = Configuration.get(Parameter.ENV).toUpperCase();
 		String testName = ReportContext.getTestDir(test).getName();
-		String key =  env + "/" + runId + "/" + testName + "/" + screenName;				
+		String key =  runId + "/" + testName + "/" + screenName;				
 		if (runId == -1) {
-			key = env + "/LOCAL/" + ReportContext.getRootID() + "/" + testName + "/" + screenName;
+			key = "/LOCAL/" + ReportContext.getRootID() + "/" + testName + "/" + screenName;
 		}
 		LOGGER.debug("Key: " + key);
 		LOGGER.debug("FullScreenPath: " + fullScreenPath);
 		String screenshotBucket = Configuration.get(Parameter.S3_SCREENSHOT_BUCKET_NAME);
-		AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath);
+		
+		ObjectMetadata metadata = new ObjectMetadata();
+		if (!comment.isEmpty()) {
+			metadata.addUserMetadata(SpecialKeywords.COMMENT, comment);
+		}
+		
+		AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath, metadata);
 	}
 	
 	/**
