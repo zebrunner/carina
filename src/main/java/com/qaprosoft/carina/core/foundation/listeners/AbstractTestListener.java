@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
@@ -45,10 +46,10 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.client.model.TestType;
 
@@ -91,11 +92,21 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String deviceName = getDeviceName();
 
     	//TODO: remove hard-coded text		
-    	if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
-   			messager.info(deviceName, test, DateUtils.now(), errorMessage);
-   			EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result.getMethod().getDescription()));
-    	}
-    	
+		if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues."))
+		{
+			messager.info(deviceName, test, DateUtils.now(), errorMessage);
+			if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null
+					&& result.getThrowable().getMessage() != null
+					&& !StringUtils.isEmpty(result.getThrowable().getMessage()))
+			{
+				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, result.getThrowable().getMessage(), result.getMethod().getDescription()));
+			} else
+			{
+				EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result
+						.getMethod().getDescription()));
+			}
+		}
+
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;

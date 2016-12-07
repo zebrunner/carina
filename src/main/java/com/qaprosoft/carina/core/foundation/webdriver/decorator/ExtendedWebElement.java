@@ -45,6 +45,7 @@ import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -690,7 +691,8 @@ public class ExtendedWebElement
 			//[CB] onPage -> inViewPort
 			//https://code.google.com/p/selenium/source/browse/java/client/src/org/openqa/selenium/remote/RemoteWebElement.java?r=abc64b1df10d5f5d72d11fba37fabf5e85644081
 			int y = locatableElement.getCoordinates().inViewPort().getY();
-			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - 120) + ");");
+			int offset = R.CONFIG.getInt("scroll_to_element_y_offset");
+			((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - offset) + ");");
 		}
 		catch (Exception e)
 		{
