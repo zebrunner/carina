@@ -15,9 +15,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 public abstract class AbstractCapabilities {
     protected static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
 
-    public abstract DesiredCapabilities getCapability(String testName);
+    private static DesiredCapabilities staticCapabilities;
 
-	private static DesiredCapabilities staticCapabilities;
+    public abstract DesiredCapabilities getCapability(String testName);
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
     	
