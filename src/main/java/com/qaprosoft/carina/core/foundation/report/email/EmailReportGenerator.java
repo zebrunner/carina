@@ -176,9 +176,7 @@ public class EmailReportGenerator
 					result = result.replace(FAIL_CONFIG_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
 				}
 				} else {
-					if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG)
-							&& (testResultItem.getDescription() != null)
-							&& testResultItem.getDescription().startsWith(SpecialKeywords.JIRA_TICKET))
+				if (Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES) && !testResultItem.getJiraTickets().isEmpty())
 				{
 					result = testResultItem.getLinkToScreenshots() != null ? BUG_TEST_LOG_DEMO_TR : BUG_TEST_LOG_TR;
 				}
@@ -211,7 +209,7 @@ public class EmailReportGenerator
 				}
 			}
 			
-			if (Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES) && !testResultItem.getJiraTickets().isEmpty())
+			if (Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES) && !testResultItem.getJiraTickets().isEmpty())
 			{
 				// do nothing
 			} else
@@ -315,7 +313,7 @@ public class EmailReportGenerator
 				passed++;
 				break;
 			case FAIL:
-				if (Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES)) {
+				if (Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES)) {
 					if (ri.getJiraTickets().size() > 0) {
 						// increment known issue counter
 						failedKnownIssue++;
