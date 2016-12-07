@@ -42,10 +42,10 @@ public abstract class AbstractCapabilities {
     		capabilities.merge(extraCapabilities);
     	}
 
-		if (staticCapabilities != null)
-		{
-			capabilities.merge(staticCapabilities);
-		}
+        if (staticCapabilities != null)
+        {
+            capabilities.merge(staticCapabilities);
+        }
 		
         return capabilities;
     }
