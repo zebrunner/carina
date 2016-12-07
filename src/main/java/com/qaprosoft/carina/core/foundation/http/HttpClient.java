@@ -66,14 +66,16 @@ public class HttpClient
 		return response;
 	}
 	
-	private static void setupProxy()
+	public static void setupProxy()
 	{
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 		
 		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 		
-		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
+		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()
+				&& Configuration.getBoolean(Parameter.PROXY_SET_TO_SYSTEM))
+		{
 			if (protocols.contains("http")) {
 				LOGGER.info(String.format("HTTP client will use http: %s:%s", proxyHost, proxyPort));
 
