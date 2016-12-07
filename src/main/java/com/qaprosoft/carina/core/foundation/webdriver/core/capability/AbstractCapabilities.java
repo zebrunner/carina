@@ -15,8 +15,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 public abstract class AbstractCapabilities {
     protected static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
 
-    public abstract DesiredCapabilities getCapability(String testName);
+    private static DesiredCapabilities staticCapabilities;
 
+    public abstract DesiredCapabilities getCapability(String testName);
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
     	
@@ -40,6 +41,11 @@ public abstract class AbstractCapabilities {
     	if (extraCapabilities != null) {
     		capabilities.merge(extraCapabilities);
     	}
+
+        if (staticCapabilities != null)
+        {
+            capabilities.merge(staticCapabilities);
+        }
 		
         return capabilities;
     }
@@ -56,6 +62,15 @@ public abstract class AbstractCapabilities {
     	return extraCapabilities;
     }
     
+	public static void addStaticCapability(String name, Object value)
+	{
+		if (staticCapabilities == null)
+		{
+			staticCapabilities = new DesiredCapabilities();
+		}
+		staticCapabilities.setCapability(name, value);
+	}
+
     protected Proxy setupProxy() {
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
