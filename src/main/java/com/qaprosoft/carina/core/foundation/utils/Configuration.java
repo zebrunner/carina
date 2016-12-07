@@ -49,7 +49,7 @@ public class Configuration
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - + " + Configuration.get(Parameter.ENV_ARG_RESOLVER));
+				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - + " + Configuration.get(Parameter.ENV_ARG_RESOLVER), e);
 			}
 		}
 	}
@@ -121,7 +121,7 @@ public class Configuration
 		
 		FAILURE_EMAIL_LIST("failure_email_list"),
 		
-		IGNORE_KNOWN_ISSUES("ignore_known_issues"),
+		TRACK_KNOWN_ISSUES("track_known_issues"),
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
@@ -310,7 +310,7 @@ public class Configuration
 		GIT_COMMIT("git_commit"),
 		
 		GIT_URL("git_url"),
-		
+
 		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
 		
 		//Amazon
@@ -352,7 +352,6 @@ public class Configuration
 		// TLS
 		TLS_KEYSECURE_LOCATION("tls_keysecure_location")
 		;
-
 
 		private final String key;
 
