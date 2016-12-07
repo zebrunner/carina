@@ -9,6 +9,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
@@ -76,6 +77,8 @@ public abstract class AbstractCapabilities {
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 		
+		HttpClient.setupProxy();
+
 		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
 			
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
@@ -83,36 +86,21 @@ public abstract class AbstractCapabilities {
 			
 			if (protocols.contains("http")) {
 				LOGGER.info(String.format("Http proxy will be set: %s:%s", proxyHost, proxyPort));
-
-				System.setProperty("http.proxyHost", proxyHost);
-				System.setProperty("http.proxyPort", proxyPort);
-				
 				proxy.setHttpProxy(proxyAddress);
 			}
 
 			if (protocols.contains("https")) {
 				LOGGER.info(String.format("Https proxy will be set: %s:%s", proxyHost, proxyPort));
-
-				System.setProperty("https.proxyHost", proxyHost);
-				System.setProperty("https.proxyPort", proxyPort);
-				
 				proxy.setSslProxy(proxyAddress);
 			}
 
 			if (protocols.contains("ftp")) {
 				LOGGER.info(String.format("FTP proxy will be set: %s:%s", proxyHost, proxyPort));
-
-				System.setProperty("ftp.proxyHost", proxyHost);
-				System.setProperty("ftp.proxyPort", proxyPort);
-				
 				proxy.setFtpProxy(proxyAddress);
 			}
 
 			if (protocols.contains("socks")) {
 				LOGGER.info(String.format("Socks proxy will be set: %s:%s", proxyHost, proxyPort));
-				System.setProperty("socksProxyHost", proxyHost);
-				System.setProperty("socksProxyPort", proxyPort);
-				
 				proxy.setSocksProxy(proxyAddress);
 			}
 			
