@@ -17,6 +17,7 @@ public abstract class AbstractCapabilities {
 
     public abstract DesiredCapabilities getCapability(String testName);
 
+	private static DesiredCapabilities staticCapabilities;
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
     	
@@ -40,6 +41,11 @@ public abstract class AbstractCapabilities {
     	if (extraCapabilities != null) {
     		capabilities.merge(extraCapabilities);
     	}
+
+		if (staticCapabilities != null)
+		{
+			capabilities.merge(staticCapabilities);
+		}
 		
         return capabilities;
     }
@@ -56,6 +62,15 @@ public abstract class AbstractCapabilities {
     	return extraCapabilities;
     }
     
+	public static void addStaticCapability(String name, Object value)
+	{
+		if (staticCapabilities == null)
+		{
+			staticCapabilities = new DesiredCapabilities();
+		}
+		staticCapabilities.setCapability(name, value);
+	}
+
     protected Proxy setupProxy() {
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
