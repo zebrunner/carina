@@ -298,10 +298,16 @@ public abstract class AbstractTest // extends DriverHelper
 			String senderEmail = Configuration.get(Parameter.SENDER_EMAIL);
 			String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD); 
 			
-			String emailContent = ZafiraIntegrator.sendEmailReport(emailList);
-			if((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL)) && !failureEmailList.isEmpty()){
-				// send 2nd email to failure list only
-				ZafiraIntegrator.sendEmailReport(failureEmailList);
+			String emailContent = null;
+			if (!Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES))
+			{
+				emailContent = ZafiraIntegrator.sendEmailReport(emailList);
+				if ((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL))
+						&& !failureEmailList.isEmpty())
+				{
+					// send 2nd email to failure list only
+					ZafiraIntegrator.sendEmailReport(failureEmailList);
+				}
 			}
 			
 			if (emailContent == null) {
