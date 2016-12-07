@@ -121,9 +121,7 @@ public class Configuration
 		
 		FAILURE_EMAIL_LIST("failure_email_list"),
 		
-		IGNORE_KNOWN_ISSUES("ignore_known_issues"),
-
-		MARK_TEST_WITH_BUG("mark_test_with_bug"),
+		TRACK_KNOWN_ISSUES("track_known_issues"),
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		

@@ -329,17 +329,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestFailure(ITestResult result)
 	{
 		String test = TestNamingUtil.getTestNameByThread();
-		// String test = TestNamingUtil.getCanonicalTestName(result);
-
-		if (Configuration.getBoolean(Parameter.MARK_TEST_WITH_BUG) && (result.getMethod().getDescription() != null)
-				&& result.getMethod().getDescription().startsWith(SpecialKeywords.JIRA_TICKET))
-		{
-			while (RetryCounter.getRunCount(test) < RetryAnalyzer.getMaxRetryCountForTest(result))
-			{
-				RetryCounter.incrementRunCount(test);
-			}
-		}
-
+		//String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);		
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);

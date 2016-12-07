@@ -146,7 +146,7 @@ public class Jira
 	}
 	
 	public static boolean isRetryDisabled(ITestResult result) {
-		boolean ignoreKnownIssue = Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES);
+		boolean ignoreKnownIssue = Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES);
 		int knownIssuesCount = getTickets(result).size();
 		
 		// [VD] QUALITY-1408 disable retry test execution if ignore_known_issues is enabled and jira ticket(s) provided
