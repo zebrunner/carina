@@ -15,6 +15,12 @@
  */
 package com.qaprosoft.carina.core.foundation.report.email;
 
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.getCucumberReportResultLink;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberReportFolderExists;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberTest;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.useJSinCucumberReport;
+import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -30,9 +36,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
-import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.*;
-import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
-
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
  * 
@@ -46,10 +49,12 @@ public class EmailReportGenerator
 	private static String PACKAGE_TR = R.EMAIL.get("package_tr");
 	private static String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
 	private static String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
+	private static String BUG_TEST_LOG_DEMO_TR = R.EMAIL.get("bug_test_log_demo_tr");
 	private static String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
 	private static String FAIL_CONFIG_LOG_DEMO_TR = R.EMAIL.get("fail_config_log_demo_tr");
 	private static String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
 	private static String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
+	private static String BUG_TEST_LOG_TR = R.EMAIL.get("bug_test_log_tr");
 	private static String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
 	private static String FAIL_CONFIG_LOG_TR = R.EMAIL.get("fail_config_log_tr");	
 	private static String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
@@ -78,13 +83,13 @@ public class EmailReportGenerator
 	private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
 	private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
 	private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
+	private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
 
 	//Cucumber section
 	private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
 	private static final String CUCUMBER_JS_PLACEHOLDER ="${js_placeholder}";
 
 
-	private static final int MESSAGE_LIMIT = 2048;
 	private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
 	private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
 	private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
@@ -170,8 +175,16 @@ public class EmailReportGenerator
 				{
 					result = result.replace(FAIL_CONFIG_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
 				}
-			} else {
-				result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
+				} else {
+				if (Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES) && !testResultItem.getJiraTickets().isEmpty())
+				{
+					result = testResultItem.getLinkToScreenshots() != null ? BUG_TEST_LOG_DEMO_TR : BUG_TEST_LOG_TR;
+				}
+				else
+				{
+					result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
+				}
+				
 				result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 				
 				failReason = testResultItem.getFailReason();
@@ -195,7 +208,12 @@ public class EmailReportGenerator
 					result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
 				}
 			}
-			failCount++;
+			
+			if (Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES) && !testResultItem.getJiraTickets().isEmpty())
+			{
+				// do nothing
+			} else
+				failCount++;
 		}
 		if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
 			failReason = testResultItem.getFailReason();
@@ -295,7 +313,7 @@ public class EmailReportGenerator
 				passed++;
 				break;
 			case FAIL:
-				if (Configuration.getBoolean(Parameter.IGNORE_KNOWN_ISSUES)) {
+				if (Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES)) {
 					if (ri.getJiraTickets().size() > 0) {
 						// increment known issue counter
 						failedKnownIssue++;
