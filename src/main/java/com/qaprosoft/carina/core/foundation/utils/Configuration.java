@@ -115,6 +115,8 @@ public class Configuration
 		
 		PROXY_PROTOCOLS("proxy_protocols"),
 		
+		PROXY_SET_TO_SYSTEM("proxy_set_to_system"),
+
 		REPORT_URL("report_url"),
 
 		EMAIL_LIST("email_list"),
