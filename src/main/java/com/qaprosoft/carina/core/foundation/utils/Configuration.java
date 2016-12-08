@@ -297,6 +297,10 @@ public class Configuration
 		
 		ZAFIRA_GRID_CHANNEL("zafira_grid_channel"),
 		
+		ZAFIRA_GIRD_LOGGING("zafira_grid_logging"),
+		
+		ZAFIRA_GIRD_TIMEOUT("zafira_grid_timeout"),
+		
 		ZAFIRA_SERVICE_URL("zafira_service_url"),
 		
 		ZAFIRA_USERNAME("zafira_username"),
