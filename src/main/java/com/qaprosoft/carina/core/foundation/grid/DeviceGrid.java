@@ -7,16 +7,21 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
+import com.google.gson.Gson;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubException;
 import com.qaprosoft.carina.core.foundation.grid.GridRequest.Operation;
+import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.zafira.client.model.EventType;
+import com.qaprosoft.zafira.client.model.EventType.Type;
 
 /**
  * DeviceGrid communicates over PubNub with grid queue and provides connect/diconnect device functionality.
@@ -27,7 +32,7 @@ public class DeviceGrid {
 	
 	private static final Logger LOGGER = Logger.getLogger(DeviceGrid.class);
 	
-	private static final String GRID_SESSION_ID = UUID.randomUUID().toString();
+	private static final String GRID_SESSION_ID = Configuration.get(Parameter.CI_RUN_ID) != null ? Configuration.get(Parameter.CI_RUN_ID) : UUID.randomUUID().toString();
 	
 	private static Pubnub heartbeat;
 	
@@ -41,15 +46,16 @@ public class DeviceGrid {
 	{
 		Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
 		GridCallback gridCallback = new GridCallback(testId);
+		GridRequest rq = new GridRequest(GRID_SESSION_ID, testId, deviceModels, Operation.CONNECT);
 		try {
 			startHeartBeat();
 			punub.subscribe(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), gridCallback);
 			
-			GridRequest rq = new GridRequest(GRID_SESSION_ID, testId, deviceModels, Operation.CONNECT);
-			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(new ObjectMapper().writeValueAsString(rq)), new Callback() {});
+			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), toJsonObject(rq), new Callback() {});
+			ZafiraIntegrator.logEvent(new EventType(Type.REQUEST_DEVICE_CONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 			
 			new FluentWait<GridCallback>(gridCallback)
-				.withTimeout(10, TimeUnit.MINUTES)
+				.withTimeout(Configuration.getInt(Parameter.ZAFIRA_GIRD_TIMEOUT), TimeUnit.SECONDS)
 				.pollingEvery(10, TimeUnit.SECONDS)
 				.until(new Function<GridCallback, Boolean>() 
 				{
@@ -59,7 +65,14 @@ public class DeviceGrid {
 						return !StringUtils.isEmpty(callback.getUdid());
 					}
 				});
-		} catch (Exception e) {
+		} 
+		catch (TimeoutException e) {
+			ZafiraIntegrator.logEvent(new EventType(Type.DEVICE_WAIT_TIMEOUT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
+			rq.setOperation(Operation.DISCONNECT);
+			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), toJsonObject(rq), new Callback() {});
+			LOGGER.error(e.getMessage(), e);
+		}
+		catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
 			punub.unsubscribeAll();
@@ -80,6 +93,7 @@ public class DeviceGrid {
 			GridRequest rq = new GridRequest(GRID_SESSION_ID, testId, udid, Operation.DISCONNECT);
 			Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
 			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(new ObjectMapper().writeValueAsString(rq)), new Callback() {});
+			ZafiraIntegrator.logEvent(new EventType(Type.REQUEST_DEVICE_DISCONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 		} catch(Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		}
@@ -128,6 +142,7 @@ public class DeviceGrid {
 					if (rs.isConnected())
 					{
 						udid = rs.getSerial();
+						ZafiraIntegrator.markEventReceived(new EventType(Type.CONNECT_DEVICE, GRID_SESSION_ID, testId));
 						LOGGER.info("Device found in grid by UDID: " + udid);
 					}
 				} catch (Exception e)
@@ -141,5 +156,19 @@ public class DeviceGrid {
 		{
 			return udid;
 		}
+	}
+	
+	private static JSONObject toJsonObject(Object object)
+	{
+		JSONObject json = null;
+		try
+		{
+			json = new JSONObject(new ObjectMapper().writeValueAsString(object));
+		}
+		catch(Exception e)
+		{
+			LOGGER.error(e.getMessage());
+		}
+		return json;
 	}
 }
