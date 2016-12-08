@@ -26,6 +26,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.client.ZafiraClient;
 import com.qaprosoft.zafira.client.ZafiraClient.Response;
+import com.qaprosoft.zafira.client.model.EventType;
 import com.qaprosoft.zafira.client.model.JobType;
 import com.qaprosoft.zafira.client.model.TestCaseType;
 import com.qaprosoft.zafira.client.model.TestRunType;
@@ -376,6 +377,21 @@ public class ZafiraIntegrator {
 		return response.getObject(); //null in case of any issue
 	}
 	
+	public static void logEvent(EventType event)
+	{
+		if(Configuration.getBoolean(Parameter.ZAFIRA_GIRD_LOGGING))
+		{
+			zc.logEvent(event);
+		}
+	}
+	
+	public static void markEventReceived(EventType event)
+	{
+		if(Configuration.getBoolean(Parameter.ZAFIRA_GIRD_LOGGING))
+		{
+			zc.markEventReceived(event);
+		}
+	}
 	
 	private static boolean isValid() {
 		if (zc == null ) {
