@@ -59,7 +59,7 @@
 
 		<jira-client.version>0.5</jira-client.version>
 
-		<zafira-client.version>1.8.2</zafira-client.version>
+		<zafira-client.version>1.8.4</zafira-client.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<json-simple.version>1.1</json-simple.version>
@@ -76,7 +76,7 @@
 		<cucumber.reporting>2.6.3</cucumber.reporting>
 		<cucumber.picocontainer.version>1.2.4</cucumber.picocontainer.version>
 		<picocontainer.version>2.15</picocontainer.version>
-		
+
 		<pubnub.version>3.7.10</pubnub.version>
 		<itext.version>5.0.6</itext.version>
 
@@ -396,7 +396,7 @@
 			<artifactId>aws-s3-manager</artifactId>
 			<version>${aws-s3-manager.version}</version>
 		</dependency>
-		
+
 		<!-- api-tools -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
