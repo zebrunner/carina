@@ -28,102 +28,131 @@ import com.qaprosoft.zafira.client.model.EventType.Type;
  * 
  * @author Alex Khursevich
  */
-public class DeviceGrid {
-	
+public class DeviceGrid
+{
+
 	private static final Logger LOGGER = Logger.getLogger(DeviceGrid.class);
-	
-	private static final String GRID_SESSION_ID = Configuration.get(Parameter.CI_RUN_ID) != null ? Configuration.get(Parameter.CI_RUN_ID) : UUID.randomUUID().toString();
-	
+
+	private static final String GRID_SESSION_ID = Configuration.get(Parameter.CI_RUN_ID) != null
+			? Configuration.get(Parameter.CI_RUN_ID) : UUID.randomUUID().toString();
+
+	private static final Integer GRID_HEARTBEAT_TIMEOUT = 120;
+	private static final Integer GRID_HEARTBEAT_INTERVAL = 59;
+	private static final Integer GRID_DEVICE_TIMEOUT = Configuration.getInt(Parameter.ZAFIRA_GRID_TIMEOUT);
+
+	private static final String PKEY = Configuration.get(Parameter.ZAFIRA_GRID_PKEY);
+	private static final String SKEY = Configuration.get(Parameter.ZAFIRA_GRID_SKEY);
+	private static final String CHANNEL = Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL);
+
 	private static Pubnub heartbeat;
-	
+
 	/**
 	 * Connect to remote mobile device.
-	 * @param testId - unique test id generated bu UUID
-	 * @param deviceModels - list of possible devices to get from STF
+	 * 
+	 * @param testId
+	 *            - unique test id generated bu UUID
+	 * @param deviceModels
+	 *            - list of possible devices to get from STF
 	 * @return device udid
 	 */
-	public static String connectDevice(String testId, List<String> deviceModels) 
+	public static String connectDevice(String testId, List<String> deviceModels)
 	{
-		Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
+		Pubnub punub = new Pubnub(PKEY, SKEY);
 		GridCallback gridCallback = new GridCallback(testId);
 		GridRequest rq = new GridRequest(GRID_SESSION_ID, testId, deviceModels, Operation.CONNECT);
-		try {
+		try
+		{
 			startHeartBeat();
-			punub.subscribe(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), gridCallback);
-			
-			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), toJsonObject(rq), new Callback() {});
-			ZafiraIntegrator.logEvent(new EventType(Type.REQUEST_DEVICE_CONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
-			
-			new FluentWait<GridCallback>(gridCallback)
-				.withTimeout(Configuration.getInt(Parameter.ZAFIRA_GIRD_TIMEOUT), TimeUnit.SECONDS)
-				.pollingEvery(10, TimeUnit.SECONDS)
-				.until(new Function<GridCallback, Boolean>() 
-				{
-					@Override
-					public Boolean apply(GridCallback callback) 
+			punub.subscribe(CHANNEL, gridCallback);
+
+			punub.publish(CHANNEL, toJsonObject(rq), new Callback()
+			{
+			});
+			ZafiraIntegrator.logEvent(
+					new EventType(Type.REQUEST_DEVICE_CONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
+
+			new FluentWait<GridCallback>(gridCallback).withTimeout(GRID_DEVICE_TIMEOUT, TimeUnit.SECONDS)
+					.pollingEvery(10, TimeUnit.SECONDS).until(new Function<GridCallback, Boolean>()
 					{
-						return !StringUtils.isEmpty(callback.getUdid());
-					}
-				});
-		} 
-		catch (TimeoutException e) {
-			ZafiraIntegrator.logEvent(new EventType(Type.DEVICE_WAIT_TIMEOUT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
-			rq.setOperation(Operation.DISCONNECT);
-			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), toJsonObject(rq), new Callback() {});
+						@Override
+						public Boolean apply(GridCallback callback)
+						{
+							return !StringUtils.isEmpty(callback.getUdid());
+						}
+					});
+		} catch (TimeoutException e)
+		{
+			ZafiraIntegrator
+					.logEvent(new EventType(Type.DEVICE_WAIT_TIMEOUT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 			LOGGER.error(e.getMessage(), e);
-		}
-		catch (Exception e) {
+		} catch (Exception e)
+		{
 			LOGGER.error(e.getMessage(), e);
-		} finally {
+		} finally
+		{
 			punub.unsubscribeAll();
 		}
-		
+
 		return gridCallback.getUdid();
 	}
-	
+
 	/**
 	 * Disconnects from remote device.
-	 * @param testId - unique test id generated bu UUID
-	 * @param udid - device udid to disconnect from
+	 * 
+	 * @param testId
+	 *            - unique test id generated bu UUID
+	 * @param udid
+	 *            - device udid to disconnect from
 	 */
-	public static void disconnectDevice(final String testId, String udid) 
+	public static void disconnectDevice(final String testId, String udid)
 	{
 		try
 		{
 			GridRequest rq = new GridRequest(GRID_SESSION_ID, testId, udid, Operation.DISCONNECT);
-			Pubnub punub = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
-			punub.publish(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new JSONObject(new ObjectMapper().writeValueAsString(rq)), new Callback() {});
-			ZafiraIntegrator.logEvent(new EventType(Type.REQUEST_DEVICE_DISCONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
-		} catch(Exception e) {
+			Pubnub punub = new Pubnub(PKEY, SKEY);
+			punub.publish(CHANNEL, toJsonObject(rq), new Callback()
+			{
+			});
+			ZafiraIntegrator.logEvent(
+					new EventType(Type.REQUEST_DEVICE_DISCONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
+		} catch (Exception e)
+		{
 			LOGGER.error(e.getMessage(), e);
 		}
 	}
-	
+
+	/**
+	 * Starts heartbeat from the very first call, if test run aborted grid will automatically drop all connections
+	 * requested from session.
+	 * @throws PubnubException
+	 */
 	public static void startHeartBeat() throws PubnubException
 	{
-		if(heartbeat == null)
+		if (heartbeat == null)
 		{
-			heartbeat = new Pubnub(Configuration.get(Parameter.ZAFIRA_GRID_PKEY), Configuration.get(Parameter.ZAFIRA_GRID_SKEY));
-			heartbeat.setHeartbeat(120);
-			heartbeat.setHeartbeatInterval(60);
+			heartbeat = new Pubnub(PKEY, SKEY);
+			heartbeat.setHeartbeat(GRID_HEARTBEAT_TIMEOUT);
+			heartbeat.setHeartbeatInterval(GRID_HEARTBEAT_INTERVAL);
 			heartbeat.setUUID(GRID_SESSION_ID);
-			heartbeat.subscribe(Configuration.get(Parameter.ZAFIRA_GRID_CHANNEL), new Callback(){});
+			heartbeat.subscribe(CHANNEL, new Callback()
+			{
+			});
 		}
 	}
-	
+
 	public static void stopHeartBeat()
 	{
-		if(heartbeat != null)
+		if (heartbeat != null)
 		{
 			heartbeat.unsubscribeAllChannels();
 		}
 	}
-	
+
 	public static class GridCallback extends Callback
 	{
 		private String udid;
 		private String testId;
-		
+
 		public GridCallback(String testId)
 		{
 			this.testId = testId;
@@ -157,15 +186,14 @@ public class DeviceGrid {
 			return udid;
 		}
 	}
-	
+
 	private static JSONObject toJsonObject(Object object)
 	{
 		JSONObject json = null;
 		try
 		{
 			json = new JSONObject(new ObjectMapper().writeValueAsString(object));
-		}
-		catch(Exception e)
+		} catch (Exception e)
 		{
 			LOGGER.error(e.getMessage());
 		}
