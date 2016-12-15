@@ -733,6 +733,9 @@ public class ZafiraIntegrator {
 			conf.getArg().add(getArgByValue(PLATFORM, device.getOs()));
 			conf.getArg().add(getArgByValue(PLATFORM_VERSION, device.getOsVersion()));
 		}
+		
+		// add custom app_version if any
+		conf.getArg().add(getArgByValue("app_version", Configuration.get(Parameter.APP_VERSION)));
 
 		return MarshallerHelper.marshall(conf);
 	}
