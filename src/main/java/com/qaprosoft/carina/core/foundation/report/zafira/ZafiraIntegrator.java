@@ -379,7 +379,7 @@ public class ZafiraIntegrator {
 	
 	public static void logEvent(EventType event)
 	{
-		if(Configuration.getBoolean(Parameter.ZAFIRA_GIRD_LOGGING))
+		if(Configuration.getBoolean(Parameter.ZAFIRA_GRID_LOGGING))
 		{
 			zc.logEvent(event);
 		}
@@ -387,7 +387,7 @@ public class ZafiraIntegrator {
 	
 	public static void markEventReceived(EventType event)
 	{
-		if(Configuration.getBoolean(Parameter.ZAFIRA_GIRD_LOGGING))
+		if(Configuration.getBoolean(Parameter.ZAFIRA_GRID_LOGGING))
 		{
 			zc.markEventReceived(event);
 		}
