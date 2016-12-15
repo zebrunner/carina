@@ -691,6 +691,7 @@ public class ZafiraIntegrator {
 	private static TestRunType finishTestRun() {
 		//reset configuration to store for example updated at run-time app_version etc
 		run.setConfigXML(getConfiguration());
+		zc.updateTestRun(run); //update config xml in case of any update on client side
 		
 		Response<TestRunType> response = zc.finishTestRun(run.getId());
 		return response.getObject();
