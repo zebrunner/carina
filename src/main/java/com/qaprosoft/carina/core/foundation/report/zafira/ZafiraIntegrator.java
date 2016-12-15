@@ -718,7 +718,13 @@ public class ZafiraIntegrator {
 	private static String getConfiguration() {
 		ConfigurationBin conf = new ConfigurationBin();
 		for (Configuration.Parameter parameter : Configuration.Parameter.values()) {
-			conf.getArg().add(getArgByParameter(parameter));
+			
+			// add custom app_version if any
+			if (parameter.equals(Parameter.APP_VERSION)) {
+				conf.getArg().add(getArgByValue("app_version", Configuration.get(Parameter.APP_VERSION)));
+			} else {
+				conf.getArg().add(getArgByParameter(parameter));
+			}
 		}
 		
 		//TODO: analyze if adding empty/null key values could be a problem
@@ -734,9 +740,6 @@ public class ZafiraIntegrator {
 			conf.getArg().add(getArgByValue(PLATFORM_VERSION, device.getOsVersion()));
 		}
 		
-		// add custom app_version if any
-		conf.getArg().add(getArgByValue("app_version", Configuration.get(Parameter.APP_VERSION)));
-
 		return MarshallerHelper.marshall(conf);
 	}
 
