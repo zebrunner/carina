@@ -361,7 +361,7 @@ public class ExtendedWebElement
 		}
 
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		setImplicitTimeout(0);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -388,7 +388,7 @@ public class ExtendedWebElement
 			LOGGER.debug(e.getMessage(), e.getCause());
 			result = false;
 		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout();
 		return result;
 	}
 	
@@ -404,7 +404,7 @@ public class ExtendedWebElement
 		
 /*		boolean result;
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		setImplicitTimeout(0);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -422,7 +422,7 @@ public class ExtendedWebElement
 		{
 			result = true;
 		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout(drv);
 		return result;*/
 	}
 
@@ -481,7 +481,7 @@ public class ExtendedWebElement
 	{
 		boolean result;
 		WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		setImplicitTimeout(0);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -502,7 +502,7 @@ public class ExtendedWebElement
 			LOGGER.debug(e.getMessage(), e.getCause());
 			result = false;
 		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout();
 		return result;
 	}	
 	
@@ -543,72 +543,33 @@ public class ExtendedWebElement
 		Screenshot.capture(drv, msg);
 	}
 
-/*	public ExtendedWebElement format(Object...objects) {
-		return format(IMPLICIT_TIMEOUT, objects);
-	}
-	public ExtendedWebElement format(long timeout, Object...objects) {
-		String locator = getBy().toString();
-		By by = null;
-		if (locator.startsWith("By.id: "))
-		{
-			by =  By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
-		}
-		if (locator.startsWith("By.name: "))
-		{
-			by =  By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
-		}
-		if (locator.startsWith("By.xpath: "))
-		{
-			by =  By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
-		}
-		if (locator.startsWith("linkText: "))
-		{
-			by =  By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
-		}
-		if (locator.startsWith("css: "))
-		{
-			by =  By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
-		}
-		if (locator.startsWith("tagName: "))
-		{
-			by =  By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
-		}
-		
-		return new ExtendedWebElement(findWebElement(by, getName(), timeout), getName(), by);
-		
-	}
-
+	/**
+	 * Set implicit timeout to default IMPLICIT_TIMEOUT value.
+	 * 
+	 */
 	
-	private WebElement findWebElement(final By by, String name, long timeout) {
-		WebElement element;
-		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return !drv.findElements(by).isEmpty();
-				}
-			});
-			element = drv.findElement(by);
-			summary.log(Messager.ELEMENT_FOUND.info(name));
-		}
-		catch (Exception e)
-		{
-			element = null;
-			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
-			setImplicitTimeout(IMPLICIT_TIMEOUT);
-			throw new RuntimeException(e);
-		}
+	public void setImplicitTimeout(){
 		setImplicitTimeout(IMPLICIT_TIMEOUT);
-		return element;
-	}	*/
+	}
 	
-	public void setImplicitTimeout(long implicit_wait){
-		getDriver().manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+	/**
+	 * Set implicit timeout.
+	 * 
+	 * @param timeout timeout in seconds
+	 */
+	
+	public void setImplicitTimeout(long timeout){
+		getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+		try {
+			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			LOGGER.error("Unable to set implicit timeout to " + timeout, e);
+			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+		} finally {
+			LOGGER.error("Unable again to set implicit timeout to " + timeout);
+			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+		}
+		
 	}
 
 	
@@ -1235,7 +1196,7 @@ public class ExtendedWebElement
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		setImplicitTimeout(0);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -1274,7 +1235,7 @@ public class ExtendedWebElement
 
 			extendedWebElements.add(new ExtendedWebElement(element, name));
 		}		
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout();
 		return extendedWebElements;
 	}
 	
@@ -1305,7 +1266,7 @@ public class ExtendedWebElement
 		LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
 		
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		setImplicitTimeout(0);
 
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
@@ -1326,7 +1287,7 @@ public class ExtendedWebElement
 			// do nothing
 		}
 
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout();
 
 	}
 
@@ -1362,5 +1323,5 @@ public class ExtendedWebElement
 		}
 
 	}
-	
+
 }
