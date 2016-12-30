@@ -559,6 +559,9 @@ public class ExtendedWebElement
 	 */
 	
 	public void setImplicitTimeout(long timeout){
+		if (timeout == 0) {
+			timeout = 1;
+		}
 		try {
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		} catch (Exception e) {
