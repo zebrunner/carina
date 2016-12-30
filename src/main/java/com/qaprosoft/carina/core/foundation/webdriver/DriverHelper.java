@@ -104,7 +104,8 @@ public class DriverHelper {
 		if (driver == null) {
 			throw new RuntimeException("[" + DevicePool.getDevice().getName() + "] WebDriver not initialized, check log files for details!");
 		}
-		driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		
 		// Initializes test log container dedicated to WebDriver instance.
 		summary = new TestLogHelper(driver);
@@ -114,12 +115,29 @@ public class DriverHelper {
 	// Base UI interaction operations
 	// --------------------------------------------------------------------------
 
+	@Deprecated
 	public long getImplicitTimeout() {
 		return IMPLICIT_TIMEOUT;
 	}
 	
-	public void setImplicitTimeout(long implicit_wait) {
-		getDriver().manage().timeouts().implicitlyWait(implicit_wait, TimeUnit.SECONDS);
+	
+	/**
+	 * Set implicit timeout.
+	 * 
+	 * @param timeout in seconds. Minimal value - 1 second
+	 */
+	
+	public void setImplicitTimeout(long timeout){
+		if (timeout < 1) {
+			timeout = 1;
+		}
+		
+		try {
+			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			LOGGER.error("Unable to set implicit timeout to " + timeout, e);
+			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+		}
 	}
 
     /**
@@ -365,8 +383,8 @@ public class DriverHelper {
 	@Deprecated
 	public boolean isElementPresent(String elementName, final By by, long timeout) {
 		boolean result;
+		setImplicitTimeout(1);
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			wait.until(new ExpectedCondition<Boolean>() {
@@ -378,7 +396,7 @@ public class DriverHelper {
 		} catch (Exception e) {
 			result = false;
 		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return result;
 	}
 
@@ -1311,8 +1329,8 @@ public class DriverHelper {
 		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
 		List<WebElement> webElements = new ArrayList<WebElement>();
 
+		setImplicitTimeout(1);
 		final WebDriver drv = getDriver();
-		drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			wait.until(new ExpectedCondition<Boolean>() {
@@ -1334,7 +1352,7 @@ public class DriverHelper {
 
 			extendedWebElements.add(new ExtendedWebElement(element, name));
 		}
-		drv.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return extendedWebElements;
 	}
 

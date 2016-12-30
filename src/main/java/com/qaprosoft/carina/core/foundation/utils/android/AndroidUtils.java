@@ -646,7 +646,7 @@ public class AndroidUtils {
 		LOGGER.info(String.format("Wait until element %s disappear",
 				locator.toString()));
 		WebDriver driver = DriverPool.getDriverByThread();
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		try {
 			if (new WebDriverWait(driver, timeout, pollingTime)
 					.until(ExpectedConditions
