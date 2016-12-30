@@ -85,7 +85,7 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 	public ExtendedWebElement findElementByIosUIAutomation(final String using, String name, long timeout)
 	{
 		ExtendedWebElement element;
-		manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		wait = new WebDriverWait(this, timeout, RETRY_TIME);
 		try
 		{
@@ -121,7 +121,7 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
-		manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		wait = new WebDriverWait(this, timeout, RETRY_TIME);
 		try
 		{
