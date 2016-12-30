@@ -12,8 +12,6 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
  *  This appender logs groups test outputs by test method so they don't mess up each other even they runs in parallel.
@@ -63,15 +61,8 @@ public class ThreadLogAppender extends AppenderSkeleton
 				
 				String logLevel = event.getLevel().toString();
 				
-				
-
-				String deviceName = DevicePool.getDevice().getName();
-				if (!deviceName.isEmpty()) {
-					deviceName = " [" + deviceName + "] ";
-				}
-				
-				String message = "[%s] [%s] [%s] [%s]%s %s";
-				fw.write(String.format(message, time, fileName, threadId, logLevel, deviceName, event.getMessage().toString()));
+				String message = "[%s] [%s] [%s] [%s] %s";
+				fw.write(String.format(message, time, fileName, threadId, logLevel, event.getMessage().toString()));
 			} else {
 				fw.write("null");
 			}

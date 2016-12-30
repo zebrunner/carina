@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -244,6 +245,9 @@ public class UITest extends AbstractTest
     			driver = drv;
     			setDriver(drv);
     			init = true;
+    			// push custom device name for log4j default messages
+    			NDC.push("[" + device.getName() + "]");
+    			
     			LOGGER.debug("initDriver finish...");
     		}
     		catch (Throwable thr) {
@@ -271,12 +275,14 @@ public class UITest extends AbstractTest
 	    	DriverPool.deregisterDriverByThread(threadId);
 	    	DevicePool.deregisterDeviceFromThread();
 			drv.quit();
+			
 	    	LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
     		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
     		LOGGER.debug("======================================================================================================================================");
 		} finally {
     		//TODO analyze how to forcibly kill session on device
+			NDC.pop();
 	    	webDrivers.remove();
 		}
     }
