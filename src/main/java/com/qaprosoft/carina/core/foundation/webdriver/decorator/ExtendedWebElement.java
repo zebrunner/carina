@@ -361,7 +361,7 @@ public class ExtendedWebElement
 		}
 
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		setImplicitTimeout(1);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -404,7 +404,7 @@ public class ExtendedWebElement
 		
 /*		boolean result;
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		setImplicitTimeout(1);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -481,7 +481,7 @@ public class ExtendedWebElement
 	{
 		boolean result;
 		WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		setImplicitTimeout(1);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -555,21 +555,18 @@ public class ExtendedWebElement
 	/**
 	 * Set implicit timeout.
 	 * 
-	 * @param timeout timeout in seconds
+	 * @param timeout in seconds. Minimal value - 1 second
 	 */
 	
 	public void setImplicitTimeout(long timeout){
-		if (timeout == 0) {
+		if (timeout < 1) {
 			timeout = 1;
 		}
+		
 		try {
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		} catch (Exception e) {
-			LOGGER.error("Unable to set implicit timeout to " + timeout);
-			e.printStackTrace();
-			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
-		} finally {
-			LOGGER.error("Unable again to set implicit timeout to " + timeout);
+			LOGGER.error("Unable to set implicit timeout to " + timeout, e);
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		}
 	}
@@ -1154,7 +1151,7 @@ public class ExtendedWebElement
 	public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		ExtendedWebElement element;
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		setImplicitTimeout(1);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -1198,7 +1195,7 @@ public class ExtendedWebElement
 		List<WebElement> webElements = new ArrayList<WebElement> ();
 		
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		setImplicitTimeout(1);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try
 		{
@@ -1268,7 +1265,7 @@ public class ExtendedWebElement
 		LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
 		
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		setImplicitTimeout(1);
 
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
