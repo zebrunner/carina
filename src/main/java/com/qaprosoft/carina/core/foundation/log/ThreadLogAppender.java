@@ -12,7 +12,6 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
