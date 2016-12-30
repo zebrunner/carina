@@ -565,7 +565,7 @@ public class ExtendedWebElement
 		try {
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		} catch (Exception e) {
-			LOGGER.error("Unable to set implicit timeout to " + timeout, e);
+			LOGGER.error("Unable to set implicit timeout to " + timeout);
 			e.printStackTrace();
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		} finally {
