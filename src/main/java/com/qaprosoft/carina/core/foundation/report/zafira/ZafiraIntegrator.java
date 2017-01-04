@@ -271,8 +271,11 @@ public class ZafiraIntegrator {
 			if (startedTest == null) {
 				//new test run registration
 				String testArgs = result.getParameters().toString();
+				
+				String group = result.getMethod().getTestClass().getName();
+				group = group.substring(0, group.lastIndexOf("."));
 
-				startedTest = startTest(test, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
+				startedTest = startTest(test, group, status, testArgs, run.getId(), testCase.getId(), demoUrl, logUrl);
 			}
 			TestNamingUtil.associateZafiraTest(startedTest);
 			
@@ -540,7 +543,7 @@ public class ZafiraIntegrator {
 		return testRun;
 	}
 
-	private static TestType startTest(String name, Status status, String testArgs, Long testRunId, Long testCaseId,
+	private static TestType startTest(String name, String group, Status status, String testArgs, Long testRunId, Long testCaseId,
 			String demoURL, String logURL) {
 
 		Long startTime = new Date().getTime();
@@ -556,6 +559,8 @@ public class ZafiraIntegrator {
 		LOGGER.debug("Test details for startup registration:" + String.format(testDetails, name, status, testArgs,
 				testRunId, testCaseId, startTime, demoURL, logURL, retry));
 
+		
+		test.setTestGroup(group);
 		Response<TestType> response = zc.startTest(test);
 		test = response.getObject();
 		if (test == null) {
@@ -608,7 +613,10 @@ public class ZafiraIntegrator {
 			TestCaseType testCase = registerTestCase(result);
 			String testArgs = result.getParameters().toString();
 			
-			test = startTest(testName, status, testArgs, run.getId(), testCase.getId(), null, null);
+			String group = result.getMethod().getTestClass().getName();
+			group = group.substring(0, group.lastIndexOf("."));
+			
+			test = startTest(testName, group, status, testArgs, run.getId(), testCase.getId(), null, null);
 		}
 		
 
