@@ -363,6 +363,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestSkipped(ITestResult result)
 	{
+		// TODO: improve later removing duplicates with AbstractTest
 		//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
 		if (result.getThrowable() != null && result.getThrowable().getMessage() != null
 				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
