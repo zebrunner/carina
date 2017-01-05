@@ -211,6 +211,22 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterMethod(alwaysRun = true)
 	public void executeAfterTestMethod(ITestResult result) {
 		try {
+			
+			// TODO: improve later removing duplicates with AbstractTestListener
+			//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
+			if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+					&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+				// [VD] it is prohibited to release TestInfoByThread in this place.!
+				return;
+			}
+			
+			//handle AbstractTest->SkipExecution
+			if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+					&& result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
+				// [VD] it is prohibited to release TestInfoByThread in this place.!
+				return;
+			}
+			
 			String test = TestNamingUtil.getCanonicalTestName(result);
 			List<String> tickets = Jira.getTickets(result);
 			result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
