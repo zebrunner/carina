@@ -215,6 +215,9 @@ public class ReportContext
 	 */
 	public static File getTestDir(String test)
 	{
+		if (test == null) {
+			test = "unknown";
+		}
 		String directory = String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		File screenDir = new File(directory);
 		if (!screenDir.exists())
