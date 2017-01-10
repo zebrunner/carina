@@ -153,10 +153,16 @@ public class HtmlReportGenerator
 				// convert toString
 				String image = R.REPORT.get("image");
 				
-				image = image.replace("${image}", imgNames.get(i).toString());
-				image = image.replace("${thumbnail}", imgNames.get(i).toString());
+				image = image.replace("${image}", imgNames.get(i));
+				image = image.replace("${thumbnail}", imgNames.get(i));
+				if(i == imgNames.size() - 1)
+				{
+					image = image.replace("onload=\"\"", "onload=\"this.click()\"");
+				}
+				
 				String title = TestLogCollector.getScreenshotComment(imgNames.get(i));
-				if (title == null) {
+				if (title == null) 
+				{
 					title = "";
 				}
 				image = image.replace("${title}", StringUtils.substring(title, 0, MAX_IMAGE_TITLE));
