@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
@@ -35,6 +36,8 @@ import com.qaprosoft.carina.core.foundation.utils.ZipManager;
 public class HtmlReportGenerator
 {
 	private static final Logger LOGGER = Logger.getLogger(HtmlReportGenerator.class);
+	
+	private static final int MAX_IMAGE_TITLE = 300;
 	
 	private static final String REPORT_NAME = "/report.html";
 	private static final String GALLERY_ZIP = "gallery-lib.zip";
@@ -76,14 +79,19 @@ public class HtmlReportGenerator
 				// convert toString
 				String image = R.REPORT.get("image");
 				
-				image = image.replace("${image}", imgNames.get(i).toString());
-				image = image.replace("${thumbnail}", imgNames.get(i).toString());
-				image = image.replace("${alt}", imgNames.get(i).toString());
+				image = image.replace("${image}", imgNames.get(i));
+				image = image.replace("${thumbnail}", imgNames.get(i));
+				if(i == imgNames.size() - 1)
+				{
+					image = image.replace("onload=\"\"", "onload=\"this.click()\"");
+				}
+				
 				String title = TestLogCollector.getScreenshotComment(imgNames.get(i));
-				if (title == null) {
+				if (title == null) 
+				{
 					title = "";
 				}
-				image = image.replace("${title}", title.toString());
+				image = image.replace("${title}", StringUtils.substring(title, 0, MAX_IMAGE_TITLE));
 				report.append(image);
 			}
 			//String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
