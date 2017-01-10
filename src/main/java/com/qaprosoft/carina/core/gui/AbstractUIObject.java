@@ -105,5 +105,4 @@ public abstract class AbstractUIObject extends DriverHelper
 	{
 		this.rootElement = rootElement;
 	}
-
 }
