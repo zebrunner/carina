@@ -118,13 +118,17 @@ public abstract class AbstractTest // extends DriverHelper
 		// Set SoapUI log4j properties
 		System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 
-		Logger root = Logger.getRootLogger();
-		Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-		while (allLoggers.hasMoreElements()) {
-			Category tmpLogger = (Category) allLoggers.nextElement();
-			if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-				tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+		try {
+			Logger root = Logger.getRootLogger();
+			Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+			while (allLoggers.hasMoreElements()) {
+				Category tmpLogger = (Category) allLoggers.nextElement();
+				if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
+					tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+				}
 			}
+		} catch (NoSuchMethodError e) {
+			LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
 		}
 		
 		startDate = new Date().getTime();
