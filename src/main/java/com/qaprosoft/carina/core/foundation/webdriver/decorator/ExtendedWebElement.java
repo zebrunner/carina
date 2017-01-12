@@ -534,6 +534,15 @@ public class ExtendedWebElement
 			msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
 			summary.log(msg);
 		}
+		catch(StaleElementReferenceException e)
+		{
+			element = findStaleElement();
+			LOGGER.debug(e.getMessage(), e.getCause());
+			element.clear();
+			element.sendKeys(decryptedText);
+			msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
+			summary.log(msg);
+		}
 		catch (Exception e)
 		{
 			msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
