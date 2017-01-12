@@ -246,7 +246,9 @@ public class UITest extends AbstractTest
     			setDriver(drv);
     			init = true;
     			// push custom device name for log4j default messages
-    			NDC.push(" [" + device.getName() + "] ");
+    			if (device != null) {
+    				NDC.push(" [" + device.getName() + "] ");
+    			}
     			
     			LOGGER.debug("initDriver finish...");
     		}
