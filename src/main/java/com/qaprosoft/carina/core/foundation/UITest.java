@@ -170,6 +170,8 @@ public class UITest extends AbstractTest
 	    		//executor.screenOff();
 	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
 				quitDriver();
+				
+				DriverPool.deregisterBrowserMobProxy();
 			}	    	
     	}
 		catch (Exception e)
@@ -190,6 +192,8 @@ public class UITest extends AbstractTest
 	    	executor.screenOff();
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
 			quitDriver();
+			
+			DriverPool.deregisterBrowserMobProxy();
 	    }
 	    
 		super.executeAfterTestClass(context);    	
@@ -205,6 +209,8 @@ public class UITest extends AbstractTest
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterSuite.");
 			quitDriver();
 			stopRecording(null);
+			
+			DriverPool.deregisterBrowserMobProxy();
 	    }
 	    
 		super.executeAfterTestSuite(context);	    
@@ -235,12 +241,11 @@ public class UITest extends AbstractTest
     			LOGGER.debug("initDriver start...");
     			
     			Device device = DevicePool.registerDevice2Thread();
-   			
-
+    			
     			LOGGER.debug("DriverFactory start...");
     			WebDriver drv = DriverFactory.create(name, device);
     			LOGGER.debug("DriverFactory finish...");
-    			DriverPool.registerDriver2Thread(drv, Thread.currentThread().getId());
+    			DriverPool.registerDriver(drv);
     			
     			driver = drv;
     			setDriver(drv);
@@ -266,7 +271,7 @@ public class UITest extends AbstractTest
 	
 	protected static void quitDriver() {
 		long threadId = Thread.currentThread().getId();
-		WebDriver drv = DriverPool.getDriverByThread(threadId);
+		WebDriver drv = DriverPool.getDriver();
 		
 		try {
 			if (drv == null) {
@@ -274,7 +279,7 @@ public class UITest extends AbstractTest
 			}
 
 			LOGGER.debug("Driver exiting..." + drv);
-	    	DriverPool.deregisterDriverByThread(threadId);
+	    	DriverPool.deregisterDriver();
 	    	DevicePool.deregisterDeviceFromThread();
 			drv.quit();
 			
