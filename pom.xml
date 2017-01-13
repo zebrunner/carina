@@ -455,6 +455,11 @@
 			<version>${itext.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.lightbody.bmp</groupId>
+			<artifactId>browsermob-core</artifactId>
+			<version>2.1.4</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
