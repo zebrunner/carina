@@ -3,8 +3,6 @@ package com.qaprosoft.carina.core.foundation.utils.android.recorder.utils;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
@@ -45,12 +44,7 @@ public class AdbExecutor {
     	if (DevicePool.isSystemDistributed()) {
     		// check if device server value equals to IP of the PC where tests were launched.
     		// adb can be executed locally in this case.
-    		String currentIP = "'fail during extaction'";
-    		try {
-    			currentIP = InetAddress.getLocalHost().getHostAddress();
-			} catch (UnknownHostException e) {
-				LOGGER.debug("Error during ip extraction: ".concat(e.getMessage()));
-			}
+    		String currentIP = HttpClient.getIpAddress();
     		LOGGER.debug("Local IP: ".concat(currentIP));
     		String remoteServer = DevicePool.getServer();
     		if (!remoteServer.equals(currentIP)){
