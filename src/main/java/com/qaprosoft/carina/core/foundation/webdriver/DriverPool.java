@@ -142,8 +142,6 @@ public class DriverPool
 		if (threadId2Proxy.containsKey(threadId)) {
 			threadId2Proxy.get(threadId).stop();
 			threadId2Proxy.remove(threadId);
-		} else {
-			Assert.fail("There is not registered BrowserMobProxy for thread: " + threadId);
 		}
 	}
 
