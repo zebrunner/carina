@@ -24,7 +24,12 @@ import org.apache.log4j.Logger;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.BrowserMobProxyServer;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.
@@ -68,6 +73,21 @@ public class HttpClient
 	
 	public static void setupProxy()
 	{
+		if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+			LOGGER.debug("Starting BrowserMobProxy...");
+			// integrate browserMob proxy if required here
+			BrowserMobProxy proxy = new BrowserMobProxyServer();
+			proxy.start(0);
+
+			Integer port = proxy.getPort();
+
+			R.CONFIG.put("proxy_host", "localhost");
+			R.CONFIG.put("proxy_port", port.toString());
+			R.CONFIG.put("proxy_protocols", "http");
+			
+			DriverPool.registerBrowserMobProxy(proxy);
+		}
+
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 		
