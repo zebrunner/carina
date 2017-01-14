@@ -29,14 +29,14 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 
     public boolean retry(ITestResult result) {
     	String test = TestNamingUtil.getCanonicalTestName(result);
-        if (RetryCounter.getRunCount(test) < getMaxRetryCountForTest(result) && !Jira.isRetryDisabled(result)) {
+        if (RetryCounter.getRunCount(test) < getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             RetryCounter.incrementRunCount(test);
             return true;
         }
         return false;
     }
 
-    public static int getMaxRetryCountForTest(ITestResult result) {
+    public static int getMaxRetryCountForTest() {
         return Configuration.getInt(Parameter.RETRY_COUNT);
     }
 }
