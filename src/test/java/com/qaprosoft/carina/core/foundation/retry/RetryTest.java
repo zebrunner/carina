@@ -9,11 +9,17 @@ public class RetryTest {
 	@Test
 	public void testRetryCounter() {
 		String test = "testRetryCounter";
-		RetryCounter.initCounter(test);
-
-		Assert.assertEquals(0, 0);
 		int count = RetryCounter.getRunCount(test);
 		Assert.assertEquals(count, 0);
+
+		RetryCounter.initCounter(test);
+		count = RetryCounter.getRunCount(test);
+		Assert.assertEquals(count, 0);
+
+		RetryCounter.initCounter(test);
+		count = RetryCounter.getRunCount(test);
+		Assert.assertEquals(count, 0);
+		
 		RetryCounter.incrementRunCount(test);
 		count = RetryCounter.getRunCount(test);
 		Assert.assertEquals(count, 1);
