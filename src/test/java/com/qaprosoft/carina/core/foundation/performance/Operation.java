@@ -5,7 +5,7 @@ import com.qaprosoft.carina.core.foundation.performance.Timer.IPerformanceOperat
 public class Operation {
 
 	public enum OPERATIONS implements IPerformanceOperation {
-		TEST("test"), TEST2("test2"), TEST3("test3"), TEST4("test4");
+		TEST("test"), TEST2("test2"), TEST3("test3"), TEST4("test4"), TEST5("test5");
 
 		private String key;
 
