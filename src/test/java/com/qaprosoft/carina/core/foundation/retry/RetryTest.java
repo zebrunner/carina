@@ -6,22 +6,40 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class RetryTest {
+	
 	@Test
-	public void testRetryCounter() {
-		String test = "testRetryCounter";
+	public void testIncrementNotExistedTestRetryCounter() {
+		String test = "test";
+		RetryCounter.incrementRunCount(test);
+		// count should be 0 anyway
+		int count = RetryCounter.getRunCount(test);
+		Assert.assertEquals(count, 0);
+	}
+	
+	@Test
+	public void testInitRetryCounter() {
+		String test = "testInitRetryCounter";
+		RetryCounter.initCounter(test);
 		int count = RetryCounter.getRunCount(test);
 		Assert.assertEquals(count, 0);
 
+	}
+	
+	@Test
+	public void testDoubleInitRetryCounter() {
+		String test = "testDoubleInitRetryCounter";
 		RetryCounter.initCounter(test);
-		count = RetryCounter.getRunCount(test);
-		Assert.assertEquals(count, 0);
-
 		RetryCounter.initCounter(test);
-		count = RetryCounter.getRunCount(test);
+		int count = RetryCounter.getRunCount(test);
 		Assert.assertEquals(count, 0);
-		
+	}
+	
+	@Test
+	public void testRetryCounter() {
+		String test = "testRetryCounter";
+		RetryCounter.initCounter(test);
 		RetryCounter.incrementRunCount(test);
-		count = RetryCounter.getRunCount(test);
+		int count = RetryCounter.getRunCount(test);
 		Assert.assertEquals(count, 1);
 	}
 
