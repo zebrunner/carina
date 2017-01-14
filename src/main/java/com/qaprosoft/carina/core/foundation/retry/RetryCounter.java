@@ -18,10 +18,8 @@ package com.qaprosoft.carina.core.foundation.retry;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.listeners.UITestListener;
-
 /**
- * Map that stores run count of tests, used in {@link UITestListener}.
+ * Map that stores run count of tests, used in {@link AbtractTestListener}.
  * 
  * @author Alex Khursevich (hursevch@gmail.com)
  */
