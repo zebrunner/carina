@@ -22,6 +22,12 @@ import com.qaprosoft.carina.core.foundation.http.HttpMethodType;
 
 public class HttpMethodTypeTest {
 	@Test
+	public void testGetHttpMethod() {
+		HttpMethodType type = HttpMethodType.HEAD;
+		Assert.assertEquals(type.get("POST"), HttpMethodType.POST);
+	}
+	
+	@Test
 	public void testHeadMethod() {
 		HttpMethodType type = HttpMethodType.HEAD;
 		Assert.assertEquals(type.getCode(), 1);
