@@ -58,6 +58,14 @@ public class PerformanceTest {
 
 	}
 
+	@Test
+	public void testNotStoppedMetric() {
+		Timer.start(OPERATIONS.TEST5);
+		Map<String, Long> testMetrics = Timer.readAndClear();
+		// do not return non stopped metric
+		Assert.assertEquals(testMetrics.size(), 0);
+	}
+
 	private void pause(Double timeout) {
 		try {
 			timeout = timeout * 1000;
