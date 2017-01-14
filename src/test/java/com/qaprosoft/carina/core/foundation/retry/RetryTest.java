@@ -6,8 +6,6 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class RetryTest {
-	RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
-
 	@Test
 	public void testRetryCounter() {
 		String test = "testRetryCounter";
@@ -30,6 +28,7 @@ public class RetryTest {
 /*	@AfterMethod
 	public void testRetryAnalyzer(ITestResult result) {
 		if (result.getMethod().getMethodName().equals("testRetryCounter")) {
+	
 			String test = TestNamingUtil.getCanonicalTestName(result);
 			R.CONFIG.put("retry_count", "1");
 			R.CONFIG.put("track_known_issues", "true");
