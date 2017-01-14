@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.browsermob;
+package com.qaprosoft.carina.core.foundation.httpclient;
 
 import java.util.Map;
 
