@@ -15,6 +15,7 @@ public class SystemProxyTest {
 	@BeforeClass(alwaysRun = true)
 	public void beforeClass() {
 		// do nothing
+		R.CONFIG.put("browsermob_proxy", "false");
 		R.CONFIG.put("proxy_set_to_system", "true");
 		R.CONFIG.put("proxy_host", host);
 		R.CONFIG.put("proxy_port", port);
