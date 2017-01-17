@@ -34,7 +34,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
@@ -192,7 +191,8 @@ public class Screenshot
 			LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
 			return;
 		}
-		Long runId = ZafiraIntegrator.getRunId();
+		// TODO: not good solution...
+		Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
 		String testName = ReportContext.getTestDir(test).getName();
 		String key =  runId + "/" + testName + "/" + screenName;				
 		if (runId == -1) {
