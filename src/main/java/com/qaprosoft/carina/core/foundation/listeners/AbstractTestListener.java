@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
@@ -37,11 +36,9 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -51,7 +48,6 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.zafira.client.model.TestType;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractTestListener extends TestArgsListener
@@ -271,53 +267,52 @@ public abstract class AbstractTestListener extends TestArgsListener
 		TestNamingUtil.associateCanonicTestName(test);
 		
 		// Analyze Zafira results for re-run
-		if (ZafiraIntegrator.isRerunFailures()) {
-			// Analyze TestResult status obligatory inside isrerun if operator because
-			// some modifications in Zafira results needed.
-			// FAILED status will be removed/unregistered from Zafira database
-			TestType testType = ZafiraIntegrator.getTestType(test);
-			
-			// if null it means that new test appeared in comparison with registered result
-			if (testType != null) {
-				boolean generateSkipException = false;
-				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
-					//for class_mode verify also that test classname is different as all testclass should be re-executed
-					generateSkipException = true;
-					if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
-						if (result.getClass().toString().equalsIgnoreCase(testType.getClass().toString())) {
-							//do not generate skip exception as all test class should be executed again 
-							generateSkipException = false;
-						}
-					}
-				} else {
-					// Analyze if any known issue is assigned.
-					if (testType.isKnownIssue()) {
-						generateSkipException = true;
-					}
-					// Do not remove test data as it should reuse already registered test and update it
-					// unregister Zafira test result
-					//ZafiraIntegrator.deleteTest(testType.getId());
-				}
-				
-				// generate already passed exception. Regular exception
-				// doesn't work as it stop DataProvider execution etc
-				if (generateSkipException) {
-					LOGGER.info(String.format("Reexecution for test '%s' is skipped as test already passed.", testType.getName()));
-					throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
-				} else {
-					LOGGER.info(String.format("Reexecution for test '%s' will be started soon.", testType.getName()));
-				}
-			} else {
-				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
-			}
-		}
-		
-		int retry = RetryCounter.getRunCount(test);
-		if (retry == 0) {
-			// register test on startup for 0 retry only!
-			ZafiraIntegrator.startTestMethod(result);
-		}
-		
+//		if (ZafiraIntegrator.isRerunFailures()) {
+//			// Analyze TestResult status obligatory inside isrerun if operator because
+//			// some modifications in Zafira results needed.
+//			// FAILED status will be removed/unregistered from Zafira database
+//			TestType testType = ZafiraIntegrator.getTestType(test);
+//			
+//			// if null it means that new test appeared in comparison with registered result
+//			if (testType != null) {
+//				boolean generateSkipException = false;
+//				if (testType.getStatus().name().equals(SpecialKeywords.PASSED)) {
+//					//for class_mode verify also that test classname is different as all testclass should be re-executed
+//					generateSkipException = true;
+//					if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
+//						if (result.getClass().toString().equalsIgnoreCase(testType.getClass().toString())) {
+//							//do not generate skip exception as all test class should be executed again 
+//							generateSkipException = false;
+//						}
+//					}
+//				} else {
+//					// Analyze if any known issue is assigned.
+//					if (testType.isKnownIssue()) {
+//						generateSkipException = true;
+//					}
+//					// Do not remove test data as it should reuse already registered test and update it
+//					// unregister Zafira test result
+//					//ZafiraIntegrator.deleteTest(testType.getId());
+//				}
+//				
+//				// generate already passed exception. Regular exception
+//				// doesn't work as it stop DataProvider execution etc
+//				if (generateSkipException) {
+//					LOGGER.info(String.format("Reexecution for test '%s' is skipped as test already passed.", testType.getName()));
+//					throw new SkipException(SpecialKeywords.ALREADY_PASSED + ": " + test);
+//				} else {
+//					LOGGER.info(String.format("Reexecution for test '%s' will be started soon.", testType.getName()));
+//				}
+//			} else {
+//				LOGGER.warn("New test '" + test + "' appeared which was not registered in Zafira during last execution!");
+//			}
+//		}
+//		
+//		int retry = RetryCounter.getRunCount(test);
+//		if (retry == 0) {
+//			// register test on startup for 0 retry only!
+//			ZafiraIntegrator.startTestMethod(result);
+//		}
 	}
 
 	@Override
@@ -325,7 +320,6 @@ public abstract class AbstractTestListener extends TestArgsListener
 	{
 		passItem(result, Messager.TEST_PASSED);
 
-		ZafiraIntegrator.finishTestMethod(result, null);
 		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSuccess(result);
 	}
@@ -344,16 +338,13 @@ public abstract class AbstractTestListener extends TestArgsListener
 			LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for " + result.getMethod().getMethodName());
 		}
 		
-		String errorMessage = "";
 		if (count < maxCount && retry != null && !Jira.isRetryDisabled(result))
 		{
 			TestNamingUtil.decreaseRetryCounter(test);
-			errorMessage = failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
+			failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
 		} else {
-			errorMessage = failItem(result, Messager.TEST_FAILED);
+			failItem(result, Messager.TEST_FAILED);
 			closeLogAppender(test);
-			//register test details for zafira data population only after finishing retries
-	    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
 		}
 		
 		//TestNamingUtil.releaseTestInfoByThread();
@@ -378,8 +369,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 			return;
 		}
 		
-		String errorMessage = skipItem(result, Messager.TEST_SKIPPED);
-    	ZafiraIntegrator.finishTestMethod(result, errorMessage);
+		skipItem(result, Messager.TEST_SKIPPED);
 		//TestNamingUtil.releaseTestInfoByThread();
 		super.onTestSkipped(result);
 	}
