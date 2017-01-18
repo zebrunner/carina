@@ -79,7 +79,7 @@ public class HttpClient
 			LOGGER.debug("Starting BrowserMobProxy...");
 			// integrate browserMob proxy if required here
 			BrowserMobProxy proxy = new BrowserMobProxyServer();
-			proxy.start(0);
+			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
 
 			Integer port = proxy.getPort();
 
