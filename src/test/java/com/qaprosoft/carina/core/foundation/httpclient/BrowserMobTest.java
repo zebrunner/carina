@@ -22,6 +22,7 @@ public class BrowserMobTest {
 	public void beforeClass() {
 		// do nothing
 		R.CONFIG.put("browsermob_proxy", "true");
+		R.CONFIG.put("browsermob_port", "0");
 		R.CONFIG.put("proxy_set_to_system", "true");
 		
 		HttpClient.setupProxy();
