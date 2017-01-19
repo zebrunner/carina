@@ -16,9 +16,9 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.zafira.client.model.config.Argument;
-import com.qaprosoft.zafira.client.model.config.Configuration;
-import com.qaprosoft.zafira.listener.IConfigurator;
+import com.qaprosoft.zafira.client.model.ArgumentType;
+import com.qaprosoft.zafira.client.model.ConfigurationType;
+import com.qaprosoft.zafira.config.IConfigurator;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -30,34 +30,34 @@ public class ZafiraConfigurator implements IConfigurator
 	private List<String> uniqueKeys = Arrays.asList(R.CONFIG.get("unique_testrun_fields").split(","));
 	
 	@Override
-	public Configuration getConfiguration()
+	public ConfigurationType getConfiguration()
 	{
-		Configuration conf = new Configuration();
+		ConfigurationType conf = new ConfigurationType();
 		
 		for (Parameter parameter : Parameter.values()) 
 		{
-			conf.getArg().add(buildArgument(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
+			conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
 		}
 		
 		// add custom arguments from browserStack
-		conf.getArg().add(buildArgument("platform", R.CONFIG.get("os")));
-		conf.getArg().add(buildArgument("platform_version", R.CONFIG.get("os_version")));
+		conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
+		conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
 		
 		// add custom arguments from current mobile device
 		Device device = DevicePool.getDevice();
 		if (!device.getName().isEmpty()) 
 		{
-			conf.getArg().add(buildArgument("device", device.getName()));
-			conf.getArg().add(buildArgument("platform", device.getOs()));
-			conf.getArg().add(buildArgument("platform_version", device.getOsVersion()));
+			conf.getArg().add(buildArgumentType("device", device.getName()));
+			conf.getArg().add(buildArgumentType("platform", device.getOs()));
+			conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
 		}
 		
 		return conf;
 	}
 	
-	private Argument buildArgument(String key, String value)
+	private ArgumentType buildArgumentType(String key, String value)
 	{
-		Argument arg = new Argument();
+		ArgumentType arg = new ArgumentType();
 		arg.setKey(key);
 		arg.setValue(value);
 		arg.setUnique(uniqueKeys.contains(key));
