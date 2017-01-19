@@ -55,18 +55,17 @@ public abstract class AbstractPage extends AbstractUIObject
 	protected void setPageURL(String relURL)
 	{
 		String baseURL;
-		//if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)))
+		// if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)))
 		if (!Configuration.get(Parameter.ENV).isEmpty())
 		{
 			baseURL = Configuration.getEnvArg("base");
-		}
-		else
+		} else
 		{
 			baseURL = Configuration.get(Parameter.URL);
 		}
 		pageURL = baseURL + relURL;
 	}
-	
+
 	protected void setPageAbsoluteURL(String url)
 	{
 		this.pageURL = url;
@@ -76,29 +75,33 @@ public abstract class AbstractPage extends AbstractUIObject
 	{
 		return pageURL;
 	}
-	
+
 	public boolean isPageOpened()
 	{
 		return isPageOpened(this);
 	}
-	
+
 	public boolean isPageOpened(long timeout)
 	{
 		return isPageOpened(this, timeout);
 	}
 
-	public String savePageAsPdf(boolean scaled) throws IOException, DocumentException {
+	public String savePageAsPdf(boolean scaled) throws IOException, DocumentException
+	{
 		String pdfName = "";
 
 		// Define test screenshot root
 		String test = "";
-		if (TestNamingUtil.isTestNameRegistered()) {
+		if (TestNamingUtil.isTestNameRegistered())
+		{
 			test = TestNamingUtil.getTestNameByThread();
-		} else {
+		} else
+		{
 			test = TestNamingUtil.getCanonicTestNameByThread();
 		}
 
-		if (test == null || StringUtils.isEmpty(test)) {
+		if (test == null || StringUtils.isEmpty(test))
+		{
 			LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
 			return null;
 		}
@@ -112,12 +115,16 @@ public abstract class AbstractPage extends AbstractUIObject
 		String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
 		Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.capture(driver, true));
 		Document document = null;
-		if (scaled) {
-			document = new Document(PageSize.A4, 10, 10 ,10, 10);
-			if (image.getHeight() > (document.getPageSize().getHeight() - 20) || image.getScaledWidth() > (document.getPageSize().getWidth() - 20)) {
+		if (scaled)
+		{
+			document = new Document(PageSize.A4, 10, 10, 10, 10);
+			if (image.getHeight() > (document.getPageSize().getHeight() - 20)
+					|| image.getScaledWidth() > (document.getPageSize().getWidth() - 20))
+			{
 				image.scaleToFit(document.getPageSize().getWidth() - 20, document.getPageSize().getHeight() - 20);
 			}
-		} else {
+		} else
+		{
 			document = new Document(new RectangleReadOnly(image.getScaledWidth(), image.getScaledHeight()));
 		}
 		PdfWriter.getInstance(document, new FileOutputStream(fullPdfPath));
@@ -127,7 +134,8 @@ public abstract class AbstractPage extends AbstractUIObject
 		return fullPdfPath;
 	}
 
-	public String savePageAsPdf() throws IOException, DocumentException {
+	public String savePageAsPdf() throws IOException, DocumentException
+	{
 		return savePageAsPdf(true);
 	}
 }
