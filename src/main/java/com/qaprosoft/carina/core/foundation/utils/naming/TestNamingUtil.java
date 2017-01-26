@@ -27,7 +27,7 @@ import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.zafira.client.model.TestType;
+import com.qaprosoft.zafira.models.dto.TestType;
 
 /**
  * Common naming utility for unique test method identification.
