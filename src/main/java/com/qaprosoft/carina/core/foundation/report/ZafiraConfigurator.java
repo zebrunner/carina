@@ -16,8 +16,8 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.zafira.client.model.ArgumentType;
-import com.qaprosoft.zafira.client.model.ConfigurationType;
+import com.qaprosoft.zafira.models.dto.config.ArgumentType;
+import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
 import com.qaprosoft.zafira.config.IConfigurator;
 
 /**
