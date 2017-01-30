@@ -10,10 +10,10 @@ import org.testng.annotations.Test;
 
 import com.qaprosoft.zafira.client.ZafiraClient;
 import com.qaprosoft.zafira.client.ZafiraClient.Response;
+import com.qaprosoft.zafira.models.db.TestRun.Initiator;
 import com.qaprosoft.zafira.models.dto.JobType;
 import com.qaprosoft.zafira.models.dto.TestCaseType;
 import com.qaprosoft.zafira.models.dto.TestRunType;
-import com.qaprosoft.zafira.models.db.TestRun.Initiator;
 import com.qaprosoft.zafira.models.dto.TestSuiteType;
 import com.qaprosoft.zafira.models.dto.TestType;
 import com.qaprosoft.zafira.models.dto.UserType;
@@ -101,7 +101,8 @@ public class ZafiraClientTest
 	{
 		List<String> workItems = new ArrayList<String>();
 		
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.models.db.Status.PASSED, "<config></config>", 1L, 1L, new Date(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems, 2, null);
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.models.db.Status.PASSED, "<config></config>", 1L, 1L, new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems, 2, null);
+		
 		Response<TestType> response = zc.startTest(test);
 		Assert.assertEquals(response.getStatus(), 200);
 		
