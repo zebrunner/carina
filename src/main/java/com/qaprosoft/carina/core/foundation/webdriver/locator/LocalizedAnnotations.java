@@ -30,8 +30,6 @@ public class LocalizedAnnotations extends Annotations
 {
 	private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 	
-	private static Matcher matcher;
-
 	public LocalizedAnnotations(Field field)
 	{
 		super(field);
@@ -44,7 +42,7 @@ public class LocalizedAnnotations extends Annotations
 		By by = super.buildBy();
 		String param = by.toString();
 		//replace by using localization pattern
-		matcher = L10N_PATTERN.matcher(param);
+		Matcher matcher = L10N_PATTERN.matcher(param);
 		if (matcher.find())
 		{
 			int start = param.indexOf(SpecialKeywords.L10N+ ":") + 5;
