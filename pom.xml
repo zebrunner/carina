@@ -32,7 +32,7 @@
 
 		<apache-http.version>4.4</apache-http.version>
 		<ocap-api.version>1.2</ocap-api.version>
-		<!--json-rpc.version>1.0</json-rpc.version-->
+		<!--json-rpc.version>1.0</json-rpc.version -->
 		<json-path.version>0.8.1</json-path.version>
 		<gson.version>2.2.2</gson.version>
 		<javax-mail.version>1.4</javax-mail.version>
@@ -190,12 +190,8 @@
 			<artifactId>ocap-api</artifactId>
 			<version>${ocap-api.version}</version>
 		</dependency>
-<!--		<dependency>
-			<groupId>com.metaparadigm</groupId>
-			<artifactId>json-rpc</artifactId>
-			<version>${json-rpc.version}</version>
-		</dependency>
--->
+		<!-- <dependency> <groupId>com.metaparadigm</groupId> <artifactId>json-rpc</artifactId> 
+			<version>${json-rpc.version}</version> </dependency> -->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
@@ -404,7 +400,7 @@
 			<version>${api-tools.version}</version>
 		</dependency>
 
-		<!-- monte-repack video recording  -->
+		<!-- monte-repack video recording -->
 		<dependency>
 			<groupId>com.pojosontheweb</groupId>
 			<artifactId>monte-repack</artifactId>
@@ -448,7 +444,7 @@
 			<version>${pubnub.version}</version>
 		</dependency>
 
-		<!--iText for pdf-->
+		<!--iText for pdf -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
@@ -460,10 +456,11 @@
 			<artifactId>browsermob-core</artifactId>
 			<version>2.1.4</version>
 		</dependency>
+
 		<dependency>
-    		<groupId>ru.yandex.qatools.ashot</groupId>
-    		<artifactId>ashot</artifactId>
-    		<version>1.5.3</version>
+			<groupId>ru.yandex.qatools.ashot</groupId>
+			<artifactId>ashot</artifactId>
+			<version>1.5.3</version>
 		</dependency>
 	</dependencies>
 
