@@ -47,7 +47,7 @@ public class UITestListener extends AbstractTestListener {
 
 	private String takeScreenshot(ITestResult result, String msg) {
 		String screenId = "";
-		WebDriver driver = DriverPool.getDriverByThread();
+		WebDriver driver = DriverPool.getDriver();
 
 		if (driver != null) {
 			screenId = Screenshot.capture(driver, true, msg); // in case of failure
