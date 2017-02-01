@@ -33,6 +33,11 @@ public class ToastDetector implements Runnable {
     }
 
     public void setWaitTimeout(int waitTimeout) {
+        if (waitTimeout > 60) {
+            LOGGER.warn("Max wait timeout 60 second!");
+            this.waitTimeout = 60;
+            return;
+        }
         this.waitTimeout = waitTimeout;
     }
 
