@@ -15,14 +15,17 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
+
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
-import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriver;
-
-import java.util.concurrent.ConcurrentHashMap;
+import net.lightbody.bmp.BrowserMobProxy;
 
 public class DriverPool
 {
@@ -31,30 +34,44 @@ public class DriverPool
 	static WebDriver single_driver;
 	private static final ConcurrentHashMap<Long, WebDriver> threadId2Driver = new ConcurrentHashMap<Long, WebDriver>();
 	private static final ConcurrentHashMap<Long, WebDriver> threadId2ExtraDriver = new ConcurrentHashMap<Long, WebDriver>();
-
-	public static void registerDriver2Thread(WebDriver driver, Long threadId)
-	{
-		threadId2Driver.put(threadId, driver);
-		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
-			//init our single driver variable
-			single_driver = driver;
-		}
-
-		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
-	}
 	
+	
+	private static final ConcurrentHashMap<Long, BrowserMobProxy> threadId2Proxy = new ConcurrentHashMap<Long, BrowserMobProxy>();
+
 	public static void registerExtraDriver2Thread(WebDriver driver, Long threadId)
 	{
 		threadId2ExtraDriver.put(threadId, driver);
 
 		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; extra driver: " + driver);
 	}
+	
+	public static void registerDriver(WebDriver driver)
+	{
+		registerDriver2Thread(driver, Thread.currentThread().getId());
+	}
+	
+	public static void registerDriver2Thread(WebDriver driver, Long threadId)
+	{
+		threadId2Driver.put(threadId, driver);
 
-	public static WebDriver getDriverByThread()
+		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
+			//init our single driver variable
+			single_driver = driver;
+		}
+		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
+	}
+
+	public static WebDriver getDriver()
 	{
 		return getDriverByThread(Thread.currentThread().getId());
 	}
 	
+	@Deprecated
+	public static WebDriver getDriverByThread()
+	{
+		return getDriverByThread(Thread.currentThread().getId());
+	}
+
 	public static WebDriver getDriverByThread(long threadId)
 	{
 		if (threadId2Driver.size() == 0) {
@@ -99,6 +116,39 @@ public class DriverPool
 			LOGGER.debug("##########        GET threadId: " + threadId + "; extra driver: " + drv);
 		}
 		return drv;
+	}
+
+	public static void registerBrowserMobProxy(BrowserMobProxy proxy)
+	{
+		threadId2Proxy.put(Thread.currentThread().getId(),  proxy);
+	}
+	
+	public static BrowserMobProxy getBrowserMobProxy()
+	{
+		BrowserMobProxy proxy = null;
+		long threadId = Thread.currentThread().getId();
+		if (threadId2Proxy.containsKey(threadId)) {
+			proxy = threadId2Proxy.get(threadId);
+		} else {
+			Assert.fail("There is not registered BrowserMobProxy for thread: " + threadId);
+		}
+		return proxy;
+	}
+	
+	public static void deregisterBrowserMobProxy()
+	{
+		long threadId = Thread.currentThread().getId();
+	
+		if (threadId2Proxy.containsKey(threadId)) {
+			threadId2Proxy.get(threadId).stop();
+			threadId2Proxy.remove(threadId);
+		}
+	}
+
+	public static void deregisterDriver()
+	{
+		deregisterDriverByThread(Thread.currentThread().getId());
+
 	}
 	
 	public static void deregisterDriverByThread(long threadId)
