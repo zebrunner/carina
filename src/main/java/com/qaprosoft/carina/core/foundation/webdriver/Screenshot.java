@@ -21,12 +21,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.SessionNotFoundException;
 
@@ -40,6 +37,10 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
+
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and
@@ -149,20 +150,19 @@ public class Screenshot
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				} 
 				
-				File fullScreen = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);				
-				//File fullScreen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+				ru.yandex.qatools.ashot.Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
+				BufferedImage fullScreen = screenshot.getImage();
 				
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1 && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1){
-					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
+					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), fullScreenPath);
 				}
-				FileUtils.copyFile(fullScreen, new File(fullScreenPath));
+				ImageIO.write(fullScreen, "PNG", new File(fullScreenPath));
 
 				// Create screenshot thumbnail
 				String thumbScreenPath = fullScreenPath.replace(screenName, "/thumbnails/" + screenName);
-				File thumbScreen = new File(thumbScreenPath);
-				FileUtils.copyFile(fullScreen, thumbScreen);
-				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT));
+				BufferedImage thumbScreen = screenshot.getImage();
+				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 				
 				// Uploading screenshot to Amazon S3
 				uploadToAmazonS3(test, fullScreenPath, screenName, comment);
@@ -220,17 +220,16 @@ public class Screenshot
 	 * @param height
 	 *            - new image height.
 	 */
-	public static void resizeImg(File imageFile, int width, int height)
+	public static void resizeImg(BufferedImage bufImage, int width, int height, String path)
 	{
 		try
 		{
-			BufferedImage bufImage = ImageIO.read(imageFile);
 			bufImage = Scalr.resize(bufImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height, Scalr.OP_ANTIALIAS);
 			if (bufImage.getHeight() > height)
 			{
 				bufImage = Scalr.crop(bufImage, bufImage.getWidth(), height);
 			}
-			ImageIO.write(bufImage, "png", imageFile);
+			ImageIO.write(bufImage, "png", new File(path));
 		}
 		catch (Exception e)
 		{
