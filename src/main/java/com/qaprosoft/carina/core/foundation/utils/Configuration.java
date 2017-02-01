@@ -115,6 +115,10 @@ public class Configuration
 		
 		PROXY_PROTOCOLS("proxy_protocols"),
 		
+		BROWSERMOB_PROXY("browsermob_proxy"),
+		
+		BROWSERMOB_PORT("browsermob_port"),
+		
 		PROXY_SET_TO_SYSTEM("proxy_set_to_system"),
 
 		REPORT_URL("report_url"),

@@ -25,7 +25,7 @@ public class ThreadLogAppender extends AppenderSkeleton
 	public synchronized void append(LoggingEvent event)
 	{
 		if (!ReportContext.isBaseDireCreated()) {
-			System.out.println("Folder structure is not created yet!");
+			//System.out.println("Folder structure is not created yet!");
 			return;
 		}
 		try

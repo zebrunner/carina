@@ -16,6 +16,8 @@
 package com.qaprosoft.carina.core.foundation.http;
 
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +27,11 @@ import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.BrowserMobProxyServer;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.
@@ -68,6 +75,24 @@ public class HttpClient
 	
 	public static void setupProxy()
 	{
+		if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+			LOGGER.debug("Starting BrowserMobProxy...");
+			// integrate browserMob proxy if required here
+			BrowserMobProxy proxy = new BrowserMobProxyServer();
+			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
+
+			Integer port = proxy.getPort();
+
+			String currentIP = HttpClient.getIpAddress();
+			LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
+			
+			R.CONFIG.put("proxy_host", currentIP);
+			R.CONFIG.put("proxy_port", port.toString());
+			R.CONFIG.put("proxy_protocols", "http");
+			
+			DriverPool.registerBrowserMobProxy(proxy);
+		}
+
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 		
@@ -105,4 +130,14 @@ public class HttpClient
 		}
 	}
 
+	public static String getIpAddress() {
+		String currentIP = "0.0.0.0"; // localhost
+		try {
+			currentIP = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
+		}
+
+		return currentIP;
+	}
 }
