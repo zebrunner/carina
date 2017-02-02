@@ -460,6 +460,12 @@
 			<artifactId>browsermob-core</artifactId>
 			<version>2.1.4</version>
 		</dependency>
+		
+		<dependency>
+    		<groupId>ru.yandex.qatools.ashot</groupId>
+    		<artifactId>ashot</artifactId>
+    		<version>1.5.3</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
