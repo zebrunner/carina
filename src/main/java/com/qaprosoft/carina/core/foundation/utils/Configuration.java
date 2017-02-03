@@ -301,16 +301,6 @@ public class Configuration
 		
 		ZAFIRA_GRID_TIMEOUT("zafira_grid_timeout"),
 		
-		ZAFIRA_SERVICE_URL("zafira_service_url"),
-		
-		ZAFIRA_USERNAME("zafira_username"),
-		
-		ZAFIRA_PASSWORD("zafira_password"),
-		
-		ZAFIRA_PROJECT("zafira_project"),
-		
-		RERUN_FAILURES("rerun_failures"),
-		
 		GIT_BRANCH("git_branch"),
 		
 		GIT_COMMIT("git_commit"),
