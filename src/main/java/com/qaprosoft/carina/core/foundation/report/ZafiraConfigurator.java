@@ -16,6 +16,7 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
 import com.qaprosoft.zafira.config.IConfigurator;
@@ -123,8 +124,8 @@ public class ZafiraConfigurator implements IConfigurator
 	}
 
 	@Override
-	public boolean isClassMode()
+	public DriverMode getDriverMode()
 	{
-		return "class_mode".equalsIgnoreCase(R.CONFIG.get("driver_mode"));
+		return DriverMode.valueOf(R.CONFIG.get("driver_mode").toUpperCase());
 	}
 }
