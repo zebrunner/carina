@@ -24,8 +24,8 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.SessionNotFoundException;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
@@ -38,6 +38,7 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 
+import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
@@ -93,7 +94,7 @@ public class Screenshot {
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images
 	 * to specified screenshots location.
-	 * 
+	 *
 	 * @param driver
 	 *            instance used for capturing.
 	 * @param isTakeScreenshot
@@ -141,9 +142,18 @@ public class Screenshot {
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				}
 
-				ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
-						.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
-				BufferedImage fullScreen = screenshot.getImage();
+				BufferedImage fullScreen;
+				BufferedImage thumbScreen;
+				if (driver.getClass().toString().contains("java_client")) {
+					File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
+					fullScreen = ImageIO.read(screenshot);
+					thumbScreen = ImageIO.read(screenshot);
+				} else {
+					ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
+							.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
+					fullScreen = screenshot.getImage();
+					thumbScreen = screenshot.getImage();
+				}
 
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
 						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
@@ -154,7 +164,6 @@ public class Screenshot {
 
 				// Create screenshot thumbnail
 				String thumbScreenPath = fullScreenPath.replace(screenName, "/thumbnails/" + screenName);
-				BufferedImage thumbScreen = screenshot.getImage();
 				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
@@ -167,8 +176,6 @@ public class Screenshot {
 
 			} catch (IOException e) {
 				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-			} catch (SessionNotFoundException e) {
-				LOGGER.error(e.getMessage());
 			} catch (Exception e) {
 				LOGGER.error("Unable to capture screenshot!", e);
 			}
