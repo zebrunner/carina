@@ -397,9 +397,9 @@ public class ExtendedWebElement
 	 * 
 	 * @return element clickability status.
 	 */
-	public boolean isElementClickable()
+	public boolean isClickable()
 	{
-		return isElementClickable(EXPLICIT_TIMEOUT);
+		return isClickable(EXPLICIT_TIMEOUT);
 	}
 	
 	/**
@@ -409,7 +409,7 @@ public class ExtendedWebElement
 	 *            - timeout.
 	 * @return element clickability status.
 	 */
-	public boolean isElementClickable(long timeout)
+	public boolean isClickable(long timeout)
 	{
 		boolean result;
 		if (timeout<=0) {
