@@ -393,6 +393,63 @@ public class ExtendedWebElement
 	}
 	
 	/**
+	 * Checks that element clickable.
+	 * 
+	 * @return element clickability status.
+	 */
+	public boolean isElementClickable()
+	{
+		return isElementClickable(EXPLICIT_TIMEOUT);
+	}
+	
+	/**
+	 * Check that element clickable within specified timeout.
+	 * 
+	 * @param timeout
+	 *            - timeout.
+	 * @return element clickability status.
+	 */
+	public boolean isElementClickable(long timeout)
+	{
+		boolean result;
+		if (timeout<=0) {
+			LOGGER.warn("Timeout should be bigger than 0.");
+			timeout = 1;
+		}
+
+		final WebDriver drv = getDriver();
+		setImplicitTimeout(1);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try
+		{
+			wait.until(new ExpectedCondition<Boolean>()
+			{
+				public Boolean apply(WebDriver drv)
+				{
+					boolean res = false;
+					
+					if(element != null) {
+						res = element.isDisplayed() && element.isEnabled();
+					}
+					
+					if (!res) {
+						res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed() && drv.findElement(by).isEnabled();
+					}
+					return res;
+				}
+			});
+			result = true;
+		}
+		catch (Exception e)
+		{
+			LOGGER.debug(e.getMessage(), e.getCause());
+			result = false;
+		}
+		setImplicitTimeout();
+		return result;
+	}
+	
+	/**
 	 * Check that element not present within specified timeout.
 	 * 
 	 * @param timeout
