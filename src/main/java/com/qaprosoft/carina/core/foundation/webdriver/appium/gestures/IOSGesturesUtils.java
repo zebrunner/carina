@@ -17,15 +17,15 @@ public final class IOSGesturesUtils extends IGesturesUtils {
 
     public static void swipeToBottom() {
         Dimension size = DriverPool.getDriver().manage().window().getSize();
-        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, size.height)
-                .waitAction(2000).moveTo(0, -size.height + 100).release();
+        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.7))
+                .waitAction(2000).moveTo(0, (int) (-size.height * 0.5)).release().perform();
         swipe.perform();
     }
 
     public static void swipeToTop() {
         Dimension size = DriverPool.getDriver().manage().window().getSize();
-        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, size.height)
-                .waitAction(2000).moveTo(0, -size.height + 100).release();
+        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.2))
+                .waitAction(2000).moveTo(0, (int) (size.height * 0.7)).release();
         swipe.perform();
     }
 
