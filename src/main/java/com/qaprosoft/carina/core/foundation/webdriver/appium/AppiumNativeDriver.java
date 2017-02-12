@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Deprecated
-public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScreen, Rotatable {
+public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScreen, Rotatable
+{
 
 	protected static final Logger LOGGER = Logger.getLogger(AppiumNativeDriver.class);
 
@@ -32,56 +33,63 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 
 	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
-	protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);	
-	
+	protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
+
 	protected static Wait<WebDriver> wait;
-	
-    private RemoteTouchScreen touch;
 
-/*    // for resolving IllegalArgumentException during using Augmenter for taking screenshots
-    public AppiumNativeDriver() {
-    }
-*/
-    public AppiumNativeDriver(URL remoteAddress, Capabilities desiredCapabilities) {
-        super(remoteAddress, desiredCapabilities);
-        touch = new RemoteTouchScreen(getExecuteMethod());
-    }
+	private RemoteTouchScreen touch;
 
-    @Override
-    public TouchScreen getTouch() {
-        return touch;
-    }
+	/*
+	 * // for resolving IllegalArgumentException during using Augmenter for taking screenshots public
+	 * AppiumNativeDriver() { }
+	 */
+	public AppiumNativeDriver(URL remoteAddress, Capabilities desiredCapabilities)
+	{
+		super(remoteAddress, desiredCapabilities);
+		touch = new RemoteTouchScreen(getExecuteMethod());
+	}
 
-    @Override
-    public void rotate(ScreenOrientation orientation) {
-        execute(DriverCommand.SET_SCREEN_ORIENTATION, ImmutableMap.of("orientation", orientation));
-    }
+	@Override
+	public TouchScreen getTouch()
+	{
+		return touch;
+	}
 
-    @Override
-    public ScreenOrientation getOrientation() {
-        return ScreenOrientation.valueOf(
-                (String) execute(DriverCommand.GET_SCREEN_ORIENTATION).getValue());
-    }
-    
-    @Override
-    public Response execute(String driverCommand, Map<String, ?> parameters) {
-      return super.execute(driverCommand, parameters);
-    }
+	@Override
+	public void rotate(ScreenOrientation orientation)
+	{
+		execute(DriverCommand.SET_SCREEN_ORIENTATION, ImmutableMap.of("orientation", orientation));
+	}
 
-    @Override
-    protected Response execute(String command) {
-      return execute(command, ImmutableMap.<String, Object>of());
-    }
-    
-    
-	public ExtendedWebElement findElementByIosUIAutomation(String using) {
+	@Override
+	public ScreenOrientation getOrientation()
+	{
+		return ScreenOrientation.valueOf(
+				(String) execute(DriverCommand.GET_SCREEN_ORIENTATION).getValue());
+	}
+
+	@Override
+	public Response execute(String driverCommand, Map<String, ?> parameters)
+	{
+		return super.execute(driverCommand, parameters);
+	}
+
+	@Override
+	protected Response execute(String command)
+	{
+		return execute(command, ImmutableMap.<String, Object> of());
+	}
+
+	public ExtendedWebElement findElementByIosUIAutomation(String using)
+	{
 		return findElementByIosUIAutomation(using, "extendedWebElement");
 	}
-	
-	public ExtendedWebElement findElementByIosUIAutomation(String using, String name) {
+
+	public ExtendedWebElement findElementByIosUIAutomation(String using, String name)
+	{
 		return findElementByIosUIAutomation(using, name, EXPLICIT_TIMEOUT);
-	}		
-	
+	}
+
 	public ExtendedWebElement findElementByIosUIAutomation(final String using, String name, long timeout)
 	{
 		ExtendedWebElement element;
@@ -96,11 +104,10 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 					return !findElements("-ios uiautomation", using).isEmpty();
 				}
 			});
-			
+
 			element = new ExtendedWebElement(findElement("-ios uiautomation", using), name);
 			LOGGER.info(Messager.ELEMENT_FOUND.info(name));
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			element = null;
 			LOGGER.info(Messager.ELEMENT_NOT_FOUND.error(name));
@@ -109,18 +116,18 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 		}
 		manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return element;
-	}	
-	
+	}
 
-	public List<ExtendedWebElement> findElementsByIosUIAutomation(String using) {
+	public List<ExtendedWebElement> findElementsByIosUIAutomation(String using)
+	{
 		return findElementsByIosUIAutomation(using, EXPLICIT_TIMEOUT);
 	}
-	
+
 	public List<ExtendedWebElement> findElementsByIosUIAutomation(final String using, long timeout)
 	{
-		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement> ();
-		List<WebElement> webElements = new ArrayList<WebElement> ();
-		
+		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
+		List<WebElement> webElements = new ArrayList<WebElement>();
+
 		manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		wait = new WebDriverWait(this, timeout, RETRY_TIME);
 		try
@@ -133,25 +140,25 @@ public class AppiumNativeDriver extends RemoteWebDriver implements HasTouchScree
 				}
 			});
 			webElements = findElements("-ios uiautomation", using);
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
-			//do nothing
+			// do nothing
 		}
-		
-		for (WebElement element : webElements) {
+
+		for (WebElement element : webElements)
+		{
 			String name = "undefined";
-			try {
+			try
+			{
 				name = element.getText();
-			} catch (Exception e) {/* do nothing*/}
-			
+			} catch (Exception e)
+			{
+				/* do nothing */}
+
 			extendedWebElements.add(new ExtendedWebElement(element, name));
-		}		
+		}
 		manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 		return extendedWebElements;
-	}		
-	
-	
-	
-	
+	}
+
 }
