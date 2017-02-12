@@ -306,7 +306,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getTestNameByThread();
 		// String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);
-		int maxCount = RetryAnalyzer.getMaxRetryCountForTest(result);
+		int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
 
 		IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
