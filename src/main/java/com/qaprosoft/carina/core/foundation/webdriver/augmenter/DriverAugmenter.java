@@ -5,14 +5,17 @@ import org.openqa.selenium.remote.Augmentable;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class DriverAugmenter extends Augmenter {
+public class DriverAugmenter extends Augmenter
+{
 
-	public DriverAugmenter() {
+	public DriverAugmenter()
+	{
 		super();
 	}
 
 	@Override
-	protected RemoteWebDriver extractRemoteWebDriver(WebDriver driver) {
+	protected RemoteWebDriver extractRemoteWebDriver(WebDriver driver)
+	{
 		if (driver.getClass().isAnnotationPresent(Augmentable.class)
 				|| driver
 						.getClass()
@@ -23,9 +26,11 @@ public class DriverAugmenter extends Augmenter {
 						.getClass()
 						.getName()
 						.startsWith(
-								"com.qaprosoft.carina.core.foundation.webdriver")) {
+								"com.qaprosoft.carina.core.foundation.webdriver"))
+		{
 			return (RemoteWebDriver) driver;
-		} else {
+		} else
+		{
 			return null;
 		}
 	}
