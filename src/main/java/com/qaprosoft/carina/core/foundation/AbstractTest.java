@@ -183,12 +183,6 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 		
 		updateS3AppPath();
-		
-		// Temporary workaround for email list provided from Carina configuration
-		if(!StringUtils.isEmpty(Configuration.get(Parameter.EMAIL_LIST)))
-		{
-			System.setProperty("zafira_report_emails", Configuration.get(Parameter.EMAIL_LIST));
-		}
 	}
 
 	@BeforeClass(alwaysRun = true)
