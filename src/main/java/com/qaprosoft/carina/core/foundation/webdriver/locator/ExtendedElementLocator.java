@@ -15,9 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -30,6 +27,10 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
+
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -83,9 +84,9 @@ public class ExtendedElementLocator implements ElementLocator
 		if (!isPredicate) { 
 			element = searchContext.findElement(by);
 		} else {
-			WebDriver drv = DriverPool.getDriverByThread();
+			WebDriver drv = DriverPool.getDriver();
 			if (drv instanceof IOSDriver) {
-				element = ((IOSDriver) drv).findElementByIosUIAutomation(getLocator(by));	
+				element = drv.findElement(MobileBy.iOSNsPredicateString(getLocator(by)));
 			} else if (drv instanceof AndroidDriver) {
 				element = ((AndroidDriver) drv).findElementByAndroidUIAutomator(getLocator(by));
 			} else {
@@ -114,9 +115,9 @@ public class ExtendedElementLocator implements ElementLocator
 		if (!isPredicate) {
 			elements = searchContext.findElements(by);
 		}  else {
-			WebDriver drv = DriverPool.getDriverByThread();
+			WebDriver drv = DriverPool.getDriver();
 			if (drv instanceof IOSDriver) {
-				elements = ((IOSDriver) drv).findElementsByIosUIAutomation(getLocator(by));	
+				elements = drv.findElements(MobileBy.iOSNsPredicateString(getLocator(by)));	
 			} else if (drv instanceof AndroidDriver) {
 				elements = ((AndroidDriver) drv).findElementsByAndroidUIAutomator(getLocator(by));
 			} else {
