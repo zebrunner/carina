@@ -1,13 +1,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
@@ -18,9 +11,16 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobil
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileWebCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.IOSElement;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MobileFactory extends AbstractFactory {
 
@@ -45,9 +45,9 @@ public class MobileFactory extends AbstractFactory {
                 driver = new RemoteWebDriver(new URL(selenium), capabilities);
             } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE) || driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
                 if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID))
-                    driver = new AndroidDriver(new URL(selenium), capabilities);
+                    driver = new AndroidDriver<AndroidElement>(new URL(selenium), capabilities);
                 else if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
-                    driver = new IOSDriver(new URL(selenium), capabilities);
+                    driver = new IOSDriver<IOSElement>(new URL(selenium), capabilities);
                 }
             } else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 driver = new RemoteWebDriver(new URL(selenium), capabilities);
