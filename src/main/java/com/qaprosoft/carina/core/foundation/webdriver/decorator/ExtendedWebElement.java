@@ -33,6 +33,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
@@ -377,63 +378,6 @@ public class ExtendedWebElement
 					
 					if (!res) {
 						res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
-					}
-					return res;
-				}
-			});
-			result = true;
-		}
-		catch (Exception e)
-		{
-			LOGGER.debug(e.getMessage(), e.getCause());
-			result = false;
-		}
-		setImplicitTimeout();
-		return result;
-	}
-	
-	/**
-	 * Checks that element clickable.
-	 * 
-	 * @return element clickability status.
-	 */
-	public boolean isClickable()
-	{
-		return isClickable(EXPLICIT_TIMEOUT);
-	}
-	
-	/**
-	 * Check that element clickable within specified timeout.
-	 * 
-	 * @param timeout
-	 *            - timeout.
-	 * @return element clickability status.
-	 */
-	public boolean isClickable(long timeout)
-	{
-		boolean result;
-		if (timeout<=0) {
-			LOGGER.warn("Timeout should be bigger than 0.");
-			timeout = 1;
-		}
-
-		final WebDriver drv = getDriver();
-		setImplicitTimeout(1);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver drv)
-				{
-					boolean res = false;
-					
-					if(element != null) {
-						res = element.isDisplayed() && element.isEnabled();
-					}
-					
-					if (!res) {
-						res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed() && drv.findElement(by).isEnabled();
 					}
 					return res;
 				}
@@ -1386,7 +1330,51 @@ public class ExtendedWebElement
 			LOGGER.warn("Return standard element not presence method");
 			return !element.isElementPresent();
 		}
-
 	}
+	
+	/**
+	 * Checks that element clickable.
+	 * 
+	 * @return element clickability status.
+	 */
+	public boolean isClickable()
+	{
+		return isClickable(EXPLICIT_TIMEOUT);
+	}
+	
+	/**
+	 * Check that element clickable within specified timeout.
+	 * 
+	 * @param timeout
+	 *            - timeout.
+	 * @return element clickability status.
+	0 */
+	public boolean isClickable(long timeout)
+	{
+		final ExtendedWebElement element = this;
 
+		LOGGER.info(String.format("Checking element %s clickability.", element.getName()));
+
+		Wait<WebDriver> wait =
+				new FluentWait<WebDriver>(getDriver())
+				.withTimeout(timeout, TimeUnit.SECONDS)
+				.pollingEvery(1, TimeUnit.SECONDS)
+				.ignoring(NoSuchElementException.class);
+		try {
+			return wait.until(new ExpectedCondition<Boolean>() {
+				ExpectedCondition<WebElement> expCondition = ExpectedConditions.elementToBeClickable(element.getBy());
+				
+				public Boolean apply(WebDriver driver) {
+					boolean result = new ExtendedWebElement(((WebElement) expCondition.apply(driver)), "elementToClick").isElementPresent();
+					if (!result) {
+						LOGGER.info(String.format("Element '%s' not found.", element.getNameWithLocator()));
+					}
+					return result;
+				}
+			});
+		} catch (Exception e) {
+			LOGGER.error("Error: " + e.getMessage(), e.getCause());
+			return !element.isElementPresent();
+		}
+	}
 }
