@@ -33,6 +33,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
@@ -47,6 +48,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -1329,7 +1331,31 @@ public class ExtendedWebElement
 			LOGGER.warn("Return standard element not presence method");
 			return !element.isElementPresent();
 		}
-
 	}
+	
+	/**
+	 * Checks that element clickable.
+	 * 
+	 * @return element clickability status.
+	 */
+	public boolean isClickable()
+	{
+		return isClickable(EXPLICIT_TIMEOUT);
+	}
+	
+	/**
+	 * Check that element clickable within specified timeout.
+	 * 
+	 * @param timeout
+	 *            - timeout.
+	 * @return element clickability status.
+	0 */
+	public boolean isClickable(long timeout)
+	{
+		final ExtendedWebElement element = this;
 
+		LOGGER.info(String.format("Checking element %s clickability.", element.getName()));
+
+		return new DriverHelper().waitForElementToBeClickable(element, timeout);
+	}
 }

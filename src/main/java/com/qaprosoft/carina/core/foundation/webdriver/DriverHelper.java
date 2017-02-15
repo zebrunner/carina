@@ -146,7 +146,7 @@ public class DriverHelper {
      * @param waitPeriod long in seconds.
      * @return true if element become clickable
      */
-    protected boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
+    public boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
      return  waitForElementToBeClickable(element,(int)waitPeriod);
     }
 	/**
@@ -158,7 +158,7 @@ public class DriverHelper {
 	 * @param waitPeriod int in seconds.
      * @return true if element become clickable
 	 */
-	protected boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
+	public boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
 		final WebDriver drv = getDriver();
 		By locator = element.getBy();
 		boolean res = true;
