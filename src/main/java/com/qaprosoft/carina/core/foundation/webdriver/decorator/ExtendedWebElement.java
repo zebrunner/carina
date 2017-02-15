@@ -48,6 +48,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -1355,26 +1356,6 @@ public class ExtendedWebElement
 
 		LOGGER.info(String.format("Checking element %s clickability.", element.getName()));
 
-		Wait<WebDriver> wait =
-				new FluentWait<WebDriver>(getDriver())
-				.withTimeout(timeout, TimeUnit.SECONDS)
-				.pollingEvery(1, TimeUnit.SECONDS)
-				.ignoring(NoSuchElementException.class);
-		try {
-			return wait.until(new ExpectedCondition<Boolean>() {
-				ExpectedCondition<WebElement> expCondition = ExpectedConditions.elementToBeClickable(element.getBy());
-				
-				public Boolean apply(WebDriver driver) {
-					boolean result = new ExtendedWebElement(((WebElement) expCondition.apply(driver)), "elementToClick").isElementPresent();
-					if (!result) {
-						LOGGER.info(String.format("Element '%s' not found.", element.getNameWithLocator()));
-					}
-					return result;
-				}
-			});
-		} catch (Exception e) {
-			LOGGER.error("Error: " + e.getMessage(), e.getCause());
-			return !element.isElementPresent();
-		}
+		return new DriverHelper().waitForElementToBeClickable(element, timeout);
 	}
 }
