@@ -60,7 +60,8 @@ public class ZafiraConfigurator implements IConfigurator
 	{
 		ArgumentType arg = new ArgumentType();
 		arg.setKey(key);
-		arg.setValue(value);
+		//populate valid null values for all arguments
+		arg.setValue("NULL".equalsIgnoreCase(value) ? null : value);
 		arg.setUnique(uniqueKeys.contains(key));
 		return arg;
 	}
