@@ -183,7 +183,6 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 		
 		updateS3AppPath();
-		
 	}
 
 	@BeforeClass(alwaysRun = true)
