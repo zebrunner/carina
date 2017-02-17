@@ -38,6 +38,8 @@ public class APIClient
 	 * Set User
 	 *
 	 * Sets the user used for authenticating the API requests.
+	 * 
+	 * @param user String
 	 */
 
 	public void setUser(String user)
@@ -49,6 +51,8 @@ public class APIClient
 	 * Set Password
 	 *
 	 * Sets the password used for authenticating the API requests.
+	 * 
+	 * @param password String
 	 */
 
 	public void setPassword(String password)
@@ -71,6 +75,13 @@ public class APIClient
 	 * either be an instance of JSONObject or JSONArray (depending on the
 	 * API method). In most cases, this returns a JSONObject instance which
 	 * is basically the same as java.util.Map.
+	 * 
+	 * @param uri String
+	 * 
+	 * @return Object
+	 * 
+	 * @throws IOException java.io.IOException
+	 * @throws APIException com.qaprosoft.carina.core.foundation.report.testrail.core.APIException
 	 */
 	public Object sendGet(String uri)
 		throws IOException, APIException
@@ -95,6 +106,14 @@ public class APIClient
 	 * either be an instance of JSONObject or JSONArray (depending on the
 	 * API method). In most cases, this returns a JSONObject instance which
 	 * is basically the same as java.util.Map.	 
+	 * 
+	 * @param uri String
+	 * @param data Object
+	 * 
+	 * @return Object
+	 * 
+	 * @throws IOException java.io.IOException
+	 * @throws APIException com.qaprosoft.carina.core.foundation.report.testrail.core.APIException
 	 */
 	public Object sendPost(String uri, Object data)
 		throws IOException, APIException

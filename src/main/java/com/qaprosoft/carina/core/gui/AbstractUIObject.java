@@ -53,7 +53,6 @@ public abstract class AbstractUIObject extends DriverHelper
 	 * 
 	 * @param driver WebDriver instance to initialize UI Object fields using PageFactory
 	 * @param searchContext Window area that will be used for locating of internal elements
-	 * @param locale Locale
 	 */
 	public AbstractUIObject(WebDriver driver, SearchContext searchContext)
 	{

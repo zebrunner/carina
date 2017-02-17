@@ -298,8 +298,7 @@ public class DevicePool
 
 	/**
 	 * Check if system is distributed (devices are connected to different servers)
-	 * 
-	 * @return
+	 * @return boolean
 	 */
 	public static boolean isSystemDistributed()
 	{
