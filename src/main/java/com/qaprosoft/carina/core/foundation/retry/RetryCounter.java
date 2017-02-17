@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Map that stores run count of tests, used in {@link AbtractTestListener}.
+ * Map that stores run count of tests, used in {@link com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener}.
  * 
  * @author Alex Khursevich (hursevch@gmail.com)
  */

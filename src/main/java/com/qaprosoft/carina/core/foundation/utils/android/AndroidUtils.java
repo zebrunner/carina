@@ -245,6 +245,8 @@ public class AndroidUtils {
 	 * @param tries
 	 *            - how much tries should be spent for scrolling. If 0 - it will
 	 *            be quick check for not present element with scrolling try.
+	 * @param oldMethod
+	 *            boolean
 	 * @return boolean
 	 */
 	public static boolean universalScrollTo(String scrollToText,

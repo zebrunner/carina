@@ -265,7 +265,7 @@ public class DriverHelper {
 	 * contain at least one element during IMPLICIT_TIMEOUT
 	 *
 	 * @param elements
-	 *            List<ExtendedWebElement>...
+	 *            List&lt;ExtendedWebElement&gt;...
 	 * @return boolean
 	 */
 	public boolean allElementListsAreNotEmpty(List<ExtendedWebElement>... elements) {
@@ -278,7 +278,7 @@ public class DriverHelper {
 	 *
 	 * @param timeout long
 	 * @param elements
-	 *            List<ExtendedWebElement>...
+	 *            List&lt;ExtendedWebElement&gt;...
 	 * @return boolean return true only if All Element lists contain at least
 	 *         one element
 	 */
@@ -416,7 +416,7 @@ public class DriverHelper {
 	/**
 	 * Check that element with text present.
 	 * 
-	 * @param extWebElement
+	 * @param extWebElement to check if element with text is present
 	 * @param text
 	 *            of element to check.
 	 * @return element with text existence status.
@@ -428,10 +428,10 @@ public class DriverHelper {
 	/**
 	 * Check that element with text present.
 	 * 
-	 * @param extWebElement
+	 * @param extWebElement to check if element with text is present
 	 * @param text
 	 *            of element to check.
-	 * @param timeout
+	 * @param timeout Long
 	 * @return element with text existence status.
 	 */
 	public boolean isElementWithTextPresent(final ExtendedWebElement extWebElement, final String text, long timeout) {
@@ -441,15 +441,35 @@ public class DriverHelper {
 	/**
 	 * Check that element not present on page.
 	 * 
+	 * @param extWebElement to check if element is not present
+	 * 
 	 * @return element non-existence status.
 	 */
 	public boolean isElementNotPresent(final ExtendedWebElement extWebElement) {
 		return isElementNotPresent(extWebElement, EXPLICIT_TIMEOUT);
 	}
+	
+	/**
+	 * Check that element not present on page.
+	 * 
+	 * @param extWebElement to check if element is not present
+	 * @param timeout to wait
+	 * 
+	 * @return element non-existence status.
+	 */
 
 	public boolean isElementNotPresent(final ExtendedWebElement extWebElement, long timeout) {
 		return extWebElement.isElementNotPresent(timeout);
 	}
+	
+	/**
+	 * Check that element not present on page.
+	 * 
+	 * @param element to check if element is not present
+	 * @param controlInfo String
+	 * 
+	 * @return element non-existence status.
+	 */
 
 	public boolean isElementNotPresent(String controlInfo, final WebElement element) {
 		return isElementNotPresent(new ExtendedWebElement(element, controlInfo));
@@ -458,12 +478,22 @@ public class DriverHelper {
 	/**
 	 * Types text to specified element.
 	 * 
+	 * @param extWebElement to type text to
 	 * @param text
 	 *            to type.
 	 */
 	public void type(final ExtendedWebElement extWebElement, String text) {
 		extWebElement.type(text);
 	}
+	
+	/**
+	 * Types text to specified element.
+	 * 
+	 * @param control WebElement to type text to
+	 * @param controlInfo String
+	 * @param text to type
+	 *            
+	 */
 
 	public void type(String controlInfo, WebElement control, String text) {
 		type(new ExtendedWebElement(control, controlInfo), text);
@@ -471,23 +501,56 @@ public class DriverHelper {
 
 	/**
 	 * Clicks on element.
+	 * 
+	 * @param extendedWebElement to click on
 	 *
 	 */
 	public void click(final ExtendedWebElement extendedWebElement) {
 		click(extendedWebElement, EXPLICIT_TIMEOUT);
 	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param extendedWebElement to click on
+	 * @param timeout to wait
+	 *
+	 */
 
 	public void click(final ExtendedWebElement extendedWebElement, long timeout) {
 		extendedWebElement.click(timeout);
 	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param control WebElement to click on
+	 * @param controlInfo String
+	 *
+	 */
 
 	public void click(String controlInfo, WebElement control) {
 		click(new ExtendedWebElement(control, controlInfo));
 	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param elements ExtendedWebElements to click
+	 *
+	 */
 
 	public void clickAny(ExtendedWebElement... elements) {
 		clickAny(EXPLICIT_TIMEOUT, elements);
 	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param elements ExtendedWebElements to click
+	 * @param timeout to wait
+	 *
+	 */
 
 	public void clickAny(long timeout, ExtendedWebElement... elements) {
 		// Method which quickly looks for any element and click during timeout
@@ -507,10 +570,29 @@ public class DriverHelper {
 			throw new RuntimeException("Unable to click onto any elements from array: " + elements.toString());
 		}
 	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param extWebElement element to check presence and click
+	 * 
+	 * @return boolean
+	 *
+	 */
 
 	public boolean clickIfPresent(final ExtendedWebElement extWebElement) {
 		return clickIfPresent(extWebElement, EXPLICIT_TIMEOUT);
 	}
+	
+	/**
+	 * Clicks on element.
+	 * 
+	 * @param extWebElement element to check presence and click
+	 * @param timeout to wait
+	 * 
+	 * @return boolean
+	 *
+	 */
 
 	public boolean clickIfPresent(final ExtendedWebElement extWebElement, long timeout) {
 		return extWebElement.clickIfPresent(timeout);
@@ -518,12 +600,22 @@ public class DriverHelper {
 
 	/**
 	 * Double Clicks on element.
+	 * 
+	 * @param extendedWebElement to do dowble click
 	 *
 	 */
 
 	public void doubleClick(final ExtendedWebElement extendedWebElement) {
 		extendedWebElement.doubleClick();
 	}
+	
+	/**
+	 * Double Clicks on element.
+	 * 
+	 * @param controlInfo String
+	 * @param control WebElement
+	 *
+	 */
 
 	public void doubleClick(String controlInfo, WebElement control) {
 		doubleClick(new ExtendedWebElement(control, controlInfo));
@@ -531,6 +623,8 @@ public class DriverHelper {
 
 	/**
 	 * Mouse Right click to element.
+	 * 
+	 * @param extendedWebElement to do right click
 	 * 
 	 * @return boolean true if there is no errors.
 	 */
@@ -541,6 +635,8 @@ public class DriverHelper {
 	/**
 	 * Click Hidden Element. useful when element present in DOM but actually is
 	 * not visible. And can't be clicked by standard click.
+	 * 
+	 * @param extendedWebElement to click hidden element
 	 * 
 	 * @return boolean true if there is no errors.
 	 */
@@ -816,6 +912,11 @@ public class DriverHelper {
 
 	/**
 	 * Select multiple text values in specified select element.
+	 * 
+	 * @param extendedWebElement final ExtendedWebElement
+	 * @param values final String[]
+	 * 
+	 * @return boolean
 	 */
 	public boolean select(final ExtendedWebElement extendedWebElement, final String[] values) {
 		return extendedWebElement.select(values);
@@ -853,6 +954,9 @@ public class DriverHelper {
 
 	/**
 	 * Selects item by index in specified select element.
+	 * 
+	 * @param extendedWebElement final ExtendedWebElement
+	 * @param index to select by
 	 * 
 	 * @return true if item selected, otherwise false.
 	 */
@@ -896,6 +1000,9 @@ public class DriverHelper {
 
 	/**
 	 * Hovers over element.
+	 * 
+	 * @param extendedWebElement 
+	 * 				final ExtendedWebElement
 	 *
 	 */
 	public void hover(final ExtendedWebElement extendedWebElement) {
@@ -1199,6 +1306,8 @@ public class DriverHelper {
 	 * 
 	 * @param script
 	 *            The script to execute
+	 *            
+	 * @return Object
 	 */
 	public Object trigger(String script) {
 		return ((JavascriptExecutor) getDriver()).executeScript(script);
@@ -1275,7 +1384,7 @@ public class DriverHelper {
 	 * 
 	 * @param by
 	 *            Selenium By locator
-	 * @param timeout
+	 * @param timeout to wait
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
 	public ExtendedWebElement findExtendedWebElement(By by, long timeout) {

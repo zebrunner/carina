@@ -25,8 +25,8 @@ public class SpecializedScreenRecorder extends ScreenRecorder {
 	 * @param audioFormat Format
 	 * @param movieFolder File
 	 * @param name File
-	 * @throws IOException
-	 * @throws AWTException
+	 * @throws IOException java.io.IOException
+	 * @throws AWTException java.awt.AWTException
 	 */
 	public SpecializedScreenRecorder(GraphicsConfiguration cfg,
 			Rectangle captureArea, Format fileFormat, Format screenFormat,

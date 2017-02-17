@@ -103,6 +103,8 @@ public class SSLContextBuilder
 	/**
 	 * Create an SSLContext for an LC client with mutual TLS authentication enabled; returns null if the
 	 * tlsConfigDirectory was not found.
+	 * 
+	 * @return SSLContext
 	 */
 	public SSLContext createSSLContext()
 	{
@@ -136,6 +138,8 @@ public class SSLContextBuilder
 
 	/**
 	 * Creates the client's trustStore; returns null if the tlsConfigDirectory was not found.
+	 * 
+	 * @return KeyStore
 	 */
 	public KeyStore createTrustStore()
 	{
@@ -156,6 +160,8 @@ public class SSLContextBuilder
 
 	/**
 	 * Creates the client's keyStore with private and public keys; returns null if the tlsConfigDirectory was not found.
+	 * 
+	 * @return KeyStore
 	 */
 	public KeyStore createPrivateKeyStore()
 	{
