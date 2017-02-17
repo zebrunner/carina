@@ -48,8 +48,8 @@ public class MongoConnector
 	/**
 	 * Creates client for DB specified in properties.
 	 * @return MongoDB client
-	 * @throws NumberFormatException
-	 * @throws UnknownHostException
+	 * @throws NumberFormatException java.lang.NumberFormatException
+	 * @throws UnknownHostException java.net.UnknownHostException
 	 */
 	public static MongoClient createClient() throws NumberFormatException, UnknownHostException
 	{
@@ -66,8 +66,8 @@ public class MongoConnector
 	 * Creates client for DB specified by parameter.
 	 * @param database DB
 	 * @return MongoDB client
-	 * @throws NumberFormatException
-	 * @throws UnknownHostException
+	 * @throws NumberFormatException java.lang.NumberFormatException
+	 * @throws UnknownHostException java.net.UnknownHostException
 	 */
 	public static MongoClient createClient(String database) throws NumberFormatException, UnknownHostException
 	{
