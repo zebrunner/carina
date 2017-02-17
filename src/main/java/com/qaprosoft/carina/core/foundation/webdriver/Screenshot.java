@@ -219,14 +219,12 @@ public class Screenshot
 	/**
 	 * Resizes image according to specified dimensions.
 	 * 
-	 * @param bufImage
+	 * @param imageFile
 	 *            - image to resize.
 	 * @param width
 	 *            - new image width.
 	 * @param height
 	 *            - new image height.
-	 * @param path
-	 * 			  - image path
 	 */
 	public static void resizeImg(File imageFile, int width, int height)
 	{
