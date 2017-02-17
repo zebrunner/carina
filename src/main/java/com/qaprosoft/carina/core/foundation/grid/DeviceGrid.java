@@ -17,11 +17,10 @@ import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubException;
 import com.qaprosoft.carina.core.foundation.grid.GridRequest.Operation;
-import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.zafira.client.model.EventType;
-import com.qaprosoft.zafira.client.model.EventType.Type;
+import com.qaprosoft.zafira.models.dto.EventType;
+import com.qaprosoft.zafira.models.dto.EventType.Type;
 
 /**
  * DeviceGrid communicates over PubNub with grid queue and provides connect/diconnect device functionality.
@@ -68,8 +67,9 @@ public class DeviceGrid
 			punub.publish(CHANNEL, toJsonObject(rq), new Callback()
 			{
 			});
-			ZafiraIntegrator.logEvent(
-					new EventType(Type.REQUEST_DEVICE_CONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
+// 			TODO: implement event logging
+//			ZafiraIntegrator.logEvent(
+//					new EventType(Type.REQUEST_DEVICE_CONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 
 			new FluentWait<GridCallback>(gridCallback).withTimeout(GRID_DEVICE_TIMEOUT, TimeUnit.SECONDS)
 					.pollingEvery(10, TimeUnit.SECONDS).until(new Function<GridCallback, Boolean>()
@@ -82,8 +82,9 @@ public class DeviceGrid
 					});
 		} catch (TimeoutException e)
 		{
-			ZafiraIntegrator
-					.logEvent(new EventType(Type.DEVICE_WAIT_TIMEOUT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
+// 			TODO: implement event logging
+//			ZafiraIntegrator
+//					.logEvent(new EventType(Type.DEVICE_WAIT_TIMEOUT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 			LOGGER.error(e.getMessage(), e);
 		} catch (Exception e)
 		{
@@ -113,8 +114,9 @@ public class DeviceGrid
 			punub.publish(CHANNEL, toJsonObject(rq), new Callback()
 			{
 			});
-			ZafiraIntegrator.logEvent(
-					new EventType(Type.REQUEST_DEVICE_DISCONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
+// 			TODO: implement event logging
+//			ZafiraIntegrator.logEvent(
+//					new EventType(Type.REQUEST_DEVICE_DISCONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 		} catch (Exception e)
 		{
 			LOGGER.error(e.getMessage(), e);
@@ -171,7 +173,8 @@ public class DeviceGrid
 					if (rs.isConnected())
 					{
 						udid = rs.getSerial();
-						ZafiraIntegrator.markEventReceived(new EventType(Type.CONNECT_DEVICE, GRID_SESSION_ID, testId));
+// 						TODO: implement event logging
+//						ZafiraIntegrator.markEventReceived(new EventType(Type.CONNECT_DEVICE, GRID_SESSION_ID, testId));
 						LOGGER.info("Device found in grid by UDID: " + udid);
 					}
 				} catch (Exception e)
