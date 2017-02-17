@@ -37,7 +37,7 @@
 		<gson.version>2.2.2</gson.version>
 		<javax-mail.version>1.4</javax-mail.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
-		<commons-beanutils.version>1.8.3</commons-beanutils.version>
+		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 		<commons-codec.version>1.9</commons-codec.version>
 		<not-yet-commons-ssl.version>0.3.11</not-yet-commons-ssl.version>
 		<wsdl4j.version>1.6.2</wsdl4j.version>
@@ -59,13 +59,13 @@
 
 		<jira-client.version>0.5</jira-client.version>
 
-		<zafira-client.version>1.8.9</zafira-client.version>
+		<zafira-client.version>2.24-SNAPSHOT</zafira-client.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<json-simple.version>1.1</json-simple.version>
 
 		<reflections.version>0.9.9-RC1</reflections.version>
-		<appium.version>3.2.0</appium.version>
+		<appium.version>5.0.0-BETA2</appium.version>
 		<opencsv.version>1.7</opencsv.version>
 		<aws-s3-manager.version>1.2.10</aws-s3-manager.version>
 		<api-tools.version>1.0.8</api-tools.version>
