@@ -1,29 +1,23 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.SwipeElementDirection;
-import io.appium.java_client.TouchAction;
+import io.appium.java_client.*;
 import io.appium.java_client.android.AndroidDeviceActionShortcuts;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.*;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
+import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 public class AndroidUtils {
 
@@ -46,12 +40,12 @@ public class AndroidUtils {
 	/**
 	 * Useful Android utilities. For usage: import
 	 * com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
-	 * 
+	 *
 	 */
 
 	/**
 	 * execute Key Event
-	 * 
+	 *
 	 * @param keyCode int
 	 */
 
@@ -67,7 +61,7 @@ public class AndroidUtils {
 
 	/**
 	 * press Key Code
-	 * 
+	 *
 	 * @param keyCode int
 	 * @return boolean
 	 */
@@ -116,8 +110,8 @@ public class AndroidUtils {
 		if (!scrolled) {
 			try {
 				LOGGER.info("Another solution Scroll to '" + text + "'");
-				((AndroidDriver<?>) DriverPool.getDriverByThread())
-						.scrollTo(text);
+
+						scrollToText(text);
 				scrolled = true;
 			} catch (Exception e) {
 				LOGGER.warn("Exception occurred for scroll operation using Solution 2.  "
@@ -127,7 +121,7 @@ public class AndroidUtils {
 		}
 		return scrolled;
 	}
-	
+
 	/**
 	 * scrollTo specified text using findElementByAndroidUIAutomator solution
 	 *
@@ -161,7 +155,7 @@ public class AndroidUtils {
 		return scrolled;
 	}
 
-	
+
 	/**
 	 * scrollTo specified text
 	 *
@@ -174,7 +168,7 @@ public class AndroidUtils {
 
 		try {
 			LOGGER.info("Scroll to '" + text + "' using AndroidDriver default solution.");
-			((AndroidDriver<?>) DriverPool.getDriverByThread()).scrollTo(text);
+			scrollToText(text);
 			scrolled = true;
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred for scroll operation using Solution 2.  "
@@ -340,7 +334,7 @@ public class AndroidUtils {
 
 	/**
 	 * tap And Swipe specific ExtendedWebElement element to required direction
-	 * 
+	 *
 	 * @param elem
 	 *            ExtendedWebElement
 	 * @param direction
@@ -356,7 +350,7 @@ public class AndroidUtils {
 
 	/**
 	 * tap And Swipe specific element to left by default
-	 * 
+	 *
 	 * @param elem
 	 *            By
 	 * @return boolean
@@ -367,7 +361,7 @@ public class AndroidUtils {
 
 	/**
 	 * tap And Swipe specific element to required direction
-	 * 
+	 *
 	 * @param elem
 	 *            By
 	 * @param direction
@@ -406,7 +400,7 @@ public class AndroidUtils {
 
 	/**
 	 * swipe In Container
-	 * 
+	 *
 	 * @param elem
 	 *            - scrollable container
 	 * @param times
@@ -490,7 +484,7 @@ public class AndroidUtils {
 
 	/**
 	 * Quick solution for scrolling To Button or element.
-	 * 
+	 *
 	 * @param extendedWebElement ExtendedWebElement
 	 * @return boolean
 	 */
@@ -529,7 +523,7 @@ public class AndroidUtils {
 
 	/**
 	 * swipe Coordinates
-	 * 
+	 *
 	 * @param startX int
 	 * @param startY int
 	 * @param endX int
@@ -544,7 +538,7 @@ public class AndroidUtils {
 
 	/**
 	 * swipe Coordinates
-	 * 
+	 *
 	 * @param startX int
 	 * @param startY int
 	 * @param endX int
@@ -556,7 +550,7 @@ public class AndroidUtils {
 
 	/**
 	 * swipe In Container To required Element
-	 * 
+	 *
 	 * @param extendedWebElement
 	 *            - expected element
 	 * @param container
@@ -635,7 +629,7 @@ public class AndroidUtils {
 
 	/**
 	 * wait Until Element Not Present
-	 * 
+	 *
 	 * @param locator
 	 *            By
 	 * @param timeout
@@ -673,7 +667,7 @@ public class AndroidUtils {
 
 	/**
 	 * Tap and Hold (LongPress) on element in Android
-	 * 
+	 *
 	 * @param element
 	 *            ExtendedWebElement
 	 * @return boolean
@@ -690,4 +684,20 @@ public class AndroidUtils {
 		return false;
 	}
 
+
+    public static ExtendedWebElement scrollToText(String text) {
+        AndroidElement androidElement = ((AndroidDriver<AndroidElement>) getDriver()).findElement(MobileBy
+                .AndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
+
+
+        return new ExtendedWebElement(androidElement);
+    }
+
+    public static ExtendedWebElement scrollToText(String scrollViewId, String text) {
+        AndroidElement androidElement = ((AndroidDriver<AndroidElement>) getDriver()).findElement(MobileBy
+                .AndroidUIAutomator("new UiScrollable(new UiSelector().resourceId(\"" + scrollViewId + "\")).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
+
+
+        return new ExtendedWebElement(androidElement);
+    }
 }
