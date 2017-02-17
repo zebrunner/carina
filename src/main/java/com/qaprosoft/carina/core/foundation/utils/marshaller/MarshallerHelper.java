@@ -76,6 +76,8 @@ public class MarshallerHelper {
 	 * @param <T> Generic
 	 * @param source Source
 	 * @param resultClazz expected class
+	 * 
+	 * @return T &lt;T&gt;
 	 */
 	public static <T> T unmarshall(Source source, Class<T> resultClazz) {
 		return marshaller.unmarshall(source, resultClazz);
@@ -87,6 +89,8 @@ public class MarshallerHelper {
 	 * @param <T> Generic
 	 * @param file File
 	 * @param resultClazz expected class
+	 * 
+	 * @return T &lt;T&gt;
 	 */
 	public static <T> T unmarshall(File file, Class<T> resultClazz) {
 		return marshaller.unmarshall(file, resultClazz);
@@ -98,6 +102,8 @@ public class MarshallerHelper {
 	 * @param <T> Generic
 	 * @param is  Input Stream
 	 * @param resultClazz expected class
+	 * 
+	 * @return T &lt;T&gt;
 	 */
 	public static <T> T unmarshall(InputStream is, Class<T> resultClazz) {
 		return marshaller.unmarshall(is, resultClazz);

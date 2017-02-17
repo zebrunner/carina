@@ -157,8 +157,7 @@ public class L10N {
 	 * 
 	 * @param key
 	 *            - String
-	 * @param locale
-	 *            - Locale
+	 * 
 	 * @return String
 	 */
 	public static String getText(String key) {

@@ -124,7 +124,7 @@ public class DeviceGrid
 	/**
 	 * Starts heartbeat from the very first call, if test run aborted grid will automatically drop all connections
 	 * requested from session.
-	 * @throws PubnubException
+	 * @throws PubnubException com.pubnub.api.PubnubException
 	 */
 	public static void startHeartBeat() throws PubnubException
 	{
