@@ -60,7 +60,6 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
-import com.qaprosoft.carina.core.foundation.report.zafira.ZafiraIntegrator;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -75,7 +74,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.zafira.client.model.TestType;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -177,7 +175,6 @@ public abstract class AbstractTest // extends DriverHelper
 			LOGGER.debug("L10Nparser bundle is not initialized successfully!", e);
 		}
 
-		ZafiraIntegrator.startSuite(context, getSuiteFileName(context));
 		TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
 
 		if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
@@ -186,7 +183,6 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 		
 		updateS3AppPath();
-		
 	}
 
 	@BeforeClass(alwaysRun = true)
@@ -231,12 +227,6 @@ public abstract class AbstractTest // extends DriverHelper
 			Jira.updateAfterTest(result);
 
 
-			//zafira
-			TestType testType = TestNamingUtil.getZafiraTest();
-			if (testType != null && tickets.size() > 0) {
-				ZafiraIntegrator.registerWorkItems(testType.getId(), tickets);
-			}
-			
 			// Populate Spira Steps
 			Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), tickets);
 			Spira.clear();
@@ -271,7 +261,6 @@ public abstract class AbstractTest // extends DriverHelper
 
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
-		boolean finishedSuite = false;
 		try {
 			ReportContext.removeTempDir(); //clean temp artifacts directory
 			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
@@ -303,49 +292,32 @@ public abstract class AbstractTest // extends DriverHelper
 			// Update Spira
 			Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, startDate);
 			
-			ZafiraIntegrator.finishSuite();
-			finishedSuite = true;
-			
 			//generate and send email report by Zafira to test group of people
 			String emailList = Configuration.get(Parameter.EMAIL_LIST);
 			String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
 			String senderEmail = Configuration.get(Parameter.SENDER_EMAIL);
 			String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD); 
 			
-			String emailContent = null;
-			if (!Configuration.getBoolean(Parameter.TRACK_KNOWN_ISSUES))
-			{
-				emailContent = ZafiraIntegrator.sendEmailReport(emailList);
-				if ((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL))
-						&& !failureEmailList.isEmpty())
-				{
-					// send 2nd email to failure list only
-					ZafiraIntegrator.sendEmailReport(failureEmailList);
-				}
-			}
-			
-			if (emailContent == null) {
-				LOGGER.warn("Generating email using local functionality as it couldn't be done via zafira.");
-				// Generate and send email report using regular method
-				EmailReportGenerator report = new EmailReportGenerator(title, env,
-						Configuration.get(Parameter.APP_VERSION), deviceName,
-						browser, DateUtils.now(), DateUtils.timeDiff(startDate), getCIJobReference(),
-						EmailReportItemCollector.getTestResults(),
-						EmailReportItemCollector.getCreatedItems());
-	
-				emailContent = report.getEmailBody();
-			
+			LOGGER.warn("Generating email using local functionality as it couldn't be done via zafira.");
+			// Generate and send email report using regular method
+			EmailReportGenerator report = new EmailReportGenerator(title, env,
+					Configuration.get(Parameter.APP_VERSION), deviceName,
+					browser, DateUtils.now(), DateUtils.timeDiff(startDate), getCIJobReference(),
+					EmailReportItemCollector.getTestResults(),
+					EmailReportItemCollector.getCreatedItems());
+
+			String emailContent = report.getEmailBody();
+		
+			EmailManager.send(title, emailContent,
+					emailList,
+					senderEmail,
+					senderPassword);
+
+			if((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL)) && !failureEmailList.isEmpty()){
 				EmailManager.send(title, emailContent,
-						emailList,
+						failureEmailList,
 						senderEmail,
 						senderPassword);
-	
-				if((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL)) && !failureEmailList.isEmpty()){
-					EmailManager.send(title, emailContent,
-							failureEmailList,
-							senderEmail,
-							senderPassword);
-				}
 			}
 			
 			// Store emailable report under emailable-report.html
@@ -367,12 +339,6 @@ public abstract class AbstractTest // extends DriverHelper
 		} catch (Exception e) {
 			LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
 			e.printStackTrace();
-		}
-		finally
-		{
-			if (!finishedSuite) {
-				ZafiraIntegrator.finishSuite();
-			}
 		}
 	}
 
@@ -661,5 +627,4 @@ public abstract class AbstractTest // extends DriverHelper
 	protected void skipExecution(String message) {
 		throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
 	}
-
 }
