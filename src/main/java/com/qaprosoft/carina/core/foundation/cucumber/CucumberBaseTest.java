@@ -13,7 +13,7 @@ public class CucumberBaseTest extends CucumberRunner {
     /**
      * Check is it Cucumber Test or not.
      *
-     * @throws Throwable
+     * @throws Throwable java.lang.Throwable
      */
     @Before
     public void beforeScenario() throws Throwable {

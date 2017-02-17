@@ -34,6 +34,8 @@ public class TestLogCollector
 
 	/**
 	 * Clears messages in driver session context.
+	 * 
+	 * @param sessionId String
      */
 	public static void clearSessionLogs(String sessionId)
 	{
@@ -65,6 +67,8 @@ public class TestLogCollector
 
 	/**
 	 * Returns test log by webdriver session ID.
+	 * 
+	 * @param sessionId String
 	 * 
 	 * @return test logs
 	 */

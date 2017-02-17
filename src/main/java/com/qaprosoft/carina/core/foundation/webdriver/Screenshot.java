@@ -67,7 +67,7 @@ public class Screenshot
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
-	 * @param comment
+	 * @param comment String
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, String comment)
@@ -98,6 +98,7 @@ public class Screenshot
 	 * @param isTakeScreenshot
 	 *            perform actual capture or not
 	 * @param comment
+	 * 			  String
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)
