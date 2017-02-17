@@ -238,6 +238,8 @@ public abstract class AbstractApiMethod extends HttpClient
 	
 	/**
 	 * @deprecated use {@link #callAPI()} instead.  
+	 * 
+	 * @return String
 	 */
 	@Deprecated
 	public String call()

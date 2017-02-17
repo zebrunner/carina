@@ -57,15 +57,15 @@ public class DesktopVideoRecorder {
      * start Desktop Recording for full screen with default parameters
      * 
      * Requirements:
-     * ScreenRecoder supports “AVI” and “QuickTime” format for recording the video.
-     * For “AVI” format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while “QuickTime” format is supported by Apple’s QuickTime Player.
+     * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
+     * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
+     * while "QuickTime" format is supported by Apple’s QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      * 
      * Folder will be from ReportContext.getArtifactsFolder()
      * fileName will start from 'TestExecuting' and date with time in format: yyyyMMdd_HH_mm_ss
-     * @throws Exception
+     * @throws Exception java.lang.Exception
      */
     public void startDesktopScreenRecording() throws Exception {
         startDesktopScreenRecording(null, VideoFormat.AVI, false);
@@ -75,9 +75,9 @@ public class DesktopVideoRecorder {
      * start Desktop Recording for browser with default parameters
      * 
      * Requirements:
-     * ScreenRecoder supports “AVI” and “QuickTime” format for recording the video.
-     * For “AVI” format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while “QuickTime” format is supported by Apple’s QuickTime Player.
+     * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
+     * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
+     * while "QuickTime" format is supported by Apple’s QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      * 
@@ -86,7 +86,7 @@ public class DesktopVideoRecorder {
      *
      * @param using_driver WebDriver
 
-     * @throws Exception
+     * @throws Exception java.lang.Exception
      */
     public void startDesktopScreenRecording(WebDriver using_driver) throws Exception {
         startDesktopScreenRecording(using_driver, VideoFormat.AVI, false);
@@ -97,9 +97,9 @@ public class DesktopVideoRecorder {
      * start Desktop Recording with specified format and with audio for MOV format
      * 
      * Requirements:
-     * ScreenRecoder supports “AVI” and “QuickTime” format for recording the video.
-     * For “AVI” format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while “QuickTime” format is supported by Apple’s QuickTime Player.
+     * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
+     * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
+     * while "QuickTime" format is supported by Apple’s QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      * 
@@ -109,7 +109,7 @@ public class DesktopVideoRecorder {
      * @param using_driver WebDriver
      * @param videoFileFormat can be VideoFormat.AVI or VideoFormat.MOV
      * @param withSound if true will try to record sound. Works only on MOV and with a lot of noises.
-     * @throws Exception
+     * @throws Exception java.lang.Exception
      */
     public void startDesktopScreenRecording(WebDriver using_driver, VideoFormat videoFileFormat, boolean withSound) throws Exception {
         File file = ReportContext.getArtifactsFolder();
@@ -139,9 +139,9 @@ public class DesktopVideoRecorder {
      * if you have more than one monitor it will record just first one. 
      * 
      * Requirements:
-     * ScreenRecoder supports “AVI” and “QuickTime” format for recording the video.
-     * For “AVI” format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while “QuickTime” format is supported by Apple’s QuickTime Player.
+     * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
+     * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
+     * while "QuickTime" format is supported by Apple’s QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      *
@@ -150,7 +150,7 @@ public class DesktopVideoRecorder {
      * @param captureSize  Rectangle
      * @param videoFileFormat can be VideoFormat.AVI or VideoFormat.MOV
      * @param withSound if true will try to record sound. Works only on MOV and with a lot of noises.
-     * @throws Exception
+     * @throws Exception java.lang.Exception
      */
     public void startDesktopScreenRecording(String fileNameBase, File file, Rectangle captureSize, 
     		VideoFormat videoFileFormat, boolean withSound) throws Exception {
@@ -296,7 +296,7 @@ public class DesktopVideoRecorder {
     /**
      * stop Web Recording
      *
-     * @throws Exception
+     * @throws Exception java.lang.Exception
      */
     public void stopDesktopScreenRecording() throws Exception {
         this.screenRecorder.stop();
