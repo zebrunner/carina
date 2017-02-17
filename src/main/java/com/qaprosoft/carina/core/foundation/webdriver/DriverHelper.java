@@ -246,9 +246,11 @@ public class DriverHelper {
 		boolean present = true;
 		boolean ret = true;
 		int counts = 1;
+		timeout = timeout / counts;
+		if (timeout < 1) timeout = 1;
 		while (present && index++ < counts) {
 			for (int i = 0; i < elements.length; i++) {
-				present = isElementPresent(elements[i], timeout / counts);
+				present = isElementPresent(elements[i], timeout);
 				if (!present) {
 					LOGGER.error(elements[i].getNameWithLocator() + " is not present.");
 					ret=false;
@@ -283,12 +285,14 @@ public class DriverHelper {
 	public boolean allElementListsAreNotEmpty(long timeout, List<ExtendedWebElement>... elements) {
 		boolean ret;
 		int counts = 3;
+		timeout = timeout / counts;
+		if (timeout < 1) timeout = 1;
 		for (int i = 0; i < elements.length; i++) {
 			boolean present = false;
 			int index = 0;
 			while (!present && index++ < counts) {
 				try {
-					present = isElementPresent(elements[i].get(0), (timeout / counts));
+					present = isElementPresent(elements[i].get(0), timeout);
 				} catch (Exception e) {
 					present = false;
 				}
@@ -325,9 +329,11 @@ public class DriverHelper {
 		int index = 0;
 		boolean present = false;
 		int counts = 10;
+		timeout = timeout / counts;
+		if (timeout < 1) timeout = 1;
 		while (!present && index++ < counts) {
 			for (int i = 0; i < elements.length; i++) {
-				present = isElementPresent(elements[i], timeout / counts);
+				present = isElementPresent(elements[i], timeout);
 				if (present) {
 					LOGGER.debug(elements[i].getNameWithLocator() + " is present");
 					return true;
@@ -364,9 +370,11 @@ public class DriverHelper {
 		int index = 0;
 		boolean present = false;
 		int counts = 10;
+		timeout = timeout / counts;
+		if (timeout < 1) timeout = 1;
 		while (!present && index++ < counts) {
 			for (int i = 0; i < elements.length; i++) {
-				present = isElementPresent(elements[i], timeout / counts);
+				present = isElementPresent(elements[i], timeout);
 				if (present) {
 					LOGGER.debug(elements[i].getNameWithLocator() + " is present");
 					return elements[i];

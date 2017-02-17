@@ -40,12 +40,13 @@ public class TestArgsListener extends TestListenerAdapter
 				{
 					result.getParameters()[i] = ParameterGenerator.process(result.getParameters()[i].toString());
 				}
-				
+
 				if (result.getParameters()[i] instanceof Map)
 				{
 					@SuppressWarnings("unchecked")
 					Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
-					for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
+					for (Map.Entry<String, String> entry : dynamicAgrs.entrySet())
+					{
 						Object param = ParameterGenerator.process(entry.getValue());
 						if (param != null)
 							dynamicAgrs.put(entry.getKey(), param.toString());

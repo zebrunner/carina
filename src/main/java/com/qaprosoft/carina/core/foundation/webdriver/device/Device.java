@@ -6,9 +6,10 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 //Motorola|ANDROID|4.4|T01130FJAD|http://localhost:4725/wd/hub;Samsung_S4|ANDROID|4.4.2|5ece160b|http://localhost:4729/wd/hub;
-public class Device {
+public class Device
+{
 	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
-	
+
 	private String name;
 	private String type;
 
@@ -16,10 +17,11 @@ public class Device {
 	private String osVersion;
 	private String udid;
 	private String seleniumServer;
-	
+
 	private String testId;
-	
-	public Device() {
+
+	public Device()
+	{
 		this.name = null;
 		this.type = null;
 		this.os = null;
@@ -27,8 +29,9 @@ public class Device {
 		this.udid = null;
 		this.seleniumServer = null;
 	}
-	
-	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer) {
+
+	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer)
+	{
 		this.name = name;
 		this.type = type;
 		this.os = os;
@@ -37,15 +40,16 @@ public class Device {
 		this.seleniumServer = seleniumServer;
 	}
 
-	public Device(String args) {
-		//Samsung_S4|ANDROID|4.4.2|5ece160b|4729|4730|http://localhost:4725/wd/hub
+	public Device(String args)
+	{
+		// Samsung_S4|ANDROID|4.4.2|5ece160b|4729|4730|http://localhost:4725/wd/hub
 		LOGGER.debug("mobile_device_args: " + args);
 		args = args.replaceAll("&#124", "|");
 		LOGGER.debug("mobile_device_args: " + args);
-		
+
 		String[] params = args.split("\\|");
-		
-		//TODO: organize verification onto the params  count
+
+		// TODO: organize verification onto the params count
 		this.name = params[0];
 		LOGGER.debug("mobile_device_name: " + params[0]);
 		this.type = params[1];
@@ -55,83 +59,104 @@ public class Device {
 		this.udid = params[4];
 		this.seleniumServer = params[5];
 	}
-	
-	public String getName() {
+
+	public String getName()
+	{
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
 
-	public String getOs() {
+	public String getOs()
+	{
 		return os;
 	}
 
-	public void setOs(String os) {
+	public void setOs(String os)
+	{
 		this.os = os;
 	}
 
-	public String getOsVersion() {
+	public String getOsVersion()
+	{
 		return osVersion;
 	}
 
-	public void setOsVersion(String osVersion) {
+	public void setOsVersion(String osVersion)
+	{
 		this.osVersion = osVersion;
 	}
 
-	public String getUdid() {
+	public String getUdid()
+	{
 		return udid;
 	}
 
-	public void setUdid(String udid) {
+	public void setUdid(String udid)
+	{
 		this.udid = udid;
 	}
 
-	public String getSeleniumServer() {
+	public String getSeleniumServer()
+	{
 		return seleniumServer;
 	}
 
-	public void setSeleniumServer(String seleniumServer) {
+	public void setSeleniumServer(String seleniumServer)
+	{
 		this.seleniumServer = seleniumServer;
 	}
 
-	public boolean isPhone() {
+	public boolean isPhone()
+	{
 		return type.equalsIgnoreCase(SpecialKeywords.PHONE);
 	}
-	
-	public boolean isTablet() {
+
+	public boolean isTablet()
+	{
 		return type.equalsIgnoreCase(SpecialKeywords.TABLET);
 	}
-	
-	public boolean isTv() {
+
+	public boolean isTv()
+	{
 		return type.equalsIgnoreCase(SpecialKeywords.TV);
 	}
-	
-	public String getTestId() {
+
+	public String getTestId()
+	{
 		return testId;
 	}
 
-	public void setTestId(String testId) {
+	public void setTestId(String testId)
+	{
 		this.testId = testId;
 	}
 
-	public Type getType() {
-		if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-			if (isTablet()) {
+	public Type getType()
+	{
+		if (os.equalsIgnoreCase(SpecialKeywords.ANDROID))
+		{
+			if (isTablet())
+			{
 				return Type.ANDROID_TABLET;
 			}
-			if (isTv()) {
+			if (isTv())
+			{
 				return Type.ANDROID_TV;
 			}
 			return Type.ANDROID_PHONE;
-		} else if (os.equalsIgnoreCase(SpecialKeywords.IOS)) {
-			if (isTablet()) {
+		} 
+		else if (os.equalsIgnoreCase(SpecialKeywords.IOS))
+		{
+			if (isTablet())
+			{
 				return Type.IOS_TABLET;
 			}
 			return Type.IOS_PHONE;
 		}
-		throw new RuntimeException(
-				"Incorrect driver type. Please, check config file.");
+		throw new RuntimeException("Incorrect driver type. Please, check config file.");
 	}
 }
