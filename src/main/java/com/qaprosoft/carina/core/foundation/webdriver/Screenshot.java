@@ -69,7 +69,7 @@ public class Screenshot {
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
-	 * @param comment
+	 * @param comment String
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, String comment) {
@@ -100,6 +100,7 @@ public class Screenshot {
 	 * @param isTakeScreenshot
 	 *            perform actual capture or not
 	 * @param comment
+	 * 			  String
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment) {
@@ -209,12 +210,14 @@ public class Screenshot {
 	/**
 	 * Resizes image according to specified dimensions.
 	 * 
-	 * @param imageFile
+	 * @param bufImage
 	 *            - image to resize.
 	 * @param width
 	 *            - new image width.
 	 * @param height
 	 *            - new image height.
+	 * @param path
+	 * 			  - image path
 	 */
 	public static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
 		try {

@@ -186,6 +186,7 @@ public class ExtendedWebElement
 	/**
 	 * Clicks on element.
 	 *
+	 * @param timeout to wait
      */
 	public void click(long timeout)
 	{
@@ -900,6 +901,10 @@ public class ExtendedWebElement
 	
 	/**
 	 * Select multiple text values in specified select element.
+	 * 
+	 * @param values final String[]
+	 * 
+	 * @return boolean.
 	 */
 	public boolean select(final String[] values)
 	{
@@ -921,12 +926,12 @@ public class ExtendedWebElement
 	 * @return true if item selected, otherwise false.
 	 * 
 	 * Usage example:
-	 * BaseMatcher<String> match=new BaseMatcher<String>() {
-	 * 	@Override
+	 * BaseMatcher&lt;String&gt; match=new BaseMatcher&lt;String&gt;() {
+	 * 	{@literal @}Override
 	 * 	public boolean matches(Object actual) {
 	 * 		return actual.toString().contains(RequiredText);
 	 * 					}
-	 * 	@Override
+	 * 	{@literal @}Override
 	 * 		public void describeTo(Description description) {
 	 * 					}
 	 * 	};
@@ -1037,7 +1042,7 @@ public class ExtendedWebElement
 	/**
 	 * Selects item by index in specified select element.
 	 * 
-	 * @param index
+	 * @param index to select by
 	 * @return true if item selected, otherwise false.
 	 */
 	public boolean select(final int index)
@@ -1131,7 +1136,7 @@ public class ExtendedWebElement
 	 * Find Extended Web Element on page using By starting search from this object.
 	 * 
 	 * @param by Selenium By locator
-	 * @param timeout
+	 * @param timeout to wait
 	 * @return ExtendedWebElement if exists otherwise null.
 	 */
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
