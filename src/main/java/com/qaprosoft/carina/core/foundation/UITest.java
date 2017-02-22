@@ -28,10 +28,8 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
-import com.qaprosoft.carina.core.foundation.listeners.UITestListener;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
@@ -44,7 +42,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
-@Listeners({ UITestListener.class })
 public class UITest extends AbstractTest
 {
     private static final Logger LOGGER = Logger.getLogger(UITest.class);
