@@ -53,7 +53,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
-public abstract class AbstractTestListener extends TestArgsListener
+public class AbstractTestListener extends TestArgsListener
 {
 	private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 
