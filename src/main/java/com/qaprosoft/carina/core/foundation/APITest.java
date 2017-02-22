@@ -21,13 +21,10 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
-import com.qaprosoft.carina.core.foundation.listeners.APITestListener;
 
-@Listeners({ APITestListener.class })
 public abstract class APITest extends AbstractTest
 {
     protected APIMethodBuilder apiMethodBuilder;
