@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriver;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -47,10 +48,12 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
-public abstract class AbstractTestListener extends TestArgsListener
+public class AbstractTestListener extends TestArgsListener
 {
 	private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 
@@ -86,6 +89,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String errorMessage = getFailureReason(result);
+		
+		takeScreenshot(result, "TEST FAILED - " + errorMessage);
+		
 		String deviceName = getDeviceName();
 
 		// TODO: remove hard-coded text
@@ -115,6 +121,9 @@ public abstract class AbstractTestListener extends TestArgsListener
 		String test = TestNamingUtil.getCanonicalTestName(result);
 
 		String errorMessage = getFailureReason(result);
+		
+		takeScreenshot(result, "TEST FAILED - " + errorMessage);
+		
 		String deviceName = getDeviceName();
 
 		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
@@ -235,6 +244,8 @@ public abstract class AbstractTestListener extends TestArgsListener
 		// closeLogAppender(test);
 
 		String errorMessage = getFailureReason(result);
+		takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
+		
 		TestResultItem resultItem = createTestResult(result, TestResultType.FAIL, errorMessage,
 				result.getMethod().getDescription());
 		setConfigFailure(resultItem);
@@ -304,6 +315,7 @@ public abstract class AbstractTestListener extends TestArgsListener
 	public void onTestFailure(ITestResult result)
 	{
 		String test = TestNamingUtil.getTestNameByThread();
+		
 		// String test = TestNamingUtil.getCanonicalTestName(result);
 		int count = RetryCounter.getRunCount(test);
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
@@ -615,5 +627,28 @@ public abstract class AbstractTestListener extends TestArgsListener
 	protected void setConfigFailure(TestResultItem resultItem)
 	{
 		configFailures.set(resultItem);
+	}
+	
+	private String takeScreenshot(ITestResult result, String msg) {
+		String screenId = "";
+		WebDriver driver = DriverPool.getDriver();
+
+		if (driver != null) {
+			screenId = Screenshot.capture(driver, true, msg); // in case of failure
+															// make screenshot
+															// by default
+		}
+		// repeat the same actions for extraDriver if any
+		driver = DriverPool.getExtraDriverByThread();
+
+		if (driver != null) {
+			screenId = Screenshot.capture(driver, true, msg); // in case of failure
+															// make screenshot
+															// by default for
+															// extra driver as
+															// well
+		}
+
+		return screenId;
 	}
 }

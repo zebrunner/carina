@@ -43,6 +43,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import com.amazonaws.services.s3.model.S3Object;
@@ -50,6 +51,7 @@ import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
+import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -80,6 +82,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
  * 
  * @author Alex Khursevich
  */
+@Listeners({ AbstractTestListener.class })
 public abstract class AbstractTest // extends DriverHelper
 {
 	protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
