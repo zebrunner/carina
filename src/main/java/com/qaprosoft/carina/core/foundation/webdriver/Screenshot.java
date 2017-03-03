@@ -51,7 +51,7 @@ public class Screenshot
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -64,7 +64,7 @@ public class Screenshot
 	}
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -77,7 +77,7 @@ public class Screenshot
 	}
 	
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -90,7 +90,7 @@ public class Screenshot
 	}
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -114,6 +114,8 @@ public class Screenshot
 	 *            perform actual capture or not
 	 * @param comment
 	 * 			  String
+	 * @param fullSize
+	 * 			  Boolean
 	 * @return screenshot name.
 	 */
 	private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
