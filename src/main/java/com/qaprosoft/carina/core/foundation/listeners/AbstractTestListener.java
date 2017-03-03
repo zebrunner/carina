@@ -634,19 +634,16 @@ public class AbstractTestListener extends TestArgsListener
 		WebDriver driver = DriverPool.getDriver();
 
 		if (driver != null) {
-			screenId = Screenshot.capture(driver, true, msg); // in case of failure
-															// make screenshot
-															// by default
+			// in case of failure make screenshot by default
+			screenId = Screenshot.captureFailure(driver, msg); 
 		}
 		// repeat the same actions for extraDriver if any
 		driver = DriverPool.getExtraDriverByThread();
 
 		if (driver != null) {
-			screenId = Screenshot.capture(driver, true, msg); // in case of failure
-															// make screenshot
-															// by default for
-															// extra driver as
-															// well
+			// in case of failure make screenshot by default for extra driver as
+			// well
+			screenId = Screenshot.captureFailure(driver, msg); 
 		}
 
 		return screenId;
