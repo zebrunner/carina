@@ -77,6 +77,19 @@ public class Screenshot
 	}
 	
 	/**
+	 * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param comment String
+	 * @return screenshot name.
+	 */
+	public static String captureFullSize(WebDriver driver, String comment)
+	{
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, true);
+	}
+	
+	/**
 	 * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
