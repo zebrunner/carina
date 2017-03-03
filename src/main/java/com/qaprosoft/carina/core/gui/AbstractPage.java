@@ -113,7 +113,8 @@ public abstract class AbstractPage extends AbstractUIObject
 		pdfName = fileID + ".pdf";
 
 		String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
-		Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.capture(driver, true));
+		// TODO: test this implementation and change back to capture if necessary
+		Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.captureFailure(driver, ""));
 		Document document = null;
 		if (scaled)
 		{
