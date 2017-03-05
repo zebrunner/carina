@@ -50,9 +50,10 @@ public class DriverPoolExTest {
 	
 	@Test
 	public void suiteModeDriverTest() {
-		if (!DriverPoolEx.isDriverRegistered()) {
-			DriverPoolEx.registerDriver(mockDriverDefault);
-		}
+		Assert.assertFalse(DriverPoolEx.isDriverRegistered(), "Default driver is mistakenly registered!");
+		
+		DriverPoolEx.registerDriver(mockDriverDefault);
+
 		Assert.assertEquals(1,  DriverPoolEx.size(), "Number of registered driver is not valid!");
 		Assert.assertTrue(DriverPoolEx.isDriverRegistered(), "Default driver is not registered!");
 		Assert.assertTrue(DriverPoolEx.isDriverRegistered(DriverPoolEx.DEFAULT), "Default driver is not registered!");
