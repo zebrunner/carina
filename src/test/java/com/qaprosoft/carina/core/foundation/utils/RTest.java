@@ -10,17 +10,17 @@ import org.testng.annotations.Test;
 public class RTest 
 {
 	@Test
+	public void testDefaultValue()
+	{
+		Assert.assertEquals(R.CONFIG.get("browser"), "chrome");
+	}
+	
+	@Test(dependsOnMethods="testDefaultValue")
 	public void testOverrideBySystemParam()
 	{
 		final String BROWSER = "firefox";
 		R.CONFIG.put("browser", BROWSER);
 		Assert.assertEquals(R.CONFIG.get("browser"), BROWSER);
-	}
-	
-	@Test
-	public void testDefaultValue()
-	{
-		Assert.assertEquals(R.CONFIG.get("browser"), "chrome");
 	}
 	
 	@Test
