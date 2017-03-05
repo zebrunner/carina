@@ -75,6 +75,10 @@ public class DriverPoolEx {
 	public static boolean isDriverRegistered(String name) {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
+		
+		if (currentDrivers == null) {
+			return false;
+		}
 		return currentDrivers.containsKey(name);
 	}
 	
