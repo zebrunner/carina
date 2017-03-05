@@ -31,9 +31,10 @@ import net.lightbody.bmp.BrowserMobProxy;
 public class DriverPoolEx {
 	private static final Logger LOGGER = Logger.getLogger(DriverPoolEx.class);
 	private final static int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
-	private final static String DEFAULT = "default";
-
-	static WebDriver single_driver;
+	
+	protected final static String DEFAULT = "default";
+	protected static WebDriver single_driver;
+	
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
@@ -131,6 +132,10 @@ public class DriverPoolEx {
 			WebDriver drv = currentDrivers.get(name);
 			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
 			currentDrivers.remove(name);
+			
+			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
+				single_driver = null;
+			}
 
 			Assert.assertFalse(drivers.get(threadId).containsKey(name),
 					"Driver '" + name + "' was not deregistered from map for thread: " + threadId);
@@ -155,7 +160,7 @@ public class DriverPoolEx {
 		deregisterDriver(name);
 		registerDriver(driver, name);
 	}
-
+	
 	private static ConcurrentHashMap<String, WebDriver> getCurrentDrivers() {
 		Long threadId = Thread.currentThread().getId();
 
@@ -180,8 +185,7 @@ public class DriverPoolEx {
 		return java.util.Arrays.copyOf(threads, n);
 	}
 
-	// ------------------------- BOWSERMOB PROXY
-	// -----------------------------------------------------------
+	// ------------------------- BOWSERMOB PROXY ---------------------------------
 	public static void registerBrowserMobProxy(BrowserMobProxy proxy) {
 		proxies.put(Thread.currentThread().getId(), proxy);
 	}
