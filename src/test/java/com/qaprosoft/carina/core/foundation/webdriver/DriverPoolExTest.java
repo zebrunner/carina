@@ -14,6 +14,11 @@ public class DriverPoolExTest {
 
 	private final static String CUSTOM1 = "custom-1-driver";
 	private final static String CUSTOM2 = "custom-2-driver";
+	
+	
+	private final static String CLASS_MODE = "class_mode";
+	private final static String METHOD_MODE = "method_mode";
+	private final static String SUITE_MODE = "suite_mode";
 
 	@Mock
 	private WebDriver mockDriverDefault;
@@ -31,7 +36,7 @@ public class DriverPoolExTest {
 	@BeforeSuite(alwaysRun = true)
 	public void beforeSuite() {
 		R.CONFIG.put("driver_type", "desktop");
-		R.CONFIG.put("driver_mode", "class_mode");
+		R.CONFIG.put("driver_mode", SUITE_MODE);
 		R.CONFIG.put("max_driver_count", "2");
 		
 		R.CONFIG.put("thread_count", "1");
@@ -42,9 +47,30 @@ public class DriverPoolExTest {
 		this.mockDriverCustom1 = mock(WebDriver.class);
 		this.mockDriverCustom2 = mock(WebDriver.class);
 	}
-
+	
 	@Test
+	public void suiteModeDriverTest() {
+		if (!DriverPoolEx.isDriverRegistered()) {
+			DriverPoolEx.registerDriver(mockDriverDefault);
+		}
+		Assert.assertEquals(1,  DriverPoolEx.size(), "Number of registered driver is not valid!");
+		Assert.assertTrue(DriverPoolEx.isDriverRegistered(), "Default driver is not registered!");
+		Assert.assertTrue(DriverPoolEx.isDriverRegistered(DriverPoolEx.DEFAULT), "Default driver is not registered!");
+		
+		Assert.assertEquals(mockDriverDefault,  DriverPoolEx.single_driver, "Number of registered driver is not valid!");
+		Assert.assertEquals(mockDriverDefault,  DriverPoolEx.getDriver(), "Number of registered driver is not valid!");
+		
+		DriverPoolEx.deregisterDriver();
+		Assert.assertFalse(DriverPoolEx.isDriverRegistered(), "Default driver is not deregistered!");
+		Assert.assertEquals(0,  DriverPoolEx.size(), "Number of registered driver is not valid!");
+		
+		R.CONFIG.put("driver_mode", CLASS_MODE);
+	}
+
+	@Test(dependsOnMethods = "suiteModeDriverTest")
 	public void registerDefaultDriver() {
+		Assert.assertEquals(CLASS_MODE, R.CONFIG.get("driver_mode"), "driver_mode is invalid!");
+		
 		DriverPoolEx.registerDriver(mockDriverDefault);
 		Assert.assertEquals(1, DriverPoolEx.size(), "Number of registered driver is not valid!");
 		Assert.assertTrue(DriverPoolEx.isDriverRegistered(), "Default driver is not registered!");
