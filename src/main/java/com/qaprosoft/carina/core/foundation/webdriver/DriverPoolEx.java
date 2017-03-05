@@ -28,65 +28,63 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
-public class DriverPoolEx
-{
+public class DriverPoolEx {
 	private static final Logger LOGGER = Logger.getLogger(DriverPoolEx.class);
 	private final static int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 	private final static String DEFAULT = "default";
-	
+
 	static WebDriver single_driver;
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
-	
+
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
 
-	public static void registerDriver(WebDriver driver)
-	{
+	public static void registerDriver(WebDriver driver) {
 		registerDriver(driver, DEFAULT);
 	}
-	
-	public static void registerDriver(WebDriver driver, String name)
-	{
+
+	public static void registerDriver(WebDriver driver, String name) {
 		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
-			//init our single driver variable
+			// init our single driver variable
 			single_driver = driver;
 		}
-		
+
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
 		if (currentDrivers.size() == MAX_DRIVER_COUNT) {
-			// TODO: after moving driver creation to DriverPoolEx need to add such verification before driver start  
-			Assert.fail("Unable to register driver as you reached max number of drivers per thread: " + MAX_DRIVER_COUNT);
+			// TODO: after moving driver creation to DriverPoolEx need to add
+			// such verification before driver start
+			Assert.fail(
+					"Unable to register driver as you reached max number of drivers per thread: " + MAX_DRIVER_COUNT);
 		}
 		if (currentDrivers.containsKey(name)) {
 			Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
 		}
-		
-		currentDrivers.put(name,  driver);
-		Assert.assertTrue(drivers.get(threadId).containsKey(name), "Driver '" + name + "' was not registered in map for thread: " + threadId);
+
+		currentDrivers.put(name, driver);
+		Assert.assertTrue(drivers.get(threadId).containsKey(name),
+				"Driver '" + name + "' was not registered in map for thread: " + threadId);
 		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
 	}
 
 	public static boolean isDriverRegistered() {
 		return isDriverRegistered(DEFAULT);
 	}
-	
+
 	public static boolean isDriverRegistered(String name) {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		return currentDrivers.containsKey(name);
 	}
-	
-	public static WebDriver getDriver()
-	{
+
+	public static WebDriver getDriver() {
 		return getDriver(DEFAULT);
 	}
-	
-	public static WebDriver getDriver(String name)
-	{
+
+	public static WebDriver getDriver(String name) {
 		WebDriver drv = null;
 		DriverMode driverMode = Configuration.getDriverMode();
 		Long threadId = Thread.currentThread().getId();
-		
+
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
 
 		if (currentDrivers.containsKey(name)) {
@@ -94,7 +92,7 @@ public class DriverPoolEx
 			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
 		} else if (driverMode == DriverMode.SUITE_MODE) {
 			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
-			//init our single driver variable
+			// init our single driver variable
 			drv = single_driver;
 		} else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
 				&& Configuration.getInt(Parameter.THREAD_COUNT) == 1
@@ -113,43 +111,39 @@ public class DriverPoolEx
 		}
 		return drv;
 	}
-	
 
-	public static void deregisterDriver()
-	{
+	public static void deregisterDriver() {
 		deregisterDriver(DEFAULT);
 	}
-	
-	public static void deregisterDriver(String name)
-	{
+
+	public static void deregisterDriver(String name) {
 		long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
-		
+
 		if (currentDrivers.containsKey(name)) {
 			WebDriver drv = currentDrivers.get(name);
 			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
 			currentDrivers.remove(name);
-			
-			Assert.assertFalse(drivers.get(threadId).containsKey(name), "Driver '" + name + "' was not deregistered from map for thread: " + threadId);
+
+			Assert.assertFalse(drivers.get(threadId).containsKey(name),
+					"Driver '" + name + "' was not deregistered from map for thread: " + threadId);
 		} else {
 			Assert.fail("Unable to find '" + name + "' driver for deregistration!");
 		}
 	}
-	
-	public static void deregisterDrivers()
-	{
+
+	public static void deregisterDrivers() {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
-		
-		for(Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+
+		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			deregisterDriver(entry.getKey());
 		}
 	}
-	
-	
+
 	public static void replaceDriver(WebDriver driver) {
 		replaceDriver(driver, DEFAULT);
 	}
-	
+
 	public static void replaceDriver(WebDriver driver, String name) {
 		deregisterDriver(name);
 		registerDriver(driver, name);
@@ -157,37 +151,35 @@ public class DriverPoolEx
 
 	private static ConcurrentHashMap<String, WebDriver> getCurrentDrivers() {
 		Long threadId = Thread.currentThread().getId();
-		
+
 		if (drivers.get(threadId) == null) {
 			ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
 			drivers.put(threadId, currentDrivers);
 		}
 		return drivers.get(threadId);
 	}
-	
-	private static Thread[] getGroupThreads( final ThreadGroup group ) {
-	    if ( group == null )
-	        throw new NullPointerException( "Null thread group" );
-	    int nAlloc = group.activeCount( );
-	    int n = 0;
-	    Thread[] threads;
-	    do {
-	        nAlloc *= 2;
-	        threads = new Thread[ nAlloc ];
-	        n = group.enumerate( threads );
-	    } while ( n == nAlloc );
-	    return java.util.Arrays.copyOf( threads, n );
+
+	private static Thread[] getGroupThreads(final ThreadGroup group) {
+		if (group == null)
+			throw new NullPointerException("Null thread group");
+		int nAlloc = group.activeCount();
+		int n = 0;
+		Thread[] threads;
+		do {
+			nAlloc *= 2;
+			threads = new Thread[nAlloc];
+			n = group.enumerate(threads);
+		} while (n == nAlloc);
+		return java.util.Arrays.copyOf(threads, n);
 	}
 
-	
-	// ------------------------- BOWSERMOB PROXY -----------------------------------------------------------
-	public static void registerBrowserMobProxy(BrowserMobProxy proxy)
-	{
-		proxies.put(Thread.currentThread().getId(),  proxy);
+	// ------------------------- BOWSERMOB PROXY
+	// -----------------------------------------------------------
+	public static void registerBrowserMobProxy(BrowserMobProxy proxy) {
+		proxies.put(Thread.currentThread().getId(), proxy);
 	}
-	
-	public static BrowserMobProxy getBrowserMobProxy()
-	{
+
+	public static BrowserMobProxy getBrowserMobProxy() {
 		BrowserMobProxy proxy = null;
 		long threadId = Thread.currentThread().getId();
 		if (proxies.containsKey(threadId)) {
@@ -197,11 +189,10 @@ public class DriverPoolEx
 		}
 		return proxy;
 	}
-	
-	public static void deregisterBrowserMobProxy()
-	{
+
+	public static void deregisterBrowserMobProxy() {
 		long threadId = Thread.currentThread().getId();
-	
+
 		if (proxies.containsKey(threadId)) {
 			proxies.get(threadId).stop();
 			proxies.remove(threadId);
