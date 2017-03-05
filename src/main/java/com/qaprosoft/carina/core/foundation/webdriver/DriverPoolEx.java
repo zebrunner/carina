@@ -43,7 +43,8 @@ public class DriverPoolEx {
 	}
 
 	public static void registerDriver(WebDriver driver, String name) {
-		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
+		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
+			//replace single_driver only for default one!
 			// init our single driver variable
 			single_driver = driver;
 		}
@@ -75,6 +76,12 @@ public class DriverPoolEx {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		return currentDrivers.containsKey(name);
 	}
+	
+	public static int size() {
+		Long threadId = Thread.currentThread().getId();
+		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
+		return currentDrivers.size();
+	}
 
 	public static WebDriver getDriver() {
 		return getDriver(DEFAULT);
@@ -90,7 +97,7 @@ public class DriverPoolEx {
 		if (currentDrivers.containsKey(name)) {
 			drv = currentDrivers.get(name);
 			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
-		} else if (driverMode == DriverMode.SUITE_MODE) {
+		} else if (driverMode == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
 			// init our single driver variable
 			drv = single_driver;
