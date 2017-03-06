@@ -34,9 +34,9 @@ import net.lightbody.bmp.BrowserMobProxy;
 
 public class DriverPoolEx {
 	private static final Logger LOGGER = Logger.getLogger(DriverPoolEx.class);
-	private final static int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
+	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 	
-	public final static String DEFAULT = "default";
+	public static final String DEFAULT = "default";
 	protected static WebDriver single_driver;
 	
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
@@ -64,8 +64,6 @@ public class DriverPoolEx {
     			drv = DriverFactory.create(name, device);
     			registerDriver(drv, name);
     			
-    			//driver = drv;
-    			//setDriver(drv);
     			init = true;
     			// push custom device name for log4j default messages
     			if (device != null) {
@@ -83,7 +81,7 @@ public class DriverPoolEx {
     		}
     	}
     	
-    	if (init_throwable != null) {
+    	if (!init) {
     		throw new RuntimeException(init_throwable);
     	}
 
@@ -119,7 +117,7 @@ public class DriverPoolEx {
 
 
 	public static void quitDrivers() {
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			quitDriver(entry.getKey());
@@ -169,7 +167,7 @@ public class DriverPoolEx {
 		}
 
 		Long threadId = Thread.currentThread().getId();
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 		if (currentDrivers.size() == MAX_DRIVER_COUNT) {
 			// TODO: after moving driver creation to DriverPoolEx need to add
 			// such verification before driver start
@@ -220,7 +218,7 @@ public class DriverPoolEx {
 		DriverMode driverMode = Configuration.getDriverMode();
 		Long threadId = Thread.currentThread().getId();
 
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		if (currentDrivers.containsKey(name)) {
 			drv = currentDrivers.get(name);
@@ -253,7 +251,7 @@ public class DriverPoolEx {
 
 	protected static void deregisterDriver(String name) {
 		long threadId = Thread.currentThread().getId();
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		if (currentDrivers.containsKey(name)) {
 			WebDriver drv = currentDrivers.get(name);
@@ -272,7 +270,7 @@ public class DriverPoolEx {
 	}
 
 	protected static void deregisterDrivers() {
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			deregisterDriver(entry.getKey());
@@ -288,7 +286,7 @@ public class DriverPoolEx {
 		registerDriver(driver, name);
 	}
 	
-	private static ConcurrentHashMap<String, WebDriver> getCurrentDrivers() {
+	public static ConcurrentHashMap<String, WebDriver> getDrivers() {
 		Long threadId = Thread.currentThread().getId();
 
 		if (drivers.get(threadId) == null) {

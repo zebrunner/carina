@@ -17,7 +17,7 @@ public class DriverPoolExTest {
 	
 	
 	private final static String CLASS_MODE = "class_mode";
-	private final static String METHOD_MODE = "method_mode";
+	// private final static String METHOD_MODE = "method_mode";
 	private final static String SUITE_MODE = "suite_mode";
 
 	@Mock
