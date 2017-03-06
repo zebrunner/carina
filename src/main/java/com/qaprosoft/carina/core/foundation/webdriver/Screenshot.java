@@ -179,10 +179,12 @@ public class Screenshot
 				BufferedImage screen;
 
 				//Create screenshot
-				if(fullSize)
+				if(fullSize){
 					screen = takeFullScreenshot(driver, augmentedDriver);
-				else
+				}
+				else{
 					screen = takeVisibleScreenshot(driver, augmentedDriver);
+				}
 				
 				BufferedImage thumbScreen = screen;
 				
