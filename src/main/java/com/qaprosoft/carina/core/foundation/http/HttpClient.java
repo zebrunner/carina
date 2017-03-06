@@ -28,7 +28,7 @@ import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -90,7 +90,7 @@ public class HttpClient
 			R.CONFIG.put("proxy_port", port.toString());
 			R.CONFIG.put("proxy_protocols", "http");
 			
-			DriverPool.registerBrowserMobProxy(proxy);
+			DriverPoolEx.registerBrowserMobProxy(proxy);
 		}
 
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);

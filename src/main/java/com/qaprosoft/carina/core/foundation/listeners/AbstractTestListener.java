@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +50,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -631,24 +633,13 @@ public class AbstractTestListener extends TestArgsListener
 	
 	private String takeScreenshot(ITestResult result, String msg) {
 		String screenId = "";
-		WebDriver driver = DriverPool.getDriver();
-
-		if (driver != null) {
-			screenId = Screenshot.capture(driver, true, msg); // in case of failure
-															// make screenshot
-															// by default
+		
+		ConcurrentHashMap<String, WebDriver> drivers = DriverPoolEx.getDrivers(); 
+		
+		for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
+			String driverName = entry.getKey();
+			screenId = Screenshot.capture(entry.getValue(), true, driverName + ": " + msg); // in case of failure
 		}
-		// repeat the same actions for extraDriver if any
-		driver = DriverPool.getExtraDriverByThread();
-
-		if (driver != null) {
-			screenId = Screenshot.capture(driver, true, msg); // in case of failure
-															// make screenshot
-															// by default for
-															// extra driver as
-															// well
-		}
-
 		return screenId;
 	}
 }
