@@ -168,7 +168,7 @@ public class Screenshot
 				// Capture full page screenshot and resize
 				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
 				screenName = fileID + ".png";
-				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+				String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
 				WebDriver augmentedDriver = driver;
 				if (!driver.toString().contains("AppiumNativeDriver")) {
@@ -176,33 +176,33 @@ public class Screenshot
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				}
 				
-				BufferedImage fullScreen;
+				BufferedImage screen;
 
 				//Create screenshot
 				if(fullSize)
-					fullScreen = takeFullScreenshot(driver, augmentedDriver);
+					screen = takeFullScreenshot(driver, augmentedDriver);
 				else
-					fullScreen = takeVisibleScreenshot(driver, augmentedDriver);
+					screen = takeVisibleScreenshot(driver, augmentedDriver);
 				
-				BufferedImage thumbScreen = fullScreen;
+				BufferedImage thumbScreen = screen;
 				
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
 						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) 
 				{
-					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), fullScreenPath);
+					resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
 				}
 				
-				ImageIO.write(fullScreen, "PNG", new File(fullScreenPath));
+				ImageIO.write(screen, "PNG", new File(screenPath));
 
 				// Create screenshot thumbnail
-				String thumbScreenPath = fullScreenPath.replace(screenName, "/thumbnails/" + screenName);
+				String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
 				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
 				// Uploading screenshot to Amazon S3
-				uploadToAmazonS3(test, fullScreenPath, screenName, comment);
+				uploadToAmazonS3(test, screenPath, screenName, comment);
 
 				// add screenshot comment to collector
 				TestLogCollector.addScreenshotComment(screenName, comment);
