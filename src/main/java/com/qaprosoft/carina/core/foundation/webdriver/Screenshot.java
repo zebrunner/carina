@@ -46,25 +46,51 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
  * 
  * @author Alex Khursevich
  */
-@SuppressWarnings("deprecation")
 public class Screenshot
 {
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
 	 * @return screenshot name.
 	 */
+	@Deprecated
 	public static String capture(WebDriver driver)
 	{
 		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT));
 	}
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param comment String
+	 * @return screenshot name.
+	 */
+	public static String captureFailure(WebDriver driver, String comment)
+	{
+		return capture(driver, true, comment, true);
+	}
+	
+	/**
+	 * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param comment String
+	 * @return screenshot name.
+	 */
+	public static String captureFullSize(WebDriver driver, String comment)
+	{
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, true);
+	}
+	
+	/**
+	 * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -73,11 +99,11 @@ public class Screenshot
 	 */
 	public static String capture(WebDriver driver, String comment)
 	{
-		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment);
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false);
 	}
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -85,9 +111,10 @@ public class Screenshot
 	 *            perform actual capture or not
 	 * @return screenshot name.
 	 */
+	@Deprecated
 	public static String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
-		return capture(driver, isTakeScreenshot, "");
+		return capture(driver, isTakeScreenshot, "", false);
 
 	}
 
@@ -100,10 +127,15 @@ public class Screenshot
 	 *            perform actual capture or not
 	 * @param comment
 	 * 			  String
+	 * @param fullSize
+	 * 			  Boolean
 	 * @return screenshot name.
 	 */
-	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment) {
+	private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
 		String screenName = "";
+		
+		// TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
+		// For the rest of cases returned previous implementation
 
 		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
 			if (driver == null) {
@@ -223,7 +255,7 @@ public class Screenshot
 	 * @param path
 	 *            - path to screenshot file.
 	 */
-	public static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
+	private static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
 		try {
 			bufImage = Scalr.resize(bufImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
 					Scalr.OP_ANTIALIAS);
