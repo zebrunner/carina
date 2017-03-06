@@ -21,10 +21,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -173,25 +175,24 @@ public class Screenshot
 					// do not augment for Appium 1.x anymore
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				}
-
+				
 				BufferedImage fullScreen;
-				BufferedImage thumbScreen;
-				if (driver.getClass().toString().contains("java_client")) {
-					File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
-					fullScreen = ImageIO.read(screenshot);
-					thumbScreen = ImageIO.read(screenshot);
-				} else {
-					ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
-							.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
-					fullScreen = screenshot.getImage();
-					thumbScreen = screenshot.getImage();
-				}
 
+				//Create screenshot
+				if(fullSize)
+					fullScreen = takeFullScreenshot(driver, augmentedDriver);
+				else
+					fullScreen = takeVisibleScreenshot(driver, augmentedDriver);
+				
+				BufferedImage thumbScreen = fullScreen;
+				
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
-						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) 
+				{
 					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
 							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), fullScreenPath);
 				}
+				
 				ImageIO.write(fullScreen, "PNG", new File(fullScreenPath));
 
 				// Create screenshot thumbnail
@@ -266,5 +267,46 @@ public class Screenshot
 		} catch (Exception e) {
 			LOGGER.error("Image scaling problem!");
 		}
+	}
+	
+	/**
+	 * Makes fullsize screenshot using javascript (May not work properly with popups and active js-elements on the page)
+	 * 
+	 * @param driver
+	 *            - webDriver.
+	 * @param augmentedDriver
+	 *            - webDriver.
+	 * @exception IOException
+	 * 
+	 * @return screenshot image
+	 */
+	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException{
+		BufferedImage screenShot;
+		if (driver.getClass().toString().contains("java_client")) {
+			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
+			screenShot = ImageIO.read(screenshot);
+		} else {
+			ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
+					.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
+			screenShot = screenshot.getImage();
+		}
+		
+		return screenShot;
+	}
+	
+	/**
+	 * Makes screenshot of visible part of the page
+	 * 
+	 * @param driver
+	 *            - webDriver.
+	 * @param augmentedDriver
+	 *            - webDriver.
+	 * @exception IOException
+	 * 
+	 * @return screenshot image
+	 */
+	private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException{
+		BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+		return screenShot;
 	}
 }
