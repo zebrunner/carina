@@ -155,6 +155,14 @@ public class DriverPool {
     }
 
 	
+	public static void restartDriver() {
+		restartDriver(DEFAULT);
+	}
+	public static void restartDriver(String name) {
+		quitDriver(name);
+		createDriver(name);
+	}
+	
 	protected static void registerDriver(WebDriver driver) {
 		registerDriver(driver, DEFAULT);
 	}
