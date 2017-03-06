@@ -1,6 +1,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.appium.gestures;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
@@ -15,15 +15,15 @@ public final class AndroidGesturesUtils extends IGesturesUtils {
     }
 
     public static synchronized void swipeToBottom() {
-        Dimension size = DriverPoolEx.getDriver().manage().window().getSize();
-        TouchAction swipe = new TouchAction((AppiumDriver) DriverPoolEx.getDriver()).press(size.width / 2, (int) (size.height * 0.90))
+        Dimension size = DriverPool.getDriver().manage().window().getSize();
+        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.90))
                 .waitAction(2000).moveTo(0, (int) (size.height * 0.10)).release();
         swipe.perform();
     }
 
     public static synchronized void swipeToTop() {
-        Dimension size = DriverPoolEx.getDriver().manage().window().getSize();
-        TouchAction swipe = new TouchAction((AppiumDriver) DriverPoolEx.getDriver()).press(size.width / 2, (int) (size.height * 0.10))
+        Dimension size = DriverPool.getDriver().manage().window().getSize();
+        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.10))
                 .waitAction(2000).moveTo(0, (int) (size.height * 0.90)).release();
         swipe.perform();
     }
