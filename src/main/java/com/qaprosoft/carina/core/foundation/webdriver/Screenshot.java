@@ -179,22 +179,20 @@ public class Screenshot
 				BufferedImage screen;
 
 				//Create screenshot
-				if(fullSize){
+				if (fullSize) {
 					screen = takeFullScreenshot(driver, augmentedDriver);
-				}
-				else{
+				} else {
 					screen = takeVisibleScreenshot(driver, augmentedDriver);
 				}
-				
+
 				BufferedImage thumbScreen = screen;
-				
+
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
-						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) 
-				{
+						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
 					resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
 							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
 				}
-				
+
 				ImageIO.write(screen, "PNG", new File(screenPath));
 
 				// Create screenshot thumbnail
@@ -272,7 +270,8 @@ public class Screenshot
 	}
 	
 	/**
-	 * Makes fullsize screenshot using javascript (May not work properly with popups and active js-elements on the page)
+	 * Makes fullsize screenshot using javascript (May not work properly with
+	 * popups and active js-elements on the page)
 	 * 
 	 * @param driver
 	 *            - webDriver.
@@ -282,7 +281,7 @@ public class Screenshot
 	 * 
 	 * @return screenshot image
 	 */
-	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException{
+	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot;
 		if (driver.getClass().toString().contains("java_client")) {
 			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
@@ -292,10 +291,10 @@ public class Screenshot
 					.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
 			screenShot = screenshot.getImage();
 		}
-		
+
 		return screenShot;
 	}
-	
+
 	/**
 	 * Makes screenshot of visible part of the page
 	 * 
@@ -307,7 +306,7 @@ public class Screenshot
 	 * 
 	 * @return screenshot image
 	 */
-	private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException{
+	private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
 		return screenShot;
 	}
