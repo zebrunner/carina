@@ -32,8 +32,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
-public class DriverPoolEx {
-	private static final Logger LOGGER = Logger.getLogger(DriverPoolEx.class);
+public class DriverPool {
+	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 	
 	public static final String DEFAULT = "default";

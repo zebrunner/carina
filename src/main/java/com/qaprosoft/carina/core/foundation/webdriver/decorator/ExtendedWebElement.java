@@ -48,7 +48,7 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class ExtendedWebElement
@@ -784,7 +784,7 @@ public class ExtendedWebElement
 	private WebDriver getDriver() {
 		// TODO: each element has parent page. Inside page there is a driver. Need to implement functionality for getDriver from parent page
 		// as current implementation has limitations for extraDriver functionality
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 		if (driver == null) {
 			throw new RuntimeException("Unable to find valid driver inside DriverPool!");	
 		}
