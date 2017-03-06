@@ -19,12 +19,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
@@ -32,18 +36,132 @@ public class DriverPoolEx {
 	private static final Logger LOGGER = Logger.getLogger(DriverPoolEx.class);
 	private final static int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 	
-	protected final static String DEFAULT = "default";
+	public final static String DEFAULT = "default";
 	protected static WebDriver single_driver;
 	
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
 
-	public static void registerDriver(WebDriver driver) {
+	
+	public static WebDriver createDriver() {
+		return createDriver(DEFAULT);
+	}
+	
+	public static WebDriver createDriver(String name) {
+    	boolean init = false;
+    	int count = 0;
+    	WebDriver drv = null;
+    	Throwable init_throwable = null;
+    	
+    	int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; //1 - is default run without retry
+    	while (!init & count++ < maxCount) {
+    		try {
+    			LOGGER.debug("initDriver start...");
+    			
+    			Device device = DevicePool.registerDevice2Thread();
+    			
+    			drv = DriverFactory.create(name, device);
+    			registerDriver(drv, name);
+    			
+    			//driver = drv;
+    			//setDriver(drv);
+    			init = true;
+    			// push custom device name for log4j default messages
+    			if (device != null) {
+    				NDC.push(" [" + device.getName() + "] ");
+    			}
+    			
+    			LOGGER.debug("initDriver finish...");
+    		}
+    		catch (Throwable thr) {
+    			//DevicePool.ignoreDevice();
+    			DevicePool.deregisterDeviceFromThread();
+    			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
+    			init_throwable = thr;
+    			pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
+    		}
+    	}
+    	
+    	if (init_throwable != null) {
+    		throw new RuntimeException(init_throwable);
+    	}
+
+    	return drv;
+	}
+	
+	public static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
+		WebDriver extraDriver = null;
+		try {
+			if (capabilities == null && selenium_host == null) {
+				Device device = DevicePool.registerDevice2Thread();
+				extraDriver = DriverFactory.create(name, device);	
+			}
+			else {
+				extraDriver = DriverFactory.create(name, capabilities, selenium_host);
+			}
+	    	
+	    	if (extraDriver == null ) {
+	    		Assert.fail("Unable to initialize extra driver: " + name + "!");
+	    	}
+		}
+		catch (Throwable thr) {
+			thr.printStackTrace();
+			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", name, thr.getMessage()), thr);
+			DevicePool.deregisterDeviceFromThread();
+			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", name, thr.getMessage()));
+			throw new RuntimeException (thr);
+		}    	
+		
+		registerDriver(extraDriver, name);
+		return extraDriver;		
+	}
+
+
+	public static void quitDrivers() {
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
+
+		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+			quitDriver(entry.getKey());
+		}
+		
+		deregisterBrowserMobProxy();
+	}
+	
+	public static void quitDriver() {
+		quitDriver(DEFAULT);
+	}
+	
+	public static void quitDriver(String name) {
+		long threadId = Thread.currentThread().getId();
+		WebDriver drv = getDriver(name);
+		
+		try {
+			if (drv == null) {
+				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
+			}
+
+			LOGGER.debug("Driver exiting..." + drv);
+	    	deregisterDriver(name);
+	    	DevicePool.deregisterDeviceFromThread();
+			drv.quit();
+			
+	    	LOGGER.debug("Driver exited..." + drv);
+		} catch (Exception e) {
+    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
+    		LOGGER.debug("======================================================================================================================================");
+		} finally {
+    		//TODO analyze how to forcibly kill session on device
+			NDC.pop();
+		}
+    }
+
+	
+	protected static void registerDriver(WebDriver driver) {
 		registerDriver(driver, DEFAULT);
 	}
 
-	public static void registerDriver(WebDriver driver, String name) {
+	protected static void registerDriver(WebDriver driver, String name) {
 		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 			//replace single_driver only for default one!
 			// init our single driver variable
@@ -68,11 +186,11 @@ public class DriverPoolEx {
 		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
 	}
 
-	public static boolean isDriverRegistered() {
+	protected static boolean isDriverRegistered() {
 		return isDriverRegistered(DEFAULT);
 	}
 
-	public static boolean isDriverRegistered(String name) {
+	protected static boolean isDriverRegistered(String name) {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		
@@ -82,12 +200,17 @@ public class DriverPoolEx {
 		return currentDrivers.containsKey(name);
 	}
 	
-	public static int size() {
+	protected static int size() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		return currentDrivers.size();
 	}
 
+	public static WebDriver getSingleDriver() {
+		return single_driver;
+	}
+
+	
 	public static WebDriver getDriver() {
 		return getDriver(DEFAULT);
 	}
@@ -124,11 +247,11 @@ public class DriverPoolEx {
 		return drv;
 	}
 
-	public static void deregisterDriver() {
+	protected static void deregisterDriver() {
 		deregisterDriver(DEFAULT);
 	}
 
-	public static void deregisterDriver(String name) {
+	protected static void deregisterDriver(String name) {
 		long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
 
@@ -148,7 +271,7 @@ public class DriverPoolEx {
 		}
 	}
 
-	public static void deregisterDrivers() {
+	protected static void deregisterDrivers() {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getCurrentDrivers();
 
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
@@ -187,6 +310,21 @@ public class DriverPoolEx {
 			n = group.enumerate(threads);
 		} while (n == nAlloc);
 		return java.util.Arrays.copyOf(threads, n);
+	}
+
+	/**
+	 * Pause for specified timeout.
+	 * 
+	 * @param timeout
+	 *            in seconds.
+	 */
+
+	private static void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// ------------------------- BOWSERMOB PROXY ---------------------------------

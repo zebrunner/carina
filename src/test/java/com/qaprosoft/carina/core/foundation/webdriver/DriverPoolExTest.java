@@ -43,7 +43,6 @@ public class DriverPoolExTest {
 		R.CONFIG.put("data_provider_thread_count", "1");
 		
 		this.mockDriverDefault = mock(WebDriver.class);
-		this.mockDriverDefault2 = mock(WebDriver.class);
 		this.mockDriverCustom1 = mock(WebDriver.class);
 		this.mockDriverCustom2 = mock(WebDriver.class);
 	}

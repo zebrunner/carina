@@ -98,6 +98,7 @@ public class DriverFactory {
     }
 
 	public static WebDriver create(String testName, Device device) {
+		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
 		String driverType = Configuration.get(Parameter.DRIVER_TYPE);
 		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
@@ -109,6 +110,7 @@ public class DriverFactory {
 		} else {
 			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
 		}
+		LOGGER.debug("DriverFactory finish...");
 		return factory.create(testName, device);
 	}
 
