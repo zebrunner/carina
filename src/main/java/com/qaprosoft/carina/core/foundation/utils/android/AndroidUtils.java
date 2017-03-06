@@ -1,6 +1,6 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import static com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx.getDriver;
+import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +17,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileBy;
@@ -60,7 +60,7 @@ public class AndroidUtils {
 	 */
 
 	public static void executeKeyEvent(int keyCode) {
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 		LOGGER.info("Execute key event: " + keyCode);
 		HashMap<String, Integer> keyCodeMap = new HashMap<String, Integer>();
 		keyCodeMap.put("keycode", keyCode);
@@ -78,7 +78,7 @@ public class AndroidUtils {
 	protected boolean pressKeyCode(int keyCode) {
 		try {
 			LOGGER.info("Press key code: " + keyCode);
-			((AndroidDeviceActionShortcuts) DriverPoolEx.getDriver())
+			((AndroidDeviceActionShortcuts) DriverPool.getDriver())
 					.pressKeyCode(keyCode);
 			return true;
 		} catch (Exception e) {
@@ -103,7 +103,7 @@ public class AndroidUtils {
 		do {
 			try {
 				LOGGER.info("Scroll to '" + text + "'");
-				((AndroidDriver<?>) DriverPoolEx.getDriver())
+				((AndroidDriver<?>) DriverPool.getDriver())
 						.findElementByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\""
 								+ text + "\").instance(0))");
 				scrolled = true;
@@ -148,7 +148,7 @@ public class AndroidUtils {
 		do {
 			try {
 				LOGGER.info("Scroll to '" + text + "' using findElementByAndroidUIAutomator.");
-				((AndroidDriver<?>) DriverPoolEx.getDriver())
+				((AndroidDriver<?>) DriverPool.getDriver())
 						.findElementByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\""
 								+ text + "\").instance(0))");
 				scrolled = true;
@@ -198,7 +198,7 @@ public class AndroidUtils {
 	public static boolean swipeUntilElementPresence(
 			final ExtendedWebElement element) {
 		int swipeTimes = 20;
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 		Dimension scrSize;
 		int x;
 		int y;
@@ -268,7 +268,7 @@ public class AndroidUtils {
 		if (scrolled) {
 			return true;
 		} else {
-			WebDriver driver = DriverPoolEx.getDriver();
+			WebDriver driver = DriverPool.getDriver();
 			LOGGER.info("Scrolling with old scroll method. Just old method:"
 					+ oldMethod + ". With " + tries + " tries.");
 			try {
@@ -383,7 +383,7 @@ public class AndroidUtils {
 	public static boolean tapAndSwipe(By elem, SwipeElementDirection direction,
 			int duration) {
 		MobileElement element;
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 		try {
 			element = (MobileElement) driver.findElement(elem);
 			element.swipe(direction, duration);
@@ -429,7 +429,7 @@ public class AndroidUtils {
 		double directMultY1 = 0.5;
 		double directMultY2 = 0.5;
 
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 
 		if (direction.equals(Direction.RIGHT)) {
 			directMultX1 = 0.2;
@@ -501,7 +501,7 @@ public class AndroidUtils {
 	public static boolean scrollTo(final ExtendedWebElement extendedWebElement) {
 		int i = 0;
 		try {
-			WebDriver driver = DriverPoolEx.getDriver();
+			WebDriver driver = DriverPool.getDriver();
 			int x = driver.manage().window().getSize().getWidth();
 			int y = driver.manage().window().getSize().getHeight();
 			LOGGER.info("Swipe down");
@@ -542,7 +542,7 @@ public class AndroidUtils {
 	 */
 	public static void swipeCoord(int startX, int startY, int endX, int endY,
 			int duration) {
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 		((AndroidDriver<?>) driver).swipe(startX, startY, endX, endY, duration);
 	}
 
@@ -581,7 +581,7 @@ public class AndroidUtils {
 		boolean bothWay = false;
 		Direction oppositeDirection = Direction.DOWN;
 		try {
-			WebDriver driver = DriverPoolEx.getDriver();
+			WebDriver driver = DriverPool.getDriver();
 			if (extendedWebElement.isElementPresent(1)) {
 				LOGGER.info("Element already present");
 				return true;
@@ -631,7 +631,7 @@ public class AndroidUtils {
 	 */
 	public static void hideKeyboard() {
 		try {
-			((AndroidDriver<?>) DriverPoolEx.getDriver()).hideKeyboard();
+			((AndroidDriver<?>) DriverPool.getDriver()).hideKeyboard();
 		} catch (Exception e) {
 			LOGGER.info("Keyboard was already hided or error occurs: " + e);
 		}
@@ -651,7 +651,7 @@ public class AndroidUtils {
 			final long timeout, final long pollingTime) {
 		LOGGER.info(String.format("Wait until element %s disappear",
 				locator.toString()));
-		WebDriver driver = DriverPoolEx.getDriver();
+		WebDriver driver = DriverPool.getDriver();
 		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		try {
 			if (new WebDriverWait(driver, timeout, pollingTime)
@@ -684,7 +684,7 @@ public class AndroidUtils {
 	 */
 	public static boolean longPress(ExtendedWebElement element) {
 		try {
-			WebDriver driver = DriverPoolEx.getDriver();
+			WebDriver driver = DriverPool.getDriver();
 			TouchAction action = new TouchAction((MobileDriver) driver);
 			action.longPress(element.getElement()).release().perform();
 			return true;

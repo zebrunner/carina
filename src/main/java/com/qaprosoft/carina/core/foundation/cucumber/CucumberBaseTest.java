@@ -1,7 +1,7 @@
 package com.qaprosoft.carina.core.foundation.cucumber;
 
 import com.qaprosoft.carina.core.foundation.utils.image.ImageProcessing;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
@@ -35,7 +35,7 @@ public class CucumberBaseTest extends CucumberRunner {
         LOGGER.info("In  @After takeScreenshotOfFailure");
         if (scenario.isFailed()) {
             LOGGER.error("Cucumber Scenario FAILED! Creating screenshot.");
-            byte[] screenshot = ((TakesScreenshot) DriverPoolEx.getDriver()).getScreenshotAs(OutputType.BYTES);
+            byte[] screenshot = ((TakesScreenshot) DriverPool.getDriver()).getScreenshotAs(OutputType.BYTES);
             screenshot = ImageProcessing.imageResize(screenshot);
             scenario.embed(screenshot, "image/png"); //stick it in the report
         }
