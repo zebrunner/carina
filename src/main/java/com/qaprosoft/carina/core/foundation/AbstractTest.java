@@ -30,8 +30,6 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -72,10 +70,6 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -95,7 +89,6 @@ public abstract class AbstractTest // extends DriverHelper
 	
 	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 	
-	protected WebDriver extraDriver;
 	protected Throwable init_throwable;
 
 	// 3rd party integrations
@@ -533,60 +526,6 @@ public abstract class AbstractTest // extends DriverHelper
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	// --------------------------------------------------------------------------
-	// Extra Web Drivers
-	// --------------------------------------------------------------------------
-	protected WebDriver createExtraDriver(final String driverName) {
-		return createExtraDriver(driverName, null, null);
-	}
-	
-	protected WebDriver createExtraDriver(String driverName, DesiredCapabilities capabilities, String selenium_host) {
-		if (extraDriver != null) {
-			LOGGER.warn("Extra Driver is already initialized! Existing extraDriver will be closed!");
-			extraDriver.quit();
-		}
-		
-		try {
-			if (capabilities == null && selenium_host == null) {
-				Device device = DevicePool.registerDevice2Thread();
-				extraDriver = DriverFactory.create(driverName, device);	
-			}
-			else {
-				extraDriver = DriverFactory.create(driverName, capabilities, selenium_host);
-			}
-	    	
-	    	if (extraDriver == null ) {
-	    		Assert.fail("Unable to initialize extra driver: " + driverName + "!");
-	    	}
-		}
-		catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()), thr);
-			DevicePool.deregisterDeviceFromThread();
-			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()));
-			init_throwable = thr;
-
-		}    	
-		
-		DriverPool.registerExtraDriver2Thread(extraDriver, Thread.currentThread().getId());
-		return extraDriver;		
-	}
-	
-
-
-	protected WebDriver getExtraDriver() {
-		return extraDriver;
-	}
-
-	protected void quitExtraDriver() {
-		if (extraDriver != null) {
-			DevicePool.deregisterDeviceFromThread();
-			extraDriver.quit();
-			extraDriver = null;
-			//DriverPool.deregisterDriverByThread();
-		}		
 	}
 	
 	protected void putS3Artifact(String key, String path) {
