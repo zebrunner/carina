@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -38,19 +37,13 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public class UITest extends AbstractTest
 {
     private static final Logger LOGGER = Logger.getLogger(UITest.class);
-    private static int driverInitCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; //1 - is default run without retry
     
-    protected WebDriver driver;
-    
-	protected static ThreadLocal<WebDriver> webDrivers = new ThreadLocal<WebDriver>();
-
     private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
     private int adb_pid = 0;
     
@@ -77,7 +70,7 @@ public class UITest extends AbstractTest
 	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
-	    	if (!initDriver(context.getSuite().getName(), driverInitCount)) {
+	    	if (!initDriver()) {
 	    		throw init_throwable;
 	    	}
 	    	executor.screenOn();
@@ -94,15 +87,12 @@ public class UITest extends AbstractTest
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
-			driver = DriverPool.getSingleDriver();
-			if (driver != null) {
-     	    	setDriver(driver);
-			}
+	    	DriverPoolEx.replaceDriver(DriverPoolEx.getSingleDriver());
 	    }
 		if (driverMode == DriverMode.CLASS_MODE && getDriver() == null)
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeClass.");
-	    	if (!initDriver(this.getClass().getName(), driverInitCount)) {
+	    	if (!initDriver()) {
 	    		throw init_throwable;
 	    	}
 	    	executor.screenOn();
@@ -115,27 +105,24 @@ public class UITest extends AbstractTest
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
     {
 		super.executeBeforeTestMethod(xmlTest, testMethod, context);
-		quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
+		// TODO: analyze below code line necessity
+		// quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
 		
 		DriverMode driverMode = Configuration.getDriverMode();
 		
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
-			driver = DriverPool.getSingleDriver();
-
-			if (driver != null) {
-     	    	setDriver(driver);
-			}
+	    	DriverPoolEx.replaceDriver(DriverPoolEx.getSingleDriver());
 	    }
 	    
 
 	    
-		String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
+		// String test = TestNamingUtil.getCanonicalTestNameBeforeTest(xmlTest, testMethod);
     	if (driverMode == DriverMode.METHOD_MODE && getDriver() == null)
     	{
     		LOGGER.debug("Initialize driver in UItest->BeforeMethod.");
-	    	if (!initDriver(test, driverInitCount)) {
+	    	if (!initDriver()) {
 	    		throw init_throwable;
 	    	}
 	    	executor.screenOn();
@@ -155,7 +142,6 @@ public class UITest extends AbstractTest
     {
     	try
     	{	    
-    		quitExtraDriver(); 
     		DriverMode driverMode = Configuration.getDriverMode();
 			
 	    	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
@@ -166,9 +152,7 @@ public class UITest extends AbstractTest
 	    		//TODO: analyze necessity to turn off device display after each method
 	    		//executor.screenOff();
 	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
-				quitDriver();
-				
-				DriverPool.deregisterBrowserMobProxy();
+				quitDrivers();
 			}	    	
     	}
 		catch (Exception e)
@@ -183,14 +167,11 @@ public class UITest extends AbstractTest
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
     	
-		quitExtraDriver();
 	    if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null)
 	    {
 	    	executor.screenOff();
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
-			quitDriver();
-			
-			DriverPool.deregisterBrowserMobProxy();
+			quitDrivers();
 	    }
 	    
 		super.executeAfterTestClass(context);    	
@@ -199,15 +180,12 @@ public class UITest extends AbstractTest
     @AfterSuite(alwaysRun = true)
     public void executeAfterTestSuite(ITestContext context)
     {
-    	quitExtraDriver();
 	    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && getDriver() != null)
 	    {
 	    	executor.screenOff();
 	    	LOGGER.debug("Deinitialize driver in UITest->AfterSuite.");
-			quitDriver();
+			quitDrivers();
 			stopRecording(null);
-			
-			DriverPool.deregisterBrowserMobProxy();
 	    }
 	    
 		super.executeAfterTestSuite(context);	    
@@ -218,77 +196,29 @@ public class UITest extends AbstractTest
 	// Web Drivers
 	// --------------------------------------------------------------------------
 	protected WebDriver getDriver() {
-		long threadId = Thread.currentThread().getId();
-		WebDriver drv = DriverPool.getDriverByThread(threadId);
+		return getDriver(DriverPoolEx.DEFAULT);
+	}
+
+	protected WebDriver getDriver(String name) {
+		WebDriver drv = DriverPoolEx.getDriver();
 		if (drv == null) {
-			LOGGER.debug("Unable to find valid driver using threadId: " + threadId);
+			LOGGER.debug("Unable to find valid driver using threadId: " + Thread.currentThread().getId());
 		}
 		return drv;
 	}
 	 
-	protected void setDriver(WebDriver driver) {
-		webDrivers.set(driver);
-	}
-    
-	protected boolean initDriver(String name, int maxCount) {
-    	boolean init = false;
-    	int count = 0;
-    	while (!init & count++ < maxCount) {
-    		try {
-    			LOGGER.debug("initDriver start...");
-    			
-    			Device device = DevicePool.registerDevice2Thread();
-    			
-    			LOGGER.debug("DriverFactory start...");
-    			WebDriver drv = DriverFactory.create(name, device);
-    			LOGGER.debug("DriverFactory finish...");
-    			DriverPool.registerDriver(drv);
-    			
-    			driver = drv;
-    			setDriver(drv);
-    			init = true;
-    			// push custom device name for log4j default messages
-    			if (device != null) {
-    				NDC.push(" [" + device.getName() + "] ");
-    			}
-    			
-    			LOGGER.debug("initDriver finish...");
-    		}
-    		catch (Throwable thr) {
-    			//DevicePool.ignoreDevice();
-    			DevicePool.deregisterDeviceFromThread();
-    			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
-    			init_throwable = thr;
-    			pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
-    		}
-    	}
-
-    	return init;
+	protected boolean initDriver() {
+		WebDriver drv = null;
+		try {
+			drv = DriverPoolEx.createDriver();
+		} catch (Throwable thr) {
+			init_throwable = thr;
+		}
+		return (drv != null);
 	}
 	
-	protected static void quitDriver() {
-		long threadId = Thread.currentThread().getId();
-		WebDriver drv = DriverPool.getDriver();
-		
-		try {
-			if (drv == null) {
-				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
-			}
-
-			LOGGER.debug("Driver exiting..." + drv);
-	    	DriverPool.deregisterDriver();
-	    	DevicePool.deregisterDeviceFromThread();
-			drv.quit();
-			
-	    	LOGGER.debug("Driver exited..." + drv);
-		} catch (Exception e) {
-    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
-    		LOGGER.debug("======================================================================================================================================");
-		} finally {
-    		//TODO analyze how to forcibly kill session on device
-			NDC.pop();
-	    	webDrivers.remove();
-		}
+	protected static void quitDrivers() {
+		DriverPoolEx.quitDrivers();
     }
 	
 	protected void startRecording() {
@@ -311,5 +241,5 @@ public class UITest extends AbstractTest
 			executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/video.mp4");
 		}	
 	}
-	
+
 }
