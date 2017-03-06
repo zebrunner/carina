@@ -243,10 +243,12 @@ public class DriverPool {
 					"Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
 			for (int i = 0; i < threads.length; i++) {
 				currentDrivers = drivers.get(threads[i].getId());
-				if (currentDrivers.containsKey(name)) {
-					drv = currentDrivers.get(name);
-					LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
-					break;
+				if (currentDrivers != null) {
+					if (currentDrivers.containsKey(name)) {
+						drv = currentDrivers.get(name);
+						LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
+						break;
+					}
 				}
 			}
 		}
