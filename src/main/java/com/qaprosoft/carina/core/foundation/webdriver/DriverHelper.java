@@ -268,6 +268,7 @@ public class DriverHelper {
 	 *            List&lt;ExtendedWebElement&gt;...
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean allElementListsAreNotEmpty(List<ExtendedWebElement>... elements) {
 		return allElementListsAreNotEmpty(IMPLICIT_TIMEOUT, elements);
 	}
@@ -282,6 +283,7 @@ public class DriverHelper {
 	 * @return boolean return true only if All Element lists contain at least
 	 *         one element
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean allElementListsAreNotEmpty(long timeout, List<ExtendedWebElement>... elements) {
 		boolean ret;
 		int counts = 3;
@@ -1480,7 +1482,7 @@ public class DriverHelper {
 	protected WebDriver getDriver() {
 		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {
-			driver = DriverPool.getDriverByThread(currentThreadId);
+			driver = DriverPoolEx.getDriver();
 		}
 		if (driver == null) {
 			LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
