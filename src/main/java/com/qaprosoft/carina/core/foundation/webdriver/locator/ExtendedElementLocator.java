@@ -25,7 +25,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 
 import io.appium.java_client.MobileBy;
@@ -84,7 +84,7 @@ public class ExtendedElementLocator implements ElementLocator
 		if (!isPredicate) { 
 			element = searchContext.findElement(by);
 		} else {
-			WebDriver drv = DriverPoolEx.getDriver();
+			WebDriver drv = DriverPool.getDriver();
 			if (drv instanceof IOSDriver) {
 				element = drv.findElement(MobileBy.iOSNsPredicateString(getLocator(by)));
 			} else if (drv instanceof AndroidDriver) {
@@ -115,7 +115,7 @@ public class ExtendedElementLocator implements ElementLocator
 		if (!isPredicate) {
 			elements = searchContext.findElements(by);
 		}  else {
-			WebDriver drv = DriverPoolEx.getDriver();
+			WebDriver drv = DriverPool.getDriver();
 			if (drv instanceof IOSDriver) {
 				elements = drv.findElements(MobileBy.iOSNsPredicateString(getLocator(by)));	
 			} else if (drv instanceof AndroidDriver) {

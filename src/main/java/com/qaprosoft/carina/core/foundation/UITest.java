@@ -37,7 +37,7 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public class UITest extends AbstractTest
@@ -87,7 +87,7 @@ public class UITest extends AbstractTest
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
-	    	DriverPoolEx.replaceDriver(DriverPoolEx.getSingleDriver());
+	    	DriverPool.replaceDriver(DriverPool.getSingleDriver());
 	    }
 		if (driverMode == DriverMode.CLASS_MODE && getDriver() == null)
 	    {
@@ -113,7 +113,7 @@ public class UITest extends AbstractTest
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
-	    	DriverPoolEx.replaceDriver(DriverPoolEx.getSingleDriver());
+	    	DriverPool.replaceDriver(DriverPool.getSingleDriver());
 	    }
 	    
 
@@ -196,11 +196,11 @@ public class UITest extends AbstractTest
 	// Web Drivers
 	// --------------------------------------------------------------------------
 	protected WebDriver getDriver() {
-		return getDriver(DriverPoolEx.DEFAULT);
+		return getDriver(DriverPool.DEFAULT);
 	}
 
 	protected WebDriver getDriver(String name) {
-		WebDriver drv = DriverPoolEx.getDriver();
+		WebDriver drv = DriverPool.getDriver();
 		if (drv == null) {
 			LOGGER.debug("Unable to find valid driver using threadId: " + Thread.currentThread().getId());
 		}
@@ -210,7 +210,7 @@ public class UITest extends AbstractTest
 	protected boolean initDriver() {
 		WebDriver drv = null;
 		try {
-			drv = DriverPoolEx.createDriver();
+			drv = DriverPool.createDriver();
 		} catch (Throwable thr) {
 			init_throwable = thr;
 		}
@@ -218,7 +218,7 @@ public class UITest extends AbstractTest
 	}
 	
 	protected static void quitDrivers() {
-		DriverPoolEx.quitDrivers();
+		DriverPool.quitDrivers();
     }
 	
 	protected void startRecording() {

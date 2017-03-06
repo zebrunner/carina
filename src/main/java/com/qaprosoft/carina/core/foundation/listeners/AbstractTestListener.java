@@ -50,7 +50,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPoolEx;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -634,7 +634,7 @@ public class AbstractTestListener extends TestArgsListener
 	private String takeScreenshot(ITestResult result, String msg) {
 		String screenId = "";
 		
-		ConcurrentHashMap<String, WebDriver> drivers = DriverPoolEx.getDrivers(); 
+		ConcurrentHashMap<String, WebDriver> drivers = DriverPool.getDrivers(); 
 		
 		for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
 			String driverName = entry.getKey();
