@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
@@ -36,7 +37,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -66,13 +66,17 @@ public class UITest extends AbstractTest
         
     	DevicePool.registerDevices();
     	DriverMode driverMode = Configuration.getDriverMode();
-    	
-	    if (driverMode == DriverMode.SUITE_MODE/*  && getDriver() == null*/) //there is no need to verify on null as it is start point for all our tests 
+/*    	
+	    if (driverMode == DriverMode.SUITE_MODE  && getDriver() == null) //there is no need to verify on null as it is start point for all our tests 
 	    {
 	    	LOGGER.debug("Initialize driver in UITest->BeforeSuite.");
 	    	if (!initDriver()) {
 	    		throw init_throwable;
 	    	}
+	    	executor.screenOn();
+	    }
+*/	    
+	    if (driverMode == DriverMode.SUITE_MODE) {
 	    	executor.screenOn();
 	    }
 
@@ -83,7 +87,12 @@ public class UITest extends AbstractTest
     	super.executeBeforeTestClass(context);
     	
     	DriverMode driverMode = Configuration.getDriverMode();
+		if (driverMode == DriverMode.CLASS_MODE)
+	    {
+	    	executor.screenOn();
+	    }
 
+/*		
 	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
@@ -97,7 +106,7 @@ public class UITest extends AbstractTest
 	    	}
 	    	executor.screenOn();
 	    }
-		
+*/		
 		
     }
     
@@ -109,8 +118,12 @@ public class UITest extends AbstractTest
 		// quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
 		
 		DriverMode driverMode = Configuration.getDriverMode();
+	   	if (driverMode == DriverMode.METHOD_MODE)
+    	{
+	    	executor.screenOn();
+    	}
 		
-	    if (driverMode == DriverMode.SUITE_MODE)
+/*	    if (driverMode == DriverMode.SUITE_MODE)
 	    {
 	    	//get from DriverPool.single_driver because everything it is deleted somehow!!
 	    	DriverPool.replaceDriver(DriverPool.getSingleDriver());
@@ -127,14 +140,15 @@ public class UITest extends AbstractTest
 	    	}
 	    	executor.screenOn();
     	}
+*/    	
     	if (driverMode == DriverMode.METHOD_MODE || driverMode == DriverMode.CLASS_MODE) {
 			startRecording();
     	}		    	
 
-		if (browserVersion.isEmpty() && getDriver() != null
+/*		if (browserVersion.isEmpty() && getDriver() != null
 				&& !Configuration.get(Parameter.CUSTOM_CAPABILITIES).isEmpty()) {
 			browserVersion = DriverFactory.getBrowserVersion(getDriver());
-		}
+		}*/
 	}    
 
     @AfterMethod(alwaysRun = true)
@@ -151,7 +165,7 @@ public class UITest extends AbstractTest
 	    	if (driverMode == DriverMode.METHOD_MODE) {
 	    		//TODO: analyze necessity to turn off device display after each method
 	    		//executor.screenOff();
-	    		LOGGER.debug("Deinitialize driver in @AfterMethod.");
+	    		LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
 				quitDrivers();
 			}	    	
     	}
@@ -170,7 +184,7 @@ public class UITest extends AbstractTest
 	    if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null)
 	    {
 	    	executor.screenOff();
-	    	LOGGER.debug("Deinitialize driver in UITest->AfterClass.");
+	    	LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
 			quitDrivers();
 	    }
 	    
@@ -183,7 +197,7 @@ public class UITest extends AbstractTest
 	    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && getDriver() != null)
 	    {
 	    	executor.screenOff();
-	    	LOGGER.debug("Deinitialize driver in UITest->AfterSuite.");
+	    	LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
 			quitDrivers();
 			stopRecording(null);
 	    }
@@ -202,21 +216,11 @@ public class UITest extends AbstractTest
 	protected WebDriver getDriver(String name) {
 		WebDriver drv = DriverPool.getDriver();
 		if (drv == null) {
-			LOGGER.debug("Unable to find valid driver using threadId: " + Thread.currentThread().getId());
+			Assert.fail("Unable to find/start driver!");
 		}
 		return drv;
 	}
 	 
-	protected boolean initDriver() {
-		WebDriver drv = null;
-		try {
-			drv = DriverPool.createDriver();
-		} catch (Throwable thr) {
-			init_throwable = thr;
-		}
-		return (drv != null);
-	}
-	
 	protected static void quitDrivers() {
 		DriverPool.quitDrivers();
     }
