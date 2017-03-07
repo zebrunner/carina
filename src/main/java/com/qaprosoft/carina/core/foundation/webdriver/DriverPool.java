@@ -252,6 +252,11 @@ public class DriverPool {
 				}
 			}
 		}
+		
+		if (drv == null) {
+			LOGGER.warn("Starting new driver as nothing was found in the pool");
+			drv = createDriver(name);
+		}
 		return drv;
 	}
 
