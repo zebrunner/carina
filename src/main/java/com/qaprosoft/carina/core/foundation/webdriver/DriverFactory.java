@@ -80,7 +80,7 @@ public class DriverFactory {
         
 		if (driver == null) {
 			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
-		    DevicePool.unregisterDevice();
+		    DevicePool.removeDevice();
 			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
 		}
 
