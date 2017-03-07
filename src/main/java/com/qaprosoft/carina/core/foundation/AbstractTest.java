@@ -112,6 +112,13 @@ public abstract class AbstractTest // extends DriverHelper
 		PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
 		// Set SoapUI log4j properties
 		System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
+		
+		String zafira_project = "zafira_project";
+		String project = R.CONFIG.get(zafira_project);
+		if (!project.isEmpty()) {
+			LOGGER.info("Set " + zafira_project + " to '" + project + "'");
+			System.setProperty(zafira_project, project);
+		}
 
 		try {
 			Logger root = Logger.getRootLogger();
