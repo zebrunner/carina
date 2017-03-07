@@ -50,7 +50,7 @@ public class DevicePool
 
 	private static final Device nullDevice = new Device("", "", "", "", "", "");
 
-	public static synchronized void registerDevice()
+	protected static synchronized void addDevice()
 	{
 		Device device = new Device(Configuration.get(Parameter.MOBILE_DEVICE_NAME),
 				Configuration.get(Parameter.MOBILE_DEVICE_TYPE),
@@ -64,12 +64,12 @@ public class DevicePool
 		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));
 	}
 
-	public static synchronized void unregisterDevice()
+	public static synchronized void removeDevice()
 	{
-		unregisterDevice(getDevice());
+		removeDevice(getDevice());
 	}
 
-	public static synchronized void unregisterDevice(Device device)
+	public static synchronized void removeDevice(Device device)
 	{
 		if (device == nullDevice)
 		{
@@ -81,11 +81,11 @@ public class DevicePool
 		LOGGER.info("Removed device from the DevicePool: " + device.getName());
 	}
 
-	public static synchronized void registerDevices()
+	public static synchronized void addDevices()
 	{
 		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
 		{
-			registerDevice();
+			addDevice();
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class DevicePool
 		}
 	}
 
-	public static Device registerDevice2Thread()
+	public static Device registerDevice()
 	{
 		Long threadId = Thread.currentThread().getId();
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
@@ -240,7 +240,7 @@ public class DevicePool
 		return device;
 	}
 
-	public static void deregisterDeviceFromThread()
+	public static void deregisterDevice()
 	{
 		Long threadId = Thread.currentThread().getId();
 		if (THREAD_2_DEVICE_MAP.containsKey(threadId))

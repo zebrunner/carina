@@ -64,7 +64,7 @@ public class UITest extends AbstractTest
             Configuration.loadCoreProperties(customCapabilities);
         }
         
-    	DevicePool.registerDevices();
+    	DevicePool.addDevices();
     	DriverMode driverMode = Configuration.getDriverMode();
 /*    	
 	    if (driverMode == DriverMode.SUITE_MODE  && getDriver() == null) //there is no need to verify on null as it is start point for all our tests 

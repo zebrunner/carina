@@ -59,7 +59,7 @@ public class DriverPool {
     		try {
     			LOGGER.debug("initDriver start...");
     			
-    			Device device = DevicePool.registerDevice2Thread();
+    			Device device = DevicePool.registerDevice();
     			
     			drv = DriverFactory.create(name, device);
     			registerDriver(drv, name);
@@ -74,7 +74,7 @@ public class DriverPool {
     		}
     		catch (Throwable thr) {
     			//DevicePool.ignoreDevice();
-    			DevicePool.deregisterDeviceFromThread();
+    			DevicePool.deregisterDevice();
     			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
     			init_throwable = thr;
     			pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
@@ -92,7 +92,7 @@ public class DriverPool {
 		WebDriver extraDriver = null;
 		try {
 			if (capabilities == null && selenium_host == null) {
-				Device device = DevicePool.registerDevice2Thread();
+				Device device = DevicePool.registerDevice();
 				extraDriver = DriverFactory.create(name, device);	
 			}
 			else {
@@ -106,7 +106,7 @@ public class DriverPool {
 		catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", name, thr.getMessage()), thr);
-			DevicePool.deregisterDeviceFromThread();
+			DevicePool.deregisterDevice();
 			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", name, thr.getMessage()));
 			throw new RuntimeException (thr);
 		}    	
@@ -141,7 +141,7 @@ public class DriverPool {
 
 			LOGGER.debug("Driver exiting..." + drv);
 	    	deregisterDriver(name);
-	    	DevicePool.deregisterDeviceFromThread();
+	    	DevicePool.deregisterDevice();
 			drv.quit();
 			
 	    	LOGGER.debug("Driver exited..." + drv);
