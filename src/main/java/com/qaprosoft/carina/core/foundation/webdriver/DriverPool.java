@@ -396,7 +396,7 @@ public class DriverPool {
 	/**
 	 * Return all drivers registered in the DriverPool for this thread
 	 * 
-	 * @return ConcurrentHashMap<String, WebDriver>
+	 * @return ConcurrentHashMap of driver names and WebDrivers
 	 * 
 	 */
 	public static ConcurrentHashMap<String, WebDriver> getDrivers() {
