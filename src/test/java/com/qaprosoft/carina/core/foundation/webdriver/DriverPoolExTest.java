@@ -53,13 +53,17 @@ public class DriverPoolExTest {
 	
 	@Test
 	public void suiteModeDriverTest() {
+		Assert.assertFalse(DriverPool.isDriverRegistered(), "Default driver is mistakenly registered!");
+		
 		this.mockDriverSuite = mock(WebDriver.class);
 		DriverPool.single_driver = mockDriverSuite;
-		DriverPool.registerDriver(mockDriverSuite, DriverPool.DEFAULT);
-	
 		
 		Assert.assertEquals(mockDriverSuite,  DriverPool.getSingleDriver(), "Single driver for suite mode is not returned by getSingleDriver() method!");
 		Assert.assertEquals(mockDriverSuite,  DriverPool.getDriver(), "Single driver for suite mode is not returned by getDriver() method!");
+		
+		
+		DriverPool.registerDriver(mockDriverSuite, DriverPool.DEFAULT);
+		Assert.assertEquals(mockDriverSuite,  DriverPool.getDriver(DriverPool.DEFAULT), "Single driver for suite mode is not returned by getDriver(DEFAULT) method!");
 		
 		DriverPool.quitDriver();
 		Assert.assertEquals(null,  DriverPool.getSingleDriver(), "Single driver for suite mode is not reset by quitDriver()!");
