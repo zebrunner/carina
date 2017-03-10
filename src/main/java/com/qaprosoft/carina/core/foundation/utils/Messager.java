@@ -47,7 +47,7 @@ public enum Messager {
 
 	TEST_SKIPPED_AS_ALREADY_PASSED(
 			"\r\n" +
-			"INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s] - %s\r\n" +
+			"INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s]\r\n" +
 			"======================================================================================================================================"),
 
 	TEST_FAILED(
