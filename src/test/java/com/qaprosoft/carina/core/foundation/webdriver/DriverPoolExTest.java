@@ -21,6 +21,9 @@ public class DriverPoolExTest {
 	private final static String SUITE_MODE = "suite_mode";
 
 	@Mock
+	private WebDriver mockDriverSuite;
+	
+	@Mock
 	private WebDriver mockDriverDefault;
 	
 	@Mock
@@ -42,6 +45,7 @@ public class DriverPoolExTest {
 		R.CONFIG.put("thread_count", "1");
 		R.CONFIG.put("data_provider_thread_count", "1");
 		
+				
 		this.mockDriverDefault = mock(WebDriver.class);
 		this.mockDriverCustom1 = mock(WebDriver.class);
 		this.mockDriverCustom2 = mock(WebDriver.class);
@@ -49,6 +53,18 @@ public class DriverPoolExTest {
 	
 	@Test
 	public void suiteModeDriverTest() {
+		this.mockDriverSuite = mock(WebDriver.class);
+		DriverPool.single_driver = mockDriverSuite;
+		DriverPool.registerDriver(mockDriverSuite, DriverPool.DEFAULT);
+	
+		
+		Assert.assertEquals(mockDriverSuite,  DriverPool.getSingleDriver(), "Single driver for suite mode is not returned by getSingleDriver() method!");
+		Assert.assertEquals(mockDriverSuite,  DriverPool.getDriver(), "Single driver for suite mode is not returned by getDriver() method!");
+		
+		DriverPool.quitDriver();
+		Assert.assertEquals(null,  DriverPool.getSingleDriver(), "Single driver for suite mode is not reset by quitDriver()!");
+		
+		
 		Assert.assertFalse(DriverPool.isDriverRegistered(), "Default driver is mistakenly registered!");
 		
 		DriverPool.registerDriver(mockDriverDefault);
