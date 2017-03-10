@@ -60,7 +60,7 @@ public class DriverPool {
 
 	/**
 	 * Get driver by name. If no driver discovered it will be created using default capabilities.
-	 * @param String driver name 
+	 * @param name String driver name 
 	 * @return WebDriver by name
 	 */
 	public static WebDriver getDriver(String name) {
@@ -69,9 +69,9 @@ public class DriverPool {
 
 	/**
 	 * Get driver by name. If no driver discovered it will be created using custom capabilities and selenium server.
-	 *  @param String driver name
-	 *  @param DesiredCapabilities capabilities
-	 *  @param String seleniumHost
+	 *  @param name String driver name
+	 *  @param capabilities DesiredCapabilities 
+	 *  @param seleniumHost String
 	 * @return WebDriver by name
 	 */
 	public static WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -122,7 +122,7 @@ public class DriverPool {
 	
 	/**
 	 * Restart driver by name with default capabilities
-	 * @param String driver name
+	 * @param name String driver name
 	 */
 	public static void restartDriver(String name) {
 		restartDriver(name, null, null);
@@ -130,9 +130,9 @@ public class DriverPool {
 	
 	/**
 	 * Restart driver by name with custom capabilities
-	 * @param String driver name
-	 * @param DesiredCapabilities capabilities
-	 * @param String seleniumHost
+	 * @param name String driver name
+	 * @param capabilities DesiredCapabilities
+	 * @param seleniumHost String
 	 */
 	public static void restartDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
 		quitDriver(name);
@@ -149,7 +149,7 @@ public class DriverPool {
 	
 	/**
 	 * Quit driver by name
-	 * @param String driver name
+	 * @param name String driver name
 	 */
 	public static void quitDriver(String name) {
 		long threadId = Thread.currentThread().getId();
