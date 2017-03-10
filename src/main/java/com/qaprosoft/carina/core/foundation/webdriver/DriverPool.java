@@ -206,19 +206,25 @@ public class DriverPool {
 		deregisterBrowserMobProxy();
 	}
 
+	/**
+	 * Create driver with custom capabilities
+	 * 
+	 * @param name
+	 *            String driver name
+	 * @param capabilities
+	 *            DesiredCapabilities
+	 * @param seleniumHost
+	 *            String
+	 * @return WebDriver
+	 */
 	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
 		boolean init = false;
 		int count = 0;
 		WebDriver drv = null;
 		Throwable init_throwable = null;
 
-		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; // 1
-																				// -
-																				// is
-																				// default
-																				// run
-																				// without
-																				// retry
+		// 1 - is default run without retry
+		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
 		while (!init & count++ < maxCount) {
 			try {
 				LOGGER.debug("initDriver start...");
@@ -258,10 +264,15 @@ public class DriverPool {
 		return drv;
 	}
 
-	protected static void registerDriver(WebDriver driver) {
-		registerDriver(driver, DEFAULT);
-	}
-
+	/**
+	 * Register driver in the DriverPool
+	 * 
+	 * @param WebDriver
+	 *            driver
+	 * @param name
+	 *            String driver name
+	 * 
+	 */
 	protected static void registerDriver(WebDriver driver, String name) {
 		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 			// replace single_driver only for default one!
@@ -287,10 +298,14 @@ public class DriverPool {
 		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
 	}
 
-	protected static boolean isDriverRegistered() {
-		return isDriverRegistered(DEFAULT);
-	}
-
+	/**
+	 * Verify if driver is registered in the DriverPool
+	 * 
+	 * @param name
+	 *            String driver name
+	 *
+	 * @return boolean
+	 */
 	protected static boolean isDriverRegistered(String name) {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
@@ -301,16 +316,24 @@ public class DriverPool {
 		return currentDrivers.containsKey(name);
 	}
 
+	/**
+	 * Return number of registered driver per thread
+	 * 
+	 * @return int
+	 */
 	protected static int size() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		return currentDrivers.size();
 	}
 
-	protected static void deregisterDriver() {
-		deregisterDriver(DEFAULT);
-	}
-
+	/**
+	 * Deregister driver by name from the DriverPool
+	 * 
+	 * @param name
+	 *            String driver name
+	 * 
+	 */
 	protected static void deregisterDriver(String name) {
 		long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
@@ -331,6 +354,10 @@ public class DriverPool {
 		}
 	}
 
+	/**
+	 * Deregister all drivers from the DriverPool for current thread
+	 * 
+	 */
 	protected static void deregisterDrivers() {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
@@ -339,15 +366,37 @@ public class DriverPool {
 		}
 	}
 
+	/**
+	 * Replace default driver in the DriverPool
+	 * 
+	 * @param WebDriver
+	 *            driver
+	 * 
+	 */
 	public static void replaceDriver(WebDriver driver) {
 		replaceDriver(driver, DEFAULT);
 	}
 
+	/**
+	 * Replace named driver in the DriverPool
+	 * 
+	 * @param WebDriver
+	 *            driver
+	 * @param name
+	 *            String driver name
+	 * 
+	 */
 	public static void replaceDriver(WebDriver driver, String name) {
 		deregisterDriver(name);
 		registerDriver(driver, name);
 	}
 
+	/**
+	 * Return all drivers registered in the DriverPool for this thread
+	 * 
+	 * @return ConcurrentHashMap<String, WebDriver>
+	 * 
+	 */
 	public static ConcurrentHashMap<String, WebDriver> getDrivers() {
 		Long threadId = Thread.currentThread().getId();
 
@@ -358,6 +407,12 @@ public class DriverPool {
 		return drivers.get(threadId);
 	}
 
+	/**
+	 * Return all threads associated with current multithreading test
+	 * 
+	 * @return Thread[]
+	 * 
+	 */
 	private static Thread[] getGroupThreads(final ThreadGroup group) {
 		if (group == null)
 			throw new NullPointerException("Null thread group");
@@ -378,7 +433,6 @@ public class DriverPool {
 	 * @param timeout
 	 *            in seconds.
 	 */
-
 	private static void pause(long timeout) {
 		try {
 			Thread.sleep(timeout * 1000);
