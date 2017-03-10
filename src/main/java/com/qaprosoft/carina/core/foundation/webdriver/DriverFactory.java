@@ -110,8 +110,9 @@ public class DriverFactory {
 		} else {
 			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
 		}
+		WebDriver drv = factory.create(testName, device);
 		LOGGER.debug("DriverFactory finish...");
-		return factory.create(testName, device);
+		return drv;
 	}
 
 
