@@ -214,9 +214,9 @@ public class UITest extends AbstractTest
 	}
 
 	protected WebDriver getDriver(String name) {
-		WebDriver drv = DriverPool.getDriver();
+		WebDriver drv = DriverPool.getDriver(name);
 		if (drv == null) {
-			Assert.fail("Unable to find/start driver!");
+			Assert.fail("Unable to find driver by name: " + name);
 		}
 		return drv;
 	}
