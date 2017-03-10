@@ -40,15 +40,155 @@ public class DriverPool {
 	protected static WebDriver single_driver;
 	
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
-
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
 
-	
-	public static WebDriver createDriver() {
-		return createDriver(DEFAULT);
+	/**
+	 * Get global suite driver. For driver_mode=suite_mode only.
+	 * @return Suite mode WebDriver
+	 */
+	public static WebDriver getSingleDriver() {
+		return single_driver;
 	}
 	
-	public static WebDriver createDriver(String name) {
+	/**
+	 * Get default driver. If no default driver discovered it will be created.
+	 * @return default WebDriver
+	 */
+	public static WebDriver getDriver() {
+		return getDriver(DEFAULT);
+	}
+
+	/**
+	 * Get driver by name. If no driver discovered it will be created using default capabilities.
+	 * @param String driver name 
+	 * @return WebDriver by name
+	 */
+	public static WebDriver getDriver(String name) {
+		return getDriver(name, null, null);
+	}
+
+	/**
+	 * Get driver by name. If no driver discovered it will be created using custom capabilities and selenium server.
+	 *  @param String driver name
+	 *  @param DesiredCapabilities capabilities
+	 *  @param String seleniumHost
+	 * @return WebDriver by name
+	 */
+	public static WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+		WebDriver drv = null;
+		DriverMode driverMode = Configuration.getDriverMode();
+		Long threadId = Thread.currentThread().getId();
+
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+
+		if (currentDrivers.containsKey(name)) {
+			drv = currentDrivers.get(name);
+			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
+		} else if (driverMode == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
+			LOGGER.debug("########## Unable to find suite driver by threadId: " + threadId);
+			// init our single driver variable
+			drv = single_driver;
+		} else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
+				&& Configuration.getInt(Parameter.THREAD_COUNT) == 1
+				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
+			Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
+			LOGGER.debug(
+					"Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
+			for (int i = 0; i < threads.length; i++) {
+				currentDrivers = drivers.get(threads[i].getId());
+				if (currentDrivers != null) {
+					if (currentDrivers.containsKey(name)) {
+						drv = currentDrivers.get(name);
+						LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
+						break;
+					}
+				}
+			}
+		}
+		
+		if (drv == null) {
+			LOGGER.warn("Starting new driver as nothing was found in the pool");
+			drv = createDriver(name, capabilities, seleniumHost);
+		}
+		return drv;
+	}
+	
+	/**
+	 * Restart default driver
+	 */
+	public static void restartDriver() {
+		restartDriver(DEFAULT);
+	}
+	
+	/**
+	 * Restart driver by name with default capabilities
+	 * @param String driver name
+	 */
+	public static void restartDriver(String name) {
+		restartDriver(name, null, null);
+	}
+	
+	/**
+	 * Restart driver by name with custom capabilities
+	 * @param String driver name
+	 * @param DesiredCapabilities capabilities
+	 * @param String seleniumHost
+	 */
+	public static void restartDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+		quitDriver(name);
+		createDriver(name, capabilities, seleniumHost);
+	}
+	
+	
+	/**
+	 * Quit default driver
+	 */
+	public static void quitDriver() {
+		quitDriver(DEFAULT);
+	}
+	
+	/**
+	 * Quit driver by name
+	 * @param String driver name
+	 */
+	public static void quitDriver(String name) {
+		long threadId = Thread.currentThread().getId();
+		WebDriver drv = getDriver(name);
+		
+		try {
+			if (drv == null) {
+				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
+			}
+
+			LOGGER.debug("Driver exiting..." + drv);
+	    	deregisterDriver(name);
+	    	DevicePool.deregisterDevice();
+			drv.quit();
+			
+	    	LOGGER.debug("Driver exited..." + drv);
+		} catch (Exception e) {
+    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
+    		LOGGER.debug("======================================================================================================================================");
+		} finally {
+    		//TODO analyze how to forcibly kill session on device
+			NDC.pop();
+		}
+    }
+	
+	/**
+	 * Quit all drivers registered for current thread/test
+	 */
+	public static void quitDrivers() {
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+
+		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+			quitDriver(entry.getKey());
+		}
+		
+		deregisterBrowserMobProxy();
+	}
+	
+	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
     	boolean init = false;
     	int count = 0;
     	WebDriver drv = null;
@@ -61,7 +201,12 @@ public class DriverPool {
     			
     			Device device = DevicePool.registerDevice();
     			
-    			drv = DriverFactory.create(name, device);
+    			if (capabilities == null && selenium_host == null) {
+    				drv = DriverFactory.create(name, device);
+    			} else {
+    				//TODO: investigate do we need transfer device to factory or not 
+    				drv = DriverFactory.create(name, capabilities, selenium_host);
+    			}
     			registerDriver(drv, name);
     			
     			init = true;
@@ -86,81 +231,6 @@ public class DriverPool {
     	}
 
     	return drv;
-	}
-	
-	public static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
-		WebDriver extraDriver = null;
-		try {
-			if (capabilities == null && selenium_host == null) {
-				Device device = DevicePool.registerDevice();
-				extraDriver = DriverFactory.create(name, device);	
-			}
-			else {
-				extraDriver = DriverFactory.create(name, capabilities, selenium_host);
-			}
-	    	
-	    	if (extraDriver == null ) {
-	    		Assert.fail("Unable to initialize extra driver: " + name + "!");
-	    	}
-		}
-		catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", name, thr.getMessage()), thr);
-			DevicePool.deregisterDevice();
-			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", name, thr.getMessage()));
-			throw new RuntimeException (thr);
-		}    	
-		
-		registerDriver(extraDriver, name);
-		return extraDriver;		
-	}
-
-
-	public static void quitDrivers() {
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-
-		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
-			quitDriver(entry.getKey());
-		}
-		
-		deregisterBrowserMobProxy();
-	}
-	
-	public static void quitDriver() {
-		quitDriver(DEFAULT);
-	}
-	
-	public static void quitDriver(String name) {
-		long threadId = Thread.currentThread().getId();
-		WebDriver drv = getDriver(name);
-		
-		try {
-			if (drv == null) {
-				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
-			}
-
-			LOGGER.debug("Driver exiting..." + drv);
-	    	deregisterDriver(name);
-	    	DevicePool.deregisterDevice();
-			drv.quit();
-			
-	    	LOGGER.debug("Driver exited..." + drv);
-		} catch (Exception e) {
-    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
-    		LOGGER.debug("======================================================================================================================================");
-		} finally {
-    		//TODO analyze how to forcibly kill session on device
-			NDC.pop();
-		}
-    }
-
-	
-	public static void restartDriver() {
-		restartDriver(DEFAULT);
-	}
-	public static void restartDriver(String name) {
-		quitDriver(name);
-		createDriver(name);
 	}
 	
 	protected static void registerDriver(WebDriver driver) {
@@ -210,54 +280,6 @@ public class DriverPool {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		return currentDrivers.size();
-	}
-
-	public static WebDriver getSingleDriver() {
-		return single_driver;
-	}
-
-	
-	public static WebDriver getDriver() {
-		return getDriver(DEFAULT);
-	}
-
-	public static WebDriver getDriver(String name) {
-		WebDriver drv = null;
-		DriverMode driverMode = Configuration.getDriverMode();
-		Long threadId = Thread.currentThread().getId();
-
-		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-
-		if (currentDrivers.containsKey(name)) {
-			drv = currentDrivers.get(name);
-			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
-		} else if (driverMode == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
-			LOGGER.debug("########## Unable to find driver by threadId: " + threadId);
-			// init our single driver variable
-			drv = single_driver;
-		} else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
-				&& Configuration.getInt(Parameter.THREAD_COUNT) == 1
-				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
-			Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
-			LOGGER.debug(
-					"Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
-			for (int i = 0; i < threads.length; i++) {
-				currentDrivers = drivers.get(threads[i].getId());
-				if (currentDrivers != null) {
-					if (currentDrivers.containsKey(name)) {
-						drv = currentDrivers.get(name);
-						LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
-						break;
-					}
-				}
-			}
-		}
-		
-		if (drv == null) {
-			LOGGER.warn("Starting new driver as nothing was found in the pool");
-			drv = createDriver(name);
-		}
-		return drv;
 	}
 
 	protected static void deregisterDriver() {

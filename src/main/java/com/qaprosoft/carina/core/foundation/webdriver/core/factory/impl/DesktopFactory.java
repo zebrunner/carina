@@ -25,11 +25,11 @@ public class DesktopFactory extends AbstractFactory
 	private static DesiredCapabilities staticCapabilities;
 
 	@Override
-	public WebDriver create(String testName, Device device)
+	public WebDriver create(String name, Device device)
 	{
-		RemoteWebDriver driver;
+		RemoteWebDriver driver = null;
 		String selenium = Configuration.get(Parameter.SELENIUM_HOST);
-		DesiredCapabilities capabilities = getCapabilities(testName);
+		DesiredCapabilities capabilities = getCapabilities(name);
 		if (staticCapabilities != null)
 		{
 			LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
@@ -43,10 +43,11 @@ public class DesktopFactory extends AbstractFactory
 		{
 			throw new RuntimeException("Unable to create desktop driver");
 		}
+		
 		return driver;
 	}
 
-	public DesiredCapabilities getCapabilities(String testName)
+	public DesiredCapabilities getCapabilities(String name)
 	{
 		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
 		if (!customCapabilities.isEmpty())
@@ -58,19 +59,19 @@ public class DesktopFactory extends AbstractFactory
 
 			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
-				return new FirefoxCapabilities().getCapability(testName);
+				return new FirefoxCapabilities().getCapability(name);
 			} else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
-				return new IECapabilities().getCapability(testName);
+				return new IECapabilities().getCapability(name);
 			} else if (BrowserType.HTMLUNIT.equalsIgnoreCase(browser))
 			{
-				return new HTMLUnitCapabilities().getCapability(testName);
+				return new HTMLUnitCapabilities().getCapability(name);
 			} else if (BrowserType.SAFARI.equalsIgnoreCase(browser))
 			{
-				return new SafariCapabilities().getCapability(testName);
+				return new SafariCapabilities().getCapability(name);
 			} else if (BrowserType.CHROME.equalsIgnoreCase(browser))
 			{
-				return new ChromeCapabilities().getCapability(testName);
+				return new ChromeCapabilities().getCapability(name);
 			} else
 			{
 				throw new RuntimeException("Unsupported browser: " + browser);
