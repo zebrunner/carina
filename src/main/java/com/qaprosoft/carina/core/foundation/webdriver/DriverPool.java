@@ -217,7 +217,7 @@ public class DriverPool {
 	 *            String
 	 * @return WebDriver
 	 */
-	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
+	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
 		boolean init = false;
 		int count = 0;
 		WebDriver drv = null;
@@ -231,12 +231,12 @@ public class DriverPool {
 
 				Device device = DevicePool.registerDevice();
 
-				if (capabilities == null && selenium_host == null) {
+				if (capabilities == null && seleniumHost == null) {
 					drv = DriverFactory.create(name, device);
 				} else {
 					// TODO: investigate do we need transfer device to factory
 					// or not
-					drv = DriverFactory.create(name, capabilities, selenium_host);
+					drv = DriverFactory.create(name, capabilities, seleniumHost);
 				}
 				registerDriver(drv, name);
 
@@ -267,8 +267,9 @@ public class DriverPool {
 	/**
 	 * Register driver in the DriverPool
 	 * 
-	 * @param WebDriver
-	 *            driver
+	 * @param driver
+	 *            WebDriver
+	 * 
 	 * @param name
 	 *            String driver name
 	 * 
@@ -369,8 +370,8 @@ public class DriverPool {
 	/**
 	 * Replace default driver in the DriverPool
 	 * 
-	 * @param WebDriver
-	 *            driver
+	 * @param driver
+	 *            WebDriver
 	 * 
 	 */
 	public static void replaceDriver(WebDriver driver) {
@@ -380,8 +381,9 @@ public class DriverPool {
 	/**
 	 * Replace named driver in the DriverPool
 	 * 
-	 * @param WebDriver
-	 *            driver
+	 * @param driver
+	 *            WebDriver
+	 * 
 	 * @param name
 	 *            String driver name
 	 * 
