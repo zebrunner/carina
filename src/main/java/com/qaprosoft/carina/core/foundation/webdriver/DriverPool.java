@@ -35,23 +35,25 @@ import net.lightbody.bmp.BrowserMobProxy;
 public class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
-	
+
 	public static final String DEFAULT = "default";
 	protected static WebDriver single_driver;
-	
+
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
 
 	/**
 	 * Get global suite driver. For driver_mode=suite_mode only.
+	 * 
 	 * @return Suite mode WebDriver
 	 */
 	public static WebDriver getSingleDriver() {
 		return single_driver;
 	}
-	
+
 	/**
 	 * Get default driver. If no default driver discovered it will be created.
+	 * 
 	 * @return default WebDriver
 	 */
 	public static WebDriver getDriver() {
@@ -59,8 +61,11 @@ public class DriverPool {
 	}
 
 	/**
-	 * Get driver by name. If no driver discovered it will be created using default capabilities.
-	 * @param name String driver name 
+	 * Get driver by name. If no driver discovered it will be created using
+	 * default capabilities.
+	 * 
+	 * @param name
+	 *            String driver name
 	 * @return WebDriver by name
 	 */
 	public static WebDriver getDriver(String name) {
@@ -68,10 +73,15 @@ public class DriverPool {
 	}
 
 	/**
-	 * Get driver by name. If no driver discovered it will be created using custom capabilities and selenium server.
-	 *  @param name String driver name
-	 *  @param capabilities DesiredCapabilities 
-	 *  @param seleniumHost String
+	 * Get driver by name. If no driver discovered it will be created using
+	 * custom capabilities and selenium server.
+	 * 
+	 * @param name
+	 *            String driver name
+	 * @param capabilities
+	 *            DesiredCapabilities
+	 * @param seleniumHost
+	 *            String
 	 * @return WebDriver by name
 	 */
 	public static WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -105,76 +115,84 @@ public class DriverPool {
 				}
 			}
 		}
-		
+
 		if (drv == null) {
 			LOGGER.warn("Starting new driver as nothing was found in the pool");
 			drv = createDriver(name, capabilities, seleniumHost);
 		}
 		return drv;
 	}
-	
+
 	/**
 	 * Restart default driver
 	 */
 	public static void restartDriver() {
 		restartDriver(DEFAULT);
 	}
-	
+
 	/**
 	 * Restart driver by name with default capabilities
-	 * @param name String driver name
+	 * 
+	 * @param name
+	 *            String driver name
 	 */
 	public static void restartDriver(String name) {
 		restartDriver(name, null, null);
 	}
-	
+
 	/**
 	 * Restart driver by name with custom capabilities
-	 * @param name String driver name
-	 * @param capabilities DesiredCapabilities
-	 * @param seleniumHost String
+	 * 
+	 * @param name
+	 *            String driver name
+	 * @param capabilities
+	 *            DesiredCapabilities
+	 * @param seleniumHost
+	 *            String
 	 */
 	public static void restartDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
 		quitDriver(name);
 		createDriver(name, capabilities, seleniumHost);
 	}
-	
-	
+
 	/**
 	 * Quit default driver
 	 */
 	public static void quitDriver() {
 		quitDriver(DEFAULT);
 	}
-	
+
 	/**
 	 * Quit driver by name
-	 * @param name String driver name
+	 * 
+	 * @param name
+	 *            String driver name
 	 */
 	public static void quitDriver(String name) {
 		long threadId = Thread.currentThread().getId();
 		WebDriver drv = getDriver(name);
-		
+
 		try {
 			if (drv == null) {
 				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
 			}
 
 			LOGGER.debug("Driver exiting..." + drv);
-	    	deregisterDriver(name);
-	    	DevicePool.deregisterDevice();
+			deregisterDriver(name);
+			DevicePool.deregisterDevice();
 			drv.quit();
-			
-	    	LOGGER.debug("Driver exited..." + drv);
+
+			LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
-    		LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
-    		LOGGER.debug("======================================================================================================================================");
+			LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
+			LOGGER.debug(
+					"======================================================================================================================================");
 		} finally {
-    		//TODO analyze how to forcibly kill session on device
+			// TODO analyze how to forcibly kill session on device
 			NDC.pop();
 		}
-    }
-	
+	}
+
 	/**
 	 * Quit all drivers registered for current thread/test
 	 */
@@ -184,62 +202,69 @@ public class DriverPool {
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			quitDriver(entry.getKey());
 		}
-		
+
 		deregisterBrowserMobProxy();
 	}
-	
-	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
-    	boolean init = false;
-    	int count = 0;
-    	WebDriver drv = null;
-    	Throwable init_throwable = null;
-    	
-    	int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; //1 - is default run without retry
-    	while (!init & count++ < maxCount) {
-    		try {
-    			LOGGER.debug("initDriver start...");
-    			
-    			Device device = DevicePool.registerDevice();
-    			
-    			if (capabilities == null && selenium_host == null) {
-    				drv = DriverFactory.create(name, device);
-    			} else {
-    				//TODO: investigate do we need transfer device to factory or not 
-    				drv = DriverFactory.create(name, capabilities, selenium_host);
-    			}
-    			registerDriver(drv, name);
-    			
-    			init = true;
-    			// push custom device name for log4j default messages
-    			if (device != null) {
-    				NDC.push(" [" + device.getName() + "] ");
-    			}
-    			
-    			LOGGER.debug("initDriver finish...");
-    		}
-    		catch (Throwable thr) {
-    			//DevicePool.ignoreDevice();
-    			DevicePool.deregisterDevice();
-    			LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count, maxCount, thr.getMessage()));
-    			init_throwable = thr;
-    			pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
-    		}
-    	}
-    	
-    	if (!init) {
-    		throw new RuntimeException(init_throwable);
-    	}
 
-    	return drv;
+	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String selenium_host) {
+		boolean init = false;
+		int count = 0;
+		WebDriver drv = null;
+		Throwable init_throwable = null;
+
+		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1; // 1
+																				// -
+																				// is
+																				// default
+																				// run
+																				// without
+																				// retry
+		while (!init & count++ < maxCount) {
+			try {
+				LOGGER.debug("initDriver start...");
+
+				Device device = DevicePool.registerDevice();
+
+				if (capabilities == null && selenium_host == null) {
+					drv = DriverFactory.create(name, device);
+				} else {
+					// TODO: investigate do we need transfer device to factory
+					// or not
+					drv = DriverFactory.create(name, capabilities, selenium_host);
+				}
+				registerDriver(drv, name);
+
+				init = true;
+				// push custom device name for log4j default messages
+				if (device != null) {
+					NDC.push(" [" + device.getName() + "] ");
+				}
+
+				LOGGER.debug("initDriver finish...");
+			} catch (Throwable thr) {
+				// DevicePool.ignoreDevice();
+				DevicePool.deregisterDevice();
+				LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
+						maxCount, thr.getMessage()));
+				init_throwable = thr;
+				pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
+			}
+		}
+
+		if (!init) {
+			throw new RuntimeException(init_throwable);
+		}
+
+		return drv;
 	}
-	
+
 	protected static void registerDriver(WebDriver driver) {
 		registerDriver(driver, DEFAULT);
 	}
 
 	protected static void registerDriver(WebDriver driver, String name) {
 		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
-			//replace single_driver only for default one!
+			// replace single_driver only for default one!
 			// init our single driver variable
 			single_driver = driver;
 		}
@@ -269,13 +294,13 @@ public class DriverPool {
 	protected static boolean isDriverRegistered(String name) {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
-		
+
 		if (currentDrivers == null) {
 			return false;
 		}
 		return currentDrivers.containsKey(name);
 	}
-	
+
 	protected static int size() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
@@ -294,7 +319,7 @@ public class DriverPool {
 			WebDriver drv = currentDrivers.get(name);
 			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
 			currentDrivers.remove(name);
-			
+
 			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 				single_driver = null;
 			}
@@ -322,7 +347,7 @@ public class DriverPool {
 		deregisterDriver(name);
 		registerDriver(driver, name);
 	}
-	
+
 	public static ConcurrentHashMap<String, WebDriver> getDrivers() {
 		Long threadId = Thread.currentThread().getId();
 
@@ -362,7 +387,7 @@ public class DriverPool {
 		}
 	}
 
-	// ------------------------- BOWSERMOB PROXY ---------------------------------
+	// ------------------------- BOWSERMOB PROXY ---------------------
 	public static void registerBrowserMobProxy(BrowserMobProxy proxy) {
 		proxies.put(Thread.currentThread().getId(), proxy);
 	}
