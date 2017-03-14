@@ -24,9 +24,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -41,6 +44,9 @@ public class DriverPool {
 
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
+	
+	private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
+	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
 
 	/**
 	 * Get global suite driver. For driver_mode=suite_mode only.
@@ -171,6 +177,9 @@ public class DriverPool {
 	public static void quitDriver(String name) {
 		long threadId = Thread.currentThread().getId();
 		WebDriver drv = getDriver(name);
+		
+		stopRecording();
+		executor.screenOff();
 
 		try {
 			if (drv == null) {
@@ -197,6 +206,7 @@ public class DriverPool {
 	 * Quit all drivers registered for current thread/test
 	 */
 	public static void quitDrivers() {
+		
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
@@ -223,6 +233,10 @@ public class DriverPool {
 		WebDriver drv = null;
 		Throwable init_throwable = null;
 
+		
+		// turn on  mobile device display if necessary
+		executor.screenOn();
+		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
 		while (!init & count++ < maxCount) {
@@ -247,6 +261,8 @@ public class DriverPool {
 				}
 
 				LOGGER.debug("initDriver finish...");
+				
+				
 			} catch (Throwable thr) {
 				// DevicePool.ignoreDevice();
 				DevicePool.deregisterDevice();
@@ -260,6 +276,8 @@ public class DriverPool {
 		if (!init) {
 			throw new RuntimeException(init_throwable);
 		}
+		
+		startRecording();
 
 		return drv;
 	}
@@ -466,6 +484,27 @@ public class DriverPool {
 			proxies.get(threadId).stop();
 			proxies.remove(threadId);
 		}
+	}
+
+	
+	private static void startRecording() {
+		Integer pid = executor.startRecording(SpecialKeywords.VIDEO_FILE_NAME);
+		adbVideoRecorderPid.set(pid);
+	}
+	
+	private static void stopRecording() {
+		Integer adb_pid = adbVideoRecorderPid.get();
+		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING) && adb_pid != null) {
+			executor.stopRecording(adb_pid); //stop recording
+			pause(3); //very often video from device is black. trying to wait before pulling the file
+			
+			String videoDir = ReportContext.getBaseDir().getAbsolutePath();			
+			videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
+ 
+			
+			//TODO: refactor video recorder to make it happen for each driver if necessary
+			executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/video.mp4");
+		}	
 	}
 
 }
