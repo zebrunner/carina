@@ -51,7 +51,7 @@ public class ThreadLogAppender extends AppenderSkeleton
 			}
 			if (event != null) {
 				//append time, thread, class name and device name if any
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss"); //2016-05-26 04:39:16
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //2016-05-26 04:39:16
 				String time = dateFormat.format(event.getTimeStamp());
 				//System.out.println("time: " + time);
 				
