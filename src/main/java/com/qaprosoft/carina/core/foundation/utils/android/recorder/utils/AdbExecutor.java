@@ -153,7 +153,13 @@ public class AdbExecutor {
     public int startRecording(String pathToFile) {
         if (!isDeviceCorrect())
             return -1;
+        
+        if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+        	return -1;
+        }
 
+        dropFile(pathToFile);
+        
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
 
         try {
