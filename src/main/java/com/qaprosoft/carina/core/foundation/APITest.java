@@ -15,40 +15,18 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
-import java.lang.reflect.Method;
-
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.xml.XmlTest;
-
-import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
-
+@Deprecated
 public abstract class APITest extends AbstractTest
 {
-    protected APIMethodBuilder apiMethodBuilder;
-    
 	@Override
+	@Deprecated
 	protected boolean isUITest()
 	{
 		return false;
 	}
 	
-    @BeforeMethod(alwaysRun = true)
-    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable
-    {
-    	super.executeBeforeTestMethod(xmlTest, testMethod, context);
-    	apiMethodBuilder = new APIMethodBuilder();
-    }
-    
-    @AfterMethod(alwaysRun = true)
-    public void executeAfterTestMethod(ITestResult result)
-    {
-		super.executeAfterTestMethod(result);    	
-    }
-	
     @Override
+    @Deprecated
     protected String getBrowser() {
     	//ignore any settings in _config.properties and return empty String instead of browser name 
     	return "";
