@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
@@ -117,6 +116,24 @@ public class Screenshot
 	public static String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
 		return capture(driver, isTakeScreenshot, "", false);
+
+	}
+	
+	/**
+	 * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param isTakeScreenshot
+	 *            perform actual capture or not
+	 * @param comment
+	 *            String
+	 * @return screenshot name.
+	 */
+	@Deprecated
+	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)
+	{
+		return capture(driver, isTakeScreenshot, comment, false);
 
 	}
 
