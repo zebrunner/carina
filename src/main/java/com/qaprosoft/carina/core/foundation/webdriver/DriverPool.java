@@ -251,20 +251,17 @@ public class DriverPool {
 					String[] apkVersions = executor.getApkVersion(Configuration.get(Parameter.MOBILE_APP));
 					if (apkVersions != null) {
 						String appPackage = apkVersions[0];
-						String versionCode = apkVersions[1];
-						String versionName = apkVersions[2];
 
 						// TODO: verify if the same version is already installed
-						String installedVersionCode = executor.getInstalledApkCode(appPackage);
-						String installedVersionName = executor.getInstalledApkName(appPackage);
+						String[] apkInstalledVersions = executor.getInstalledApkVersion(appPackage);
 
-						if (installedVersionCode.equalsIgnoreCase(versionCode)
-								&& installedVersionName.equalsIgnoreCase(versionName)) {
+						if (apkVersions[1].equals(apkInstalledVersions[1])
+								&& apkVersions[2].equals(apkInstalledVersions[2])) {
 							LOGGER.info(
 									"Skip application uninstall and cache cleanup as the same version are installed.");
 						} else {
-							LOGGER.info("installed app: " + installedVersionName + "-" + installedVersionCode);
-							LOGGER.info("new app: " + versionName + "-" + versionCode);
+							LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
+							LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
 
 							executor.uninstallApp(appPackage);
 							executor.clearAppData(appPackage);
