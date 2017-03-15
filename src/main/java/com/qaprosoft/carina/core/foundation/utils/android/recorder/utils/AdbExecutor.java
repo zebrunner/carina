@@ -228,7 +228,7 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return;
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell dumpsys package ", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", packageName);
         execute(cmd);
     }
     
@@ -241,7 +241,7 @@ public class AdbExecutor {
         String[] res = new String[3];
         res[0] = packageName;
         
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell dumpsys package ", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell",  "dumpsys",  "package", packageName);
 		List<String> output = execute(cmd);
         
 		
