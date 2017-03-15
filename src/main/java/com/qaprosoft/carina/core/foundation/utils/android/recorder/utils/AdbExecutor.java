@@ -247,13 +247,13 @@ public class AdbExecutor {
 		
 		for (String line : output) {
 			LOGGER.debug(line);
-			if (line.contains("versionName")) {
+			if (line.contains("versionCode")) {
 				LOGGER.info("Line for parsing installed app: " + line);
 				String[] outputs = line.split("=");
 				res[1] = outputs[1];
 			}
 			
-			if (line.contains("versionName") || line.contains("versionCode")) {
+			if (line.contains("versionName")) {
 				LOGGER.info("Line for parsing installed app: " + line);
 				String[] outputs = line.split("=");
 				res[2] = outputs[1];
