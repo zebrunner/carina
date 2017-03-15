@@ -244,6 +244,8 @@ public class Configuration
         
         MOBILE_APP("mobile_app"),
         
+        MOBILE_APP_REINSTALL("mobile_app_reinstall"),
+        
         MOBILE_APP_ACTIVITY("mobile_app_activity"),
         
 		MOBILE_APP_PACKAGE("mobile_app_package"), 
