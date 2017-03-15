@@ -234,18 +234,6 @@ public class DriverPool {
 		Throwable init_throwable = null;
 
 		
-		// turn on  mobile device display if necessary
-		executor.screenOn();
-		if (Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
-			//explicit reinstall the apk
-			String appPackage = Configuration.get(Parameter.MOBILE_APP_PACKAGE);
-			String appVersion = executor.getAppVersion(Configuration.get(Parameter.MOBILE_APP));
-			LOGGER.info("App version for apk is " + appVersion);
-			executor.uninstallApp(appPackage);
-			executor.clearAppData(appPackage);
-		}
-		
-		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
 		while (!init & count++ < maxCount) {
@@ -253,6 +241,17 @@ public class DriverPool {
 				LOGGER.debug("initDriver start...");
 
 				Device device = DevicePool.registerDevice();
+				
+				// turn on  mobile device display if necessary. action can be done after registering available device with thread
+				executor.screenOn();
+				if (Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
+					//explicit reinstall the apk
+					String appPackage = Configuration.get(Parameter.MOBILE_APP_PACKAGE);
+					String appVersion = executor.getAppVersion(Configuration.get(Parameter.MOBILE_APP));
+					LOGGER.info("App version for apk is " + appVersion);
+					executor.uninstallApp(appPackage);
+					executor.clearAppData(appPackage);
+				}
 
 				if (capabilities == null && seleniumHost == null) {
 					drv = DriverFactory.create(name, device);
