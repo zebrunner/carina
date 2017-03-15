@@ -224,13 +224,57 @@ public class AdbExecutor {
         execute(cmd);
     }
 
-    public void uninstallApp(String app) {
+    public void uninstallApp(String packageName) {
         if (!isDeviceCorrect())
             return;
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell dumpsys package ", packageName);
         execute(cmd);
     }
+    
+    public String getInstalledApkCode(String packageName) {
+        if (!isDeviceCorrect())
+            return "";
+        //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
+        //	versionCode=17040000 targetSdk=25
+        
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell dumpsys package ", packageName);
+		List<String> output = execute(cmd);
+        
+		
+		String versionCode = "";
+		for (String line : output) {
+			if (line.contains("versionName")) {
+				LOGGER.debug(line);
+				String[] outputs = line.split("=");
+				versionCode = outputs[1];
+			}
+		}
+		
+		return versionCode;
+    }
+    
+    public String getInstalledApkName(String app) {
+        if (!isDeviceCorrect())
+            return "";
+        
+        //adb -s UDID shell dumpsys package PACKAGE | grep versionName
+        //    versionName=17.4.0_develop_fd99
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
+		List<String> output = execute(cmd);
+		
+		String versionName = "";
+		for (String line : output) {
+			if (line.contains("versionName")) {
+				LOGGER.debug(line);
+				String[] outputs = line.split("=");
+				versionName = outputs[1];
+			}
+		}
+		
+		return versionName;
+    }
+
     
 	public String[] getApkVersion(String apkFile) {
 		if (!isDeviceCorrect())
@@ -250,9 +294,9 @@ public class AdbExecutor {
 			if (line.contains("versionCode") && line.contains("versionName")) {
 				LOGGER.debug(line);
 				String[] outputs = line.split("'");
-				res[0] = outputs[1];
-				res[1] = outputs[3];
-				res[2] = outputs[5];
+				res[0] = outputs[1]; //package
+				res[1] = outputs[3]; //versionCode
+				res[2] = outputs[5]; //versionName
 			}
 		}
 
