@@ -236,6 +236,15 @@ public class DriverPool {
 		
 		// turn on  mobile device display if necessary
 		executor.screenOn();
+		if (Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
+			//explicit reinstall the apk
+			String appPackage = Configuration.get(Parameter.MOBILE_APP_PACKAGE);
+			String appVersion = executor.getAppVersion(Configuration.get(Parameter.MOBILE_APP));
+			LOGGER.info("App version for apk is " + appVersion);
+			executor.uninstallApp(appPackage);
+			executor.clearAppData(appPackage);
+		}
+		
 		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
