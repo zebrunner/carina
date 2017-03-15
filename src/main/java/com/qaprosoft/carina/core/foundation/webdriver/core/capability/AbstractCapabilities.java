@@ -45,8 +45,6 @@ public abstract class AbstractCapabilities {
     }
     
     protected DesiredCapabilities getExtraCapabilities() {
-    	HttpClient.setupProxy();
-    	
 		//handle variant with extra capabilities from external property file
     	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
     	DesiredCapabilities extraCapabilities = null;
