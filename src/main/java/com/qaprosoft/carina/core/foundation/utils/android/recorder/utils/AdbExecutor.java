@@ -237,13 +237,12 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return "";
         
-        String mobileAppPackage = Configuration.get(Parameter.MOBILE_APP_PACKAGE);
-        //aapt dump badging <apk_file> | grep versionCode | grep com.myfitnesspal.android
+        //aapt dump badging <apk_file> | grep versionCode
         //aapt dump badging <apk_file> | grep versionName
         //output:
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
         
-        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile, "| grep versionCode | grep , ", mobileAppPackage);
+        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile, "| grep versionCode");
         for (String output: cmd) {
         	LOGGER.debug(output);
         }
