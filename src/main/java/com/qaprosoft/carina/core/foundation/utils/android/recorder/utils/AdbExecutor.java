@@ -232,49 +232,36 @@ public class AdbExecutor {
         execute(cmd);
     }
     
-    public String getInstalledApkCode(String packageName) {
+    public String[] getInstalledApkVersion(String packageName) {
         if (!isDeviceCorrect())
-            return "";
+            return null;
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
         //	versionCode=17040000 targetSdk=25
+        
+        String[] res = new String[3];
+        res[0] = packageName;
         
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell dumpsys package ", packageName);
 		List<String> output = execute(cmd);
         
 		
-		String versionCode = "";
 		for (String line : output) {
+			LOGGER.debug(line);
 			if (line.contains("versionName")) {
-				LOGGER.debug(line);
+				LOGGER.info("Line for parsing installed app: " + line);
 				String[] outputs = line.split("=");
-				versionCode = outputs[1];
+				res[1] = outputs[1];
+			}
+			
+			if (line.contains("versionName") || line.contains("versionCode")) {
+				LOGGER.info("Line for parsing installed app: " + line);
+				String[] outputs = line.split("=");
+				res[2] = outputs[1];
 			}
 		}
 		
-		return versionCode;
+		return res;
     }
-    
-    public String getInstalledApkName(String app) {
-        if (!isDeviceCorrect())
-            return "";
-        
-        //adb -s UDID shell dumpsys package PACKAGE | grep versionName
-        //    versionName=17.4.0_develop_fd99
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
-		List<String> output = execute(cmd);
-		
-		String versionName = "";
-		for (String line : output) {
-			if (line.contains("versionName")) {
-				LOGGER.debug(line);
-				String[] outputs = line.split("=");
-				versionName = outputs[1];
-			}
-		}
-		
-		return versionName;
-    }
-
     
 	public String[] getApkVersion(String apkFile) {
 		if (!isDeviceCorrect())
