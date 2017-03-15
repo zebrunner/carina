@@ -242,26 +242,19 @@ public class AdbExecutor {
         //output:
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
         
-        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile, "| grep versionCode");
-        for (String output: cmd) {
-        	LOGGER.debug(output);
-        }
-        
+        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
         List<String> res = execute(cmd);
         //parse output command and get appropriate data
+        String versionCode = "", versionName = "";
         for (String output: res) {
-        	LOGGER.debug(output);
+        	if (output.contains("versionCode") && output.contains("versionName")) {
+        		LOGGER.debug(output);
+            	String[] outputs = output.split("'");
+            	versionCode = outputs[3];
+            	versionName = outputs[5];
+            	LOGGER.info(versionName + versionCode);
+        	}
         }
-        
-        if (res.size() != 1) {
-        	Assert.fail("Unable to parse versionCode and Name from apk file: " + apkFile);
-        }
-        
-    	String[] outputs = res.get(0).split("'");
-    	String versionCode = outputs[3];
-    	String versionName = outputs[5];
-    	LOGGER.info(versionName + versionCode);
-        
         
         return versionName + versionCode;
     }
