@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -233,31 +232,32 @@ public class AdbExecutor {
         execute(cmd);
     }
     
-    public String getAppVersion(String apkFile) {
-        if (!isDeviceCorrect())
-            return "";
-        
-        //aapt dump badging <apk_file> | grep versionCode
-        //aapt dump badging <apk_file> | grep versionName
-        //output:
-        // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
-        
-        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
-        List<String> res = execute(cmd);
-        //parse output command and get appropriate data
-        String versionCode = "", versionName = "";
-        for (String output: res) {
-        	if (output.contains("versionCode") && output.contains("versionName")) {
-        		LOGGER.debug(output);
-            	String[] outputs = output.split("'");
-            	versionCode = outputs[3];
-            	versionName = outputs[5];
-            	LOGGER.info(versionName + versionCode);
-        	}
-        }
-        
-        return versionName + versionCode;
-    }
+	public String[] getApkVersion(String apkFile) {
+		if (!isDeviceCorrect())
+			return null;
+
+		// aapt dump badging <apk_file> | grep versionCode
+		// aapt dump badging <apk_file> | grep versionName
+		// output:
+		// package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
+
+		String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
+		List<String> output = execute(cmd);
+		// parse output command and get appropriate data
+		String[] res = new String[3];
+
+		for (String line : output) {
+			if (line.contains("versionCode") && line.contains("versionName")) {
+				LOGGER.debug(line);
+				String[] outputs = line.split("'");
+				res[0] = outputs[1];
+				res[1] = outputs[3];
+				res[2] = outputs[5];
+			}
+		}
+
+		return res;
+	}
     
     
 
