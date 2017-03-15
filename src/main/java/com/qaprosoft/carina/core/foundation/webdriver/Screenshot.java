@@ -21,10 +21,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -46,25 +48,51 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
  * 
  * @author Alex Khursevich
  */
-@SuppressWarnings("deprecation")
 public class Screenshot
 {
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
 	 * @return screenshot name.
 	 */
+	@Deprecated
 	public static String capture(WebDriver driver)
 	{
 		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT));
 	}
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param comment String
+	 * @return screenshot name.
+	 */
+	public static String captureFailure(WebDriver driver, String comment)
+	{
+		return capture(driver, true, comment, true);
+	}
+	
+	/**
+	 * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param comment String
+	 * @return screenshot name.
+	 */
+	public static String captureFullSize(WebDriver driver, String comment)
+	{
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, true);
+	}
+	
+	/**
+	 * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -73,11 +101,11 @@ public class Screenshot
 	 */
 	public static String capture(WebDriver driver, String comment)
 	{
-		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment);
+		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false);
 	}
 
 	/**
-	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -85,9 +113,10 @@ public class Screenshot
 	 *            perform actual capture or not
 	 * @return screenshot name.
 	 */
+	@Deprecated
 	public static String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
-		return capture(driver, isTakeScreenshot, "");
+		return capture(driver, isTakeScreenshot, "", false);
 
 	}
 
@@ -100,10 +129,15 @@ public class Screenshot
 	 *            perform actual capture or not
 	 * @param comment
 	 * 			  String
+	 * @param fullSize
+	 * 			  Boolean
 	 * @return screenshot name.
 	 */
-	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment) {
+	private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
 		String screenName = "";
+		
+		// TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
+		// For the rest of cases returned previous implementation
 
 		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
 			if (driver == null) {
@@ -134,42 +168,41 @@ public class Screenshot
 				// Capture full page screenshot and resize
 				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
 				screenName = fileID + ".png";
-				String fullScreenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+				String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
 				WebDriver augmentedDriver = driver;
 				if (!driver.toString().contains("AppiumNativeDriver")) {
 					// do not augment for Appium 1.x anymore
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				}
+				
+				BufferedImage screen;
 
-				BufferedImage fullScreen;
-				BufferedImage thumbScreen;
-				if (driver.getClass().toString().contains("java_client")) {
-					File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
-					fullScreen = ImageIO.read(screenshot);
-					thumbScreen = ImageIO.read(screenshot);
+				//Create screenshot
+				if (fullSize) {
+					screen = takeFullScreenshot(driver, augmentedDriver);
 				} else {
-					ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
-							.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
-					fullScreen = screenshot.getImage();
-					thumbScreen = screenshot.getImage();
+					screen = takeVisibleScreenshot(driver, augmentedDriver);
 				}
+
+				BufferedImage thumbScreen = screen;
 
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
 						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
-					resizeImg(fullScreen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), fullScreenPath);
+					resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
 				}
-				ImageIO.write(fullScreen, "PNG", new File(fullScreenPath));
+
+				ImageIO.write(screen, "PNG", new File(screenPath));
 
 				// Create screenshot thumbnail
-				String thumbScreenPath = fullScreenPath.replace(screenName, "/thumbnails/" + screenName);
+				String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
 				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
 				// Uploading screenshot to Amazon S3
-				uploadToAmazonS3(test, fullScreenPath, screenName, comment);
+				uploadToAmazonS3(test, screenPath, screenName, comment);
 
 				// add screenshot comment to collector
 				TestLogCollector.addScreenshotComment(screenName, comment);
@@ -223,7 +256,7 @@ public class Screenshot
 	 * @param path
 	 *            - path to screenshot file.
 	 */
-	public static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
+	private static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
 		try {
 			bufImage = Scalr.resize(bufImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
 					Scalr.OP_ANTIALIAS);
@@ -234,5 +267,47 @@ public class Screenshot
 		} catch (Exception e) {
 			LOGGER.error("Image scaling problem!");
 		}
+	}
+	
+	/**
+	 * Makes fullsize screenshot using javascript (May not work properly with
+	 * popups and active js-elements on the page)
+	 * 
+	 * @param driver
+	 *            - webDriver.
+	 * @param augmentedDriver
+	 *            - webDriver.
+	 * @exception IOException
+	 * 
+	 * @return screenshot image
+	 */
+	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
+		BufferedImage screenShot;
+		if (driver.getClass().toString().contains("java_client")) {
+			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
+			screenShot = ImageIO.read(screenshot);
+		} else {
+			ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
+					.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
+			screenShot = screenshot.getImage();
+		}
+
+		return screenShot;
+	}
+
+	/**
+	 * Makes screenshot of visible part of the page
+	 * 
+	 * @param driver
+	 *            - webDriver.
+	 * @param augmentedDriver
+	 *            - webDriver.
+	 * @exception IOException
+	 * 
+	 * @return screenshot image
+	 */
+	private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
+		BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+		return screenShot;
 	}
 }
