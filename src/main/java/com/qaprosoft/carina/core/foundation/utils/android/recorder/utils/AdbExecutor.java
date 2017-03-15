@@ -236,7 +236,7 @@ public class AdbExecutor {
         if (!isDeviceCorrect())
             return null;
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
-        //	versionCode=17040000 targetSdk=25
+        
         
         String[] res = new String[3];
         res[0] = packageName;
@@ -248,12 +248,15 @@ public class AdbExecutor {
 		for (String line : output) {
 			LOGGER.debug(line);
 			if (line.contains("versionCode")) {
+				// versionCode=17040000 targetSdk=25
 				LOGGER.info("Line for parsing installed app: " + line);
 				String[] outputs = line.split("=");
-				res[1] = outputs[1];
+				String tmp = outputs[1]; //everything after '=' sign
+				res[1] = tmp.split(" ")[0];
 			}
 			
 			if (line.contains("versionName")) {
+				// versionName=8.5.0
 				LOGGER.info("Line for parsing installed app: " + line);
 				String[] outputs = line.split("=");
 				res[2] = outputs[1];
