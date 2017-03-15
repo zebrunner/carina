@@ -246,6 +246,11 @@ public class AdbExecutor {
         String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile, "| grep versionCode | grep , ", mobileAppPackage);
         List<String> res = execute(cmd);
         
+        //parse output command and get appropriate data
+        for (String output: res) {
+        	LOGGER.info(output);
+        }
+        
         if (res.size() != 1) {
         	Assert.fail("Unable to parse versionCode and Name from apk file: " + apkFile);
         }
@@ -255,10 +260,6 @@ public class AdbExecutor {
     	String versionName = outputs[5];
     	LOGGER.info(versionName + versionCode);
         
-        //parse output command and get appropriate data
-        for (String output: res) {
-        	LOGGER.info(output);
-        }
         
         return versionName + versionCode;
     }
