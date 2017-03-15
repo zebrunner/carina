@@ -244,11 +244,14 @@ public class AdbExecutor {
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
         
         String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile, "| grep versionCode | grep , ", mobileAppPackage);
-        List<String> res = execute(cmd);
+        for (String output: cmd) {
+        	LOGGER.debug(output);
+        }
         
+        List<String> res = execute(cmd);
         //parse output command and get appropriate data
         for (String output: res) {
-        	LOGGER.info(output);
+        	LOGGER.debug(output);
         }
         
         if (res.size() != 1) {
