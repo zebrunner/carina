@@ -242,15 +242,22 @@ public class DriverPool {
 
 				Device device = DevicePool.registerDevice();
 				
-				// turn on  mobile device display if necessary. action can be done after registering available device with thread
+				// turn on mobile device display if necessary. action can be
+				// done after registering available device with thread
 				executor.screenOn();
 				if (Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
-					//explicit reinstall the apk
-					String appPackage = Configuration.get(Parameter.MOBILE_APP_PACKAGE);
-					String appVersion = executor.getAppVersion(Configuration.get(Parameter.MOBILE_APP));
-					LOGGER.info("App version for apk is " + appVersion);
-					executor.uninstallApp(appPackage);
-					executor.clearAppData(appPackage);
+					// explicit reinstall the apk
+
+					String[] apkVersions = executor.getApkVersion(Configuration.get(Parameter.MOBILE_APP));
+					if (apkVersions != null) {
+						String appPackage = apkVersions[0];
+
+						// TODO: verify if the same version is already installed
+						// and skip uninstallation in this case
+
+						executor.uninstallApp(appPackage);
+						executor.clearAppData(appPackage);
+					}
 				}
 
 				if (capabilities == null && seleniumHost == null) {
