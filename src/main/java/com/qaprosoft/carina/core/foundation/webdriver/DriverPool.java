@@ -255,14 +255,14 @@ public class DriverPool {
 						// TODO: verify if the same version is already installed
 						String[] apkInstalledVersions = executor.getInstalledApkVersion(appPackage);
 
+						LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
+						LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
+
 						if (apkVersions[1].equals(apkInstalledVersions[1])
 								&& apkVersions[2].equals(apkInstalledVersions[2])) {
 							LOGGER.info(
 									"Skip application uninstall and cache cleanup as the same version are installed.");
 						} else {
-							LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
-							LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
-
 							executor.uninstallApp(appPackage);
 							executor.clearAppData(appPackage);
 						}
