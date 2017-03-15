@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -18,6 +19,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+
 
 /**
  * Created by YP.
@@ -230,6 +232,38 @@ public class AdbExecutor {
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
         execute(cmd);
     }
+    
+    public String getAppVersion(String apkFile) {
+        if (!isDeviceCorrect())
+            return "";
+        
+        String mobileAppPackage = Configuration.get(Parameter.MOBILE_APP_PACKAGE);
+        //aapt dump badging <apk_file> | grep versionCode | grep com.myfitnesspal.android
+        //aapt dump badging <apk_file> | grep versionName
+        //output:
+        // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
+        
+        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile, "| grep versionCode | grep , ", mobileAppPackage);
+        List<String> res = execute(cmd);
+        
+        if (res.size() != 1) {
+        	Assert.fail("Unable to parse versionCode and Name from apk file: " + apkFile);
+        }
+        
+    	String[] outputs = res.get(0).split("'");
+    	String versionCode = outputs[3];
+    	String versionName = outputs[5];
+    	LOGGER.info(versionName + versionCode);
+        
+        //parse output command and get appropriate data
+        for (String output: res) {
+        	LOGGER.info(output);
+        }
+        
+        return versionName + versionCode;
+    }
+    
+    
 
     private Boolean getScreenState(String udid) {
         // determine current screen status
