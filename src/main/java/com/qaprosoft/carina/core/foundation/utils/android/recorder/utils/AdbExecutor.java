@@ -309,6 +309,7 @@ public class AdbExecutor {
 		for (String line : output) {
 			LOGGER.debug(line);
 		}
+		pause(5);
 	}
 	
 
