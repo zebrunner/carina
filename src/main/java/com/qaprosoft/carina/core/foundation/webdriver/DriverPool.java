@@ -517,8 +517,10 @@ public class DriverPool {
 
 	
 	private static void startRecording() {
-		Integer pid = executor.startRecording(SpecialKeywords.VIDEO_FILE_NAME);
-		adbVideoRecorderPid.set(pid);
+		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) { 
+			Integer pid = executor.startRecording(SpecialKeywords.VIDEO_FILE_NAME);
+			adbVideoRecorderPid.set(pid);
+		}
 	}
 	
 	private static void stopRecording() {
