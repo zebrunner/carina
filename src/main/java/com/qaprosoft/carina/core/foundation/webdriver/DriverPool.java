@@ -245,6 +245,11 @@ public class DriverPool {
 				// turn on mobile device display if necessary. action can be
 				// done after registering available device with thread
 				executor.screenOn();
+				
+				if (Configuration.getBoolean(Parameter.MOBILE_APPIM_RESTART)) {
+					executor.stopAppium(device);
+					executor.startAppium(device);
+				}
 				if (Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
 					// explicit reinstall the apk
 
@@ -253,7 +258,7 @@ public class DriverPool {
 						String appPackage = apkVersions[0];
 
 						// TODO: verify if the same version is already installed
-						String[] apkInstalledVersions = executor.getInstalledApkVersion(appPackage);
+						String[] apkInstalledVersions = executor.getInstalledApkVersion(device, appPackage);
 
 						LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
 						LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
@@ -263,8 +268,8 @@ public class DriverPool {
 							LOGGER.info(
 									"Skip application uninstall and cache cleanup as the same version are installed.");
 						} else {
-							executor.uninstallApp(appPackage);
-							executor.clearAppData(appPackage);
+							executor.uninstallApp(device, appPackage);
+							executor.clearAppData(device, appPackage);
 						}
 					}
 				}
