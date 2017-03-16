@@ -246,6 +246,8 @@ public class Configuration
         
         MOBILE_APP_REINSTALL("mobile_app_reinstall"),
         
+        MOBILE_APPIM_RESTART("mobile_appim_restart"),
+        
         MOBILE_APP_ACTIVITY("mobile_app_activity"),
         
 		MOBILE_APP_PACKAGE("mobile_app_package"), 

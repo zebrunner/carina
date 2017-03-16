@@ -17,6 +17,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 
@@ -216,32 +217,28 @@ public class AdbExecutor {
         execute(cmd);
     }
 
-    public void clearAppData(String app) {
-        if (!isDeviceCorrect())
-            return;
+    public void clearAppData(Device device, String app) {
         //adb -s UDID shell pm clear com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "shell", "pm", "clear", app);
         execute(cmd);
     }
 
-    public void uninstallApp(String packageName) {
+    public void uninstallApp(Device device, String packageName) {
         if (!isDeviceCorrect())
             return;
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "uninstall", packageName);
         execute(cmd);
     }
     
-    public String[] getInstalledApkVersion(String packageName) {
-        if (!isDeviceCorrect())
-            return null;
+    public String[] getInstalledApkVersion(Device device, String packageName) {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
         
         
         String[] res = new String[3];
         res[0] = packageName;
         
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell",  "dumpsys",  "package", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "shell",  "dumpsys",  "package", packageName);
 		List<String> output = execute(cmd);
         
 		
@@ -267,8 +264,6 @@ public class AdbExecutor {
     }
     
 	public String[] getApkVersion(String apkFile) {
-		if (!isDeviceCorrect())
-			return null;
 
 		// aapt dump badging <apk_file> | grep versionCode
 		// aapt dump badging <apk_file> | grep versionName
@@ -293,7 +288,20 @@ public class AdbExecutor {
 		return res;
 	}
     
-    
+    // TODO: think about moving shutdown/startup scripts into external property and make it cross platform 
+	public void stopAppium(Device device) {
+		LOGGER.info("Stopping appium...");
+		String[] cmd = CmdLine.insertCommandsAfter("$HOME/tools/selenium/stopNodeAppium.sh".split(" "), device.getUdid());
+		execute(cmd);
+	}
+	
+	public void startAppium(Device device) {
+		LOGGER.info("Starting appium...");
+		
+		String[] cmd = CmdLine.insertCommandsAfter("$HOME/tools/selenium/startNodeAppium.sh".split(" "), device.getUdid());
+		execute(cmd);
+	}
+	
 
     private Boolean getScreenState(String udid) {
         // determine current screen status
