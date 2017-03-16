@@ -246,7 +246,7 @@ public class DriverPool {
 				// done after registering available device with thread
 				executor.screenOn();
 				
-				if (Configuration.getBoolean(Parameter.MOBILE_APPIM_RESTART)) {
+				if (Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART)) {
 					executor.stopAppium(device);
 					executor.startAppium(device);
 				}
@@ -266,7 +266,7 @@ public class DriverPool {
 						if (apkVersions[1].equals(apkInstalledVersions[1])
 								&& apkVersions[2].equals(apkInstalledVersions[2])) {
 							LOGGER.info(
-									"Skip application uninstall and cache cleanup as the same version are installed.");
+									"Skip application uninstall and cache cleanup as exactly the same version is already installed.");
 						} else {
 							executor.uninstallApp(device, appPackage);
 							executor.clearAppData(device, appPackage);
