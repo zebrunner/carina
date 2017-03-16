@@ -291,14 +291,17 @@ public class AdbExecutor {
     // TODO: think about moving shutdown/startup scripts into external property and make it cross platform 
 	public void stopAppium(Device device) {
 		LOGGER.info("Stopping appium...");
-		String[] cmd = CmdLine.insertCommandsAfter("$HOME/tools/selenium/stopNodeAppium.sh".split(" "), device.getUdid());
+		
+		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/stopNodeAppium.sh";
+		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid());
 		execute(cmd);
 	}
 	
 	public void startAppium(Device device) {
 		LOGGER.info("Starting appium...");
 		
-		String[] cmd = CmdLine.insertCommandsAfter("$HOME/tools/selenium/startNodeAppium.sh".split(" "), device.getUdid());
+		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/startNodeAppium.sh";
+		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid());
 		execute(cmd);
 	}
 	

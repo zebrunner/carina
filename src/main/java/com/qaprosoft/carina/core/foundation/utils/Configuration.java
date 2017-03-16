@@ -256,6 +256,8 @@ public class Configuration
 		
 		MOBILE_DEVICES("mobile_devices"),
 		
+		MOBILE_TOOLS_HOME("mobile_tools_home"),
+		
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
