@@ -303,7 +303,7 @@ public class AdbExecutor {
 	public void startAppium(Device device) {
 		LOGGER.info("Starting appium...");
 		
-		String cmdLine = "nohup " + Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/startNodeAppium.sh";
+		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/startNodeAppium.sh";
 		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid(), "&");
 		List<String> output = execute(cmd);
 		for (String line : output) {
