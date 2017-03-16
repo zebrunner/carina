@@ -294,7 +294,10 @@ public class AdbExecutor {
 		
 		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/stopNodeAppium.sh";
 		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid());
-		execute(cmd);
+		List<String> output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
+		}
 	}
 	
 	public void startAppium(Device device) {
@@ -302,7 +305,10 @@ public class AdbExecutor {
 		
 		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/startNodeAppium.sh";
 		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid());
-		execute(cmd);
+		List<String> output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
+		}
 	}
 	
 
