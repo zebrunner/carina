@@ -31,7 +31,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -49,6 +48,7 @@ import org.testng.xml.XmlTest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
@@ -63,6 +63,7 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollecto
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -72,9 +73,7 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
@@ -86,6 +85,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 public abstract class AbstractTest // extends DriverHelper
 {
 	protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
+	
+    protected APIMethodBuilder apiMethodBuilder;
 
 	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
 	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -95,16 +96,13 @@ public abstract class AbstractTest // extends DriverHelper
 	
 	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 	
-	protected WebDriver extraDriver;
-	protected Throwable init_throwable;
-
 	// 3rd party integrations
 	// TestRails case(s)
 	private List<String> testRailCases = new ArrayList<String>();
 
 	protected String browserVersion = "";
 	protected long startDate;
-
+	
 	@BeforeSuite(alwaysRun = true)
 	public void executeBeforeTestSuite(ITestContext context) throws Throwable {
 		
@@ -186,6 +184,15 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 		
 		updateS3AppPath();
+
+		// moved from UITest->executeBeforeTestSuite 
+    	String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+        	//redefine core properties using custom capabilities file
+            Configuration.loadCoreProperties(customCapabilities);
+        }
+        
+    	DevicePool.addDevices();
 	}
 
 	@BeforeClass(alwaysRun = true)
@@ -195,7 +202,10 @@ public abstract class AbstractTest // extends DriverHelper
 
 	@AfterClass(alwaysRun = true)
 	public void executeAfterTestClass(ITestContext context) throws Throwable {
-		// do nothing for now
+		if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null) {
+			LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
+			quitDrivers();
+		}
 	}
 
 	@BeforeMethod(alwaysRun = true)
@@ -203,12 +213,34 @@ public abstract class AbstractTest // extends DriverHelper
 			ITestContext context) throws Throwable {
 		// do nothing for now
 		Spira.registerStepsFromAnnotation(testMethod);
+		
+		// TODO: analyze below code line necessity
+		// quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
+		
+/*		if (browserVersion.isEmpty() && getDriver() != null
+				&& !Configuration.get(Parameter.CUSTOM_CAPABILITIES).isEmpty()) {
+			browserVersion = DriverFactory.getBrowserVersion(getDriver());
+		}*/
+		
+		apiMethodBuilder = new APIMethodBuilder();
 	}
 
 	@AfterMethod(alwaysRun = true)
 	public void executeAfterTestMethod(ITestResult result) {
-		try {
+		
+		try
+    	{	    
+    		DriverMode driverMode = Configuration.getDriverMode();
 			
+	    	if (driverMode == DriverMode.METHOD_MODE) {
+	    		//TODO: analyze necessity to turn off device display after each method
+	    		//executor.screenOff();
+	    		LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
+				quitDrivers();
+			}	    	
+			
+	    	
+	    	
 			// TODO: improve later removing duplicates with AbstractTestListener
 			//handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
 			if (result.getThrowable() != null && result.getThrowable().getMessage() != null
@@ -265,6 +297,12 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
 		try {
+		    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && getDriver() != null)
+		    {
+		    	LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
+				quitDrivers();
+		    }
+		    
 			ReportContext.removeTempDir(); //clean temp artifacts directory
 			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
@@ -535,60 +573,6 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 	}
 	
-	// --------------------------------------------------------------------------
-	// Extra Web Drivers
-	// --------------------------------------------------------------------------
-	protected WebDriver createExtraDriver(final String driverName) {
-		return createExtraDriver(driverName, null, null);
-	}
-	
-	protected WebDriver createExtraDriver(String driverName, DesiredCapabilities capabilities, String selenium_host) {
-		if (extraDriver != null) {
-			LOGGER.warn("Extra Driver is already initialized! Existing extraDriver will be closed!");
-			extraDriver.quit();
-		}
-		
-		try {
-			if (capabilities == null && selenium_host == null) {
-				Device device = DevicePool.registerDevice2Thread();
-				extraDriver = DriverFactory.create(driverName, device);	
-			}
-			else {
-				extraDriver = DriverFactory.create(driverName, capabilities, selenium_host);
-			}
-	    	
-	    	if (extraDriver == null ) {
-	    		Assert.fail("Unable to initialize extra driver: " + driverName + "!");
-	    	}
-		}
-		catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.debug(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()), thr);
-			DevicePool.deregisterDeviceFromThread();
-			LOGGER.error(String.format("Extra Driver initialization '%s' FAILED! Reason: %s", driverName, thr.getMessage()));
-			init_throwable = thr;
-
-		}    	
-		
-		DriverPool.registerExtraDriver2Thread(extraDriver, Thread.currentThread().getId());
-		return extraDriver;		
-	}
-	
-
-
-	protected WebDriver getExtraDriver() {
-		return extraDriver;
-	}
-
-	protected void quitExtraDriver() {
-		if (extraDriver != null) {
-			DevicePool.deregisterDeviceFromThread();
-			extraDriver.quit();
-			extraDriver = null;
-			//DriverPool.deregisterDriverByThread();
-		}		
-	}
-	
 	protected void putS3Artifact(String key, String path) {
 		AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
 	}
@@ -630,4 +614,25 @@ public abstract class AbstractTest // extends DriverHelper
 	protected void skipExecution(String message) {
 		throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
 	}
+	
+	
+	// --------------------------------------------------------------------------
+	// Web Drivers
+	// --------------------------------------------------------------------------
+	protected WebDriver getDriver() {
+		return getDriver(DriverPool.DEFAULT);
+	}
+
+	protected WebDriver getDriver(String name) {
+		WebDriver drv = DriverPool.getDriver(name);
+		if (drv == null) {
+			Assert.fail("Unable to find driver by name: " + name);
+		}
+		return drv;
+	}
+	 
+	protected static void quitDrivers() {
+		DriverPool.quitDrivers();
+    }
+	
 }

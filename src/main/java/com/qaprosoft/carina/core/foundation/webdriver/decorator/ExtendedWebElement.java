@@ -33,7 +33,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
@@ -783,14 +782,11 @@ public class ExtendedWebElement
 	}
 	
 	private WebDriver getDriver() {
-		//each element has parent page. Inside page there is a driver. Need to implement functionality for getDriver from parent page
+		// TODO: each element has parent page. Inside page there is a driver. Need to implement functionality for getDriver from parent page
 		// as current implementation has limitations for extraDriver functionality
-		WebDriver driver = DriverPool.getDriverByThread();
+		WebDriver driver = DriverPool.getDriver();
 		if (driver == null) {
-			driver = DriverPool.getExtraDriverByThread();
-		}
-		if (driver == null) {
-			throw new RuntimeException("Unable to find valid driver inside DriverPool including extraDriver!");
+			throw new RuntimeException("Unable to find valid driver inside DriverPool!");	
 		}
 		return driver;
 	}
