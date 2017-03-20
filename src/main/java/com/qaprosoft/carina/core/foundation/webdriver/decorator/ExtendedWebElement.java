@@ -27,12 +27,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
@@ -47,7 +49,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -1350,13 +1351,34 @@ public class ExtendedWebElement
 	 * @param timeout
 	 *            - timeout.
 	 * @return element clickability status.
-	0 */
+	 */
 	public boolean isClickable(long timeout)
 	{
-		final ExtendedWebElement element = this;
-
-		LOGGER.info(String.format("Checking element %s clickability.", element.getName()));
-
-		return new DriverHelper().waitForElementToBeClickable(element, timeout);
+		final WebDriver drv = getDriver();
+		By locator = getBy();
+		boolean res = true;
+		String msg = "Right Click";
+		try {
+			(new WebDriverWait(drv, timeout)).until(ExpectedConditions.elementToBeClickable(locator));
+			msg = Messager.ELEMENT_BECOME_CLICKABLE.info(getName());
+			summary.log(msg);
+		} catch (TimeoutException ex) {
+			msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
+			summary.log(msg);
+			LOGGER.error(ex);
+			res = false;
+		} catch (Exception e) {
+			msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
+			summary.log(msg);
+			LOGGER.error(e);
+			res = false;
+		}
+		try {
+			Screenshot.capture(getDriver(), msg);
+		} catch (Exception e) {
+			LOGGER.info(e.getMessage());
+		}
+		return res;
 	}
+	
 }
