@@ -9,9 +9,9 @@ public class DeviceGridTest
 	@Test(enabled=false)
 	public void testDeviceGrid() throws InterruptedException
 	{
-		DevicePool.registerDevices();
-		DevicePool.registerDevice2Thread();
+		DevicePool.addDevices();
+		DevicePool.registerDevice();
 		Thread.sleep(5 * 1000);
-		DevicePool.deregisterDeviceFromThread();
+		DevicePool.deregisterDevice();
 	}
 }
