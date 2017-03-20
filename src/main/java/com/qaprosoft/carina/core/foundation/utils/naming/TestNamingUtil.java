@@ -27,7 +27,6 @@ import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.zafira.models.dto.TestType;
 
 /**
  * Common naming utility for unique test method identification.
@@ -50,8 +49,6 @@ public class TestNamingUtil
 																															// without
 																															// configuration
 																															// steps
-
-	private static final ConcurrentHashMap<Long, TestType> threadId2ZafiraTest = new ConcurrentHashMap<Long, TestType>();
 
 	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
@@ -193,39 +190,6 @@ public class TestNamingUtil
 			LOGGER.warn("Unable to find start date for test: '" + test + "'!");
 		}
 		return startDate;
-	}
-
-	public static synchronized void associateZafiraTest(TestType zafiraTest)
-	{
-		long threadId = Thread.currentThread().getId();
-		if (zafiraTest == null)
-		{
-			LOGGER.error("NULL ZafiraTest is registered for thread: " + threadId);
-			return;
-		}
-		LOGGER.debug("Associate ZafiraTest id: " + zafiraTest.getId() + "; name: " + zafiraTest.getName()
-				+ " with thread: " + threadId);
-		threadId2ZafiraTest.put(threadId, zafiraTest);
-	}
-
-	public static TestType getZafiraTest()
-	{
-		return threadId2ZafiraTest.get(Thread.currentThread().getId());
-	}
-
-	public static synchronized void releaseZafiraTest()
-	{
-		long threadId = Thread.currentThread().getId();
-		TestType zafiraTest = threadId2ZafiraTest.get(threadId);
-		if (zafiraTest != null)
-		{
-			LOGGER.debug("Releasing ZafiraTest id: " + zafiraTest.getId() + "; name: " + zafiraTest.getName()
-					+ " from thread: " + threadId);
-		} else
-		{
-			LOGGER.error("Unable to release ZafiraTest by threadId: " + threadId);
-		}
-		threadId2ZafiraTest.remove(threadId);
 	}
 
 	public static synchronized void associateCanonicTestName(String test)

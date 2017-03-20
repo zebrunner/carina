@@ -32,7 +32,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -40,7 +39,6 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -149,6 +147,7 @@ public class DriverHelper {
     public boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
      return  waitForElementToBeClickable(element,(int)waitPeriod);
     }
+    
 	/**
 	 * Wait for element to be clickable. Alternative for isElementPresent with
 	 * other condition.
@@ -159,31 +158,7 @@ public class DriverHelper {
      * @return true if element become clickable
 	 */
 	public boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
-		final WebDriver drv = getDriver();
-		By locator = element.getBy();
-		boolean res = true;
-		String msg = "Right Click";
-		try {
-			(new WebDriverWait(drv, waitPeriod)).until(ExpectedConditions.elementToBeClickable(locator));
-			msg = Messager.ELEMENT_BECOME_CLICKABLE.info(element.getName());
-			summary.log(msg);
-		} catch (TimeoutException ex) {
-			msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(element.getName());
-			summary.log(msg);
-			LOGGER.error(ex);
-			res = false;
-		} catch (Exception e) {
-			msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(element.getName());
-			summary.log(msg);
-			LOGGER.error(e);
-			res = false;
-		}
-		try {
-			Screenshot.capture(getDriver(), msg);
-		} catch (Exception e) {
-			LOGGER.info(e.getMessage());
-		}
-		return res;
+		return element.isClickable(waitPeriod);
 	}
 
 	/**
