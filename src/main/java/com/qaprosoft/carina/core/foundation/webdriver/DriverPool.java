@@ -24,16 +24,19 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 
+import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.BrowserMobProxyServer;
 
 public class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
@@ -190,6 +193,10 @@ public class DriverPool {
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
 			drv.quit();
+			
+			if (size() == 0) {
+				stopProxy();
+			}
 
 			LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
@@ -212,8 +219,6 @@ public class DriverPool {
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			quitDriver(entry.getKey());
 		}
-
-		deregisterBrowserMobProxy();
 	}
 
 	/**
@@ -239,6 +244,9 @@ public class DriverPool {
 		while (!init & count++ < maxCount) {
 			try {
 				LOGGER.debug("initDriver start...");
+				
+				//TODO: move browsermob startup to this location
+				startProxy();
 
 				Device device = DevicePool.registerDevice();
 				
@@ -257,7 +265,6 @@ public class DriverPool {
 					if (apkVersions != null) {
 						String appPackage = apkVersions[0];
 
-						// TODO: verify if the same version is already installed
 						String[] apkInstalledVersions = executor.getInstalledApkVersion(device, appPackage);
 
 						LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
@@ -491,11 +498,70 @@ public class DriverPool {
 	}
 
 	// ------------------------- BOWSERMOB PROXY ---------------------
-	public static void registerBrowserMobProxy(BrowserMobProxy proxy) {
-		proxies.put(Thread.currentThread().getId(), proxy);
+	// TODO: investigate possibility to return interface to support JettyProxy
+	/**
+	 * start BrowserMobProxy Server
+	 * 
+	 * @return BrowserMobProxy
+	 * 
+	 */
+	public static BrowserMobProxy startProxy() {
+		if (!Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+			return null;
+		}
+		// integrate browserMob proxy if required here
+		BrowserMobProxy proxy = null;
+		long threadId = Thread.currentThread().getId();
+		if (proxies.containsKey(threadId)) {
+			proxy = proxies.get(threadId);
+		} else {
+			proxy = new BrowserMobProxyServer();
+			proxies.put(Thread.currentThread().getId(), proxy);
+		}
+
+		if (!proxy.isStarted()) {
+			LOGGER.info("Starting BrowserMob proxy...");
+			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
+		} else {
+			LOGGER.info("BrowserMob proxy is already started on port " + proxy.getPort());
+		}
+
+		Integer port = proxy.getPort();
+
+		String currentIP = HttpClient.getIpAddress();
+		LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
+
+		R.CONFIG.put("proxy_host", currentIP);
+		R.CONFIG.put("proxy_port", port.toString());
+		R.CONFIG.put("proxy_protocols", "http");
+
+		return proxy;
 	}
 
-	public static BrowserMobProxy getBrowserMobProxy() {
+	/**
+	 * stop BrowserMobProxy Server
+	 * 
+	 */
+	public static void stopProxy() {
+		long threadId = Thread.currentThread().getId();
+
+		if (proxies.containsKey(threadId)) {
+			BrowserMobProxy proxy = proxies.get(threadId);
+			if (proxy.isStarted()) {
+				LOGGER.info("Stopping BrowserMob proxy...");
+				proxy.stop();
+			}
+			proxies.remove(threadId);
+		}
+	}
+
+	/**
+	 * get registered BrowserMobProxy Server
+	 * 
+	 * @return BrowserMobProxy
+	 * 
+	 */
+	public static BrowserMobProxy getProxy() {
 		BrowserMobProxy proxy = null;
 		long threadId = Thread.currentThread().getId();
 		if (proxies.containsKey(threadId)) {
@@ -506,15 +572,19 @@ public class DriverPool {
 		return proxy;
 	}
 
-	public static void deregisterBrowserMobProxy() {
+	/**
+	 * register custom BrowserMobProxy Server
+	 * 
+	 * @param proxy
+	 *            custom BrowserMobProxy
+	 * 
+	 */
+	public static void registerProxy(BrowserMobProxy proxy) {
 		long threadId = Thread.currentThread().getId();
-
-		if (proxies.containsKey(threadId)) {
-			proxies.get(threadId).stop();
-			proxies.remove(threadId);
-		}
+		LOGGER.info("Register custom proxy with thread: " + threadId);
+		proxies.put(threadId, proxy);
 	}
-
+	
 	
 	private static void startRecording() {
 		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) { 

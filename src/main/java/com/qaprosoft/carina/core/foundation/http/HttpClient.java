@@ -31,7 +31,6 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.BrowserMobProxyServer;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.
@@ -76,11 +75,7 @@ public class HttpClient
 	public static void setupProxy()
 	{
 		if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
-			LOGGER.debug("Starting BrowserMobProxy...");
-			// integrate browserMob proxy if required here
-			BrowserMobProxy proxy = new BrowserMobProxyServer();
-			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
-
+			BrowserMobProxy proxy = DriverPool.startProxy();
 			Integer port = proxy.getPort();
 
 			String currentIP = HttpClient.getIpAddress();
@@ -90,7 +85,6 @@ public class HttpClient
 			R.CONFIG.put("proxy_port", port.toString());
 			R.CONFIG.put("proxy_protocols", "http");
 			
-			DriverPool.registerBrowserMobProxy(proxy);
 		}
 
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);

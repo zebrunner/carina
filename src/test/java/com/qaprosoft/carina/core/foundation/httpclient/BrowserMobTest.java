@@ -27,13 +27,13 @@ public class BrowserMobTest {
 		
 		HttpClient.setupProxy();
 
-		BrowserMobProxy proxy = DriverPool.getBrowserMobProxy();
+		BrowserMobProxy proxy = DriverPool.getProxy();
 		proxy.addHeader(header, headerValue);
 	}
 	
 	@Test
 	public void testIsBrowserModStarted() {
-		Assert.assertTrue(DriverPool.getBrowserMobProxy().isStarted(), "BrowserMobProxy is not started!");
+		Assert.assertTrue(DriverPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
 	}
 	
 	@Test
@@ -44,12 +44,12 @@ public class BrowserMobTest {
 
 	@Test
 	public void testBrowserModProxyHeader() {
-		Map<String, String> headers = DriverPool.getBrowserMobProxy().getAllHeaders();
+		Map<String, String> headers = DriverPool.getProxy().getAllHeaders();
 		Assert.assertTrue(headers.containsKey(header), "There is no custom header: " + header);
 		Assert.assertTrue(headers.get(header).equals(headerValue), "There is no custom header value: " + headerValue);
 		
-		DriverPool.getBrowserMobProxy().removeHeader(header);
-		if (DriverPool.getBrowserMobProxy().getAllHeaders().size() != 0) {
+		DriverPool.getProxy().removeHeader(header);
+		if (DriverPool.getProxy().getAllHeaders().size() != 0) {
 			Assert.fail("Custom header was not removed: " + header);
 		}
 	}
