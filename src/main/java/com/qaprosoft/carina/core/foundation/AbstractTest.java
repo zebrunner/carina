@@ -31,6 +31,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -625,6 +626,14 @@ public abstract class AbstractTest // extends DriverHelper
 
 	protected WebDriver getDriver(String name) {
 		WebDriver drv = DriverPool.getDriver(name);
+		if (drv == null) {
+			Assert.fail("Unable to find driver by name: " + name);
+		}
+		return drv;
+	}
+	
+	protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+		WebDriver drv = DriverPool.getDriver(name, capabilities, seleniumHost);
 		if (drv == null) {
 			Assert.fail("Unable to find driver by name: " + name);
 		}
