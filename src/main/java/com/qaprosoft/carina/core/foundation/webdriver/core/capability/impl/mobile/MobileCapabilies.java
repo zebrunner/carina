@@ -1,8 +1,9 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public abstract class MobileCapabilies extends AbstractCapabilities {
 
@@ -10,6 +11,7 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
     public DesiredCapabilities getMobileCapabilities(boolean gridMode, String platform, String platformVersion, String deviceName,
                                                         String automationName, String commandTimeout, String browserName, String app, String appActivity, String appPackage) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
+        
         capabilities.setCapability("platformName", platform);
         capabilities.setCapability("platformVersion", platformVersion);
         if (deviceName != null)
