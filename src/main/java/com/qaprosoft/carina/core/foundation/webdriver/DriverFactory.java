@@ -80,7 +80,7 @@ public class DriverFactory {
         
 		if (driver == null) {
 			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
-		    DevicePool.unregisterDevice();
+		    DevicePool.removeDevice();
 			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
 		}
 
@@ -98,6 +98,7 @@ public class DriverFactory {
     }
 
 	public static WebDriver create(String testName, Device device) {
+		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
 		String driverType = Configuration.get(Parameter.DRIVER_TYPE);
 		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
@@ -109,7 +110,9 @@ public class DriverFactory {
 		} else {
 			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
 		}
-		return factory.create(testName, device);
+		WebDriver drv = factory.create(testName, device);
+		LOGGER.debug("DriverFactory finish...");
+		return drv;
 	}
 
 

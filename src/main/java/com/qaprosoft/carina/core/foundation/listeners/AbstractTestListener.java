@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -197,13 +199,6 @@ public class AbstractTestListener extends TestArgsListener
 		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
-	
-	private void skipAlreadyPassedItem(ITestResult result, Messager messager)
-	{
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		String deviceName = getDeviceName();
-		messager.info(deviceName, test, DateUtils.now());
-	}
 
 	private String getDeviceName()
 	{
@@ -358,7 +353,6 @@ public class AbstractTestListener extends TestArgsListener
 				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED))
 		{
 			// [VD] it is prohibited to release TestInfoByThread in this place.!
-			skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
 			return;
 		}
 
@@ -639,21 +633,13 @@ public class AbstractTestListener extends TestArgsListener
 	
 	private String takeScreenshot(ITestResult result, String msg) {
 		String screenId = "";
-		WebDriver driver = DriverPool.getDriver();
-
-		if (driver != null) {
-			// in case of failure make screenshot by default
-			screenId = Screenshot.captureFailure(driver, msg); 
+		
+		ConcurrentHashMap<String, WebDriver> drivers = DriverPool.getDrivers(); 
+		
+		for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
+			String driverName = entry.getKey();
+			screenId = Screenshot.capture(entry.getValue(), true, driverName + ": " + msg); // in case of failure
 		}
-		// repeat the same actions for extraDriver if any
-		driver = DriverPool.getExtraDriverByThread();
-
-		if (driver != null) {
-			// in case of failure make screenshot by default for extra driver as
-			// well
-			screenId = Screenshot.captureFailure(driver, msg); 
-		}
-
 		return screenId;
 	}
 }
