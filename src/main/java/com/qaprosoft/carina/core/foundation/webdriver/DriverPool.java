@@ -379,7 +379,9 @@ public class DriverPool {
 	protected static int size() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
-		return currentDrivers.size();
+		int size = currentDrivers.size();
+		LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+		return size;
 	}
 
 	/**
@@ -545,14 +547,23 @@ public class DriverPool {
 	public static void stopProxy() {
 		long threadId = Thread.currentThread().getId();
 
+		LOGGER.debug("stopProxy starting...");
 		if (proxies.containsKey(threadId)) {
 			BrowserMobProxy proxy = proxies.get(threadId);
-			if (proxy.isStarted()) {
-				LOGGER.info("Stopping BrowserMob proxy...");
-				proxy.stop();
+			if (proxy != null) {
+				LOGGER.debug("Found registered proxy by thread: " + threadId);
+				if (proxy.isStarted()) {
+					LOGGER.info("Stopping BrowserMob proxy...");
+					proxy.stop();
+				} else {
+					LOGGER.info("Stopping BrowserMob proxy skipped as it is not started.");
+				}
 			}
 			proxies.remove(threadId);
+		} else {
+			
 		}
+		LOGGER.debug("stopProxy finished...");
 	}
 
 	/**
