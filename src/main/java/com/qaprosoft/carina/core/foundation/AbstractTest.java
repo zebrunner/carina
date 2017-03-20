@@ -202,7 +202,7 @@ public abstract class AbstractTest // extends DriverHelper
 
 	@AfterClass(alwaysRun = true)
 	public void executeAfterTestClass(ITestContext context) throws Throwable {
-		if (Configuration.getDriverMode() == DriverMode.CLASS_MODE && getDriver() != null) {
+		if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
 			LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
 			quitDrivers();
 		}
@@ -297,7 +297,7 @@ public abstract class AbstractTest // extends DriverHelper
 	@AfterSuite(alwaysRun = true)
 	public void executeAfterTestSuite(ITestContext context) {
 		try {
-		    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && getDriver() != null)
+		    if (Configuration.getDriverMode() == DriverMode.SUITE_MODE)
 		    {
 		    	LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
 				quitDrivers();
