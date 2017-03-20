@@ -41,7 +41,7 @@ public class CustomTypePageFactory {
 			.getLogger(CustomTypePageFactory.class);
 
 	public static <T extends AbstractPage> T initPage(Class<T> parentClass, Object... parameters){
-		return initPage(DriverPool.getDriverByThread(), parentClass, parameters);
+		return initPage(DriverPool.getDriver(), parentClass, parameters);
 	}
 	
 	public static <T extends AbstractPage> T initPage(WebDriver driver,

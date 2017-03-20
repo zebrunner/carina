@@ -17,7 +17,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+
 
 /**
  * Created by YP.
@@ -153,7 +155,13 @@ public class AdbExecutor {
     public int startRecording(String pathToFile) {
         if (!isDeviceCorrect())
             return -1;
+        
+        if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+        	return -1;
+        }
 
+        dropFile(pathToFile);
+        
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
 
         try {
@@ -209,21 +217,101 @@ public class AdbExecutor {
         execute(cmd);
     }
 
-    public void clearAppData(String app) {
-        if (!isDeviceCorrect())
-            return;
+    public void clearAppData(Device device, String app) {
         //adb -s UDID shell pm clear com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "pm", "clear", app);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "shell", "pm", "clear", app);
         execute(cmd);
     }
 
-    public void uninstallApp(String app) {
+    public void uninstallApp(Device device, String packageName) {
         if (!isDeviceCorrect())
             return;
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "uninstall", app);
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "uninstall", packageName);
         execute(cmd);
     }
+    
+    public String[] getInstalledApkVersion(Device device, String packageName) {
+        //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
+        
+        
+        String[] res = new String[3];
+        res[0] = packageName;
+        
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "shell",  "dumpsys",  "package", packageName);
+		List<String> output = execute(cmd);
+        
+		
+		for (String line : output) {
+			LOGGER.debug(line);
+			if (line.contains("versionCode")) {
+				// versionCode=17040000 targetSdk=25
+				LOGGER.info("Line for parsing installed app: " + line);
+				String[] outputs = line.split("=");
+				String tmp = outputs[1]; //everything after '=' sign
+				res[1] = tmp.split(" ")[0];
+			}
+			
+			if (line.contains("versionName")) {
+				// versionName=8.5.0
+				LOGGER.info("Line for parsing installed app: " + line);
+				String[] outputs = line.split("=");
+				res[2] = outputs[1];
+			}
+		}
+		
+		return res;
+    }
+    
+	public String[] getApkVersion(String apkFile) {
+
+		// aapt dump badging <apk_file> | grep versionCode
+		// aapt dump badging <apk_file> | grep versionName
+		// output:
+		// package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
+
+		String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
+		List<String> output = execute(cmd);
+		// parse output command and get appropriate data
+		String[] res = new String[3];
+
+		for (String line : output) {
+			if (line.contains("versionCode") && line.contains("versionName")) {
+				LOGGER.debug(line);
+				String[] outputs = line.split("'");
+				res[0] = outputs[1]; //package
+				res[1] = outputs[3]; //versionCode
+				res[2] = outputs[5]; //versionName
+			}
+		}
+
+		return res;
+	}
+    
+    // TODO: think about moving shutdown/startup scripts into external property and make it cross platform 
+	public void stopAppium(Device device) {
+		LOGGER.info("Stopping appium...");
+		
+		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/stopNodeAppium.sh";
+		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid());
+		List<String> output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
+		}
+	}
+	
+	public void startAppium(Device device) {
+		LOGGER.info("Starting appium...");
+		
+		String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/startNodeAppium.sh";
+		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), device.getUdid(), "&");
+		List<String> output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
+		}
+		pause(5);
+	}
+	
 
     private Boolean getScreenState(String udid) {
         // determine current screen status

@@ -103,6 +103,8 @@ public class Configuration
 		
 		DRIVER_MODE("driver_mode"),
 		
+		MAX_DRIVER_COUNT("max_driver_count"),
+		
 		CUSTOM_CAPABILITIES("custom_capabilities"),
 		
 		EXTRA_CAPABILITIES("extra_capabilities"),
@@ -242,6 +244,10 @@ public class Configuration
         
         MOBILE_APP("mobile_app"),
         
+        MOBILE_APP_REINSTALL("mobile_app_reinstall"),
+        
+        MOBILE_APPIUM_RESTART("mobile_appium_restart"),
+        
         MOBILE_APP_ACTIVITY("mobile_app_activity"),
         
 		MOBILE_APP_PACKAGE("mobile_app_package"), 
@@ -249,6 +255,8 @@ public class Configuration
 		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout"),
 		
 		MOBILE_DEVICES("mobile_devices"),
+		
+		MOBILE_TOOLS_HOME("mobile_tools_home"),
 		
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
