@@ -194,10 +194,6 @@ public class DriverPool {
 			DevicePool.deregisterDevice();
 			drv.quit();
 			
-			if (size() == 0) {
-				stopProxy();
-			}
-
 			LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
@@ -219,6 +215,8 @@ public class DriverPool {
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			quitDriver(entry.getKey());
 		}
+		
+		stopProxy();
 	}
 
 	/**
