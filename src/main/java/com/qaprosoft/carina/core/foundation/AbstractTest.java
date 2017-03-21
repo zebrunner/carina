@@ -344,7 +344,6 @@ public abstract class AbstractTest // extends DriverHelper
 			String senderEmail = Configuration.get(Parameter.SENDER_EMAIL);
 			String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD); 
 			
-			LOGGER.warn("Generating email using local functionality as it couldn't be done via zafira.");
 			// Generate and send email report using regular method
 			EmailReportGenerator report = new EmailReportGenerator(title, env,
 					Configuration.get(Parameter.APP_VERSION), deviceName,
