@@ -124,12 +124,14 @@ public class CustomTypePageFactory {
 			if (parameters.length == 0) {
 				parameters = new Object[] { driver };
 			}
+			LOGGER.debug("Invoking constructor for " + requiredClass);
 			ctor = getConstructorByParams(requiredClass, parameters);
 			return ctor.newInstance(parameters);
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| SecurityException e) {
-			throw new RuntimeException(e.getMessage(), e);
+			LOGGER.debug("Discovered one of the InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException");
+			throw new RuntimeException("Unable to instantiate page!" , e);
 		}
 	}
 	
