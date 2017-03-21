@@ -199,6 +199,13 @@ public class AbstractTestListener extends TestArgsListener
 		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
+	
+	private void skipAlreadyPassedItem(ITestResult result, Messager messager)
+	{
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		String deviceName = getDeviceName();
+		messager.info(deviceName, test, DateUtils.now());
+	}
 
 	private String getDeviceName()
 	{
@@ -353,6 +360,7 @@ public class AbstractTestListener extends TestArgsListener
 				&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED))
 		{
 			// [VD] it is prohibited to release TestInfoByThread in this place.!
+			skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
 			return;
 		}
 
