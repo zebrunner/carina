@@ -283,9 +283,13 @@ public abstract class AbstractTest // extends DriverHelper
 			
 			
 
-			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-			if (tla != null) {
-				tla.closeResource(test);
+			try {
+				ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+				if (tla != null) {
+					tla.closeResource(test);
+				}
+			} catch (NoSuchMethodError e) {
+				LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
 			}
 
 		} catch (Exception e) {
