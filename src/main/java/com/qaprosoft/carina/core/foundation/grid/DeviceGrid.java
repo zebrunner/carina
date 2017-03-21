@@ -12,15 +12,12 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
-import com.google.gson.Gson;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubException;
 import com.qaprosoft.carina.core.foundation.grid.GridRequest.Operation;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.zafira.models.dto.EventType;
-import com.qaprosoft.zafira.models.dto.EventType.Type;
 
 /**
  * DeviceGrid communicates over PubNub with grid queue and provides connect/diconnect device functionality.
