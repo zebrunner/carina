@@ -506,8 +506,6 @@ public abstract class AbstractTest // extends DriverHelper
 		return ciTestJob;
 	}
 
-	protected abstract boolean isUITest();
-
 	/**
 	 * Redefine Jira tickets from test.
 	 * 
