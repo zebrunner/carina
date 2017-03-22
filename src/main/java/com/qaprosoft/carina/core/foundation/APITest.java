@@ -18,13 +18,6 @@ package com.qaprosoft.carina.core.foundation;
 @Deprecated
 public abstract class APITest extends AbstractTest
 {
-	@Override
-	@Deprecated
-	protected boolean isUITest()
-	{
-		return false;
-	}
-	
     @Override
     @Deprecated
     protected String getBrowser() {

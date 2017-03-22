@@ -18,12 +18,4 @@ package com.qaprosoft.carina.core.foundation;
 @Deprecated
 public class UITest extends AbstractTest
 {
-    
-	@Override
-	@Deprecated
-	protected boolean isUITest()
-	{
-		return true;
-	}
-
 }
