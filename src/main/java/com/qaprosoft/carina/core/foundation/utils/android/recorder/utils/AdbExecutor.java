@@ -251,40 +251,29 @@ public class AdbExecutor {
     }
     
     public void reinstallApp(Device device, String mobileApp) {
-    	reinstallApp(device, mobileApp, null);
-    }
-    
-    public void reinstallApp(Device device, String mobileApp, Boolean async) {
 
-    	if (!Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
-    		return;
-    	}
+    	if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
+			// explicit reinstall the apk
+			String[] apkVersions = getApkVersion(mobileApp); // Configuration.get(Parameter.MOBILE_APP)
+			if (apkVersions != null) {
+				String appPackage = apkVersions[0];
 
-		// explicit reinstall the apk
-		String[] apkVersions = getApkVersion(mobileApp); // Configuration.get(Parameter.MOBILE_APP)
-		if (apkVersions != null) {
-			String appPackage = apkVersions[0];
+				String[] apkInstalledVersions = getInstalledApkVersion(device, appPackage);
 
-			String[] apkInstalledVersions = getInstalledApkVersion(device, appPackage);
+				LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
+				LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
 
-			LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
-			LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
-
-			if (apkVersions[1].equals(apkInstalledVersions[1]) && apkVersions[2].equals(apkInstalledVersions[2])) {
-				LOGGER.info(
-						"Skip application uninstall and cache cleanup as exactly the same version is already installed.");
-			} else {
-				uninstallApp(device, appPackage);
-				clearAppData(device, appPackage);
-
-				if (async != null) {
-					if (async) {
-						installApp(device, mobileApp);
-					} else {
-						// install application in single thread to fix issue with gray Google maps
-						installAppSync(device, mobileApp);
-					}
+				if (apkVersions[1].equals(apkInstalledVersions[1]) && apkVersions[2].equals(apkInstalledVersions[2])) {
+					LOGGER.info(
+							"Skip application uninstall and cache cleanup as exactly the same version is already installed.");
+				} else {
+					uninstallApp(device, appPackage);
+					clearAppData(device, appPackage);
 				}
+			}
+			if (Configuration.getBoolean(Parameter.MOBILE_APP_INSTALL)) {
+				// install application in single thread to fix issue with gray Google maps
+				installAppSync(device, mobileApp);
 			}
 		}
     }
