@@ -251,34 +251,10 @@ public class DriverPool {
 				// turn on mobile device display if necessary. action can be
 				// done after registering available device with thread
 				executor.screenOn();
+				executor.restartAppium(device);
 				
-				if (Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART)) {
-					executor.stopAppium(device);
-					executor.startAppium(device);
-				}
-				if (Configuration.getBoolean(Parameter.MOBILE_APP_REINSTALL)) {
-					// explicit reinstall the apk
-
-					String[] apkVersions = executor.getApkVersion(Configuration.get(Parameter.MOBILE_APP));
-					if (apkVersions != null) {
-						String appPackage = apkVersions[0];
-
-						String[] apkInstalledVersions = executor.getInstalledApkVersion(device, appPackage);
-
-						LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
-						LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
-
-						if (apkVersions[1].equals(apkInstalledVersions[1])
-								&& apkVersions[2].equals(apkInstalledVersions[2])) {
-							LOGGER.info(
-									"Skip application uninstall and cache cleanup as exactly the same version is already installed.");
-						} else {
-							executor.uninstallApp(device, appPackage);
-							executor.clearAppData(device, appPackage);
-							executor.installApp(device, appPackage);
-						}
-					}
-				}
+				// verify if valid build i already installed and uninstall only in case of any difference 
+				executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
 
 				if (capabilities == null && seleniumHost == null) {
 					drv = DriverFactory.create(name, device);
