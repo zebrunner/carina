@@ -253,7 +253,7 @@ public class DriverPool {
 				executor.screenOn();
 				executor.restartAppium(device);
 				
-				// verify if valid build i already installed and uninstall only in case of any difference 
+				// verify if valid build is already installed and uninstall only in case of any difference 
 				executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
 
 				if (capabilities == null && seleniumHost == null) {
