@@ -244,7 +244,9 @@ public class Configuration
         
         MOBILE_APP("mobile_app"),
         
-        MOBILE_APP_REINSTALL("mobile_app_reinstall"),
+        MOBILE_APP_UNINSTALL("mobile_app_uninstall"),
+        
+        MOBILE_APP_INSTALL("mobile_app_install"),
         
         MOBILE_APPIUM_RESTART("mobile_appium_restart"),
         
