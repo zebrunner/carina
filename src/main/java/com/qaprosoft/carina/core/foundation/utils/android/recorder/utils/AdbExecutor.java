@@ -43,6 +43,10 @@ public class AdbExecutor {
     
     private void initDefaultCmd() {
     	String tempCmd = "";
+    	String adbPath = "adb";
+    	if (!Configuration.get(Parameter.ADB_PATH).isEmpty()) {
+    		adbPath = Configuration.get(Parameter.ADB_PATH);
+    	}
     	if (DevicePool.isSystemDistributed()) {
     		// check if device server value equals to IP of the PC where tests were launched.
     		// adb can be executed locally in this case.
@@ -51,7 +55,6 @@ public class AdbExecutor {
     		String remoteServer = DevicePool.getServer();
     		if (!remoteServer.equals(currentIP)){
     			String login = Configuration.get(Parameter.SSH_USERNAME);
-    			String adbPath = Configuration.get(Parameter.ADB_PATH);
         		tempCmd = String.format(REMOTE_ADB_EXECUTION_CMD, login, remoteServer, adbPath);
     		}
     	}
