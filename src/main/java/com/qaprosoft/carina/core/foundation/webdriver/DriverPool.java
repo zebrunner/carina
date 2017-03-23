@@ -300,8 +300,9 @@ public class DriverPool {
 			} catch (Throwable thr) {
 				// DevicePool.ignoreDevice();
 				DevicePool.deregisterDevice();
-				LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
-						maxCount, thr.getMessage()));
+				LOGGER.error(
+						String.format("Driver initialization '%s' FAILED for selenium: %s! Retry %d of %d time - %s",
+								name, seleniumHost, count, maxCount, thr.getMessage()));
 				init_throwable = thr;
 				pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
 			}
