@@ -275,6 +275,7 @@ public class DriverPool {
 						} else {
 							executor.uninstallApp(device, appPackage);
 							executor.clearAppData(device, appPackage);
+							executor.installApp(device, appPackage);
 						}
 					}
 				}

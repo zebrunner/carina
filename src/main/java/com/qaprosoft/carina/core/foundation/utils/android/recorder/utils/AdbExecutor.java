@@ -234,6 +234,14 @@ public class AdbExecutor {
         execute(cmd);
     }
     
+    public void installApp(Device device, String packageName) {
+        if (!isDeviceCorrect())
+            return;
+        //adb -s UDID install com.myfitnesspal.android
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
+        execute(cmd);
+    }
+    
     public String[] getInstalledApkVersion(Device device, String packageName) {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
         
