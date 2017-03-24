@@ -285,13 +285,13 @@ public class AdbExecutor {
     	if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS))
     		return;
     		
-        //xcrun simctl shutdown $id || echo 'Shutdown failed'
+        //killall "Simulator"
         //xcrun simctl erase $id || echo 'Erase failed'
     	
     	LOGGER.info("Erasing iOS simulator for " + simulatorId);
     	
     	//TODO: implement solution to find simulatorId by device name aka 'iPhone 6'
-		String cmdLine ="xcrun simctl shutdown " + simulatorId;
+		String cmdLine ="killall Simulator";
 		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
 		List<String> output = execute(cmd);
 		for (String line : output) {
