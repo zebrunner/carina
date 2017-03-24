@@ -291,7 +291,7 @@ public class AdbExecutor {
     	LOGGER.info("Erasing iOS simulator for " + simulatorId);
     	
     	//TODO: implement solution to find simulatorId by device name aka 'iPhone 6'
-		String cmdLine ="xcrun simctl shutdown " + simulatorId + " || echo 'Shutdown failed'";
+		String cmdLine ="xcrun simctl shutdown " + simulatorId;
 		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
 		List<String> output = execute(cmd);
 		for (String line : output) {
@@ -299,7 +299,7 @@ public class AdbExecutor {
 		}
 		
 		
-		cmdLine ="xcrun simctl erase " + simulatorId + " $id || echo 'Erase failed'";
+		cmdLine ="xcrun simctl erase " + simulatorId;
 		cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
 		output = execute(cmd);
 		for (String line : output) {
