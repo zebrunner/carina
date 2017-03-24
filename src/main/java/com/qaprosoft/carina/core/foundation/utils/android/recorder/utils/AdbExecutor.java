@@ -26,6 +26,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
  * Date: 8/19/2014
  * Time: 12:57 AM
  */
+
+//TODO: rename class to CmdExecutor as we added iOS shell commands as well
 public class AdbExecutor {
     private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
     
@@ -93,6 +95,7 @@ public class AdbExecutor {
             ProcessBuilderExecutor.gcNullSafe(executor);
         }
     }
+    
 
     public boolean isDeviceCorrect() {
         return isDeviceCorrect(DevicePool.getDeviceUdid());
@@ -275,6 +278,27 @@ public class AdbExecutor {
 				// install application in single thread to fix issue with gray Google maps
 				installAppSync(device, mobileApp);
 			}
+		}
+    }
+    
+    public synchronized void eraseSimulator(String simulatorId) {
+        //xcrun simctl shutdown $id || echo 'Shutdown failed'
+        //xcrun simctl erase $id || echo 'Erase failed'
+    	
+    	
+		String cmdLine ="xcrun simctl shutdown " + simulatorId + " || echo 'Shutdown failed'";
+		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
+		List<String> output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
+		}
+		
+		
+		cmdLine ="xcrun simctl erase " + simulatorId + " $id || echo 'Erase failed'";
+		cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
+		output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
 		}
     }
     
