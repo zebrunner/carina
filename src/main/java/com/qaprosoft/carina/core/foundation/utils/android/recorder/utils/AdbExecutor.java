@@ -282,8 +282,13 @@ public class AdbExecutor {
     }
     
     public void eraseSimulator(String simulatorId) {
+    	if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS))
+    		return;
+    		
         //xcrun simctl shutdown $id || echo 'Shutdown failed'
         //xcrun simctl erase $id || echo 'Erase failed'
+    	
+    	LOGGER.info("Erasing iOS simulator for " + simulatorId);
     	
     	//TODO: implement solution to find simulatorId by device name aka 'iPhone 6'
 		String cmdLine ="xcrun simctl shutdown " + simulatorId + " || echo 'Shutdown failed'";
