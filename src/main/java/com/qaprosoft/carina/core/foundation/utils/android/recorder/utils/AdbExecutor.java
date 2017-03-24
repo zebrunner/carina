@@ -285,7 +285,7 @@ public class AdbExecutor {
         //xcrun simctl shutdown $id || echo 'Shutdown failed'
         //xcrun simctl erase $id || echo 'Erase failed'
     	
-    	
+    	//TODO: implement solution to find simulatorId by device name aka 'iPhone 6'
 		String cmdLine ="xcrun simctl shutdown " + simulatorId + " || echo 'Shutdown failed'";
 		String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
 		List<String> output = execute(cmd);
