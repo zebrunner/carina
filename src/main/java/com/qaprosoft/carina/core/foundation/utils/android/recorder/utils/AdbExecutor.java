@@ -281,7 +281,7 @@ public class AdbExecutor {
 		}
     }
     
-    public synchronized void eraseSimulator(String simulatorId) {
+    public void eraseSimulator(String simulatorId) {
         //xcrun simctl shutdown $id || echo 'Shutdown failed'
         //xcrun simctl erase $id || echo 'Erase failed'
     	
