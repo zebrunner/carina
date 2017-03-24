@@ -281,14 +281,14 @@ public class AdbExecutor {
 		}
     }
     
-    public void eraseSimulator(String simulatorId) {
+    public void eraseSimulators() {
     	if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS))
     		return;
     		
         //killall "Simulator"
         //xcrun simctl erase $id || echo 'Erase failed'
     	
-    	LOGGER.info("Erasing iOS simulator for " + simulatorId);
+    	LOGGER.info("Erasing iOS simulators... ");
     	
     	//TODO: implement solution to find simulatorId by device name aka 'iPhone 6'
 		String cmdLine ="killall Simulator";
@@ -299,7 +299,7 @@ public class AdbExecutor {
 		}
 		
 		
-		cmdLine ="xcrun simctl erase " + simulatorId;
+		cmdLine ="xcrun simctl erase all";
 		cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
 		output = execute(cmd);
 		for (String line : output) {
