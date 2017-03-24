@@ -81,6 +81,10 @@ public class DevicePool
 		LOGGER.info("Removed device from the DevicePool: " + device.getName());
 	}
 
+	public static synchronized List<Device> getDevices() {
+		return DEVICES;
+	}
+	
 	public static synchronized void addDevices()
 	{
 		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
