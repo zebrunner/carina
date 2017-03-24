@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,31 +66,34 @@ public class ReportContext
 	 */
 	public static synchronized File getBaseDir()
 	{
-		if (baseDirectory == null)
-		{
-			removeOldReports();
-			File projectRoot = new File(String.format("%s/%s", System.getProperty("user.dir"),
-					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
-			if (!projectRoot.exists())
+		try {
+			if (baseDirectory == null)
 			{
-				boolean isCreated = projectRoot.mkdirs();
+				removeOldReports();
+				File projectRoot = new File(String.format("%s/%s", URLDecoder.decode(System.getProperty("user.dir"), "utf-8"),
+							Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
+				if (!projectRoot.exists())
+				{
+					boolean isCreated = projectRoot.mkdirs();
+					if (!isCreated)
+					{
+						throw new RuntimeException("Folder not created: " + projectRoot.getAbsolutePath());
+					}
+				}
+				rootID = System.currentTimeMillis();
+				String directory = String.format("%s/%s/%d", URLDecoder.decode(System.getProperty("user.dir"), "utf-8"),
+						Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), rootID);
+				File baseDirectoryTmp = new File(directory);  
+				boolean isCreated = baseDirectoryTmp.mkdir();
 				if (!isCreated)
 				{
-					throw new RuntimeException("Folder not created: " + projectRoot.getAbsolutePath());
+					throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
 				}
+				
+				baseDirectory = baseDirectoryTmp;
 			}
-			
-			rootID = System.currentTimeMillis();
-			String directory = String.format("%s/%s/%d", System.getProperty("user.dir"),
-					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), rootID);
-			File baseDirectoryTmp = new File(directory);  
-			boolean isCreated = baseDirectoryTmp.mkdir();
-			if (!isCreated)
-			{
-				throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
-			}
-			
-			baseDirectory = baseDirectoryTmp;
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
 		}
 		return baseDirectory;
 	}
@@ -126,7 +131,11 @@ public class ReportContext
 	{
 		if (artifactsDirectory == null)
 		{
-			artifactsDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), ARTIFACTS_FOLDER));
+			try {
+				artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(getBaseDir().getAbsolutePath(), "utf-8"), ARTIFACTS_FOLDER));
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
+			}
 			boolean isCreated = artifactsDirectory.mkdir();
 			if (!isCreated)
 			{
