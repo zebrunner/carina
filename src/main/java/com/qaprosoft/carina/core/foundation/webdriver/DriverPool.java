@@ -102,7 +102,6 @@ public class DriverPool {
 
 		if (currentDrivers.containsKey(name)) {
 			drv = currentDrivers.get(name);
-			LOGGER.debug("##########        GET threadId: " + threadId + "; driver: " + drv);
 		} else if (driverMode == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 			LOGGER.debug("########## Unable to find suite driver by threadId: " + threadId);
 			// init our single driver variable
