@@ -281,7 +281,7 @@ public class AdbExecutor {
 		}
     }
     
-    public void eraseSimulators() {
+    public void eraseSimulator(String id) {
     	if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS))
     		return;
     		
@@ -300,6 +300,13 @@ public class AdbExecutor {
 		
 		
 		cmdLine ="xcrun simctl erase all";
+		cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
+		output = execute(cmd);
+		for (String line : output) {
+			LOGGER.debug(line);
+		}
+		
+		cmdLine ="rm -rf $HOME/Library/Developer/CoreSimulator/Devices/" + id;
 		cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "));
 		output = execute(cmd);
 		for (String line : output) {
@@ -362,6 +369,28 @@ public class AdbExecutor {
 		}
 
 		return res;
+	}
+	
+	public String getApkPackageName(String apkFile) {
+		// aapt dump badging <apk_file> | grep versionCode
+		// aapt dump badging <apk_file> | grep versionName
+		// output:
+		// package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
+
+		String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
+		List<String> output = execute(cmd);
+		// parse output command and get appropriate data
+		String packageName = "";
+
+		for (String line : output) {
+			if (line.contains("versionCode") && line.contains("versionName")) {
+				LOGGER.debug(line);
+				String[] outputs = line.split("'");
+				packageName = outputs[1]; //package
+			}
+		}
+
+		return packageName;
 	}
     
 	public void restartAppium(Device device) {
