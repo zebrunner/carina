@@ -646,7 +646,7 @@ public class AbstractTestListener extends TestArgsListener
 		
 		for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
 			String driverName = entry.getKey();
-			screenId = Screenshot.capture(entry.getValue(), true, driverName + ": " + msg); // in case of failure
+			screenId = Screenshot.captureFullSize(entry.getValue(), driverName + ": " + msg); // in case of failure
 		}
 		return screenId;
 	}
