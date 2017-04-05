@@ -79,6 +79,7 @@ public class ExtendedWebElement
 	public ExtendedWebElement(WebElement element)
 	{
 		this.element = element;
+		
 		summary = new TestLogHelper(getDriver());
 		try
 		{
@@ -195,6 +196,8 @@ public class ExtendedWebElement
 		summary.log(msg);
 		try
 		{
+			JavascriptExecutor js = (JavascriptExecutor)getDriver();
+			js.executeScript("arguments[0].style.border='3px solid red'", element);
 			Screenshot.capture(getDriver(), msg);
 		}
 		catch (Exception e)
@@ -592,6 +595,10 @@ public class ExtendedWebElement
 	private void clickSafe(long timeout, boolean startTimer)
 	{
 		WebDriver drv = getDriver();
+		
+		//JavascriptExecutor js = (JavascriptExecutor)drv;
+		//js.executeScript("arguments[0].style.border='3px solid red'", element);
+		
 		boolean clicked = false;
 		Exception reason = null;
 		if (startTimer)

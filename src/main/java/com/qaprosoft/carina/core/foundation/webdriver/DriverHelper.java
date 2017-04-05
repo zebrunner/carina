@@ -483,6 +483,7 @@ public class DriverHelper {
 	 *
 	 */
 	public void click(final ExtendedWebElement extendedWebElement) {
+
 		click(extendedWebElement, EXPLICIT_TIMEOUT);
 	}
 	
