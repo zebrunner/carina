@@ -16,12 +16,19 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -52,10 +59,10 @@ public class DriverFactory {
 
     @SuppressWarnings("rawtypes")
 	public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
-        RemoteWebDriver driver = null;
+    	RemoteWebDriver driver = null;
         try {
             if (capabilities.getCapability("automationName") == null)
-                driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
+                driver = new RemoteWebDriver(new ExtendedCommandExecutor(new HttpCommandExecutor(new URL(selenium_host))), capabilities);
             else {
                 String platform;
                 if (capabilities.getCapability("platform") != null) {
