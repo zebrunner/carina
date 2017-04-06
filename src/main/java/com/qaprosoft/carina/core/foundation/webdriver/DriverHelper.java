@@ -188,11 +188,11 @@ public class DriverHelper {
 	}
 
 	public boolean isElementPresent(String controlInfo, final WebElement element) {
-		return new ExtendedWebElement(element, controlInfo).isElementPresent();
+		return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent();
 	}
 
 	public boolean isElementPresent(String controlInfo, final WebElement element, long timeout) {
-		return new ExtendedWebElement(element, controlInfo).isElementPresent(timeout);
+		return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent(timeout);
 	}
 
 	/**
@@ -362,7 +362,7 @@ public class DriverHelper {
 			LOGGER.error("All elements are not present");
 			throw new RuntimeException("Unable to find any element from array: " + elements.toString());
 		}
-		return new ExtendedWebElement(null, null, null);
+		return new ExtendedWebElement(null, null, null, null);
 	}
 
 	@Deprecated
@@ -449,7 +449,7 @@ public class DriverHelper {
 	 */
 
 	public boolean isElementNotPresent(String controlInfo, final WebElement element) {
-		return isElementNotPresent(new ExtendedWebElement(element, controlInfo));
+		return isElementNotPresent(new ExtendedWebElement(element, controlInfo, getDriver()));
 	}
 
 	/**
@@ -473,7 +473,7 @@ public class DriverHelper {
 	 */
 
 	public void type(String controlInfo, WebElement control, String text) {
-		type(new ExtendedWebElement(control, controlInfo), text);
+		type(new ExtendedWebElement(control, controlInfo, getDriver()), text);
 	}
 
 	/**
@@ -507,7 +507,7 @@ public class DriverHelper {
 	 */
 
 	public void click(String controlInfo, WebElement control) {
-		click(new ExtendedWebElement(control, controlInfo));
+		click(new ExtendedWebElement(control, controlInfo, getDriver()));
 	}
 	
 	/**
@@ -595,7 +595,7 @@ public class DriverHelper {
 	 */
 
 	public void doubleClick(String controlInfo, WebElement control) {
-		doubleClick(new ExtendedWebElement(control, controlInfo));
+		doubleClick(new ExtendedWebElement(control, controlInfo, getDriver()));
 	}
 
 	/**
@@ -645,7 +645,7 @@ public class DriverHelper {
 	 */
 	@Deprecated
 	public void pressEnter(String controlInfo, WebElement control) {
-		pressEnter(new ExtendedWebElement(control, controlInfo));
+		pressEnter(new ExtendedWebElement(control, controlInfo, getDriver()));
 	}
 
 	@Deprecated
@@ -900,7 +900,7 @@ public class DriverHelper {
 	}
 
 	public void select(String controlInfo, WebElement control, String selectText) {
-		select(new ExtendedWebElement(control, controlInfo), selectText);
+		select(new ExtendedWebElement(control, controlInfo, getDriver()), selectText);
 	}
 
 	/**
@@ -942,7 +942,7 @@ public class DriverHelper {
 	}
 
 	public void select(String controlInfo, WebElement control, int index) {
-		select(new ExtendedWebElement(control, controlInfo), index);
+		select(new ExtendedWebElement(control, controlInfo, getDriver()), index);
 	}
 
 	// TODO: review why hover from ExtendedWelement doesn't work
@@ -1028,7 +1028,7 @@ public class DriverHelper {
 	}
 
 	public void hover(String controlInfo, WebElement control) {
-		hover(new ExtendedWebElement(control, controlInfo));
+		hover(new ExtendedWebElement(control, controlInfo, getDriver()));
 	}
 
 	/**
@@ -1403,7 +1403,7 @@ public class DriverHelper {
 					return !drv.findElements(by).isEmpty();
 				}
 			});
-			element = new ExtendedWebElement(driver.findElement(by), name, by);
+			element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
 			summary.log(Messager.ELEMENT_FOUND.info(name));
 		} catch (Exception e) {
 			element = null;
@@ -1444,7 +1444,7 @@ public class DriverHelper {
 			} catch (Exception e) {/* do nothing */
 			}
 
-			extendedWebElements.add(new ExtendedWebElement(element, name));
+			extendedWebElements.add(new ExtendedWebElement(element, name, drv));
 		}
 		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return extendedWebElements;
@@ -1455,6 +1455,11 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
+		if (driver != null) {
+			return driver;
+		}
+		LOGGER.error("Unable to find driver in DriverHelpr without DriverPool!");
+		
 		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {
 			driver = DriverPool.getDriver();
@@ -1496,7 +1501,7 @@ public class DriverHelper {
 		try {
 			res = findExtendedWebElement(by, by.toString(), timeout);
 		} catch (Exception e) {
-			res = new ExtendedWebElement(null, element.getName(), by);
+			res = new ExtendedWebElement(null, element.getName(), by, getDriver());
 		}
 		return res;
 	}
