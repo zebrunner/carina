@@ -68,6 +68,25 @@ public class DriverPool {
 	public static WebDriver getDriver() {
 		return getDriver(DEFAULT);
 	}
+	
+	/**
+	 * Get first registered driver from Pool.
+	 * 
+	 * @return default WebDriver
+	 */
+	public static WebDriver getExistingDriver() {
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+		if (currentDrivers.size() == 0) {
+			throw new RuntimeException("Unable to find exiting river in DriverPool!");
+		}
+		
+		if (currentDrivers.size() > 0) {
+			return currentDrivers.get(0);
+		}
+		
+		// TODO: take a look to extendeWebElement->getDriver() method (786 line  todo)
+		return getDriver(DEFAULT);
+	}
 
 	/**
 	 * Get driver by name. If no driver discovered it will be created using
