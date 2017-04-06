@@ -270,6 +270,7 @@ public class DriverPool {
 				// done after registering available device with thread
 				executor.screenOn();
 				executor.restartAppium(device);
+				executor.clearAppData(device);
 				
 				// verify if valid build is already installed and uninstall only in case of any difference 
 				executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
