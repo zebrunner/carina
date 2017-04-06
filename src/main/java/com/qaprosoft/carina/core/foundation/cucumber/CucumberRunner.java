@@ -1,6 +1,6 @@
 package com.qaprosoft.carina.core.foundation.cucumber;
 
-import com.qaprosoft.carina.core.foundation.UITest;
+import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import cucumber.api.testng.CucumberFeatureWrapper;
@@ -18,7 +18,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CucumberRunner extends UITest {
+public abstract class CucumberRunner extends AbstractTest {
     private TestNGCucumberRunner testNGCucumberRunner;
 
     public static final String CUCUMBER_REPORT_FOLDER = "CucumberReport";
