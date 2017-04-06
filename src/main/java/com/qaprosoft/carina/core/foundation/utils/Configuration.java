@@ -248,6 +248,8 @@ public class Configuration
         
         MOBILE_APP_INSTALL("mobile_app_install"),
         
+        MOBILE_APP_CLEAR_CACHE("mobile_app_clear_cache"),
+        
         MOBILE_APPIUM_RESTART("mobile_appium_restart"),
         
         MOBILE_APP_ACTIVITY("mobile_app_activity"),
