@@ -700,7 +700,7 @@ public class AndroidUtils {
                 .AndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
 
 
-        return new ExtendedWebElement(androidElement);
+        return new ExtendedWebElement(androidElement, getDriver());
     }
 
     public static ExtendedWebElement scrollToText(String scrollViewId, String text) {
@@ -708,6 +708,6 @@ public class AndroidUtils {
                 .AndroidUIAutomator("new UiScrollable(new UiSelector().resourceId(\"" + scrollViewId + "\")).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
 
 
-        return new ExtendedWebElement(androidElement);
+        return new ExtendedWebElement(androidElement, getDriver());
     }
 }
