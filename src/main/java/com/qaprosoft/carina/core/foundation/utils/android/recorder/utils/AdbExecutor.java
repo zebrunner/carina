@@ -428,7 +428,8 @@ public class AdbExecutor {
 		for (String line : output) {
 			LOGGER.debug(line);
 		}
-		pause(5);
+		//TODO: implement verification logic for started appium
+		pause(8);
 	}
 	
 
