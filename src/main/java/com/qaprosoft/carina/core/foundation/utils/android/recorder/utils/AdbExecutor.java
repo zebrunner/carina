@@ -223,11 +223,27 @@ public class AdbExecutor {
         execute(cmd);
     }
 
+    @Deprecated
     public void clearAppData(Device device, String app) {
         //adb -s UDID shell pm clear com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "shell", "pm", "clear", app);
         execute(cmd);
     }
+    
+    public void clearAppData(Device device) {
+    	if (!Configuration.getBoolean(Parameter.MOBILE_APP_CLEAR_CACHE))
+    		return;
+
+        if (!isDeviceCorrect())
+            return;
+
+        //adb -s UDID shell pm clear com.myfitnesspal.android
+        String packageName = getApkPackageName(Configuration.get(Parameter.MOBILE_APP));
+        
+        String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "shell", "pm", "clear", packageName);
+        execute(cmd);
+    }
+
 
     public void uninstallApp(Device device, String packageName) {
         if (!isDeviceCorrect())
