@@ -186,6 +186,11 @@
 			<version>${apache-http.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<version>${apache-http.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.googlecode.jinahya</groupId>
 			<artifactId>ocap-api</artifactId>
 			<version>${ocap-api.version}</version>
