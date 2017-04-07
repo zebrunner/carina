@@ -123,6 +123,7 @@ public class TestNamingUtil
 		// getInvocationCount() value
 		if (testName2Counter == null) {
 			LOGGER.error("Unable to decrease retry counter for '" + test + "'.");
+			return;
 		}
 		if (testName2Counter.containsKey(test))
 		{
