@@ -22,9 +22,7 @@ public final class AppiumStatus {
 
     public static boolean isStarted(String appiumServer) {
 
-        LOGGER.info("Checking Appium is stared on " + appiumServer);
-
-        LOGGER.info("Getting response from Appium Server");
+        LOGGER.debug("Checking Appium is stared on " + appiumServer);
 
         String response = null;
 
@@ -41,12 +39,12 @@ public final class AppiumStatus {
         try {
 
             if (response == null) {
-                LOGGER.info("Cannot determine if Appium session started - got NULL response from Appium server");
+                LOGGER.debug("Cannot determine if Appium session started - got NULL response from Appium server");
                 return false;
             }
             status = JsonUtils.fromJson(response, Status.class);
             if (status == null) {
-                LOGGER.info("Appium session on url " + appiumServer + " is not started");
+                LOGGER.debug("Appium session on url " + appiumServer + " is not started yet");
                 return false;
             }
 
@@ -68,5 +66,7 @@ public final class AppiumStatus {
                         return AppiumStatus.isStarted(appiumHost);
                     }
                 });
+        
+        LOGGER.debug("Appium started!");
     }
 }
