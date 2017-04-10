@@ -26,7 +26,6 @@ public class ExtendedCommandExecutor implements CommandExecutor{
 
 	@Override
 	public Response execute(Command command) throws IOException {
-		LOGGER.info("Extended Command Executor started...");
 		Response response = commandExecutor.execute(command);
 		return response;
 	}
