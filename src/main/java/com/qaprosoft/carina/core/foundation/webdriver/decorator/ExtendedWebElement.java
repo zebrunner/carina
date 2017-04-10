@@ -75,12 +75,44 @@ public class ExtendedWebElement
 	private WebElement element;
 	private String name;
 	private By by;
+	private WebDriver driver;
 
+	@Deprecated
+	public ExtendedWebElement(WebElement element, String name) 
+	{
+		//TODO: remove usage with default river!
+		this(element, name, DriverPool.getDriver());
+	}
+	
+	@Deprecated
+	public ExtendedWebElement(WebElement element, String name, By by)
+	{
+		this(element, name, by, DriverPool.getDriver());
+	}
+	
+	@Deprecated
 	public ExtendedWebElement(WebElement element)
 	{
+		this(element, DriverPool.getDriver());
+	}
+	
+	public ExtendedWebElement(WebElement element, String name, WebDriver driver)
+	{
+		this(element, driver);
+		this.name = name;
+	}
+
+	public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver)
+	{
+		this(element, name, driver);
+		this.by = by;
+	}
+	
+	public ExtendedWebElement(WebElement element, WebDriver driver)
+	{
 		this.element = element;
-		
-		summary = new TestLogHelper(getDriver());
+		this.driver = driver;
+		summary = new TestLogHelper(driver);
 		try
 		{
 			cryptoTool = new CryptoTool();
@@ -89,18 +121,6 @@ public class ExtendedWebElement
 		{
 			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
 		}
-	}
-
-	public ExtendedWebElement(WebElement element, String name)
-	{
-		this(element);
-		this.name = name;
-	}
-	
-	public ExtendedWebElement(WebElement element, String name, By by)
-	{
-		this(element, name);
-		this.by = by;
 	}
 	
 	public WebElement getElement()
@@ -792,10 +812,6 @@ public class ExtendedWebElement
 	private WebDriver getDriver() {
 		// TODO: each element has parent page. Inside page there is a driver. Need to implement functionality for getDriver from parent page
 		// as current implementation has limitations for extraDriver functionality
-		WebDriver driver = DriverPool.getDriver();
-		if (driver == null) {
-			throw new RuntimeException("Unable to find valid driver inside DriverPool!");	
-		}
 		return driver;
 	}
 	
@@ -1188,7 +1204,7 @@ public class ExtendedWebElement
 					return false;
 				}
 			});
-			element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
+			element = new ExtendedWebElement(this.getElement().findElement(by), name, by, driver);
 			//summary.log(Messager.ELEMENT_FOUND.info(name));
 		}
 		catch (Exception e)
@@ -1252,7 +1268,7 @@ public class ExtendedWebElement
 				LOGGER.debug(e.getMessage(), e.getCause());
 			}
 
-			extendedWebElements.add(new ExtendedWebElement(element, name));
+			extendedWebElements.add(new ExtendedWebElement(element, name, driver));
 		}		
 		setImplicitTimeout();
 		return extendedWebElements;
