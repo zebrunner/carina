@@ -68,6 +68,25 @@ public class DriverPool {
 	public static WebDriver getDriver() {
 		return getDriver(DEFAULT);
 	}
+	
+	/**
+	 * Get first registered driver from Pool.
+	 * 
+	 * @return default WebDriver
+	 */
+	public static WebDriver getExistingDriver() {
+		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+		if (currentDrivers.size() == 0) {
+			throw new RuntimeException("Unable to find exiting river in DriverPool!");
+		}
+		
+		if (currentDrivers.size() > 0) {
+			return currentDrivers.get(0);
+		}
+		
+		// TODO: take a look to extendeWebElement->getDriver() method (786 line  todo)
+		return getDriver(DEFAULT);
+	}
 
 	/**
 	 * Get driver by name. If no driver discovered it will be created using
@@ -251,12 +270,16 @@ public class DriverPool {
 				// done after registering available device with thread
 				executor.screenOn();
 				executor.restartAppium(device);
+				executor.clearAppData(device);
 				
 				// verify if valid build is already installed and uninstall only in case of any difference 
 				executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
 
 				if (capabilities == null && seleniumHost == null) {
 					drv = DriverFactory.create(name, device);
+					if (device != null) {
+						seleniumHost = device.getSeleniumServer();
+					}
 				} else {
 					// TODO: investigate do we need transfer device to factory
 					// or not

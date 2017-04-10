@@ -121,6 +121,10 @@ public class TestNamingUtil
 	{
 		// introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
 		// getInvocationCount() value
+		if (test == null) {
+			LOGGER.error("Unable to decrease retry counter for null test.");
+			return;
+		}
 		if (testName2Counter.containsKey(test))
 		{
 			int count = testName2Counter.get(test) - 1;
