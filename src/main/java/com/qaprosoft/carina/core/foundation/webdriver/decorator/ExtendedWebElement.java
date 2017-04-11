@@ -211,17 +211,23 @@ public class ExtendedWebElement
      */
 	public void click(long timeout)
 	{
-		clickSafe(timeout, true);
+		JavascriptExecutor js = (JavascriptExecutor)driver;
+		js.executeScript("arguments[0].style.border='3px solid red'", element);
 		String msg = Messager.ELEMENT_CLICKED.info(getName());
-		summary.log(msg);
+		
 		try
 		{
-			Screenshot.capture(getDriver(), msg);
+			Screenshot.capture(driver, msg);
+			Thread.sleep(1000); //This is done to prevent jump to next page after clickSafe() while taking Screenshot
 		}
 		catch (Exception e)
 		{
 			LOGGER.info(e.getMessage());
 		}
+	
+		clickSafe(timeout, true);
+		summary.log(msg);
+		
 	}
 	
 	/**
@@ -613,6 +619,10 @@ public class ExtendedWebElement
 	private void clickSafe(long timeout, boolean startTimer)
 	{
 		WebDriver drv = getDriver();
+		
+		//JavascriptExecutor js = (JavascriptExecutor)drv;
+		//js.executeScript("arguments[0].style.border='3px solid red'", element);
+		
 		boolean clicked = false;
 		Exception reason = null;
 		if (startTimer)
