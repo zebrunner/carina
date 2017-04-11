@@ -87,7 +87,7 @@ public class Screenshot
 	 */
 	public static String captureFullSize(WebDriver driver, String comment)
 	{
-		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, true);
+		return capture(driver, true /*explicitly make full size screenshot*/, comment, true);
 	}
 	
 	/**
