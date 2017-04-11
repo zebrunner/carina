@@ -211,19 +211,23 @@ public class ExtendedWebElement
      */
 	public void click(long timeout)
 	{
-		clickSafe(timeout, true);
+		JavascriptExecutor js = (JavascriptExecutor)driver;
+		js.executeScript("arguments[0].style.border='3px solid red'", element);
 		String msg = Messager.ELEMENT_CLICKED.info(getName());
-		summary.log(msg);
+		
 		try
 		{
-			JavascriptExecutor js = (JavascriptExecutor)getDriver();
-			js.executeScript("arguments[0].style.border='3px solid red'", element);
-			Screenshot.capture(getDriver(), msg);
+			Screenshot.capture(driver, msg);
+			Thread.sleep(1000); //This is done to prevent jump to next page after clickSafe() while taking Screenshot
 		}
 		catch (Exception e)
 		{
 			LOGGER.info(e.getMessage());
 		}
+	
+		clickSafe(timeout, true);
+		summary.log(msg);
+		
 	}
 	
 	/**
