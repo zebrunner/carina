@@ -6,10 +6,12 @@ import java.net.URL;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.ExtendedCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
@@ -38,7 +40,7 @@ public class DesktopFactory extends AbstractFactory
 
 		try
 		{
-			driver = new RemoteWebDriver(new URL(selenium), capabilities);
+			driver = new RemoteWebDriver(new ExtendedCommandExecutor(new HttpCommandExecutor(new URL(selenium))), capabilities);
 		} catch (MalformedURLException e)
 		{
 			throw new RuntimeException("Unable to create desktop driver");
