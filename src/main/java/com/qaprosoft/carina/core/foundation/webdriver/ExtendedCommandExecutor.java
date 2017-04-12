@@ -28,7 +28,7 @@ public class ExtendedCommandExecutor implements CommandExecutor {
 
     @Override
     public Response execute(Command command) throws IOException {
-        if (command.getName().equals(DriverCommand.CLICK_ELEMENT)|| command.getName().equals(DriverCommand.EXECUTE_SCRIPT)) {
+        if (command.getName().equals(DriverCommand.CLICK_ELEMENT)) {
             //Here we are interested only in the send keys event (viz., type action)
             MetaDataCollector.collectDataFromElement(commandExecutor, command);
         }
