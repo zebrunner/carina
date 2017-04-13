@@ -15,6 +15,9 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +36,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -76,26 +80,9 @@ public class ExtendedWebElement
 	private String name;
 	private By by;
 	private WebDriver driver;
+	
+	private String parentClassName;
 
-	@Deprecated
-	public ExtendedWebElement(WebElement element, String name) 
-	{
-		//TODO: remove usage with default river!
-		this(element, name, DriverPool.getDriver());
-	}
-	
-	@Deprecated
-	public ExtendedWebElement(WebElement element, String name, By by)
-	{
-		this(element, name, by, DriverPool.getDriver());
-	}
-	
-	@Deprecated
-	public ExtendedWebElement(WebElement element)
-	{
-		this(element, DriverPool.getDriver());
-	}
-	
 	public ExtendedWebElement(WebElement element, String name, WebDriver driver)
 	{
 		this(element, driver);
@@ -107,6 +94,14 @@ public class ExtendedWebElement
 		this(element, name, driver);
 		this.by = by;
 	}
+	
+	public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver, String parentClassName)
+	{
+		this(element, name, driver);
+		this.by = by;
+		this.parentClassName = parentClassName;
+	}
+
 	
 	public ExtendedWebElement(WebElement element, WebDriver driver)
 	{
@@ -1397,5 +1392,31 @@ public class ExtendedWebElement
 		}
 		return res;
 	}
-	
+
+	private void captureElements() {
+		try {
+            Class<?> c = Class.forName("com.mlb.qa.demo.HomebaseHomePage");
+            Constructor<?> cons = c.getConstructor(WebDriver.class);
+            Object object = cons.newInstance(driver);
+            Field[] fileds = object.getClass().getDeclaredFields();
+            for (Field filed : fileds) {
+                if (filed.isAnnotationPresent(FindBy.class)) {
+                    ExtendedWebElement extendedWebElement = (ExtendedWebElement) filed.get(object);
+                    LOGGER.info("Element Name: " + filed.getName());
+                    LOGGER.info("Element locator strategy: " + extendedWebElement.getBy());
+                    LOGGER.info("Element location: " + extendedWebElement.getElement().getLocation());
+                }
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+	}
 }
