@@ -15,32 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import com.google.common.base.Function;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.*;
-import org.testng.Assert;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +27,49 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+import com.google.common.base.Function;
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
@@ -1217,6 +1234,10 @@ public class ExtendedWebElement {
 
     private void captureElements() {
 
+    	if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
+    		return;
+    	}
+    	
         String currentUrl = driver.getCurrentUrl();
 
         String cache = currentUrl + ":" + parentClassName;
@@ -1229,13 +1250,10 @@ public class ExtendedWebElement {
                 ElementsInfo elementsInfo = new ElementsInfo();
                 elementsInfo.setClassName(parentClassName);
                 elementsInfo.setCurrentURL(currentUrl);
-                File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
-                File newPlace = new File("metadata/" + cache.hashCode() + ".png");
-                try {
-                    FileUtils.copyFile(file, newPlace);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                //File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
+                String screenFilePath = Screenshot.capture(driver, true, cache);
+                File newPlace = new File(ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + cache.hashCode() + ".png");
+                FileUtils.copyFile(new File(screenFilePath), newPlace);
                 ScreenShootInfo screenShootInfo = new ScreenShootInfo();
                 screenShootInfo.setScreenshotPath(newPlace.getAbsolutePath());
                 BufferedImage bimg = ImageIO.read(newPlace);
