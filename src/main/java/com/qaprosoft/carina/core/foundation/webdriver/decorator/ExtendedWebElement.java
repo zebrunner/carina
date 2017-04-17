@@ -1325,7 +1325,7 @@ public class ExtendedWebElement {
 
     private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement, Field field) {
         ElementInfo elementInfo = new ElementInfo();
-        if (extendedWebElement.isElementPresent()) {
+        if (extendedWebElement.isElementPresent(1)) {
             elementInfo.setElementName(field.getName());
             Point location = extendedWebElement.getElement().getLocation();
             Dimension size = extendedWebElement.getElement().getSize();
