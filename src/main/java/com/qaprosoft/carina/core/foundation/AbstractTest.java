@@ -378,7 +378,7 @@ public abstract class AbstractTest // extends DriverHelper
     private void generateMetadata() {
         Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
         for (String key : allData.keySet()) {
-            File file = new File("metadata/" + key.hashCode() + ".json");
+            File file = new File(ReportContext.getArtifactsFolder().getAbsolutePath() +  "/metadata/" + key.hashCode() + ".json");
             PrintWriter out = null;
             try {
                 out = new PrintWriter(file);
