@@ -143,11 +143,9 @@ public class Screenshot
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
-	 * @param isTakeScreenshot
-	 *            perform actual capture or not
 	 * @param comment
 	 *            String
-	 * @return screenshot name.
+	 * @return screenshot file.
 	 */
 	public static File captureWithControls(WebDriver driver, String comment)
 	{
