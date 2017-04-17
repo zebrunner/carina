@@ -1271,10 +1271,10 @@ public class ExtendedWebElement {
                 ElementsInfo elementsInfo = new ElementsInfo();
                 elementsInfo.setClassName(parentClassName);
                 elementsInfo.setCurrentURL(currentUrl);
-                //File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
-                File screenFile = Screenshot.captureWithControls(driver, cache);
+                File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
+                //TODO: reuse Screenshot for generation
                 File newPlace = new File(ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + cache.hashCode() + ".png");
-                FileUtils.copyFile(screenFile, newPlace);
+                FileUtils.copyFile(file, newPlace);
                 ScreenShootInfo screenShootInfo = new ScreenShootInfo();
                 screenShootInfo.setScreenshotPath(newPlace.getAbsolutePath());
                 BufferedImage bimg = ImageIO.read(newPlace);
