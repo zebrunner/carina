@@ -69,6 +69,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class ExtendedWebElement {
@@ -127,6 +128,25 @@ public class ExtendedWebElement {
         }
     }
 
+	@Deprecated
+	public ExtendedWebElement(WebElement element, String name) 
+	{
+		//TODO: remove usage with default river!
+		this(element, name, DriverPool.getDriver());
+	}
+	
+	@Deprecated
+	public ExtendedWebElement(WebElement element, String name, By by)
+	{
+		this(element, name, by, DriverPool.getDriver());
+	}
+	
+	@Deprecated
+	public ExtendedWebElement(WebElement element)
+	{
+		this(element, DriverPool.getDriver());
+	}
+	
     public WebElement getElement() {
         return element;
     }
