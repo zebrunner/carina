@@ -136,28 +136,6 @@ public class Screenshot
 		return capture(driver, isTakeScreenshot, comment, false);
 
 	}
-
-	
-	/**
-	 * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
-	 * 
-	 * @param driver
-	 *            instance used for capturing.
-	 * @param comment
-	 *            String
-	 * @return screenshot file.
-	 */
-	public static File captureWithControls(WebDriver driver, String comment)
-	{
-		String test = "";
-		if (TestNamingUtil.isTestNameRegistered()) {
-			test = TestNamingUtil.getTestNameByThread();
-		} else {
-			test = TestNamingUtil.getCanonicTestNameByThread();
-		}
-		
-		return new File(ReportContext.getTestDir(test).getAbsoluteFile() + "/" + capture(driver, comment));
-	}
 	
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
