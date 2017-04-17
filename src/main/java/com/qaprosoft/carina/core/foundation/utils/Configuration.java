@@ -133,6 +133,8 @@ public class Configuration
 
 		AUTO_SCREENSHOT("auto_screenshot"),
 		
+		SMART_SCREENSHOT("smart_screenshot"),
+		
 		IMPLICIT_TIMEOUT("implicit_timeout"),
 
 		EXPLICIT_TIMEOUT("explicit_timeout"),
