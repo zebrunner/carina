@@ -11,7 +11,7 @@ public class ElementsInfo {
 
     private String currentURL;
 
-    private String screenshot;
+    private ScreenShootInfo screenShootInfo;
 
     private String className;
 
@@ -25,12 +25,12 @@ public class ElementsInfo {
         this.currentURL = currentURL;
     }
 
-    public String getScreenshot() {
-        return screenshot;
+    public ScreenShootInfo getScreenshot() {
+        return screenShootInfo;
     }
 
-    public void setScreenshot(String screenshot) {
-        this.screenshot = screenshot;
+    public void setScreenshot(ScreenShootInfo screenShootInfo) {
+        this.screenShootInfo = screenShootInfo;
     }
 
     public String getClassName() {
@@ -46,7 +46,7 @@ public class ElementsInfo {
     }
 
     public void addElement(ElementInfo element) {
-        if (element != null){
+        if (element != null) {
             elements.add(element);
         }
 
