@@ -97,6 +97,8 @@ public abstract class AbstractTest // extends DriverHelper
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable {
 
+        // Add shutdown hook
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         // Set log4j properties
         PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
         // Set SoapUI log4j properties
@@ -371,27 +373,9 @@ public abstract class AbstractTest // extends DriverHelper
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
             e.printStackTrace();
         }
-        generateMetadata();
 
     }
 
-    private void generateMetadata() {
-        Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
-        for (String key : allData.keySet()) {
-            File file = new File(ReportContext.getArtifactsFolder().getAbsolutePath() +  "/metadata/" + key.hashCode() + ".json");
-            PrintWriter out = null;
-            try {
-                out = new PrintWriter(file);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
-            out.flush();
-        }
-        ;
-
-
-    }
 
     private String getDeviceName() {
         String deviceName = "Desktop";
@@ -647,4 +631,31 @@ public abstract class AbstractTest // extends DriverHelper
         DriverPool.quitDrivers();
     }
 
+
+    public static class ShutdownHook extends Thread {
+
+        private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
+
+        private void generateMetadata() {
+            Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
+            for (String key : allData.keySet()) {
+                File file = new File(ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + key.hashCode() + ".json");
+                PrintWriter out = null;
+                try {
+                    out = new PrintWriter(file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
+                out.flush();
+            }
+        }
+
+        @Override
+        public void run() {
+            LOGGER.info("Running shutdown hook");
+            generateMetadata();
+        }
+
+    }
 }
