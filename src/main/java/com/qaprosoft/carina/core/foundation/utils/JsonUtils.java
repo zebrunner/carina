@@ -1,9 +1,7 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -23,8 +21,8 @@ public final class JsonUtils {
 
     static {
         mapper = new ObjectMapper();
-        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+//        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+//        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     }
 
     public static <T> T fromJson(String json, Class<T> classOfT) {
@@ -37,7 +35,7 @@ public final class JsonUtils {
 
     public static String toJson(Object src) {
         try {
-            return mapper.writeValueAsString(src);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(src);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
