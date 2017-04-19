@@ -1259,6 +1259,11 @@ public class ExtendedWebElement {
     		return;
     	}
     	
+    	if (parentClassName == null) {
+    		LOGGER.warn("Unable to capture screenshot and metadata as element is declared without additional information about parent class.");
+    		return;
+    	}
+    	
         String currentUrl = driver.getCurrentUrl();
 
         String cache = currentUrl + ":" + parentClassName;
