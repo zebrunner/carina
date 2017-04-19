@@ -136,7 +136,7 @@ public class Screenshot
 		return capture(driver, isTakeScreenshot, comment, false);
 
 	}
-
+	
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
@@ -150,6 +150,7 @@ public class Screenshot
 	 * 			  Boolean
 	 * @return screenshot name.
 	 */
+	
 	private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
 		String screenName = "";
 		

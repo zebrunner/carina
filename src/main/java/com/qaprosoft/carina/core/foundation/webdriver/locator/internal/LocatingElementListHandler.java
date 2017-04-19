@@ -34,13 +34,15 @@ public class LocatingElementListHandler implements InvocationHandler
 	private String name;
 	private By by;
 	private WebDriver webDriver; 
+	private String parentClassName;
 
-	public LocatingElementListHandler(ElementLocator locator, String name, By by, WebDriver driver)
+	public LocatingElementListHandler(ElementLocator locator, String name, By by, WebDriver driver, String parentClassName)
 	{
 		this.locator = locator;
 		this.name = name;
 		this.by = by;
 		this.webDriver = driver;
+		this.parentClassName = parentClassName;
 	}
 
 	public Object invoke(Object object, Method method, Object[] objects) throws Throwable
@@ -53,7 +55,7 @@ public class LocatingElementListHandler implements InvocationHandler
 			extendedWebElements = new ArrayList<ExtendedWebElement>();
 			for (WebElement element : elements)
 			{
-				extendedWebElements.add(new ExtendedWebElement(element, name, by, webDriver));
+				extendedWebElements.add(new ExtendedWebElement(element, name, by, webDriver, parentClassName));
 			}
 		}
 
