@@ -1458,7 +1458,7 @@ public class DriverHelper {
 		if (driver != null) {
 			return driver;
 		}
-		LOGGER.error("Unable to find driver in DriverHelpr without DriverPool!");
+		LOGGER.error("Unable to find driver in DriverHelper without DriverPool!");
 		
 		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {
@@ -1471,10 +1471,11 @@ public class DriverHelper {
 		return driver;
 	}
 
+	@Deprecated
 	public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
 		return format(IMPLICIT_TIMEOUT, element, objects);
 	}
-
+	@Deprecated
 	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object... objects) {
 		String locator = element.getBy().toString();
 		By by = null;
