@@ -638,16 +638,25 @@ public abstract class AbstractTest // extends DriverHelper
 
         private void generateMetadata() {
             Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
+            if (allData.size() > 0) {
+            	LOGGER.debug("Generating collected metadada start...");
+            }
             for (String key : allData.keySet()) {
+            	LOGGER.debug("Creating... medata for '" + key + "' object...");
                 File file = new File(ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + key.hashCode() + ".json");
                 PrintWriter out = null;
                 try {
                     out = new PrintWriter(file);
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                	LOGGER.error("Unable to write metadata to json file: " + file.getAbsolutePath(), e);
                 }
                 out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
                 out.flush();
+            	LOGGER.debug("Created medata for '" + key + "' object...");
+            }
+            
+            if (allData.size() > 0) {
+            	LOGGER.debug("Generating collected metadada finish...");
             }
         }
 
