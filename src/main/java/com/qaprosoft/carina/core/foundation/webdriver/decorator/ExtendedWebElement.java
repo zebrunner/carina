@@ -1334,7 +1334,7 @@ public class ExtendedWebElement {
             elementInfo.setElementName(field.getName());
             Point location = extendedWebElement.getElement().getLocation();
             Dimension size = extendedWebElement.getElement().getSize();
-            elementInfo.setRect(new Rect(location.getX() * 2, location.getY() * 2, size.getWidth() * 2, size.getHeight() * 2));
+            elementInfo.setRect(new Rect(location.getX(), location.getY(), size.getWidth(), size.getHeight()));
             elementInfo.setElementsAttributes((Map<String, String>) ((RemoteWebDriver) driver).executeScript(ATTRIBUTE_JS, extendedWebElement.getElement()));
             return elementInfo;
         } else {
