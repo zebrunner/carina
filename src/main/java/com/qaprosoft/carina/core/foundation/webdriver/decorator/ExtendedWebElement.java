@@ -1264,7 +1264,13 @@ public class ExtendedWebElement {
     		return;
     	}
     	
-        String currentUrl = driver.getCurrentUrl();
+        String currentUrl = "";
+        if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
+        	currentUrl = driver.getCurrentUrl();
+        } else {
+        	//change for XBox and looks like mobile part
+        	currentUrl = driver.getTitle();
+        }
 
         String cache = currentUrl + ":" + parentClassName;
         if (!MetadataCollector.getAllCollectedData().containsKey(cache)) {
