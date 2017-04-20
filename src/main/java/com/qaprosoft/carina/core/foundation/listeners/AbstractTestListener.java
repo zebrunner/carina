@@ -615,6 +615,10 @@ public class AbstractTestListener extends TestArgsListener
 
 	private void closeLogAppender(String test)
 	{
+		if (test == null) {
+			LOGGER.error("Unable to close appender for null test!");
+			return;
+		}
 		try
 		{
 			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
