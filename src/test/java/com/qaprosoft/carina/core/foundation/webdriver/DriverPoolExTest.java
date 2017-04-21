@@ -157,12 +157,12 @@ public class DriverPoolExTest {
 		Assert.assertEquals(0, DriverPool.size(), "Number of registered driver is not valid!");
 	}
 
-	@Test(expectedExceptions = {
+/*	@Test(expectedExceptions = {
 			AssertionError.class }, expectedExceptionsMessageRegExp = "Unable to find 'NOT-EXISTED-DRIVER' driver for deregistration!")
 	public void deregisterInvalidDriver() {
 		DriverPool.deregisterDriver("NOT-EXISTED-DRIVER");
 	}
-
+*/
 	@Test(dependsOnMethods = "deregisterAllDrivers")
 	public void replaceDefaultDriver() {
 		DriverPool.registerDriver(mockDriverDefault, DriverPool.DEFAULT);
