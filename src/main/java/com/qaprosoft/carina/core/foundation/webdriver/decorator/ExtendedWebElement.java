@@ -1317,21 +1317,23 @@ public class ExtendedWebElement {
                     MetadataCollector.putPageInfo(cache, elementsInfo);
                 }
             } catch (InstantiationException e) {
-                e.printStackTrace();
+            	LOGGER.error("Unable to capture elements metadata!", e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            	LOGGER.error("Unable to capture elements metadata!", e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            	LOGGER.error("Unable to capture elements metadata!", e);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            	LOGGER.error("Unable to capture elements metadata!", e);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            	LOGGER.error("Unable to capture elements metadata!", e);
             } catch (IOException e) {
-                e.printStackTrace();
+            	LOGGER.error("Unable to capture elements metadata!", e);
+            } catch (Exception e) {
+            	LOGGER.error("Unable to capture elements metadata!", e);
+            } catch (Throwable thr) {
+            	LOGGER.error("Unable to capture elements metadata!", thr);
             }
-
         }
-
     }
 
     private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement, Field field) {
