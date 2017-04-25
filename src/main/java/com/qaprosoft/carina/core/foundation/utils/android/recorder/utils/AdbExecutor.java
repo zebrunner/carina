@@ -288,11 +288,12 @@ public class AdbExecutor {
                 } else {
                     uninstallApp(device, appPackage);
                     clearAppData(device, appPackage);
+                    
+                    if (Configuration.getBoolean(Parameter.MOBILE_APP_INSTALL)) {
+                        // install application in single thread to fix issue with gray Google maps
+                        installAppSync(device, mobileApp);
+                    }
                 }
-            }
-            if (Configuration.getBoolean(Parameter.MOBILE_APP_INSTALL)) {
-                // install application in single thread to fix issue with gray Google maps
-                installAppSync(device, mobileApp);
             }
         }
     }
