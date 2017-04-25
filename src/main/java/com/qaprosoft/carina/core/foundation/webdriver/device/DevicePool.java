@@ -164,6 +164,7 @@ public class DevicePool
 						if (THREAD_2_DEVICE_MAP.containsValue(device))
 						{
 							String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
+							DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 							throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
 						}
 						device.setTestId(testId);
