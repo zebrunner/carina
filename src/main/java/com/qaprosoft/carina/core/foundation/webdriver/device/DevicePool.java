@@ -338,6 +338,10 @@ public class DevicePool
 		return getServer(getDevice().getSeleniumServer());
 	}
 
+	public static Device getNullDevice() {
+		return nullDevice;
+	}
+
 	/**
 	 * Pause for specified timeout.
 	 * 

@@ -159,4 +159,8 @@ public class Device
 		}
 		throw new RuntimeException("Incorrect driver type. Please, check config file.");
 	}
+	
+	public boolean isNull() {
+		return name == null || seleniumServer == null;
+	}
 }
