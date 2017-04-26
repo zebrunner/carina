@@ -144,11 +144,11 @@ public class DevicePool
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
 				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
 		{
-			return null;
+			return nullDevice;
 		}
 
 		final String testId = UUID.randomUUID().toString();
-		Device freeDevice = null;
+		Device freeDevice = nullDevice;
 		if (GRID_ENABLED)
 		{
 			String allModels = StringUtils.join(DEVICE_MODELS, "+");
@@ -197,7 +197,7 @@ public class DevicePool
 			}
 		}
 
-		if (freeDevice != null)
+		if (freeDevice != nullDevice)
 		{
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
 			String msg = "found device %s-%s for test %s";
