@@ -231,6 +231,10 @@ public class AdbExecutor {
     }
 
     public void clearAppData(Device device) {
+        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            return;
+        }
+        
         if (!Configuration.getBoolean(Parameter.MOBILE_APP_CLEAR_CACHE))
             return;
 
@@ -270,6 +274,9 @@ public class AdbExecutor {
     }
 
     public void reinstallApp(Device device, String mobileApp) {
+        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            return;
+        }
 
         if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
             // explicit reinstall the apk
@@ -298,7 +305,7 @@ public class AdbExecutor {
         }
     }
 
-    public void eraseSimulator(String id) {
+/*    public void eraseSimulator(String id) {
         if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS))
             return;
 
@@ -329,7 +336,7 @@ public class AdbExecutor {
         for (String line : output) {
             LOGGER.debug(line);
         }
-    }
+    }*/
 
     public String[] getInstalledApkVersion(Device device, String packageName) {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode

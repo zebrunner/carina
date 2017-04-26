@@ -38,7 +38,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
-public class DriverPool {
+public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
@@ -84,7 +84,6 @@ public class DriverPool {
 			return currentDrivers.get(0);
 		}
 		
-		// TODO: take a look to extendeWebElement->getDriver() method (786 line  todo)
 		return getDriver(DEFAULT);
 	}
 
@@ -145,41 +144,53 @@ public class DriverPool {
 
 		if (drv == null) {
 			LOGGER.warn("Starting new driver as nothing was found in the pool");
-			drv = createDriver(name, capabilities, seleniumHost);
+			drv = createDriver(name, capabilities, seleniumHost, null);
 		}
 		return drv;
 	}
 
 	/**
 	 * Restart default driver
+	 * @return WebDriver
 	 */
-	public static void restartDriver() {
-		restartDriver(DEFAULT);
+	public static WebDriver restartDriver() {
+		return restartDriver(false);
 	}
 
 	/**
-	 * Restart driver by name with default capabilities
+	 * Restart default driver on the same device
 	 * 
-	 * @param name
-	 *            String driver name
+	 * @param isSameDevice
+	 *            boolean restart driver on the same device or not
+	 * @return WebDriver
 	 */
-	public static void restartDriver(String name) {
-		restartDriver(name, null, null);
-	}
+	public static WebDriver restartDriver(boolean isSameDevice) {
+		WebDriver drv = getDriver(DEFAULT);
+		Device device = null;
+		if (isSameDevice) {
+			//device should be already registered to the thread
+			device = DevicePool.getDevice();
+		}
+		
+		try {
+			LOGGER.debug("Driver restarting..." + drv);
+			deregisterDriver(DEFAULT);
 
-	/**
-	 * Restart driver by name with custom capabilities
-	 * 
-	 * @param name
-	 *            String driver name
-	 * @param capabilities
-	 *            DesiredCapabilities
-	 * @param seleniumHost
-	 *            String
-	 */
-	public static void restartDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
-		quitDriver(name);
-		createDriver(name, capabilities, seleniumHost);
+			if (device == null) {
+				DevicePool.deregisterDevice();
+			}
+
+			drv.quit();
+			LOGGER.debug("Driver exited during restart..." + drv);
+			
+			//start default driver. Device can be null...
+			return createDriver(DEFAULT, null, null, device);
+			
+		} catch (Exception e) {
+			LOGGER.warn("Error discovered during driver restart: " + e.getMessage());
+		}
+		
+		throw new RuntimeException("Unable to restart default driver!");
 	}
 
 	/**
@@ -196,22 +207,16 @@ public class DriverPool {
 	 *            String driver name
 	 */
 	public static void quitDriver(String name) {
-		long threadId = Thread.currentThread().getId();
 		WebDriver drv = getDriver(name);
 		
 		stopRecording();
 		executor.screenOff();
 
 		try {
-			if (drv == null) {
-				LOGGER.error("Unable to find valid driver using threadId: " + threadId);
-			}
-
 			LOGGER.debug("Driver exiting..." + drv);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
 			drv.quit();
-			
 			LOGGER.debug("Driver exited..." + drv);
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
@@ -246,14 +251,15 @@ public class DriverPool {
 	 *            DesiredCapabilities
 	 * @param seleniumHost
 	 *            String
+	 * @param device
+	 *            Device where we want to start driver
 	 * @return WebDriver
 	 */
-	protected static WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+	private static WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost, Device device) {
 		boolean init = false;
 		int count = 0;
 		WebDriver drv = null;
 		Throwable init_throwable = null;
-
 		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
@@ -264,33 +270,38 @@ public class DriverPool {
 				//TODO: move browsermob startup to this location
 				startProxy();
 
-				Device device = DevicePool.registerDevice();
-				
-				// turn on mobile device display if necessary. action can be
-				// done after registering available device with thread
-				executor.screenOn();
-				executor.restartAppium(device);
-				executor.clearAppData(device);
-				
-				// verify if valid build is already installed and uninstall only in case of any difference 
-				executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
+				if (device == null) {
+					// find and register device from the DevicePool
+					device = DevicePool.registerDevice();
+					
+					// turn on mobile device display if necessary. action can be done after registering available device with thread
+					// there is no sense to clean cache and reinstall app if we request dedicated device
+					executor.screenOn();
+					
+					executor.restartAppium(device);
+					executor.clearAppData(device);
+					
+					// verify if valid build is already installed and uninstall only in case of any difference 
+					executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
+				}
 
-				if (capabilities == null && seleniumHost == null) {
+
+				if (device != null) {
+					seleniumHost = device.getSeleniumServer();
 					drv = DriverFactory.create(name, device);
-					if (device != null) {
-						seleniumHost = device.getSeleniumServer();
-					}
 				} else {
-					// TODO: investigate do we need transfer device to factory
-					// or not
+					// TODO: investigate do we need transfer device to factory or not
 					drv = DriverFactory.create(name, capabilities, seleniumHost);
 				}
 				registerDriver(drv, name);
 
 				init = true;
-				// push custom device name for log4j default messages
+				long threadId = Thread.currentThread().getId();
+				// push custom device name and threadId for log4j default messages
 				if (device != null) {
-					NDC.push(" [" + device.getName() + "] ");
+					NDC.push(" [" + device.getName() + "] [" + threadId + "] ");
+				} else {
+					NDC.push(" [" + threadId + "] ");
 				}
 
 				LOGGER.debug("initDriver finish...");
