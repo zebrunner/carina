@@ -166,31 +166,29 @@ public final class DriverPool {
 	 */
 	public static WebDriver restartDriver(boolean isSameDevice) {
 		WebDriver drv = getDriver(DEFAULT);
-		Device device = null;
-		if (isSameDevice) {
-			//device should be already registered to the thread
-			device = DevicePool.getDevice();
-		}
+		Device device = DevicePool.getDevice();
 		
 		try {
 			LOGGER.debug("Driver restarting..." + drv);
 			deregisterDriver(DEFAULT);
 
-			if (device == null) {
+			if (!isSameDevice) {
 				DevicePool.deregisterDevice();
 			}
 
 			drv.quit();
 			LOGGER.debug("Driver exited during restart..." + drv);
 			
-			//start default driver. Device can be null...
-			return createDriver(DEFAULT, null, null, device);
-			
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver restart: ", e);
+		} finally {
+			NDC.pop();
 		}
-		
-		throw new RuntimeException("Unable to restart default driver!");
+
+
+		//start default driver. Device can be nullDevice...
+		return createDriver(DEFAULT, null, null, device);
+
 	}
 
 	/**
@@ -261,6 +259,11 @@ public final class DriverPool {
 		WebDriver drv = null;
 		Throwable init_throwable = null;
 		
+		
+		if (device == null) {
+			device = DevicePool.getNullDevice();
+		}
+		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
 		while (!init & count++ < maxCount) {
@@ -270,7 +273,7 @@ public final class DriverPool {
 				//TODO: move browsermob startup to this location
 				startProxy();
 
-				if (device == null) {
+				if (device.isNull()) {
 					// find and register device from the DevicePool
 					device = DevicePool.registerDevice();
 					
@@ -286,7 +289,7 @@ public final class DriverPool {
 				}
 
 
-				if (device != null) {
+				if (!device.isNull()) {
 					seleniumHost = device.getSeleniumServer();
 					drv = DriverFactory.create(name, device);
 				} else {
@@ -298,7 +301,7 @@ public final class DriverPool {
 				init = true;
 				long threadId = Thread.currentThread().getId();
 				// push custom device name and threadId for log4j default messages
-				if (device != null) {
+				if (!device.isNull()) {
 					NDC.push(" [" + device.getName() + "] [" + threadId + "] ");
 				} else {
 					NDC.push(" [" + threadId + "] ");
