@@ -32,7 +32,7 @@ public class MobileFactory extends AbstractFactory {
         String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
         String mobile_platform_name = Configuration.get(Configuration.Parameter.MOBILE_PLATFORM_NAME);
 
-        if (device != null) {
+        if (!device.isNull()) {
         	selenium = device.getSeleniumServer();
         }
         
