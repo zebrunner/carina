@@ -22,6 +22,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.SessionNotFoundException;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
@@ -38,6 +40,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
+@SuppressWarnings("deprecation")
 public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
@@ -178,7 +181,9 @@ public final class DriverPool {
 
 			drv.quit();
 			LOGGER.debug("Driver exited during restart..." + drv);
-			
+		} catch (SessionNotFoundException | UnreachableBrowserException e) { 
+			//do not remove this handler as AppiumDriver still has it
+			LOGGER.debug("unable to quit as sesion was not found" + drv);
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver restart: ", e);
 		} finally {
@@ -216,10 +221,11 @@ public final class DriverPool {
 			DevicePool.deregisterDevice();
 			drv.quit();
 			LOGGER.debug("Driver exited..." + drv);
+		} catch (SessionNotFoundException | UnreachableBrowserException e) { 
+			//do not remove this handler as AppiumDriver still has it
+			LOGGER.debug("unable to quit as sesion was not found" + drv);
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
-			LOGGER.debug(
-					"======================================================================================================================================");
 		} finally {
 			// TODO analyze how to forcibly kill session on device
 			NDC.pop();
