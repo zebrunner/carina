@@ -15,6 +15,48 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
 import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
@@ -31,31 +73,6 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.*;
-import org.testng.Assert;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
@@ -614,7 +631,7 @@ public class ExtendedWebElement {
             ((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - offset) + ");");
         } catch (Exception e) {
             // TODO: calm error logging as it is too noisy
-            LOGGER.debug("Scroll to element: " + getName() + " not performed!" + e.getMessage());
+            //LOGGER.debug("Scroll to element: " + getName() + " not performed!" + e.getMessage());
         }
     }
 
@@ -714,8 +731,6 @@ public class ExtendedWebElement {
     }
 
     private WebDriver getDriver() {
-        // TODO: each element has parent page. Inside page there is a driver. Need to implement functionality for getDriver from parent page
-        // as current implementation has limitations for extraDriver functionality
         return driver;
     }
 
@@ -1275,7 +1290,8 @@ public class ExtendedWebElement {
 
 
 
-    private void captureElements() {
+    @SuppressWarnings("unchecked")
+	private void captureElements() {
 
     	if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
     		return;
@@ -1358,7 +1374,8 @@ public class ExtendedWebElement {
         }
     }
 
-    private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement, Field field) {
+    @SuppressWarnings("unchecked")
+	private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement, Field field) {
         ElementInfo elementInfo = new ElementInfo();
         if (extendedWebElement.isElementPresent(1)) {
             elementInfo.setElementName(field.getName());
