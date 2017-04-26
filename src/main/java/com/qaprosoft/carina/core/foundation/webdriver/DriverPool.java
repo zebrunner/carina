@@ -298,9 +298,11 @@ public final class DriverPool {
 				if (!device.isNull()) {
 					seleniumHost = device.getSeleniumServer();
 					drv = DriverFactory.create(name, device);
-				} else {
+				} else if (capabilities != null && seleniumHost != null) {
 					// TODO: investigate do we need transfer device to factory or not
 					drv = DriverFactory.create(name, capabilities, seleniumHost);
+				} else {
+					drv = DriverFactory.create(name);
 				}
 				registerDriver(drv, name);
 
