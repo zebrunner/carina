@@ -187,7 +187,7 @@ public final class DriverPool {
 			return createDriver(DEFAULT, null, null, device);
 			
 		} catch (Exception e) {
-			LOGGER.warn("Error discovered during driver restart: " + e.getMessage());
+			LOGGER.warn("Error discovered during driver restart: ", e);
 		}
 		
 		throw new RuntimeException("Unable to restart default driver!");
