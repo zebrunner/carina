@@ -34,6 +34,7 @@ public class MobileFactory extends AbstractFactory {
 
         if (!device.isNull()) {
         	selenium = device.getSeleniumServer();
+        	LOGGER.debug("selenium_host: " + selenium);
         }
         
         LOGGER.debug("selenium: " + selenium);
