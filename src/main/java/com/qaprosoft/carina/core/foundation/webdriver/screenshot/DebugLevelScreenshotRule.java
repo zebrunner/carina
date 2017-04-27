@@ -3,7 +3,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
-public class DebugLevelRule implements IScreenshotRule {
+public class DebugLevelScreenshotRule implements IScreenshotRule {
 
     @Override
     public boolean isTakeScreenshot() {
