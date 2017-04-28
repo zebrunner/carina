@@ -375,6 +375,10 @@
 					<groupId>dom4j</groupId>
 					<artifactId>dom4j</artifactId>
 				</exclusion>
+		                <exclusion>
+                		        <groupId>com.google.guava</groupId>
+		                        <artifactId>guava</artifactId>
+		                </exclusion>
 			</exclusions>
 		</dependency>
 		<!-- CSV -->
