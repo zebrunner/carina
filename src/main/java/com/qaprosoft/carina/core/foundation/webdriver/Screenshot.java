@@ -110,7 +110,7 @@ public class Screenshot
 	            break;
 	        }
 	    }
-	    return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) && isTakeScreenshotRules, comment, false);
+	    return capture(driver, isTakeScreenshotRules, comment, false);
     }
 	
 	/**
