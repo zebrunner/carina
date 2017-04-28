@@ -18,6 +18,9 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -37,6 +40,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -51,6 +55,64 @@ public class Screenshot
 {
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
+	private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+	
+	/**
+	 * Adds screenshot rule
+	 * @param rule
+	 * @return list of existing rules
+	 */
+	public static List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
+	    LOGGER.debug("Following rule will be added: ".concat(rule.getClass().getName()));
+	    rules.add(rule);
+	    LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
+	    return rules;
+	}
+	
+	/**
+	 * Adds screenshot rules
+	 * @param rulesList - list of new rules
+	 * @return list of existing rules
+	 */
+	public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
+	    for (IScreenshotRule iScreenshotRule : rulesList) {
+	        LOGGER.debug("Following rule will be added: ".concat(iScreenshotRule.getClass().getName()));
+        }
+        rules.addAll(rulesList);
+        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
+        return rules;
+    }
+	
+	/**
+	 * Deletes rule
+	 * @param rule
+	 * @return list of existing rules
+	 */
+	public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
+        LOGGER.debug("Following rule will be removed if it exists: ".concat(rule.getClass().getName()));
+        rules.remove(rule);
+        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
+        return rules;
+    }
+	
+	public static List<IScreenshotRule> clearRules() {
+	    LOGGER.debug("All rules will be deleted.");
+	    rules.clear();
+        return rules;
+    }
+	
+	public static String captureByRule(WebDriver driver, String comment)
+    {
+	    boolean isTakeScreenshotRules = false;
+	    for (IScreenshotRule iScreenshotRule : rules) {
+	        isTakeScreenshotRules = iScreenshotRule.isTakeScreenshot();
+	        if (isTakeScreenshotRules) {
+	            break;
+	        }
+	    }
+	    return capture(driver, isTakeScreenshotRules, comment, false);
+    }
+	
 	/**
 	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
