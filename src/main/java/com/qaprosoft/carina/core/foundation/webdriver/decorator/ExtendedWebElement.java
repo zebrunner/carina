@@ -15,48 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-
 import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
@@ -73,6 +31,27 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.*;
+import org.testng.Assert;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
@@ -1296,12 +1275,7 @@ public class ExtendedWebElement {
     	if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
     		return;
     	}
-    	
-    	if (parentClassName == null) {
-    		LOGGER.warn("Unable to capture screenshot and metadata as element is declared without additional information about parent class.");
-    		return;
-    	}
-    	
+
         String currentUrl = "";
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
         	currentUrl = driver.getCurrentUrl();
@@ -1310,15 +1284,10 @@ public class ExtendedWebElement {
         	currentUrl = driver.getTitle();
         }
 
-        String cache = currentUrl + ":" + parentClassName;
+        String cache = currentUrl;
         if (!MetadataCollector.getAllCollectedData().containsKey(cache)) {
             try {
-                Class<?> clazz = Class.forName(parentClassName);
-                Constructor<?> cons = clazz.getConstructor(WebDriver.class);
-                Object object = cons.newInstance(driver);
-                Field[] fields = object.getClass().getDeclaredFields();
                 ElementsInfo elementsInfo = new ElementsInfo();
-                elementsInfo.setClassName(parentClassName);
                 elementsInfo.setCurrentURL(currentUrl);
                 File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
                 //TODO: reuse Screenshot for generation
@@ -1331,39 +1300,15 @@ public class ExtendedWebElement {
                 screenShootInfo.setHeight(bimg.getHeight());
                 elementsInfo.setScreenshot(screenShootInfo);
 
-                for (Field field : fields) {
-                    if (field.isAnnotationPresent(FindBy.class)) {
-                        if (field.getType().equals(ExtendedWebElement.class)) {
-                            field.setAccessible(true);
-                            ExtendedWebElement extendedWebElement = (ExtendedWebElement) field.get(object);
-                            ElementInfo elementInfo = getElementInfo(extendedWebElement, field);
-                            elementsInfo.addElement(elementInfo);
-                        }
 
-                        if (field.getType().equals(List.class)) {
-                            field.setAccessible(true);
-                            List<ExtendedWebElement> extendedWebElements = (List<ExtendedWebElement>) field.get(object);
-                            for (ExtendedWebElement extendedWebElement : extendedWebElements) {
-                                ElementInfo elementInfo = getElementInfo(extendedWebElement, field);
-                                elementsInfo.addElement(elementInfo);
-                            }
-                        }
-
-
+                   List<WebElement> webElements =   ((RemoteWebDriver) driver).findElements(By.xpath("//input | //button | .//*[contains(@class, 'btn')] | //select"));
+                    for (WebElement webElement : webElements) {
+                        ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement,driver));
+                        elementsInfo.addElement(elementInfo);
+                        MetadataCollector.putPageInfo(cache, elementsInfo);
                     }
 
-                    MetadataCollector.putPageInfo(cache, elementsInfo);
-                }
-            } catch (InstantiationException e) {
-            	LOGGER.error("Unable to capture elements metadata!", e);
-            } catch (IllegalAccessException e) {
-            	LOGGER.error("Unable to capture elements metadata!", e);
-            } catch (InvocationTargetException e) {
-            	LOGGER.error("Unable to capture elements metadata!", e);
-            } catch (NoSuchMethodException e) {
-            	LOGGER.error("Unable to capture elements metadata!", e);
-            } catch (ClassNotFoundException e) {
-            	LOGGER.error("Unable to capture elements metadata!", e);
+
             } catch (IOException e) {
             	LOGGER.error("Unable to capture elements metadata!", e);
             } catch (Exception e) {
@@ -1375,10 +1320,9 @@ public class ExtendedWebElement {
     }
 
     @SuppressWarnings("unchecked")
-	private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement, Field field) {
+	private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement) {
         ElementInfo elementInfo = new ElementInfo();
         if (extendedWebElement.isElementPresent(1)) {
-            elementInfo.setElementName(field.getName());
             Point location = extendedWebElement.getElement().getLocation();
             Dimension size = extendedWebElement.getElement().getSize();
             elementInfo.setRect(new Rect(location.getX(), location.getY(), size.getWidth(), size.getHeight()));
@@ -1389,4 +1333,5 @@ public class ExtendedWebElement {
         }
 
     }
+
 }
