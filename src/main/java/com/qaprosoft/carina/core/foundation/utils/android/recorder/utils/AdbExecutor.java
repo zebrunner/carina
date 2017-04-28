@@ -183,6 +183,9 @@ public class AdbExecutor {
     }
 
     public void stopRecording(int pid) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+        
         if (!isDeviceCorrect())
             return;
 
@@ -193,6 +196,9 @@ public class AdbExecutor {
 
 
     public void pullFile(String pathFrom, String pathTo) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
@@ -200,6 +206,9 @@ public class AdbExecutor {
     }
 
     public void dropFile(String pathToFile) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
@@ -216,6 +225,9 @@ public class AdbExecutor {
     }
 
     public void pressKey(int key) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
 
@@ -238,6 +250,9 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APP_CLEAR_CACHE))
             return;
 
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
 
@@ -250,6 +265,9 @@ public class AdbExecutor {
 
 
     public void uninstallApp(Device device, String packageName) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
         //adb -s UDID uninstall com.myfitnesspal.android
@@ -258,6 +276,9 @@ public class AdbExecutor {
     }
 
     public void installApp(Device device, String packageName) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
         //adb -s UDID install com.myfitnesspal.android
@@ -266,6 +287,9 @@ public class AdbExecutor {
     }
 
     public synchronized void installAppSync(Device device, String packageName) {
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         if (!isDeviceCorrect())
             return;
         //adb -s UDID install com.myfitnesspal.android
@@ -277,6 +301,10 @@ public class AdbExecutor {
         if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             return;
         }
+
+        if (DevicePool.getDevice().isNull())
+        	return;
+
 
         if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
             // explicit reinstall the apk
@@ -420,6 +448,10 @@ public class AdbExecutor {
     public void restartAppium(Device device) {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
+        
+        if (DevicePool.getDevice().isNull())
+        	return;
+
 
         stopAppium(device);
         startAppium(device);
@@ -429,6 +461,10 @@ public class AdbExecutor {
     public void stopAppium(Device device) {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
+        
+        if (DevicePool.getDevice().isNull())
+        	return;
+
 
         LOGGER.info("Stopping appium...");
 
@@ -443,6 +479,10 @@ public class AdbExecutor {
     public void startAppium(Device device) {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
+        
+        if (DevicePool.getDevice().isNull())
+        	return;
+
 
         LOGGER.info("Starting appium...");
 
@@ -507,6 +547,10 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
             return;
         }
+        
+        if (DevicePool.getDevice().isNull())
+        	return;
+
         String udid = DevicePool.getDeviceUdid();
 
         if (!isDeviceCorrect(udid)) {
@@ -545,6 +589,9 @@ public class AdbExecutor {
             return;
         }
 
+        if (DevicePool.getDevice().isNull())
+        	return;
+        
         String udid = DevicePool.getDeviceUdid();
         if (!isDeviceCorrect(udid)) {
             return;
