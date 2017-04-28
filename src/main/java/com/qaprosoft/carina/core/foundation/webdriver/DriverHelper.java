@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
@@ -52,8 +54,6 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
-
-import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -1256,6 +1256,11 @@ public class DriverHelper {
 			result = true;
 		} catch (Exception e) {
 			result = false;
+		}
+		if (!result)
+		{
+			LOGGER.warn(String.format("Actual URL differs from expected one. Expected '%s' but found '%s'",
+					page.getPageURL(), drv.getCurrentUrl()));
 		}
 		return result;
 	}
