@@ -11,6 +11,8 @@ public class ElementInfo {
 
     private Rect rect;
 
+    private String text;
+
     public Map<String, String> getElementsAttributes() {
         return elementsAttributes;
     }
@@ -25,5 +27,13 @@ public class ElementInfo {
 
     public void setRect(Rect rect) {
         this.rect = rect;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
