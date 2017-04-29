@@ -662,7 +662,7 @@ public abstract class AbstractTest // extends DriverHelper
 
         @Override
         public void run() {
-            LOGGER.info("Running shutdown hook");
+            LOGGER.debug("Running shutdown hook");
             generateMetadata();
         }
 
