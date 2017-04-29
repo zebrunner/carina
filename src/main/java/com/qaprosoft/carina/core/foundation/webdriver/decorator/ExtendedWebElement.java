@@ -1327,6 +1327,15 @@ public class ExtendedWebElement {
             Dimension size = extendedWebElement.getElement().getSize();
             elementInfo.setRect(new Rect(location.getX(), location.getY(), size.getWidth(), size.getHeight()));
             elementInfo.setElementsAttributes((Map<String, String>) ((RemoteWebDriver) driver).executeScript(ATTRIBUTE_JS, extendedWebElement.getElement()));
+
+            try {
+                elementInfo.setText(extendedWebElement.getText());
+            } catch (Exception e){
+                elementInfo.setText("");
+            }
+
+
+
             return elementInfo;
         } else {
             return null;
