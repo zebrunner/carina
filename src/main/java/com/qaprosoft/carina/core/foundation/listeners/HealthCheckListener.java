@@ -32,8 +32,17 @@ public class HealthCheckListener implements ISuiteListener {
 			healthCheckClass = suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey());
 		}
 
-		String[] healthCheckMethods = Configuration.get(Parameter.HEALTH_CHECK_METHODS).split(",");
-		checkHealth(suite, healthCheckClass, healthCheckMethods);
+		String healthCheckMethods = Configuration.get(Parameter.HEALTH_CHECK_METHODS);
+		if (suite.getParameter(Parameter.HEALTH_CHECK_METHODS.getKey()) != null) {
+			// redefine by suite arguments as they have higher priority
+			healthCheckMethods = suite.getParameter(Parameter.HEALTH_CHECK_METHODS.getKey());
+		}
+		
+		String[] healthCheckMethodsArray = null;
+		if (!healthCheckMethods.isEmpty()) {
+			healthCheckMethodsArray = healthCheckMethods.split(",");
+		}
+		checkHealth(suite, healthCheckClass, healthCheckMethodsArray);
 	}
 
 	private void checkHealth(ISuite suite, String className, String[] methods) {
@@ -54,7 +63,7 @@ public class HealthCheckListener implements ISuiteListener {
 		XmlClass healthCheckClass = new XmlClass();
 		healthCheckClass.setName(className);
 
-		if (methods.length > 0) {
+		if (methods != null) {
 			// declare particular methods if they are provided
 			List<XmlInclude> methodsToRun = constructIncludes(methods);
 			healthCheckClass.setIncludedMethods(methodsToRun);
