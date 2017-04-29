@@ -45,14 +45,12 @@ public class HealthCheckListener implements ISuiteListener {
 		checkHealth(suite, healthCheckClass, healthCheckMethodsArray);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void checkHealth(ISuite suite, String className, String[] methods) {
 
 		if (className.isEmpty()) {
 			return;
 		}
-
-		// hc suite class should be available
-		// hc method name should be available
 
 		// create runtime XML suite for health check
 		XmlSuite xmlSuite = new XmlSuite();
@@ -62,14 +60,19 @@ public class HealthCheckListener implements ISuiteListener {
 		xmltest.setName("HealthCheck TestCase");
 		XmlClass healthCheckClass = new XmlClass();
 		healthCheckClass.setName(className);
-
+		
+		// TestNG do not execute missed methods so we have to calulate expected methods count to handle potential mistakes in methods naming  
+		int expectedMethodsCount = -1; 
 		if (methods != null) {
 			// declare particular methods if they are provided
 			List<XmlInclude> methodsToRun = constructIncludes(methods);
+			expectedMethodsCount = methodsToRun.size();
 			healthCheckClass.setIncludedMethods(methodsToRun);
 		}
 
 		xmltest.setXmlClasses(Arrays.asList(new XmlClass[] { healthCheckClass }));
+		xmlSuite.setTests(Arrays.asList(new XmlTest[] { xmltest }));
+		
 
 		LOGGER.info("HealthCheck '" + className + "' is started.");
 		LOGGER.debug("HealthCheck suite content:" + xmlSuite.toXml());
@@ -83,8 +86,20 @@ public class HealthCheckListener implements ISuiteListener {
 
 		testng.run();
 		synchronized (this) {
-			if (tla.getPassedTests().size() > 0 && tla.getFailedTests().size() == 0
-					&& tla.getSkippedTests().size() == 0) {
+			boolean passed = false;
+			if (expectedMethodsCount == -1) {
+				if (tla.getPassedTests().size() > 0 && tla.getFailedTests().size() == 0
+						&& tla.getSkippedTests().size() == 0) {
+					passed = true;
+				}
+			} else {
+				LOGGER.info("Expected passed tests count: " + expectedMethodsCount);
+				if (tla.getPassedTests().size() == expectedMethodsCount && tla.getFailedTests().size() == 0
+						&& tla.getSkippedTests().size() == 0) {
+					passed = true;
+				}
+			}
+			if (passed) {
 				LOGGER.info("HealthCheck suite '" + className + "' is finished successfully.");
 			} else {
 				throw new SkipException("Skip test(s) due to health check failures for '" + className + "'");
