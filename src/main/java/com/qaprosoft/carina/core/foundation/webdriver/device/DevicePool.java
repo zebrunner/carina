@@ -121,20 +121,25 @@ public class DevicePool
 			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), DEVICES.size()));
 		}
 
-		// if pool has single device then redefine device name/version etc parameter instead of abstract DevicesPool and
-		// Android 5-6...
+		// if pool has single device then redefine device name/version etc parameter instead of abstract DevicesPool and Android 5-6...
 		if (DEVICES.size() == 1)
 		{
-			// -Dmobile_device_name=DevicesPool
-			// -Dmobile_platform_name=Android
-			// -Dmobile_platform_version=5-6
 			Device device = DEVICES.get(0);
 			LOGGER.info(String.format("Redefine mobile device settings using single device data: %s %s-%s",
 					device.getName(), device.getOs(), device.getOsVersion()));
 
-			R.CONFIG.put("mobile_device_name", device.getName());
-			R.CONFIG.put("mobile_platform_name", device.getOs());
-			R.CONFIG.put("mobile_platform_version", device.getOsVersion());
+			// QAA-1574 Redefine particular phone details for single threaded mobile tests
+			// redefine test execution logic onto the single thread and single device
+			R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
+			R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
+
+			R.CONFIG.put(Parameter.DRIVER_TYPE.getKey(), "mobile");
+
+			R.CONFIG.put(Parameter.MOBILE_DEVICE_NAME.getKey(), device.getName());
+			R.CONFIG.put(Parameter.MOBILE_PLATFORM_NAME.getKey(), device.getOs());
+			R.CONFIG.put(Parameter.MOBILE_PLATFORM_VERSION.getKey(), device.getOsVersion());
+			R.CONFIG.put(Parameter.MOBILE_DEVICE_UDID.getKey(), device.getUdid());
+			R.CONFIG.put(Parameter.MOBILE_DEVICE_TYPE.getKey(), device.getType().toString());
 		}
 	}
 
