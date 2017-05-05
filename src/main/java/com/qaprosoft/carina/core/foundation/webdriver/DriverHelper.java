@@ -1476,11 +1476,11 @@ public class DriverHelper {
 		return driver;
 	}
 
-	@Deprecated
+	//@Deprecated
 	public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
 		return format(IMPLICIT_TIMEOUT, element, objects);
 	}
-	@Deprecated
+	//@Deprecated
 	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object... objects) {
 		String locator = element.getBy().toString();
 		By by = null;
