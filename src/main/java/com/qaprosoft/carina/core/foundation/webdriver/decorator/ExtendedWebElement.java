@@ -1287,6 +1287,7 @@ public class ExtendedWebElement {
         String cache = currentUrl;
         if (!MetadataCollector.getAllCollectedData().containsKey(cache)) {
             try {
+
                 ElementsInfo elementsInfo = new ElementsInfo();
                 elementsInfo.setCurrentURL(currentUrl);
                 File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
@@ -1300,14 +1301,37 @@ public class ExtendedWebElement {
                 screenShootInfo.setHeight(bimg.getHeight());
                 elementsInfo.setScreenshot(screenShootInfo);
 
+                List<WebElement> all = driver.findElements(By.xpath("//*"));
 
-                   List<WebElement> webElements =   ((RemoteWebDriver) driver).findElements(By.xpath("//input | //button | .//*[contains(@class, 'btn')] | //select"));
-                    for (WebElement webElement : webElements) {
-                        ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement,driver));
-                        elementsInfo.addElement(elementInfo);
-                        MetadataCollector.putPageInfo(cache, elementsInfo);
+                List<WebElement> control = ((RemoteWebDriver) driver).findElements(By.xpath("//input[not(contains(@type,'hidden'))] | //button | .//*[contains(@class, 'btn') and not(self::span)] | //select"));
+
+                for (WebElement webElement : control) {
+                    ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement, driver));
+
+                    int elementPosition = all.indexOf(webElement);
+                    for (int i = 1; i < 10; i++) {
+                        if (elementPosition - i < 0) {
+                            break;
+                        }
+
+                        if (control.indexOf(all.get(elementPosition - i)) > 0) {
+                            break;
+                        }
+                        if (!all.get(elementPosition - i).isDisplayed()) {
+                            continue;
+                        }
+                        String sti = all.get(elementPosition - i).getText();
+                        if (sti == null || sti.isEmpty() || control.get(0).getText().equals(sti)) {
+                            continue;
+                        } else {
+                            elementInfo.setTextInfo(getElementInfo(new ExtendedWebElement(all.get(elementPosition - i))));
+                            break;
+                        }
+
                     }
-
+                    elementsInfo.addElement(elementInfo);
+                    MetadataCollector.putPageInfo(cache, elementsInfo);
+                }
 
             } catch (IOException e) {
             	LOGGER.error("Unable to capture elements metadata!", e);
