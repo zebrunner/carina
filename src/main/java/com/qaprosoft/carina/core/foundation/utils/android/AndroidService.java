@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat;
 import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 public class AndroidService {
@@ -556,7 +555,7 @@ public class AndroidService {
             openTZChangingApk(turnOffAuto, timeFormat);
         }
 
-        TZChangerPage tzChangerPage =  new TZChangerPage(getDriver());
+        TZChangerPage tzChangerPage = new TZChangerPage(getDriver());
         if (!tzChangerPage.isOpened(10)) {
             openTZChangingApk(turnOffAuto, timeFormat);
         }
@@ -1020,7 +1019,7 @@ public class AndroidService {
 
             forceTZChangingApkOpen(true, timeFormat, 3);
 
-            TZChangerPage tzChangerPage =  new TZChangerPage(getDriver());
+            TZChangerPage tzChangerPage = new TZChangerPage(getDriver());
 
             if (tzChangerPage.isOpened(3)) {
                 LOGGER.info("TimeZone changer main page was open.");
