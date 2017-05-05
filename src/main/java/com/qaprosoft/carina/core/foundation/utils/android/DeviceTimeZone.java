@@ -38,7 +38,7 @@ public class DeviceTimeZone {
      *
      * @param auto_time         boolean
      * @param auto_timezone     boolean
-     * @param time_format       String
+     * @param time_format       AndroidService.TimeFormat
      * @param timezone          String
      * @param gmt               String
      * @param setDeviceDateTime String
@@ -62,7 +62,7 @@ public class DeviceTimeZone {
      *
      * @param auto_time         boolean
      * @param auto_timezone     boolean
-     * @param time_format       String
+     * @param time_format       AndroidService.TimeFormat
      * @param timezone          String
      * @param setDeviceDateTime String
      * @param changeDateTime    boolean
