@@ -43,6 +43,14 @@ public class AdbExecutor {
         initDefaultCmd();
     }
 
+    /**
+     * buildDefaultCmd from init Cmd
+     * @return String[]
+     */
+    public String[] buildDefaultCmd() {
+        return cmdInit;
+    }
+
     private void initDefaultCmd() {
         String tempCmd = "";
         String adbPath = "adb";
@@ -65,6 +73,8 @@ public class AdbExecutor {
         // when issues with remote adb execution will be resolved: "concat("-H ADB_HOST -P ADB_PORT")"
         cmdInit = tempCmd.concat("adb").split(" ");
     }
+
+
 
     public List<String> getAttachedDevices() {
         ProcessBuilderExecutor executor = null;
