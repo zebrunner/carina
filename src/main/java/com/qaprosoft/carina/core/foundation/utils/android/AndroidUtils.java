@@ -3,8 +3,12 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -94,6 +98,7 @@ public class AndroidUtils {
 	 *            - String
 	 * @return boolean
 	 */
+	@Deprecated
 	public static boolean scrollTo(final String text) {
 		boolean scrolled = false;
 		int repeat = 1;
@@ -139,6 +144,8 @@ public class AndroidUtils {
 	 *            - String
 	 * @return boolean
 	 */
+	/*
+	@Deprecated
 	public static boolean scrollTo1(final String text) {
 		boolean scrolled = false;
 		int repeat = 1;
@@ -164,7 +171,7 @@ public class AndroidUtils {
 
 		return scrolled;
 	}
-
+*/
 
 	/**
 	 * scrollTo specified text
@@ -173,6 +180,7 @@ public class AndroidUtils {
 	 *            - String
 	 * @return boolean
 	 */
+	@Deprecated
 	public static boolean scrollTo2(final String text) {
 		boolean scrolled = false;
 
@@ -240,9 +248,9 @@ public class AndroidUtils {
 	 *            ExtendedWebElement
 	 * @return boolean
 	 */
-	public static boolean universalScrollTo(String scrollToText,
+	public static boolean universalScrollToBase(String scrollToText,
 			ExtendedWebElement containerElement) {
-		return universalScrollTo(scrollToText, containerElement, 3, false);
+		return universalScrollToBase(scrollToText, containerElement, 3, false);
 	}
 
 	/**
@@ -259,7 +267,7 @@ public class AndroidUtils {
 	 *            boolean
 	 * @return boolean
 	 */
-	public static boolean universalScrollTo(String scrollToText,
+	public static boolean universalScrollToBase(String scrollToText,
 			ExtendedWebElement containerElement, int tries, boolean oldMethod) {
 		boolean scrolled = false;
 		if ((tries > 0) && (!oldMethod)) {
@@ -498,6 +506,7 @@ public class AndroidUtils {
 	 * @param extendedWebElement ExtendedWebElement
 	 * @return boolean
 	 */
+	@Deprecated
 	public static boolean scrollTo(final ExtendedWebElement extendedWebElement) {
 		int i = 0;
 		try {
@@ -573,6 +582,7 @@ public class AndroidUtils {
 	 *            - times
 	 * @return boolean
 	 */
+	@Deprecated
 	public static boolean swipeInContainerToElement(
 			final ExtendedWebElement extendedWebElement,
 			ExtendedWebElement container, Direction direction, int duration,
@@ -694,7 +704,7 @@ public class AndroidUtils {
 		return false;
 	}
 
-
+	@Deprecated
     public static ExtendedWebElement scrollToText(String text) {
         AndroidElement androidElement = ((AndroidDriver<AndroidElement>) getDriver()).findElement(MobileBy
                 .AndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
@@ -703,6 +713,7 @@ public class AndroidUtils {
         return new ExtendedWebElement(androidElement, getDriver());
     }
 
+	@Deprecated
     public static ExtendedWebElement scrollToText(String scrollViewId, String text) {
         AndroidElement androidElement = ((AndroidDriver<AndroidElement>) getDriver()).findElement(MobileBy
                 .AndroidUIAutomator("new UiScrollable(new UiSelector().resourceId(\"" + scrollViewId + "\")).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
@@ -710,4 +721,244 @@ public class AndroidUtils {
 
         return new ExtendedWebElement(androidElement, getDriver());
     }
+
+
+	/**
+	 * newScrollTo. Try to use new java_appium solution. (Unstable) And 2 more scroll solutions from AndroidUtils.
+	 * https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/touch-actions.md
+	 * @param scrollToText String
+	 * @param containerElement ExtendedWebElement
+	 * @param tries int
+	 * @return boolean
+	 */
+	private static boolean newScrollTo(String scrollToText,
+									   ExtendedWebElement containerElement, int tries) {
+		boolean scrolled = false;
+
+		WebDriver driver = DriverPool.getDriver();
+		try {
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			HashMap<String, String> scrollObject = new HashMap<String, String>();
+			scrollObject.put("direction", "down");
+			scrollObject.put("element", ((RemoteWebElement) driver
+					.findElement(containerElement.getBy())).getId());
+			scrollObject.put("text", scrollToText);
+			//scrollObject.put("element", ((RemoteWebElement) element).getId());
+			js.executeScript("mobile: scroll", scrollObject);
+			scrolled = true;
+		} catch (Exception e) {
+			LOGGER.warn("Exception occurred for scroll operation using new Appium Java client! "
+					+ String.format(
+					"Scrolling to text '%s', Scroll container: %s",
+					scrollToText,
+					containerElement.getNameWithLocator()));
+		}
+		/*if ((tries > 0) && (!scrolled )) {
+			LOGGER.info("Using scrollTo1 method.");
+			scrolled = AndroidUtils.scrollTo1(scrollToText);
+		}*/
+
+		if (!scrolled) {
+			LOGGER.info("Using scrollTo2 method.");
+			scrolled = AndroidUtils.scrollTo2(scrollToText);
+		}
+		return scrolled;
+	}
+
+
+	/**
+	 * universal Scroll To text with different methods (Extended)
+	 *
+	 * @param scrollToText
+	 *            String
+	 * @param containerElement
+	 *            ExtendedWebElement
+	 * @return boolean
+	 */
+	public static boolean universalScrollToExtended(String scrollToText,
+													ExtendedWebElement containerElement) {
+		return universalScrollToExtended(scrollToText, containerElement, 3, false);
+	}
+
+	/**
+	 * universal Scroll To text with different methods (Extended)
+	 *
+	 * @param scrollToText     String
+	 * @param containerElement ExtendedWebElement
+	 * @param tries            - how much tries should be spent for scrolling. If 0 - it will
+	 *                         be quick check for not present element with scrolling try.
+	 * @param oldMethod - if true - will try to execute old methods.
+	 * @return boolean
+	 */
+	public static boolean universalScrollToExtended(String scrollToText,
+													ExtendedWebElement containerElement, int tries, boolean oldMethod) {
+
+		//Set oldMethod to false for trying use as much as possible solutions for scrolling.
+		//oldMethod = false;
+
+		boolean scrolled = AndroidUtils.universalScrollTo(scrollToText,containerElement,tries,oldMethod);
+		if (!scrolled) {
+			LOGGER.info("Try to use 3 more new solutions for scrolling. ");
+			scrolled=newScrollTo(scrollToText, containerElement, tries);
+		}
+
+		if (scrolled) {
+			LOGGER.info("Finally scrolled to text '" + scrollToText + "'.");
+		}
+		return scrolled;
+	}
+
+	/**
+	 * universal Scroll To text with different methods
+	 *
+	 * @param scrollToText     String
+	 * @param containerElement ExtendedWebElement
+	 * @param tries            - how much tries should be spent for scrolling. If 0 - it will
+	 *                         be quick check for not present element with scrolling try.
+	 * @param oldMethod - if true try to call old methods
+	 * @return boolean
+	 */
+	public static boolean universalScrollTo(String scrollToText,
+											ExtendedWebElement containerElement, int tries, boolean oldMethod) {
+		return universalScrollToExtended(scrollToText,containerElement,tries,oldMethod);
+	}
+
+	/**
+	 * universal Scroll To text with different methods
+	 *
+	 * @param scrollToText
+	 *            String
+	 * @param containerElement
+	 *            ExtendedWebElement
+	 * @return boolean
+	 */
+	public static boolean universalScrollTo(String scrollToText,
+											ExtendedWebElement containerElement) {
+		return universalScrollToExtended(scrollToText, containerElement, 3, false);
+	}
+
+
+	// TODO temporary decision. If it works it should be moved to carina
+	public static boolean swipeUntilElementPresence(
+			final ExtendedWebElement element, int times) {
+		WebDriver driver = DriverPool.getDriver();
+		Dimension scrSize;
+		int x;
+		int y;
+		boolean isPresent = element.isElementPresent(1);
+		LOGGER.info("Swipe down to element: ".concat(element.toString()));
+		while (!isPresent && times-- > 0) {
+			LOGGER.debug("Element not present! Swipe down will be executed.");
+			scrSize = driver.manage().window().getSize();
+			x = scrSize.width / 2;
+			y = scrSize.height / 2;
+			((AndroidDriver<?>) driver).swipe(x, y, x, y / 2, 500);
+			LOGGER.info("Swipe was executed. Attempts remain: " + times);
+			isPresent = element.isElementPresent(1);
+			LOGGER.info("Result: " + isPresent);
+		}
+		if (!isPresent) {
+			LOGGER.info("Swipe up to element: ".concat(element.toString()));
+			while (!isPresent && times-- > 0) {
+				LOGGER.debug("Element not present! Swipe up will be executed.");
+				scrSize = driver.manage().window().getSize();
+				x = scrSize.width / 2;
+				y = scrSize.height / 2;
+				((AndroidDriver<?>) driver).swipe(x, y / 2, x, y, 500);
+				LOGGER.info("Swipe was executed. Attempts remain: " + times);
+				isPresent = element.isElementPresent(1);
+				LOGGER.info("Result: " + isPresent);
+			}
+		}
+		return isPresent;
+	}
+
+
+
+
+
+	/**
+	 * change Android Device Language
+	 *
+	 * Url:  <a href="http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+	 *     ADBChangeLanguage apk
+	 *     </a>
+	 * Change locale (language) of your device via ADB (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older).
+	 * No need to root your device! With ADB (Android Debug Bridge) on your computer,
+	 * you can fast switch the device locale to see how your application UI looks on different languages.
+	 * Usage:
+	 * - install this app
+	 * - setup adb connection to your device (http://developer.android.com/tools/help/adb.html)
+	 * - Android OS 4.2 onwards (tip: you can copy the command here and paste it to your command console):
+	 * adb shell pm grant net.sanapeli.adbchangelanguage android.permission.CHANGE_CONFIGURATION
+	 *
+	 * English: adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en
+	 * Russian: adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language ru
+	 * Spanish: adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
+	 *
+	 * @param language to set. Can be es, en, etc.
+	 * @return boolean
+	 */
+	public static boolean setDeviceLanguage(String language) {
+		boolean status = false;
+
+		String[] setLocalizationChangePermissionCmd;
+
+		String[] setLocalizationCmd;
+
+		AdbExecutor executor;
+
+		language = language.toLowerCase();
+
+		executor = new AdbExecutor();
+		String[] initCmd = executor.buildDefaultCmd();
+		LOGGER.debug("Init cmd: ".concat(initCmd.toString()));
+		String deviceUdid = DevicePool.getDeviceUdid();
+
+		LOGGER.info("Device udid: ".concat(deviceUdid));
+		if (!deviceUdid.isEmpty()) {
+			setLocalizationChangePermissionCmd = CmdLine.insertCommandsAfter(
+					initCmd, "-s", deviceUdid, "shell", "pm", "grant",
+					"net.sanapeli.adbchangelanguage",
+					"android.permission.CHANGE_CONFIGURATION");
+			setLocalizationCmd = CmdLine.insertCommandsAfter(initCmd, "-s",
+					deviceUdid, "shell", "am", "start", "-n",
+					"net.sanapeli.adbchangelanguage/.AdbChangeLanguage", "-e",
+					"language", language);
+		} else {
+			setLocalizationChangePermissionCmd = CmdLine.insertCommandsAfter(
+					initCmd, "shell", "pm", "grant",
+					"net.sanapeli.adbchangelanguage",
+					"android.permission.CHANGE_CONFIGURATION");
+			setLocalizationCmd = CmdLine.insertCommandsAfter(initCmd, "shell",
+					"am", "start", "-n",
+					"net.sanapeli.adbchangelanguage/.AdbChangeLanguage", "-e",
+					"language", language);
+
+		}
+
+		LOGGER.info("Set localization change permission using apk 'ADB Change Language_v0.52' cmd: "
+				+ CmdLine.arrayToString(setLocalizationChangePermissionCmd));
+
+		LOGGER.info("Set localization change to '" + language
+				+ "' using apk 'ADB Change Language_v0.52' cmd: "
+				+ CmdLine.arrayToString(setLocalizationCmd));
+
+		LOGGER.info("Try set localization change permission with following cmd:"
+				+ CmdLine.arrayToString(setLocalizationChangePermissionCmd));
+		List<String> expandOutput = executor
+				.execute(setLocalizationChangePermissionCmd);
+		LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': "
+				+ expandOutput);
+
+		LOGGER.info("Try set localization to '" + language
+				+ "' with following cmd:"
+				+ CmdLine.arrayToString(setLocalizationCmd));
+		List<String> changeLocaleOutput = executor.execute(setLocalizationCmd);
+		LOGGER.info("Output after set localization to '" + language
+				+ "' using 'ADB Change Language apk': " + changeLocaleOutput);
+
+		return status;
+	}
+
 }
