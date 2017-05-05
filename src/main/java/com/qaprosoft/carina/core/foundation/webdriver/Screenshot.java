@@ -59,7 +59,7 @@ public class Screenshot
 	
 	/**
 	 * Adds screenshot rule
-	 * @param rule
+	 * @param rule IScreenshotRule
 	 * @return list of existing rules
 	 */
 	public static List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
@@ -85,7 +85,7 @@ public class Screenshot
 	
 	/**
 	 * Deletes rule
-	 * @param rule
+	 * @param rule IScreenshotRule
 	 * @return list of existing rules
 	 */
 	public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
