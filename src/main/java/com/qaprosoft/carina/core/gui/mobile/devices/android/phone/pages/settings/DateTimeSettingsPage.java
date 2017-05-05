@@ -1,26 +1,26 @@
-package com.qaprosoft.carina.core.gui.mobile.devices.android.pages.phone.settings;
+package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings;
 
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.mobile.devices.common.pages.settings.DateTimeSettingsPageBase;
+import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-@DeviceType(pageType = Type.ANDROID_PHONE, parentClass = DateTimeSettingsPageBase.class)
-public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
+public class DateTimeSettingsPage extends MobileAbstractPage {
+
+    protected static final Logger LOGGER = Logger.getLogger(DateTimeSettingsPage.class);
+
+    @FindBy(xpath = "//*[@resource-id = 'com.android.settings:id/date_time_settings_fragment' or @resource-id = 'com.android.systemui:id/latestItems']")
+    protected ExtendedWebElement title;
 
     public DateTimeSettingsPage(WebDriver driver) {
         super(driver);
-    }
 
-    protected static final By NOTIFICATION_XPATH = By
-            .xpath("//*[@resource-id = 'com.android.systemui:id/"
-                    + "notification_stack_scroller']/android.widget.FrameLayout");
+    }
 
     @FindBy(xpath = "//android.widget.TextView[@text = 'Select time zone']")
     protected ExtendedWebElement selectTimeZone;
@@ -37,7 +37,10 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
 
     protected static final String TIMEZONE_TEXT_BASE = "//android.widget.TextView[contains(@text,'%s')]";
 
-    @Override
+
+    /**
+     *  openTimeZoneSetting
+     */
     public void openTimeZoneSetting() {
         boolean found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
         if (!found) {
@@ -51,7 +54,13 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
         LOGGER.info("Select Time Zone Menu item was clicked: " + found);
     }
 
-    @Override
+
+    /**
+     * selectTimeZone
+     * @param tz String
+     * @param timezone String
+     * @return boolean
+     */
     public boolean selectTimeZone(String tz, String timezone) {
         int defaultSwipeTime = 15;
         boolean multiTimezoneText = false;
@@ -146,8 +155,6 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
                         }
                     }
                 }
-
-
             }
 
         }
@@ -155,6 +162,12 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
         return selected;
     }
 
+    /**
+     * selectTimezoneByText
+     * @param timezone String
+     * @param defaultSwipeTime int
+     * @return boolean
+     */
     private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
         boolean scrolled = MobileUtils.swipeInContainerTillElement(
                 format(1, tzSelectionBase, timezone),
@@ -166,7 +179,10 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
         return scrolled;
     }
 
-    @Override
+    /**
+     * clickNextButton
+     * @return boolean
+     */
     public boolean clickNextButton() {
         boolean res = nextButton.clickIfPresent(SHORT_TIMEOUT);
         LOGGER.info("Next button was clicked: " + res);
@@ -179,7 +195,6 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
      * @param timeout long
      * @return boolean
      */
-    @Override
     public boolean isOpened(long timeout) {
         return title.isElementPresent(timeout);
     }
@@ -188,4 +203,5 @@ public class DateTimeSettingsPage extends DateTimeSettingsPageBase {
     public boolean isOpened() {
         return isOpened(EXPLICIT_TIMEOUT );
     }
+
 }
