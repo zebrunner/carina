@@ -6,6 +6,7 @@ import org.joda.time.DateTimeZone;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat;
 
 public class DeviceTimeZone {
 
@@ -13,7 +14,7 @@ public class DeviceTimeZone {
 
     private boolean auto_time;
     private boolean auto_timezone;
-    private AndroidService.TimeFormat time_format;
+    private TimeFormat time_format;
     private String timezone;
     private String gmt;
     private String setDeviceDateTime;
@@ -24,7 +25,7 @@ public class DeviceTimeZone {
     public DeviceTimeZone() {
         this.auto_time = true;
         this.auto_timezone = true;
-        this.time_format = AndroidService.TimeFormat.FORMAT_24;
+        this.time_format = TimeFormat.FORMAT_24;
         this.timezone = "";
         this.gmt = "";
         this.setDeviceDateTime = "";
@@ -45,7 +46,7 @@ public class DeviceTimeZone {
      * @param changeDateTime    boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, AndroidService.TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -68,7 +69,7 @@ public class DeviceTimeZone {
      * @param changeDateTime    boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, AndroidService.TimeFormat time_format, String timezone, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -97,11 +98,11 @@ public class DeviceTimeZone {
         this.auto_timezone = auto_timezone;
     }
 
-    public AndroidService.TimeFormat getTimeFormat() {
+    public TimeFormat getTimeFormat() {
         return time_format;
     }
 
-    public void setTimeFormat(AndroidService.TimeFormat time_format) {
+    public void setTimeFormat(TimeFormat time_format) {
         this.time_format = time_format;
     }
 
