@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat.FORMAT_12;
+import static com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat.FORMAT_24;
 import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 public class AndroidService {
@@ -79,10 +81,10 @@ public class AndroidService {
 
     private static AndroidService instance;
 
-	private AndroidService() {
-		executor = new AdbExecutor();
-		baseInitCmd = executor.buildDefaultCmd();
-	}
+    private AndroidService() {
+        executor = new AdbExecutor();
+        baseInitCmd = executor.buildDefaultCmd();
+    }
 
     static {
         try {
@@ -103,15 +105,15 @@ public class AndroidService {
      * @return String in one line
      */
     public String executeAbdCommand(String command) {
-    	 String udid = DevicePool.getDeviceUdid();
-		if (!udid.isEmpty()) {
-			// add udid reference
-			command = "-s " + udid + " " + command;
-		}
-         
+        String udid = DevicePool.getDeviceUdid();
+        if (!udid.isEmpty()) {
+            // add udid reference
+            command = "-s " + udid + " " + command;
+        }
+
         LOGGER.info("Command: " + command);
         String[] listOfCommands = command.split(" ");
-        
+
         String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
 
         LOGGER.info("Try to execute following cmd:" + CmdLine.arrayToString(execCmd));
@@ -129,41 +131,41 @@ public class AndroidService {
     /**
      * expandStatusBar
      */
-	public void expandStatusBar() {
-		String[] expandStatusBarCmd = null;
-		String udid = DevicePool.getDeviceUdid();
+    public void expandStatusBar() {
+        String[] expandStatusBarCmd = null;
+        String udid = DevicePool.getDeviceUdid();
 
-		if (!udid.isEmpty()) {
-			expandStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "service", "call",
-					"statusbar", "1");
-		} else {
-			expandStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "service", "call", "statusbar", "1");
-		}
+        if (!udid.isEmpty()) {
+            expandStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "service", "call",
+                    "statusbar", "1");
+        } else {
+            expandStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "service", "call", "statusbar", "1");
+        }
 
-		LOGGER.info("Expand status bar cmd was built: " + CmdLine.arrayToString(expandStatusBarCmd));
-		LOGGER.debug("Try to expand Status bar with following cmd:" + CmdLine.arrayToString(expandStatusBarCmd));
-		List<String> expandOutput = executor.execute(expandStatusBarCmd);
-		LOGGER.debug("Output after attempt to expand status bar: " + expandOutput);
-	}
+        LOGGER.info("Expand status bar cmd was built: " + CmdLine.arrayToString(expandStatusBarCmd));
+        LOGGER.debug("Try to expand Status bar with following cmd:" + CmdLine.arrayToString(expandStatusBarCmd));
+        List<String> expandOutput = executor.execute(expandStatusBarCmd);
+        LOGGER.debug("Output after attempt to expand status bar: " + expandOutput);
+    }
 
-	/**
-	 * collapseStatusBar
-	 */
-	public void collapseStatusBar() {
-		String[] collapseStatusBarCmd = null;
-		String udid = DevicePool.getDeviceUdid();
-		if (!udid.isEmpty()) {
-			collapseStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "service", "call",
-					"statusbar", "2");
-		} else {
-			collapseStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "service", "call", "statusbar",
-					"2");
-		}
+    /**
+     * collapseStatusBar
+     */
+    public void collapseStatusBar() {
+        String[] collapseStatusBarCmd = null;
+        String udid = DevicePool.getDeviceUdid();
+        if (!udid.isEmpty()) {
+            collapseStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "service", "call",
+                    "statusbar", "2");
+        } else {
+            collapseStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "service", "call", "statusbar",
+                    "2");
+        }
 
-		LOGGER.info("Collapse status bar cmd was built: " + CmdLine.arrayToString(collapseStatusBarCmd));
-		List<String> collapseOutput = executor.execute(collapseStatusBarCmd);
-		LOGGER.debug("Output after attempt to collapse status bar: " + collapseOutput);
-	}
+        LOGGER.info("Collapse status bar cmd was built: " + CmdLine.arrayToString(collapseStatusBarCmd));
+        List<String> collapseOutput = executor.execute(collapseStatusBarCmd);
+        LOGGER.debug("Output after attempt to collapse status bar: " + collapseOutput);
+    }
 
     /**
      * getNotifications
@@ -174,57 +176,56 @@ public class AndroidService {
         return getNotifications(true);
     }
 
-	/**
-	 * getNotifications
-	 *
-	 * @param withLogger
-	 *            boolean
-	 * @return List of Notification
-	 */
-	public List<Notification> getNotifications(boolean withLogger) {
-		String[] getNotificationsCmd = null;
-		String udid = DevicePool.getDeviceUdid();
-		if (!udid.isEmpty()) {
-			getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "dumpsys",
-					"notification");
-		} else {
-			getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "dumpsys", "notification");
-		}
+    /**
+     * getNotifications
+     *
+     * @param withLogger boolean
+     * @return List of Notification
+     */
+    public List<Notification> getNotifications(boolean withLogger) {
+        String[] getNotificationsCmd = null;
+        String udid = DevicePool.getDeviceUdid();
+        if (!udid.isEmpty()) {
+            getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "dumpsys",
+                    "notification");
+        } else {
+            getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "dumpsys", "notification");
+        }
 
-		LOGGER.info("getNotifications cmd was built: " + CmdLine.arrayToString(getNotificationsCmd));
+        LOGGER.info("getNotifications cmd was built: " + CmdLine.arrayToString(getNotificationsCmd));
 
-		List<Notification> resultList = new ArrayList<Notification>();
-		List<String> notificationsOutput = executor.execute(getNotificationsCmd);
-		Notification notification = new Notification();
-		for (String output : notificationsOutput) {
-			boolean found = false;
+        List<Notification> resultList = new ArrayList<Notification>();
+        List<String> notificationsOutput = executor.execute(getNotificationsCmd);
+        Notification notification = new Notification();
+        for (String output : notificationsOutput) {
+            boolean found = false;
 
-			Matcher matcher = NOTIFICATION_PATTERN.matcher(output);
-			while (matcher.find()) {
-				notification.setNotificationPkg(matcher.group(1));
-				if (withLogger)
-					LOGGER.info(matcher.group(1));
-			}
-			Matcher matcher2 = NOTIFICATION_TEXT_PATTERN.matcher(output);
-			while (matcher2.find()) {
-				notification.setNotificationText(matcher2.group(1));
-				if (withLogger)
-					LOGGER.info(matcher2.group(1));
-				found = true;
-			}
-			if (found) {
-				resultList.add(notification);
-				if (withLogger)
-					LOGGER.info(notification);
-				notification = new Notification();
-				found = false;
-			}
+            Matcher matcher = NOTIFICATION_PATTERN.matcher(output);
+            while (matcher.find()) {
+                notification.setNotificationPkg(matcher.group(1));
+                if (withLogger)
+                    LOGGER.info(matcher.group(1));
+            }
+            Matcher matcher2 = NOTIFICATION_TEXT_PATTERN.matcher(output);
+            while (matcher2.find()) {
+                notification.setNotificationText(matcher2.group(1));
+                if (withLogger)
+                    LOGGER.info(matcher2.group(1));
+                found = true;
+            }
+            if (found) {
+                resultList.add(notification);
+                if (withLogger)
+                    LOGGER.info(notification);
+                notification = new Notification();
+                found = false;
+            }
 
-		}
-		if (withLogger)
-			LOGGER.info("Found: " + resultList.size() + " notifications.");
-		return resultList;
-	}
+        }
+        if (withLogger)
+            LOGGER.info("Found: " + resultList.size() + " notifications.");
+        return resultList;
+    }
 
     /**
      * notificationsCount
@@ -456,13 +457,16 @@ public class AndroidService {
                 switchDeviceAutoTimeAndTimeZone(false);
             }
 
-            if (timeFormat != null) {
-                if (timeFormat.equals(TimeFormat.FORMAT_12)) {
+            switch (timeFormat) {
+                case FORMAT_12: {
                     LOGGER.info("Set 12 hours format");
                     executeAbdCommand("shell settings put system time_12_24 12");
-                } else if (timeFormat.equals(TimeFormat.FORMAT_24)) {
+                    break;
+                }
+                case FORMAT_24: {
                     LOGGER.info("Set 24 hours format");
                     executeAbdCommand("shell settings put system time_12_24 24");
+                    break;
                 }
             }
 
@@ -485,14 +489,18 @@ public class AndroidService {
                 switchDeviceAutoTimeAndTimeZone(false);
             }
 
-            if (timeFormat.equals(TimeFormat.FORMAT_12)) {
-                LOGGER.info("Set 12 hours format");
-                executeAbdCommand("shell settings put system time_12_24 12");
-            } else if (timeFormat.equals(TimeFormat.FORMAT_24)) {
-                LOGGER.info("Set 24 hours format");
-                executeAbdCommand("shell settings put system time_12_24 24");
+            switch (timeFormat) {
+                case FORMAT_12: {
+                    LOGGER.info("Set 12 hours format");
+                    executeAbdCommand("shell settings put system time_12_24 12");
+                    break;
+                }
+                case FORMAT_24: {
+                    LOGGER.info("Set 24 hours format");
+                    executeAbdCommand("shell settings put system time_12_24 24");
+                    break;
+                }
             }
-
 
             openApp("com.futurek.android.tzc/com.futurek.android.tzc.MainActivity");
             pause(2);
@@ -577,7 +585,8 @@ public class AndroidService {
 
     /**
      * openApp
-     * @param pkg String
+     *
+     * @param pkg      String
      * @param activity String
      */
     public void openApp(String pkg, String activity) {
@@ -586,6 +595,7 @@ public class AndroidService {
 
     /**
      * openApp
+     *
      * @param app String
      */
     public void openApp(String app) {
@@ -596,7 +606,7 @@ public class AndroidService {
      * clear Apk Cache
      *
      * @param appPackageName for example: com.bamnetworks.mobile.android.gameday.atbat
-     * @return  boolean
+     * @return boolean
      */
     public boolean clearApkCache(String appPackageName) {
         //Later can be used:
@@ -663,7 +673,7 @@ public class AndroidService {
         if (deviceSetDate.isEmpty()) {
             changeDateTime = false;
         }
-        DeviceTimeZone dt = new DeviceTimeZone(false, false, timeFormat.toString(), timeZone, tzGMT, deviceSetDate, changeDateTime, true);
+        DeviceTimeZone dt = new DeviceTimeZone(false, false, timeFormat, timeZone, tzGMT, deviceSetDate, changeDateTime, true);
         return setDeviceTimeZoneByADB(dt);
     }
 
@@ -673,16 +683,16 @@ public class AndroidService {
      * adb shell settings put global auto_time 0
      * Automatic time zone = OFF (settings - date and time)
      * adb shell settings put global auto_time_zone 0
-     *
+     * <p>
      * Set Time Zone on device
      * adb shell setprop persist.sys.timezone "America/Chicago"
-     *
+     * <p>
      * Check timezones:
      * <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">List_of_tz_database_time_zones</a>
-     *
+     * <p>
      * Check time on device
      * adb shell date -s %mynow%
-     *
+     * <p>
      * Restart application
      *
      * @param dt DeviceTimeZone
@@ -709,14 +719,17 @@ public class AndroidService {
                 executeAbdCommand("shell settings put global auto_time_zone 0");
             }
 
-            if (dt.getTimeFormat().equals("12")) {
-                LOGGER.info("Set 12 hours format");
-                executeAbdCommand("shell settings put system time_12_24 12");
-            } else if (dt.getTimeFormat().equals("24")) {
-                LOGGER.info("Set 24 hours format");
-                executeAbdCommand("shell settings put system time_12_24 24");
-            } else {
-                LOGGER.error("Time Format is unknown: " + dt.getTimeFormat());
+            switch (dt.getTimeFormat()) {
+                case FORMAT_12: {
+                    LOGGER.info("Set 12 hours format");
+                    executeAbdCommand("shell settings put system time_12_24 12");
+                    break;
+                }
+                case FORMAT_24: {
+                    LOGGER.info("Set 24 hours format");
+                    executeAbdCommand("shell settings put system time_12_24 24");
+                    break;
+                }
             }
 
             if (!dt.getTimezone().isEmpty()) {
@@ -757,8 +770,8 @@ public class AndroidService {
      * @return DeviceTimeZone
      */
     public DeviceTimeZone getDeviceTimeZone(String defaultTZ) {
-    	
-    	getDriver(); //start driver in before class to assign it for particular thread
+
+        getDriver(); //start driver in before class to assign it for particular thread
         DeviceTimeZone dt = new DeviceTimeZone();
 
         try {
@@ -778,9 +791,9 @@ public class AndroidService {
 
             value = executeAbdCommand("shell settings get system time_12_24");
             if (value.contains("12")) {
-                dt.setTimeFormat("12");
+                dt.setTimeFormat(FORMAT_12);
             } else {
-                dt.setTimeFormat("24");
+                dt.setTimeFormat(FORMAT_24);
             }
 
             if (defaultTZ.isEmpty()) {
@@ -846,7 +859,7 @@ public class AndroidService {
 
         boolean changed = false;
 
-    	getDriver(); //start driver in before class to assign it for particular thread
+        getDriver(); //start driver in before class to assign it for particular thread
         String actualTZ = getDeviceActualTimeZone();
 
         String variant = "all";
@@ -928,7 +941,8 @@ public class AndroidService {
 
     /**
      * setDeviceTimeZoneBySetting
-     * @param timeZone String
+     *
+     * @param timeZone   String
      * @param settingsTZ String
      * @param timeFormat TimeFormat
      * @return boolean
@@ -1066,6 +1080,7 @@ public class AndroidService {
 
     /**
      * installTZChangerApk
+     *
      * @param standartUsage boolean
      */
     private void installTZChangerApk(boolean standartUsage) {
@@ -1100,6 +1115,7 @@ public class AndroidService {
 
     /**
      * getResourceFilePath
+     *
      * @param resourceFileName String
      * @return String
      * @throws Exception error
