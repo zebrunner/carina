@@ -7,15 +7,15 @@ import org.openqa.selenium.WebDriver;
 
 public abstract class MobileAbstractPage extends AbstractPage {
 
-	protected static final Logger LOGGER = Logger.getLogger(MobileAbstractPage.class);
+    protected static final Logger LOGGER = Logger.getLogger(MobileAbstractPage.class);
 
-	protected static final long DELAY = 10;
+    protected static final long DELAY = 10;
 
-    protected static final long SHORT_TIMEOUT = Configuration.getLong(Configuration.Parameter.EXPLICIT_TIMEOUT)/20;
+    protected static final long SHORT_TIMEOUT = Configuration.getLong(Configuration.Parameter.EXPLICIT_TIMEOUT) / 20;
 
     protected static final long ONE_SEC_TIMEOUT = 1;
 
-    protected static final long DEFAULT_TRIES=10;
+    protected static final long DEFAULT_TRIES = 10;
 
     public static final long PUSH_NOTIFICATIONS_TIMEOUT = 120;
 
@@ -29,5 +29,5 @@ public abstract class MobileAbstractPage extends AbstractPage {
      * @return true by default. Override it in child classes
      */
     public abstract boolean isOpened();
-    
+
 }
