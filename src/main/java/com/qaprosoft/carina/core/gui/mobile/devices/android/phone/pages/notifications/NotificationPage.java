@@ -1,32 +1,31 @@
-package com.qaprosoft.carina.core.gui.mobile.devices.android.pages.phone.notifications;
+package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications;
 
 import java.util.List;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
-import com.qaprosoft.carina.core.gui.mobile.devices.common.pages.notifications.NotificationPageBase;
+import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
+import io.appium.java_client.MobileBy;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import org.openqa.selenium.support.FindBys;
 
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+public class NotificationPage extends MobileAbstractPage {
 
-import io.appium.java_client.MobileBy;
-
-@DeviceType(pageType = Type.ANDROID_PHONE, parentClass = NotificationPageBase.class)
-public class NotificationPage extends NotificationPageBase {
+    protected static final Logger LOGGER = Logger.getLogger(NotificationPage.class);
 
     public NotificationPage(WebDriver driver) {
         super(driver);
-
         notificationService = AndroidService.getInstance();
     }
+
 
     protected AndroidService notificationService;
 
@@ -36,6 +35,7 @@ public class NotificationPage extends NotificationPageBase {
 
     @FindBy(xpath = "//*[@resource-id = 'com.android.systemui:id/notification_stack_scroller' or @resource-id = 'com.android.systemui:id/latestItems']")
     protected ExtendedWebElement title;
+
 
     @FindBy(xpath = "//*[@resource-id = 'com.android.systemui:id/notification_stack_scroller']")
     protected ExtendedWebElement notification_scroller;
@@ -71,6 +71,8 @@ public class NotificationPage extends NotificationPageBase {
     @FindBy(id = "android:id/title")
     private List<ExtendedWebElement> itemTitle;
 
+
+
     String itemTitle_Locator_Text = "android:id/title";
 
     @FindBys({
@@ -89,7 +91,6 @@ public class NotificationPage extends NotificationPageBase {
      * isNativeNotificationPage
      * @return boolean
      */
-    @Override
     public boolean isNativeNotificationPage() {
         boolean bool;
         bool = !notificationPanel.isEmpty();
@@ -100,7 +101,6 @@ public class NotificationPage extends NotificationPageBase {
      * isClearAllBtnLoaded
      * @return boolean
      */
-    @Override
     public boolean isClearAllBtnLoaded() {
         boolean bool;
         bool = !clearAllBtn.isEmpty();
@@ -111,7 +111,6 @@ public class NotificationPage extends NotificationPageBase {
      * getLastItemsContentSize
      * @return int
      */
-    @Override
     public int getLastItemsContentSize() {
         return lastItemsContent.size();
     }
@@ -122,7 +121,6 @@ public class NotificationPage extends NotificationPageBase {
      * @param num notification number
      * @return String
      */
-    @Override
     public String getItemTitle(int num) {
         try {
             return lastItemsContent.get(num).findExtendedWebElement(By.id(itemTitle_Locator_Text)).getText();
@@ -137,7 +135,6 @@ public class NotificationPage extends NotificationPageBase {
      * @param num notification number
      * @return String
      */
-    @Override
     public String getItemText(int num) {
         //TODO: Check on Tablet
         //if (isPhone())
@@ -158,7 +155,6 @@ public class NotificationPage extends NotificationPageBase {
         }
     }
 
-    @Override
     public void tapClearAllBtn() {
         clearAllBtn.get(0).click();
     }
@@ -176,7 +172,6 @@ public class NotificationPage extends NotificationPageBase {
     /**
      * clearNotifications
      */
-    @Override
     public void clearNotifications() {
         if (!isOpened(1)) {
             notificationService.expandStatusBar();
@@ -213,7 +208,6 @@ public class NotificationPage extends NotificationPageBase {
     /**
      * cleanNotificationByService
      */
-    @Override
     public void cleanNotificationByService() {
         notificationService.clearNotifications();
     }
@@ -224,7 +218,6 @@ public class NotificationPage extends NotificationPageBase {
      *
      * @return List of Notification
      */
-    @Override
     public List<Notification> getAllAvailableNotifications() {
         LOGGER.info("Android device");
         List<Notification> list = notificationService.getNotifications();
@@ -234,7 +227,6 @@ public class NotificationPage extends NotificationPageBase {
     /**
      * collapseStatusBar
      */
-    @Override
     public void collapseStatusBar() {
         LOGGER.info("Android device");
         notificationService.collapseStatusBar();
@@ -245,7 +237,6 @@ public class NotificationPage extends NotificationPageBase {
      *
      * @return boolean
      */
-    @Override
     public boolean isStatusBarExpanded() {
         LOGGER.info("Android device");
         notificationService.expandStatusBar();
@@ -258,7 +249,7 @@ public class NotificationPage extends NotificationPageBase {
      * @param timeout long
      * @return boolean
      */
-    @Override
+
     public boolean isOpened(long timeout) {
         return title.isElementPresent(timeout);
     }
@@ -267,4 +258,6 @@ public class NotificationPage extends NotificationPageBase {
     public boolean isOpened() {
         return isOpened(EXPLICIT_TIMEOUT);
     }
+
+
 }

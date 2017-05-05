@@ -1,21 +1,23 @@
-package com.qaprosoft.carina.core.gui.mobile.devices.android.pages.phone.tzchanger;
+package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger;
 
-
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.mobile.devices.common.pages.tzchanger.TZChangerPageBase;
+import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-@DeviceType(pageType = Type.ANDROID_PHONE, parentClass = TZChangerPageBase.class)
-public class TZChangerPage extends TZChangerPageBase {
+public class TZChangerPage extends MobileAbstractPage {
+
+    protected static final Logger LOGGER = Logger.getLogger(TZChangerPage.class);
+
+    @FindBy(id = "com.futurek.android.tzc:id/txt_selected")
+    protected ExtendedWebElement title;
 
     public TZChangerPage(WebDriver driver) {
         super(driver);
-    }
 
+    }
 
     @FindBy(xpath = "//android.widget.ListView")
     protected ExtendedWebElement scrollableContainer;
@@ -29,7 +31,11 @@ public class TZChangerPage extends TZChangerPageBase {
     protected static final String TIMEZONE_TEXT_BASE = "//android.widget.TextView[contains(@text,'%s')]";
 
 
-    @Override
+    /**
+     * selectTimeZone
+     * @param timezone String format should be "Europe/London"
+     * @return boolean
+     */
     public boolean selectTimeZone(String timezone) {
         int defaultSwipeTime = 30;
 
@@ -94,6 +100,12 @@ public class TZChangerPage extends TZChangerPageBase {
         return selected;
     }
 
+    /**
+     * selectTimezoneByText in TZ changer
+     * @param timezone String
+     * @param defaultSwipeTime int
+     * @return boolean
+     */
     private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
         boolean scrolled = MobileUtils.swipeInContainerTillElement(
                 format(1, tzSelectionBase, timezone),
@@ -111,7 +123,6 @@ public class TZChangerPage extends TZChangerPageBase {
      * @param timeout long
      * @return boolean
      */
-    @Override
     public boolean isOpened(long timeout) {
         return title.isElementPresent(timeout);
     }
@@ -120,4 +131,6 @@ public class TZChangerPage extends TZChangerPageBase {
     public boolean isOpened() {
         return isOpened(EXPLICIT_TIMEOUT );
     }
+
+
 }
