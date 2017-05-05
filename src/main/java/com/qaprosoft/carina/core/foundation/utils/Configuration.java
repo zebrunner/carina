@@ -364,7 +364,12 @@ public class Configuration
 		ADB_PATH("adb_path"),
 
 		// TLS
-		TLS_KEYSECURE_LOCATION("tls_keysecure_location")
+		TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
+		
+		//HealthCheck
+		HEALTH_CHECK_CLASS("health_check_class"),
+		
+		HEALTH_CHECK_METHODS("health_check_methods")
 		;
 
 		private final String key;
