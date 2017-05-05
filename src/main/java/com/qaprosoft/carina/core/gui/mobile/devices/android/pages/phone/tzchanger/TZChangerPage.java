@@ -118,6 +118,6 @@ public class TZChangerPage extends TZChangerPageBase {
 
     @Override
     public boolean isOpened() {
-        return isOpened(LONG_TIMEOUT);
+        return isOpened(EXPLICIT_TIMEOUT );
     }
 }

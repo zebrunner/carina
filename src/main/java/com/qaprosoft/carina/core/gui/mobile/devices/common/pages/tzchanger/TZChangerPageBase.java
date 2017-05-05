@@ -25,7 +25,7 @@ public abstract class TZChangerPageBase extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(LONG_TIMEOUT);
+        return isOpened(EXPLICIT_TIMEOUT );
     }
 
 

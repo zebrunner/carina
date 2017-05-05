@@ -265,6 +265,6 @@ public class NotificationPage extends NotificationPageBase {
 
     @Override
     public boolean isOpened() {
-        return isOpened(LONG_TIMEOUT);
+        return isOpened(EXPLICIT_TIMEOUT);
     }
 }
