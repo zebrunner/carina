@@ -796,7 +796,7 @@ public class AndroidUtils {
 		//Set oldMethod to false for trying use as much as possible solutions for scrolling.
 		//oldMethod = false;
 
-		boolean scrolled = AndroidUtils.universalScrollTo(scrollToText,containerElement,tries,oldMethod);
+		boolean scrolled = AndroidUtils.universalScrollToBase(scrollToText,containerElement,tries,oldMethod);
 		if (!scrolled) {
 			LOGGER.info("Try to use 3 more new solutions for scrolling. ");
 			scrolled=newScrollTo(scrollToText, containerElement, tries);

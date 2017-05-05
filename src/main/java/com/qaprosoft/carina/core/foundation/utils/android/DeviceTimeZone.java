@@ -13,7 +13,7 @@ public class DeviceTimeZone {
 
     private boolean auto_time;
     private boolean auto_timezone;
-    private String time_format;
+    private AndroidService.TimeFormat time_format;
     private String timezone;
     private String gmt;
     private String setDeviceDateTime;
@@ -24,7 +24,7 @@ public class DeviceTimeZone {
     public DeviceTimeZone() {
         this.auto_time = true;
         this.auto_timezone = true;
-        this.time_format = "24";
+        this.time_format = AndroidService.TimeFormat.FORMAT_24;
         this.timezone = "";
         this.gmt = "";
         this.setDeviceDateTime = "";
@@ -45,7 +45,7 @@ public class DeviceTimeZone {
      * @param changeDateTime    boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, String time_format, String timezone, String gmt, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, AndroidService.TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -68,7 +68,7 @@ public class DeviceTimeZone {
      * @param changeDateTime    boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, String time_format, String timezone, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, AndroidService.TimeFormat time_format, String timezone, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -97,11 +97,11 @@ public class DeviceTimeZone {
         this.auto_timezone = auto_timezone;
     }
 
-    public String getTimeFormat() {
+    public AndroidService.TimeFormat getTimeFormat() {
         return time_format;
     }
 
-    public void setTimeFormat(String time_format) {
+    public void setTimeFormat(AndroidService.TimeFormat time_format) {
         this.time_format = time_format;
     }
 
@@ -177,7 +177,6 @@ public class DeviceTimeZone {
     }
 
     public static String getTimezoneOffset(TimeZone tz) {
-        //TimeZone tz = TimeZone.getDefault();
         Calendar cal = GregorianCalendar.getInstance(tz);
         int offsetInMillis = tz.getOffset(cal.getTimeInMillis());
 
