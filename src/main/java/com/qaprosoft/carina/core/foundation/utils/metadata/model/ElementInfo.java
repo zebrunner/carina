@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.utils.metadata.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Map;
 
 /**
@@ -11,7 +13,11 @@ public class ElementInfo {
 
     private Rect rect;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ElementInfo textInfo;
 
     public Map<String, String> getElementsAttributes() {
         return elementsAttributes;
@@ -35,5 +41,13 @@ public class ElementInfo {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public ElementInfo getTextInfo() {
+        return textInfo;
+    }
+
+    public void setTextInfo(ElementInfo textInfo) {
+        this.textInfo = textInfo;
     }
 }
