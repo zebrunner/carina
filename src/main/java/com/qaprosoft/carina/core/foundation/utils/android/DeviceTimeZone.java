@@ -230,7 +230,7 @@ public class DeviceTimeZone {
         return "DeviceTimeZone{" +
                 "auto_time=" + auto_time +
                 ", auto_timezone=" + auto_timezone +
-                ", time_format='" + time_format + '\'' +
+                ", time_format=" + time_format +
                 ", timezone='" + timezone + '\'' +
                 ", gmt='" + gmt + '\'' +
                 ", setDeviceDateTime='" + setDeviceDateTime + '\'' +
