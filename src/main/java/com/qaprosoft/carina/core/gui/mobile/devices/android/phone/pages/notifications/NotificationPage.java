@@ -72,7 +72,6 @@ public class NotificationPage extends MobileAbstractPage {
     private List<ExtendedWebElement> itemTitle;
 
 
-
     String itemTitle_Locator_Text = "android:id/title";
 
     @FindBys({
@@ -89,6 +88,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     /**
      * isNativeNotificationPage
+     *
      * @return boolean
      */
     public boolean isNativeNotificationPage() {
@@ -99,6 +99,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     /**
      * isClearAllBtnLoaded
+     *
      * @return boolean
      */
     public boolean isClearAllBtnLoaded() {
@@ -109,6 +110,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     /**
      * getLastItemsContentSize
+     *
      * @return int
      */
     public int getLastItemsContentSize() {
@@ -118,6 +120,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     /**
      * getItemTitle
+     *
      * @param num notification number
      * @return String
      */
@@ -132,6 +135,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     /**
      * getItemText
+     *
      * @param num notification number
      * @return String
      */

@@ -33,6 +33,7 @@ public class TZChangerPage extends MobileAbstractPage {
 
     /**
      * selectTimeZone
+     *
      * @param timezone String format should be "Europe/London"
      * @return boolean
      */
@@ -102,7 +103,8 @@ public class TZChangerPage extends MobileAbstractPage {
 
     /**
      * selectTimezoneByText in TZ changer
-     * @param timezone String
+     *
+     * @param timezone         String
      * @param defaultSwipeTime int
      * @return boolean
      */
@@ -129,7 +131,7 @@ public class TZChangerPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(EXPLICIT_TIMEOUT );
+        return isOpened(EXPLICIT_TIMEOUT);
     }
 
 

@@ -39,7 +39,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
 
     /**
-     *  openTimeZoneSetting
+     * openTimeZoneSetting
      */
     public void openTimeZoneSetting() {
         boolean found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
@@ -57,7 +57,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
     /**
      * selectTimeZone
-     * @param tz String
+     *
+     * @param tz       String
      * @param timezone String
      * @return boolean
      */
@@ -164,7 +165,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
     /**
      * selectTimezoneByText
-     * @param timezone String
+     *
+     * @param timezone         String
      * @param defaultSwipeTime int
      * @return boolean
      */
@@ -181,6 +183,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
     /**
      * clickNextButton
+     *
      * @return boolean
      */
     public boolean clickNextButton() {
@@ -201,7 +204,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(EXPLICIT_TIMEOUT );
+        return isOpened(EXPLICIT_TIMEOUT);
     }
 
 }
