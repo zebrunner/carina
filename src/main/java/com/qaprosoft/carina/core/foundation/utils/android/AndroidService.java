@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat.FORMAT_12;
-import static com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat.FORMAT_24;
+import static com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat;
 import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 public class AndroidService {
@@ -787,9 +786,9 @@ public class AndroidService {
 
             value = executeAbdCommand("shell settings get system time_12_24");
             if (value.contains("12")) {
-                dt.setTimeFormat(FORMAT_12);
+                dt.setTimeFormat(TimeFormat.FORMAT_12);
             } else {
-                dt.setTimeFormat(FORMAT_24);
+                dt.setTimeFormat(TimeFormat.FORMAT_24);
             }
 
             if (defaultTZ.isEmpty()) {
