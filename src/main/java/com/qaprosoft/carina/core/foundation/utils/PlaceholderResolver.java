@@ -36,7 +36,7 @@ public class PlaceholderResolver
 	private static final Pattern PATTERN = Pattern.compile(SpecialKeywords.PLACEHOLER);
 	
 	/**
-	 * Resolves value by placehodler recursivly.
+	 * Resolves value by placeholder recursively.
 	 * @param properties Properties
 	 * @param key Key
 	 * @return resolved value
