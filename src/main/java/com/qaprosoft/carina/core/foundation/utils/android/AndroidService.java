@@ -5,15 +5,14 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
-import com.qaprosoft.carina.core.foundation.utils.factory.CustomTypePageFactory;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.carina.core.gui.mobile.devices.common.pages.notifications.NotificationPageBase;
-import com.qaprosoft.carina.core.gui.mobile.devices.common.pages.settings.DateTimeSettingsPageBase;
-import com.qaprosoft.carina.core.gui.mobile.devices.common.pages.tzchanger.TZChangerPageBase;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.log4j.Logger;
 
@@ -356,7 +355,7 @@ public class AndroidService {
 
         }
 
-        NotificationPageBase nativeNotificationPage = CustomTypePageFactory.initPage(getDriver(), NotificationPageBase.class);
+        NotificationPage nativeNotificationPage = new NotificationPage(getDriver());
 
         LOGGER.info("Native notification page is loaded: " + nativeNotificationPage.isNativeNotificationPage());
 
@@ -404,8 +403,7 @@ public class AndroidService {
      */
     public void clearNotifications() {
         LOGGER.info("Clear notifications");
-        NotificationPageBase notificationPage = CustomTypePageFactory
-                .initPage(NotificationPageBase.class);
+        NotificationPage notificationPage = new NotificationPage(getDriver());
         int attempts = 3;
         boolean isStatusBarOpened;
         // three attempts will be executed to clear notifications
@@ -559,8 +557,7 @@ public class AndroidService {
             openTZChangingApk(turnOffAuto, timeFormat);
         }
 
-        TZChangerPageBase tzChangerPage = CustomTypePageFactory
-                .initPage(getDriver(), TZChangerPageBase.class);
+        TZChangerPage tzChangerPage =  new TZChangerPage(getDriver());
         if (!tzChangerPage.isOpened(10)) {
             openTZChangingApk(turnOffAuto, timeFormat);
         }
@@ -651,8 +648,7 @@ public class AndroidService {
      * @return boolean
      */
     public boolean isStatusBarExpanded() {
-        NotificationPageBase notificationPage = CustomTypePageFactory
-                .initPage(NotificationPageBase.class);
+        NotificationPage notificationPage = new NotificationPage(getDriver());
         return notificationPage.isStatusBarExpanded();
 
     }
@@ -969,8 +965,7 @@ public class AndroidService {
             }
 
 
-            DateTimeSettingsPageBase dtSettingsPage = CustomTypePageFactory
-                    .initPage(getDriver(), DateTimeSettingsPageBase.class);
+            DateTimeSettingsPage dtSettingsPage = new DateTimeSettingsPage(getDriver());
             if (!dtSettingsPage.isOpened(3)) {
                 openDateTimeSettingsSetupWizard(true, timeFormat);
             }
@@ -1026,8 +1021,7 @@ public class AndroidService {
 
             forceTZChangingApkOpen(true, timeFormat, 3);
 
-            TZChangerPageBase tzChangerPage = CustomTypePageFactory
-                    .initPage(getDriver(), TZChangerPageBase.class);
+            TZChangerPage tzChangerPage =  new TZChangerPage(getDriver());
 
             if (tzChangerPage.isOpened(3)) {
                 LOGGER.info("TimeZone changer main page was open.");
