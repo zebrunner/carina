@@ -13,8 +13,6 @@ public class ElementsInfo {
 
     private ScreenShootInfo screenShootInfo;
 
-    private String className;
-
     List<ElementInfo> elements = new ArrayList<>();
 
     public String getCurrentURL() {
@@ -31,14 +29,6 @@ public class ElementsInfo {
 
     public void setScreenshot(ScreenShootInfo screenShootInfo) {
         this.screenShootInfo = screenShootInfo;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
     }
 
     public List<ElementInfo> getElements() {
