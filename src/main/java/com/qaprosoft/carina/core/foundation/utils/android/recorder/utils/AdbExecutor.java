@@ -107,40 +107,6 @@ public class AdbExecutor {
     }
 
 
-    public boolean isDeviceCorrect() {
-        return isDeviceCorrect(DevicePool.getDeviceUdid());
-    }
-
-    public boolean isDeviceCorrect(String udid) {
-        ProcessBuilderExecutor executor = null;
-        BufferedReader in = null;
-        boolean correctDevice = false;
-        try {
-            String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", udid, "shell", "getprop", "ro.build.version.sdk");
-            executor = new ProcessBuilderExecutor(cmd);
-
-            Process process = executor.start();
-            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = in.readLine();
-            LOGGER.debug("sdkVersion: " + line);
-            if (line != null) {
-                int sdkVersion = Integer.parseInt(line);
-                correctDevice = sdkVersion >= 19;
-            } else {
-                LOGGER.error("SDK version for '" + DevicePool.getDevice(udid).getName() + "' device is not recognized!");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return correctDevice;
-        } finally {
-            closeQuietly(in);
-            ProcessBuilderExecutor.gcNullSafe(executor);
-
-        }
-        return correctDevice;
-    }
-
     public List<String> execute(String[] cmd) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
@@ -169,13 +135,13 @@ public class AdbExecutor {
     }
 
     public int startRecording(String pathToFile) {
-        if (!isDeviceCorrect())
-            return -1;
-
         if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
             return -1;
         }
-
+        
+        if (DevicePool.getDevice().isNull())
+        	return -1;
+        
         dropFile(pathToFile);
 
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
@@ -196,9 +162,6 @@ public class AdbExecutor {
         if (DevicePool.getDevice().isNull())
         	return;
         
-        if (!isDeviceCorrect())
-            return;
-
         if (pid != -1) {
             Platform.killProcesses(Arrays.asList(pid));
         }
@@ -209,8 +172,6 @@ public class AdbExecutor {
         if (DevicePool.getDevice().isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
         execute(cmd);
     }
@@ -219,8 +180,6 @@ public class AdbExecutor {
         if (DevicePool.getDevice().isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
         execute(cmd);
     }
@@ -237,9 +196,6 @@ public class AdbExecutor {
     public void pressKey(int key) {
         if (DevicePool.getDevice().isNull())
         	return;
-
-        if (!isDeviceCorrect())
-            return;
 
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
         execute(cmd);
@@ -260,11 +216,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APP_CLEAR_CACHE))
             return;
 
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
-        if (!isDeviceCorrect())
-            return;
 
         //adb -s UDID shell pm clear com.myfitnesspal.android
         String packageName = getApkPackageName(Configuration.get(Parameter.MOBILE_APP));
@@ -275,33 +228,27 @@ public class AdbExecutor {
 
 
     public void uninstallApp(Device device, String packageName) {
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         //adb -s UDID uninstall com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "uninstall", packageName);
         execute(cmd);
     }
 
     public void installApp(Device device, String packageName) {
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         //adb -s UDID install com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
         execute(cmd);
     }
 
     public synchronized void installAppSync(Device device, String packageName) {
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         //adb -s UDID install com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
         execute(cmd);
@@ -312,9 +259,8 @@ public class AdbExecutor {
             return;
         }
 
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
             // explicit reinstall the apk
@@ -378,7 +324,8 @@ public class AdbExecutor {
 
     public String[] getInstalledApkVersion(Device device, String packageName) {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
-
+        if (device.isNull())
+        	return null;
 
         String[] res = new String[3];
         res[0] = packageName;
@@ -405,11 +352,13 @@ public class AdbExecutor {
             }
         }
 
+        if (res[0] == null && res[1] == null && res[2] == null) {
+        	return null;
+        }
         return res;
     }
 
     public String[] getApkVersion(String apkFile) {
-
         // aapt dump badging <apk_file> | grep versionCode
         // aapt dump badging <apk_file> | grep versionName
         // output:
@@ -459,9 +408,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
         
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         stopAppium(device);
         startAppium(device);
@@ -472,9 +420,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
         
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         LOGGER.info("Stopping appium...");
 
@@ -490,9 +437,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
         
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         LOGGER.info("Starting appium...");
 
@@ -563,10 +509,6 @@ public class AdbExecutor {
 
         String udid = DevicePool.getDeviceUdid();
 
-        if (!isDeviceCorrect(udid)) {
-            return;
-        }
-
         Boolean screenState = getScreenState(udid);
         if (screenState == null) {
             return;
@@ -603,9 +545,6 @@ public class AdbExecutor {
         	return;
         
         String udid = DevicePool.getDeviceUdid();
-        if (!isDeviceCorrect(udid)) {
-            return;
-        }
 
         Boolean screenState = getScreenState(udid);
         if (screenState == null) {
