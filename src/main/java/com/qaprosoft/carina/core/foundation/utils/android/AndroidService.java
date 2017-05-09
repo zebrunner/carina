@@ -77,10 +77,10 @@ public class AndroidService {
 	}
 
 	public enum ChangeTimeZoneWorkflow {
-		ADB(0b001), // 1
-		SETTINGS(0b010), // 2
-		APK(0b100), // 4
-		ALL(0b111); // 7
+		ADB(1), 		// 0b001
+		SETTINGS(2), 	// 0b010
+		APK(4), 		// 0b100
+		ALL(7); 		// 0b111
 		private int workflow;
 
 		ChangeTimeZoneWorkflow(int workflow) {
