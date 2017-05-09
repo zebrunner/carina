@@ -112,9 +112,6 @@ public class AdbExecutor {
     }
 
     public boolean isDeviceCorrect(String udid) {
-        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            return false;
-        }
     	
     	//TODO: [VD] Think about moving this command onto the DevicePool creation to check it at once only!
         ProcessBuilderExecutor executor = null;
