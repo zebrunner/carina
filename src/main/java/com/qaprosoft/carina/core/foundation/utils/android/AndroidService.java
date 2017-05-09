@@ -1064,24 +1064,19 @@ public class AndroidService {
     }
 
     /**
-     * installTZChangerApk with standart usage
-     */
-    private void installTZChangerApk() {
-        installTZChangerApk(true);
-    }
-
-    /**
-     * installTZChangerApk
-     *
+     * install android Apk. Should be put in src/main/resources/app
+     * @param apkPath String
      * @param standartUsage boolean
+     * @return boolean
      */
-    private void installTZChangerApk(boolean standartUsage) {
-        String TZ_CHANGE_APP_PATH = "app/TimeZone_Changer.apk";
+    public boolean installApk(String apkPath, boolean standartUsage) {
         String path = "";
+        boolean ret = true;
         try {
-            path = getResourceFilePath(TZ_CHANGE_APP_PATH);
+            path = getResourceFilePath(apkPath);
         } catch (Exception e) {
             LOGGER.error(e);
+            return false;
         }
         LOGGER.info("Path: " + path);
 
@@ -1101,9 +1096,31 @@ public class AndroidService {
         } else {
             String res = executeAbdCommand("install " + path);
             LOGGER.info(res);
-
         }
+        return ret;
     }
+
+    /**
+     * installTZChangerApk with standard usage
+     */
+    private void installTZChangerApk() {
+        installTZChangerApk(true);
+    }
+
+    /**
+     * installTZChangerApk
+     *
+     * @param standartUsage boolean
+     */
+    private void installTZChangerApk(boolean standartUsage) {
+        String TZ_CHANGE_APP_PATH = "app/TimeZone_Changer.apk";
+        boolean res = installApk(TZ_CHANGE_APP_PATH,standartUsage);
+        if(res) {
+            LOGGER.info("Application '"+TZ_CHANGE_APP_PATH+"' was successfully installed.");
+        } else {
+            LOGGER.info("Application '"+TZ_CHANGE_APP_PATH+"' was NOT installed.");
+        }
+     }
 
     /**
      * getResourceFilePath
