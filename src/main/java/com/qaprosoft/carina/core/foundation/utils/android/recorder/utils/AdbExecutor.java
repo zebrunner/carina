@@ -320,10 +320,6 @@ public class AdbExecutor {
         if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect(device.getUdid()))
-            return;
-
-
         if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
             // explicit reinstall the apk
             String[] apkVersions = getApkVersion(mobileApp); // Configuration.get(Parameter.MOBILE_APP)
