@@ -112,6 +112,8 @@ public class AdbExecutor {
     }
 
     public boolean isDeviceCorrect(String udid) {
+    	
+    	//TODO: [VD] Think about moving this command onto the DevicePool creation to check it at once only!
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
         boolean correctDevice = false;
@@ -260,10 +262,10 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APP_CLEAR_CACHE))
             return;
 
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
+        if (!isDeviceCorrect(device.getUdid()))
             return;
 
         //adb -s UDID shell pm clear com.myfitnesspal.android
@@ -275,33 +277,36 @@ public class AdbExecutor {
 
 
     public void uninstallApp(Device device, String packageName) {
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
+        if (!isDeviceCorrect(device.getUdid()))
             return;
+
         //adb -s UDID uninstall com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "uninstall", packageName);
         execute(cmd);
     }
 
     public void installApp(Device device, String packageName) {
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
+        if (!isDeviceCorrect(device.getUdid()))
             return;
+
         //adb -s UDID install com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
         execute(cmd);
     }
 
     public synchronized void installAppSync(Device device, String packageName) {
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect())
+        if (!isDeviceCorrect(device.getUdid()))
             return;
+
         //adb -s UDID install com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
         execute(cmd);
@@ -312,8 +317,11 @@ public class AdbExecutor {
             return;
         }
 
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
+
+        if (!isDeviceCorrect(device.getUdid()))
+            return;
 
 
         if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
@@ -378,7 +386,11 @@ public class AdbExecutor {
 
     public String[] getInstalledApkVersion(Device device, String packageName) {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
+        if (device.isNull())
+        	return null;
 
+        if (!isDeviceCorrect(device.getUdid()))
+            return null;
 
         String[] res = new String[3];
         res[0] = packageName;
@@ -405,11 +417,13 @@ public class AdbExecutor {
             }
         }
 
+        if (res[0] == null && res[1] == null && res[2] == null) {
+        	return null;
+        }
         return res;
     }
 
     public String[] getApkVersion(String apkFile) {
-
         // aapt dump badging <apk_file> | grep versionCode
         // aapt dump badging <apk_file> | grep versionName
         // output:
@@ -459,9 +473,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
         
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         stopAppium(device);
         startAppium(device);
@@ -472,9 +485,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
         
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         LOGGER.info("Stopping appium...");
 
@@ -490,9 +502,8 @@ public class AdbExecutor {
         if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
             return;
         
-        if (DevicePool.getDevice().isNull())
+        if (device.isNull())
         	return;
-
 
         LOGGER.info("Starting appium...");
 
