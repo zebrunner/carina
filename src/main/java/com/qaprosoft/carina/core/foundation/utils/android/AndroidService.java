@@ -19,13 +19,11 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
@@ -35,52 +33,68 @@ import io.appium.java_client.android.AndroidDriver;
 
 public class AndroidService {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(AndroidService.class);
+	private static final Logger LOGGER = Logger.getLogger(AndroidService.class);
 
-    protected static final int INIT_TIMEOUT = 20;
+	protected static final int INIT_TIMEOUT = 20;
 
-    private final Pattern NOTIFICATION_PATTERN = Pattern
-            .compile(".* NotificationRecord.*pkg=(.*) user");
+	private final Pattern NOTIFICATION_PATTERN = Pattern.compile(".* NotificationRecord.*pkg=(.*) user");
 
-    private final Pattern NOTIFICATION_TEXT_PATTERN = Pattern
-            .compile(".*tickerText=(.*)");
+	private final Pattern NOTIFICATION_TEXT_PATTERN = Pattern.compile(".*tickerText=(.*)");
 
-    private String[] baseInitCmd;
+	private final String TZ_CHANGE_APP_PATH = "app/TimeZone_Changer.apk";
+	private String[] baseInitCmd;
 
-
-    private AdbExecutor executor;
+	private AdbExecutor executor;
 
 
-    public enum TimeFormat {
-        FORMAT_12("12"),
-        FORMAT_24("24");
-        private String format;
+	public enum TimeFormat {
+		FORMAT_12("12"), 
+		FORMAT_24("24");
+		private String format;
 
-        TimeFormat(String format) {
-            this.format = format;
-        }
+		TimeFormat(String format) {
+			this.format = format;
+		}
 
-        public String format() {
-            return format;
-        }
+		public String format() {
+			return format;
+		}
 
-        public String toString() {
-            return format;
-        }
+		public String toString() {
+			return format;
+		}
 
-        public static TimeFormat parse(String text) {
-            if (text != null) {
-                for (TimeFormat type : TimeFormat.values()) {
-                    if (text.equalsIgnoreCase(type.toString())) {
-                        return type;
-                    }
-                }
-            }
-            return FORMAT_12;
-        }
-    }
+		public static TimeFormat parse(String text) {
+			if (text != null) {
+				for (TimeFormat type : TimeFormat.values()) {
+					if (text.equalsIgnoreCase(type.toString())) {
+						return type;
+					}
+				}
+			}
+			return FORMAT_12;
+		}
+	}
 
+	public enum ChangeTimeZoneWorkflow {
+		ADB(0b001), // 1
+		SETTINGS(0b010), // 2
+		APK(0b100), // 4
+		ALL(0b111); // 7
+		private int workflow;
+
+		ChangeTimeZoneWorkflow(int workflow) {
+			this.workflow = workflow;
+		}
+
+		public int getWorkflow() {
+			return workflow;
+		}
+
+		public boolean isSupported(ChangeTimeZoneWorkflow workflow) {
+			return (this.workflow & workflow.getWorkflow()) > 0;
+		}
+	}
 
     private static AndroidService instance;
 
@@ -93,7 +107,7 @@ public class AndroidService {
         try {
             instance = new AndroidService();
         } catch (Exception e) {
-            throw new RuntimeException("Exception occurred in creating singleton AndroidService");
+            throw new RuntimeException("Exception occurred in creating singleton AndroidService!");
         }
     }
 
@@ -101,75 +115,56 @@ public class AndroidService {
         return instance;
     }
 
-    /**
-     * executeAbdCommand
-     *
-     * @param command String
-     * @return String in one line
-     */
-    public String executeAbdCommand(String command) {
-        String udid = DevicePool.getDeviceUdid();
-        if (!udid.isEmpty()) {
-            // add udid reference
-            command = "-s " + udid + " " + command;
-        }
+	/**
+	 * executeAbdCommand
+	 *
+	 * @param command
+	 *            String
+	 * @return String command output in one line
+	 */
+	public String executeAbdCommand(String command) {
+		String udid = DevicePool.getDeviceUdid();
+		if (!udid.isEmpty()) {
+			// add udid reference
+			command = "-s " + udid + " " + command;
+		}
 
-        LOGGER.info("Command: " + command);
-        String[] listOfCommands = command.split(" ");
+		String result = "";
+		LOGGER.info("Command: " + command);
+		String[] listOfCommands = command.split(" ");
 
-        String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
+		String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
 
-        LOGGER.info("Try to execute following cmd:" + CmdLine.arrayToString(execCmd));
-        List<String> execOutput = executor.execute(execCmd);
-        LOGGER.info("Output after execution ADB command: "
-                + execOutput);
+		try {
+			LOGGER.info("Try to execute following cmd:" + CmdLine.arrayToString(execCmd));
+			List<String> execOutput = executor.execute(execCmd);
+			LOGGER.info("Output after execution ADB command: " + execOutput);
 
-        String result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
+			result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
 
-        LOGGER.info("Returning Output: " + result);
+			LOGGER.info("Returning Output: " + result);
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
 
-        return result;
-    }
-
+		return result;
+	}
+    
     /**
      * expandStatusBar
      */
     public void expandStatusBar() {
-        String[] expandStatusBarCmd = null;
-        String udid = DevicePool.getDeviceUdid();
-
-        if (!udid.isEmpty()) {
-            expandStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "service", "call",
-                    "statusbar", "1");
-        } else {
-            expandStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "service", "call", "statusbar", "1");
-        }
-
-        LOGGER.info("Expand status bar cmd was built: " + CmdLine.arrayToString(expandStatusBarCmd));
-        LOGGER.debug("Try to expand Status bar with following cmd:" + CmdLine.arrayToString(expandStatusBarCmd));
-        List<String> expandOutput = executor.execute(expandStatusBarCmd);
-        LOGGER.debug("Output after attempt to expand status bar: " + expandOutput);
+        executeAbdCommand("shell service call statusbar 1");
     }
 
     /**
      * collapseStatusBar
      */
     public void collapseStatusBar() {
-        String[] collapseStatusBarCmd = null;
-        String udid = DevicePool.getDeviceUdid();
-        if (!udid.isEmpty()) {
-            collapseStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "service", "call",
-                    "statusbar", "2");
-        } else {
-            collapseStatusBarCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "service", "call", "statusbar",
-                    "2");
-        }
-
-        LOGGER.info("Collapse status bar cmd was built: " + CmdLine.arrayToString(collapseStatusBarCmd));
-        List<String> collapseOutput = executor.execute(collapseStatusBarCmd);
-        LOGGER.debug("Output after attempt to collapse status bar: " + collapseOutput);
+        executeAbdCommand("shell service call statusbar 2");
     }
 
+    //TODO: move notifications methods into separate class if possible. Maybe declare notification service instance inside AndroidService 
     /**
      * getNotifications
      *
@@ -197,6 +192,7 @@ public class AndroidService {
 
         LOGGER.info("getNotifications cmd was built: " + CmdLine.arrayToString(getNotificationsCmd));
 
+        //TODO: migrate to executeAbdCommand later
         List<Notification> resultList = new ArrayList<Notification>();
         List<String> notificationsOutput = executor.execute(getNotificationsCmd);
         Notification notification = new Notification();
@@ -347,7 +343,8 @@ public class AndroidService {
      * @param partially     boolean
      * @return boolean
      */
-    public boolean findExpectedNotification(String expectedTitle, String expectedText, boolean partially) {
+    @SuppressWarnings("rawtypes")
+	public boolean findExpectedNotification(String expectedTitle, String expectedText, boolean partially) {
         //open notification
         try {
             ((AndroidDriver) getDriver()).openNotifications();
@@ -439,11 +436,7 @@ public class AndroidService {
      * Open developer settings on device
      */
     public void openDeveloperOptions() {
-        try {
-            executeAbdCommand("shell am start -n com.android.settings/.DevelopmentSettings");
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
+        executeAbdCommand("shell am start -n com.android.settings/.DevelopmentSettings");
     }
 
     /**
@@ -453,17 +446,13 @@ public class AndroidService {
      * @param timeFormat  - can be 12 or 24. Or empty.
      */
     public void openDateTimeSettingsSetupWizard(boolean turnOffAuto, TimeFormat timeFormat) {
-        try {
-            if (turnOffAuto) {
-                switchDeviceAutoTimeAndTimeZone(false);
-            }
+		if (turnOffAuto) {
+			switchDeviceAutoTimeAndTimeZone(false);
+		}
 
-            setSystemTime(timeFormat);
+		setSystemTime(timeFormat);
 
-            openApp("com.android.settings/.DateTimeSettingsSetupWizard");
-        } catch (Exception e) {
-            LOGGER.error("Exception: " + e);
-        }
+		openApp("com.android.settings/.DateTimeSettingsSetupWizard");
     }
 
     /**
@@ -473,18 +462,14 @@ public class AndroidService {
      * @param timeFormat  - can be 12 or 24. Or empty.
      */
     public void openTZChangingApk(boolean turnOffAuto, TimeFormat timeFormat) {
-        try {
-            if (turnOffAuto) {
-                switchDeviceAutoTimeAndTimeZone(false);
-            }
+		if (turnOffAuto) {
+			switchDeviceAutoTimeAndTimeZone(false);
+		}
 
-            setSystemTime(timeFormat);
+		setSystemTime(timeFormat);
 
-            openApp("com.futurek.android.tzc/com.futurek.android.tzc.MainActivity");
-            pause(2);
-        } catch (Exception e) {
-            LOGGER.error("Exception. ", e);
-        }
+		openApp("com.futurek.android.tzc/com.futurek.android.tzc.MainActivity");
+		pause(2);
     }
 
 	private void setSystemTime(TimeFormat timeFormat) {
@@ -504,20 +489,15 @@ public class AndroidService {
      *
      * @param autoSwitch boolean. If true - auto Time and TimeZone will be set as On.
      */
-    public void switchDeviceAutoTimeAndTimeZone(boolean autoSwitch) {
-        try {
-            if (autoSwitch) {
-                executeAbdCommand("shell settings put global auto_time 1");
-                executeAbdCommand("shell settings put global auto_time_zone 1");
-            } else {
-                executeAbdCommand("shell settings put global auto_time 0");
-                executeAbdCommand("shell settings put global auto_time_zone 0");
-            }
+	public void switchDeviceAutoTimeAndTimeZone(boolean autoSwitch) {
+		String value = "0";
+		if (autoSwitch) {
+			value = "1";
+		}
 
-        } catch (Exception e) {
-            LOGGER.error("Exception. ", e);
-        }
-    }
+		executeAbdCommand("shell settings put global auto_time " + value);
+		executeAbdCommand("shell settings put global auto_time_zone " + value);
+	}
 
     /**
      * @param turnOffAuto boolean
@@ -540,12 +520,7 @@ public class AndroidService {
 
         if (!isTzOpened) {
             LOGGER.info("Probably TimeZone Changer APK was not installed correctly. Try to reinstall.");
-            try {
-                installTZChangerApk(false);
-            } catch (Exception e) {
-                LOGGER.error("Error during TZ Changer installation: ", e);
-            }
-
+            installTZChangerApk();
             openTZChangingApk(turnOffAuto, timeFormat);
         }
 
@@ -603,12 +578,8 @@ public class AndroidService {
         String packageName = executor.getApkPackageName(String apkFile);
         executor.clearAppData(Device device, String appPackage);
         */
-        String result = "";
-        try {
-            result = executeAbdCommand("shell pm clear " + appPackageName);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
+        String result = executeAbdCommand("shell pm clear " + appPackageName);
+        
         if (result.contains("Success")) {
             LOGGER.info("Cache was cleared correctly");
             return true;
@@ -625,12 +596,7 @@ public class AndroidService {
      * @return String
      */
     public String getCurrentDeviceFocus() {
-        String result = "";
-        try {
-            result = executeAbdCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
+        String result = executeAbdCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
         return result;
     }
 
@@ -642,94 +608,8 @@ public class AndroidService {
     public boolean isStatusBarExpanded() {
         NotificationPage notificationPage = new NotificationPage(getDriver());
         return notificationPage.isStatusBarExpanded();
-
     }
 
-
-    /**
-     * setDeviceTimeZoneByADB
-     *
-     * @param timeZone      String
-     * @param timeFormat    TimeFormat
-     * @param deviceSetDate String in format yyyyMMdd.HHmmss. Can be empty.
-     * @return String
-     */
-    public String setDeviceTimeZoneByADB(String timeZone, TimeFormat timeFormat, String deviceSetDate) {
-        boolean changeDateTime = true;
-        //TODO: tzGMT
-        String tzGMT = "";
-        if (deviceSetDate.isEmpty()) {
-            changeDateTime = false;
-        }
-        DeviceTimeZone dt = new DeviceTimeZone(false, false, timeFormat, timeZone, tzGMT, deviceSetDate, changeDateTime, true);
-        return setDeviceTimeZoneByADB(dt);
-    }
-
-    /**
-     * setDeviceTimeZoneByADB
-     * Automatic date and time = OFF (settings - date and time)
-     * adb shell settings put global auto_time 0
-     * Automatic time zone = OFF (settings - date and time)
-     * adb shell settings put global auto_time_zone 0
-     * <p>
-     * Set Time Zone on device
-     * adb shell setprop persist.sys.timezone "America/Chicago"
-     * <p>
-     * Check timezones:
-     * <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">List_of_tz_database_time_zones</a>
-     * <p>
-     * Check time on device
-     * adb shell date -s %mynow%
-     * <p>
-     * Restart application
-     *
-     * @param dt DeviceTimeZone
-     * @return String actual Device Date and Time
-     */
-    public String setDeviceTimeZoneByADB(DeviceTimeZone dt) {
-
-        if (dt == null) {
-            LOGGER.error("DeviceTimeZone is not initialised.");
-            dt = new DeviceTimeZone();
-        }
-        LOGGER.info(dt.toString());
-
-        try {
-            if (dt.isAutoTime()) {
-                executeAbdCommand("shell settings put global auto_time 1");
-            } else {
-                executeAbdCommand("shell settings put global auto_time 0");
-            }
-
-            if (dt.isAutoTimezone()) {
-                executeAbdCommand("shell settings put global auto_time_zone 1");
-            } else {
-                executeAbdCommand("shell settings put global auto_time_zone 0");
-            }
-
-            setSystemTime(dt.getTimeFormat());
-            
-            if (!dt.getTimezone().isEmpty()) {
-                executeAbdCommand("shell setprop persist.sys.timezone \"" + dt.getTimezone() + "\"");
-            }
-
-            if (dt.isRefreshDeviceTime()) {
-                executeAbdCommand("shell am broadcast -a android.intent.action.TIME_SET");
-            }
-
-            if (dt.isChangeDateTime() && !dt.getSetDeviceDateTime().isEmpty()) {
-                //Try to set date for device but it will not work on not rooted devices
-                executeAbdCommand("shell date " + dt.getSetDeviceDateTime());
-            }
-
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-
-        String actualDT = executeAbdCommand("shell date -s %mynow%");
-        LOGGER.info(actualDT);
-        return actualDT;
-    }
 
     /**
      * get Device Time Zone
@@ -751,52 +631,48 @@ public class AndroidService {
         getDriver(); //start driver in before class to assign it for particular thread
         DeviceTimeZone dt = new DeviceTimeZone();
 
-        try {
-            String value = executeAbdCommand("shell settings get global auto_time");
-            if (value.contains("0")) {
-                dt.setAutoTime(false);
-            } else {
-                dt.setAutoTime(true);
-            }
+		String value = executeAbdCommand("shell settings get global auto_time");
+		if (value.contains("0")) {
+			dt.setAutoTime(false);
+		} else {
+			dt.setAutoTime(true);
+		}
 
-            value = executeAbdCommand("shell settings get global auto_time_zone");
-            if (value.contains("0")) {
-                dt.setAutoTimezone(false);
-            } else {
-                dt.setAutoTimezone(true);
-            }
+		value = executeAbdCommand("shell settings get global auto_time_zone");
+		if (value.contains("0")) {
+			dt.setAutoTimezone(false);
+		} else {
+			dt.setAutoTimezone(true);
+		}
 
-            value = executeAbdCommand("shell settings get system time_12_24");
-            if (value.contains("12")) {
-                dt.setTimeFormat(TimeFormat.FORMAT_12);
-            } else {
-                dt.setTimeFormat(TimeFormat.FORMAT_24);
-            }
+		value = executeAbdCommand("shell settings get system time_12_24");
+		if (value.contains("12")) {
+			dt.setTimeFormat(TimeFormat.FORMAT_12);
+		} else {
+			dt.setTimeFormat(TimeFormat.FORMAT_24);
+		}
 
-            if (defaultTZ.isEmpty()) {
-                value = executeAbdCommand("shell getprop persist.sys.timezone");
-                if (!value.isEmpty()) {
-                    dt.setTimezone(value);
-                }
-            } else {
-                dt.setTimezone(defaultTZ);
-            }
+		if (defaultTZ.isEmpty()) {
+			value = executeAbdCommand("shell getprop persist.sys.timezone");
+			if (!value.isEmpty()) {
+				dt.setTimezone(value);
+			}
+		} else {
+			dt.setTimezone(defaultTZ);
+		}
 
-            value = executeAbdCommand("shell date -s %mynow%");
-            LOGGER.info(value);
-            if (!value.isEmpty()) {
-                value = convertDateInCorrectString(parseOutputDate(value));
-                dt.setSetDeviceDateTime(value);
-                LOGGER.info(value);
-            }
+		value = executeAbdCommand("shell date -s %mynow%");
+		LOGGER.info(value);
+		if (!value.isEmpty()) {
+			value = convertDateInCorrectString(parseOutputDate(value));
+			dt.setSetDeviceDateTime(value);
+			LOGGER.info(value);
+		}
 
-            dt.setChangeDateTime(false);
-            dt.setRefreshDeviceTime(true);
+		dt.setChangeDateTime(false);
+		dt.setRefreshDeviceTime(true);
 
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-        LOGGER.info(dt.toString());
+		LOGGER.info(dt.toString());
 
         return dt;
     }
@@ -807,23 +683,27 @@ public class AndroidService {
      * @return String
      */
     public String getDeviceActualTimeZone() {
-        String res = "";
-        try {
-
-            String value = executeAbdCommand("shell getprop persist.sys.timezone");
-            if (!value.isEmpty()) {
-                res = value;
-                LOGGER.info(value);
-            }
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-        return res;
+		String value = executeAbdCommand("shell getprop persist.sys.timezone");
+		if (!value.isEmpty()) {
+			LOGGER.info(value);
+		}
+        return value;
     }
 
 
     //Start of TimeZone Setting section
 
+    /**
+     * set Device TimeZone using all supported workflows. By ADB and Settings
+     *
+     * @param timeZone   String required timeZone
+     * @param timeFormat String 12 or 24
+     * @param settingsTZ TimeFormat
+     * @return boolean
+     */
+    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat) {
+    	return setDeviceTimeZone(timeZone, settingsTZ, timeFormat, ChangeTimeZoneWorkflow.ALL);
+    }
     /**
      * set Device TimeZone. By ADB and Settings
      *
@@ -832,107 +712,145 @@ public class AndroidService {
      * @param settingsTZ TimeFormat
      * @return boolean
      */
-    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat) {
-
+    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, ChangeTimeZoneWorkflow workflow) {
         boolean changed = false;
-
+        
         getDriver(); //start driver in before class to assign it for particular thread
         String actualTZ = getDeviceActualTimeZone();
+        
+        if (isRequiredTimeZone(actualTZ, timeZone)) {
+            LOGGER.info("Required TimeZone is already set.");
+            return true;
+        }
 
-        String variant = "all";
         String currentAndroidVersion = Configuration.get(Configuration.Parameter.MOBILE_PLATFORM_VERSION);
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
         if (currentAndroidVersion.contains("7.")) {
             LOGGER.info("TimeZone changing for Android 7+ works only by TimeZone changer apk.");
-            variant = "3";
+            workflow = ChangeTimeZoneWorkflow.APK;
         }
-
-        if (comparingExpectedAndActualTZ(actualTZ, timeZone)) {
-            LOGGER.info("Required timeZone is already set.");
-            return true;
-        }
-
-        String deviceSetDate = "";
 
         //Solution for ADB timezone changing.
-        if (variant.equals("all") || variant.contains("1")) {
-            LOGGER.info("Solution for ADB timezone changing.");
-            String response = setDeviceTimeZoneByADB(timeZone, timeFormat, deviceSetDate);
-
-            LOGGER.info(response);
-
-            actualTZ = getDeviceActualTimeZone();
-            if (comparingExpectedAndActualTZ(actualTZ, timeZone)) {
-                LOGGER.info("Required timeZone '" + timeZone + "' was set by ADB.");
-                try {
-                    LOGGER.info("Restart driver when correct TimeZone set.");
-                    DriverPool.restartDriver();
-                } catch (AssertionError err) {
-                    LOGGER.error("Assertion error. ", err);
-                } catch (Exception e) {
-                    LOGGER.error("Error restarting driver: ", e);
-                }
-                changed = true;
-            } else {
-                LOGGER.error("TimeZone was not changed by ADB. Actual TZ is: " + actualTZ);
-                changed = false;
-            }
+        if (ChangeTimeZoneWorkflow.ADB.isSupported(workflow)) {
+            LOGGER.info("Try to change TimeZone by ADB");
+            LOGGER.info(setDeviceTimeZoneByADB(timeZone, timeFormat, ""));
+            changed = applyTZChanges(ChangeTimeZoneWorkflow.ADB, timeZone);
         }
 
-        //Solution for timezone changing by device Settings. (Tested on S7, Note 3, S6, S5).
-        if (!changed) {
-            if (variant.equals("all") || variant.contains("2")) {
-                LOGGER.info("Try to change TimeZone by Device Settings");
-                changed = setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat);
-                if (changed) {
-                    LOGGER.info("Required timeZone '" + timeZone + "' was set by device Settings.");
-                    try {
-                        LOGGER.info("Restart driver at the end of Settings change.");
-                        DriverPool.restartDriver();
-                    } catch (AssertionError err) {
-                        LOGGER.error("Assertion error. ", err);
-                    } catch (Exception e) {
-                        LOGGER.error("Error restarting driver: ", e);
-                    }
-                }
-            }
-        }
+		// Solution for timezone changing by device Settings. (Tested on S7, Note 3, S6, S5).
+		if (!changed && ChangeTimeZoneWorkflow.SETTINGS.isSupported(workflow)) {
+			LOGGER.info("Try to change TimeZone by Device Settings");
+			setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat);
+			changed = applyTZChanges(ChangeTimeZoneWorkflow.SETTINGS, timeZone);
+		}
 
-        //Solution for using TimeZone Changer apk.
-        if (!changed) {
-            if (variant.equals("all") || variant.contains("3")) {
-                LOGGER.info("Use TimeZone Changer apk.");
-                changed = setDeviceTimeZoneByChangerApk(timeZone, timeFormat);
-                try {
-                    LOGGER.info("Restart driver at the end of usage TimeZone change apk.");
-                    DriverPool.restartDriver();
-                } catch (AssertionError err) {
-                    LOGGER.error("Assertion error. ", err);
-                } catch (Exception e) {
-                    LOGGER.error("Error restarting driver: ", e);
-                }
-            }
-        }
+		// Solution for using TimeZone Changer apk.
+		if (!changed && ChangeTimeZoneWorkflow.APK.isSupported(workflow)) {
+			LOGGER.info("Try to change TimeZone by TimeZone Changer apk.");
+			setDeviceTimeZoneByChangerApk(timeZone, timeFormat);
+			changed = applyTZChanges(ChangeTimeZoneWorkflow.APK, timeZone);
+		}
         return changed;
     }
 
+    /**
+     * setDeviceTimeZoneByADB
+     *
+     * @param timeZone      String
+     * @param timeFormat    TimeFormat
+     * @param deviceSetDate String in format yyyyMMdd.HHmmss. Can be empty.
+     * @return String
+     */
+    private String setDeviceTimeZoneByADB(String timeZone, TimeFormat timeFormat, String deviceSetDate) {
+        boolean changeDateTime = true;
+        //TODO: tzGMT
+        String tzGMT = "";
+        if (deviceSetDate.isEmpty()) {
+            changeDateTime = false;
+        }
+        DeviceTimeZone dt = new DeviceTimeZone(false, false, timeFormat, timeZone, tzGMT, deviceSetDate, changeDateTime, true);
+        return setDeviceTimeZoneByADB(dt);
+    }
+    
+    /**
+     * setDeviceTimeZoneByADB
+     * Automatic date and time = OFF (settings - date and time)
+     * adb shell settings put global auto_time 0
+     * Automatic time zone = OFF (settings - date and time)
+     * adb shell settings put global auto_time_zone 0
+     * <p>
+     * Set Time Zone on device
+     * adb shell setprop persist.sys.timezone "America/Chicago"
+     * <p>
+     * Check timezones:
+     * <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">List_of_tz_database_time_zones</a>
+     * <p>
+     * Check time on device
+     * adb shell date -s %mynow%
+     * <p>
+     * Restart application
+     *
+     * @param dt DeviceTimeZone
+     * @return String actual Device Date and Time
+     */
+    private String setDeviceTimeZoneByADB(DeviceTimeZone dt) {
+
+        if (dt == null) {
+            LOGGER.error("DeviceTimeZone is not initialised.");
+            dt = new DeviceTimeZone();
+        }
+        LOGGER.info(dt.toString());
+
+		String autoTime = "0";
+		String autoTimeZone = "0";
+
+		if (dt.isAutoTime()) {
+			autoTime = "1";
+		}
+		executeAbdCommand("shell settings put global auto_time " + autoTime);
+
+		if (dt.isAutoTimezone()) {
+			autoTimeZone = "1";
+		}
+		executeAbdCommand("shell settings put global auto_time_zone " + autoTimeZone);
+
+		setSystemTime(dt.getTimeFormat());
+
+		if (!dt.getTimezone().isEmpty()) {
+			executeAbdCommand("shell setprop persist.sys.timezone \"" + dt.getTimezone() + "\"");
+		}
+
+		if (dt.isRefreshDeviceTime()) {
+			executeAbdCommand("shell am broadcast -a android.intent.action.TIME_SET");
+		}
+
+		if (dt.isChangeDateTime() && !dt.getSetDeviceDateTime().isEmpty()) {
+			// Try to set date for device but it will not work on not rooted
+			// devices
+			executeAbdCommand("shell date " + dt.getSetDeviceDateTime());
+		}
+
+        String actualDT = executeAbdCommand("shell date -s %mynow%");
+        LOGGER.info(actualDT);
+        return actualDT;
+    }
+    
     /**
      * setDeviceTimeZoneBySetting
      *
      * @param timeZone   String
      * @param settingsTZ String
      * @param timeFormat TimeFormat
-     * @return boolean
      */
-    public boolean setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat) {
+    private void setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat) {
 
         String actualTZ = getDeviceActualTimeZone();
 
         String tz = DeviceTimeZone.getTimezoneOffset(timeZone);
 
-        if (comparingExpectedAndActualTZ(actualTZ, timeZone)) {
+        if (isRequiredTimeZone(actualTZ, timeZone)) {
             LOGGER.info("Required timeZone is already set.");
-            return true;
+            return;
         }
 
         try {
@@ -962,14 +880,6 @@ public class AndroidService {
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
-        actualTZ = getDeviceActualTimeZone();
-        if (comparingExpectedAndActualTZ(actualTZ, timeZone)) {
-            LOGGER.info("Required timeZone '" + timeZone + "' was set by Settings.");
-            return true;
-        } else {
-            LOGGER.error("TimeZone was not changed by Settings. Actual TZ is: " + actualTZ);
-            return false;
-        }
     }
 
 
@@ -980,23 +890,24 @@ public class AndroidService {
      * @param timeFormat TimeFormat
      * @return boolean
      */
+    @Deprecated
     public boolean setDeviceTimeZoneByChangerApk(String timeZone, TimeFormat timeFormat) {
-
+    	//TODO: #1 - remove deprecation after making it private and void, It is recommended to use single method:
+    	//	setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, ChangeTimeZoneWorkflow workflow)
+    	
+    	//TODO: #2 - take a look and maybe remove boolean return value later
         String actualTZ = getDeviceActualTimeZone();
 
         String tz = DeviceTimeZone.getTimezoneOffset(timeZone);
         LOGGER.info("Required TimeZone offset: " + tz);
 
-        if (comparingExpectedAndActualTZ(actualTZ, timeZone)) {
+        if (isRequiredTimeZone(actualTZ, timeZone)) {
             LOGGER.info("Required timeZone is already set.");
             return true;
         }
 
-        try {
-            installTZChangerApk(false);
-        } catch (Exception e) {
-            LOGGER.error("Error during TZ Changer installation: ", e);
-        }
+        installTZChangerApk();
+        
 
         try {
 
@@ -1017,15 +928,9 @@ public class AndroidService {
             LOGGER.error("Exception: ", e);
         }
 
-
+		// TODO: #1 - remove getDeviceActualTimeZone and return
         actualTZ = getDeviceActualTimeZone();
-        if (comparingExpectedAndActualTZ(actualTZ, timeZone)) {
-            LOGGER.info("Required timeZone '" + timeZone + "' was set by TimeZoneChanger apk.");
-            return true;
-        } else {
-            LOGGER.error("TimeZone was not changed by TimeZoneChanger apk. Actual TZ is: '" + actualTZ + "' but expected: '" + timeZone + "'.");
-            return false;
-        }
+        return isRequiredTimeZone(actualTZ, timeZone);
     }
 
 
@@ -1047,66 +952,72 @@ public class AndroidService {
     }
 
     /**
-     * install android Apk. Should be put in src/main/resources/app
+     * install android Apk by path to apk file.
      * @param apkPath String
-     * @param standartUsage boolean
      */
+    public void installApk(final String apkPath) {
+    	installApk(apkPath, false);
+    }
     
-	public void installApk(final String apkClassPath, boolean standartUsage) {
+    /**
+     * install android Apk by path to apk or by name in classpath.
+     * @param apkPath String
+     * @param inClasspath boolean
+     */
+	public void installApk(final String apkPath, boolean inClasspath) {
 
-		URL baseResource = ClassLoader.getSystemResource(apkClassPath);
-		if (baseResource == null) {
-			throw new RuntimeException("Unable to get resource from classpath: " + apkClassPath);
-		} else {
-			LOGGER.debug("Resource was found: " + baseResource.getPath());
-		}
-		
-		String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." +	FilenameUtils.getExtension(baseResource.getPath());
-		//make temporary copy of resource in artifacts folder
-		String filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName; 
-		
-		File file = new File(filePath);
-		if (!file.exists()) {
-		     InputStream link = (ClassLoader.getSystemResourceAsStream(apkClassPath));
-		     try {
-				Files.copy(link, file.getAbsoluteFile().toPath());
-			} catch (IOException e) {
-				LOGGER.error("Unable to extract resource from ClassLoader!", e);
+		String filePath = apkPath;
+		if (inClasspath) {
+			URL baseResource = ClassLoader.getSystemResource(apkPath);
+			if (baseResource == null) {
+				throw new RuntimeException("Unable to get resource from classpath: " + apkPath);
+			} else {
+				LOGGER.debug("Resource was found: " + baseResource.getPath());
+			}
+
+			String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "."
+					+ FilenameUtils.getExtension(baseResource.getPath());
+			// make temporary copy of resource in artifacts folder
+			filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
+
+			File file = new File(filePath);
+			if (!file.exists()) {
+				InputStream link = (ClassLoader.getSystemResourceAsStream(apkPath));
+				try {
+					Files.copy(link, file.getAbsoluteFile().toPath());
+				} catch (IOException e) {
+					LOGGER.error("Unable to extract resource from ClassLoader!", e);
+				}
 			}
 		}
 		
-		
-        if (standartUsage) {
-            Device device = DevicePool.getDevice();        	
-
-            String defautlPropUninstall = R.CONFIG.get("mobile_app_uninstall");
-            String defautlPropInstall = R.CONFIG.get("mobile_app_install");
-            LOGGER.info("defautlPropUninstall = " + defautlPropUninstall);
-            LOGGER.info("defautlPropInstall = " + defautlPropInstall);
-            R.CONFIG.put("mobile_app_uninstall", "true");
-            R.CONFIG.put("mobile_app_install", "true");
-
-            executor.reinstallApp(device, filePath);
-
-            R.CONFIG.put("mobile_app_uninstall", defautlPropUninstall);
-            R.CONFIG.put("mobile_app_install", defautlPropInstall);
-        } else {
-            String res = executeAbdCommand("install " + filePath);
-            LOGGER.info(res);
-        }
-
+		executeAbdCommand("install " + filePath);
 	}
 
     /**
      * installTZChangerApk
-     *
-     * @param standartUsage boolean
      */
-    private void installTZChangerApk(boolean standartUsage) {
-        String TZ_CHANGE_APP_PATH = "app/TimeZone_Changer.apk";
-        installApk(TZ_CHANGE_APP_PATH,standartUsage);
+    private void installTZChangerApk() {
+        try {
+        	installApk(TZ_CHANGE_APP_PATH, true);
+        } catch (Exception e) {
+            LOGGER.error("Error during TZ Changer installation: ", e);
+        }
      }
 
+    private boolean applyTZChanges(ChangeTimeZoneWorkflow workflow, String expectedZone) {
+    	boolean res = false;
+        String actualTZ = getDeviceActualTimeZone();
+        if (isRequiredTimeZone(actualTZ, expectedZone)) {
+            LOGGER.info("Required timeZone '" + expectedZone + "' was set by " + workflow.toString() + ". Restarting driver to apply changes.");
+            DriverPool.restartDriver(true);
+            res = true;
+        } else {
+            LOGGER.error("TimeZone was not changed by " + workflow.toString() + ". Actual TZ is: " + actualTZ);
+        }
+        return res;
+    }
+    
     /**
      * comparingExpectedAndActualTZ
      *
@@ -1114,12 +1025,12 @@ public class AndroidService {
      * @param tz       String
      * @return boolean
      */
-    private boolean comparingExpectedAndActualTZ(String actualTZ, String tz) {
-        boolean res = actualTZ.equals(tz);
+    private boolean isRequiredTimeZone(String actualTZ, String expextedTZ) {
+        boolean res = actualTZ.equals(expextedTZ);
         if (!res) {
             String[] actTZ = actualTZ.split("/");
             String lastActTZ = actTZ[actTZ.length - 1];
-            String[] timeZoneTZ = tz.split("/");
+            String[] timeZoneTZ = expextedTZ.split("/");
             String lastTimeZoneTZ = timeZoneTZ[timeZoneTZ.length - 1];
             LOGGER.debug("Comparing '" + lastActTZ + "' with '" + lastTimeZoneTZ + "'.");
             res = lastActTZ.equals(lastTimeZoneTZ);
@@ -1127,7 +1038,7 @@ public class AndroidService {
         return res;
     }
 
-//End of TimeZone Setting section
+    //End of TimeZone Setting section
 
     //Private section
 
