@@ -107,42 +107,6 @@ public class AdbExecutor {
     }
 
 
-    public boolean isDeviceCorrect() {
-        return isDeviceCorrect(DevicePool.getDeviceUdid());
-    }
-
-    public boolean isDeviceCorrect(String udid) {
-    	
-    	//TODO: [VD] Think about moving this command onto the DevicePool creation to check it at once only!
-        ProcessBuilderExecutor executor = null;
-        BufferedReader in = null;
-        boolean correctDevice = false;
-        try {
-            String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", udid, "shell", "getprop", "ro.build.version.sdk");
-            executor = new ProcessBuilderExecutor(cmd);
-
-            Process process = executor.start();
-            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = in.readLine();
-            LOGGER.debug("sdkVersion: " + line);
-            if (line != null) {
-                int sdkVersion = Integer.parseInt(line);
-                correctDevice = sdkVersion >= 19;
-            } else {
-                LOGGER.error("SDK version for '" + DevicePool.getDevice(udid).getName() + "' device is not recognized!");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return correctDevice;
-        } finally {
-            closeQuietly(in);
-            ProcessBuilderExecutor.gcNullSafe(executor);
-
-        }
-        return correctDevice;
-    }
-
     public List<String> execute(String[] cmd) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
@@ -171,13 +135,13 @@ public class AdbExecutor {
     }
 
     public int startRecording(String pathToFile) {
-        if (!isDeviceCorrect())
-            return -1;
-
         if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
             return -1;
         }
-
+        
+        if (DevicePool.getDevice().isNull())
+        	return -1;
+        
         dropFile(pathToFile);
 
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "screenrecord", "--bit-rate", "6000000", "--verbose", pathToFile);
@@ -198,9 +162,6 @@ public class AdbExecutor {
         if (DevicePool.getDevice().isNull())
         	return;
         
-        if (!isDeviceCorrect())
-            return;
-
         if (pid != -1) {
             Platform.killProcesses(Arrays.asList(pid));
         }
@@ -211,8 +172,6 @@ public class AdbExecutor {
         if (DevicePool.getDevice().isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "pull", pathFrom, pathTo);
         execute(cmd);
     }
@@ -221,8 +180,6 @@ public class AdbExecutor {
         if (DevicePool.getDevice().isNull())
         	return;
 
-        if (!isDeviceCorrect())
-            return;
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "-s", DevicePool.getDeviceUdid(), "shell", "rm", pathToFile);
         execute(cmd);
     }
@@ -239,9 +196,6 @@ public class AdbExecutor {
     public void pressKey(int key) {
         if (DevicePool.getDevice().isNull())
         	return;
-
-        if (!isDeviceCorrect())
-            return;
 
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", DevicePool.getDeviceUdid(), "shell", "input", "keyevent", String.valueOf(key));
         execute(cmd);
@@ -265,9 +219,6 @@ public class AdbExecutor {
         if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect(device.getUdid()))
-            return;
-
         //adb -s UDID shell pm clear com.myfitnesspal.android
         String packageName = getApkPackageName(Configuration.get(Parameter.MOBILE_APP));
 
@@ -280,9 +231,6 @@ public class AdbExecutor {
         if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect(device.getUdid()))
-            return;
-
         //adb -s UDID uninstall com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "uninstall", packageName);
         execute(cmd);
@@ -292,9 +240,6 @@ public class AdbExecutor {
         if (device.isNull())
         	return;
 
-        if (!isDeviceCorrect(device.getUdid()))
-            return;
-
         //adb -s UDID install com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
         execute(cmd);
@@ -303,9 +248,6 @@ public class AdbExecutor {
     public synchronized void installAppSync(Device device, String packageName) {
         if (device.isNull())
         	return;
-
-        if (!isDeviceCorrect(device.getUdid()))
-            return;
 
         //adb -s UDID install com.myfitnesspal.android
         String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "-s", device.getUdid(), "install", packageName);
@@ -384,9 +326,6 @@ public class AdbExecutor {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode
         if (device.isNull())
         	return null;
-
-        if (!isDeviceCorrect(device.getUdid()))
-            return null;
 
         String[] res = new String[3];
         res[0] = packageName;
@@ -570,10 +509,6 @@ public class AdbExecutor {
 
         String udid = DevicePool.getDeviceUdid();
 
-        if (!isDeviceCorrect(udid)) {
-            return;
-        }
-
         Boolean screenState = getScreenState(udid);
         if (screenState == null) {
             return;
@@ -610,9 +545,6 @@ public class AdbExecutor {
         	return;
         
         String udid = DevicePool.getDeviceUdid();
-        if (!isDeviceCorrect(udid)) {
-            return;
-        }
 
         Boolean screenState = getScreenState(udid);
         if (screenState == null) {
