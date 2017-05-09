@@ -18,7 +18,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
@@ -505,10 +504,11 @@ public class AndroidService {
      * @param attemps     int
      * @return boolean
      */
-    private boolean forceTZChangingApkOpen(boolean turnOffAuto, TimeFormat timeFormat, int attemps) {
+    private boolean forceTZChangingApkOpen(boolean turnOffAuto, TimeFormat timeFormat) {
         boolean res = false;
 
         String tzPackageName = "com.futurek.android.tzc";
+        int attemps = 3;
 
         boolean isTzOpened = checkCurrentDeviceFocus(tzPackageName);
         while (!isTzOpened && attemps > 0) {
@@ -520,7 +520,7 @@ public class AndroidService {
 
         if (!isTzOpened) {
             LOGGER.info("Probably TimeZone Changer APK was not installed correctly. Try to reinstall.");
-            installTZChangerApk();
+            installApk(TZ_CHANGE_APP_PATH, true);
             openTZChangingApk(turnOffAuto, timeFormat);
         }
 
@@ -723,7 +723,7 @@ public class AndroidService {
             return true;
         }
 
-        String currentAndroidVersion = Configuration.get(Configuration.Parameter.MOBILE_PLATFORM_VERSION);
+        String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
         if (currentAndroidVersion.contains("7.")) {
             LOGGER.info("TimeZone changing for Android 7+ works only by TimeZone changer apk.");
@@ -906,12 +906,11 @@ public class AndroidService {
             return true;
         }
 
-        installTZChangerApk();
+        installApk(TZ_CHANGE_APP_PATH, true);
         
 
         try {
-
-            forceTZChangingApkOpen(true, timeFormat, 3);
+            forceTZChangingApkOpen(true, timeFormat);
 
             TZChangerPage tzChangerPage = new TZChangerPage(getDriver());
 
@@ -993,17 +992,6 @@ public class AndroidService {
 		
 		executeAbdCommand("install " + filePath);
 	}
-
-    /**
-     * installTZChangerApk
-     */
-    private void installTZChangerApk() {
-        try {
-        	installApk(TZ_CHANGE_APP_PATH, true);
-        } catch (Exception e) {
-            LOGGER.error("Error during TZ Changer installation: ", e);
-        }
-     }
 
     private boolean applyTZChanges(ChangeTimeZoneWorkflow workflow, String expectedZone) {
     	boolean res = false;
