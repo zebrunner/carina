@@ -1,6 +1,23 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
+import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
@@ -13,19 +30,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
+
 import io.appium.java_client.android.AndroidDriver;
-import org.apache.log4j.Logger;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 public class AndroidService {
 
@@ -417,9 +423,8 @@ public class AndroidService {
             }
             LOGGER.debug("Page source [expand status bar]: ".concat(
                     getDriver().getPageSource()));
-            TestLogCollector.addScreenshotComment(
-                    Screenshot.capture(getDriver(), true),
-                    "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
+			Screenshot.capture(getDriver(),
+					"Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
             try {
                 notificationPage.clearNotifications();
             } catch (Exception e) {
@@ -453,20 +458,8 @@ public class AndroidService {
                 switchDeviceAutoTimeAndTimeZone(false);
             }
 
-            switch (timeFormat) {
-                case FORMAT_12: {
-                    LOGGER.info("Set 12 hours format");
-                    executeAbdCommand("shell settings put system time_12_24 12");
-                    break;
-                }
-                case FORMAT_24: {
-                    LOGGER.info("Set 24 hours format");
-                    executeAbdCommand("shell settings put system time_12_24 24");
-                    break;
-                }
-            }
+            setSystemTime(timeFormat);
 
-            //executeAbdCommand("shell am start -n com.android.settings/.DateTimeSettingsSetupWizard");
             openApp("com.android.settings/.DateTimeSettingsSetupWizard");
         } catch (Exception e) {
             LOGGER.error("Exception: " + e);
@@ -485,18 +478,7 @@ public class AndroidService {
                 switchDeviceAutoTimeAndTimeZone(false);
             }
 
-            switch (timeFormat) {
-                case FORMAT_12: {
-                    LOGGER.info("Set 12 hours format");
-                    executeAbdCommand("shell settings put system time_12_24 12");
-                    break;
-                }
-                case FORMAT_24: {
-                    LOGGER.info("Set 24 hours format");
-                    executeAbdCommand("shell settings put system time_12_24 24");
-                    break;
-                }
-            }
+            setSystemTime(timeFormat);
 
             openApp("com.futurek.android.tzc/com.futurek.android.tzc.MainActivity");
             pause(2);
@@ -505,6 +487,18 @@ public class AndroidService {
         }
     }
 
+	private void setSystemTime(TimeFormat timeFormat) {
+		switch (timeFormat) {
+		case FORMAT_12:
+			LOGGER.info("Set 12 hours format");
+			executeAbdCommand("shell settings put system time_12_24 12");
+			break;
+		case FORMAT_24:
+			LOGGER.info("Set 24 hours format");
+			executeAbdCommand("shell settings put system time_12_24 24");
+			break;
+		}
+	}
     /**
      * switchDeviceAutoTimeAndTimeZone
      *
@@ -713,19 +707,8 @@ public class AndroidService {
                 executeAbdCommand("shell settings put global auto_time_zone 0");
             }
 
-            switch (dt.getTimeFormat()) {
-                case FORMAT_12: {
-                    LOGGER.info("Set 12 hours format");
-                    executeAbdCommand("shell settings put system time_12_24 12");
-                    break;
-                }
-                case FORMAT_24: {
-                    LOGGER.info("Set 24 hours format");
-                    executeAbdCommand("shell settings put system time_12_24 24");
-                    break;
-                }
-            }
-
+            setSystemTime(dt.getTimeFormat());
+            
             if (!dt.getTimezone().isEmpty()) {
                 executeAbdCommand("shell setprop persist.sys.timezone \"" + dt.getTimezone() + "\"");
             }
@@ -1067,21 +1050,35 @@ public class AndroidService {
      * install android Apk. Should be put in src/main/resources/app
      * @param apkPath String
      * @param standartUsage boolean
-     * @return boolean
      */
-    public boolean installApk(String apkPath, boolean standartUsage) {
-        String path = "";
-        boolean ret = true;
-        try {
-            path = getResourceFilePath(apkPath);
-        } catch (Exception e) {
-            LOGGER.error(e);
-            return false;
-        }
-        LOGGER.info("Path: " + path);
+    
+	public void installApk(final String apkClassPath, boolean standartUsage) {
 
+		URL baseResource = ClassLoader.getSystemResource(apkClassPath);
+		if (baseResource == null) {
+			throw new RuntimeException("Unable to get resource from classpath: " + apkClassPath);
+		} else {
+			LOGGER.debug("Resource was found: " + baseResource.getPath());
+		}
+		
+		String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." +	FilenameUtils.getExtension(baseResource.getPath());
+		//make temporary copy of resource in artifacts folder
+		String filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName; 
+		
+		File file = new File(filePath);
+		if (!file.exists()) {
+		     InputStream link = (ClassLoader.getSystemResourceAsStream(apkClassPath));
+		     try {
+				Files.copy(link, file.getAbsoluteFile().toPath());
+			} catch (IOException e) {
+				LOGGER.error("Unable to extract resource from ClassLoader!", e);
+			}
+		}
+		
+		
         if (standartUsage) {
-            Device device = DevicePool.getDevice();
+            Device device = DevicePool.getDevice();        	
+
             String defautlPropUninstall = R.CONFIG.get("mobile_app_uninstall");
             String defautlPropInstall = R.CONFIG.get("mobile_app_install");
             LOGGER.info("defautlPropUninstall = " + defautlPropUninstall);
@@ -1089,23 +1086,16 @@ public class AndroidService {
             R.CONFIG.put("mobile_app_uninstall", "true");
             R.CONFIG.put("mobile_app_install", "true");
 
-            executor.reinstallApp(device, path);
+            executor.reinstallApp(device, filePath);
 
             R.CONFIG.put("mobile_app_uninstall", defautlPropUninstall);
             R.CONFIG.put("mobile_app_install", defautlPropInstall);
         } else {
-            String res = executeAbdCommand("install " + path);
+            String res = executeAbdCommand("install " + filePath);
             LOGGER.info(res);
         }
-        return ret;
-    }
 
-    /**
-     * installTZChangerApk with standard usage
-     */
-    private void installTZChangerApk() {
-        installTZChangerApk(true);
-    }
+	}
 
     /**
      * installTZChangerApk
@@ -1114,51 +1104,8 @@ public class AndroidService {
      */
     private void installTZChangerApk(boolean standartUsage) {
         String TZ_CHANGE_APP_PATH = "app/TimeZone_Changer.apk";
-        boolean res = installApk(TZ_CHANGE_APP_PATH,standartUsage);
-        if(res) {
-            LOGGER.info("Application '"+TZ_CHANGE_APP_PATH+"' was successfully installed.");
-        } else {
-            LOGGER.info("Application '"+TZ_CHANGE_APP_PATH+"' was NOT installed.");
-        }
+        installApk(TZ_CHANGE_APP_PATH,standartUsage);
      }
-
-    /**
-     * getResourceFilePath
-     *
-     * @param resourceFileName String
-     * @return String
-     * @throws Exception error
-     */
-    private String getResourceFilePath(String resourceFileName) throws Exception {
-        String filePath = "";
-        try {
-            filePath = URLDecoder.decode(getClass().getClassLoader().getResource(resourceFileName).getFile(), "utf-8");
-            LOGGER.info("Path1: " + filePath);
-            String filePath2 = URLDecoder.decode(getClass().getClassLoader().getSystemResource(resourceFileName).getFile(), "utf-8");
-            LOGGER.info("Path2: " + filePath2);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Error in path decoding for '" + resourceFileName + "' : " + e);
-        } catch (Exception e) {
-            LOGGER.error("Error for '" + resourceFileName + "' : " + e);
-            try {
-                String filePath2 = URLDecoder.decode(getClass().getClassLoader().getSystemResource(resourceFileName).getFile(), "utf-8");
-                LOGGER.info("Path2: " + filePath2);
-                filePath = filePath2;
-            } catch (Exception e2) {
-                LOGGER.error("Error for Path 2 '" + resourceFileName + "' : " + e);
-                throw new Exception("Error in getting resources for " + resourceFileName);
-            }
-        }
-        if (filePath.contains(":")) {
-            LOGGER.info("Windows execution. Return with substring.");
-            filePath = filePath.substring(1);
-        } else {
-            if (filePath.startsWith("/")) {
-                LOGGER.info("Path is correct: " + filePath);
-            } else filePath = "/" + filePath;
-        }
-        return filePath;
-    }
 
     /**
      * comparingExpectedAndActualTZ
