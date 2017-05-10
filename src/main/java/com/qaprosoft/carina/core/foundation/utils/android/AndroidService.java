@@ -718,6 +718,7 @@ public class AndroidService {
             res = fakeGpsPage.locationSearch(location);
             if (res) {
                 LOGGER.info("Set Fake GPS locale: " + location);
+                AndroidUtils.hideKeyboard();
                 fakeGpsPage.clickSetLocation();
             }
             DriverPool.restartDriver(true);
