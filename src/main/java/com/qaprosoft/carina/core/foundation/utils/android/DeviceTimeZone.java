@@ -52,7 +52,11 @@ public class DeviceTimeZone {
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
         this.timezone = timezone;
-        this.gmt = gmt;
+        if (gmt.isEmpty()) {
+            this.gmt = getTZforID();
+        } else {
+            this.gmt = gmt;
+        }
         this.setDeviceDateTime = setDeviceDateTime;
         this.changeDateTime = changeDateTime;
         this.refreshDeviceTime = refreshDeviceTime;
