@@ -1,10 +1,9 @@
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications;
 
-import java.util.List;
-
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 import io.appium.java_client.MobileBy;
 import org.apache.log4j.Logger;
@@ -13,9 +12,9 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import org.openqa.selenium.support.FindBys;
+
+import java.util.List;
 
 public class NotificationPage extends MobileAbstractPage {
 
