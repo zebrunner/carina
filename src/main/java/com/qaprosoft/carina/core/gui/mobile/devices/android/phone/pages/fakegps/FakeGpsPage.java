@@ -77,6 +77,7 @@ public class FakeGpsPage extends MobileAbstractPage {
 
     public void clickSetLocation() {
         if (setLocationStart.isElementPresent(1)) {
+            LOGGER.info("Start Fake GPS");
             setLocationStart.click();
         } else {
             LOGGER.info("Old app");
@@ -95,6 +96,7 @@ public class FakeGpsPage extends MobileAbstractPage {
                 inputLocationNew.type(location);
                 ((AndroidDriver<AndroidElement>) getDriver()).pressKeyCode(AndroidKeyCode.ENTER);
                 ((AndroidDriver<AndroidElement>) getDriver()).pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
+                pause(3);
                 return true;
             }
         } else {
