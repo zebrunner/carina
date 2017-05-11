@@ -15,7 +15,42 @@
  */
 package com.qaprosoft.carina.core.foundation;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
+import org.testng.xml.XmlTest;
+
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
@@ -35,7 +70,11 @@ import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.*;
+import com.qaprosoft.carina.core.foundation.utils.DateUtils;
+import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -44,28 +83,6 @@ import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.SkipException;
-import org.testng.annotations.*;
-import org.testng.xml.XmlTest;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -575,25 +592,56 @@ public abstract class AbstractTest // extends DriverHelper
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
-    /**
-     * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
-     */
-    protected void updateS3AppPath() {
-        Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
-        // get app path to be sure that we need(do not need) to download app from s3 bucket
-        String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
-        Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
-        if (matcher.find()) {
-            String bucketName = matcher.group(1);
-            String key = matcher.group(2);
-            String[] array = mobileAppPath.split("/");
-            String fileName = array[array.length - 1];
-            File file = new File(fileName);
-            LOGGER.info(String.format("Following data was extracted: %s, %s, %s", bucketName, key, file.getAbsolutePath()));
-            AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
-            R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
-        }
-    }
+	/**
+	 * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
+	 */
+	private void updateS3AppPath() {
+		Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
+		// get app path to be sure that we need(do not need) to download app
+		// from s3 bucket
+		String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+		Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+
+		if (matcher.find()) {
+			String bucketName = matcher.group(1);
+			String key = matcher.group(2);
+			Pattern pattern = Pattern.compile(key);
+
+			// analyze if we have any pattern inside mobile_app to make extra
+			// search in AWS
+			int position = key.indexOf(".*");
+			if (position > 0) {
+				// /android/develop/dfgdfg.*/Mapmyrun.apk
+				int slashPosition = key.substring(0, position).lastIndexOf("/");
+				if (slashPosition > 0) {
+					key = key.substring(0, slashPosition);
+					S3ObjectSummary lastBuild = AmazonS3Manager.getInstance().getLatestBuildArtifact(bucketName, key,
+							pattern);
+					key = lastBuild.getKey();
+				}
+
+			}
+
+			S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
+
+			String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
+
+			String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
+			File file = new File(fileName);
+
+			// verify maybe requested artifact with the same size was already
+			// download
+			if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
+				LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+			} else {
+				LOGGER.info(String.format("Following data was extracted: %s, %s, %s", bucketName, key,
+						file.getAbsolutePath()));
+				AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
+			}
+
+			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+		}
+	}
 
     protected void setBug(String id) {
         String test = TestNamingUtil.getTestNameByThread();
