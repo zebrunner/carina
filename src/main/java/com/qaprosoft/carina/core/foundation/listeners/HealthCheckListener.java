@@ -25,7 +25,6 @@ public class HealthCheckListener implements ISuiteListener {
 
 	@Override
 	public void onStart(ISuite suite) {
-
 		String healthCheckClass = Configuration.get(Parameter.HEALTH_CHECK_CLASS);
 		if (suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey()) != null) {
 			// redefine by suite arguments as they have higher priority
