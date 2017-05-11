@@ -170,32 +170,34 @@ public abstract class AbstractTest // extends DriverHelper
         try {
             L10N.init();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            LOGGER.debug("L10N bundle is not initialized successfully!", e);
+            LOGGER.error("L10N bundle is not initialized successfully!", e);
         }
 
         try {
             I18N.init();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            LOGGER.debug("I18N bundle is not initialized successfully!", e);
+            LOGGER.error("I18N bundle is not initialized successfully!", e);
         }
 
         try {
             L10Nparser.init();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            LOGGER.debug("L10Nparser bundle is not initialized successfully!", e);
+            LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
         }
 
         TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
 
-        if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-            AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
-                    Configuration.get(Parameter.SECRET_KEY));
-        }
+		try {
+			if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+				AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
+						Configuration.get(Parameter.SECRET_KEY));
+				updateS3AppPath();
+			}
+		} catch (Exception e) {
+            LOGGER.error("AWS S3 client is not initialized successfully!", e);
+		}
 
-        updateS3AppPath();
+        
 
         // moved from UITest->executeBeforeTestSuite
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
@@ -603,6 +605,7 @@ public abstract class AbstractTest // extends DriverHelper
 		Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
 
 		if (matcher.find()) {
+			LOGGER.info("app artifact is located on s3...");
 			String bucketName = matcher.group(1);
 			String key = matcher.group(2);
 			Pattern pattern = Pattern.compile(key);
@@ -634,12 +637,13 @@ public abstract class AbstractTest // extends DriverHelper
 			if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
 				LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
 			} else {
-				LOGGER.info(String.format("Following data was extracted: %s, %s, %s", bucketName, key,
+				LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s", bucketName, key,
 						file.getAbsolutePath()));
 				AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
 			}
 
 			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+			LOGGER.info("Updated mobile-app: " + Configuration.get(Parameter.MOBILE_APP));
 		}
 	}
 
