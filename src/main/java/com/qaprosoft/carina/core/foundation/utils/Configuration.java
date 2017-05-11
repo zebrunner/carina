@@ -334,6 +334,8 @@ public class Configuration
 		
 		SECRET_KEY("secret_key"),
 		
+		S3_LOCAL_STORAGE("s3_local_storage"),
+				
 		//Amazon-Screenshot
 		S3_SCREENSHOT_BUCKET_NAME("s3_screenshot_bucket_name"),
 		
