@@ -67,7 +67,7 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<appium.version>5.0.0-BETA5</appium.version>
 		<opencsv.version>1.7</opencsv.version>
-		<aws-s3-manager.version>1.2.11</aws-s3-manager.version>
+		<aws-s3-manager.version>1.2.13</aws-s3-manager.version>
 		<api-tools.version>1.0.8</api-tools.version>
 		<monte-repack.version>1.0</monte-repack.version>
 
