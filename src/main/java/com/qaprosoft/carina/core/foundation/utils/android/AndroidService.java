@@ -145,7 +145,7 @@ public class AndroidService {
         String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
 
         try {
-            LOGGER.info("Try to execute following cmd:" + CmdLine.arrayToString(execCmd));
+            LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
             List<String> execOutput = executor.execute(execCmd);
             LOGGER.info("Output after execution ADB command: " + execOutput);
 
@@ -674,8 +674,21 @@ public class AndroidService {
             R.CONFIG.put("language", lang);
         }
 
-        if (getDeviceLanguage().contains(language)) {
+        if (getDeviceLanguage().toLowerCase().contains(language)) {
             status = true;
+        } else {
+            if (getDeviceLanguage().isEmpty()) {
+                LOGGER.info("Adb return empty response without errors.");
+                status = true;
+            } else {
+                String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+                LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
+                if (currentAndroidVersion.contains("7.")) {
+                    LOGGER.info("Adb return language command do not work on some Android 7+ devices." +
+                            " Check that there are no error.");
+                    status = !getDeviceLanguage().toLowerCase().contains("error");
+                }
+            }
         }
         return status;
     }
@@ -694,12 +707,23 @@ public class AndroidService {
     // Fake GPS section
 
     /**
-     * startFakeGPS
+     * startFakeGPS to emulate GPS location
      *
-     * @param location String
-     * @return boolean
+     * @param location String - existing city (for ex. New York)
+     * @return boolean return true if everything is ok.
      */
     public boolean setFakeGPSLocation(String location) {
+        return setFakeGPSLocation(location, false);
+    }
+
+    /**
+     * startFakeGPS to emulate GPS location
+     *
+     * @param location   String - existing city (for ex. New York)
+     * @param restartApk - if true  DriverPool.restartDriver(true);
+     * @return boolean return true if everything is ok.
+     */
+    public boolean setFakeGPSLocation(String location, boolean restartApk) {
         getDriver();
         boolean res = false;
         installApk(FAKE_GPS_APP_PATH, true);
@@ -721,7 +745,8 @@ public class AndroidService {
                 AndroidUtils.hideKeyboard();
                 fakeGpsPage.clickSetLocation();
             }
-            DriverPool.restartDriver(true);
+            res = true;
+            if (restartApk) DriverPool.restartDriver(true);
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
@@ -730,11 +755,21 @@ public class AndroidService {
 
 
     /**
-     * stopFakeGPS
+     * stopFakeGPS stop using Fake GPS
      *
      * @return boolean
      */
     public boolean stopFakeGPS() {
+        return stopFakeGPS(false);
+    }
+
+    /**
+     * stopFakeGPS stop using Fake GPS
+     *
+     * @param restartApk - if true  DriverPool.restartDriver(true);
+     * @return boolean
+     */
+    public boolean stopFakeGPS(boolean restartApk) {
         getDriver();
         boolean res = false;
         String activity = FAKE_GPS_APP_ACTIVITY;
@@ -750,20 +785,31 @@ public class AndroidService {
             }
             LOGGER.info("STOP Fake GPS locale");
             res = fakeGpsPage.clickStopFakeGps();
-            DriverPool.restartDriver(true);
+            if (restartApk) DriverPool.restartDriver(true);
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
+        LOGGER.info("Stop Fake GPS button was clicked: " + res);
         return res;
     }
 
+    /**
+     * forceFakeGPSApkOpen
+     *
+     * @return boolean
+     */
     private boolean forceFakeGPSApkOpen() {
-        String activity = FAKE_GPS_APP_ACTIVITY;
-        String packageName = FAKE_GPS_APP_PACKAGE;
-        String apkPath = FAKE_GPS_APP_PATH;
-        return forceApkOpen(activity, packageName, apkPath);
+        return forceApkOpen(FAKE_GPS_APP_ACTIVITY, FAKE_GPS_APP_PACKAGE, FAKE_GPS_APP_PATH);
     }
 
+    /**
+     * forceApkOpen
+     *
+     * @param activity    String
+     * @param packageName String
+     * @param apkPath     String
+     * @return boolean
+     */
     private boolean forceApkOpen(String activity, String packageName, String apkPath) {
         boolean res;
 
