@@ -1,7 +1,9 @@
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -63,8 +65,21 @@ public class FakeGpsPage extends MobileAbstractPage {
     private ExtendedWebElement inputLocationNew;
 
 
-    @FindBy(xpath = "//android.widget.TextView[contains(@text,'Allow mock locations')]")
+    //@FindBy(xpath = "//android.widget.TextView[contains(@text,'Allow mock locations')]")
+    @FindBy(xpath = "//android.widget.TextView[contains(@text,'ock location')]")
     private ExtendedWebElement allowMock;
+
+
+    @FindBy(xpath = "//android.widget.TextView[contains(@text,'ock location')]")
+    private ExtendedWebElement allowMock7;
+
+    @FindBy(xpath = "//*[contains(@resource-id,':id/list')]")
+    private ExtendedWebElement devSettingsContainer;
+
+
+    @FindBy(xpath = "//android.widget.TextView[contains(@text,'com.lexa.fakegps')]")
+    private ExtendedWebElement fakeGpsPackage;
+
 
     protected static final int MINIMAL_TIMEOUT = 1;
 
@@ -72,11 +87,10 @@ public class FakeGpsPage extends MobileAbstractPage {
         super(driver);
     }
 
-
     protected static final Logger LOGGER = Logger.getLogger(FakeGpsPage.class);
 
     public void clickSetLocation() {
-        if (setLocationStart.isElementPresent(1)) {
+        if (setLocationStart.isElementPresent(DELAY)) {
             LOGGER.info("Start Fake GPS");
             setLocationStart.click();
         } else {
@@ -87,10 +101,9 @@ public class FakeGpsPage extends MobileAbstractPage {
 
 
     public boolean locationSearch(String location) {
-        //solveMockSettings();
-        //TODO: Check, do we have to set Allow from DevSetting on new version
+        solveMockSettings();
 
-        if (actionSearch.isElementPresent(1)) {
+        if (actionSearch.isElementPresent(DELAY)) {
             actionSearch.click();
             if (inputLocationNew.isElementPresent(DELAY)) {
                 inputLocationNew.type(location);
@@ -113,29 +126,45 @@ public class FakeGpsPage extends MobileAbstractPage {
 
     public boolean clickStopFakeGps() {
         if (stopFakeGpsButtonNew.isElementPresent(DELAY)) {
-            return stopFakeGpsButtonNew.clickIfPresent(1);
+            return stopFakeGpsButtonNew.clickIfPresent(MINIMAL_TIMEOUT);
         } else {
             return stopFakeGpsButton.clickIfPresent(DELAY);
         }
     }
 
     public boolean isOpenSettingButtonPresent() {
-        return openSettingsButtonNew.isElementPresent(1) || openSettingsButton.isElementPresent(1);
+        return openSettingsButton.isElementPresent(MINIMAL_TIMEOUT);
     }
 
     public void solveMockSettings() {
+        boolean scrolled = false;
 
-        if (openSettingsButtonNew.isElementPresent(1)) {
-            openSettingsButtonNew.click();
-            openDevSettings.click();
-        } else {
+        if (openSettingsButton.isElementPresent(MINIMAL_TIMEOUT)) {
             openSettingsButton.clickIfPresent(DELAY);
+
+            String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+            LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
+            if (currentAndroidVersion.contains("7.")) {
+                scrolled = MobileUtils.swipeInContainerTillElement(allowMock7, devSettingsContainer);
+                if (!scrolled) {
+                    scrolled = AndroidUtils.scrollTo(allowMock7);
+                }
+                if (scrolled) {
+                    allowMock7.clickIfPresent(MINIMAL_TIMEOUT);
+                    fakeGpsPackage.clickIfPresent(DELAY);
+                }
+            } else {
+                scrolled = MobileUtils.swipeInContainerTillElement(allowMock, devSettingsContainer);
+                if (!scrolled) {
+                    AndroidUtils.scrollTo(allowMock);
+                }
+                LOGGER.info("Allow Mock config is present:" + allowMock.isElementPresent(SHORT_TIMEOUT));
+                allowMock.clickIfPresent(MINIMAL_TIMEOUT);
+                fakeGpsPackage.clickIfPresent(DELAY / 3);
+            }
+
+            getDriver().navigate().back();
         }
-        //TODO: Update with correct scroll later if needed
-        AndroidUtils.scrollTo(allowMock);
-        LOGGER.info("Allow Mock config is present:" + allowMock.isElementPresent(SHORT_TIMEOUT));
-        allowMock.clickIfPresent(1);
-        getDriver().navigate().back();
     }
 
     public boolean isOpened(long timeout) {
