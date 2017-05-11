@@ -96,6 +96,8 @@ public abstract class AbstractTest // extends DriverHelper
 
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable {
+    	
+    	DevicePool.addDevices();
 
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
@@ -185,7 +187,6 @@ public abstract class AbstractTest // extends DriverHelper
             Configuration.loadCoreProperties(customCapabilities);
         }
 
-        DevicePool.addDevices();
     }
 
     @BeforeClass(alwaysRun = true)
