@@ -87,6 +87,11 @@ public class DevicePool
 	
 	public static synchronized void addDevices()
 	{
+		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
+				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+			return;
+		}
+			
 		if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
 		{
 			addDevice();
