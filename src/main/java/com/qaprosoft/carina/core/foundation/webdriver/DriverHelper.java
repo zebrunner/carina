@@ -23,9 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -54,6 +51,8 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
+
+import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -1476,40 +1475,12 @@ public class DriverHelper {
 		return driver;
 	}
 
-	//@Deprecated
 	public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
-		return format(IMPLICIT_TIMEOUT, element, objects);
+		return element.format(IMPLICIT_TIMEOUT, objects);
 	}
-	//@Deprecated
-	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object... objects) {
-		String locator = element.getBy().toString();
-		By by = null;
-		if (locator.startsWith("By.id: ")) {
-			by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
-		}
-		if (locator.startsWith("By.name: ")) {
-			by = By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
-		}
-		if (locator.startsWith("By.xpath: ")) {
-			by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
-		}
-		if (locator.startsWith("linkText: ")) {
-			by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
-		}
-		if (locator.startsWith("css: ")) {
-			by = By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
-		}
-		if (locator.startsWith("tagName: ")) {
-			by = By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
-		}
 
-		ExtendedWebElement res = null;
-		try {
-			res = findExtendedWebElement(by, by.toString(), timeout);
-		} catch (Exception e) {
-			res = new ExtendedWebElement(null, element.getName(), by, getDriver());
-		}
-		return res;
+	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object... objects) {
+		return element.format(timeout, objects);
 	}
 
 }
