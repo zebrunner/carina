@@ -73,19 +73,19 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
             boolean scrolled = MobileUtils.swipeInContainerTillElement(
-                    format(1, tzSelectionBase, tz),
+                    format(tzSelectionBase, tz),
                     scrollableContainer, defaultSwipeTime);
             if (!scrolled) {
                 LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
                 defaultSwipeTime = 30;
                 scrolled = MobileUtils.swipeInContainerTillElement(
-                        format(1, tzSelectionBase, tz),
+                        format(tzSelectionBase, tz),
                         scrollableContainer, defaultSwipeTime);
             }
             if (scrolled) {
                 if (timezone.isEmpty()) {
                     LOGGER.info("Select timezone by GMT: " + tz);
-                    format(1, tzSelectionBase, tz).click();
+                    format(tzSelectionBase, tz).click();
                     selected = true;
                 } else {
                     LOGGER.info("Check that timezone by GMT '" + tz + "' is unique.");
@@ -96,23 +96,23 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                     if (!multiTimezoneText) {
                         LOGGER.info("Searching for " + timezone);
                         scrolled = MobileUtils.swipeInContainerTillElement(
-                                format(1, tzSelectionBase, timezone),
+                                format(tzSelectionBase, timezone),
                                 scrollableContainer, defaultSwipeTime);
                         if (scrolled) {
                             List<ExtendedWebElement> elements = findExtendedWebElements(By.xpath(String.format(TIMEZONE_TEXT_BASE, tz)), 1);
                             LOGGER.info("Found '" + tz + "' " + elements.size() + " times.");
 
                             LOGGER.info("Select timezone by TimeZone text: " + timezone);
-                            format(1, tzSelectionBase, timezone).click();
+                            format(tzSelectionBase, timezone).click();
                             selected = true;
                         } else {
                             LOGGER.error("Did not find timezone by timezone text: " + timezone);
                             scrolled = MobileUtils.swipeInContainerTillElement(
-                                    format(1, tzSelectionBase, tz),
+                                    format(tzSelectionBase, tz),
                                     scrollableContainer, defaultSwipeTime);
                             if (scrolled) {
                                 LOGGER.info("Select timezone by GMT: " + tz);
-                                format(1, tzSelectionBase, tz).click();
+                                format(tzSelectionBase, tz).click();
                                 selected = true;
                             }
                         }
@@ -172,11 +172,11 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      */
     private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
         boolean scrolled = MobileUtils.swipeInContainerTillElement(
-                format(1, tzSelectionBase, timezone),
+                format(tzSelectionBase, timezone),
                 scrollableContainer, defaultSwipeTime);
         if (scrolled) {
             LOGGER.info("Select timezone by TimeZone text: " + timezone);
-            format(1, tzSelectionBase, timezone).click();
+            format(tzSelectionBase, timezone).click();
         }
         return scrolled;
     }
