@@ -1476,11 +1476,12 @@ public class DriverHelper {
 	}
 
 	public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
-		return element.format(IMPLICIT_TIMEOUT, objects);
+		return element.format(objects);
 	}
 
+	@Deprecated
 	public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object... objects) {
-		return element.format(timeout, objects);
+		return element.format(objects);
 	}
 
 }
