@@ -145,9 +145,35 @@ public class ExtendedWebElement {
 	{
 		this(element, DriverPool.getDriver());
 	}
+
+	public WebElement getElement() {
+		return element;
+	}
 	
-    public WebElement getElement() {
-        return element;
+	private WebElement findElement() {
+		if (element == null) {
+			LOGGER.debug("There is null WebElement object. Trying to find element...");
+
+			if (!getDriver().findElements(by).isEmpty()) {
+				LOGGER.debug("Element was idenfified using By: " + by.toString());
+				element = getDriver().findElement(by);
+			} else {
+				throw new RuntimeException("Unable to identify element using By: " + by.toString());
+			}
+		}
+		return element;
+	}
+	
+    private WebElement findStaleElement() {
+        WebElement staleElement;
+        WebDriver drv = getDriver();
+        if (!drv.findElements(by).isEmpty()) {
+        	LOGGER.debug("Element was idenfified using By: " + by.toString());
+        	staleElement = drv.findElement(by);
+        } else {
+            throw new RuntimeException("Unable to identify element using By: " + by.toString());
+        }
+        return staleElement;
     }
 
     public void setElement(WebElement element) {
@@ -168,30 +194,26 @@ public class ExtendedWebElement {
 
     public String getText() {
         String text = null;
-        if (element != null) {
-            try {
-                text = element.getText();
-            } catch (StaleElementReferenceException e) {
-                LOGGER.debug(e.getMessage(), e.getCause());
-                element = findStaleElement();
-                text = element.getText();
-            }
-        }
+		try {
+			text = findElement().getText();
+		} catch (StaleElementReferenceException e) {
+			LOGGER.debug(e.getMessage(), e.getCause());
+			element = findStaleElement();
+			text = element.getText();
+		}
 
         return text;
     }
 
     public String getAttribute(String attributeName) {
         String attribute = null;
-        if (element != null) {
-            try {
-                attribute = element.getAttribute(attributeName);
-            } catch (StaleElementReferenceException e) {
-                LOGGER.debug(e.getMessage(), e.getCause());
-                element = findStaleElement();
-                attribute = element.getAttribute(attributeName);
-            }
-        }
+		try {
+			attribute = findElement().getAttribute(attributeName);
+		} catch (StaleElementReferenceException e) {
+			LOGGER.debug(e.getMessage(), e.getCause());
+			element = findStaleElement();
+			attribute = element.getAttribute(attributeName);
+		}
 
         return attribute;
     }
@@ -262,7 +284,7 @@ public class ExtendedWebElement {
         }
         try {
             Thread.sleep(RETRY_TIME);
-            action.moveToElement(getElement()).doubleClick(getElement()).build().perform();
+            action.moveToElement(findElement()).doubleClick(findElement()).build().perform();
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             drv.switchTo().alert().accept();
@@ -297,7 +319,7 @@ public class ExtendedWebElement {
         try {
             WebDriver drv = getDriver();
             Actions action = new Actions(drv);
-            action.moveToElement(getElement()).contextClick(getElement()).build().perform();
+            action.moveToElement(findElement()).contextClick(findElement()).build().perform();
 
             msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
             summary.log(msg);
@@ -329,7 +351,7 @@ public class ExtendedWebElement {
         String msg = "Hidden Element Click";
         boolean res = false;
         try {
-            WebElement elem = getElement();
+            WebElement elem = findElement();
             JavascriptExecutor executor = (JavascriptExecutor) getDriver();
             executor.executeScript("arguments[0].click();", elem);
 
@@ -377,16 +399,7 @@ public class ExtendedWebElement {
         try {
             wait.until(new ExpectedCondition<Boolean>() {
                 public Boolean apply(WebDriver drv) {
-                    boolean res = false;
-
-                    if (element != null) {
-                        res = element.isDisplayed();
-                    }
-
-                    if (!res) {
-                        res = !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
-                    }
-                    return res;
+                    return findElement().isDisplayed();
                 }
             });
             result = true;
@@ -406,29 +419,6 @@ public class ExtendedWebElement {
      */
     public boolean isElementNotPresent(long timeout) {
         return !isElementPresent(timeout);
-
-/*		boolean result;
-        final WebDriver drv = getDriver();
-		setImplicitTimeout(1);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-		try
-		{
-			wait.until(new ExpectedCondition<Boolean>()
-			{
-				public Boolean apply(WebDriver dr)
-				{
-					return element.isDisplayed();
-				}
-			});
-			result = false;
-			summary.log(Messager.UNEXPECTED_ELEMENT_PRESENT.error(getNameWithLocator()));
-		}
-		catch (Exception e)
-		{
-			result = true;
-		}
-		setImplicitTimeout(drv);
-		return result;*/
     }
 
     /**
@@ -449,7 +439,7 @@ public class ExtendedWebElement {
             wait.until(new ExpectedCondition<Boolean>() {
                 public Boolean apply(WebDriver dr) {
                     try {
-                        return element.isDisplayed() && element.getText().contains(decryptedText);
+                        return findElement().isDisplayed() && findElement().getText().contains(decryptedText);
                     } catch (Exception e) {
                         LOGGER.debug(e.getMessage(), e.getCause());
                         return false;
@@ -478,7 +468,7 @@ public class ExtendedWebElement {
         try {
             wait.until(new ExpectedCondition<Boolean>() {
                 public Boolean apply(WebDriver drv) {
-                    return element.isDisplayed();
+                    return findElement().isDisplayed();
                 }
             });
             element.click();
@@ -508,10 +498,11 @@ public class ExtendedWebElement {
         try {
             wait.until(new ExpectedCondition<Boolean>() {
                 public Boolean apply(WebDriver drv) {
-                    return element.isDisplayed();
+                    return findElement().isDisplayed();
                 }
             });
             scrollTo();
+            element = findElement();
             element.clear();
             element.sendKeys(decryptedText);
             msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
@@ -565,7 +556,6 @@ public class ExtendedWebElement {
      * @param startTimer Start time
      */
     private void clickSafe(long timeout, boolean startTimer) {
-        WebDriver drv = getDriver();
         boolean clicked = false;
         Exception reason = null;
         if (startTimer) {
@@ -573,19 +563,7 @@ public class ExtendedWebElement {
         }
         try {
             Thread.sleep(RETRY_TIME);
-            if (element == null) {
-                LOGGER.debug("Click operation is executed against nul WebElement object. Trying to find element...");
-                if (!drv.findElements(by).isEmpty()) {
-                    element = drv.findElement(by);
-                    LOGGER.debug("Element was idenfified using By: " + by.toString());
-                } else if (getElement() != null) {
-                    element = getElement().findElement(by);
-                    LOGGER.debug("Element was idenfified using existing element and By: " + by.toString());
-                } else {
-                    throw new RuntimeException("Unable to identify element using By: " + by.toString());
-                }
-            }
-            element.click();
+            findElement().click();
             clicked = true;
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
@@ -617,7 +595,7 @@ public class ExtendedWebElement {
             return;
         }
         try {
-            Locatable locatableElement = (Locatable) getElement();
+            Locatable locatableElement = (Locatable) findElement();
             //[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
             //https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
 
@@ -645,10 +623,10 @@ public class ExtendedWebElement {
         try {
             wait.until(new ExpectedCondition<Boolean>() {
                 public Boolean apply(WebDriver dr) {
-                    return getElement().isDisplayed();
+                    return findElement().isDisplayed();
                 }
             });
-            getElement().sendKeys(decryptedFilePath);
+            findElement().sendKeys(decryptedFilePath);
             msg = Messager.FILE_ATTACHED.info(filePath);
             summary.log(msg);
         } catch (Exception e) {
@@ -665,7 +643,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void check() {
-        if (isElementPresent() && !getElement().isSelected()) {
+        if (isElementPresent() && !findElement().isSelected()) {
             click();
             String msg = Messager.CHECKBOX_CHECKED.info(getName());
             summary.log(msg);
@@ -679,7 +657,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-        if (isElementPresent() && getElement().isSelected()) {
+        if (isElementPresent() && findElement().isSelected()) {
             click();
             String msg = Messager.CHECKBOX_UNCHECKED.info(getName());
             summary.log(msg);
@@ -694,9 +672,9 @@ public class ExtendedWebElement {
      */
     public boolean isChecked() {
         assertElementPresent();
-        boolean res = getElement().isSelected();
-        if (getElement().getAttribute("checked") != null) {
-            res |= getElement().getAttribute("checked").equalsIgnoreCase("true");
+        boolean res = findElement().isSelected();
+        if (findElement().getAttribute("checked") != null) {
+            res |= findElement().getAttribute("checked").equalsIgnoreCase("true");
         }
         return res;
     }
@@ -709,7 +687,7 @@ public class ExtendedWebElement {
      */
     public String getSelectedValue() {
         assertElementPresent();
-        return new Select(getElement()).getAllSelectedOptions().get(0).getText();
+        return new Select(findElement()).getAllSelectedOptions().get(0).getText();
     }
 
     /**
@@ -719,7 +697,7 @@ public class ExtendedWebElement {
      */
     public List<String> getSelectedValues() {
         assertElementPresent();
-        Select s = new Select(getElement());
+        Select s = new Select(findElement());
         List<String> values = new ArrayList<String>();
         for (WebElement we : s.getAllSelectedOptions()) {
             values.add(we.getText());
@@ -731,64 +709,6 @@ public class ExtendedWebElement {
         return driver;
     }
 
-/*	*//**
-     * Hovers over element.
-     *
-     *//*
-    public void hover() {
-		hover(null, null);
-	}
-	
-
-	
-	public void hover(Integer xOffset, Integer  yOffset)
-	{
-		WebDriver drv = getDriver();
-		if (isElementPresent())
-		{
-			
-			if (!drv.toString().contains("safari")) {
-				Actions action = new Actions(drv);
-				if (xOffset != null && yOffset != null) {
-					action.moveToElement(getElement(), xOffset, yOffset);
-				}
-				else {
-					action.moveToElement(getElement());
-				}
-
-				action.perform();				
-			}
-			else {
-				//https://code.google.com/p/selenium/issues/detail?id=4136
-				JavascriptExecutor js = (JavascriptExecutor) drv;
-				String locatorType = getBy().toString().substring(3);
-				String elem = "var elem = document;";
-				if (locatorType.startsWith("id")) {
-					elem = "var elem = document.getElementById(\""+locatorType.substring(4)+"\");";
-				}
-				else if (locatorType.startsWith("xpath")) {
-					String snippet = "document.getElementByXPath = function(sValue) { var a = this.evaluate(sValue, this, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null); if (a.snapshotLength > 0) { return a.snapshotItem(0); } }; ";
-					js.executeScript(snippet);
-					elem = "var elem = document.getElementByXPath(\""+locatorType.substring(7)+"\");";
-				}
-				else if (locatorType.startsWith("className")) {
-					elem = "var elem = document.getElementsByClassName(\""+locatorType.substring(14)+"\")[0];";
-				}
-				String mouseOverScript = elem + " if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false);" +
-						" elem.dispatchEvent(evObj);} else if(document.createEventObject) { elem.fireEvent('onmouseover');}";
-				js.executeScript(mouseOverScript);
-			}
-
-			String msg = Messager.HOVER_IMG.info(getName());
-			summary.log(msg);
-			Screenshot.capture(drv, msg);
-		}
-		else
-		{
-			summary.log(Messager.ELEMENT_NOT_HOVERED.error(getNameWithLocator()));
-		}
-	}*/
-
     /**
      * Selects text in specified select element.
      *
@@ -798,7 +718,7 @@ public class ExtendedWebElement {
     public boolean select(final String selectText) {
         boolean isSelected = false;
         final String decryptedSelectText = cryptoTool.decryptByPattern(selectText, CRYPTO_PATTERN);
-        final Select s = new Select(getElement());
+        final Select s = new Select(findElement());
         WebDriver drv = getDriver();
         String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
@@ -810,6 +730,7 @@ public class ExtendedWebElement {
                         s.selectByVisibleText(decryptedSelectText);
                         return true;
                     } catch (Exception e) {
+                    	//do nothing
                     }
                     return false;
                 }
@@ -861,7 +782,7 @@ public class ExtendedWebElement {
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
         boolean isSelected = false;
-        final Select s = new Select(getElement());
+        final Select s = new Select(findElement());
         WebDriver drv = getDriver();
         String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
@@ -905,7 +826,7 @@ public class ExtendedWebElement {
      */
     public boolean selectByPartialText(final String partialSelectText) {
         boolean isSelected = false;
-        final Select s = new Select(getElement());
+        final Select s = new Select(findElement());
         WebDriver drv = getDriver();
         String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
@@ -948,7 +869,7 @@ public class ExtendedWebElement {
      */
     public boolean select(final int index) {
         boolean isSelected = false;
-        final Select s = new Select(getElement());
+        final Select s = new Select(findElement());
         WebDriver drv = getDriver();
         String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
@@ -1131,18 +1052,6 @@ public class ExtendedWebElement {
         js.executeScript("mobile: tap", tapObject);
     }
 
-    private WebElement findStaleElement() {
-        WebElement el;
-        WebDriver drv = getDriver();
-        if (!drv.findElements(by).isEmpty()) {
-            el = drv.findElement(by);
-            LOGGER.debug("Element was idenfified using By: " + by.toString());
-        } else {
-            throw new RuntimeException("Unable to identify element using By: " + by.toString());
-        }
-        return el;
-    }
-
     public void waitUntilElementNotPresent(final long timeout) {
         final ExtendedWebElement element = this;
 
@@ -1249,7 +1158,7 @@ public class ExtendedWebElement {
         return res;
     }
 
-    public ExtendedWebElement format(long timeout, Object... objects) {
+    public ExtendedWebElement format(Object... objects) {
         String locator = by.toString();
         By by = null;
         if (locator.startsWith("By.id: ")) {
@@ -1271,13 +1180,7 @@ public class ExtendedWebElement {
             by = By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
         }
 
-        ExtendedWebElement res = null;
-        try {
-            res = findExtendedWebElement(by, by.toString(), timeout);
-        } catch (Exception e) {
-            res = new ExtendedWebElement(null, name, by, driver);
-        }
-        return res;
+        return new ExtendedWebElement(null, name, by, driver);
     }
 
 
