@@ -25,12 +25,13 @@ public class ThreadLogAppender extends AppenderSkeleton
 	public synchronized void append(LoggingEvent event)
 	{
 		if (!ReportContext.isBaseDireCreated()) {
-			//System.out.println("Folder structure is not created yet!");
+			System.out.println(event.getMessage().toString());
 			return;
 		}
 		try
 		{
 			if (!TestNamingUtil.isTestNameRegistered()) {
+				System.out.println(event.getMessage().toString());
 				//don't write any message into the log if thread is not associated anymore with test 
 				return;
 			}
