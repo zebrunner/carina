@@ -9,7 +9,7 @@ import com.qaprosoft.carina.core.foundation.performance.Operation.OPERATIONS;
 
 public class PerformanceTest {
 
-	@Test
+	@Test(priority = 1)
 	public void testAlreadyStartedMetric() {
 		Timer.start(OPERATIONS.TEST);
 		try {
@@ -21,7 +21,7 @@ public class PerformanceTest {
 		Timer.stop(OPERATIONS.TEST);
 	}
 
-	@Test
+	@Test(priority = 2)
 	public void testNotStartedMetric() {
 		try {
 			Timer.stop(OPERATIONS.TEST2);
@@ -31,7 +31,7 @@ public class PerformanceTest {
 		}
 	}
 
-	@Test
+	@Test(priority = 3)
 	public void testClearMetric() {
 		Timer.start(OPERATIONS.TEST3);
 		pause(0.1);
@@ -42,7 +42,7 @@ public class PerformanceTest {
 		Assert.assertEquals(testMetrics.size(), 0);
 	}
 
-	@Test
+	@Test(priority = 4)
 	public void testTrackMetric() {
 		Timer.start(OPERATIONS.TEST4);
 		pause(0.1);
@@ -58,7 +58,7 @@ public class PerformanceTest {
 
 	}
 
-	@Test
+	@Test(priority = 5)
 	public void testNotStoppedMetric() {
 		Timer.start(OPERATIONS.TEST5);
 		Map<String, Long> testMetrics = Timer.readAndClear();
