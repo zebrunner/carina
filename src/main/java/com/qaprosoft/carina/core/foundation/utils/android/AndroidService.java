@@ -4,6 +4,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -989,8 +990,8 @@ public class AndroidService {
 
         String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
-        if (currentAndroidVersion.contains("7.")) {
-            LOGGER.info("TimeZone changing for Android 7+ works only by TimeZone changer apk.");
+        if (currentAndroidVersion.contains("7.") || (DevicePool.getDeviceType() == DeviceType.Type.ANDROID_TABLET)) {
+            LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
             workflow = ChangeTimeZoneWorkflow.APK;
         }
 
