@@ -2,8 +2,10 @@ package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notific
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 import io.appium.java_client.MobileBy;
 import org.apache.log4j.Logger;
@@ -26,7 +28,7 @@ public class NotificationPage extends MobileAbstractPage {
     }
 
 
-    protected AndroidService notificationService;
+    private AndroidService notificationService;
 
     protected static final By NOTIFICATION_XPATH = By
             .xpath("//*[@resource-id = 'com.android.systemui:id/"
@@ -139,21 +141,24 @@ public class NotificationPage extends MobileAbstractPage {
      * @return String
      */
     public String getItemText(int num) {
-        //TODO: Check on Tablet
-        //if (isPhone())
         try {
             LOGGER.info("Visible text:" + lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).size());
-            if (true)
-                return lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).get(2).getText();
-            else {
-                if (lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).isElementNotPresent(1)) {
-                    return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Phone_Locator_Text)).getText();
-                } else {
-                    return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).getText();
+            if (DevicePool.getDeviceType() == DeviceType.Type.ANDROID_TABLET) {
+                try {
+                    if (lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).isElementNotPresent(1)) {
+                        return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Phone_Locator_Text)).getText();
+                    } else {
+                        return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).getText();
+                    }
+                } catch (Exception err) {
+                    LOGGER.error("Issue for getting notifications on Tablet.",err);
+                    return lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).get(2).getText();
                 }
+            } else {
+                return lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).get(2).getText();
             }
         } catch (Exception e) {
-            LOGGER.info("Can't get notification text. Exception: " + e);
+            LOGGER.info("Can't get notification text. Exception: ", e);
             return "";
         }
     }
