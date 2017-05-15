@@ -36,7 +36,8 @@ public class ThreadLogAppender extends AppenderSkeleton
 			}
 			String test = TestNamingUtil.getTestNameByThread();
 			if (test == null) {
-				//System.out.println("TestNamingUtil.getTestNameByThread returned test=null!");
+				// Write message into the regular console output only
+				System.out.println(event.getMessage().toString());
 				return;
 			} else {
 				//System.out.println("test: " + test);
