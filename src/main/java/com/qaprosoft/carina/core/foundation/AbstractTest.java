@@ -185,10 +185,15 @@ public abstract class AbstractTest // extends DriverHelper
             LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
         }
 
-        TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
+        try {
+        	TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
+        } catch (Exception e) {
+        	LOGGER.error("TestRail is not initialized successfully!", e);
+        }
 
 		try {
 			if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+				LOGGER.info("Initializing AWS S3 client...");
 				AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
 						Configuration.get(Parameter.SECRET_KEY));
 				updateS3AppPath();
@@ -604,6 +609,7 @@ public abstract class AbstractTest // extends DriverHelper
 		String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
 		Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
 
+		LOGGER.info("Analyzing if mobile_app is located on S3...");
 		if (matcher.find()) {
 			LOGGER.info("app artifact is located on s3...");
 			String bucketName = matcher.group(1);
@@ -643,7 +649,7 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 
 			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
-			LOGGER.info("Updated mobile-app: " + Configuration.get(Parameter.MOBILE_APP));
+			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
 		}
 	}
 
