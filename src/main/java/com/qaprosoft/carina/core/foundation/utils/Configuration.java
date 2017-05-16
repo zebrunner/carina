@@ -534,6 +534,9 @@ public class Configuration
         	String devicePlatform = propertiesMap.get("core.mobile_platform_name");
         	String devicePlatformVersion = propertiesMap.get("core.mobile_platform_version");
         	String deviceUdid = propertiesMap.get("core.mobile_platform_udid");
+        	if (deviceUdid == null) {
+        		deviceUdid = "";
+        	}
         	String seleniumServer = propertiesMap.get("core.selenium_host");
         	
         	DevicePool.addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer));
