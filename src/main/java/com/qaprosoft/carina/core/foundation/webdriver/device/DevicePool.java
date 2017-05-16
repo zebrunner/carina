@@ -85,6 +85,13 @@ public class DevicePool
 		return DEVICES;
 	}
 	
+	public static synchronized void addDevice(Device device) {
+		DEVICES.add(device);
+		DEVICE_MODELS.add(device.getName());
+		String msg = "Registered single device into the DevicePool: %s - %s";
+		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));
+	}
+	
 	public static synchronized void addDevices()
 	{
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
