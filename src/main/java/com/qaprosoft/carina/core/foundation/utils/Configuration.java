@@ -26,6 +26,9 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+
 /**
  * Configuration utility.
  * 
@@ -522,6 +525,18 @@ public class Configuration
             	LOGGER.info("Set custom core property: " + key + "; value: " + value);
             	R.CONFIG.put(key, value);
             }
+        }
+        
+        if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
+        	//add device from custom capabilities to the devicePool
+        	String deviceName = propertiesMap.get("core.mobile_device_name");
+        	String deviceType = propertiesMap.get("core.mobile_device_type");
+        	String devicePlatform = propertiesMap.get("core.mobile_platform_name");
+        	String devicePlatformVersion = propertiesMap.get("core.mobile_platform_version");
+        	String deviceUdid = propertiesMap.get("core.mobile_platform_udid");
+        	String seleniumServer = propertiesMap.get("core.selenium_host");
+        	
+        	DevicePool.addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer));
         }
 
     }
