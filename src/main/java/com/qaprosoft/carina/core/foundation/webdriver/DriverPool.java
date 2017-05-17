@@ -611,10 +611,9 @@ public final class DriverPool {
 	 * 
 	 */
 	public static void registerProxy(BrowserMobProxy proxy) {
-		BrowserMobProxy currentProxy = getProxy();
 		long threadId = Thread.currentThread().getId();
-		
-		if (currentProxy != null) {
+		if (proxies.containsKey(threadId)) {
+			BrowserMobProxy currentProxy = proxies.get(threadId);
 			LOGGER.warn("Existing proxy is detected and will be overriten");
 			if (currentProxy.isStarted()) {
 				currentProxy.stop();
