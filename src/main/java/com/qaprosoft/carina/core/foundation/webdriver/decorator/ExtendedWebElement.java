@@ -147,6 +147,9 @@ public class ExtendedWebElement {
 	}
 
 	public WebElement getElement() {
+		if (element == null) {
+			element = findExtendedWebElement(getBy(), 1).getElement();
+		}
 		return element;
 	}
 	
