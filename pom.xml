@@ -14,8 +14,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<source.version>1.7</source.version>
-		<target.version>1.7</target.version>
+		<source.version>1.8</source.version>
+		<target.version>1.8</target.version>
 
 		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
 
@@ -25,7 +25,7 @@
 		<hamcrest-library.version>1.3</hamcrest-library.version>
 		<junit.version>4.11</junit.version>
 		<rest-assured.version>2.7.0</rest-assured.version>
-		<selenium-java.version>2.53.1</selenium-java.version>
+		<selenium-java.version>3.4.0</selenium-java.version>
 
 		<log4j.version>1.2.17</log4j.version>
 		<logback.version>1.0.6</logback.version>
@@ -55,7 +55,7 @@
 		<xmlbeans.version>2.4.0</xmlbeans.version>
 		<bcprov-jdk16.version>1.45</bcprov-jdk16.version>
 		<jackson-mapper-asl.version>1.9.11</jackson-mapper-asl.version>
-		<guava.version>20.0</guava.version>
+		<guava.version>21.0</guava.version>
 
 		<jira-client.version>0.5</jira-client.version>
 
@@ -65,7 +65,7 @@
 		<json-simple.version>1.1</json-simple.version>
 
 		<reflections.version>0.9.9-RC1</reflections.version>
-		<appium.version>5.0.0-BETA5</appium.version>
+		<appium.version>5.0.0-BETA8</appium.version>
 		<opencsv.version>1.7</opencsv.version>
 		<aws-s3-manager.version>1.2.15</aws-s3-manager.version>
 		<api-tools.version>1.0.11</api-tools.version>
@@ -326,6 +326,12 @@
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>${jackson-mapper-asl.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -349,6 +355,10 @@
 				<exclusion>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -468,6 +478,12 @@
 			<groupId>net.lightbody.bmp</groupId>
 			<artifactId>browsermob-core</artifactId>
 			<version>2.1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
