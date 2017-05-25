@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.core.foundation.webdriver.appium.status;
 
-import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.appium.status.model.Status;
 import org.apache.http.client.fluent.Request;
@@ -60,12 +59,7 @@ public final class AppiumStatus {
 
         new FluentWait<>(appiumHost).withTimeout(waitTimeoutSeconds, TimeUnit.SECONDS).withMessage("Appium '" + appiumHost +
                 "' isn't started during " + waitTimeoutSeconds + "seconds. ")
-                .until(new Function<String, Boolean>() {
-                    @Override
-                    public Boolean apply(String appiumHost) {
-                        return AppiumStatus.isStarted(appiumHost);
-                    }
-                });
+                .until(host -> AppiumStatus.isStarted(host));
         
         LOGGER.debug("Appium started!");
     }
