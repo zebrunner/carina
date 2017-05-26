@@ -371,7 +371,7 @@ public abstract class AbstractTest // extends DriverHelper
                     senderEmail,
                     senderPassword);
 
-            if ((testResult.equals(TestResultType.FAIL) || testResult.equals(TestResultType.SKIP_ALL)) && !failureEmailList.isEmpty()) {
+            if (testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()) {
                 EmailManager.send(title, emailContent,
                         failureEmailList,
                         senderEmail,
