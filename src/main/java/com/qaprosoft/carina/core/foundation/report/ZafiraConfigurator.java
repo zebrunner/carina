@@ -12,6 +12,7 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -40,9 +41,11 @@ public class ZafiraConfigurator implements IConfigurator
 			conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
 		}
 		
-		// add custom arguments from browserStack
-		conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
-		conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
+		if (!buildArgumentType("platform", R.CONFIG.get("os")).equals(SpecialKeywords.NULL)) {
+			// add custom arguments from browserStack
+			conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
+			conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
+		}
 		
 		// add custom arguments from current mobile device
 		Device device = DevicePool.getDevice();
