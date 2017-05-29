@@ -3,6 +3,7 @@ package com.qaprosoft.carina.core.foundation.grid;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -11,7 +12,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubException;
@@ -69,14 +69,7 @@ public class DeviceGrid
 //					new EventType(Type.REQUEST_DEVICE_CONNECT, GRID_SESSION_ID, testId, new Gson().toJson(rq)));
 
 			new FluentWait<GridCallback>(gridCallback).withTimeout(GRID_DEVICE_TIMEOUT, TimeUnit.SECONDS)
-					.pollingEvery(10, TimeUnit.SECONDS).until(new Function<GridCallback, Boolean>()
-					{
-						@Override
-						public Boolean apply(GridCallback callback)
-						{
-							return !StringUtils.isEmpty(callback.getUdid());
-						}
-					});
+					.pollingEvery(10, TimeUnit.SECONDS).until(callback -> !StringUtils.isEmpty(callback.getUdid()));
 		} catch (TimeoutException e)
 		{
 // 			TODO: implement event logging
