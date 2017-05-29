@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.SessionNotFoundException;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
 
@@ -181,7 +180,7 @@ public final class DriverPool {
 
 			drv.quit();
 			LOGGER.debug("Driver exited during restart..." + drv);
-		} catch (SessionNotFoundException | UnreachableBrowserException e) { 
+		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
 			LOGGER.debug("unable to quit as sesion was not found" + drv);
 		} catch (Exception e) {
@@ -221,7 +220,7 @@ public final class DriverPool {
 			DevicePool.deregisterDevice();
 			drv.quit();
 			LOGGER.debug("Driver exited..." + drv);
-		} catch (SessionNotFoundException | UnreachableBrowserException e) { 
+		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
 			LOGGER.debug("unable to quit as sesion was not found" + drv);
 		} catch (Exception e) {
