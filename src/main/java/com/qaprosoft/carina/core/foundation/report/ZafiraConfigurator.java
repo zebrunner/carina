@@ -35,34 +35,12 @@ public class ZafiraConfigurator implements IConfigurator
     public ConfigurationType getConfiguration()
     {
         ConfigurationType conf = new ConfigurationType();
-        List<ArgumentType> configArguments = conf.getArg();
-        int platformsCount = 0;
-        int platformIndex = 0;
-        for (Parameter parameter : Parameter.values())
-        {
-            String parameterKey = parameter.getKey();
-            String configValue = R.CONFIG.get(parameterKey);
-            configArguments.add(buildArgumentType(parameterKey, configValue));
-            switch (parameterKey) {
-                case "platform":
-                    platformIndex = configArguments.size()-1;
-                    break;
-                case "browser":
-                case "mobile_platform_name":
-                    if (!configValue.equals(SpecialKeywords.NULL)&&!configValue.equals("")) {
-                        platformsCount++;}
-                    break;
-            }
+
+         if (!buildArgumentType("platform", R.CONFIG.get("os")).getValue().equals(SpecialKeywords.NULL)) {
+            // add custom arguments from browserStack
+            conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
+            conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
         }
-        if(platformsCount==0){
-            configArguments.remove(platformIndex);
-            configArguments.add(platformIndex, buildArgumentType("platform", "API"));
-        }
-//			if (!buildArgumentType("platform", R.CONFIG.get("os")).equals(SpecialKeywords.NULL)) {
-//				// add custom arguments from browserStack
-//				conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
-//				conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
-//			}
         // add custom arguments from current mobile device
         Device device = DevicePool.getDevice();
         if (!device.getName().isEmpty())
