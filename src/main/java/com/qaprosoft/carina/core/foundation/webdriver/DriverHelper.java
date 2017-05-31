@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -371,11 +372,7 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver drv) {
-					return !drv.findElements(by).isEmpty() && drv.findElement(by).isDisplayed();
-				}
-			});
+			wait.until((Function<WebDriver, Object>) dr -> !dr.findElements(by).isEmpty() && dr.findElement(by).isDisplayed());
 			result = true;
 		} catch (Exception e) {
 			result = false;
@@ -808,11 +805,7 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver dr) {
-					return drv.getTitle().contains(decryptedExpectedTitle);
-				}
-			});
+			wait.until((Function<WebDriver, Object>) dr -> drv.getTitle().contains(decryptedExpectedTitle));
 			result = true;
 			summary.log(Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), expectedTitle));
 		} catch (Exception e) {
@@ -1164,11 +1157,7 @@ public class DriverHelper {
 		WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver dr) {
-					return isAlertPresent();
-				}
-			});
+			wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
 			drv.switchTo().alert().accept();
 			Messager.ALERT_ACCEPTED.info("");
 		} catch (Exception e) {
@@ -1183,11 +1172,7 @@ public class DriverHelper {
 		WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver dr) {
-					return isAlertPresent();
-				}
-			});
+			wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
 			drv.switchTo().alert().dismiss();
 			Messager.ALERT_CANCELED.info("");
 		} catch (Exception e) {
@@ -1247,11 +1232,7 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver dr) {
-					return LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl());
-				}
-			});
+			wait.until((Function<WebDriver, Object>) dr -> LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl()));
 			result = true;
 		} catch (Exception e) {
 			result = false;
@@ -1402,11 +1383,7 @@ public class DriverHelper {
 		setImplicitTimeout(0);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver dr) {
-					return !drv.findElements(by).isEmpty();
-				}
-			});
+			wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
 			element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
 			summary.log(Messager.ELEMENT_FOUND.info(name));
 		} catch (Exception e) {
@@ -1431,7 +1408,7 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			wait.until(new ExpectedCondition<Boolean>() {
+			wait.until(new Function<WebDriver, Object>() {
 				public Boolean apply(WebDriver dr) {
 					return !drv.findElements(by).isEmpty();
 				}
