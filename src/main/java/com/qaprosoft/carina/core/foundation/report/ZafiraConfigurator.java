@@ -4,12 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.testng.ISuite;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
@@ -33,12 +35,17 @@ public class ZafiraConfigurator implements IConfigurator
     public ConfigurationType getConfiguration()
     {
         ConfigurationType conf = new ConfigurationType();
+        for (Parameter parameter : Parameter.values())
+        {
+            conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
+        }
 
-         if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
+        if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
             // add custom arguments from browserStack
             conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
         }
+
         // add custom arguments from current mobile device
         Device device = DevicePool.getDevice();
         if (!device.getName().isEmpty())
