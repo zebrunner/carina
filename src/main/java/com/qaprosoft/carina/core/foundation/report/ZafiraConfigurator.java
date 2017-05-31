@@ -10,17 +10,15 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.zafira.config.IConfigurator;
 import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
-import com.qaprosoft.zafira.config.IConfigurator;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -36,7 +34,7 @@ public class ZafiraConfigurator implements IConfigurator
     {
         ConfigurationType conf = new ConfigurationType();
 
-         if (!buildArgumentType("platform", R.CONFIG.get("os")).getValue().equals(SpecialKeywords.NULL)) {
+         if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
             // add custom arguments from browserStack
             conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
