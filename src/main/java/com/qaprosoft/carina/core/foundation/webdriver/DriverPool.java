@@ -25,12 +25,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
 
-import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -39,7 +37,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
-@SuppressWarnings("deprecation")
 public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
@@ -533,11 +530,12 @@ public final class DriverPool {
 		// integrate browserMob proxy if required here
 		BrowserMobProxy proxy = null;
 		long threadId = Thread.currentThread().getId();
+		
 		if (proxies.containsKey(threadId)) {
 			proxy = proxies.get(threadId);
 		} else {
 			proxy = new BrowserMobProxyServer();
-			proxies.put(Thread.currentThread().getId(), proxy);
+			proxies.put(threadId, proxy);
 		}
 
 		if (!proxy.isStarted()) {
@@ -547,15 +545,7 @@ public final class DriverPool {
 			LOGGER.info("BrowserMob proxy is already started on port " + proxy.getPort());
 		}
 
-		Integer port = proxy.getPort();
-
-		String currentIP = HttpClient.getIpAddress();
-		LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
-
-		R.CONFIG.put("proxy_host", currentIP);
-		R.CONFIG.put("proxy_port", port.toString());
-		R.CONFIG.put("proxy_protocols", "http");
-
+		//TODO: we shouldn't use global proxy_host/port/protocols config properties as we should support multi threading
 		return proxy;
 	}
 
@@ -577,6 +567,8 @@ public final class DriverPool {
 				} else {
 					LOGGER.info("Stopping BrowserMob proxy skipped as it is not started.");
 				}
+				
+				//TODO: we shouldn't use global proxy_host/port/protocols config properties as we should support multi threading
 			}
 			proxies.remove(threadId);
 		} else {
