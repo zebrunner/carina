@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.http;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,6 @@ import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 import net.lightbody.bmp.BrowserMobProxy;
@@ -74,24 +74,23 @@ public class HttpClient
 	
 	public static void setupProxy()
 	{
+		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
+		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
+		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
+		
 		if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
 			BrowserMobProxy proxy = DriverPool.startProxy();
 			Integer port = proxy.getPort();
 
-			String currentIP = HttpClient.getIpAddress();
-			LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
+			//redefine proxy settings using custom data
+			proxyHost = HttpClient.getIpAddress();
+			proxyPort = port.toString();
+			protocols = new ArrayList<String>();
+			protocols.add("http");
 			
-			R.CONFIG.put("proxy_host", currentIP);
-			R.CONFIG.put("proxy_port", port.toString());
-			R.CONFIG.put("proxy_protocols", "http");
-			
+			LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + proxyHost + "; port: " + proxyPort);
 		}
 
-		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
-		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
-		
-		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
-		
 		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()
 				&& Configuration.getBoolean(Parameter.PROXY_SET_TO_SYSTEM))
 		{

@@ -7,8 +7,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
@@ -38,8 +36,8 @@ public class BrowserMobTest {
 	
 	@Test
 	public void testBrowserModProxySystemIntegration() {
-		Assert.assertEquals(Configuration.get(Parameter.PROXY_HOST), System.getProperty("http.proxyHost"));
-		Assert.assertEquals(Configuration.get(Parameter.PROXY_PORT), System.getProperty("http.proxyPort"));
+		Assert.assertEquals(HttpClient.getIpAddress(), System.getProperty("http.proxyHost"));
+		Assert.assertEquals(Integer.toString(DriverPool.getProxy().getPort()), System.getProperty("http.proxyPort"));
 	}
 
 	@Test
