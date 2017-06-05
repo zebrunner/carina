@@ -16,121 +16,100 @@
 package com.qaprosoft.carina.core.foundation.http;
 
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import org.apache.log4j.Logger;
 
-import net.lightbody.bmp.BrowserMobProxy;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.
  * 
  * @author Alex Khursevich
  */
-public class HttpClient
-{
-	protected static final Logger LOGGER = Logger.getLogger(HttpClient.class);
-	
-	public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType)
-	{
-		Response response = null;
-		setupProxy();
-		switch (methodType)
-		{
-		case HEAD:
-			response = request.head(methodPath);
-			break;
-		case GET:
-			response = request.get(methodPath);
-			break;
-		case PUT:
-			response = request.put(methodPath);
-			break;
-		case POST:
-			response = request.post(methodPath);
-			break;
-		case DELETE:
-			response = request.delete(methodPath);
-			break;
-		case PATCH:
-			response = request.patch(methodPath);
-			break;
-		default:
-			throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
-		}
+public class HttpClient {
 
-		return response;
-	}
-	
-	public static void setupProxy()
-	{
-		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
-		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
-		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
-		
-		if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
-			BrowserMobProxy proxy = DriverPool.startProxy();
-			Integer port = proxy.getPort();
+    protected static final Logger LOGGER = Logger.getLogger(HttpClient.class);
 
-			//redefine proxy settings using custom data
-			proxyHost = HttpClient.getIpAddress();
-			proxyPort = port.toString();
-			protocols = new ArrayList<String>();
-			protocols.add("http");
-			
-			LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + proxyHost + "; port: " + proxyPort);
-		}
+    public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType) {
+        Response response = null;
+        setupProxy();
+        switch (methodType) {
+            case HEAD:
+                response = request.head(methodPath);
+                break;
+            case GET:
+                response = request.get(methodPath);
+                break;
+            case PUT:
+                response = request.put(methodPath);
+                break;
+            case POST:
+                response = request.post(methodPath);
+                break;
+            case DELETE:
+                response = request.delete(methodPath);
+                break;
+            case PATCH:
+                response = request.patch(methodPath);
+                break;
+            default:
+                throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
+        }
 
-		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()
-				&& Configuration.getBoolean(Parameter.PROXY_SET_TO_SYSTEM))
-		{
-			if (protocols.contains("http")) {
-				LOGGER.info(String.format("HTTP client will use http: %s:%s", proxyHost, proxyPort));
+        return response;
+    }
 
-				System.setProperty("http.proxyHost", proxyHost);
-				System.setProperty("http.proxyPort", proxyPort);
-			}
+    public static void setupProxy() {
 
-			if (protocols.contains("https")) {
-				LOGGER.info(String.format("HTTP client will use https proxies: %s:%s", proxyHost, proxyPort));
+        String proxyHost = Configuration.get(Parameter.PROXY_HOST);
+        String proxyPort = Configuration.get(Parameter.PROXY_PORT);
+        List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 
-				System.setProperty("https.proxyHost", proxyHost);
-				System.setProperty("https.proxyPort", proxyPort);
-			}
 
-			if (protocols.contains("ftp")) {
-				LOGGER.info(String.format("HTTP client will use ftp proxies: %s:%s", proxyHost, proxyPort));
+        if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty() && Configuration.getBoolean(Parameter.PROXY_SET_TO_SYSTEM)) {
+            if (protocols.contains("http")) {
+                LOGGER.info(String.format("HTTP client will use http: %s:%s", proxyHost, proxyPort));
 
-				System.setProperty("ftp.proxyHost", proxyHost);
-				System.setProperty("ftp.proxyPort", proxyPort);
-			}
+                System.setProperty("http.proxyHost", proxyHost);
+                System.setProperty("http.proxyPort", proxyPort);
+            }
 
-			if (protocols.contains("socks")) {
-				LOGGER.info(String.format("HTTP client will use socks proxies: %s:%s", proxyHost, proxyPort));
-				System.setProperty("socksProxyHost", proxyHost);
-				System.setProperty("socksProxyPort", proxyPort);
-			}
-		}
-	}
+            if (protocols.contains("https")) {
+                LOGGER.info(String.format("HTTP client will use https proxies: %s:%s", proxyHost, proxyPort));
 
-	public static String getIpAddress() {
-		String currentIP = "0.0.0.0"; // localhost
-		try {
-			currentIP = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
-		}
+                System.setProperty("https.proxyHost", proxyHost);
+                System.setProperty("https.proxyPort", proxyPort);
+            }
 
-		return currentIP;
-	}
+            if (protocols.contains("ftp")) {
+                LOGGER.info(String.format("HTTP client will use ftp proxies: %s:%s", proxyHost, proxyPort));
+
+                System.setProperty("ftp.proxyHost", proxyHost);
+                System.setProperty("ftp.proxyPort", proxyPort);
+            }
+
+            if (protocols.contains("socks")) {
+                LOGGER.info(String.format("HTTP client will use socks proxies: %s:%s", proxyHost, proxyPort));
+                System.setProperty("socksProxyHost", proxyHost);
+                System.setProperty("socksProxyPort", proxyPort);
+            }
+        }
+    }
+
+    public static String getIpAddress() {
+        String currentIP = "0.0.0.0"; // localhost
+        try {
+            currentIP = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
+        }
+
+        return currentIP;
+    }
 }
