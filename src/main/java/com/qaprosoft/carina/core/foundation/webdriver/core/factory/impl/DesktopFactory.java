@@ -70,7 +70,7 @@ public class DesktopFactory extends AbstractFactory
 			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
 				return new FirefoxCapabilities().getCapability(name);
-			} else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser))
+			} else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
 				return new IECapabilities().getCapability(name);
 			} else if (BrowserType.HTMLUNIT.equalsIgnoreCase(browser))
