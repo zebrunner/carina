@@ -75,7 +75,7 @@ public class AndroidUtils {
      * @param keyCode int
      * @return boolean
      */
-    public boolean pressKeyCode(int keyCode) {
+    public static boolean pressKeyCode(int keyCode) {
         try {
             LOGGER.info("Press key code: " + keyCode);
             ((PressesKeyCode) DriverPool.getDriver()).pressKeyCode(keyCode);
