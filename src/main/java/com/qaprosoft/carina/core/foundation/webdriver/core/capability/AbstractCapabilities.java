@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -8,6 +10,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -32,8 +35,27 @@ public abstract class AbstractCapabilities {
         capabilities.setCapability("name", testName);
         
 		Proxy proxy = setupProxy();
-		if (proxy != null) {
+
+		if (proxy != null && !BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
 			capabilities.setCapability(CapabilityType.PROXY, proxy);
+		}
+		if (proxy != null && BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
+			int port = DriverPool.getProxy().getPort();
+			String proxyHost = HttpClient.getIpAddress();
+			JsonObject proxyObject = new JsonParser().parse("{proxy:{" +
+					"proxyType:" + "manual" + "," +
+					"httpProxy:\"" + proxy + "\"," +
+					"httpProxyPort:" + port + "," +
+					"sslProxy:\"" + proxyHost + "\"," +
+					"sslProxyPort:" + port + "," +
+					"ftpProxy:\"" + proxyHost + "\"," +
+					"ftpProxyPort:" + port + "," +
+					"socksProxy:\"" + proxyHost + "\"," +
+					"socksProxyPort:" + port +
+					"}}").getAsJsonObject();
+
+			capabilities.setCapability("requiredCapabilities", proxyObject);
+			capabilities.setCapability("acceptInsecureCerts", true);
 		}
 		
 		//handle variant with extra capabilities from external property file
