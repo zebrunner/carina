@@ -15,16 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.UnreachableBrowserException;
-import org.testng.Assert;
-
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
@@ -33,9 +23,18 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
+import net.lightbody.bmp.proxy.CaptureType;
+import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.testng.Assert;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
@@ -530,7 +529,7 @@ public final class DriverPool {
 		// integrate browserMob proxy if required here
 		BrowserMobProxy proxy = null;
 		long threadId = Thread.currentThread().getId();
-		
+
 		if (proxies.containsKey(threadId)) {
 			proxy = proxies.get(threadId);
 		} else {
@@ -541,6 +540,10 @@ public final class DriverPool {
 		if (!proxy.isStarted()) {
 			LOGGER.info("Starting BrowserMob proxy...");
 			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
+			proxy.newHar();
+			proxy.setHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.REQUEST_COOKIES,
+					CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_CONTENT, CaptureType.RESPONSE_COOKIES,
+					CaptureType.RESPONSE_HEADERS);
 		} else {
 			LOGGER.info("BrowserMob proxy is already started on port " + proxy.getPort());
 		}
