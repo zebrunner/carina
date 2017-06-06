@@ -41,4 +41,6 @@ public @interface CsvDataSourceParameters {
 
 	String bugColumn() default "";
 
+	String[] doNotRunTestNames() default {};
+
 }

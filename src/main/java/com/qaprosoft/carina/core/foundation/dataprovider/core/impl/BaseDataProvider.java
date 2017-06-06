@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
@@ -19,6 +20,7 @@ public abstract class BaseDataProvider {
 
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
     protected Map<String, String> testMethodNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+	protected Map<String, String> canonicalTestNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
     
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
@@ -30,8 +32,9 @@ public abstract class BaseDataProvider {
 	protected List<String> argsList;
     protected List<String> staticArgsList;
 
+	protected List<String> doNotRunTestNames;
 
-    public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context);
+	public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
 
     protected static Object getStaticParam(String name, ITestContext context, DSBean dsBean) {
         return ParameterGenerator.process(dsBean
@@ -66,6 +69,16 @@ public abstract class BaseDataProvider {
 	public Map<String, String> getBugArgsMap()
 	{
 		return bugArgsMap;
+	}
+
+	public List<String> getDoNotRunRowsIDs()
+	{
+		return doNotRunTestNames;
+	}
+
+	public Map<String, String> getCanonicalTestNameArgsMap()
+	{
+		return canonicalTestNameArgsMap;
 	}
 
 }
