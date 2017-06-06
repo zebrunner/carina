@@ -75,7 +75,7 @@ public class AndroidUtils {
      * @param keyCode int
      * @return boolean
      */
-    protected boolean pressKeyCode(int keyCode) {
+    public boolean pressKeyCode(int keyCode) {
         try {
             LOGGER.info("Press key code: " + keyCode);
             ((PressesKeyCode) DriverPool.getDriver()).pressKeyCode(keyCode);
@@ -89,6 +89,12 @@ public class AndroidUtils {
                 return true;
             } catch (Exception err) {
                 LOGGER.error("Exception during pressKeyCode with old method:", err);
+                try {
+                    LOGGER.info("Press key code by javaScript: " + keyCode);
+                    executeKeyEvent(keyCode);
+                } catch (Exception err2) {
+                    LOGGER.error("Exception during pressKeyCode with JavaScript:", err2);
+                }
             }
         }
         return false;
