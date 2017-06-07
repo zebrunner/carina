@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -7,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -23,6 +26,10 @@ public class DesktopFactory extends AbstractFactory
 {
 
 	private static DesiredCapabilities staticCapabilities;
+	private static final String RESTART_ALL_BAT_PATH = "C:\\Tools\\selenium-server\\restart-all.bat";
+	private static final String RESTART_ALL_SH_PATH = "$HOME/tools/selenium/restart-all.sh";
+	private static final String PREFIX_WIN = "cmd /c ";
+	private static final String PREFIX_NIX = "/bin/bash -c ";
 
 	@Override
 	public WebDriver create(String name, Device device)
@@ -39,8 +46,11 @@ public class DesktopFactory extends AbstractFactory
 		try
 		{
 			driver = new RemoteWebDriver(new URL(selenium), capabilities);
-		} catch (MalformedURLException e)
-		{
+		} catch (UnreachableBrowserException e) {
+			// try to restart selenium hub
+			restartAll(PREFIX_WIN, RESTART_ALL_BAT_PATH);
+			restartAll(PREFIX_NIX, RESTART_ALL_SH_PATH);
+		} catch (MalformedURLException e) {
 			throw new RuntimeException("Unable to create desktop driver");
 		}
 		
@@ -86,5 +96,16 @@ public class DesktopFactory extends AbstractFactory
 			staticCapabilities = new DesiredCapabilities();
 		}
 		staticCapabilities.setCapability(name, value);
+	}
+
+	private void restartAll(String cmdPrefix, String filePath) {
+		if (new File(filePath).exists()) {
+			LOGGER.info("Following command will be executed: " + cmdPrefix + filePath);
+			try {
+				Runtime.getRuntime().exec(cmdPrefix + filePath);
+			} catch (IOException e) {
+				throw new RuntimeException("Cannot restart selenium server");
+			}
+		}
 	}
 }
