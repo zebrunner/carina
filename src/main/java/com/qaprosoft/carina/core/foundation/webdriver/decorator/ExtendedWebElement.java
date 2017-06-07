@@ -152,17 +152,37 @@ public class ExtendedWebElement {
 		return element;
 	}
 	
-	private WebElement findElement() {
-		if (element == null) {
-			LOGGER.debug("There is null WebElement object. Trying to find element...");
-
-			if (!getDriver().findElements(by).isEmpty()) {
-				LOGGER.debug("Element was idenfified using By: " + by.toString());
-				element = getDriver().findElement(by);
-			} else {
-				throw new RuntimeException("Unable to identify element using By: " + by.toString());
-			}
+	private WebElement findElement(long timeout) {
+		if (element != null) {
+			return element;
 		}
+		
+		LOGGER.debug("There is null WebElement object. Trying to find element...");
+		final WebDriver drv = getDriver();
+		setImplicitTimeout(1);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try {
+			wait.until((Function<WebDriver, Object>) dr -> {
+				if (!drv.findElements(by).isEmpty()) {
+					LOGGER.debug("Dynamic element was found using By: " + by.toString());
+					element = drv.findElement(by);
+					return true;
+				}
+				return false;
+			});
+			// summary.log(Messager.ELEMENT_FOUND.info(name));
+		} catch (Exception e) {
+			element = null;
+			// summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			setImplicitTimeout(IMPLICIT_TIMEOUT);
+			throw new RuntimeException(e);
+		}
+		setImplicitTimeout(IMPLICIT_TIMEOUT);
+
+		if (element == null) {
+			throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
+		}
+
 		return element;
 	}
 	
@@ -197,7 +217,7 @@ public class ExtendedWebElement {
     public String getText() {
         String text = null;
 		try {
-			text = findElement().getText();
+			text = findElement(EXPLICIT_TIMEOUT).getText();
 		} catch (StaleElementReferenceException e) {
 			LOGGER.debug(e.getMessage(), e.getCause());
 			element = findStaleElement();
@@ -210,7 +230,7 @@ public class ExtendedWebElement {
     public String getAttribute(String attributeName) {
         String attribute = null;
 		try {
-			attribute = findElement().getAttribute(attributeName);
+			attribute = findElement(EXPLICIT_TIMEOUT).getAttribute(attributeName);
 		} catch (StaleElementReferenceException e) {
 			LOGGER.debug(e.getMessage(), e.getCause());
 			element = findStaleElement();
@@ -285,8 +305,8 @@ public class ExtendedWebElement {
             timer = System.currentTimeMillis();
         }
         try {
-            Thread.sleep(RETRY_TIME);
-            action.moveToElement(findElement()).doubleClick(findElement()).build().perform();
+        	element = findElement(EXPLICIT_TIMEOUT);
+            action.moveToElement(element).doubleClick(element).build().perform();
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             drv.switchTo().alert().accept();
@@ -298,6 +318,7 @@ public class ExtendedWebElement {
             if (e.getMessage().contains("Element is not clickable")) {
                 scrollTo();
             }
+            pause(RETRY_TIME);
 
             if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000) {
                 doubleClickSafe(false);
@@ -321,7 +342,8 @@ public class ExtendedWebElement {
         try {
             WebDriver drv = getDriver();
             Actions action = new Actions(drv);
-            action.moveToElement(findElement()).contextClick(findElement()).build().perform();
+            element = findElement(EXPLICIT_TIMEOUT);
+            action.moveToElement(element).contextClick(element).build().perform();
 
             msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
             summary.log(msg);
@@ -353,7 +375,7 @@ public class ExtendedWebElement {
         String msg = "Hidden Element Click";
         boolean res = false;
         try {
-            WebElement elem = findElement();
+            WebElement elem = findElement(EXPLICIT_TIMEOUT);
             JavascriptExecutor executor = (JavascriptExecutor) getDriver();
             executor.executeScript("arguments[0].click();", elem);
 
@@ -394,12 +416,14 @@ public class ExtendedWebElement {
             LOGGER.warn("Timeout should be bigger than 0.");
             timeout = 1;
         }
+        
+        final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
         setImplicitTimeout(1);
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
-            wait.until((Function<WebDriver, Object>) dr -> findElement().isDisplayed());
+            wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
@@ -436,7 +460,8 @@ public class ExtendedWebElement {
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
                 try {
-                    return findElement().isDisplayed() && findElement().getText().contains(decryptedText);
+                	element = findElement(timeout);
+                    return element.isDisplayed() && element.getText().contains(decryptedText);
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage(), e.getCause());
                     return false;
@@ -462,7 +487,7 @@ public class ExtendedWebElement {
         setImplicitTimeout(1);
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
-            wait.until((Function<WebDriver, Object>) dr -> findElement().isDisplayed());
+            wait.until((Function<WebDriver, Object>) dr -> findElement(timeout).isDisplayed());
             element.click();
             String msg = Messager.ELEMENT_CLICKED.info(getName());
             summary.log(msg);
@@ -488,9 +513,9 @@ public class ExtendedWebElement {
         WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
-            wait.until((Function<WebDriver, Object>) dr -> findElement().isDisplayed());
+        	element = findElement(EXPLICIT_TIMEOUT);
+            wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
             scrollTo();
-            element = findElement();
             element.clear();
             element.sendKeys(decryptedText);
             msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
@@ -550,8 +575,7 @@ public class ExtendedWebElement {
             timer = System.currentTimeMillis();
         }
         try {
-            Thread.sleep(RETRY_TIME);
-            findElement().click();
+            findElement(timeout).click();
             clicked = true;
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
@@ -566,6 +590,7 @@ public class ExtendedWebElement {
         }
 
         if (!clicked) {
+        	pause(RETRY_TIME);
             //repeat again until timeout achieved
             if (System.currentTimeMillis() - timer < timeout * 1000) {
                 clickSafe(timeout, false);
@@ -583,7 +608,7 @@ public class ExtendedWebElement {
             return;
         }
         try {
-            Locatable locatableElement = (Locatable) findElement();
+            Locatable locatableElement = (Locatable) findElement(EXPLICIT_TIMEOUT);
             //[VD] onScreen should be updated onto onPage as only 2nd one returns real coordinates without scrolling... read below material for details
             //https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
 
@@ -609,8 +634,9 @@ public class ExtendedWebElement {
         WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
-            wait.until((Function<WebDriver, Object>) dr -> findElement().isDisplayed());
-            findElement().sendKeys(decryptedFilePath);
+        	element = findElement(EXPLICIT_TIMEOUT);
+            wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
+            element.sendKeys(decryptedFilePath);
             msg = Messager.FILE_ATTACHED.info(filePath);
             summary.log(msg);
         } catch (Exception e) {
@@ -627,7 +653,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void check() {
-        if (isElementPresent() && !findElement().isSelected()) {
+        if (isElementPresent() && !findElement(EXPLICIT_TIMEOUT).isSelected()) {
             click();
             String msg = Messager.CHECKBOX_CHECKED.info(getName());
             summary.log(msg);
@@ -641,7 +667,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-        if (isElementPresent() && findElement().isSelected()) {
+        if (isElementPresent() && findElement(EXPLICIT_TIMEOUT).isSelected()) {
             click();
             String msg = Messager.CHECKBOX_UNCHECKED.info(getName());
             summary.log(msg);
@@ -656,9 +682,10 @@ public class ExtendedWebElement {
      */
     public boolean isChecked() {
         assertElementPresent();
-        boolean res = findElement().isSelected();
-        if (findElement().getAttribute("checked") != null) {
-            res |= findElement().getAttribute("checked").equalsIgnoreCase("true");
+        element = findElement(EXPLICIT_TIMEOUT);
+        boolean res = element.isSelected();
+        if (element.getAttribute("checked") != null) {
+            res |= element.getAttribute("checked").equalsIgnoreCase("true");
         }
         return res;
     }
@@ -671,7 +698,7 @@ public class ExtendedWebElement {
      */
     public String getSelectedValue() {
         assertElementPresent();
-        return new Select(findElement()).getAllSelectedOptions().get(0).getText();
+        return new Select(findElement(EXPLICIT_TIMEOUT)).getAllSelectedOptions().get(0).getText();
     }
 
     /**
@@ -681,7 +708,7 @@ public class ExtendedWebElement {
      */
     public List<String> getSelectedValues() {
         assertElementPresent();
-        Select s = new Select(findElement());
+        Select s = new Select(findElement(EXPLICIT_TIMEOUT));
         List<String> values = new ArrayList<String>();
         for (WebElement we : s.getAllSelectedOptions()) {
             values.add(we.getText());
@@ -702,10 +729,13 @@ public class ExtendedWebElement {
     public boolean select(final String selectText) {
         boolean isSelected = false;
         final String decryptedSelectText = cryptoTool.decryptByPattern(selectText, CRYPTO_PATTERN);
-        final Select s = new Select(findElement());
+
         WebDriver drv = getDriver();
-        String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        
+        final Select s = new Select(findElement(EXPLICIT_TIMEOUT));
+        String msg = null;
+
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
                 try {
@@ -763,10 +793,13 @@ public class ExtendedWebElement {
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
         boolean isSelected = false;
-        final Select s = new Select(findElement());
+
         WebDriver drv = getDriver();
-        String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        
+        final Select s = new Select(findElement(EXPLICIT_TIMEOUT));
+        String msg = null;
+        
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
                 try {
@@ -805,10 +838,13 @@ public class ExtendedWebElement {
      */
     public boolean selectByPartialText(final String partialSelectText) {
         boolean isSelected = false;
-        final Select s = new Select(findElement());
+
         WebDriver drv = getDriver();
-        String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        
+        final Select s = new Select(findElement(EXPLICIT_TIMEOUT));
+        String msg = null;
+
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
                 try {
@@ -846,10 +882,12 @@ public class ExtendedWebElement {
      */
     public boolean select(final int index) {
         boolean isSelected = false;
-        final Select s = new Select(findElement());
         WebDriver drv = getDriver();
-        String msg = null;
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        
+        final Select s = new Select(findElement(EXPLICIT_TIMEOUT));
+        String msg = null;
+
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
                 try {
@@ -1247,5 +1285,20 @@ public class ExtendedWebElement {
         }
 
     }
+
+	/**
+	 * Pause for specified timeout.
+	 * 
+	 * @param timeout
+	 *            in seconds.
+	 */
+
+	public void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
