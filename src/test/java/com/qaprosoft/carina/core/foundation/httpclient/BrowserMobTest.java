@@ -1,16 +1,13 @@
 package com.qaprosoft.carina.core.foundation.httpclient;
 
-import java.util.Map;
-
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import net.lightbody.bmp.BrowserMobProxy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.http.HttpClient;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-
-import net.lightbody.bmp.BrowserMobProxy;
+import java.util.Map;
 
 public class BrowserMobTest {
 	private static String header = "my_header";
@@ -23,9 +20,7 @@ public class BrowserMobTest {
 		R.CONFIG.put("browsermob_port", "0");
 		R.CONFIG.put("proxy_set_to_system", "true");
 		
-		HttpClient.setupProxy();
-
-		BrowserMobProxy proxy = DriverPool.getProxy();
+		BrowserMobProxy proxy = DriverPool.startProxy();
 		proxy.addHeader(header, headerValue);
 	}
 	
@@ -34,12 +29,6 @@ public class BrowserMobTest {
 		Assert.assertTrue(DriverPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
 	}
 	
-	@Test
-	public void testBrowserModProxySystemIntegration() {
-		Assert.assertEquals(HttpClient.getIpAddress(), System.getProperty("http.proxyHost"));
-		Assert.assertEquals(Integer.toString(DriverPool.getProxy().getPort()), System.getProperty("http.proxyPort"));
-	}
-
 	@Test
 	public void testBrowserModProxyHeader() {
 		Map<String, String> headers = DriverPool.getProxy().getAllHeaders();
