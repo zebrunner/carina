@@ -1137,7 +1137,7 @@ public class ExtendedWebElement {
         final WebDriver drv = getDriver();
         By locator = getBy();
         boolean res = true;
-        String msg = "Right Click";
+        String msg = "";
         try {
             ExpectedConditions.elementToBeClickable(locator);
             (new WebDriverWait(drv, timeout)).until(ExpectedConditions.elementToBeClickable(locator));
@@ -1150,6 +1150,50 @@ public class ExtendedWebElement {
             res = false;
         } catch (Exception e) {
             msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
+            summary.log(msg);
+            LOGGER.error(e);
+            res = false;
+        }
+        try {
+            Screenshot.capture(getDriver(), msg);
+        } catch (Exception e) {
+            LOGGER.info(e.getMessage());
+        }
+        return res;
+    }
+    
+    /**
+     * Checks that element visible.
+     *
+     * @return element visibility status.
+     */
+    public boolean isVisible() {
+        return isVisible(EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Check that element visible within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @return element visibility status.
+     */
+    public boolean isVisible(long timeout) {
+        final WebDriver drv = getDriver();
+        By locator = getBy();
+        boolean res = true;
+        String msg = "";
+        try {
+            ExpectedConditions.elementToBeClickable(locator);
+            (new WebDriverWait(drv, timeout)).until(ExpectedConditions.visibilityOfElementLocated(locator));
+            msg = Messager.ELEMENT_BECOME_VISIBLE.info(getName());
+            summary.log(msg);
+        } catch (TimeoutException ex) {
+            msg = Messager.ELEMENT_NOT_BECOME_VISIBLE.info(getName());
+            summary.log(msg);
+            LOGGER.error(ex);
+            res = false;
+        } catch (Exception e) {
+            msg = Messager.ELEMENT_NOT_BECOME_VISIBLE.info(getName());
             summary.log(msg);
             LOGGER.error(e);
             res = false;
