@@ -37,6 +37,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
@@ -547,19 +548,18 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     @DataProvider(name = "DataProvider", parallel = true)
-    public Object[][] createData(final Method testMethod, ITestContext context) {
-        Annotation[] annotations = testMethod.getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getDataProvider(annotations,
-                context);
+	public Object[][] createData(final ITestNGMethod testMethod, ITestContext context)
+	{
+		Annotation[] annotations = testMethod.getMethod().getDeclaredAnnotations();
+		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
         return objects;
     }
 
     @DataProvider(name = "SingleDataProvider")
-    public Object[][] createDataSingeThread(final Method testMethod,
+	public Object[][] createDataSingeThread(final ITestNGMethod testMethod,
                                             ITestContext context) {
-        Annotation[] annotations = testMethod.getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getDataProvider(annotations,
-                context);
+		Annotation[] annotations = testMethod.getMethod().getDeclaredAnnotations();
+		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
         return objects;
     }
 
