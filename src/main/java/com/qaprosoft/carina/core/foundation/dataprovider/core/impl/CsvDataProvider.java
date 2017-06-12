@@ -12,12 +12,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -40,8 +42,11 @@ public class CsvDataProvider extends BaseDataProvider {
     
     @SuppressWarnings("unchecked")
 	@Override
-    public Object[][] getDataProvider(Annotation annotation, ITestContext context) {
+	public Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod)
+	{
         CsvDataSourceParameters parameters = (CsvDataSourceParameters) annotation;
+		doNotRunTestNames = Arrays.asList(parameters.doNotRunTestNames());
+
         DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest().getAllParameters());
 
         char separator, quote;
@@ -157,6 +162,7 @@ public class CsvDataProvider extends BaseDataProvider {
             
             HashMap<String,String> csvRow = (HashMap<String, String>) args[rowIndex][0];
             
+			canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingUtil.appendTestMethodName(testName, testMethod));
             if (testMethodColumn.isEmpty()) {
             	testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); //provide organized args to generate valid hash
             } else {
