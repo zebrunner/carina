@@ -38,4 +38,6 @@ public @interface XlsDataSourceParameters {
     String testMethodOwnerColumn() default "";
 
 	String bugColumn() default "";
+
+	String[] doNotRunTestNames() default {};
 }

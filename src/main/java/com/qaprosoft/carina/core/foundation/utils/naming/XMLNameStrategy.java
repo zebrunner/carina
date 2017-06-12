@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
@@ -75,20 +76,7 @@ public class XMLNameStrategy implements INamingStrategy
 			}
 		}
 		
-		int invocationID = -1;
-		if (result.getMethod().getInvocationCount() > 1){
-			invocationID = result.getMethod().getCurrentInvocationCount() + 1; 
-		}
-		
-		if (invocationID != -1) {
-			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time 
-			testName = testName + " - " +  result.getMethod().getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
-		}
-		else {
-			testName = testName + " - " +  result.getMethod().getMethodName();
-		}
-
-		return testName;
+		return appendTestMethodName(testName, result.getMethod());
 	}
 	
 	@Override
@@ -112,6 +100,27 @@ public class XMLNameStrategy implements INamingStrategy
 	public String getPackageName(ITestResult result)
 	{
 		return result.getMethod().getRealClass().getPackage().getName();
+	}
+
+	@Override
+	public String appendTestMethodName(String testName, ITestNGMethod m)
+	{
+		int invocationID = -1;
+		if (m.getInvocationCount() > 1)
+		{
+			invocationID = m.getCurrentInvocationCount() + 1;
+		}
+
+		if (invocationID != -1)
+		{
+			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
+			testName = testName + " - " + m.getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
+		} else
+		{
+			testName = testName + " - " + m.getMethodName();
+		}
+
+		return testName;
 	}
 	
 }

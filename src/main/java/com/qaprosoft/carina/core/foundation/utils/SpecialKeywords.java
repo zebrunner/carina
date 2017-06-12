@@ -80,6 +80,7 @@ public class SpecialKeywords
 	public static final String NULL = "NULL";
 
 	public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
+	public static final String CANONICAL_TEST_NAME_ARGS_MAP = "canonicalTestNameArgsMap";
 	public static final String TEST_METHOD_NAME_ARGS_MAP = "testMethodNameArgsMap";
 	public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";	
 	public static final String JIRA_ARGS_MAP = "jiraArgsMap";
@@ -88,6 +89,7 @@ public class SpecialKeywords
 	public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
 	public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
 	public static final String BUG_ARGS_MAP = "bugArgsMap";
+	public static final String DO_NOT_RUN_TESTS = "doNotRunTests";
 	
 	
 	public static final String INV_COUNT = "InvCount";
