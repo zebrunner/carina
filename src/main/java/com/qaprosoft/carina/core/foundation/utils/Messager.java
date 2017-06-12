@@ -113,6 +113,10 @@ public enum Messager {
 	ELEMENT_BECOME_CLICKABLE("PASS: element '%s' become clickable."),
 
 	ELEMENT_NOT_BECOME_CLICKABLE("FAIL: element '%s' is not become clickable before timeout!"),
+	
+	ELEMENT_BECOME_VISIBLE("PASS: element '%s' become visible."),
+
+	ELEMENT_NOT_BECOME_VISIBLE("FAIL: element '%s' is not become visible before timeout!"),
 
 	ELEMENT_CLICKED("PASS: element '%s' is clicked."),
 
