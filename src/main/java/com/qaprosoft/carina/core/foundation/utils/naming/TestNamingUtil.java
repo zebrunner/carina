@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
@@ -84,6 +85,11 @@ public class TestNamingUtil
 	public static String getPackageName(ITestResult result)
 	{
 		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
+	}
+
+	public static String appendTestMethodName(String testName, ITestNGMethod m)
+	{
+		return StringEscapeUtils.escapeHtml4(namingStrategy.appendTestMethodName(testName, m));
 	}
 
 	public static synchronized String associateTestInfo2Thread(String test, Long threadId)
