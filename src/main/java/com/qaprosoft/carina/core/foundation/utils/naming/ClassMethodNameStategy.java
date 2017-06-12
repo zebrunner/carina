@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.utils.naming;
 
 import java.lang.reflect.Method;
 
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
@@ -48,5 +49,12 @@ public class ClassMethodNameStategy implements INamingStrategy
 	public String getPackageName(ITestResult result)
 	{
 		return result.getMethod().getRealClass().getPackage().getName();
+	}
+
+	@Override
+	public String appendTestMethodName(String testName, ITestNGMethod m)
+	{
+		// do nothing additional
+		return testName;
 	}
 }
