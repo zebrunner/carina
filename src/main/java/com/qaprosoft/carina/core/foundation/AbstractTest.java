@@ -550,7 +550,7 @@ public abstract class AbstractTest // extends DriverHelper
     @DataProvider(name = "DataProvider", parallel = true)
 	public Object[][] createData(final ITestNGMethod testMethod, ITestContext context)
 	{
-		Annotation[] annotations = testMethod.getMethod().getDeclaredAnnotations();
+		Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
 		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
         return objects;
     }
@@ -558,7 +558,7 @@ public abstract class AbstractTest // extends DriverHelper
     @DataProvider(name = "SingleDataProvider")
 	public Object[][] createDataSingeThread(final ITestNGMethod testMethod,
                                             ITestContext context) {
-		Annotation[] annotations = testMethod.getMethod().getDeclaredAnnotations();
+		Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
 		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
         return objects;
     }
