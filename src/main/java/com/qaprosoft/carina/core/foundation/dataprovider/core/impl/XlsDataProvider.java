@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
@@ -14,6 +15,7 @@ import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -22,10 +24,12 @@ public class XlsDataProvider extends BaseDataProvider {
 
 
     @Override
-    public Object[][] getDataProvider(Annotation annotation, ITestContext context) {
+	public Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod)
+	{
 
 
         XlsDataSourceParameters parameters = (XlsDataSourceParameters) annotation;
+		doNotRunTestNames = Arrays.asList(parameters.doNotRunTestNames());
 
         DSBean dsBean = new DSBean(parameters, context
                 .getCurrentXmlTest().getAllParameters());
@@ -122,7 +126,7 @@ public class XlsDataProvider extends BaseDataProvider {
             // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
-
+			canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingUtil.appendTestMethodName(testName, testMethod));
             if (testMethodColumn.isEmpty()) {
                 testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
             } else {
@@ -157,7 +161,7 @@ public class XlsDataProvider extends BaseDataProvider {
            
             rowIndex++;
         }
-
+        
         return args;
     }
     
@@ -173,5 +177,5 @@ public class XlsDataProvider extends BaseDataProvider {
             }
         }    	
     }
-    
+
 }
