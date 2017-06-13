@@ -39,7 +39,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
-@SuppressWarnings("deprecation")
 public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
@@ -242,7 +241,7 @@ public final class DriverPool {
 			quitDriver(entry.getKey());
 		}
 		
-		stopProxy();
+		// stopProxy();
 	}
 
 	/**
@@ -559,10 +558,15 @@ public final class DriverPool {
 		return proxy;
 	}
 
+	// https://github.com/lightbody/browsermob-proxy/issues/264 'started' flag is not set to false after stopping BrowserMobProxyServer
+	// Due to the above issue we can't control BrowserMob isRunning state and shouldn't stop it
+	// TODO: investigate possibility to clean HAR files if necessary
+	
 	/**
 	 * stop BrowserMobProxy Server
 	 * 
 	 */
+	/*
 	public static void stopProxy() {
 		long threadId = Thread.currentThread().getId();
 
@@ -571,6 +575,7 @@ public final class DriverPool {
 			BrowserMobProxy proxy = proxies.get(threadId);
 			if (proxy != null) {
 				LOGGER.debug("Found registered proxy by thread: " + threadId);
+
 				if (proxy.isStarted()) {
 					LOGGER.info("Stopping BrowserMob proxy...");
 					proxy.stop();
@@ -579,11 +584,9 @@ public final class DriverPool {
 				}
 			}
 			proxies.remove(threadId);
-		} else {
-			
 		}
 		LOGGER.debug("stopProxy finished...");
-	}
+	}*/
 
 	/**
 	 * get registered BrowserMobProxy Server
