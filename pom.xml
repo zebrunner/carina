@@ -421,6 +421,12 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>api-tools</artifactId>
 			<version>${api-tools.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- monte-repack video recording  -->
