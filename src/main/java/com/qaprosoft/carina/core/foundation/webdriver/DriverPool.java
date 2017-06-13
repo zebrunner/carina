@@ -604,6 +604,17 @@ public final class DriverPool {
 		}
 		return proxy;
 	}
+	
+	/**
+	 * return true if proxy is already registered
+	 * 
+	 * @return boolean
+	 * 
+	 */
+	public static boolean isProxyRegistered() {
+		long threadId = Thread.currentThread().getId();
+		return proxies.containsKey(threadId);
+	}
 
 	/**
 	 * register custom BrowserMobProxy Server
