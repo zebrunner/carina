@@ -26,7 +26,9 @@ public class ZafiraClientTest
 	private TestSuiteType testSuite;
 	TestRunType testRun;
 	
-	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira", "admin", "admin");
+	//TODO: to enable tests we should incorporate zc.login somehow later
+	private static final ZafiraClient zc = new ZafiraClient("http://stg.caronfly.com:8080/zafira");
+	
 	
 	@Test(enabled=ENABLED)
 	public void testStatus()
