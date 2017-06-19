@@ -16,7 +16,7 @@ import com.qaprosoft.zafira.models.dto.TestCaseType;
 import com.qaprosoft.zafira.models.dto.TestRunType;
 import com.qaprosoft.zafira.models.dto.TestSuiteType;
 import com.qaprosoft.zafira.models.dto.TestType;
-import com.qaprosoft.zafira.models.dto.UserType;
+import com.qaprosoft.zafira.models.dto.user.UserType;
 
 public class ZafiraClientTest
 {
