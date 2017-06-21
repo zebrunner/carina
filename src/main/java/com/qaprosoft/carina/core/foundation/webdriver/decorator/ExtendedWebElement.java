@@ -15,44 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -68,6 +30,30 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.*;
+import org.testng.Assert;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
@@ -1239,7 +1225,7 @@ public class ExtendedWebElement {
     		return;
     	}
 
-        String currentUrl = "";
+        String currentUrl;
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
         	currentUrl = driver.getCurrentUrl();
         } else {
@@ -1247,7 +1233,7 @@ public class ExtendedWebElement {
         	currentUrl = driver.getTitle();
         }
 
-        String cache = currentUrl;
+        String cache = getUrlWithoutParameters(currentUrl);
         if (!MetadataCollector.getAllCollectedData().containsKey(cache)) {
             try {
 
@@ -1266,7 +1252,7 @@ public class ExtendedWebElement {
 
                 List<WebElement> all = driver.findElements(By.xpath("//*"));
 
-                List<WebElement> control = ((RemoteWebDriver) driver).findElements(By.xpath("//input[not(contains(@type,'hidden'))] | //button | .//*[contains(@class, 'btn') and not(self::span)] | //select"));
+                List<WebElement> control = driver.findElements(By.xpath("//input[not(contains(@type,'hidden'))] | //button | .//*[contains(@class, 'btn') and not(self::span)] | //select"));
 
                 for (WebElement webElement : control) {
                     ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement, driver));
@@ -1304,6 +1290,17 @@ public class ExtendedWebElement {
             	LOGGER.error("Unable to capture elements metadata!", thr);
             }
         }
+    }
+
+    private  String getUrlWithoutParameters(String url) {
+
+        try {
+            URI uri = new URI(url);
+            return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, uri.getFragment()).toString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return url;
     }
 
     @SuppressWarnings("unchecked")
