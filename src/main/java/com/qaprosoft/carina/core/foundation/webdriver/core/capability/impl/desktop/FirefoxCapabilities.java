@@ -56,7 +56,9 @@ public class FirefoxCapabilities extends AbstractCapabilities {
         profile.setPreference("dom.max_script_run_time", 0);
         profile.setEnableNativeEvents(true);
 
-        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+		if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
+				|| "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS))))
+		{
             profile.setPreference("browser.download.folderList", 2);
             profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
@@ -66,6 +68,12 @@ public class FirefoxCapabilities extends AbstractCapabilities {
             profile.setPreference("plugin.scan.plid.all", false);
             profile.setPreference("plugin.scan.Acrobat", "99.0");
         }
+		else if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
+				|| "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))
+		{
+			LOGGER.warn(
+					"If you want to enable auto-download for FF please specify '" + Configuration.Parameter.AUTO_DOWNLOAD_APPS.getKey() + "' param");
+		}
 
         profile.setAcceptUntrustedCertificates(true);
         profile.setAssumeUntrustedCertificateIssuer(true);
