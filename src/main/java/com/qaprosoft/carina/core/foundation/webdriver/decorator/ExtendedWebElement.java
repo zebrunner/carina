@@ -37,6 +37,7 @@ import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
@@ -1221,9 +1222,13 @@ public class ExtendedWebElement {
 
 	private void captureElements() {
 
-    	if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
+        if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
     		return;
     	}
+
+        if (!BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))){
+            return;
+        }
 
         String currentUrl;
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
