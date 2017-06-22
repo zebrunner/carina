@@ -577,7 +577,7 @@ public class ExtendedWebElement {
         }
 
         if (!clicked) {
-        	pause(RETRY_TIME);
+			pause((double) RETRY_TIME / 1000);
             //repeat again until timeout achieved
             if (System.currentTimeMillis() - timer < timeout * 1000) {
                 clickSafe(timeout, false);
@@ -1343,6 +1343,17 @@ public class ExtendedWebElement {
 		try {
 			Thread.sleep(timeout * 1000);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void pause(double timeout)
+	{
+		try
+		{
+			Thread.sleep((long) (timeout * 1000));
+		} catch (InterruptedException e)
+		{
 			e.printStackTrace();
 		}
 	}
