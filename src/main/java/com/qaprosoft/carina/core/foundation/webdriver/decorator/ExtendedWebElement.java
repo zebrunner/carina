@@ -305,7 +305,7 @@ public class ExtendedWebElement {
             if (e.getMessage().contains("Element is not clickable")) {
                 scrollTo();
             }
-            pause(RETRY_TIME);
+            pause((double) RETRY_TIME / 1000);
 
             if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000) {
                 doubleClickSafe(false);
