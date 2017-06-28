@@ -213,11 +213,12 @@ public abstract class AbstractTest // extends DriverHelper
         }
         
         // sync email_list and zafira_report_emails properties to keep the only one. Zafira is preferable
-        if (R.CONFIG.getBoolean("zafira_enabled")) {
+        if (R.ZAFIRA.getBoolean("zafira_enabled")) {
         	String emailList = Configuration.get(Parameter.EMAIL_LIST);
         	if (!emailList.isEmpty()) {
         		LOGGER.info("Emaling reporting will be done using Zafira for email_list: " + emailList);
-        		R.CONFIG.put("zafira_report_emails", emailList);
+        		R.ZAFIRA.put("zafira_report_emails", emailList);
+        		System.setProperty("zafira_report_emails", emailList);
         		R.CONFIG.put(Parameter.EMAIL_LIST.getKey(), "");
         	}
         }
