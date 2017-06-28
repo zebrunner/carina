@@ -133,7 +133,10 @@ public class ZafiraConfigurator implements IConfigurator
     }
 
 	@Override
-	public Set<TestArtifactType> getArtifacts(ITestResult arg0) {
-		return Link.getLinks();
+	public Set<TestArtifactType> getArtifacts(ITestResult test) {
+		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
+		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
+		
+		return Artifacts.getArtifacts();
 	}
 }
