@@ -60,7 +60,7 @@ import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
-import com.qaprosoft.carina.core.foundation.report.Link;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -297,7 +297,7 @@ public abstract class AbstractTest // extends DriverHelper
             // clear jira tickets to be sure that next test is not affected.
             Jira.clearTickets();
             testRailCases.clear();
-            Link.clearLinks();
+            Artifacts.clearArtifacts();
 
 
             try {

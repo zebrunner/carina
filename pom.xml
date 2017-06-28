@@ -59,7 +59,7 @@
 
 		<jira-client.version>0.5</jira-client.version>
 
-		<zafira-client.version>3.0.4-SNAPSHOT</zafira-client.version>
+		<zafira-client.version>3.0.5-SNAPSHOT</zafira-client.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<json-simple.version>1.1</json-simple.version>

@@ -23,32 +23,23 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /*
  * Link
- * 
  */
-final public class Link
-{
-    private static final ThreadLocal<Set<TestArtifactType>> testLinks = ThreadLocal.withInitial(HashSet::new);
+final public class Artifacts {
+	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 
-	public static void clearLinks() {
-		testLinks.remove();
-	}
-	
-	public synchronized static Set<TestArtifactType> getLinks()
-	{
-		return testLinks.get();
+	public static void clearArtifacts() {
+		testArtifacts.remove();
 	}
 
-	public static void addLink(String name, String link) {
-		addLink(name, link, null);
+	public synchronized static Set<TestArtifactType> getArtifacts() {
+		return testArtifacts.get();
 	}
-	
-	public static void addLink(String name, String link, Date expires_at) {
-		// TODO: organize valid constructor for below class
-		TestArtifactType artifact = new TestArtifactType();
-		artifact.setName(name);
-		artifact.setLink(link);
-		artifact.setExpiresAt(expires_at);
-		
-		testLinks.get().add(artifact);
+
+	public static void add(String name, String link) {
+		add(name, link, null);
+	}
+
+	public static void add(String name, String link, Date expires_at) {
+		testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
 	}
 }
