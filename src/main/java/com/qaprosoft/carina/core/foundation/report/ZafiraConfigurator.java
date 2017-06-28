@@ -3,6 +3,7 @@ package com.qaprosoft.carina.core.foundation.report;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.testng.ISuite;
 import org.testng.ITestResult;
@@ -132,7 +133,7 @@ public class ZafiraConfigurator implements IConfigurator
     }
 
 	@Override
-	public List<TestArtifactType> getArtifacts(ITestResult arg0) {
+	public Set<TestArtifactType> getArtifacts(ITestResult arg0) {
 		return Link.getLinks();
 	}
 }
