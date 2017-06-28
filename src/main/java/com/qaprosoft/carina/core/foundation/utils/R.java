@@ -46,7 +46,9 @@ public enum R
 
 	REPORT("report.properties"),
 
-	DATABASE("database.properties");
+	DATABASE("database.properties"),
+	
+	ZAFIRA("zafira.properties");
 
 	private static final Logger LOGGER = Logger.getLogger(R.class);
 	
