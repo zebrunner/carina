@@ -25,14 +25,9 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * Link
  * 
  */
-public class Link
+final public class Link
 {
-    protected static ThreadLocal<Set<TestArtifactType>> testLinks = new ThreadLocal<Set<TestArtifactType>>();
-    
-    static
-	{
-		testLinks.set(new HashSet<>());
-	}
+    private static final ThreadLocal<Set<TestArtifactType>> testLinks = ThreadLocal.withInitial(HashSet::new);
 
 	public static void clearLinks() {
 		testLinks.remove();
