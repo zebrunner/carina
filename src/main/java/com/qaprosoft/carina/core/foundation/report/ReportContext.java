@@ -391,6 +391,14 @@ public class ReportContext
 	public static String getTestScreenshotsLink(String test)
 	{
 		String link = "";
+		// Add verification if report.html exists and return empty link
+		 String reportPath = String.format("file://%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		 File report = new File(reportPath);
+		 if (!report.exists()) {
+			 return link;
+		 }
+		 
+		
 		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
