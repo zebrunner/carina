@@ -392,9 +392,10 @@ public class ReportContext
 	{
 		String link = "";
 		// Add verification if report.html exists and return empty link
-		 String reportPath = String.format("file://%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		 String reportPath = String.format("%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		 File report = new File(reportPath);
 		 if (!report.exists()) {
+			 LOGGER.warn("Report file doesn't exist: " + reportPath);
 			 return link;
 		 }
 		 
