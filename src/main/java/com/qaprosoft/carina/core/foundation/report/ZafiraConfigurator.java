@@ -3,8 +3,8 @@ package com.qaprosoft.carina.core.foundation.report;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.testng.ISuite;
 import org.testng.ITestResult;
 
@@ -19,6 +19,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.config.IConfigurator;
 import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
+import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
 
@@ -130,4 +131,12 @@ public class ZafiraConfigurator implements IConfigurator
     {
         return DriverMode.valueOf(R.CONFIG.get("driver_mode").toUpperCase());
     }
+
+	@Override
+	public Set<TestArtifactType> getArtifacts(ITestResult test) {
+		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
+		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
+		
+		return Artifacts.getArtifacts();
+	}
 }

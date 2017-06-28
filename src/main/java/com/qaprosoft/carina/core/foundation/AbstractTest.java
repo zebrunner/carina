@@ -60,6 +60,7 @@ import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -204,12 +205,21 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 
         
-
         // moved from UITest->executeBeforeTestSuite
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
             //redefine core properties using custom capabilities file
             Configuration.loadCoreProperties(customCapabilities);
+        }
+        
+        // sync email_list and zafira_report_emails properties to keep the only one. Zafira is preferable
+        if (R.CONFIG.getBoolean("zafira_enabled")) {
+        	String emailList = Configuration.get(Parameter.EMAIL_LIST);
+        	if (!emailList.isEmpty()) {
+        		LOGGER.info("Emaling reporting will be done using Zafira for email_list: " + emailList);
+        		R.CONFIG.put("zafira_report_emails", emailList);
+        		R.CONFIG.put(Parameter.EMAIL_LIST.getKey(), "");
+        	}
         }
 
     }
@@ -296,6 +306,7 @@ public abstract class AbstractTest // extends DriverHelper
             // clear jira tickets to be sure that next test is not affected.
             Jira.clearTickets();
             testRailCases.clear();
+            Artifacts.clearArtifacts();
 
 
             try {
