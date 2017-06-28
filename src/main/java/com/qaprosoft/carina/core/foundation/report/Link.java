@@ -16,7 +16,8 @@
 package com.qaprosoft.carina.core.foundation.report;
 
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -26,13 +27,18 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  */
 public class Link
 {
-    protected static ThreadLocal<List<TestArtifactType>> testLinks = new ThreadLocal<List<TestArtifactType>>();
+    protected static ThreadLocal<Set<TestArtifactType>> testLinks = new ThreadLocal<Set<TestArtifactType>>();
+    
+    static
+	{
+		testLinks.set(new HashSet<>());
+	}
 
 	public static void clearLinks() {
 		testLinks.remove();
 	}
 	
-	public synchronized static List<TestArtifactType> getLinks()
+	public synchronized static Set<TestArtifactType> getLinks()
 	{
 		return testLinks.get();
 	}
@@ -47,5 +53,7 @@ public class Link
 		artifact.setName(name);
 		artifact.setLink(link);
 		artifact.setExpiresAt(expires_at);
+		
+		testLinks.get().add(artifact);
 	}
 }
