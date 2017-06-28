@@ -390,6 +390,7 @@ public class ReportContext
 	 */
 	public static String getTestScreenshotsLink(String test)
 	{
+		// TODO: find unified solution for screenshots presence determination. Combine it with AbstractTestListener->createTestResult code
 		String link = "";
 		if (FileUtils.listFiles(ReportContext.getTestDir(test), new String[] { "png" }, false).isEmpty()) {
 			// no png screenshot files at all
