@@ -205,12 +205,21 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 
         
-
         // moved from UITest->executeBeforeTestSuite
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
             //redefine core properties using custom capabilities file
             Configuration.loadCoreProperties(customCapabilities);
+        }
+        
+        // sync email_list and zafira_report_emails properties to keep the only one. Zafira is preferable
+        if (R.CONFIG.getBoolean("zafira_enabled")) {
+        	String emailList = Configuration.get(Parameter.EMAIL_LIST);
+        	if (!emailList.isEmpty()) {
+        		LOGGER.info("Emaling reporting will be done using Zafira for email_list: " + emailList);
+        		R.CONFIG.put("zafira_report_emails", emailList);
+        		R.CONFIG.put(Parameter.EMAIL_LIST.getKey(), "");
+        	}
         }
 
     }
