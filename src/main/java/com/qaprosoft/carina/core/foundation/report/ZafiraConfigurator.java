@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestResult;
 
@@ -31,6 +32,7 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  */
 public class ZafiraConfigurator implements IConfigurator
 {
+	protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
     private List<String> uniqueKeys = Arrays.asList(R.CONFIG.get("unique_testrun_fields").split(","));
 
     @Override
@@ -143,10 +145,12 @@ public class ZafiraConfigurator implements IConfigurator
 	
 	@Override
 	public String getReportEmails() {
-		String emailList = ""; //do not send enails via Zafira until integration is enabled explicitly
+		String emailList = ""; //do not send emails via Zafira until integration is enabled explicitly
         if (R.ZAFIRA.getBoolean("zafira_enabled")) {
             // sync email_list and zafira_report_emails properties to keep the only way for notification.
         	emailList = Configuration.get(Parameter.EMAIL_LIST);
+        	LOGGER.info("Disabling local email and providind recipients email_list to Zafira. email_list: " + emailList);
+
         	if (!emailList.isEmpty()) {
         		R.CONFIG.put(Parameter.EMAIL_LIST.getKey(), "");
         	}
