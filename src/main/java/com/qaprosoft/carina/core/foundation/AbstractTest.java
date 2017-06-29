@@ -368,16 +368,20 @@ public abstract class AbstractTest // extends DriverHelper
 
             String emailContent = report.getEmailBody();
 
-            EmailManager.send(title, emailContent,
-                    emailList,
-                    senderEmail,
-                    senderPassword);
-
-            if (testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()) {
-                EmailManager.send(title, emailContent,
-                        failureEmailList,
-                        senderEmail,
-                        senderPassword);
+			 
+            if (!R.ZAFIRA.getBoolean("zafira_enabled")) {
+            	//Do not send email if run is running with enabled Zafira
+	            EmailManager.send(title, emailContent,
+	                    emailList,
+	                    senderEmail,
+	                    senderPassword);
+	
+	            if (testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()) {
+	                EmailManager.send(title, emailContent,
+	                        failureEmailList,
+	                        senderEmail,
+	                        senderPassword);
+	            }
             }
 
             // Store emailable report under emailable-report.html

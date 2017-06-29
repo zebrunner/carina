@@ -145,16 +145,7 @@ public class ZafiraConfigurator implements IConfigurator
 	
 	@Override
 	public String getReportEmails() {
-		String emailList = ""; //do not send emails via Zafira until integration is enabled explicitly
-        if (R.ZAFIRA.getBoolean("zafira_enabled")) {
-            // sync email_list and zafira_report_emails properties to keep the only way for notification.
-        	emailList = Configuration.get(Parameter.EMAIL_LIST);
-        	LOGGER.info("Disabling local email and providind recipients email_list to Zafira. email_list: " + emailList);
-
-        	if (!emailList.isEmpty()) {
-        		R.CONFIG.put(Parameter.EMAIL_LIST.getKey(), "");
-        	}
-        }
-		return emailList;
+		// This code is invoked only from ZafiraListener i.e. Zafira integration is already enabled!
+		return  Configuration.get(Parameter.EMAIL_LIST);
 	}
 }
