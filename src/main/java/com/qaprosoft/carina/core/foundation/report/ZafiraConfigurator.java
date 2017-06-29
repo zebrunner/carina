@@ -11,6 +11,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -138,5 +139,18 @@ public class ZafiraConfigurator implements IConfigurator
 		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
 		
 		return Artifacts.getArtifacts();
+	}
+	
+	@Override
+	public String getReportEmails() {
+		String emailList = ""; //do not send enails via Zafira until integration is enabled explicitly
+        if (R.ZAFIRA.getBoolean("zafira_enabled")) {
+            // sync email_list and zafira_report_emails properties to keep the only way for notification.
+        	emailList = Configuration.get(Parameter.EMAIL_LIST);
+        	if (!emailList.isEmpty()) {
+        		R.CONFIG.put(Parameter.EMAIL_LIST.getKey(), "");
+        	}
+        }
+		return emailList;
 	}
 }
