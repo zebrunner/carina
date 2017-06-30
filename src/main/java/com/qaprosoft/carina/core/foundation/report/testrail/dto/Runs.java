@@ -46,6 +46,11 @@ public class Runs {
         return new Request(new JSONObject(),"get_run/"+run_id,"GET");
 
     }
+    @SuppressWarnings("unchecked")
+    public static Request getRuns(int projectId){
+        return new Request(new JSONObject(),"get_runs/"+projectId,"GET");
+
+    }
     
     @SuppressWarnings("unchecked")
 	public static Request deleteRun(int run_id){
