@@ -19,12 +19,16 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /*
  * Link
  */
 final public class Artifacts {
+	protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
 	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 
 	public static void clearArtifacts() {
@@ -40,6 +44,7 @@ final public class Artifacts {
 	}
 
 	public static void add(String name, String link, Date expires_at) {
+		LOGGER.debug("Adding artifact to test. name: " + name + "; link: " + link + "; expires_at: " + expires_at );
 		testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
 	}
 }
