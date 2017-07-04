@@ -1,8 +1,6 @@
 package com.qaprosoft.carina.core.foundation.report;
 
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -139,14 +137,9 @@ public class ZafiraConfigurator implements IConfigurator
 
 	@Override
 	public Set<TestArtifactType> getArtifacts(ITestResult test) {
-		// by default specify 1 month to keep links onto the Log and Demo. After
-		// that time we usually remove builds with logs from CI (Jenkins)
-		LocalDate localDate = LocalDate.now().plusMonths(1);
-
-		Date expirationDate = java.sql.Date.valueOf(localDate);
-		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)), expirationDate);
-		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)), expirationDate);
-
+		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
+		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
+		
 		return Artifacts.getArtifacts();
 	}
 	
