@@ -26,7 +26,13 @@ public abstract class AbstractCapabilities {
         }
         
         capabilities.setBrowserName(browser);
-        capabilities.setVersion(Configuration.get(Parameter.BROWSER_VERSION).trim());
+        
+        // Selenium 3.4 doesn't support '*'. Only explicit or empty browser version should be provided 
+        String browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
+        if ("*".equalsIgnoreCase(browserVersion)) {
+        	browserVersion = "";
+        }
+        capabilities.setVersion(browserVersion);
         capabilities.setCapability("name", testName);
         
 		Proxy proxy = setupProxy();
