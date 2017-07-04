@@ -26,7 +26,7 @@ public abstract class AbstractCapabilities {
         }
         
         capabilities.setBrowserName(browser);
-        capabilities.setVersion(Configuration.get(Parameter.BROWSER_VERSION));
+        capabilities.setVersion(Configuration.get(Parameter.BROWSER_VERSION).trim());
         capabilities.setCapability("name", testName);
         
 		Proxy proxy = setupProxy();
