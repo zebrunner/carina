@@ -15,19 +15,18 @@
  */
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /*
  * TODO: Add Java doc
@@ -41,6 +40,7 @@ public class TestRail
 	private static final Logger LOGGER = Logger.getLogger(TestRail.class);
 	private static ITestRailUpdater updater;
 	private static boolean isInitialized = false;
+	private static ThreadLocal<List<String>> casesIds =  ThreadLocal.withInitial(ArrayList::new);
 	
 	static
 	{
@@ -96,14 +96,27 @@ public class TestRail
 	
 	public synchronized static List<String> getCases(ITestResult result)
 	{
-		List<String> cases = getCasesIdFromDataProvider(result); //higher priority
-		
-		if (cases.size() == 0)
-			cases = getCasesIdFromAnnotation(result); //lower priority
 
-		return cases;
+		if(casesIds.get().isEmpty()){
+			casesIds.set(getCasesIdFromDataProvider(result));
+
+		}
+		if (casesIds.get().isEmpty()) {
+			casesIds.set(getCasesIdFromAnnotation(result));
+		}
+
+		return casesIds.get();
+
+
+
 	}
-	
+
+	public static void setCasesID(String... cases){
+		for (String _case : cases) {
+			casesIds.get().add(_case);
+		}
+	}
+
 	private static List<String> getCasesIdFromDataProvider(ITestResult result) {
 		List<String> cases = new ArrayList<String>();
 		@SuppressWarnings("unchecked")
@@ -148,5 +161,10 @@ public class TestRail
         }
 		
 		return new ArrayList<String>(Arrays.asList(testCasesId.split(",")));
+	}
+
+	public static void clearCases() {
+
+		casesIds.set(new ArrayList());
 	}
 }
