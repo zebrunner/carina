@@ -265,7 +265,7 @@ public abstract class AbstractTest // extends DriverHelper
             }
             result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
 
-            if (Configuration.getBoolean(Parameter.ZAFIRA_TESTRAIL_INTEGRATION)){
+            if (!Configuration.getBoolean(Parameter.ZAFIRA_TESTRAIL_INTEGRATION)){
                 TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
             }
 
