@@ -83,9 +83,6 @@ public abstract class AbstractTest // extends DriverHelper
     protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 
     // 3rd party integrations
-    // TestRails case(s)
-    private List<String> testRailCases = new ArrayList<String>();
-
     protected String browserVersion = "";
     protected long startDate;
 
@@ -260,13 +257,11 @@ public abstract class AbstractTest // extends DriverHelper
             Spira.clear();
 
             // Populate TestRail Cases
-            if (testRailCases.size() == 0) { // it was not redefined in the test
-                testRailCases = TestRail.getCases(result);
-            }
-            result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, testRailCases);
 
             if (!Configuration.getBoolean(Parameter.ZAFIRA_TESTRAIL_INTEGRATION)){
+                result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
                 TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+                TestRail.clearCases();
             }
 
             //we shouldn't deregister info here as all retries will not work
@@ -274,7 +269,8 @@ public abstract class AbstractTest // extends DriverHelper
 
             // clear jira tickets to be sure that next test is not affected.
             Jira.clearTickets();
-            testRailCases.clear();
+
+
             Artifacts.clearArtifacts();
 
 
@@ -526,10 +522,9 @@ public abstract class AbstractTest // extends DriverHelper
      * @param cases to set
      */
     protected void setTestRailCase(String... cases) {
-        for (String _case : cases) {
-            testRailCases.add(_case);
-        }
+       TestRail.setCasesID(cases);
     }
+
 
     @DataProvider(name = "DataProvider", parallel = true)
 	public Object[][] createData(final ITestNGMethod testMethod, ITestContext context)
