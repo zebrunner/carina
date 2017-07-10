@@ -119,8 +119,6 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
 
             LOGGER.info("Suite ID: " + suiteID + "\n Project ID: " + projectID + "\nUser ID:  " + userId);
 
-
-            Object obj;
             int MAX_CHAR = 250;
 
             int maxLength = (title.length() < MAX_CHAR) ? title.length() : MAX_CHAR;
@@ -275,9 +273,10 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
                     Map responseMap = (HashMap) trResult;
                     String testId = responseMap.get("test_id").toString();
                     Object testInfo = apiClient.sendRequest(TestInfo.getTestInfo(testId));
-                    Object testCaseNam = ((HashMap) testInfo).get("title");
-                    Artifacts.add(testCaseNam.toString(), url + "/index.php?/tests/view/" + ((HashMap) trResult).get("test_id"));
-
+                    Object testCaseName = ((HashMap) testInfo).get("title");
+                    LOGGER.debug("testCaseName: " + testCaseName.toString());
+                    LOGGER.debug("url: " + url + "/index.php?/tests/view/" + ((HashMap) trResult).get("test_id"));
+                    Artifacts.add(testCaseName.toString(), url + "/index.php?/tests/view/" + ((HashMap) trResult).get("test_id"));
                 }
 
 
