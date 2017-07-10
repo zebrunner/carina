@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /*
@@ -44,6 +43,14 @@ final public class Artifacts {
 	}
 
 	public static void add(String name, String link, Date expires_at) {
+		if (name == null || name.isEmpty()) {
+			return;
+		}
+		
+		if (link == null || link.isEmpty()) {
+			return;
+		}
+		
 		LOGGER.debug("Adding artifact to test. name: " + name + "; link: " + link + "; expires_at: " + expires_at );
 		testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
 	}
