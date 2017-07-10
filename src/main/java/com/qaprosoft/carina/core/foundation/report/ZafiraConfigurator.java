@@ -1,20 +1,13 @@
 package com.qaprosoft.carina.core.foundation.report;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -24,6 +17,14 @@ import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -139,7 +140,10 @@ public class ZafiraConfigurator implements IConfigurator
 	public Set<TestArtifactType> getArtifacts(ITestResult test) {
 		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
 		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
-		
+        // Generate additional artifacts links on test run
+        if (Configuration.getBoolean(Parameter.ZAFIRA_TESTRAIL_INTEGRATION)){
+            TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+        }
 		return Artifacts.getArtifacts();
 	}
 	
