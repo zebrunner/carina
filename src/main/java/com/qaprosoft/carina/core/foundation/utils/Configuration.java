@@ -15,6 +15,11 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -22,12 +27,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * Configuration utility.
@@ -321,6 +320,8 @@ public class Configuration
 		ZAFIRA_GRID_LOGGING("zafira_grid_logging"),
 		
 		ZAFIRA_GRID_TIMEOUT("zafira_grid_timeout"),
+
+		ZAFIRA_TESTRAIL_INTEGRATION("zafira_testrail_integration"),
 		
 		GIT_BRANCH("git_branch"),
 		
