@@ -270,16 +270,20 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             if (testCasesStatus.size() > 0) {
                 JSONArray newResult = (JSONArray) apiClient.sendRequest(Results.addResultsWithLinks(runId, testCasesStatus));
                 for (Object trResult : newResult) {
-                    Map responseMap = (HashMap) trResult;
+                	
+                    @SuppressWarnings("rawtypes")
+					Map responseMap = (HashMap) trResult;
                     String testId = responseMap.get("test_id").toString();
                     Object testInfo = apiClient.sendRequest(TestInfo.getTestInfo(testId));
-                    Object testCaseName = ((HashMap) testInfo).get("title");
+                    
+                    @SuppressWarnings("rawtypes")
+					Object testCaseName = ((HashMap) testInfo).get("title");
                     LOGGER.debug("testCaseName: " + testCaseName.toString());
-                    LOGGER.debug("url: " + url + "/index.php?/tests/view/" + ((HashMap) trResult).get("test_id"));
-                    Artifacts.add(testCaseName.toString(), url + "/index.php?/tests/view/" + ((HashMap) trResult).get("test_id"));
+                    
+                    testId = ((HashMap) trResult).get("test_id").toString();
+                    LOGGER.debug("url: " + url + "/index.php?/tests/view/" + testId);
+                    Artifacts.add(testCaseName.toString(), url + "/index.php?/tests/view/" + testId);
                 }
-
-
             } else {
                 LOGGER.info("Results list is empty!");
             }
