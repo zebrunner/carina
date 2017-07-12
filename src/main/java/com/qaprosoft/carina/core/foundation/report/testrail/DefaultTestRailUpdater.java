@@ -282,7 +282,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
                     
                     testId = ((HashMap) trResult).get("test_id").toString();
                     LOGGER.debug("url: " + url + "/index.php?/tests/view/" + testId);
-                    Artifacts.add(testCaseName.toString(), url + "/index.php?/tests/view/" + testId);
+                    Artifacts.add(testId, url + "/index.php?/tests/view/" + testId);
                 }
             } else {
                 LOGGER.info("Results list is empty!");
