@@ -10,11 +10,15 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
-public class Ownership {
-	
+public class Ownership 
+{
 	protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
 	
-	public static String getMethodOwner(ITestResult result) {
+	public enum OwnerType {PRIMARY, SECONDARY};
+	
+	@SuppressWarnings("unlikely-arg-type")
+	public static String getMethodOwner(ITestResult result, OwnerType type) 
+	{
 		
 		@SuppressWarnings("unchecked")
 		Map<Object[], String> testMethodOwnerArgsMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP);
@@ -51,8 +55,19 @@ public class Ownership {
 				if (testMethod.isAnnotationPresent(MethodOwner.class))
 				{
 					MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-					owner = methodAnnotation.owner();
-					LOGGER.debug("Method " + testMethod + " owner is " + owner);
+					switch (type) 
+					{
+					case PRIMARY:
+						owner = methodAnnotation.owner();
+						LOGGER.debug("Method " + testMethod + " primary owner is " + owner);
+						break;
+
+					case SECONDARY:
+						owner = methodAnnotation.secondatyOwner();
+						LOGGER.debug("Method " + testMethod + " secondary owner is " + owner);
+						break;
+					}
+					
 				}
 			}
 		} catch (ClassNotFoundException e) {

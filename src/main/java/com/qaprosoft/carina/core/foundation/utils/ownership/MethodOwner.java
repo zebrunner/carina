@@ -12,4 +12,5 @@ import java.lang.annotation.*;
 public @interface MethodOwner 
 {
 	String owner() default "";
+	String secondatyOwner() default "";
 }

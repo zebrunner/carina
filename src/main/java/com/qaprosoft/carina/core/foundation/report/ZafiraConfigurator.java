@@ -10,6 +10,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
+import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership.OwnerType;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.config.IConfigurator;
@@ -80,11 +81,18 @@ public class ZafiraConfigurator implements IConfigurator
     }
 
     @Override
-    public String getOwner(ITestResult test)
+    public String getPrimaryOwner(ITestResult test)
     {
         // TODO: re-factor that
-        return Ownership.getMethodOwner(test);
+        return Ownership.getMethodOwner(test, OwnerType.PRIMARY);
     }
+    
+    @Override
+	public String getSecondaryOwner(ITestResult test) 
+    {
+    		// TODO: re-factor that
+        return Ownership.getMethodOwner(test, OwnerType.SECONDARY);
+	}
 
     @Override
     public String getTestName(ITestResult test)
