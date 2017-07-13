@@ -63,7 +63,7 @@ public class Ownership
 						break;
 
 					case SECONDARY:
-						owner = methodAnnotation.secondatyOwner();
+						owner = methodAnnotation.secondaryOwner();
 						LOGGER.debug("Method " + testMethod + " secondary owner is " + owner);
 						break;
 					}
