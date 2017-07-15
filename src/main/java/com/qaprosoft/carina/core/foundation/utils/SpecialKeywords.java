@@ -33,7 +33,7 @@ public class SpecialKeywords
 	public static final String I18N = "I18N";
 	public static final String L10N = "L10N";
 	public static final String I18N_PATTERN = String.format("\\{%s:.*\\}", I18N);
-	public static final String L10N_PATTERN = String.format("\\{%s:.*\\}", L10N);
+	public static final String L10N_PATTERN = String.format("\\{(%s:.[^\\'\\\"]*)}", L10N);
 	
 	public static final String EXCEL = "\\{excel:.*\\}";
 	public static final String CRYPT = "\\{crypt:[^\\{\\}]*\\}";

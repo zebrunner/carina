@@ -43,14 +43,14 @@ public class LocalizedAnnotations extends Annotations
 		String param = by.toString();
 		//replace by using localization pattern
 		Matcher matcher = L10N_PATTERN.matcher(param);
-		if (matcher.find())
+		while (matcher.find())
 		{
-			int start = param.indexOf(SpecialKeywords.L10N+ ":") + 5;
+			int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
 			int end = param.indexOf("}");
 			String key = param.substring(start, end);
-			by = createBy(StringUtils.replace(param, matcher.group(), L10N.getText(key)));
+			param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
 		}
-
+		by = createBy(param);
 		return by;
 	}
 
