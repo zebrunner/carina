@@ -108,12 +108,17 @@ public class ParameterGenerator {
 			}
 			
 			matcher = L10N_PATTERN.matcher(param);
-			if (matcher.find())
+			String initStrL10N = param;
+			while (matcher.find())
 			{
 				int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
 				int end = param.indexOf("}");
 				String key = param.substring(start, end);
-				return StringUtils.replace(param, matcher.group(), L10N.getText(key));
+				param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
+			}
+			// in case if L10N pattern was applied
+			if(!initStrL10N.equalsIgnoreCase(param)) {
+				return param;
 			}
 		}
 		catch (Exception e)
