@@ -141,12 +141,11 @@ public class ZafiraConfigurator implements IConfigurator
 		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
 		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
         // Generate additional artifacts links on test run
-        if (Configuration.getBoolean(Parameter.ZAFIRA_TESTRAIL_INTEGRATION)){
-            test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
-            TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-            TestRail.clearCases();
-        }
-		return Artifacts.getArtifacts();
+
+        test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
+        TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+        TestRail.clearCases();
+        return Artifacts.getArtifacts();
 	}
 	
 	@Override

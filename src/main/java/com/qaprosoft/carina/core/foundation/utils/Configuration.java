@@ -321,8 +321,6 @@ public class Configuration
 		
 		ZAFIRA_GRID_TIMEOUT("zafira_grid_timeout"),
 
-		ZAFIRA_TESTRAIL_INTEGRATION("zafira_testrail_integration"),
-		
 		GIT_BRANCH("git_branch"),
 		
 		GIT_COMMIT("git_commit"),
