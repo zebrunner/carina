@@ -549,11 +549,11 @@ public final class DriverPool {
 		Integer port = proxy.getPort();
 
 		String currentIP = HttpClient.getIpAddress();
-		LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
+		LOGGER.warn("Set http and https proxy settings ONLY to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
 
 		R.CONFIG.put("proxy_host", currentIP);
 		R.CONFIG.put("proxy_port", port.toString());
-		R.CONFIG.put("proxy_protocols", "http");
+		R.CONFIG.put("proxy_protocols", "http, https");
 
 		return proxy;
 	}
