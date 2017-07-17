@@ -258,7 +258,7 @@ public abstract class AbstractTest // extends DriverHelper
 
             // Populate TestRail Cases
 
-            if (!Configuration.getBoolean(Parameter.ZAFIRA_TESTRAIL_INTEGRATION)){
+            if (!R.ZAFIRA.getBoolean("zafira_enabled")){
                 result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
                 TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
                 TestRail.clearCases();
