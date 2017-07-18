@@ -539,8 +539,6 @@ public final class DriverPool {
 			proxies.put(Thread.currentThread().getId(), proxy);
 		}
 		
-		proxy.setTrustAllServers(true);
-
 		if (!proxy.isStarted()) {
 			LOGGER.info("Starting BrowserMob proxy...");
 			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
