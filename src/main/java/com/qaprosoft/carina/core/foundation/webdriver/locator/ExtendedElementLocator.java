@@ -148,10 +148,14 @@ public class ExtendedElementLocator implements ElementLocator
 			return StringUtils.remove(locator, "linkText=");
 		} else if (locator.startsWith("partialLinkText=")) {
 			return StringUtils.remove(locator, "partialLinkText=");
+		} else if (locator.startsWith("cssSelector=")) {
+			return StringUtils.remove(locator, "cssSelector=");
 		} else if (locator.startsWith("css=")) {
 			return StringUtils.remove(locator, "css=");
 		} else if (locator.startsWith("tagName=")) {
 			return StringUtils.remove(locator, "tagName=");
+		} else if (locator.startsWith("className=")) {
+			return StringUtils.remove(locator, "className=");
 		} else if (locator.startsWith("By.id: ")) {
 			return StringUtils.remove(locator, "By.id: ");
 		} else if (locator.startsWith("By.name: ")) {
@@ -166,6 +170,8 @@ public class ExtendedElementLocator implements ElementLocator
 			return StringUtils.remove(locator, "By.css: ");
 		} else if (locator.startsWith("By.cssSelector: ")) {
 			return StringUtils.remove(locator, "By.cssSelector: ");
+		} else if (locator.startsWith("By.className: ")) {
+			return StringUtils.remove(locator, "By.className: ");
 		} else if (locator.startsWith("By.tagName: ")) {
 			return StringUtils.remove(locator, "By.tagName: ");
 		}
