@@ -164,6 +164,8 @@ public class ExtendedElementLocator implements ElementLocator
 			return StringUtils.remove(locator, "By.partialLinkText: ");
 		} else if (locator.startsWith("By.css: ")) {
 			return StringUtils.remove(locator, "By.css: ");
+		} else if (locator.startsWith("By.cssSelector: ")) {
+			return StringUtils.remove(locator, "By.cssSelector: ");
 		} else if (locator.startsWith("By.tagName: ")) {
 			return StringUtils.remove(locator, "By.tagName: ");
 		}

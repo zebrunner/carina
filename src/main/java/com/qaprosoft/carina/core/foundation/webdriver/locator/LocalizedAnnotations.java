@@ -82,6 +82,8 @@ public class LocalizedAnnotations extends Annotations
 			return By.linkText(StringUtils.remove(locator, "By.partialLinkText: "));
 		} else if (locator.startsWith("By.css: ")) {
 			return By.cssSelector(StringUtils.remove(locator, "By.css: "));
+		} else if (locator.startsWith("By.cssSelector: ")) {
+			return By.cssSelector(StringUtils.remove(locator, "By.cssSelector: "));
 		} else if (locator.startsWith("By.tagName: ")) {
 			return By.tagName(StringUtils.remove(locator, "By.tagName: "));
 		}
