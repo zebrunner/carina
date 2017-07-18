@@ -65,11 +65,15 @@ public class LocalizedAnnotations extends Annotations
 		} else if (locator.startsWith("linkText=")) {
 			return By.linkText(StringUtils.remove(locator, "linkText="));
 		} else if (locator.startsWith("partialLinkText=")) {
-			return By.linkText(StringUtils.remove(locator, "partialLinkText="));
+			return By.partialLinkText(StringUtils.remove(locator, "partialLinkText="));
+		} else if (locator.startsWith("cssSelector=")) {
+			return By.cssSelector(StringUtils.remove(locator, "cssSelector="));
 		} else if (locator.startsWith("css=")) {
 			return By.cssSelector(StringUtils.remove(locator, "css="));
 		} else if (locator.startsWith("tagName=")) {
 			return By.tagName(StringUtils.remove(locator, "tagName="));
+		} else if (locator.startsWith("className=")) {
+			return By.className(StringUtils.remove(locator, "className="));
 		} else if (locator.startsWith("By.id: ")) {
 			return By.id(StringUtils.remove(locator, "By.id: "));
 		} else if (locator.startsWith("By.name: ")) {
@@ -79,11 +83,13 @@ public class LocalizedAnnotations extends Annotations
 		} else if (locator.startsWith("By.linkText: ")) {
 			return By.linkText(StringUtils.remove(locator, "By.linkText: "));
 		} else if (locator.startsWith("By.partialLinkText: ")) {
-			return By.linkText(StringUtils.remove(locator, "By.partialLinkText: "));
+			return By.partialLinkText(StringUtils.remove(locator, "By.partialLinkText: "));
 		} else if (locator.startsWith("By.css: ")) {
 			return By.cssSelector(StringUtils.remove(locator, "By.css: "));
 		} else if (locator.startsWith("By.cssSelector: ")) {
 			return By.cssSelector(StringUtils.remove(locator, "By.cssSelector: "));
+		} else if (locator.startsWith("By.className: ")) {
+			return By.className(StringUtils.remove(locator, "By.className: "));
 		} else if (locator.startsWith("By.tagName: ")) {
 			return By.tagName(StringUtils.remove(locator, "By.tagName: "));
 		}
