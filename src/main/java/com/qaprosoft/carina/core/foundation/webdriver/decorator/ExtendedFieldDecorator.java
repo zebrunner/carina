@@ -68,6 +68,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 			locator = factory.createLocator(field);
 		} catch (Exception e)
 		{
+			LOGGER.error(e.getMessage(), e);
 			return null;
 		}
 		if (locator == null)
