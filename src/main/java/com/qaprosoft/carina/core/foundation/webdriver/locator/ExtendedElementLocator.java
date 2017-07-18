@@ -146,6 +146,8 @@ public class ExtendedElementLocator implements ElementLocator
 			return StringUtils.remove(locator, "xpath=");
 		} else if (locator.startsWith("linkText=")) {
 			return StringUtils.remove(locator, "linkText=");
+		} else if (locator.startsWith("partialLinkText=")) {
+			return StringUtils.remove(locator, "partialLinkText=");
 		} else if (locator.startsWith("css=")) {
 			return StringUtils.remove(locator, "css=");
 		} else if (locator.startsWith("tagName=")) {
@@ -158,6 +160,8 @@ public class ExtendedElementLocator implements ElementLocator
 			return StringUtils.remove(locator, "By.xpath: ");
 		} else if (locator.startsWith("By.linkText: ")) {
 			return StringUtils.remove(locator, "By.linkText: ");
+		} else if (locator.startsWith("By.partialLinkText: ")) {
+			return StringUtils.remove(locator, "By.partialLinkText: ");
 		} else if (locator.startsWith("By.css: ")) {
 			return StringUtils.remove(locator, "By.css: ");
 		} else if (locator.startsWith("By.tagName: ")) {

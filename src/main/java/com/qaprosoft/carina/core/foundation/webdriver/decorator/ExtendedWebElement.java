@@ -82,9 +82,6 @@ public class ExtendedWebElement {
     private By by;
     private WebDriver driver;
 
-    //TODO: contact with YP to ensure that parentClassname can be removed after delivering AI metadata generation v4.0 
-    private String parentClassName;
-
     public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
         this(element, driver);
         this.name = name;
@@ -94,13 +91,6 @@ public class ExtendedWebElement {
         this(element, name, driver);
         this.by = by;
     }
-
-    public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver, String parentClassName) {
-        this(element, name, driver);
-        this.by = by;
-        this.parentClassName = parentClassName;
-    }
-
 
     public ExtendedWebElement(WebElement element, WebDriver driver) {
         this.element = element;
@@ -1207,6 +1197,9 @@ public class ExtendedWebElement {
         }
         if (locator.startsWith("linkText: ")) {
             by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
+        }
+        if (locator.startsWith("partialLinkText: ")) {
+            by = By.linkText(String.format(StringUtils.remove(locator, "partialLinkText: "), objects));
         }
         if (locator.startsWith("css: ")) {
             by = By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));

@@ -64,6 +64,8 @@ public class LocalizedAnnotations extends Annotations
 			return By.xpath(StringUtils.remove(locator, "xpath="));
 		} else if (locator.startsWith("linkText=")) {
 			return By.linkText(StringUtils.remove(locator, "linkText="));
+		} else if (locator.startsWith("partialLinkText=")) {
+			return By.linkText(StringUtils.remove(locator, "partialLinkText="));
 		} else if (locator.startsWith("css=")) {
 			return By.cssSelector(StringUtils.remove(locator, "css="));
 		} else if (locator.startsWith("tagName=")) {
@@ -76,6 +78,8 @@ public class LocalizedAnnotations extends Annotations
 			return By.xpath(StringUtils.remove(locator, "By.xpath: "));
 		} else if (locator.startsWith("By.linkText: ")) {
 			return By.linkText(StringUtils.remove(locator, "By.linkText: "));
+		} else if (locator.startsWith("By.partialLinkText: ")) {
+			return By.linkText(StringUtils.remove(locator, "By.partialLinkText: "));
 		} else if (locator.startsWith("By.css: ")) {
 			return By.cssSelector(StringUtils.remove(locator, "By.css: "));
 		} else if (locator.startsWith("By.tagName: ")) {
