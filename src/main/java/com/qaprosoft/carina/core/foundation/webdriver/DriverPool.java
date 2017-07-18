@@ -553,7 +553,7 @@ public final class DriverPool {
 
 		R.CONFIG.put("proxy_host", currentIP);
 		R.CONFIG.put("proxy_port", port.toString());
-		R.CONFIG.put("proxy_protocols", "http");
+		//R.CONFIG.put("proxy_protocols", "http");
 
 		return proxy;
 	}
