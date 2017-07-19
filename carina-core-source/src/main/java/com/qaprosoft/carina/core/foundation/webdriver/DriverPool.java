@@ -31,6 +31,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -534,15 +535,11 @@ public final class DriverPool {
 		if (proxies.containsKey(threadId)) {
 			proxy = proxies.get(threadId);
 		} else {
-			proxy = ProxyPool.startProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
+			proxy = ProxyPool.createProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
 			proxies.put(Thread.currentThread().getId(), proxy);
 		}
 		
 		if (!proxy.isStarted()) {
-			proxy.setTrustAllServers(true);
-			System.setProperty("jsse.enableSNIExtension", "false");
-			//proxy.setMitmManager(ImpersonatingMitmManager.builder().trustAllServers(true).build());
-			
 			LOGGER.info("Starting BrowserMob proxy...");
 			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
 		} else {
@@ -552,12 +549,12 @@ public final class DriverPool {
 		Integer port = proxy.getPort();
 
 		String currentIP = HttpClient.getIpAddress();
-		LOGGER.warn("Set http proxy settings ONLY to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
+		LOGGER.warn("Set http/https proxy settings ONLY to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
 
 		//TODO: double check mobile proxy support
-		// R.CONFIG.put("proxy_host", currentIP);
-		// R.CONFIG.put("proxy_port", port.toString());
-		//R.CONFIG.put("proxy_protocols", "http");
+		R.CONFIG.put("proxy_host", currentIP);
+		R.CONFIG.put("proxy_port", port.toString());
+		R.CONFIG.put("proxy_protocols", "http,https");
 
 		return proxy;
 	}
