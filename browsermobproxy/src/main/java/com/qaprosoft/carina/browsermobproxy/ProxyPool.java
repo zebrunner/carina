@@ -15,34 +15,23 @@
  */
 package com.qaprosoft.carina.browsermobproxy;
 
-import org.apache.log4j.Logger;
-
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
-	private static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
 
 	// ------------------------- BOWSERMOB PROXY ---------------------
 	// TODO: investigate possibility to return interface to support JettyProxy
 	/**
-	 * start BrowserMobProxy Server
+	 * create BrowserMobProxy Server object
 	 * 
 	 * @return BrowserMobProxy
 	 * 
 	 */
-	public static BrowserMobProxy startProxy(int port) {
-
-		// integrate browserMob proxy if required here
-		BrowserMobProxy proxy = new BrowserMobProxyServer();
-		
+	public static BrowserMobProxy createProxy(int port) {
+		BrowserMobProxyServer proxy = new BrowserMobProxyServer();
 		proxy.setTrustAllServers(true);
-		System.setProperty("jsse.enableSNIExtension", "false");
-		//proxy.setMitmManager(ImpersonatingMitmManager.builder().trustAllServers(true).build());
-		
-		LOGGER.info("Starting BrowserMob proxy...");
-		proxy.start(port);
-
+		//System.setProperty("jsse.enableSNIExtension", "false");
 		return proxy;
 	}
 
