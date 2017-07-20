@@ -53,7 +53,11 @@ public class SecretKeyManager
 	}
 	
 	public static SecretKey loadKey(File file) throws IOException {
-	    SecretKey key = new SecretKeySpec(Base64.decodeBase64(FileUtils.readFileToByteArray(file)), R.CONFIG.get("crypto_key_type"));
+		return loadKey(file, R.CONFIG.get("crypto_key_type"));
+	}
+	
+	public static SecretKey loadKey(File file, String cryptoKeyType) throws IOException {
+	    SecretKey key = new SecretKeySpec(Base64.decodeBase64(FileUtils.readFileToByteArray(file)), cryptoKeyType);
 	    return key;
 	}
 }
