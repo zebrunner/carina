@@ -182,7 +182,9 @@ public abstract class AbstractTest // extends DriverHelper
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
             //redefine core properties using custom capabilities file
-            Configuration.loadCoreProperties(customCapabilities);
+        	Map<String, String> properties = Configuration.loadCoreProperties(customCapabilities);
+            //reregister device if mobile core properties are redefined 
+            DevicePool.addDevice(properties);
         }
         
     }
