@@ -626,7 +626,7 @@ public class AbstractTestListener extends TestArgsListener
 			{
 				tla.closeResource(test);
 			}
-		} catch (Exception e)
+		} catch (Throwable e)
 		{
 			LOGGER.error("close log appender was not successful.");
 			e.printStackTrace();
