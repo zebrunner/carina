@@ -57,7 +57,7 @@ public class Jira
 	{
 		try
 		{
-			cryptoTool = new CryptoTool();
+			cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 			updater = (IJiraUpdater) Class.forName(Configuration.get(Parameter.JIRA_UPDATER)).newInstance();
 			BasicCredentials creds = new BasicCredentials(cryptoTool.decryptByPattern(Configuration.get(Parameter.JIRA_USER), CRYPTO_PATTERN), 
 					(cryptoTool.decryptByPattern(Configuration.get(Parameter.JIRA_PASSWORD), CRYPTO_PATTERN)));

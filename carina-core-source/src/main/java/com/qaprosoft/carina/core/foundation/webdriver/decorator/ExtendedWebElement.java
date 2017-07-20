@@ -97,7 +97,7 @@ public class ExtendedWebElement {
         this.driver = driver;
         summary = new TestLogHelper(driver);
         try {
-            cryptoTool = new CryptoTool();
+            cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
         } catch (Exception e) {
             throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
         }
