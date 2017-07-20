@@ -21,11 +21,16 @@
 		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
 
 		<log4j.version>1.2.17</log4j.version>
-
+		<commons-lang3.version>3.4</commons-lang3.version>
+		<commons-cli.version>1.2</commons-cli.version>
+		<commons-io.version>2.5</commons-io.version>
+		<commons-codec.version>1.9</commons-codec.version>
 	</properties>
 
 	<modules>
 		<module>browsermobproxy</module>
+		<module>core-utils</module>
+		<module>cryptotool</module>
 		<module>carina-core-source</module>
 	</modules>
 
@@ -126,7 +131,6 @@
 	<dependencies>
 		<!-- Dependencies that are expected to be shared across modules; define 
 			them here -->
-
 	</dependencies>
 
 	<dependencyManagement>
@@ -136,6 +140,18 @@
 			<dependency>
 				<groupId>com.qaprosoft.carina</groupId>
 				<artifactId>browsermobproxy</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.qaprosoft.carina</groupId>
+				<artifactId>core-utils</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.qaprosoft.carina</groupId>
+				<artifactId>cryptotool</artifactId>
 				<version>1.0-SNAPSHOT</version>
 			</dependency>
 
@@ -153,6 +169,29 @@
 				<version>${log4j.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${commons-cli.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${commons-codec.version}</version>
+			</dependency>
 
 		</dependencies>
 	</dependencyManagement>

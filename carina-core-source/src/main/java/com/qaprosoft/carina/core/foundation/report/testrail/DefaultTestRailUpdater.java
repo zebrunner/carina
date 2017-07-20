@@ -1,6 +1,19 @@
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -10,22 +23,18 @@ import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.testrail.core.APIClient;
 import com.qaprosoft.carina.core.foundation.report.testrail.core.TestStatus;
-import com.qaprosoft.carina.core.foundation.report.testrail.dto.*;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Milestones;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Results;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Runs;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCaseInfo;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCaseResult;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCases;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestInfo;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Users;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 public class DefaultTestRailUpdater implements ITestRailUpdater {
 
@@ -54,7 +63,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     public DefaultTestRailUpdater() {
 
         try {
-            cryptoTool = new CryptoTool();
+            cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
             user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
             password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD), CRYPTO_PATTERN);
         } catch (Exception e) {
