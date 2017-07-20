@@ -62,13 +62,10 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     @SuppressWarnings("rawtypes")
     public DefaultTestRailUpdater() {
 
-        try {
-            cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-            user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
-            password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD), CRYPTO_PATTERN);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+		user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
+		password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD),
+				CRYPTO_PATTERN);
 
         url = Configuration.get(Configuration.Parameter.TESTRAIL_URL);
         apiClient = new APIClient(url);

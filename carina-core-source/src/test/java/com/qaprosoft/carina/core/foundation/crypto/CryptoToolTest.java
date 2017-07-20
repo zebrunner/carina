@@ -9,8 +9,6 @@ import javax.crypto.NoSuchPaddingException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
@@ -21,7 +19,7 @@ public class CryptoToolTest
 	@Test
 	public void testInitialization() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException
 	{
-		CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+		CryptoTool cryptoTool = new CryptoTool();
 		Assert.assertNotNull(cryptoTool.getAlgorithm());
 		Assert.assertNotNull(cryptoTool.getCipher());
 		Assert.assertEquals(R.CONFIG.get("crypto_algorithm"), cryptoTool.getAlgorithm());
@@ -30,7 +28,7 @@ public class CryptoToolTest
 	@Test
 	public void testEncrypt() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException 
 	{
-		CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+		CryptoTool cryptoTool = new CryptoTool();
 		String input = "EncryptMe";
 		String encrypted = cryptoTool.encrypt(input);
 		Assert.assertNotNull(encrypted);
@@ -40,7 +38,7 @@ public class CryptoToolTest
 	@Test
 	public void testDecrypt() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException 
 	{
-		CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+		CryptoTool cryptoTool = new CryptoTool();
 		String input = "EncryptMe";
 		String encrypted = cryptoTool.encrypt(input);
 		String decrypted = cryptoTool.decrypt(encrypted);

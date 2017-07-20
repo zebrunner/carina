@@ -72,20 +72,12 @@ public class DriverHelper {
 	protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
 	public DriverHelper() {
-		try {
-			cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-		} catch (Exception e) {
-			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
-		}
+		cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 		summary = new TestLogHelper(UUID.randomUUID().toString());
 	}
 	
 	public DriverHelper(WebDriver driver) {
-		try {
-			cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-		} catch (Exception e) {
-			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
-		}
+		cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 		this.driver = driver;
 
 		if (driver == null) {
