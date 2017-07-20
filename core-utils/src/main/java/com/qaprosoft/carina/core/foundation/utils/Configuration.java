@@ -40,19 +40,18 @@ public class Configuration
 	static
 	{
 		String envArgResolverClass = Configuration.get(Parameter.ENV_ARG_RESOLVER);
-		if(envArgResolverClass.isEmpty())
-		{
-			//redefine using default class
+		if (envArgResolverClass.isEmpty()) {
+			// redefine using default class
 			envArgResolverClass = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
 		}
 
 		try {
-			Class<?> cl = Class.forName(Configuration.get(Parameter.ENV_ARG_RESOLVER));
+			Class<?> cl = Class.forName(envArgResolverClass);
 			Constructor<?> ct = cl.getConstructor();
 			Configuration.setEnvArgResolver((IEnvArgResolver) ct.newInstance());
 		} catch (Exception e) {
-			throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - '"
-					+ Configuration.get(Parameter.ENV_ARG_RESOLVER) + "'", e);
+			throw new RuntimeException(
+					"Configuration failure: can not initiate EnvArgResolver - '" + envArgResolverClass + "'", e);
 		}
 		
 	}
