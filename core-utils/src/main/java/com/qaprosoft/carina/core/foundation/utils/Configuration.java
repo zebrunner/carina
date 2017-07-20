@@ -39,19 +39,22 @@ public class Configuration
 	
 	static
 	{
-		if(!Configuration.isNull(Parameter.ENV_ARG_RESOLVER))
+		String envArgResolverClass = Configuration.get(Parameter.ENV_ARG_RESOLVER);
+		if(envArgResolverClass.isEmpty())
 		{
-			try
-			{
-				Class<?> cl = Class.forName(Configuration.get(Parameter.ENV_ARG_RESOLVER));
-				Constructor<?> ct = cl.getConstructor();
-				Configuration.setEnvArgResolver((IEnvArgResolver)ct.newInstance());
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - '" + Configuration.get(Parameter.ENV_ARG_RESOLVER) + "'", e);
-			}
+			//redefine using default class
+			envArgResolverClass = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
 		}
+
+		try {
+			Class<?> cl = Class.forName(Configuration.get(Parameter.ENV_ARG_RESOLVER));
+			Constructor<?> ct = cl.getConstructor();
+			Configuration.setEnvArgResolver((IEnvArgResolver) ct.newInstance());
+		} catch (Exception e) {
+			throw new RuntimeException("Configuration failure: can not initiate EnvArgResolver - '"
+					+ Configuration.get(Parameter.ENV_ARG_RESOLVER) + "'", e);
+		}
+		
 	}
 
 	/**
@@ -485,7 +488,8 @@ public class Configuration
 	
 	public static boolean isNull(Parameter param)
 	{
-		return get(param) == null || SpecialKeywords.NULL.equalsIgnoreCase(get(param)); 
+		// null is never returned from configuration now so compare with empty string
+		return get(param).isEmpty(); 
 	}
 	
     @SuppressWarnings({"rawtypes", "unchecked"})
