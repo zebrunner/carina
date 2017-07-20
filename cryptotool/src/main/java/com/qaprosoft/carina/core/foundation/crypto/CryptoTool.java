@@ -62,12 +62,13 @@ public class CryptoTool
 		}
 	}
 	
-	public CryptoTool(String cryptoKeyPath, String cryptoAlgorithm)
+	// for dynamic products where R.CONFIG doesn't work correctly (for example Zafira)
+	public CryptoTool(String cryptoKeyPath, String cryptoAlgorithm, String cryptoKeyType)
 	{
 		algorithm = cryptoAlgorithm;
 		
 		try {
-			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath));
+			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
 		}
