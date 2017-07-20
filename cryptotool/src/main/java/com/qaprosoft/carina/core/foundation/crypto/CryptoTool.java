@@ -62,6 +62,22 @@ public class CryptoTool
 		}
 	}
 	
+	public CryptoTool(String cryptoKeyPath, String cryptoAlgorithm)
+	{
+		algorithm = cryptoAlgorithm;
+		
+		try {
+			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath));
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		try {
+			this.cipher = Cipher.getInstance(algorithm);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+	}
+	
 	public String encrypt(String strToEncrypt)
 	{
 		try
