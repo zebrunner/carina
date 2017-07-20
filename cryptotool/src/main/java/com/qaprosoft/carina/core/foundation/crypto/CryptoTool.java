@@ -38,7 +38,7 @@ public class CryptoTool
     private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);
 
     
-	private String algorithm = R.CONFIG.get("crypto_algorithm");
+	private String algorithm;
 	private Cipher cipher;
 	private Key key;
 
@@ -49,6 +49,7 @@ public class CryptoTool
 	
 	public CryptoTool(String cryptoKeyPath)
 	{
+		algorithm = R.CONFIG.get("crypto_algorithm");
 		try {
 			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath));
 		} catch (IOException e) {
