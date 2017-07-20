@@ -1,11 +1,5 @@
 package com.qaprosoft.carina.core.foundation.crypto;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -17,7 +11,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 public class CryptoToolTest
 {
 	@Test
-	public void testInitialization() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException
+	public void testInitialization()
 	{
 		CryptoTool cryptoTool = new CryptoTool();
 		Assert.assertNotNull(cryptoTool.getAlgorithm());
@@ -26,7 +20,7 @@ public class CryptoToolTest
 	}
 	
 	@Test
-	public void testEncrypt() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException 
+	public void testEncrypt()
 	{
 		CryptoTool cryptoTool = new CryptoTool();
 		String input = "EncryptMe";
@@ -36,7 +30,7 @@ public class CryptoToolTest
 	}
 	
 	@Test
-	public void testDecrypt() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException 
+	public void testDecrypt()
 	{
 		CryptoTool cryptoTool = new CryptoTool();
 		String input = "EncryptMe";
