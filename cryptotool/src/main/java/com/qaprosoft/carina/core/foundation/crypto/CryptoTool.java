@@ -27,19 +27,38 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class CryptoTool
 {
+    private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);
+
+    
 	private String algorithm = R.CONFIG.get("crypto_algorithm");
 	private Cipher cipher;
 	private Key key;
 
-	public CryptoTool(String cryptoKeyPath) throws NoSuchAlgorithmException, NoSuchPaddingException, IOException
+	public CryptoTool()
 	{
-		this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath));
-		this.cipher = Cipher.getInstance(algorithm);
+		this(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+	}
+	
+	public CryptoTool(String cryptoKeyPath)
+	{
+		try {
+			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath));
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		try {
+			this.cipher = Cipher.getInstance(algorithm);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
 	}
 	
 	public String encrypt(String strToEncrypt)
@@ -52,7 +71,7 @@ public class CryptoTool
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException("Error while encrypting, check your crypto key! " + e.getMessage());
+			throw new RuntimeException("Error while encrypting, check your crypto key! " + e.getMessage(), e);
 		}
 	}
 
@@ -66,7 +85,7 @@ public class CryptoTool
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException("Error while decrypting, check your crypto key! " + e.getMessage());
+			throw new RuntimeException("Error while decrypting, check your crypto key! " + e.getMessage(), e);
 		}
 	}
 	
