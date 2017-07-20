@@ -19,12 +19,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 
 /**
@@ -56,10 +54,6 @@ public enum R
 
 	private String resourceFile;
 
-	private static CryptoTool cryptoTool;
-	
-	private static Pattern CRYPT_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-	
 	private static Map<String, Properties> propertiesHolder = new HashMap<String, Properties>();
 
 	static
@@ -136,12 +130,6 @@ public enum R
 		return value != null ? value : StringUtils.EMPTY;
 	}
 	
-/*	public String getSecured(String key)
-	{
-		String value = get(key);
-		return value != null ? encrypt(value) : StringUtils.EMPTY;
-	}*/
-
 	public int getInt(String key)
 	{
 		return Integer.parseInt(get(key));
@@ -170,33 +158,4 @@ public enum R
 		return path;
 	}
 	
-	private static String encrypt(String value)
-	{
-		return String.format(SpecialKeywords.CRYPT_WRAPPER, getCryptoTool().encrypt(value));
-	}
-	
-	private static String decrypt(String value)
-	{
-		if(CRYPT_PATTERN.matcher(value).find())
-		{
-			value = getCryptoTool().decryptByPattern(value, CRYPT_PATTERN);
-		}
-		return value;
-	}
-	
-	private static CryptoTool getCryptoTool()
-	{
-		if(cryptoTool == null)
-		{
-			try
-			{
-				cryptoTool = new CryptoTool();
-			}
-			catch(Exception e)
-			{
-				throw new InvalidConfigurationException("Invalid crypto tool configuration: " + e.getMessage());
-			}
-		}
-		return cryptoTool;
-	}
 }

@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.crypto;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -29,20 +28,17 @@ import javax.crypto.NoSuchPaddingException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
-//TODO: move those methods onto the static level...
 public class CryptoTool
 {
 	private String algorithm = R.CONFIG.get("crypto_algorithm");
 	private Cipher cipher;
 	private Key key;
 
-	public CryptoTool() throws NoSuchAlgorithmException, NoSuchPaddingException, IOException, URISyntaxException
+	public CryptoTool(String cryptoKeyPath) throws NoSuchAlgorithmException, NoSuchPaddingException, IOException
 	{
-		this(SecretKeyManager.loadKey(new File(Configuration.get(Parameter.CRYPTO_KEY_PATH))));
+		this(SecretKeyManager.loadKey(new File(cryptoKeyPath)));
 	}
 	
 	public CryptoTool(Key secretKey) throws NoSuchAlgorithmException, NoSuchPaddingException

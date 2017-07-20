@@ -73,7 +73,7 @@ public class DriverHelper {
 
 	public DriverHelper() {
 		try {
-			cryptoTool = new CryptoTool();
+			cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 		} catch (Exception e) {
 			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
 		}
@@ -82,7 +82,7 @@ public class DriverHelper {
 	
 	public DriverHelper(WebDriver driver) {
 		try {
-			cryptoTool = new CryptoTool();
+			cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 		} catch (Exception e) {
 			throw new RuntimeException("CryptoTool not initialized, check arg 'crypto_key_path'!");
 		}
