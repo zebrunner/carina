@@ -8,7 +8,7 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 //Motorola|ANDROID|4.4|T01130FJAD|http://localhost:4725/wd/hub;Samsung_S4|ANDROID|4.4.2|5ece160b|http://localhost:4729/wd/hub;
 public class Device
 {
-	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
+	private static final Logger LOGGER = Logger.getLogger(Device.class);
 
 	private String name;
 	private String type;

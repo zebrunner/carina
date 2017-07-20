@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -90,6 +91,24 @@ public class DevicePool
 		DEVICE_MODELS.add(device.getName());
 		String msg = "Registered single device into the DevicePool: %s - %s";
 		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));
+	}
+	
+	public static synchronized void addDevice(Map<String, String> propertiesMap) {
+        if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
+        	//add device from custom capabilities to the devicePool
+        	String deviceName = propertiesMap.get("core.mobile_device_name");
+        	String deviceType = propertiesMap.get("core.mobile_device_type");
+        	String devicePlatform = propertiesMap.get("core.mobile_platform_name");
+        	String devicePlatformVersion = propertiesMap.get("core.mobile_platform_version");
+        	String deviceUdid = propertiesMap.get("core.mobile_platform_udid");
+        	if (deviceUdid == null) {
+        		deviceUdid = "";
+        	}
+        	String seleniumServer = propertiesMap.get("core.selenium_host");
+        	
+        	addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer));
+        }
+
 	}
 	
 	public static synchronized void addDevices()

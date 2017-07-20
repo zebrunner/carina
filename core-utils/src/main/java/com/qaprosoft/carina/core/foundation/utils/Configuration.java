@@ -15,11 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.utils;
 
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -27,6 +22,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 /**
  * Configuration utility.
@@ -491,7 +489,7 @@ public class Configuration
 	}
 	
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void loadCoreProperties(String fileName) {
+    public static Map<String, String> loadCoreProperties(String fileName) {
 
         LOGGER.info("Loading capabilities:");
         Properties props = new Properties();
@@ -526,20 +524,6 @@ public class Configuration
             }
         }
         
-        if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
-        	//add device from custom capabilities to the devicePool
-        	String deviceName = propertiesMap.get("core.mobile_device_name");
-        	String deviceType = propertiesMap.get("core.mobile_device_type");
-        	String devicePlatform = propertiesMap.get("core.mobile_platform_name");
-        	String devicePlatformVersion = propertiesMap.get("core.mobile_platform_version");
-        	String deviceUdid = propertiesMap.get("core.mobile_platform_udid");
-        	if (deviceUdid == null) {
-        		deviceUdid = "";
-        	}
-        	String seleniumServer = propertiesMap.get("core.selenium_host");
-        	
-        	DevicePool.addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer));
-        }
-
+        return propertiesMap;
     }
 }
