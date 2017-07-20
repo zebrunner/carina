@@ -83,8 +83,7 @@ public class CryptoConsole
 			}
 			else if(line.hasOption(ENCRYPT_ARG) && line.hasOption(KEY_ARG))
 			{
-				SecretKey key = SecretKeyManager.loadKey(new File(line.getOptionValue(KEY_ARG)));
-				CryptoTool crypto = new CryptoTool(key);
+				CryptoTool crypto = new CryptoTool(line.getOptionValue(KEY_ARG));
 				if(line.hasOption(FILE_ARG))
 				{
 					File inFile = new File(line.getOptionValue(FILE_ARG));
@@ -112,8 +111,7 @@ public class CryptoConsole
 			}
 			else if(line.hasOption(DECRYPT_ARG) && line.hasOption(KEY_ARG))
 			{
-				SecretKey key = SecretKeyManager.loadKey(new File(line.getOptionValue(KEY_ARG)));
-				CryptoTool crypto = new CryptoTool(key);
+				CryptoTool crypto = new CryptoTool(line.getOptionValue(KEY_ARG));
 				if(line.hasOption(FILE_ARG))
 				{
 					File inFile = new File(line.getOptionValue(FILE_ARG));
