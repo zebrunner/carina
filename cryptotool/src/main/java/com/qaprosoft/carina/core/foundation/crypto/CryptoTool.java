@@ -38,15 +38,10 @@ public class CryptoTool
 
 	public CryptoTool(String cryptoKeyPath) throws NoSuchAlgorithmException, NoSuchPaddingException, IOException
 	{
-		this(SecretKeyManager.loadKey(new File(cryptoKeyPath)));
-	}
-	
-	public CryptoTool(Key secretKey) throws NoSuchAlgorithmException, NoSuchPaddingException
-	{
-		this.key = secretKey;
+		this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath));
 		this.cipher = Cipher.getInstance(algorithm);
 	}
-
+	
 	public String encrypt(String strToEncrypt)
 	{
 		try
