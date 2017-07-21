@@ -51,4 +51,8 @@ public class SecretKeyManager
 	    return key;
 	}
 	
+	public static SecretKey getKey(String keyAsString, String cryptoKeyType) {
+	    return new SecretKeySpec(Base64.decodeBase64(keyAsString), cryptoKeyType);
+	}
+	
 }

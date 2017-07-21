@@ -47,7 +47,7 @@ public class CryptoToolTest
 	}
 	
 	@Test(priority = 4)
-	public void testInitialization()
+	public void testInitializationFromKeyFile()
 	{
 		cryptoTool = new CryptoTool(cryptoFileName);
 		Assert.assertNotNull(cryptoTool.getAlgorithm());
@@ -73,6 +73,35 @@ public class CryptoToolTest
 		Assert.assertNotNull(decrypted);
 		Assert.assertEquals(input, decrypted);
 	}
+	
+	@Test(priority = 7)
+	public void testInitializationFromKey()
+	{
+		cryptoTool = new CryptoTool(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, key);
+		Assert.assertNotNull(cryptoTool.getAlgorithm());
+		Assert.assertNotNull(cryptoTool.getCipher());
+		Assert.assertEquals(SpecialKeywords.CRYPTO_ALGORITHM, cryptoTool.getAlgorithm());
+	}
+	
+	@Test(priority = 8)
+	public void testEncrypt2()
+	{
+		String input = "EncryptMe";
+		String encrypted = cryptoTool.encrypt(input);
+		Assert.assertNotNull(encrypted);
+		Assert.assertFalse(encrypted.equals(input));
+	}
+	
+	@Test(priority = 8)
+	public void testDecrypt2()
+	{
+		String input = "EncryptMe";
+		String encrypted = cryptoTool.encrypt(input);
+		String decrypted = cryptoTool.decrypt(encrypted);
+		Assert.assertNotNull(decrypted);
+		Assert.assertEquals(input, decrypted);
+	}
+	
 	@AfterSuite
 	public void cleanup() {
 		File keyFile = new File(cryptoFileName);

@@ -37,17 +37,25 @@ public class CryptoTool {
 	private String algorithm;
 	private Cipher cipher;
 	private Key key;
+	
+	public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, Key key) {
+		this.algorithm = cryptoAlgorithm;
 
-	public CryptoTool() {
-		this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_PATH);
+		this.key = key;
+		
+		try {
+			this.cipher = Cipher.getInstance(algorithm);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
 	}
-
+	
 	public CryptoTool(String cryptoKeyPath) {
 		this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, cryptoKeyPath);
 	}
-
+	
 	public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, String cryptoKeyPath) {
-		algorithm = cryptoAlgorithm;
+		this.algorithm = cryptoAlgorithm;
 
 		try {
 			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
