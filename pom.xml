@@ -27,6 +27,8 @@
 		<commons-cli.version>1.2</commons-cli.version>
 		<commons-io.version>2.5</commons-io.version>
 		<commons-codec.version>1.9</commons-codec.version>
+
+		<selenium-java.version>3.4.0</selenium-java.version>
 	</properties>
 
 	<modules>
@@ -201,6 +203,13 @@
 				<artifactId>commons-codec</artifactId>
 				<version>${commons-codec.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-java</artifactId>
+				<version>${selenium-java.version}</version>
+			</dependency>
+
 
 			<!-- Test utilities -->
 			<dependency>

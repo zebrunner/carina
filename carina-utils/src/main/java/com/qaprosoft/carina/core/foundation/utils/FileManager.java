@@ -24,8 +24,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-
 public class FileManager
 {
 
@@ -94,24 +92,4 @@ public class FileManager
 		}
 	}
 
-	public static File createLogRootFolder(String name)
-	{
-		//createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.ROOT_REPORT_DIRECTORY));
-		createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
-		return createFolder(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY) + "/" + name);
-	}
-
-	private static File createFolder(String name)
-	{
-		File folder = new File(name);
-		if (!folder.exists())
-		{
-			boolean isCreated = folder.mkdir();
-			if (isCreated)
-			{
-				return folder;
-			}
-		}
-		throw new RuntimeException("Folder not created: " + folder.getAbsolutePath());
-	}
 }

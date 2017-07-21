@@ -1,9 +1,11 @@
-package com.qaprosoft.carina.core.foundation.utils;
+package com.qaprosoft.carina.core.utils;
 
 import java.io.InputStream;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.qaprosoft.carina.core.foundation.utils.PDFUtil;
 
 /**
  * Tests for {@link PDFUtil}

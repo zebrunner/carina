@@ -1,10 +1,12 @@
-package com.qaprosoft.carina.core.foundation.utils;
+package com.qaprosoft.carina.core.utils;
 
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
  * Tests for {@link Configuration}
