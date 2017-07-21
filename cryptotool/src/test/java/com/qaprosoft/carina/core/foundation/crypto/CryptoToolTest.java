@@ -3,9 +3,11 @@ package com.qaprosoft.carina.core.foundation.crypto;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Pattern;
 
 import javax.crypto.SecretKey;
 
+import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.Test;
@@ -18,8 +20,9 @@ import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
  */
 public class CryptoToolTest
 {
+	private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 	private SecretKey key;
-	CryptoTool cryptoTool;
+	private CryptoTool cryptoTool;
 	private final static String cryptoFileName = "crypto.key";
 	
 	@Test(priority = 1)
@@ -101,6 +104,49 @@ public class CryptoToolTest
 		Assert.assertNotNull(decrypted);
 		Assert.assertEquals(input, decrypted);
 	}
+	
+	@Test(priority = 8)
+	public void testEncryptByPattern()
+	{
+		String input = "{crypt: EncryptMe}";
+		String encrypted = cryptoTool.encryptByPattern(input, CRYPTO_PATTERN);
+		Assert.assertNotNull(encrypted);
+		Assert.assertFalse(encrypted.equals(input));
+	}
+	
+	@Test(priority = 8)
+	public void testDecryptByPattern()
+	{
+		String input = "{crypt:EncryptMe}";
+		String resultInput = "EncryptMe";
+		String encrypted = cryptoTool.encryptByPattern(input, CRYPTO_PATTERN);
+		String decrypted = cryptoTool.decrypt(encrypted);
+		Assert.assertNotNull(decrypted);
+		Assert.assertEquals(resultInput, decrypted);
+	}
+	
+	@Test(priority = 8)
+	public void testEncryptByPatternAndWrap()
+	{
+		String input = "{custom_crypt: EncryptMe}";
+		String customWrapper = "{custom_crypt:%s}";
+		Pattern customPattern = Pattern.compile("\\{custom_crypt:[^\\{\\}]*\\}");
+
+		String encrypted = cryptoTool.encryptByPatternAndWrap(input, customPattern, customWrapper);
+		Assert.assertNotNull(encrypted);
+		Assert.assertFalse(encrypted.equals(input));
+	}
+	
+	@Test(priority = 8)
+	public void testDecryptByPatternAndWrap()
+	{
+		String input = "{crypt: EncryptMe}";
+		String encrypted = cryptoTool.encrypt(input);
+		String decrypted = cryptoTool.decrypt(encrypted);
+		Assert.assertNotNull(decrypted);
+		Assert.assertEquals(input, decrypted);
+	}
+	
 	
 	@AfterSuite
 	public void cleanup() {
