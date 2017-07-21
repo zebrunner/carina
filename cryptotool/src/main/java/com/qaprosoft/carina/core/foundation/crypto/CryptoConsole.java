@@ -71,7 +71,8 @@ public class CryptoConsole
 			}
 			else if(line.hasOption(GENERATE_KEY_ARG) && line.hasOption(KEY_ARG))
 			{
-				SecretKey secretKey = SecretKeyManager.generateKey();
+				// TODO: provide command line arguments to use any key type/size			
+				SecretKey secretKey = SecretKeyManager.generateKey(SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_SIZE);
 				File file = new File(line.getOptionValue(KEY_ARG));
 				if(file.exists())
 				{
@@ -83,7 +84,8 @@ public class CryptoConsole
 			}
 			else if(line.hasOption(ENCRYPT_ARG) && line.hasOption(KEY_ARG))
 			{
-				CryptoTool crypto = new CryptoTool(line.getOptionValue(KEY_ARG));
+				//TODO: adjust command line options to be able to generate key using any algorithm/size etc
+				CryptoTool crypto = new CryptoTool(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, line.getOptionValue(KEY_ARG));
 				if(line.hasOption(FILE_ARG))
 				{
 					File inFile = new File(line.getOptionValue(FILE_ARG));
@@ -111,7 +113,9 @@ public class CryptoConsole
 			}
 			else if(line.hasOption(DECRYPT_ARG) && line.hasOption(KEY_ARG))
 			{
-				CryptoTool crypto = new CryptoTool(line.getOptionValue(KEY_ARG));
+				//TODO: adjust command line options to be able to generate key using any algorithm/size etc
+				CryptoTool crypto = new CryptoTool(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, line.getOptionValue(KEY_ARG));
+
 				if(line.hasOption(FILE_ARG))
 				{
 					File inFile = new File(line.getOptionValue(FILE_ARG));
