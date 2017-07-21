@@ -124,4 +124,12 @@ public class SpecialKeywords
 	public static final String COMMENT = "comment";
 	
 	
+	
+	// ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
+	public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
+	public static final String CRYPTO_KEY_TYPE = "AES";
+	public static final int CRYPTO_KEY_SIZE = 128;
+	public static final String CRYPTO_KEY_PATH = "./src/main/resources/crypto.key";
+	
+	
 }
