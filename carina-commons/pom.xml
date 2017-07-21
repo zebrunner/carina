@@ -5,12 +5,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qaprosoft.carina</groupId>
-	<artifactId>cryptotool</artifactId>
+	<artifactId>carina-commons</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>CryptoTool Carina Core</name>
-	<description></description>
+	<name>Carina Core Commons</name>
+	<description>Set of shared carina utilities.</description>
 
 	<parent>
 		<groupId>com.qaprosoft.carina</groupId>
@@ -29,41 +29,14 @@
 	</properties>
 
 	<dependencies>
-		<!-- Carina sub-modules dependencies -->
-		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
-			<artifactId>carina-commons</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-
-		<!-- Test utilities -->
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
 		</dependency>
 
 	</dependencies>
@@ -111,18 +84,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<distributionManagement>
-		<repository>
-			<id>deploymentRepo</id>
-			<name>Qaprosoft Releases</name>
-			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>deploymentRepo</id>
-			<name>Qaprosoft Snapshots</name>
-			<url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 </project>

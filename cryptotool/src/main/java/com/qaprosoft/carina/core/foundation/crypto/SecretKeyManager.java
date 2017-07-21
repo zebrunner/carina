@@ -27,37 +27,28 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
-
 public class SecretKeyManager
 {
 	private static final Logger LOGGER = Logger.getLogger(SecretKeyManager.class);
 	
-	private static SecretKey generateKey(String algorithm, int size) throws NoSuchAlgorithmException 
+	public static SecretKey generateKey(String keyType, int size) throws NoSuchAlgorithmException 
 	{
-		LOGGER.debug("generating key use algorithm: '" + algorithm + "'; size: " + size);
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
+		LOGGER.debug("generating key use algorithm: '" + keyType + "'; size: " + size);
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(keyType);
 	    keyGenerator.init(size);
 	    SecretKey key = keyGenerator.generateKey();
 	    return key; 
 	}
 	
-	public static SecretKey generateKey() throws NoSuchAlgorithmException 
-	{
-	    return generateKey(R.CONFIG.get("crypto_key_type"), R.CONFIG.getInt("crypto_key_size")); 
-	}   
 	
 	public static void saveKey(SecretKey key, File file) throws IOException {
 	    byte[] encoded = key.getEncoded();
 	    FileUtils.writeByteArrayToFile(file, Base64.encodeBase64(encoded));
 	}
 	
-	public static SecretKey loadKey(File file) throws IOException {
-		return loadKey(file, R.CONFIG.get("crypto_key_type"));
-	}
-	
 	public static SecretKey loadKey(File file, String cryptoKeyType) throws IOException {
 	    SecretKey key = new SecretKeySpec(Base64.decodeBase64(FileUtils.readFileToByteArray(file)), cryptoKeyType);
 	    return key;
 	}
+	
 }
