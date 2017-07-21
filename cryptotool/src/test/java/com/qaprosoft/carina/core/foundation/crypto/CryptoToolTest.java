@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import javax.crypto.SecretKey;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.Test;

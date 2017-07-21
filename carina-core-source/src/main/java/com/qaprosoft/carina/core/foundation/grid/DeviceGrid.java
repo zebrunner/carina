@@ -3,7 +3,6 @@ package com.qaprosoft.carina.core.foundation.grid;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
