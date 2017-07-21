@@ -120,7 +120,9 @@ public class CryptoToolTest
 		String input = "{crypt:EncryptMe}";
 		String resultInput = "EncryptMe";
 		String encrypted = cryptoTool.encryptByPattern(input, CRYPTO_PATTERN);
-		String decrypted = cryptoTool.decrypt(encrypted);
+		String encryptedWithPattern = String.format("{crypt:%s}", encrypted);
+		
+		String decrypted = cryptoTool.decryptByPattern(encryptedWithPattern, CRYPTO_PATTERN);
 		Assert.assertNotNull(decrypted);
 		Assert.assertEquals(resultInput, decrypted);
 	}
@@ -140,9 +142,12 @@ public class CryptoToolTest
 	@Test(priority = 8)
 	public void testDecryptByPatternAndWrap()
 	{
-		String input = "{crypt: EncryptMe}";
-		String encrypted = cryptoTool.encrypt(input);
-		String decrypted = cryptoTool.decrypt(encrypted);
+		String input = "{custom_crypt: EncryptMe}";
+		String customWrapper = "{custom_crypt:%s}";
+		Pattern customPattern = Pattern.compile("\\{custom_crypt:[^\\{\\}]*\\}");
+		
+		String encrypted = cryptoTool.encryptByPatternAndWrap(input, customPattern, customWrapper);
+		String decrypted = cryptoTool.decryptByPatternAndWrap(encrypted, customPattern, customWrapper);
 		Assert.assertNotNull(decrypted);
 		Assert.assertEquals(input, decrypted);
 	}
