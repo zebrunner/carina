@@ -32,7 +32,6 @@ public class ImageProcessing {
      * @return <code>byte[]</code> - default file format is PNG
      */
     public static byte[] imageResize(byte[] fileData) {
-        ByteArrayInputStream in = new ByteArrayInputStream(fileData);
         int percent = 30;
 
         if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_TESTS_RESULTS_IMAGE_RESIZE)) {

@@ -1,12 +1,12 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.File;
+import java.lang.reflect.Type;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-
-import java.io.File;
-import java.lang.reflect.Type;
 
 /**
  * Created by yauhenipatotski on 4/13/16.
