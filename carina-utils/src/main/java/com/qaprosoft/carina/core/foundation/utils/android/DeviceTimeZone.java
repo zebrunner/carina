@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidService.TimeFormat;
 
 public class DeviceTimeZone {
 
@@ -22,6 +21,36 @@ public class DeviceTimeZone {
     private boolean changeDateTime;
     private boolean refreshDeviceTime;
     private boolean daylightTime;
+
+    public enum TimeFormat {
+        FORMAT_12("12"),
+        FORMAT_24("24");
+        private String format;
+
+        TimeFormat(String format) {
+            this.format = format;
+        }
+
+        public String format() {
+            return format;
+        }
+
+        public String toString() {
+            return format;
+        }
+
+        public static TimeFormat parse(String text) {
+            if (text != null) {
+                for (TimeFormat type : TimeFormat.values()) {
+                    if (text.equalsIgnoreCase(type.toString())) {
+                        return type;
+                    }
+                }
+            }
+            return FORMAT_12;
+        }
+    }
+
 
     public DeviceTimeZone() {
         this.auto_time = true;
@@ -154,7 +183,6 @@ public class DeviceTimeZone {
         this.refreshDeviceTime = refreshDeviceTime;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public boolean isDaylightTime() {
         return daylightTime;
     }

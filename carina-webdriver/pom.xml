@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.qaprosoft.carina</groupId>
+	<artifactId>carina-webdriver</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Carina WebDriver Core</name>
+	<description></description>
+
+	<parent>
+		<groupId>com.qaprosoft.carina</groupId>
+		<artifactId>carina-core</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<source.version>1.8</source.version>
+		<target.version>1.8</target.version>
+
+		<appium.version>5.0.0-BETA8</appium.version>
+		<imgscalr-lib.version>4.2</imgscalr-lib.version>
+		<aws-s3-manager.version>1.2.15</aws-s3-manager.version>
+		<ashot.version>1.5.3</ashot.version>
+		<commons-httpclient.version>3.1</commons-httpclient.version>
+		<apache-http.version>4.4</apache-http.version>
+		<pubnub.version>3.7.10</pubnub.version>
+		<itext.version>5.0.6</itext.version>
+
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-utils</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>browsermobproxy</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>cryptotool</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-reporting</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+		</dependency>
+
+		<!-- Appium -->
+		<dependency>
+			<groupId>io.appium</groupId>
+			<artifactId>java-client</artifactId>
+			<version>${appium.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.gson</groupId>
+					<artifactId>gson</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.imgscalr</groupId>
+			<artifactId>imgscalr-lib</artifactId>
+			<version>${imgscalr-lib.version}</version>
+			<type>jar</type>
+		</dependency>
+
+		<!-- Amazon -->
+		<dependency>
+			<groupId>com.qaprosoft.amazon</groupId>
+			<artifactId>aws-s3-manager</artifactId>
+			<version>${aws-s3-manager.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ru.yandex.qatools.ashot</groupId>
+			<artifactId>ashot</artifactId>
+			<version>${ashot.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>${commons-httpclient.version}</version>
+		</dependency>
+
+		<!-- HTTP utilities -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${apache-http.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>${apache-http.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<version>${apache-http.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.pubnub</groupId>
+			<artifactId>pubnub</artifactId>
+			<version>${pubnub.version}</version>
+		</dependency>
+
+		<!--iText for pdf -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>${itext.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${source.version}</source>
+					<target>${target.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.qaprosoft.carina.core.foundation.webdriver.ProxyPool</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

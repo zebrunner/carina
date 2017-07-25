@@ -5,12 +5,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qaprosoft.carina</groupId>
-	<artifactId>carina-utils</artifactId>
+	<artifactId>carina-reporting</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Carina Core Utils</name>
-	<description>Set of useful carina core utilities.</description>
+	<name>Carina Reporting Module</name>
+	<description></description>
 
 	<parent>
 		<groupId>com.qaprosoft.carina</groupId>
@@ -26,11 +26,11 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<pdfbox.version>1.8.7</pdfbox.version>
-		<jackson-databind.version>2.8.9</jackson-databind.version>
-		<rest-assured.version>2.9.0</rest-assured.version>
-		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
-		<joda-time.version>2.9.9</joda-time.version>
+		<javax-mail.version>1.4</javax-mail.version>
+		<zafira-client.version>3.0.5</zafira-client.version>
+		<monte-repack.version>1.0</monte-repack.version>
+		<json-simple.version>1.1</json-simple.version>
+
 
 	</properties>
 
@@ -38,67 +38,55 @@
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
 			<groupId>com.qaprosoft.carina</groupId>
-			<artifactId>carina-commons</artifactId>
+			<artifactId>carina-utils</artifactId>
 		</dependency>
 
-		<!-- Other dependencies -->
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>cryptotool</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
 
+		<!-- carina-reporting only dependencies -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>${javax-mail.version}</version>
+		</dependency>
+
+		<!-- Zafira -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>zafira-client</artifactId>
+			<version>${zafira-client.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- monte-repack video recording -->
+		<dependency>
+			<groupId>com.pojosontheweb</groupId>
+			<artifactId>monte-repack</artifactId>
+			<version>${monte-repack.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>${json-simple.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-		</dependency>
-
-		<!-- Test utilities -->
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-		</dependency>
-
-		<!-- Carina-utils only dependencies -->
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>${pdfbox.version}</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>${jackson-databind.version}</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>com.jayway.restassured</groupId>
-		    <artifactId>rest-assured</artifactId>
-		    <version>${rest-assured.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>${mongo-java-driver.version}</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>joda-time</groupId>
-		    <artifactId>joda-time</artifactId>
-		    <version>${joda-time.version}</version>
-		</dependency>
-
 
 	</dependencies>
 
