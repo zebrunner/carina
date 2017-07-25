@@ -143,19 +143,12 @@ public abstract class CucumberRunner extends AbstractTest {
 
 
             if (list.size() > 0) {
-                String pluginUrlPath = "";
                 //String buildNumber = "1";
                 //String buildProject = "CUCUMBER";
                 boolean skippedFails = true;
                 boolean pendingFails = true;
                 boolean undefinedFails = true;
                 boolean missingFails = true;
-                boolean flashCharts = true;
-                boolean runWithJenkins = false;
-                boolean highCharts = false;
-                boolean parallelTesting = true;
-                boolean artifactsEnabled = false;
-                String artifactConfig = "";
 
                 net.masterthought.cucumber.Configuration configuration = new net.masterthought.cucumber.Configuration(reportOutputDirectory, buildProject + " Cucumber Test Results");
                 configuration.setStatusFlags(skippedFails, pendingFails, undefinedFails, missingFails);
