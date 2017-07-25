@@ -103,7 +103,7 @@ public class ZafiraClientTest
 	{
 		List<String> workItems = new ArrayList<String>();
 		
-		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.models.db.Status.PASSED, "<config></config>", 1L, 1L, new Date().getTime(), "http://localhost:8081/demo", "http://localhost:8081/log", workItems, 2, null);
+		TestType test = new TestType("Zafira login test", com.qaprosoft.zafira.models.db.Status.PASSED, "<config></config>", 1L, 1L, new Date().getTime(), workItems, 2, null);
 		
 		Response<TestType> response = zc.startTest(test);
 		Assert.assertEquals(response.getStatus(), 200);

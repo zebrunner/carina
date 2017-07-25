@@ -109,18 +109,6 @@ public class ZafiraConfigurator implements IConfigurator
     }
 
     @Override
-    public String getLogURL(ITestResult test)
-    {
-        return ReportContext.getTestLogLink(getTestName(test));
-    }
-
-    @Override
-    public String getDemoURL(ITestResult test)
-    {
-        return ReportContext.getTestScreenshotsLink(getTestName(test));
-    }
-
-    @Override
     public List<String> getTestWorkItems(ITestResult test)
     {
         return Jira.getTickets(test);
