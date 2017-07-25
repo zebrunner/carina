@@ -35,7 +35,9 @@
 		<module>carina-commons</module>
 		<module>browsermobproxy</module>
 		<module>carina-utils</module>
+		<module>carina-reporting</module>
 		<module>cryptotool</module>
+		<module>carina-webdriver</module>
 		<module>carina-core-source</module>
 	</modules>
 
@@ -162,7 +164,19 @@
 
 			<dependency>
 				<groupId>com.qaprosoft.carina</groupId>
+				<artifactId>carina-reporting</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.qaprosoft.carina</groupId>
 				<artifactId>cryptotool</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.qaprosoft.carina</groupId>
+				<artifactId>carina-webdriver</artifactId>
 				<version>1.0-SNAPSHOT</version>
 			</dependency>
 

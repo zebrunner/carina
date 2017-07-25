@@ -101,25 +101,7 @@ public class TZChangerPage extends MobileAbstractPage {
         return selected;
     }
 
-    /**
-     * selectTimezoneByText in TZ changer
-     *
-     * @param timezone         String
-     * @param defaultSwipeTime int
-     * @return boolean
-     */
-    private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
-        boolean scrolled = MobileUtils.swipeInContainerTillElement(
-                format(tzSelectionBase, timezone),
-                scrollableContainer, defaultSwipeTime);
-        if (scrolled) {
-            LOGGER.info("Select timezone by TimeZone text: " + timezone);
-            format(tzSelectionBase, timezone).click();
-        }
-        return scrolled;
-    }
-
-    /**
+     /**
      * isOpened
      *
      * @param timeout long

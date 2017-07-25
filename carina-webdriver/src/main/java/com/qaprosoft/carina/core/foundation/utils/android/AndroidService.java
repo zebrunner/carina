@@ -2,6 +2,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
@@ -54,36 +55,6 @@ public class AndroidService {
     private String[] baseInitCmd;
 
     private AdbExecutor executor;
-
-
-    public enum TimeFormat {
-        FORMAT_12("12"),
-        FORMAT_24("24");
-        private String format;
-
-        TimeFormat(String format) {
-            this.format = format;
-        }
-
-        public String format() {
-            return format;
-        }
-
-        public String toString() {
-            return format;
-        }
-
-        public static TimeFormat parse(String text) {
-            if (text != null) {
-                for (TimeFormat type : TimeFormat.values()) {
-                    if (text.equalsIgnoreCase(type.toString())) {
-                        return type;
-                    }
-                }
-            }
-            return FORMAT_12;
-        }
-    }
 
     public enum ChangeTimeZoneWorkflow {
         ADB(1),        // 0b001
