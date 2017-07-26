@@ -13,8 +13,8 @@
 	<description>Set of shared carina utilities.</description>
 
 	<parent>
-		<groupId>com.qaprosoft.carina</groupId>
-		<artifactId>carina-core</artifactId>
+		<groupId>com.qaprosoft</groupId>
+		<artifactId>carina</artifactId>
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>

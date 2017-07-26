@@ -4,13 +4,13 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qaprosoft.carina</groupId>
-	<artifactId>carina-webdriver</artifactId>
+	<groupId>com.qaprosoft</groupId>
+	<artifactId>carina-core</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Carina WebDriver Core</name>
-	<description></description>
+	<name>Carina Core</name>
+	<description>Carina core module for web, mobile, API testing.</description>
 
 	<parent>
 		<groupId>com.qaprosoft</groupId>
@@ -26,116 +26,122 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<appium.version>5.0.0-BETA8</appium.version>
-		<imgscalr-lib.version>4.2</imgscalr-lib.version>
-		<aws-s3-manager.version>1.2.15</aws-s3-manager.version>
-		<ashot.version>1.5.3</ashot.version>
-		<commons-httpclient.version>3.1</commons-httpclient.version>
-		<apache-http.version>4.4</apache-http.version>
-		<pubnub.version>3.7.10</pubnub.version>
-		<itext.version>5.0.6</itext.version>
+		<api-tools.version>1.0.11</api-tools.version>
+
+		<jira-client.version>0.5</jira-client.version>
+		<opencsv.version>1.7</opencsv.version>
+
+		<cucumber.testng.version>1.2.4</cucumber.testng.version>
+		<cucumber.java.version>1.2.4</cucumber.java.version>
+		<cucumber.reporting>2.6.3</cucumber.reporting>
+
+		<reflections.version>0.9.9-RC1</reflections.version>
+		<apache-poi.version>3.11-beta3</apache-poi.version>
 
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
-			<artifactId>carina-utils</artifactId>
-		</dependency>
-
+		<!-- Carina Core sub-modules -->
 		<dependency>
 			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>browsermobproxy</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.qaprosoft.carina</groupId>
-			<artifactId>cryptotool</artifactId>
+			<artifactId>carina-utils</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>cryptotool</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-webdriver</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
 
+		<!-- Reflections -->
 		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-		</dependency>
-
-		<!-- Appium -->
-		<dependency>
-			<groupId>io.appium</groupId>
-			<artifactId>java-client</artifactId>
-			<version>${appium.version}</version>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>${reflections.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.google.code.gson</groupId>
-					<artifactId>gson</artifactId>
+					<groupId>dom4j</groupId>
+					<artifactId>dom4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- CSV -->
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>${opencsv.version}</version>
+		</dependency>
+
+
+		<!-- api-tools -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>api-tools</artifactId>
+			<version>${api-tools.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 
 		<dependency>
-			<groupId>org.imgscalr</groupId>
-			<artifactId>imgscalr-lib</artifactId>
-			<version>${imgscalr-lib.version}</version>
-			<type>jar</type>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${apache-poi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${apache-poi.version}</version>
 		</dependency>
 
-		<!-- Amazon -->
+		<!-- Jira -->
 		<dependency>
-			<groupId>com.qaprosoft.amazon</groupId>
-			<artifactId>aws-s3-manager</artifactId>
-			<version>${aws-s3-manager.version}</version>
+			<groupId>net.rcarz</groupId>
+			<artifactId>jira-client</artifactId>
+			<version>${jira-client.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>ru.yandex.qatools.ashot</groupId>
-			<artifactId>ashot</artifactId>
-			<version>${ashot.version}</version>
-		</dependency>
 
+		<!-- Cucumber -->
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>${commons-httpclient.version}</version>
-		</dependency>
-
-		<!-- HTTP utilities -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${apache-http.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>${apache-http.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>fluent-hc</artifactId>
-			<version>${apache-http.version}</version>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-testng</artifactId>
+			<version>${cucumber.testng.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.pubnub</groupId>
-			<artifactId>pubnub</artifactId>
-			<version>${pubnub.version}</version>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>${cucumber.java.version}</version>
 		</dependency>
 
-		<!--iText for pdf -->
 		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>${itext.version}</version>
+			<groupId>net.masterthought</groupId>
+			<artifactId>cucumber-reporting</artifactId>
+			<version>${cucumber.reporting}</version>
 		</dependency>
 
 	</dependencies>
