@@ -161,7 +161,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.qaprosoft.carina.core.foundation.webdriver.ProxyPool</mainClass>
+							<mainClass>com.qaprosoft.carina.core.foundation.AbstractTest</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
