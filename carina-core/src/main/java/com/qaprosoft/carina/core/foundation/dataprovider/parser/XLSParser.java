@@ -15,23 +15,29 @@
  */
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
-import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.model.ExternalLinksTable;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFTable;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jfree.util.Log;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.model.ExternalLinksTable;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFTable;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
+import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
+
 public class XLSParser
 {
+	protected static final Logger LOGGER = Logger.getLogger(XLSParser.class);
 	private static DataFormatter df;
 	private static FormulaEvaluator evaluator;	
 	
@@ -167,8 +173,7 @@ public class XLSParser
 			}
 		}
 		catch (Exception e) {
-			Log.error(e.getMessage());
-		    e.printStackTrace();			
+			LOGGER.error(e.getMessage(), e);
 		}
 		return dataTable;
 	}
