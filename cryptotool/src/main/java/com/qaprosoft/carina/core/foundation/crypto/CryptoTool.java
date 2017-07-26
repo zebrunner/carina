@@ -50,6 +50,10 @@ public class CryptoTool {
 		}
 	}
 	
+	public CryptoTool() {
+		this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_PATH);
+	}
+	
 	public CryptoTool(String cryptoKeyPath) {
 		this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, cryptoKeyPath);
 	}
