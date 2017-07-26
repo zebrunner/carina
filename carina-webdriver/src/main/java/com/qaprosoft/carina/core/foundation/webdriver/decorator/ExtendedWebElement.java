@@ -1215,7 +1215,7 @@ public class ExtendedWebElement {
     		return;
     	}
 
-        if (!BrowserType.FIREFOX.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))){
+        if (!BrowserType.CHROME.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))){
             return;
         }
 
