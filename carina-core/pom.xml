@@ -38,6 +38,8 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<apache-poi.version>3.11-beta3</apache-poi.version>
 
+		<commons-beanutils.version>1.9.2</commons-beanutils.version>
+
 	</properties>
 
 	<dependencies>
@@ -143,6 +145,14 @@
 			<artifactId>cucumber-reporting</artifactId>
 			<version>${cucumber.reporting}</version>
 		</dependency>
+
+		<!-- For ZafiraListener -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>${commons-beanutils.version}</version>
+		</dependency>
+
 
 	</dependencies>
 
