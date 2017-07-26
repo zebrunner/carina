@@ -13,6 +13,7 @@ import org.reflections.Reflections;
 
 import com.qaprosoft.carina.core.foundation.exception.RequiredCtorNotFoundException;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
@@ -38,6 +39,10 @@ public class CustomTypePageFactory {
 
 	protected static final Logger LOGGER = Logger
 			.getLogger(CustomTypePageFactory.class);
+
+	public static <T extends AbstractPage> T initPage(Class<T> parentClass, Object... parameters) {
+		return initPage(DriverPool.getDriver(), parentClass, parameters);
+	}
 
 	public static <T extends AbstractPage> T initPage(WebDriver driver,
 			Class<T> parentClass, Object... parameters) {
