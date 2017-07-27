@@ -33,7 +33,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -49,7 +48,6 @@ public final class DriverPool {
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
 	
-	private static AdbExecutor executor = new AdbExecutor(Configuration.get(Parameter.ADB_HOST), Configuration.get(Parameter.ADB_PORT));
 	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
 
 	/**
@@ -209,9 +207,21 @@ public final class DriverPool {
 	 */
 	public static void quitDriver(String name) {
 		WebDriver drv = getDriver(name);
+
+		//TODO: try to understand valid place for recorded video file to suport method/class and suite mode
+		DevicePool.getDevice().stopRecording(adbVideoRecorderPid.get());
 		
-		stopRecording();
-		executor.screenOff();
+		pause(3); //very often video from device is black. trying to wait before pulling the file
+		
+		String videoDir = ReportContext.getBaseDir().getAbsolutePath();			
+		videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
+
+		
+		//TODO: refactor video recorder to make it happen for each driver if necessary
+		DevicePool.getDevice().pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/video.mp4");
+
+
+		DevicePool.getDevice().screenOff();
 
 		try {
 			LOGGER.debug("Driver exiting..." + drv);
@@ -283,13 +293,13 @@ public final class DriverPool {
 					
 					// turn on mobile device display if necessary. action can be done after registering available device with thread
 					// there is no sense to clean cache and reinstall app if we request dedicated device
-					executor.screenOn();
+					device.screenOn();
 					
-					executor.restartAppium(device);
-					executor.clearAppData(device);
+					device.restartAppium();
+					device.clearAppData();
 					
 					// verify if valid build is already installed and uninstall only in case of any difference 
-					executor.reinstallApp(device, Configuration.get(Parameter.MOBILE_APP));
+					device.reinstallApp();
 				}
 
 
@@ -331,11 +341,12 @@ public final class DriverPool {
 			throw new RuntimeException(init_throwable);
 		}
 		
-		startRecording();
-
+		Integer pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
+		adbVideoRecorderPid.set(pid);
+		
 		return drv;
 	}
-
+	
 	/**
 	 * Register driver in the DriverPool
 	 * 
@@ -636,27 +647,4 @@ public final class DriverPool {
 		proxies.put(threadId, proxy);
 	}
 	
-	
-	private static void startRecording() {
-		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) { 
-			Integer pid = executor.startRecording(SpecialKeywords.VIDEO_FILE_NAME);
-			adbVideoRecorderPid.set(pid);
-		}
-	}
-	
-	private static void stopRecording() {
-		Integer adb_pid = adbVideoRecorderPid.get();
-		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING) && adb_pid != null) {
-			executor.stopRecording(adb_pid); //stop recording
-			pause(3); //very often video from device is black. trying to wait before pulling the file
-			
-			String videoDir = ReportContext.getBaseDir().getAbsolutePath();			
-			videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
- 
-			
-			//TODO: refactor video recorder to make it happen for each driver if necessary
-			executor.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/video.mp4");
-		}	
-	}
-
 }

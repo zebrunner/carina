@@ -244,9 +244,11 @@ public class Configuration
         
         MOBILE_PLATFORM_VERSION("mobile_platform_version"),
         
-        MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Sendroid 
+        MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Selendroid 
         
         MOBILE_APP("mobile_app"),
+        
+        MOBILE_APP_PREUPGRADE("mobile_app_preupgrade"),
         
         MOBILE_APP_UNINSTALL("mobile_app_uninstall"),
         
@@ -363,9 +365,9 @@ public class Configuration
 
 		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder"),
 		
-		SSH_USERNAME("ssh_username"),
+//		SSH_USERNAME("ssh_username"),
 		
-		ADB_PATH("adb_path"),
+//		ADB_PATH("adb_path"),
 
 		// TLS
 		TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
