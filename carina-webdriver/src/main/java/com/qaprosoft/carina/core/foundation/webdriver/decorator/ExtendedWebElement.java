@@ -15,34 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.*;
-import org.testng.Assert;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +27,47 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.hamcrest.BaseMatcher;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
+import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
@@ -461,6 +474,7 @@ public class ExtendedWebElement {
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(timeout).isDisplayed());
+            captureElements();
             element.click();
             String msg = Messager.ELEMENT_CLICKED.info(getName());
             summary.log(msg);
@@ -1233,13 +1247,15 @@ public class ExtendedWebElement {
 
                 ElementsInfo elementsInfo = new ElementsInfo();
                 elementsInfo.setCurrentURL(currentUrl);
-                File file = ((RemoteWebDriver) driver).getScreenshotAs(OutputType.FILE);
-                //TODO: reuse Screenshot for generation
-                File newPlace = new File(ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + cache.hashCode() + ".png");
-                FileUtils.copyFile(file, newPlace);
+                
+                String metadataScreenPath = Screenshot.captureMetadata(getDriver(), String.valueOf(cache.hashCode()));
+                
+                File newPlace = new File(metadataScreenPath);
+                
                 ScreenShootInfo screenShootInfo = new ScreenShootInfo();
                 screenShootInfo.setScreenshotPath(newPlace.getAbsolutePath());
                 BufferedImage bimg = ImageIO.read(newPlace);
+                
                 screenShootInfo.setWidth(bimg.getWidth());
                 screenShootInfo.setHeight(bimg.getHeight());
                 elementsInfo.setScreenshot(screenShootInfo);
@@ -1252,7 +1268,7 @@ public class ExtendedWebElement {
                     ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement, driver));
 
                     int elementPosition = all.indexOf(webElement);
-                    for (int i = 1; i < 10; i++) {
+                    for (int i = 1; i < 5; i++) {
                         if (elementPosition - i < 0) {
                             break;
                         }
@@ -1267,10 +1283,9 @@ public class ExtendedWebElement {
                         if (sti == null || sti.isEmpty() || control.get(0).getText().equals(sti)) {
                             continue;
                         } else {
-                            elementInfo.setTextInfo(getElementInfo(new ExtendedWebElement(all.get(elementPosition - i))));
+                            elementInfo.setTextInfo(getElementInfo(new ExtendedWebElement(all.get(elementPosition - i), driver)));
                             break;
                         }
-
                     }
                     elementsInfo.addElement(elementInfo);
                     MetadataCollector.putPageInfo(cache, elementsInfo);
