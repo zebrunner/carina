@@ -199,6 +199,55 @@ public class Screenshot
 
 	}
 	
+	
+	/**
+	 * Captures driver screenshot for Alice-AI metadata and put it to appropriate metadata location
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param screenName
+	 * 			  String
+	 * @return screenshot name.
+	 */
+	
+	public static String captureMetadata(WebDriver driver, String screenName) {
+
+		String screenPath = "";
+		if (!DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
+			if (driver == null) {
+				LOGGER.warn("Unable to capture screenshot as driver is null.");
+				return null;
+			}
+			if (driver.toString().contains("null")) {
+				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
+				return null;
+			}
+
+			try {
+				screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
+
+				WebDriver augmentedDriver = driver;
+				if (!driver.toString().contains("AppiumNativeDriver")) {
+					// do not augment for Appium 1.x anymore
+					augmentedDriver = new DriverAugmenter().augment(driver);
+				}
+				
+				BufferedImage screen;
+
+				//Create screenshot
+				screen = takeVisibleScreenshot(driver, augmentedDriver);
+
+				ImageIO.write(screen, "PNG", new File(screenPath));
+
+			} catch (IOException e) {
+				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+			} catch (Exception e) {
+				LOGGER.error("Unable to capture screenshot!", e);
+			}
+		}
+		return screenPath;
+	}
+	
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
