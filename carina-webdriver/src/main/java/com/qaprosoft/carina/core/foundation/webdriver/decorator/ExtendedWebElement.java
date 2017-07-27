@@ -1249,7 +1249,7 @@ public class ExtendedWebElement {
                 elementsInfo.setCurrentURL(currentUrl);
                 
                 String metadataScreenPath = Screenshot.captureMetadata(getDriver(), String.valueOf(cache.hashCode()));
-                
+                //TODO: double check that file exist because due to the different reason screenshot can miss
                 File newPlace = new File(metadataScreenPath);
                 
                 ScreenShootInfo screenShootInfo = new ScreenShootInfo();

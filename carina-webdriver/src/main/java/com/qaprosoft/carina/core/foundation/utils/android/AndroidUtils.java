@@ -890,7 +890,7 @@ public class AndroidUtils {
         language = language.toLowerCase();
 
         executor = new AdbExecutor();
-        String[] initCmd = executor.buildDefaultCmd();
+        String[] initCmd = executor.getDefaultCmd();
         LOGGER.debug("Init cmd: ".concat(initCmd.toString()));
         String deviceUdid = DevicePool.getDeviceUdid();
 

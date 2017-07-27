@@ -80,7 +80,7 @@ public class AndroidService {
 
     private AndroidService() {
         executor = new AdbExecutor();
-        baseInitCmd = executor.buildDefaultCmd();
+        baseInitCmd = executor.getDefaultCmd();
     }
 
     static {
