@@ -608,4 +608,8 @@ public class Device
 
         AppiumStatus.waitStartup(getSeleniumServer(), 30);
     }
+    
+    public List<String> execute(String[] cmd) {
+    	return executor.execute(cmd);
+    }
 }
