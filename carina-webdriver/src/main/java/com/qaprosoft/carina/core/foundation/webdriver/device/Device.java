@@ -480,7 +480,7 @@ public class Device
                 LOGGER.info("installed app: " + apkInstalledVersions[2] + "-" + apkInstalledVersions[1]);
                 LOGGER.info("new app: " + apkVersions[2] + "-" + apkVersions[1]);
 
-                if (apkVersions[1].equals(apkInstalledVersions[1]) && apkVersions[2].equals(apkInstalledVersions[2])) {
+                if (apkVersions[1].equals(apkInstalledVersions[1]) && apkVersions[2].equals(apkInstalledVersions[2]) && oldMobileApp.isEmpty()) {
                     LOGGER.info(
                             "Skip application uninstall and cache cleanup as exactly the same version is already installed.");
                 } else {
