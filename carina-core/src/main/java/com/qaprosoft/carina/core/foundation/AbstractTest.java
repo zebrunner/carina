@@ -52,7 +52,6 @@ import org.testng.xml.XmlTest;
 
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.automation.remarks.testng.VideoListener;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
