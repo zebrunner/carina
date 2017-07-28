@@ -401,6 +401,27 @@ public class ReportContext
 		}
 	}
 	
+	/**
+	 * Returns URL for test screenshot folder.
+	 * 
+	 * @param test test name
+	 * @return - URL for test screenshot folder.
+	 */
+	public static String getTestArtifactsLink()
+	{
+		String link = "";
+		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+			//remove report url and make link relative
+			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			link = String.format("%s/%d/artifacts", Configuration.get(Parameter.REPORT_URL), rootID);
+		}
+		else {
+			link = String.format("file://%s/%d/artifacts", baseDirectory, rootID);
+		}
+		
+		return link;
+		
+	}
 
 	/**
 	 * Returns URL for test screenshot folder.
@@ -423,6 +444,7 @@ public class ReportContext
 			link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
+			//TODO: it seems like defect
 			link = String.format("file://%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
@@ -445,6 +467,7 @@ public class ReportContext
 			link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		else {
+			//TODO: it seems like defect
 			link = String.format("file://%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
 		}
 		
