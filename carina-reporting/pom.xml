@@ -88,12 +88,6 @@
 			<version>${json-simple.version}</version>
 		</dependency>
 
-<dependency>
-  <groupId>com.automation-remarks</groupId>
-  <artifactId>video-recorder-testng</artifactId>
-  <version>LATEST</version>
-</dependency>
-
 	</dependencies>
 
 	<build>
