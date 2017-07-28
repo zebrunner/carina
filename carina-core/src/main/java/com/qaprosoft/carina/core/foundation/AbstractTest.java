@@ -92,7 +92,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
  * 
  * @author Alex Khursevich
  */
-@Listeners({AbstractTestListener.class, VideoListener.class})
+@Listeners({AbstractTestListener.class})
 public abstract class AbstractTest // extends DriverHelper
 {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
