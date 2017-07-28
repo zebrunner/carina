@@ -402,9 +402,7 @@ public class ReportContext
 	}
 	
 	/**
-	 * Returns URL for test screenshot folder.
-	 * 
-	 * @param test test name
+	 * Returns URL for test artifacts folder.
 	 * @return - URL for test screenshot folder.
 	 */
 	public static String getTestArtifactsLink()
