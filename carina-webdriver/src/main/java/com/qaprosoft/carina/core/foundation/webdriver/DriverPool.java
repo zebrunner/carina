@@ -27,6 +27,7 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
@@ -208,19 +209,21 @@ public final class DriverPool {
 	public static void quitDriver(String name) {
 		WebDriver drv = getDriver(name);
 
-		//TODO: try to understand valid place for recorded video file to suport method/class and suite mode
+		//TODO: try to understand valid place for recorded video file to support method/class and suite mode
+		// 1. create for each driver their own video file. 
+		// 2. save it using unique driver/test/thread name - maybe time in ms
+		// 3. register link onto the video as test artifact
 		DevicePool.getDevice().stopRecording(adbVideoRecorderPid.get());
 		
 		pause(3); //very often video from device is black. trying to wait before pulling the file
 		
-		String videoDir = ReportContext.getBaseDir().getAbsolutePath();			
-		videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
-
+		String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
+		String uniqueFileName = "video-" + System.currentTimeMillis() + ".mp4";
+		DevicePool.getDevice().pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
 		
-		//TODO: refactor video recorder to make it happen for each driver if necessary
-		DevicePool.getDevice().pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/video.mp4");
-
-
+		String artifactsLink = ReportContext.getTestArtifactsLink();
+		Artifacts.add("video.mp4", artifactsLink +"/" + uniqueFileName);
+		
 		DevicePool.getDevice().screenOff();
 
 		try {
