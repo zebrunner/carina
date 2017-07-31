@@ -52,7 +52,10 @@ final public class Artifacts {
 	}
 
 	public synchronized static Set<TestArtifactType> getArtifacts() {
-		return testArtifacts.get();
+		Set<TestArtifactType> currentArtifacts = testArtifacts.get();
+		currentArtifacts.addAll(classArtifacts.get());
+		currentArtifacts.addAll(suiteArtifacts.get());
+		return currentArtifacts;
 	}
 
 	public static void add(String name, String link) {
