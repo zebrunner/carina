@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -30,19 +31,19 @@ public class ThreadLogAppender extends AppenderSkeleton
 		}
 		try
 		{
-			if (!TestNamingUtil.isTestNameRegistered()) {
-				System.out.println(event.getMessage().toString());
-				//don't write any message into the log if thread is not associated anymore with test 
-				return;
-			}
-			String test = TestNamingUtil.getTestNameByThread();
-			if (test == null) {
-				// Write message into the regular console output only
-				System.out.println(event.getMessage().toString());
-				return;
+			String test = "";
+			if (TestNamingUtil.isTestNameRegistered()) {
+				test = TestNamingUtil.getTestNameByThread();
 			} else {
-				//System.out.println("test: " + test);
+				test = TestNamingUtil.getCanonicTestNameByThread();
 			}
+
+			if (test == null || StringUtils.isEmpty(test)) {
+				System.out.println(event.getMessage().toString());
+				//don't write any message into the log if thread is not associated anymore with test
+				return;
+			}
+			
 			BufferedWriter fw = test2file.get(test);
 			if (fw == null)
 			{
