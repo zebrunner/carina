@@ -72,15 +72,22 @@ final public class Artifacts {
 			return;
 		}
 		
+		TestArtifactType testArtifactType = new TestArtifactType(name, link, expires_at);
 		switch (mode) {
 		case METHOD_MODE:
-			testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			if (!testArtifacts.get().contains(testArtifactType)) {
+				testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			}
 			break;
 		case CLASS_MODE:
-			classArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			if (!classArtifacts.get().contains(testArtifactType)) {
+				classArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			}
 			break;
 		case SUITE_MODE:
-			suiteArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			if (!suiteArtifacts.get().contains(testArtifactType)) {
+				suiteArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			}
 			break;
 		}
 	}
