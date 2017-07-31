@@ -213,18 +213,24 @@ public final class DriverPool {
 		// 1. create for each driver their own video file. 
 		// 2. save it using unique driver/test/thread name - maybe time in ms
 		// 3. register link onto the video as test artifact
-		DevicePool.getDevice().stopRecording(adbVideoRecorderPid.get());
+		Device device = DevicePool.getDevice();
+		if (!device.isNull()) {
+			
+			if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+				device.stopRecording(adbVideoRecorderPid.get());
+				pause(3); //very often video from device is black. trying to wait before pulling the file
+			
+				String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
+				String uniqueFileName = "video-" + System.currentTimeMillis() + ".mp4";
+				device.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
+				
+				String artifactsLink = ReportContext.getTestArtifactsLink();
+				//TODO: Double check how artifacts are cleaned on Zafira level as nothing is registered now 
+				Artifacts.add("video.mp4", artifactsLink +"/" + uniqueFileName);
+			}
 		
-		pause(3); //very often video from device is black. trying to wait before pulling the file
-		
-		String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
-		String uniqueFileName = "video-" + System.currentTimeMillis() + ".mp4";
-		DevicePool.getDevice().pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
-		
-		String artifactsLink = ReportContext.getTestArtifactsLink();
-		Artifacts.add("video.mp4", artifactsLink +"/" + uniqueFileName);
-		
-		DevicePool.getDevice().screenOff();
+			device.screenOff();
+		}
 
 		try {
 			LOGGER.debug("Driver exiting..." + drv);
