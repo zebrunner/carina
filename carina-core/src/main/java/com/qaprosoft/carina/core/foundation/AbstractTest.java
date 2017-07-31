@@ -234,8 +234,8 @@ public abstract class AbstractTest // extends DriverHelper
     public void executeAfterTestClass(ITestContext context) throws Throwable {
         if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
             LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
-            quitDrivers();
             stopRecording();
+            quitDrivers();
         }
         
         Artifacts.clearArtifacts(Configuration.getDriverMode());
@@ -264,11 +264,9 @@ public abstract class AbstractTest // extends DriverHelper
             DriverMode driverMode = Configuration.getDriverMode();
 
             if (driverMode == DriverMode.METHOD_MODE) {
-                //TODO: analyze necessity to turn off device display after each method
-                //executor.screenOff();
                 LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
-                quitDrivers();
                 stopRecording();
+                quitDrivers();
             }
 
 
@@ -334,8 +332,8 @@ public abstract class AbstractTest // extends DriverHelper
         try {
             if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
                 LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
-                quitDrivers();
                 stopRecording();
+                quitDrivers();                
             }
 
             ReportContext.removeTempDir(); //clean temp artifacts directory
