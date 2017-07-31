@@ -84,6 +84,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
@@ -105,6 +106,8 @@ public abstract class AbstractTest // extends DriverHelper
     protected static final String XML_SUITE_NAME = " (%s)";
 
     protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
+    
+	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
 
     // 3rd party integrations
     protected String browserVersion = "";
@@ -211,11 +214,20 @@ public abstract class AbstractTest // extends DriverHelper
             DevicePool.addDevice(properties);
         }
         
+        DriverMode driverMode = Configuration.getDriverMode();
+        if (driverMode == DriverMode.SUITE_MODE) {
+        	startRecording();
+        }
+        
     }
 
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
         // do nothing for now
+        DriverMode driverMode = Configuration.getDriverMode();
+        if (driverMode == DriverMode.CLASS_MODE) {
+        	startRecording();
+        }
     }
 
     @AfterClass(alwaysRun = true)
@@ -223,7 +235,10 @@ public abstract class AbstractTest // extends DriverHelper
         if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
             LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
             quitDrivers();
+            stopRecording();
         }
+        
+        Artifacts.clearArtifacts(Configuration.getDriverMode());
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -231,18 +246,17 @@ public abstract class AbstractTest // extends DriverHelper
                                         ITestContext context) throws Throwable {
         // do nothing for now
         Spira.registerStepsFromAnnotation(testMethod);
+        
+        DriverMode driverMode = Configuration.getDriverMode();
+        if (driverMode == DriverMode.METHOD_MODE) {
+        	startRecording();
+        }
 
-        // TODO: analyze below code line necessity
-        // quitExtraDriver(); //quit from extra Driver to be able to proceed with single method_mode for mobile automation
-
-/*		if (browserVersion.isEmpty() && getDriver() != null
-                && !Configuration.get(Parameter.CUSTOM_CAPABILITIES).isEmpty()) {
-			browserVersion = DriverFactory.getBrowserVersion(getDriver());
-		}*/
 
         apiMethodBuilder = new APIMethodBuilder();
     }
-
+    
+    
     @AfterMethod(alwaysRun = true)
     public void executeAfterTestMethod(ITestResult result) {
 
@@ -254,6 +268,7 @@ public abstract class AbstractTest // extends DriverHelper
                 //executor.screenOff();
                 LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
                 quitDrivers();
+                stopRecording();
             }
 
 
@@ -296,9 +311,7 @@ public abstract class AbstractTest // extends DriverHelper
             // clear jira tickets to be sure that next test is not affected.
             Jira.clearTickets();
 
-
-            Artifacts.clearArtifacts();
-
+            Artifacts.clearArtifacts(Configuration.getDriverMode());
 
             try {
                 ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
@@ -322,6 +335,7 @@ public abstract class AbstractTest // extends DriverHelper
             if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
                 LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
                 quitDrivers();
+                stopRecording();
             }
 
             ReportContext.removeTempDir(); //clean temp artifacts directory
@@ -401,6 +415,8 @@ public abstract class AbstractTest // extends DriverHelper
                 default:
                     //do nothing
             }
+            
+            Artifacts.clearArtifacts(Configuration.getDriverMode());
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
             e.printStackTrace();
@@ -731,4 +747,29 @@ public abstract class AbstractTest // extends DriverHelper
         }
 
     }
+    
+    private void startRecording() {
+   		Integer pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
+		adbVideoRecorderPid.set(pid);
+    }
+
+	private void stopRecording() {
+		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+			Device device = DevicePool.getDevice();
+			if (!device.isNull()) {
+				device.stopRecording(adbVideoRecorderPid.get());
+				pause(3); // very often video from device is black. waiting before pulling the file
+
+				String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
+				String uniqueFileName = "VIDEO-" + System.currentTimeMillis() + ".mp4";
+				device.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
+
+				String artifactsLink = ReportContext.getTestArtifactsLink();
+
+				// TODO: use expiration date as current_date + 30
+				Artifacts.add("VIDEO", artifactsLink + "/" + uniqueFileName, null, Configuration.getDriverMode());
+			}
+		}
+	}
+
 }

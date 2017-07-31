@@ -15,12 +15,14 @@
  */
 package com.qaprosoft.carina.core.foundation.report;
 
-import com.qaprosoft.zafira.models.dto.TestArtifactType;
-import org.apache.log4j.Logger;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
+import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /*
  * Link
@@ -28,9 +30,25 @@ import java.util.Set;
 final public class Artifacts {
 	protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
 	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
+	private static final ThreadLocal<Set<TestArtifactType>> classArtifacts = ThreadLocal.withInitial(HashSet::new);
+	private static final ThreadLocal<Set<TestArtifactType>> suiteArtifacts = ThreadLocal.withInitial(HashSet::new);
 
 	public static void clearArtifacts() {
-		testArtifacts.remove();
+		clearArtifacts(DriverMode.METHOD_MODE);
+	}
+
+	public static void clearArtifacts(DriverMode mode) {
+		switch (mode) {
+		case METHOD_MODE:
+			testArtifacts.remove();
+			break;
+		case CLASS_MODE:
+			classArtifacts.remove();
+			break;
+		case SUITE_MODE:
+			suiteArtifacts.remove();
+			break;
+		}
 	}
 
 	public synchronized static Set<TestArtifactType> getArtifacts() {
@@ -38,11 +56,11 @@ final public class Artifacts {
 	}
 
 	public static void add(String name, String link) {
-		add(name, link, null);
+		add(name, link, null, DriverMode.METHOD_MODE);
 	}
 
-	public static void add(String name, String link, Date expires_at) {
-		LOGGER.debug("Adding artifact to test. name: " + name + "; link: " + link + "; expires_at: " + expires_at );
+	public static void add(String name, String link, Date expires_at, DriverMode mode) {
+		LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expires_at: " + expires_at );
 		if (name == null || name.isEmpty()) {
 			return;
 		}
@@ -50,6 +68,17 @@ final public class Artifacts {
 		if (link == null || link.isEmpty()) {
 			return;
 		}
-		testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+		
+		switch (mode) {
+		case METHOD_MODE:
+			testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			break;
+		case CLASS_MODE:
+			classArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			break;
+		case SUITE_MODE:
+			suiteArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+			break;
+		}
 	}
 }
