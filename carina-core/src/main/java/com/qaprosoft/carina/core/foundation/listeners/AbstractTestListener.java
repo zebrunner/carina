@@ -228,6 +228,12 @@ public class AbstractTestListener extends TestArgsListener
 		// // context doesn't have up-to-date information.
 		// // This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
 		removeIncorrectlyFailedTests(result.getTestContext());
+		
+		// added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
+		TestNamingUtil.releaseTestInfoByThread();
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		TestNamingUtil.associateCanonicTestName(test);
+		
 		super.beforeConfiguration(result);
 	}
 
