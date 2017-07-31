@@ -459,6 +459,12 @@ public class ReportContext
 	public static String getTestLogLink(String test)
 	{
 		String link = "";
+		File testLogFile = new File(ReportContext.getTestDir(test) + "/" + "test.log");
+		if (!testLogFile.exists()) {
+			// no test.log file at all
+			return link;
+		}
+		
 		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/test.log", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
