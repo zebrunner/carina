@@ -76,7 +76,7 @@ public class ReportContext
 							Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
 				if (!projectRoot.exists())
 				{
-					boolean isCreated = projectRoot.mkdirs();
+					boolean isCreated = projectRoot.mkdir();
 					if (!isCreated)
 					{
 						throw new RuntimeException("Folder not created: " + projectRoot.getAbsolutePath());
@@ -86,7 +86,7 @@ public class ReportContext
 				String directory = String.format("%s/%s/%d", URLDecoder.decode(System.getProperty("user.dir"), "utf-8"),
 						Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), rootID);
 				File baseDirectoryTmp = new File(directory);  
-				boolean isCreated = baseDirectoryTmp.mkdirs();
+				boolean isCreated = baseDirectoryTmp.mkdir();
 				if (!isCreated)
 				{
 					throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
@@ -108,7 +108,7 @@ public class ReportContext
 		if (tempDirectory == null)
 		{
 			tempDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), TEMP_FOLDER));
-			boolean isCreated = tempDirectory.mkdirs();
+			boolean isCreated = tempDirectory.mkdir();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Folder not created: " + tempDirectory.getAbsolutePath());
@@ -138,7 +138,7 @@ public class ReportContext
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
 			}
-			boolean isCreated = artifactsDirectory.mkdirs();
+			boolean isCreated = artifactsDirectory.mkdir();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
@@ -156,7 +156,7 @@ public class ReportContext
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException("Artifacts metadata folder not created: " + metaDataDirectory.getAbsolutePath());
 			}
-			boolean isCreated = metaDataDirectory.mkdirs();
+			boolean isCreated = metaDataDirectory.mkdir();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Artifacts metadata folder not created: " + metaDataDirectory.getAbsolutePath());
@@ -251,13 +251,13 @@ public class ReportContext
 		File screenDir = new File(directory);
 		if (!screenDir.exists())
 		{
-			boolean isCreated = screenDir.mkdirs();
+			boolean isCreated = screenDir.mkdir();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Folder not created: " + screenDir.getAbsolutePath());
 			}
 			File thumbDir = new File(screenDir.getAbsolutePath() + "/thumbnails");
-			isCreated = thumbDir.mkdirs();
+			isCreated = thumbDir.mkdir();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Folder not created: " + thumbDir.getAbsolutePath());
