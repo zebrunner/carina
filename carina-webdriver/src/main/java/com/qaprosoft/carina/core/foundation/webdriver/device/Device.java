@@ -488,11 +488,13 @@ public class Device
                     clearAppData(appPackage);
                     
                     if (!oldMobileApp.isEmpty()) {
+                    	LOGGER.info("Starting sync install operation for preupgrade app: " + oldMobileApp);
                     	installAppSync(oldMobileApp);
                     }
                     
                     if (Configuration.getBoolean(Parameter.MOBILE_APP_INSTALL)) {
                         // install application in single thread to fix issue with gray Google maps
+                    	LOGGER.info("Starting sync install operation for app: " + mobileApp);
                     	installAppSync(mobileApp);
                     }
                 }
