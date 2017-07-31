@@ -27,13 +27,10 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -49,8 +46,6 @@ public final class DriverPool {
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
 	
-	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
-
 	/**
 	 * Get global suite driver. For driver_mode=suite_mode only.
 	 * 
@@ -215,20 +210,6 @@ public final class DriverPool {
 		// 3. register link onto the video as test artifact
 		Device device = DevicePool.getDevice();
 		if (!device.isNull()) {
-			
-			if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-				device.stopRecording(adbVideoRecorderPid.get());
-				pause(3); //very often video from device is black. trying to wait before pulling the file
-			
-				String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
-				String uniqueFileName = "video-" + System.currentTimeMillis() + ".mp4";
-				device.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
-				
-				String artifactsLink = ReportContext.getTestArtifactsLink();
-				//TODO: Double check how artifacts are cleaned on Zafira level as nothing is registered now 
-				Artifacts.add("video.mp4", artifactsLink +"/" + uniqueFileName);
-			}
-		
 			device.screenOff();
 		}
 
@@ -349,9 +330,6 @@ public final class DriverPool {
 		if (!init) {
 			throw new RuntimeException(init_throwable);
 		}
-		
-		Integer pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
-		adbVideoRecorderPid.set(pid);
 		
 		return drv;
 	}
