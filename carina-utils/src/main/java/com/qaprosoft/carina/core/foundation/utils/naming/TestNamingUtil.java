@@ -143,7 +143,7 @@ public class TestNamingUtil
 		long threadId = Thread.currentThread().getId();
 		if (!isTestNameRegistered())
 		{
-			LOGGER.warn("There is no TestInfo for release in threadId: " + threadId);
+			//LOGGER.warn("There is no TestInfo for release in threadId: " + threadId);
 			return;
 		}
 
