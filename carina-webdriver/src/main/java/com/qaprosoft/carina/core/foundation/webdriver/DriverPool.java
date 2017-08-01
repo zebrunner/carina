@@ -27,10 +27,13 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -45,6 +48,8 @@ public final class DriverPool {
 
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
+	
+	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
 	
 	/**
 	 * Get global suite driver. For driver_mode=suite_mode only.
@@ -235,6 +240,8 @@ public final class DriverPool {
 	 */
 	public static void quitDrivers() {
 		
+		stopRecording();
+		
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
@@ -331,9 +338,50 @@ public final class DriverPool {
 			throw new RuntimeException(init_throwable);
 		}
 		
+		startRecording();
 		return drv;
 	}
 	
+	private static void startRecording() {
+		if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+			return;
+		}
+		
+		Integer pid = adbVideoRecorderPid.get();
+		if (pid == null) {
+			// video recording is not started yet for current thread
+			pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
+			adbVideoRecorderPid.set(pid);
+		} else {
+			LOGGER.warn("Video recording is already started for current thread.");
+		}
+
+	}
+	
+	private static void stopRecording() {
+		if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
+			return;
+		}
+		
+		
+		Device device = DevicePool.getDevice();
+		if (!device.isNull()) {
+			device.stopRecording(adbVideoRecorderPid.get());
+			pause(3); // very often video from device is black. waiting
+						// before pulling the file
+
+			String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
+			String uniqueFileName = "VIDEO-" + System.currentTimeMillis() + ".mp4";
+			device.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
+
+			String artifactsLink = ReportContext.getTestArtifactsLink();
+
+			// TODO: use expiration date as current_date + 30
+			Artifacts.add("VIDEO", artifactsLink + "/" + uniqueFileName, null, Configuration.getDriverMode());
+		}
+
+	}
+
 	/**
 	 * Register driver in the DriverPool
 	 * 

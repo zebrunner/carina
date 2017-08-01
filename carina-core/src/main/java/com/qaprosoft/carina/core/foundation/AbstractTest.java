@@ -84,7 +84,6 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
@@ -107,8 +106,6 @@ public abstract class AbstractTest // extends DriverHelper
 
     protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
     
-	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
-
     // 3rd party integrations
     protected String browserVersion = "";
     protected long startDate;
@@ -213,28 +210,17 @@ public abstract class AbstractTest // extends DriverHelper
             //reregister device if mobile core properties are redefined 
             DevicePool.addDevice(properties);
         }
-        
-        DriverMode driverMode = Configuration.getDriverMode();
-        if (driverMode == DriverMode.SUITE_MODE) {
-        	startRecording();
-        }
-        
     }
-
+    
     @BeforeClass(alwaysRun = true)
     public void executeBeforeTestClass(ITestContext context) throws Throwable {
         // do nothing for now
-        DriverMode driverMode = Configuration.getDriverMode();
-        if (driverMode == DriverMode.CLASS_MODE) {
-        	startRecording();
-        }
     }
 
     @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
         if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
             LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
-            stopRecording();
             quitDrivers();
         }
         
@@ -247,12 +233,6 @@ public abstract class AbstractTest // extends DriverHelper
         // do nothing for now
         Spira.registerStepsFromAnnotation(testMethod);
         
-        DriverMode driverMode = Configuration.getDriverMode();
-        if (driverMode == DriverMode.METHOD_MODE) {
-        	startRecording();
-        }
-
-
         apiMethodBuilder = new APIMethodBuilder();
     }
     
@@ -265,7 +245,6 @@ public abstract class AbstractTest // extends DriverHelper
 
             if (driverMode == DriverMode.METHOD_MODE) {
                 LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
-                stopRecording();
                 quitDrivers();
             }
 
@@ -332,7 +311,6 @@ public abstract class AbstractTest // extends DriverHelper
         try {
             if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
                 LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
-                stopRecording();
                 quitDrivers();                
             }
 
@@ -746,28 +724,4 @@ public abstract class AbstractTest // extends DriverHelper
 
     }
     
-    private void startRecording() {
-   		Integer pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
-		adbVideoRecorderPid.set(pid);
-    }
-
-	private void stopRecording() {
-		if (Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-			Device device = DevicePool.getDevice();
-			if (!device.isNull()) {
-				device.stopRecording(adbVideoRecorderPid.get());
-				pause(3); // very often video from device is black. waiting before pulling the file
-
-				String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
-				String uniqueFileName = "VIDEO-" + System.currentTimeMillis() + ".mp4";
-				device.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
-
-				String artifactsLink = ReportContext.getTestArtifactsLink();
-
-				// TODO: use expiration date as current_date + 30
-				Artifacts.add("VIDEO", artifactsLink + "/" + uniqueFileName, null, Configuration.getDriverMode());
-			}
-		}
-	}
-
 }
