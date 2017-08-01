@@ -185,7 +185,8 @@ public class Device
         
         dropFile(pathToFile);
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile);
+        //String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile);
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("nohup", "adb", "-s", getUdid(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile, "&");
 
         try {
             ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
