@@ -223,8 +223,6 @@ public abstract class AbstractTest // extends DriverHelper
             LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
             quitDrivers();
         }
-        
-        Artifacts.clearArtifacts(Configuration.getDriverMode());
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -288,7 +286,7 @@ public abstract class AbstractTest // extends DriverHelper
             // clear jira tickets to be sure that next test is not affected.
             Jira.clearTickets();
 
-            Artifacts.clearArtifacts(Configuration.getDriverMode());
+            Artifacts.clearArtifacts();
 
             try {
                 ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
@@ -392,7 +390,6 @@ public abstract class AbstractTest // extends DriverHelper
                     //do nothing
             }
             
-            Artifacts.clearArtifacts(Configuration.getDriverMode());
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
             e.printStackTrace();
