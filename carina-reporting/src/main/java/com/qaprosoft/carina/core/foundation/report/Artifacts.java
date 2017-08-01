@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /*
@@ -30,39 +29,20 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 final public class Artifacts {
 	protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
 	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
-	private static final ThreadLocal<Set<TestArtifactType>> classArtifacts = ThreadLocal.withInitial(HashSet::new);
-	private static final ThreadLocal<Set<TestArtifactType>> suiteArtifacts = ThreadLocal.withInitial(HashSet::new);
 
 	public static void clearArtifacts() {
-		clearArtifacts(DriverMode.METHOD_MODE);
-	}
-
-	public static void clearArtifacts(DriverMode mode) {
-		switch (mode) {
-		case METHOD_MODE:
-			testArtifacts.remove();
-			break;
-		case CLASS_MODE:
-			classArtifacts.remove();
-			break;
-		case SUITE_MODE:
-			suiteArtifacts.remove();
-			break;
-		}
+		testArtifacts.remove();
 	}
 
 	public synchronized static Set<TestArtifactType> getArtifacts() {
-		Set<TestArtifactType> currentArtifacts = testArtifacts.get();
-		currentArtifacts.addAll(classArtifacts.get());
-		currentArtifacts.addAll(suiteArtifacts.get());
-		return currentArtifacts;
+		return testArtifacts.get();
 	}
 
 	public static void add(String name, String link) {
-		add(name, link, null, DriverMode.METHOD_MODE);
+		add(name, link, null);
 	}
 
-	public static void add(String name, String link, Date expires_at, DriverMode mode) {
+	public static void add(String name, String link, Date expires_at) {
 		LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expires_at: " + expires_at );
 		if (name == null || name.isEmpty()) {
 			return;
@@ -73,22 +53,8 @@ final public class Artifacts {
 		}
 		
 		TestArtifactType testArtifactType = new TestArtifactType(name, link, expires_at);
-		switch (mode) {
-		case METHOD_MODE:
 			if (!testArtifacts.get().contains(testArtifactType)) {
 				testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
 			}
-			break;
-		case CLASS_MODE:
-			if (!classArtifacts.get().contains(testArtifactType)) {
-				classArtifacts.get().add(new TestArtifactType(name, link, expires_at));
-			}
-			break;
-		case SUITE_MODE:
-			if (!suiteArtifacts.get().contains(testArtifactType)) {
-				suiteArtifacts.get().add(new TestArtifactType(name, link, expires_at));
-			}
-			break;
-		}
 	}
 }
