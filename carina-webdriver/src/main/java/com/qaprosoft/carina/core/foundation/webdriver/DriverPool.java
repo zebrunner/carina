@@ -377,7 +377,7 @@ public final class DriverPool {
 			String artifactsLink = ReportContext.getTestArtifactsLink();
 
 			// TODO: use expiration date as current_date + 30
-			Artifacts.add("VIDEO", artifactsLink + "/" + uniqueFileName, null, Configuration.getDriverMode());
+			Artifacts.add("VIDEO", artifactsLink + "/" + uniqueFileName);
 		}
 
 	}
