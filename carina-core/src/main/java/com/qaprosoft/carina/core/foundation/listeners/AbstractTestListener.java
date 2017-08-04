@@ -35,6 +35,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -219,6 +220,14 @@ public class AbstractTestListener extends TestArgsListener
 
 		return deviceName;
 	}
+	
+	private void afterConfiguration(ITestResult result) {
+		//register configuration step as test artifact
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
+		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));
+		TestNamingUtil.releaseTestInfoByThread();
+	}
 
 	@Override
 	public void beforeConfiguration(ITestResult result)
@@ -228,12 +237,20 @@ public class AbstractTestListener extends TestArgsListener
 		// // context doesn't have up-to-date information.
 		// // This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
 		removeIncorrectlyFailedTests(result.getTestContext());
+		
+		
+		// added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
+		TestNamingUtil.releaseTestInfoByThread();
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		TestNamingUtil.associateCanonicTestName(test);
+		
 		super.beforeConfiguration(result);
 	}
 
 	@Override
 	public void onConfigurationSuccess(ITestResult result)
 	{
+		afterConfiguration(result);
 		// passItem(result, Messager.CONFIG_PASSED);
 		super.onConfigurationSuccess(result);
 	}
@@ -241,6 +258,7 @@ public class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onConfigurationSkip(ITestResult result)
 	{
+		afterConfiguration(result);
 		// skipItem(result, Messager.CONFIG_SKIPPED);
 		super.onConfigurationSkip(result);
 	}
@@ -248,6 +266,7 @@ public class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onConfigurationFailure(ITestResult result)
 	{
+		afterConfiguration(result);		
 		// failItem(result, Messager.CONFIG_FAILED);
 		// String test = TestNamingUtil.getCanonicalTestName(result);
 		// closeLogAppender(test);
