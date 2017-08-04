@@ -35,7 +35,7 @@
 		<cucumber.java.version>1.2.4</cucumber.java.version>
 		<cucumber.reporting>2.6.3</cucumber.reporting>
 
-		<reflections.version>0.9.9-RC1</reflections.version>
+		<reflections.version>0.9.11</reflections.version>
 		<apache-poi.version>3.11-beta3</apache-poi.version>
 
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
@@ -72,8 +72,8 @@
 
 		<!-- Reflections -->
 		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
+		    <groupId>org.reflections</groupId>
+		    <artifactId>reflections</artifactId>
 			<version>${reflections.version}</version>
 			<exclusions>
 				<exclusion>
