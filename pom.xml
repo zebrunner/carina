@@ -40,7 +40,7 @@
 		<module>carina-reporting</module>
 		<module>cryptotool</module>
 		<module>carina-webdriver</module>
-		<module>carina-grid</module>
+		<!--module>carina-grid</module-->
 		<module>carina-core</module>
 	</modules>
 
