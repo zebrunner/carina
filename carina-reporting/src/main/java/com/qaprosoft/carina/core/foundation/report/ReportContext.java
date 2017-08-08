@@ -76,7 +76,7 @@ public class ReportContext
 							Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY)));
 				if (!projectRoot.exists())
 				{
-					boolean isCreated = projectRoot.mkdir();
+					boolean isCreated = projectRoot.mkdirs();
 					if (!isCreated)
 					{
 						throw new RuntimeException("Folder not created: " + projectRoot.getAbsolutePath());
