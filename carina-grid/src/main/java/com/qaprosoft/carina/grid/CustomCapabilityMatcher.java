@@ -15,6 +15,7 @@
  */
 package com.qaprosoft.carina.grid;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -124,13 +125,13 @@ public class CustomCapabilityMatcher extends DefaultCapabilityMatcher
 					}
 					break;
 				case MobileCapabilityType.DEVICE_NAME:
-					if(actualValue != null && !StringUtils.equalsIgnoreCase(actualValue, expectedValue))
+					if(actualValue != null && !Arrays.asList(expectedValue.split(",")).contains(actualValue))
 					{
 						return false;
 					}
 					break;
 				case MobileCapabilityType.UDID:
-					if(actualValue != null && !StringUtils.equalsIgnoreCase(actualValue, expectedValue))
+					if(actualValue != null && !Arrays.asList(expectedValue.split(",")).contains(actualValue))
 					{
 						return false;
 					}

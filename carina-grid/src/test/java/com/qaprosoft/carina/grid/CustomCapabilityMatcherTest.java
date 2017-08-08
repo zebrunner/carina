@@ -97,6 +97,18 @@ public class CustomCapabilityMatcherTest
 	}
 	
 	@Test
+	public void testUDIDs()
+	{
+		Map<String, Object> nodeCapability = new HashMap<>();
+		nodeCapability.put(MobileCapabilityType.UDID, "sdf44242ggsd");
+		
+		Map<String, Object> requestedCapability = new HashMap<>();
+		requestedCapability.put(MobileCapabilityType.UDID, "sdf44242ggsd,seee4242ggsd");
+		
+		Assert.assertTrue(matcher.matches(nodeCapability, requestedCapability));
+	}
+	
+	@Test
 	public void testDeviceName()
 	{
 		Map<String, Object> nodeCapability = new HashMap<>();
@@ -108,6 +120,18 @@ public class CustomCapabilityMatcherTest
 		Assert.assertTrue(matcher.matches(nodeCapability, requestedCapability));
 		nodeCapability.put(MobileCapabilityType.DEVICE_NAME, "Samsung_Galaxy_S7");
 		Assert.assertFalse(matcher.matches(nodeCapability, requestedCapability));
+	}
+	
+	@Test
+	public void testDeviceNames()
+	{
+		Map<String, Object> nodeCapability = new HashMap<>();
+		nodeCapability.put(MobileCapabilityType.DEVICE_NAME, "Samsung_Galaxy_S6");
+		
+		Map<String, Object> requestedCapability = new HashMap<>();
+		requestedCapability.put(MobileCapabilityType.DEVICE_NAME, "Samsung_Galaxy_S6,Samsung_Galaxy_S7");
+		
+		Assert.assertTrue(matcher.matches(nodeCapability, requestedCapability));
 	}
 	
 	@Test
