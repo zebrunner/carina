@@ -251,7 +251,7 @@ public class ReportContext
 		File screenDir = new File(directory);
 		if (!screenDir.exists())
 		{
-			boolean isCreated = screenDir.mkdir();
+			boolean isCreated = screenDir.mkdirs();
 			if (!isCreated)
 			{
 				throw new RuntimeException("Folder not created: " + screenDir.getAbsolutePath());
