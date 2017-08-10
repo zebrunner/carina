@@ -242,7 +242,7 @@ public class ReportContext
 	 *            = name of test.
 	 * @return test screenshot folder.
 	 */
-	public static File getTestDir(String test)
+	public static synchronized File getTestDir(String test)
 	{
 		if (test == null) {
 			test = "unknown";
