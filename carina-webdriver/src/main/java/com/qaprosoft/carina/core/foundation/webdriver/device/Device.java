@@ -172,6 +172,9 @@ public class Device
 	}
 	
 	public boolean isNull() {
+		if (name == null || seleniumServer == null) {
+			return true;
+		}
 		return name.isEmpty() || seleniumServer.isEmpty();
 	}
 
