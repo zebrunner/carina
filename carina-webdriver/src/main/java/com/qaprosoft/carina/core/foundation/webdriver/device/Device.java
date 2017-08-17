@@ -33,6 +33,8 @@ public class Device
 
 	private String testId;
 	
+	private boolean isAppInstalled = false;
+	
 	AdbExecutor executor = new AdbExecutor();
 
 	public Device(String args)
@@ -437,21 +439,21 @@ public class Device
         executor.execute(cmd);
     }
 
-    public void installApp(String packageName) {
+    public void installApp(String apkPath) {
         if (isNull())
         	return;
 
         //adb -s UDID install com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", apkPath);
         executor.execute(cmd);
     }
 
-    public synchronized void installAppSync(String packageName) {
+    public synchronized void installAppSync(String apkPath) {
         if (isNull())
         	return;
 
         //adb -s UDID install com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", apkPath);
         executor.execute(cmd);
     }
     
@@ -489,7 +491,7 @@ public class Device
                 } else {
                     uninstallApp(appPackage);
                     clearAppData(appPackage);
-                    
+                    isAppInstalled = false;
                     if (!oldMobileApp.isEmpty()) {
                     	LOGGER.info("Starting sync install operation for preupgrade app: " + oldMobileApp);
                     	installAppSync(oldMobileApp);
@@ -502,6 +504,10 @@ public class Device
                     }
                 }
             }
+        } else if (Configuration.getBoolean(Parameter.MOBILE_APP_INSTALL) && !isAppInstalled) {
+        	LOGGER.info("Starting install operation for app: " + mobileApp);
+        	installApp(mobileApp);
+        	isAppInstalled = true;
         }
     }
     
