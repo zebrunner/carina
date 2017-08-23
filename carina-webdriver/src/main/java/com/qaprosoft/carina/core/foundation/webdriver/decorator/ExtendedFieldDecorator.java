@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2017 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 
+import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingElementListHandler;
@@ -55,7 +56,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 
 	public Object decorate(ClassLoader loader, Field field)
 	{
-		if (!field.isAnnotationPresent(FindBy.class) /*Enable field decorator logic only in case of presence the FindBy annotation in the field*/ ||
+		if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(FindByAI.class)) /*Enable field decorator logic only in case of presence the FindBy/FindByAI annotation in the field*/ ||
 				!(ExtendedWebElement.class.isAssignableFrom(field.getType()) || AbstractUIObject.class.isAssignableFrom(field.getType()) || isDecoratableList(field)) /*also verify that it is ExtendedWebElement or derived from AbstractUIObject or DecoratableList*/)
 		{
 			// returning null is ok in this method.
@@ -137,7 +138,7 @@ public class ExtendedFieldDecorator implements FieldDecorator
 		InvocationHandler handler = new LocatingElementHandler(locator);
 		WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]
 		{ WebElement.class, WrapsElement.class, Locatable.class }, handler);
-		return new ExtendedWebElement(proxy, field.getName(), new LocalizedAnnotations(field).buildBy(), webDriver);
+		return new ExtendedWebElement(proxy, field.getName(), field.isAnnotationPresent(FindBy.class) ? new LocalizedAnnotations(field).buildBy() : null, webDriver);
 	}
 
 	@SuppressWarnings("unchecked")

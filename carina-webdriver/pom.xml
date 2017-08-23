@@ -146,6 +146,16 @@
 			<version>${itext.version}</version>
 		</dependency>
 
+    <!-- AI integration -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>alice-client</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-configuration2</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
