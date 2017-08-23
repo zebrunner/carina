@@ -229,33 +229,31 @@ public class Device
     public String getFullPackageByName(final String name) {
 
         List<String> packagesList = getInstalledPackages();
-		LOGGER.info("Found packages: ".concat(packagesList.toString()));
-		String resultPackage = null;
-		for (String packageStr : packagesList) {
-			if (packageStr.matches(String.format(".*%s.*", name))) {
-				LOGGER.info("Package was found: ".concat(packageStr));
-				resultPackage = packageStr;
-				break;
-			}
-		}
-		if (null == resultPackage) {
-			LOGGER.info("Package wasn't found using following name: "
-					.concat(name));
-			resultPackage = "not found";
-		}
-		return resultPackage;
-	}
+        LOGGER.info("Found packages: ".concat(packagesList.toString()));
+        String resultPackage = null;
+        for (String packageStr : packagesList) {
+            if (packageStr.matches(String.format(".*%s.*", name))) {
+                LOGGER.info("Package was found: ".concat(packageStr));
+                resultPackage = packageStr;
+                break;
+            }
+        }
+        if (null == resultPackage) {
+            LOGGER.info("Package wasn't found using following name: ".concat(name));
+            resultPackage = "not found";
+        }
+        return resultPackage;
+    }
     
     public List<String> getInstalledPackages() {
         String deviceUdid = getUdid();
         LOGGER.info("Device udid: ".concat(deviceUdid));
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list",
-                "packages");
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list", "packages");
         LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
         List<String> packagesList = executor.execute(cmd);
         return packagesList;
     }
-    
+
     public boolean isAppInstall(final String packageName) {
         return !getFullPackageByName(packageName).contains("not found");
     }
