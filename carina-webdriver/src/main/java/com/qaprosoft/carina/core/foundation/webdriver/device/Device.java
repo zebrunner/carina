@@ -1,20 +1,25 @@
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Platform;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.ProcessBuilderExecutor;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.appium.status.AppiumStatus;
 
@@ -223,12 +228,7 @@ public class Device
     
     public String getFullPackageByName(final String name) {
 
-		String deviceUdid = getUdid();
-		LOGGER.info("Device udid: ".concat(deviceUdid));
-		String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list",
-				"packages");
-		LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
-		List<String> packagesList = executor.execute(cmd);
+        List<String> packagesList = getInstalledPackages();
 		LOGGER.info("Found packages: ".concat(packagesList.toString()));
 		String resultPackage = null;
 		for (String packageStr : packagesList) {
@@ -245,6 +245,20 @@ public class Device
 		}
 		return resultPackage;
 	}
+    
+    public List<String> getInstalledPackages() {
+        String deviceUdid = getUdid();
+        LOGGER.info("Device udid: ".concat(deviceUdid));
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list",
+                "packages");
+        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
+        List<String> packagesList = executor.execute(cmd);
+        return packagesList;
+    }
+    
+    public boolean isAppInstall(final String packageName) {
+        return !getFullPackageByName(packageName).contains("not found");
+    }
     
     public void pullFile(String pathFrom, String pathTo) {
         if (isNull())
@@ -622,5 +636,33 @@ public class Device
     
     public List<String> execute(String[] cmd) {
     	return executor.execute(cmd);
+    }
+    
+    public void setProxy(final String host, final String port, final String ssid, final String password) {
+        if (!getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
+            LOGGER.error("Proxy configuration is available for Android ONLY");
+            throw new RuntimeException("Proxy configuration is available for Android ONLY");
+        }
+        if (!isAppInstall(SpecialKeywords.PROXY_SETTER_PACKAGE)) {
+            final String proxySetterFileName = "./proxy-setter-temp.apk";
+            File targetFile = new File(proxySetterFileName);
+            downloadFileFromJar(SpecialKeywords.PROXY_SETTER_RES_PATH, targetFile);
+            installApp(proxySetterFileName);
+        }
+        String deviceUdid = getUdid();
+        LOGGER.info("Device udid: ".concat(deviceUdid));
+        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "am", "start", "-n",
+                "tk.elevenk.proxysetter/.MainActivity", "-e", "host", host, "-e", "port", port, "-e", "ssid", ssid, "-e", "key", password);
+        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
+        executor.execute(cmd);
+    }
+
+    private void downloadFileFromJar(final String path, final File targetFile) {
+        InputStream initialStream = Device.class.getClassLoader().getResourceAsStream(path);
+        try {
+            FileUtils.copyInputStreamToFile(initialStream, targetFile);
+        } catch (IOException e) {
+            LOGGER.error("Error during copying of file from the resources. ".concat(e.getMessage()));
+        }
     }
 }
