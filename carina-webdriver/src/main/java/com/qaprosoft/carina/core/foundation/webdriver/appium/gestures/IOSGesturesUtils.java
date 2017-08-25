@@ -9,23 +9,25 @@ import org.openqa.selenium.Dimension;
 /**
  * Created by yauhenipatotski on 2/9/17.
  */
+@Depricated
 public final class IOSGesturesUtils extends IGesturesUtils {
 
     private IOSGesturesUtils() {
     }
 
-
+    @Depricated
     public static void swipeToBottom() {
         Dimension size = DriverPool.getDriver().manage().window().getSize();
-        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.7))
-                .waitAction(2000).moveTo(0, (int) (-size.height * 0.5)).release().perform();
+        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.7)).waitAction(2000)
+                .moveTo(0, (int) (-size.height * 0.5)).release().perform();
         swipe.perform();
     }
 
+    @Depricated
     public static void swipeToTop() {
         Dimension size = DriverPool.getDriver().manage().window().getSize();
-        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.2))
-                .waitAction(2000).moveTo(0, (int) (size.height * 0.7)).release();
+        TouchAction swipe = new TouchAction((AppiumDriver) DriverPool.getDriver()).press(size.width / 2, (int) (size.height * 0.2)).waitAction(2000)
+                .moveTo(0, (int) (size.height * 0.7)).release();
         swipe.perform();
     }
 
@@ -37,6 +39,7 @@ public final class IOSGesturesUtils extends IGesturesUtils {
         throw new UnsupportedOperationException("Method not supported for following platform");
     }
 
+    @Depricated
     public static synchronized void scrollToElement(ExtendedWebElement extendedWebElement, int swipeCount) {
 
         if (!extendedWebElement.getElement().isDisplayed()) {
