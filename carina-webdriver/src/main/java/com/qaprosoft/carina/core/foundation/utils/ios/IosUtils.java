@@ -10,7 +10,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.qaprosoft.carina.core.foundation.utils.IUtil;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
@@ -23,7 +23,7 @@ import io.appium.java_client.ios.IOSDriver;
  * com.qaprosoft.carina.core.foundation.utils.ios.IosUtils;
  *
  */
-public class IosUtils implements IUtil {
+public class IosUtils extends MobileUtils {
 
     private static final Logger LOGGER = Logger.getLogger(IosUtils.class);
 

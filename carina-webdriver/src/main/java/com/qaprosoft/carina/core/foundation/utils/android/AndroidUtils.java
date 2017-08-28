@@ -16,9 +16,9 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.qaprosoft.carina.core.foundation.utils.IUtil;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -38,7 +38,7 @@ import io.appium.java_client.android.AndroidElement;
  * com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
  *
  */
-public class AndroidUtils implements IUtil {
+public class AndroidUtils extends MobileUtils {
 
     protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
 
