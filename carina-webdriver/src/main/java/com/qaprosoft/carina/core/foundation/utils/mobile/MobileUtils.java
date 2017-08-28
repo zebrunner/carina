@@ -6,6 +6,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -321,5 +323,31 @@ public class MobileUtils {
         } catch (Exception e) {
             LOGGER.error(String.format("Error during Swipe from (X = %d; Y = %d) to (X = %d; Y = %d): %s", startx, starty, endx, endy, e));
         }
+    }
+
+    /**
+     * swipe Coordinates
+     *
+     * @param startX int
+     * @param startY int
+     * @param endX int
+     * @param endY int
+     * @param duration int
+     */
+    public static void swipeCoord(int startX, int startY, int endX, int endY, int duration) {
+        WebDriver driver = DriverPool.getDriver();
+        ((AppiumDriver<?>) driver).swipe(startX, startY, endX, endY, duration);
+    }
+
+    /**
+     * swipe Coordinates
+     *
+     * @param startX int
+     * @param startY int
+     * @param endX int
+     * @param endY int
+     */
+    public static void swipeCoord(int startX, int startY, int endX, int endY) {
+        swipeCoord(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
     }
 }
