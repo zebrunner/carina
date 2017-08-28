@@ -6,6 +6,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFor
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.Direction;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -57,10 +58,10 @@ public class AndroidService {
     private AdbExecutor executor;
 
     public enum ChangeTimeZoneWorkflow {
-        ADB(1),        // 0b001
-        SETTINGS(2),    // 0b010
-        APK(4),        // 0b100
-        ALL(7);        // 0b111
+        ADB(1), // 0b001
+        SETTINGS(2), // 0b010
+        APK(4), // 0b100
+        ALL(7); // 0b111
         private int workflow;
 
         ChangeTimeZoneWorkflow(int workflow) {
@@ -134,7 +135,7 @@ public class AndroidService {
     /**
      * openApp
      *
-     * @param pkg      String
+     * @param pkg String
      * @param activity String
      */
     public void openApp(String pkg, String activity) {
@@ -153,15 +154,16 @@ public class AndroidService {
     /**
      * clear Apk Cache
      *
-     * @param appPackageName for example: com.bamnetworks.mobile.android.gameday.atbat
+     * @param appPackageName for example:
+     * com.bamnetworks.mobile.android.gameday.atbat
      * @return boolean
      */
     public boolean clearApkCache(String appPackageName) {
-        //Later can be used:
+        // Later can be used:
         /*
-        String packageName = executor.getApkPackageName(String apkFile);
-        executor.clearAppData(Device device, String appPackage);
-        */
+         * String packageName = executor.getApkPackageName(String apkFile);
+         * executor.clearAppData(Device device, String appPackage);
+         */
         String result = executeAbdCommand("shell pm clear " + appPackageName);
 
         if (result.contains("Success")) {
@@ -174,7 +176,8 @@ public class AndroidService {
     }
 
     /**
-     * checkCurrentDeviceFocus - return actual device focused apk and compare with expected.
+     * checkCurrentDeviceFocus - return actual device focused apk and compare
+     * with expected.
      *
      * @param apk String
      * @return boolean
@@ -212,7 +215,7 @@ public class AndroidService {
     /**
      * install android Apk by path to apk or by name in classpath.
      *
-     * @param apkPath     String
+     * @param apkPath String
      * @param inClasspath boolean
      */
     public void installApk(final String apkPath, boolean inClasspath) {
@@ -226,8 +229,7 @@ public class AndroidService {
                 LOGGER.debug("Resource was found: " + baseResource.getPath());
             }
 
-            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "."
-                    + FilenameUtils.getExtension(baseResource.getPath());
+            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." + FilenameUtils.getExtension(baseResource.getPath());
             // make temporary copy of resource in artifacts folder
             filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
 
@@ -252,10 +254,9 @@ public class AndroidService {
         executeAbdCommand("shell am start -n com.android.settings/.DevelopmentSettings");
     }
 
-
     // End of Common Methods
 
-    //Notification section
+    // Notification section
 
     /**
      * expandStatusBar
@@ -271,7 +272,8 @@ public class AndroidService {
         executeAbdCommand("shell service call statusbar 2");
     }
 
-    //TODO: move notifications methods into separate class if possible. Maybe declare notification service instance inside AndroidService 
+    // TODO: move notifications methods into separate class if possible. Maybe
+    // declare notification service instance inside AndroidService
 
     /**
      * getNotifications
@@ -292,15 +294,14 @@ public class AndroidService {
         String[] getNotificationsCmd = null;
         String udid = DevicePool.getDeviceUdid();
         if (!udid.isEmpty()) {
-            getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "dumpsys",
-                    "notification");
+            getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "dumpsys", "notification");
         } else {
             getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "dumpsys", "notification");
         }
 
         LOGGER.info("getNotifications cmd was built: " + CmdLine.arrayToString(getNotificationsCmd));
 
-        //TODO: migrate to executeAbdCommand later
+        // TODO: migrate to executeAbdCommand later
         List<Notification> resultList = new ArrayList<Notification>();
         List<String> notificationsOutput = executor.execute(getNotificationsCmd);
         Notification notification = new Notification();
@@ -367,12 +368,12 @@ public class AndroidService {
     /**
      * waitUntilNewNotificationAppear
      *
-     * @param text    String
+     * @param text String
      * @param timeout long
      * @return boolean
      */
     public boolean waitUntilNewNotificationAppear(String text, long timeout) {
-        //boolean found = false;
+        // boolean found = false;
         int base = notificationsCount();
         int time = 0;
         boolean foundText = isNotificationWithTextExist(text);
@@ -399,7 +400,8 @@ public class AndroidService {
 
         for (Notification notify : resultList) {
             if (notify.getNotificationPkg().contains(text)) {
-                LOGGER.info("Found '" + text + "' in notification packages '" + notify.getNotificationPkg() + "' with text '" + notify.getNotificationText() + "'.");
+                LOGGER.info("Found '" + text + "' in notification packages '" + notify.getNotificationPkg() + "' with text '"
+                        + notify.getNotificationText() + "'.");
                 return true;
             }
 
@@ -410,12 +412,12 @@ public class AndroidService {
     /**
      * waitUntilNewNotificationPackageAppear
      *
-     * @param pkg     String
+     * @param pkg String
      * @param timeout long
      * @return boolean
      */
     public boolean waitUntilNewNotificationPackageAppear(String pkg, long timeout) {
-        //boolean found = false;
+        // boolean found = false;
         int base = notificationsCount();
         int time = 0;
         boolean foundText = isNotificationPkgExist(pkg);
@@ -431,12 +433,11 @@ public class AndroidService {
         return (foundText);
     }
 
-
     /**
      * find Expected Notification with partial text
      *
      * @param expectedTitle String
-     * @param expectedText  String
+     * @param expectedText String
      * @return boolean
      */
     public boolean findExpectedNotification(String expectedTitle, String expectedText) {
@@ -447,16 +448,17 @@ public class AndroidService {
      * find Expected Notification
      *
      * @param expectedTitle String
-     * @param expectedText  String
-     * @param partially     boolean
+     * @param expectedText String
+     * @param partially boolean
      * @return boolean
      */
     @SuppressWarnings("rawtypes")
     public boolean findExpectedNotification(String expectedTitle, String expectedText, boolean partially) {
-        //open notification
+        // open notification
         try {
             ((AndroidDriver) getDriver()).openNotifications();
-            pause(2); //wait while notifications are playing animation to appear to avoid missed taps
+            pause(2); // wait while notifications are playing animation to
+                      // appear to avoid missed taps
         } catch (Exception e) {
             LOGGER.error(e);
             LOGGER.info("Using adb to expand Status bar. ");
@@ -485,7 +487,8 @@ public class AndroidService {
                 } else if (partially) {
                     if (expectedTitle.contains(title)) {
                         notificationItemNum = i;
-                        LOGGER.info("Found that expected title '" + expectedTitle + "' contains '" + title + "' in notification #" + notificationItemNum);
+                        LOGGER.info(
+                                "Found that expected title '" + expectedTitle + "' contains '" + title + "' in notification #" + notificationItemNum);
                         return true;
                     }
                 }
@@ -498,7 +501,8 @@ public class AndroidService {
                 } else if (partially) {
                     if (expectedText.contains(text)) {
                         notificationItemNum = i;
-                        LOGGER.info("Found that expected text '" + expectedText + "' contains '" + text + "' in notification #" + notificationItemNum);
+                        LOGGER.info(
+                                "Found that expected text '" + expectedText + "' contains '" + text + "' in notification #" + notificationItemNum);
                         return true;
                     }
                 }
@@ -522,14 +526,11 @@ public class AndroidService {
             // wait until status bar will be opened
             isStatusBarOpened = notificationPage.isOpened(INIT_TIMEOUT);
             if (!isStatusBarOpened) {
-                LOGGER.info(String.format("Status bar isn't opened after %d seconds. One more attempt.",
-                        (int) INIT_TIMEOUT));
+                LOGGER.info(String.format("Status bar isn't opened after %d seconds. One more attempt.", (int) INIT_TIMEOUT));
                 expandStatusBar();
             }
-            LOGGER.debug("Page source [expand status bar]: ".concat(
-                    getDriver().getPageSource()));
-            Screenshot.capture(getDriver(),
-                    "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
+            LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
+            Screenshot.capture(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
             try {
                 notificationPage.clearNotifications();
             } catch (Exception e) {
@@ -538,7 +539,6 @@ public class AndroidService {
         }
         collapseStatusBar();
     }
-
 
     /**
      * isStatusBarExpanded
@@ -550,9 +550,7 @@ public class AndroidService {
         return notificationPage.isStatusBarExpanded();
     }
 
-
     // End of Notification section
-
 
     // Change Device Language section
 
@@ -566,29 +564,31 @@ public class AndroidService {
         return setDeviceLanguage(language, true, 20);
     }
 
-
     /**
      * change Android Device Language
      * <p>
-     * Url:  <a href="http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
-     * ADBChangeLanguage apk
-     * </a>
-     * Change locale (language) of your device via ADB (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older).
-     * No need to root your device! With ADB (Android Debug Bridge) on your computer,
-     * you can fast switch the device locale to see how your application UI looks on different languages.
-     * Usage:
-     * - install this app
-     * - setup adb connection to your device (http://developer.android.com/tools/help/adb.html)
-     * - Android OS 4.2 onwards (tip: you can copy the command here and paste it to your command console):
-     * adb shell pm grant net.sanapeli.adbchangelanguage android.permission.CHANGE_CONFIGURATION
+     * Url: <a href=
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * ADBChangeLanguage apk </a> Change locale (language) of your device via
+     * ADB (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to
+     * root your device! With ADB (Android Debug Bridge) on your computer, you
+     * can fast switch the device locale to see how your application UI looks on
+     * different languages. Usage: - install this app - setup adb connection to
+     * your device (http://developer.android.com/tools/help/adb.html) - Android
+     * OS 4.2 onwards (tip: you can copy the command here and paste it to your
+     * command console): adb shell pm grant net.sanapeli.adbchangelanguage
+     * android.permission.CHANGE_CONFIGURATION
      * <p>
-     * English: adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en
-     * Russian: adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language ru
-     * Spanish: adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
+     * English: adb shell am start -n
+     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en Russian:
+     * adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage
+     * -e language ru Spanish: adb shell am start -n
+     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
      *
-     * @param language     to set. Can be es, en, etc.
-     * @param changeConfig boolean if true - update config locale and language params
-     * @param waitTime     int wait in seconds before device refresh.
+     * @param language to set. Can be es, en, etc.
+     * @param changeConfig boolean if true - update config locale and language
+     * params
+     * @param waitTime int wait in seconds before device refresh.
      * @return boolean
      */
     public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
@@ -605,8 +605,7 @@ public class AndroidService {
 
         String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language " + language;
 
-        LOGGER.info("Try set localization change permission with following cmd:"
-                + setLocalizationChangePermissionCmd);
+        LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
         String expandOutput = executeAbdCommand(setLocalizationChangePermissionCmd);
 
         if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
@@ -615,19 +614,14 @@ public class AndroidService {
             expandOutput = executeAbdCommand(setLocalizationChangePermissionCmd);
         }
 
-        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': "
-                + expandOutput);
+        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
 
-        LOGGER.info("Try set localization to '" + language
-                + "' with following cmd: "
-                + setLocalizationCmd);
+        LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
         String changeLocaleOutput = executeAbdCommand(setLocalizationCmd);
-        LOGGER.info("Output after set localization to '" + language
-                + "' using 'ADB Change Language apk' : " + changeLocaleOutput);
+        LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : " + changeLocaleOutput);
 
         if (waitTime > 0) {
-            LOGGER.info("Wait for at least '" + waitTime
-                    + "' seconds before device refresh.");
+            LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
             pause(waitTime);
         }
 
@@ -656,8 +650,7 @@ public class AndroidService {
                 String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
                 LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
-                    LOGGER.info("Adb return language command do not work on some Android 7+ devices." +
-                            " Check that there are no error.");
+                    LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
                     status = !getDeviceLanguage().toLowerCase().contains("error");
                 }
             }
@@ -675,7 +668,6 @@ public class AndroidService {
     }
     // End Language Change section
 
-
     // Fake GPS section
 
     /**
@@ -691,8 +683,8 @@ public class AndroidService {
     /**
      * startFakeGPS to emulate GPS location
      *
-     * @param location   String - existing city (for ex. New York)
-     * @param restartApk - if true  DriverPool.restartDriver(true);
+     * @param location String - existing city (for ex. New York)
+     * @param restartApk - if true DriverPool.restartDriver(true);
      * @return boolean return true if everything is ok.
      */
     public boolean setFakeGPSLocation(String location, boolean restartApk) {
@@ -718,13 +710,13 @@ public class AndroidService {
                 fakeGpsPage.clickSetLocation();
             }
             res = true;
-            if (restartApk) DriverPool.restartDriver(true);
+            if (restartApk)
+                DriverPool.restartDriver(true);
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
         return res;
     }
-
 
     /**
      * stopFakeGPS stop using Fake GPS
@@ -738,7 +730,7 @@ public class AndroidService {
     /**
      * stopFakeGPS stop using Fake GPS
      *
-     * @param restartApk - if true  DriverPool.restartDriver(true);
+     * @param restartApk - if true DriverPool.restartDriver(true);
      * @return boolean
      */
     public boolean stopFakeGPS(boolean restartApk) {
@@ -757,7 +749,8 @@ public class AndroidService {
             }
             LOGGER.info("STOP Fake GPS locale");
             res = fakeGpsPage.clickStopFakeGps();
-            if (restartApk) DriverPool.restartDriver(true);
+            if (restartApk)
+                DriverPool.restartDriver(true);
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
@@ -777,9 +770,9 @@ public class AndroidService {
     /**
      * forceApkOpen
      *
-     * @param activity    String
+     * @param activity String
      * @param packageName String
-     * @param apkPath     String
+     * @param apkPath String
      * @return boolean
      */
     private boolean forceApkOpen(String activity, String packageName, String apkPath) {
@@ -815,13 +808,13 @@ public class AndroidService {
 
     // End of Fake GPS section
 
-
     // TimeZone change section
 
     /**
      * switchDeviceAutoTimeAndTimeZone
      *
-     * @param autoSwitch boolean. If true - auto Time and TimeZone will be set as On.
+     * @param autoSwitch boolean. If true - auto Time and TimeZone will be set
+     * as On.
      */
     public void switchDeviceAutoTimeAndTimeZone(boolean autoSwitch) {
         String value = "0";
@@ -832,7 +825,6 @@ public class AndroidService {
         executeAbdCommand("shell settings put global auto_time " + value);
         executeAbdCommand("shell settings put global auto_time_zone " + value);
     }
-
 
     /**
      * get Device Time Zone
@@ -851,7 +843,8 @@ public class AndroidService {
      */
     public DeviceTimeZone getDeviceTimeZone(String defaultTZ) {
 
-        getDriver(); //start driver in before class to assign it for particular thread
+        getDriver(); // start driver in before class to assign it for particular
+                     // thread
         DeviceTimeZone dt = new DeviceTimeZone();
 
         String value = executeAbdCommand("shell settings get global auto_time");
@@ -913,13 +906,13 @@ public class AndroidService {
         return value;
     }
 
-
-    //Start of TimeZone Setting section
+    // Start of TimeZone Setting section
 
     /**
      * set Device TimeZone by using Apk
      *
-     * @param timeZone   String required timeZone in Android standard format (Europe/London)
+     * @param timeZone String required timeZone in Android standard format
+     * (Europe/London)
      * @param timeFormat String 12 or 24
      * @return boolean
      */
@@ -928,9 +921,10 @@ public class AndroidService {
     }
 
     /**
-     * set Device TimeZone using all supported workflows. By ADB, Settings and Apk
+     * set Device TimeZone using all supported workflows. By ADB, Settings and
+     * Apk
      *
-     * @param timeZone   String required timeZone
+     * @param timeZone String required timeZone
      * @param timeFormat String 12 or 24
      * @param settingsTZ TimeFormat
      * @return boolean
@@ -942,16 +936,17 @@ public class AndroidService {
     /**
      * set Device TimeZone. By required workflow: ADB, Settings or APK
      *
-     * @param timeZone   String required timeZone
+     * @param timeZone String required timeZone
      * @param timeFormat String 12 or 24
      * @param settingsTZ TimeFormat
-     * @param workflow   ChangeTimeZoneWorkflow
+     * @param workflow ChangeTimeZoneWorkflow
      * @return boolean
      */
     public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, ChangeTimeZoneWorkflow workflow) {
         boolean changed = false;
 
-        getDriver(); //start driver in before class to assign it for particular thread
+        getDriver(); // start driver in before class to assign it for particular
+                     // thread
         String actualTZ = getDeviceActualTimeZone();
 
         if (isRequiredTimeZone(actualTZ, timeZone)) {
@@ -966,14 +961,15 @@ public class AndroidService {
             workflow = ChangeTimeZoneWorkflow.APK;
         }
 
-        //Solution for ADB timezone changing.
+        // Solution for ADB timezone changing.
         if (ChangeTimeZoneWorkflow.ADB.isSupported(workflow)) {
             LOGGER.info("Try to change TimeZone by ADB");
             LOGGER.info(setDeviceTimeZoneByADB(timeZone, timeFormat, ""));
             changed = applyTZChanges(ChangeTimeZoneWorkflow.ADB, timeZone);
         }
 
-        // Solution for timezone changing by device Settings. (Tested on S7, Note 3, S6, S5).
+        // Solution for timezone changing by device Settings. (Tested on S7,
+        // Note 3, S6, S5).
         if (!changed && ChangeTimeZoneWorkflow.SETTINGS.isSupported(workflow)) {
             LOGGER.info("Try to change TimeZone by Device Settings");
             setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat);
@@ -989,17 +985,17 @@ public class AndroidService {
         return changed;
     }
 
-    //End of TimeZone change sections
+    // End of TimeZone change sections
 
-    //Private section
+    // Private section
 
-    //TimeZone Private methods
+    // TimeZone Private methods
 
     /**
      * setDeviceTimeZoneByADB
      *
-     * @param timeZone      String
-     * @param timeFormat    TimeFormat
+     * @param timeZone String
+     * @param timeFormat TimeFormat
      * @param deviceSetDate String in format yyyyMMdd.HHmmss. Can be empty.
      * @return String
      */
@@ -1014,20 +1010,17 @@ public class AndroidService {
     }
 
     /**
-     * setDeviceTimeZoneByADB
-     * Automatic date and time = OFF (settings - date and time)
-     * adb shell settings put global auto_time 0
-     * Automatic time zone = OFF (settings - date and time)
-     * adb shell settings put global auto_time_zone 0
+     * setDeviceTimeZoneByADB Automatic date and time = OFF (settings - date and
+     * time) adb shell settings put global auto_time 0 Automatic time zone = OFF
+     * (settings - date and time) adb shell settings put global auto_time_zone 0
      * <p>
-     * Set Time Zone on device
-     * adb shell setprop persist.sys.timezone "America/Chicago"
+     * Set Time Zone on device adb shell setprop persist.sys.timezone
+     * "America/Chicago"
      * <p>
-     * Check timezones:
-     * <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">List_of_tz_database_time_zones</a>
+     * Check timezones: <a href=
+     * "https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">List_of_tz_database_time_zones</a>
      * <p>
-     * Check time on device
-     * adb shell date -s %mynow%
+     * Check time on device adb shell date -s %mynow%
      * <p>
      * Restart application
      *
@@ -1079,7 +1072,7 @@ public class AndroidService {
     /**
      * setDeviceTimeZoneBySetting
      *
-     * @param timeZone   String
+     * @param timeZone String
      * @param settingsTZ String
      * @param timeFormat TimeFormat
      */
@@ -1121,11 +1114,10 @@ public class AndroidService {
         }
     }
 
-
     /**
      * setDeviceTimeZoneByChangerApk
      *
-     * @param timeZone   String
+     * @param timeZone String
      * @param timeFormat TimeFormat
      */
     private void setDeviceTimeZoneByChangerApk(String timeZone, TimeFormat timeFormat) {
@@ -1158,7 +1150,6 @@ public class AndroidService {
         }
     }
 
-
     private boolean applyTZChanges(ChangeTimeZoneWorkflow workflow, String expectedZone) {
         boolean res = false;
         String actualTZ = getDeviceActualTimeZone();
@@ -1175,7 +1166,7 @@ public class AndroidService {
     /**
      * comparingExpectedAndActualTZ
      *
-     * @param actualTZ   String
+     * @param actualTZ String
      * @param expextedTZ String
      * @return boolean
      */
@@ -1192,10 +1183,9 @@ public class AndroidService {
         return res;
     }
 
-
     /**
      * @param turnOffAuto boolean
-     * @param timeFormat  TimeFormat
+     * @param timeFormat TimeFormat
      * @return boolean
      */
     private boolean forceTZChangingApkOpen(boolean turnOffAuto, TimeFormat timeFormat) {
@@ -1244,7 +1234,7 @@ public class AndroidService {
      * openDateTimeSettingsSetupWizard in settings
      *
      * @param turnOffAuto - turn off AutoTimeZone and AutoTime
-     * @param timeFormat  - can be 12 or 24. Or empty.
+     * @param timeFormat - can be 12 or 24. Or empty.
      */
     private void openDateTimeSettingsSetupWizard(boolean turnOffAuto, TimeFormat timeFormat) {
         if (turnOffAuto) {
@@ -1260,7 +1250,7 @@ public class AndroidService {
      * openDateTimeSettingsSetupWizard in settings
      *
      * @param turnOffAuto - turn off AutoTimeZone and AutoTime
-     * @param timeFormat  - can be 12 or 24. Or empty.
+     * @param timeFormat - can be 12 or 24. Or empty.
      */
     private void openTZChangingApk(boolean turnOffAuto, TimeFormat timeFormat) {
         if (turnOffAuto) {
@@ -1275,14 +1265,14 @@ public class AndroidService {
 
     private void setSystemTime(TimeFormat timeFormat) {
         switch (timeFormat) {
-            case FORMAT_12:
-                LOGGER.info("Set 12 hours format");
-                executeAbdCommand("shell settings put system time_12_24 12");
-                break;
-            case FORMAT_24:
-                LOGGER.info("Set 24 hours format");
-                executeAbdCommand("shell settings put system time_12_24 24");
-                break;
+        case FORMAT_12:
+            LOGGER.info("Set 12 hours format");
+            executeAbdCommand("shell settings put system time_12_24 12");
+            break;
+        case FORMAT_24:
+            LOGGER.info("Set 24 hours format");
+            executeAbdCommand("shell settings put system time_12_24 24");
+            break;
         }
     }
 
@@ -1325,7 +1315,7 @@ public class AndroidService {
         return res;
     }
 
-    //End of TimeZone private section
+    // End of TimeZone private section
 
     /**
      * Pause
@@ -1339,6 +1329,5 @@ public class AndroidService {
             e.printStackTrace();
         }
     }
-
 
 }
