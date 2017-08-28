@@ -40,6 +40,10 @@ import io.appium.java_client.android.AndroidElement;
  */
 public class AndroidUtils extends MobileUtils {
 
+    public enum Direction {
+        LEFT, RIGHT, UP, DOWN, VERTICAL, HORIZONTAL, VERTICAL_DOWN_FIRST, HORIZONTAL_RIGHT_FIRST
+    }
+
     protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
 
     /**
