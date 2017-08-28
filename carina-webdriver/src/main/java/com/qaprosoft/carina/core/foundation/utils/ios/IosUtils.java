@@ -28,76 +28,6 @@ public class IosUtils extends MobileUtils {
     private static final Logger LOGGER = Logger.getLogger(IosUtils.class);
 
     /**
-     * Swipe Until Element Presence
-     *
-     * @param element ExtendedWebElement
-     * @return boolean
-     */
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element) {
-        boolean isPeresent = swipeUntilElementPresence(element, 20);
-        if (!isPeresent)
-            return swipeUntilElementPresence(element, 20);
-        return isPeresent;
-    }
-
-    /**
-     * Swipe Until Element Presence for several times
-     *
-     * @param element ExtendedWebElement
-     * @param swipeTimes int
-     * @return boolean
-     */
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int swipeTimes) {
-        IOSDriver<?> driver = ((IOSDriver<?>) DriverPool.getDriver());
-        Dimension scrSize;
-        int screenWidth;
-        int screenHeight;
-        boolean isPresent = element.isElementPresent(MINIMUM_TIMEOUT);
-        try {
-            scrSize = driver.manage().window().getSize();
-            screenWidth = scrSize.getWidth() / 2;
-            screenHeight = scrSize.getHeight() / 2;
-            LOGGER.info("Swipe down to element: ".concat(element.toString()));
-            while (!isPresent && swipeTimes-- > 0) {
-                LOGGER.info("Element not present! Swipe will be executed.");
-                driver.swipe(screenWidth, screenHeight, screenWidth, 10, 1000);
-                LOGGER.info("Swipe was executed. Attemps remain: " + swipeTimes);
-                isPresent = element.isElementPresent(MINIMUM_TIMEOUT);
-                LOGGER.info("Result: " + isPresent);
-            }
-        } catch (Exception e) {
-            LOGGER.info("Can not swipe");
-        }
-        return isPresent;
-    }
-
-    /**
-     * Swipe Coordinates
-     *
-     * @param startX int
-     * @param startY int
-     * @param endX int
-     * @param endY int
-     * @param duration int
-     */
-    public static void swipeCoord(int startX, int startY, int endX, int endY, int duration) {
-        WebDriver driver = DriverPool.getDriver();
-        ((IOSDriver<?>) driver).swipe(startX, startY, endX, endY, duration);
-    }
-
-    /**
-     * Swipe Coordinates
-     *
-     * @param startX int
-     * @param startY int
-     * @param endX int
-     * @param endY int
-     */
-    public static void swipeCoord(int startX, int startY, int endX, int endY) {
-        swipeCoord(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
-    }
-
-    /**
      * Hide Keyboard
      * 
      */
@@ -197,22 +127,6 @@ public class IosUtils extends MobileUtils {
             LOGGER.info("There is no space for scrolling with JS");
         }
 
-    }
-
-    /**
-     * Swipe
-     * 
-     * @param startx int
-     * @param starty int
-     * @param endx int
-     * @param endy int
-     * @param duration int
-     */
-    public static void swipe(int startx, int starty, int endx, int endy, int duration) {
-        int xOffset = endx - startx;
-        int yOffset = endy - starty;
-        new TouchAction((IOSDriver<?>) DriverPool.getDriver()).press(startx, starty).waitAction(Duration.ofMillis(duration)).moveTo(xOffset, yOffset)
-                .release().perform();
     }
 
     /**
