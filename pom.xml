@@ -31,6 +31,9 @@
 		<selenium-java.version>3.4.0</selenium-java.version>
 		<selenium-server.version>3.4.0</selenium-server.version>
 		<appium.version>5.0.0-BETA9</appium.version>
+
+		<alice-client.version>1.0.2</alice-client.version>
+		<commons-configuration2.version>2.1</commons-configuration2.version>
 	</properties>
 
 	<modules>
@@ -243,6 +246,18 @@
 				<artifactId>testng</artifactId>
 				<version>${testng.version}</version>
 				<scope>compile</scope>
+			</dependency>
+
+			<!-- AI integration -->
+			<dependency>
+				 <groupId>com.qaprosoft</groupId>
+				 <artifactId>alice-client</artifactId>
+				 <version>${alice-client.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.apache.commons</groupId>
+			    <artifactId>commons-configuration2</artifactId>
+			    <version>${commons-configuration2.version}</version>
 			</dependency>
 
 		</dependencies>
