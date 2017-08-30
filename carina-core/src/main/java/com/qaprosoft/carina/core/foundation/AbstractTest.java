@@ -644,6 +644,12 @@ public abstract class AbstractTest // extends DriverHelper
 
 			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
 			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+			
+			//try to redefine app_version if it's value is latest or empty
+			String appVersion = Configuration.get(Parameter.APP_VERSION);
+			if (appVersion.equals("latest") || appVersion.isEmpty()) {
+				R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+			}
 		}
 	}
 
