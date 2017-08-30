@@ -132,4 +132,8 @@ public class SpecialKeywords
 	public static final String CRYPTO_KEY_PATH = "./src/main/resources/crypto.key";
 	
 	
+	// ------------- PROXY PROPERTIES ---------------------------------
+	public static final String PROXY_SETTER_PACKAGE = "tk.elevenk.proxysetter";
+	public static final String PROXY_SETTER_RES_PATH = "app/proxy-setter-debug-0.2.apk";
+	
 }
