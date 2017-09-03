@@ -44,7 +44,6 @@ public class HealthCheckListener implements ISuiteListener {
 		checkHealth(suite, healthCheckClass, healthCheckMethodsArray);
 	}
 
-	@SuppressWarnings("deprecation")
 	private void checkHealth(ISuite suite, String className, String[] methods) {
 
 		if (className.isEmpty()) {
