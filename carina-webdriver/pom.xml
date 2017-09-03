@@ -4,9 +4,7 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qaprosoft</groupId>
 	<artifactId>carina-webdriver</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Carina WebDriver Core</name>
@@ -29,7 +27,6 @@
 		<guava.version>21.0</guava.version>
 		<appium.version>5.0.0-BETA8</appium.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
-		<aws-s3-manager.version>1.2.15</aws-s3-manager.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
@@ -59,6 +56,10 @@
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>aws-s3-manager</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -95,13 +96,6 @@
 			<artifactId>imgscalr-lib</artifactId>
 			<version>${imgscalr-lib.version}</version>
 			<type>jar</type>
-		</dependency>
-
-		<!-- Amazon -->
-		<dependency>
-			<groupId>com.qaprosoft.amazon</groupId>
-			<artifactId>aws-s3-manager</artifactId>
-			<version>${aws-s3-manager.version}</version>
 		</dependency>
 
 		<dependency>

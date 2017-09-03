@@ -4,11 +4,11 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>browsermobproxy</artifactId>
+	<artifactId>aws-s3-manager</artifactId>
 	<packaging>jar</packaging>
 
-	<name>BrowserMobProxy Core</name>
-	<description>BrowserMob Proxy module web, mobile, API testing.</description>
+	<name>AWS S3 Helper Utility</name>
+	<description></description>
 
 	<parent>
 		<groupId>com.qaprosoft</groupId>
@@ -23,20 +23,41 @@
 
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
+		<aws-java-sdk.version>1.10.30</aws-java-sdk.version>
+		<junit.version>4.11</junit.version>
 
 	</properties>
 
 	<dependencies>
+		<!-- Carina sub-modules dependencies -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-utils</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>net.lightbody.bmp</groupId>
-			<artifactId>browsermob-core</artifactId>
-			<version>2.1.4</version>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>${aws-java-sdk.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+		</dependency>
+
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -52,11 +73,6 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>com.qaprosoft.carina.browsermobproxy.ProxyPool</mainClass>
-						</manifest>
-					</archive>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
