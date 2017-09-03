@@ -511,7 +511,6 @@ public class AndroidUtils extends MobileUtils {
         boolean bothWay = false;
         Direction oppositeDirection = Direction.DOWN;
         try {
-            WebDriver driver = DriverPool.getDriver();
             if (extendedWebElement.isElementPresent(1)) {
                 LOGGER.info("Element already present");
                 return true;

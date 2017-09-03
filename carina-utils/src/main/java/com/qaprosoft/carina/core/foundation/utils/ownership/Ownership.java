@@ -16,7 +16,6 @@ public class Ownership
 	
 	public enum OwnerType {PRIMARY, SECONDARY};
 	
-	@SuppressWarnings("unlikely-arg-type")
 	public static String getMethodOwner(ITestResult result, OwnerType type) 
 	{
 		

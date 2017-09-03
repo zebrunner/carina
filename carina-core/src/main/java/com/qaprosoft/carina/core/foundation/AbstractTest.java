@@ -192,9 +192,6 @@ public abstract class AbstractTest // extends DriverHelper
 
 		try {
 			if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-				LOGGER.info("Initializing AWS S3 client...");
-				AmazonS3Manager.getInstance().initS3client(Configuration.get(Parameter.ACCESS_KEY_ID),
-						Configuration.get(Parameter.SECRET_KEY));
 				updateS3AppPath();
 			}
 		} catch (Exception e) {
