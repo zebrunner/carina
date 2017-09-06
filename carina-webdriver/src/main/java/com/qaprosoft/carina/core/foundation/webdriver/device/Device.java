@@ -185,6 +185,25 @@ public class Device
 		return name.isEmpty() || seleniumServer.isEmpty();
 	}
 
+	public void connect() {
+		if (isNull())
+			return;
+
+		LOGGER.info("adb connect " + getUdid());
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getUdid());
+		executor.execute(cmd);
+	}
+	
+	public void disconnect() {
+		if (isNull())
+			return;
+
+		LOGGER.info("adb disconnect " + getUdid());
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getUdid());
+		executor.execute(cmd);
+	}
+	
+	
     public int startRecording(String pathToFile) {
         if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
             return -1;
