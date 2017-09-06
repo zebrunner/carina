@@ -82,8 +82,9 @@ public class DeviceGrid
 		{
 			punub.unsubscribeAll();
 		}
-
-		return gridCallback.getUdid();
+		// TODO: temporary solution for Docker
+		//return gridCallback.getUdid();
+		return gridCallback.getRemoteURL();
 	}
 
 	/**
@@ -143,6 +144,7 @@ public class DeviceGrid
 	{
 		private String udid;
 		private String testId;
+		private String remoteURL;
 
 		public GridCallback(String testId)
 		{
@@ -162,6 +164,7 @@ public class DeviceGrid
 					if (rs.isConnected())
 					{
 						udid = rs.getSerial();
+						remoteURL = rs.getRemoteConnectURL();
 // 						TODO: implement event logging
 //						ZafiraIntegrator.markEventReceived(new EventType(Type.CONNECT_DEVICE, GRID_SESSION_ID, testId));
 						LOGGER.info("Device found in grid by UDID: " + udid);
@@ -177,6 +180,12 @@ public class DeviceGrid
 		{
 			return udid;
 		}
+
+		public String getRemoteURL() 
+		{
+			return remoteURL;
+		}
+		
 	}
 
 	private static JSONObject toJsonObject(Object object)
