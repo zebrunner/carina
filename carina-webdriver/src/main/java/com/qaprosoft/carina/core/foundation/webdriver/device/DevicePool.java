@@ -199,10 +199,12 @@ public class DevicePool
 						if (THREAD_2_DEVICE_MAP.containsValue(device))
 						{
 							String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
+							device.disconnect();
 							DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 							throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
 						}
 						device.setTestId(testId);
+						device.connect();
 						freeDevice = device;
 						break;
 					}
@@ -288,6 +290,7 @@ public class DevicePool
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
 			if (GRID_ENABLED)
 			{
+				device.disconnect();
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
