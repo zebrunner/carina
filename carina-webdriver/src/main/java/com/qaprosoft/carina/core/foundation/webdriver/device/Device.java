@@ -588,6 +588,9 @@ public class Device
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
 
         String[] res = new String[3];
+        res[0] = "";
+        res[1] = "";
+        res[2] = "";
         
         //TODO: restore appt verification
 /*        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
