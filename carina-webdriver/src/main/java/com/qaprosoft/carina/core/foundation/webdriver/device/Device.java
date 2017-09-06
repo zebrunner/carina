@@ -445,10 +445,13 @@ public class Device
         // output:
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
 
-        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
+        String packageName = "";
+        
+        //TODO: restore verification when aapt will be installed
+/*        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
         List<String> output = executor.execute(cmd);
         // parse output command and get appropriate data
-        String packageName = "";
+
 
         for (String line : output) {
             if (line.contains("versionCode") && line.contains("versionName")) {
@@ -457,7 +460,7 @@ public class Device
                 packageName = outputs[1]; //package
             }
         }
-
+*/
         return packageName;
     }
     
