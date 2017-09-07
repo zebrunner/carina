@@ -37,6 +37,7 @@ public class Device
 	private String seleniumServer;
 
 	private String testId;
+	private String remoteURL;
 	
 	private boolean isAppInstalled = false;
 	
@@ -75,8 +76,8 @@ public class Device
 		this.osVersion = osVersion;
 		this.udid = udid;
 		this.seleniumServer = seleniumServer;
-	}
 
+	}
 
 	public String getName()
 	{
@@ -126,6 +127,14 @@ public class Device
 	public void setSeleniumServer(String seleniumServer)
 	{
 		this.seleniumServer = seleniumServer;
+	}
+	
+	public String getRemoteURL() {
+		return remoteURL;
+	}
+
+	public void setRemoteURL(String remoteURL) {
+		this.remoteURL = remoteURL;
 	}
 
 	public boolean isPhone()
@@ -185,21 +194,21 @@ public class Device
 		return name.isEmpty() || seleniumServer.isEmpty();
 	}
 
-	public void connect() {
+	public void connectRemote() {
 		if (isNull())
 			return;
 
-		LOGGER.info("adb connect " + getUdid());
-		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getUdid());
+		LOGGER.info("adb connect " + getRemoteURL());
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
 		executor.execute(cmd);
 	}
 	
-	public void disconnect() {
+	public void disconnectRemote() {
 		if (isNull())
 			return;
 
-		LOGGER.info("adb disconnect " + getUdid());
-		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getUdid());
+		LOGGER.info("adb disconnect " + getRemoteURL());
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
 		executor.execute(cmd);
 	}
 	

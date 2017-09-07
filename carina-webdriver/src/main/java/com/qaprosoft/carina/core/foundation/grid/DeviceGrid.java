@@ -17,6 +17,8 @@ import com.pubnub.api.PubnubException;
 import com.qaprosoft.carina.core.foundation.grid.GridRequest.Operation;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * DeviceGrid communicates over PubNub with grid queue and provides connect/diconnect device functionality.
@@ -48,9 +50,9 @@ public class DeviceGrid
 	 *            - unique test id generated bu UUID
 	 * @param deviceModels
 	 *            - list of possible devices to get from STF
-	 * @return device udid
+	 * @return Device object
 	 */
-	public static String connectDevice(String testId, List<String> deviceModels)
+	public static Device connectDevice(String testId, List<String> deviceModels)
 	{
 		Pubnub punub = new Pubnub(PKEY, SKEY);
 		GridCallback gridCallback = new GridCallback(testId);
@@ -82,9 +84,14 @@ public class DeviceGrid
 		{
 			punub.unsubscribeAll();
 		}
-		// TODO: temporary solution for Docker
-		//return gridCallback.getUdid();
-		return gridCallback.getRemoteURL();
+		String udid = gridCallback.getUdid();
+		String remoteURL = gridCallback.getRemoteURL();
+		
+		Device device = DevicePool.findDevice(udid);
+		// init remoteURL value using dynamic data from STF
+		device.setRemoteURL(remoteURL);
+		
+		return device;
 	}
 
 	/**
