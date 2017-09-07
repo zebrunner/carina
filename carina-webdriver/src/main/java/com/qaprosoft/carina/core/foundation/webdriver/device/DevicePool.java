@@ -190,11 +190,12 @@ public class DevicePool
 			LOGGER.info(
 					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
 			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
+			LOGGER.info("Identified free device using STF: " + udid);
 			if (!StringUtils.isEmpty(udid))
 			{
 				for (Device device : DEVICES)
 				{
-					if (device.getUdid().equalsIgnoreCase(udid))
+					if (udid.contains(device.getUdid()))
 					{
 						if (THREAD_2_DEVICE_MAP.containsValue(device))
 						{
