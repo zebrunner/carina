@@ -201,6 +201,10 @@ public class Device
 		LOGGER.info("adb connect " + getRemoteURL());
 		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
 		executor.execute(cmd);
+		
+		//TODO: add several attempt of connect until device appear among connected devices
+		// quick workaround to do double connect...
+		executor.execute(cmd);
 	}
 	
 	public void disconnectRemote() {
