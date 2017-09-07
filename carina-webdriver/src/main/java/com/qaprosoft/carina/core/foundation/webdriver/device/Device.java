@@ -223,7 +223,7 @@ public class Device
         
         dropFile(pathToFile);
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile);
 
         try {
             ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
@@ -250,7 +250,7 @@ public class Device
         if (this.isNull())
         	return;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "rm", pathToFile);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "rm", pathToFile);
         executor.execute(cmd);
     }
     
@@ -274,7 +274,7 @@ public class Device
     }
     
     public List<String> getInstalledPackages() {
-        String deviceUdid = getUdid();
+        String deviceUdid = getAdbName();
         LOGGER.info("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list", "packages");
         LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
@@ -290,7 +290,7 @@ public class Device
         if (isNull())
         	return;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "pull", pathFrom, pathTo);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "pull", pathFrom, pathTo);
         executor.execute(cmd);
     }
     
@@ -299,7 +299,7 @@ public class Device
     private Boolean getScreenState() {
         // determine current screen status
         // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "dumpsys",
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys",
                 "input_method");
         List<String> output = executor.execute(cmd);
 
@@ -355,7 +355,7 @@ public class Device
             return;
         }
         if (screenState) {
-			String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "input",
+			String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "input",
 					"keyevent", "26");
             executor.execute(cmd);
 
@@ -391,7 +391,7 @@ public class Device
         }
 
         if (!screenState) {
-            String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell",
+            String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell",
                     "input", "keyevent", "26");
             executor.execute(cmd);
 
@@ -413,7 +413,7 @@ public class Device
 		if (isNull())
 			return;
 
-		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "input",
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "input",
 				"keyevent", String.valueOf(key));
 		executor.execute(cmd);
 	}
@@ -444,7 +444,7 @@ public class Device
         //adb -s UDID shell pm clear com.myfitnesspal.android
         String packageName = getApkPackageName(app);
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "pm", "clear", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "pm", "clear", packageName);
         executor.execute(cmd);
     }
     
@@ -477,7 +477,7 @@ public class Device
         	return;
 
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "uninstall", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "uninstall", packageName);
         executor.execute(cmd);
     }
 
@@ -486,7 +486,7 @@ public class Device
         	return;
 
         //adb -s UDID install com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", apkPath);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "install", "-r", apkPath);
         executor.execute(cmd);
     }
 
@@ -495,7 +495,7 @@ public class Device
         	return;
 
         //adb -s UDID install com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", apkPath);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "install", "-r", apkPath);
         executor.execute(cmd);
     }
     
@@ -561,7 +561,7 @@ public class Device
         String[] res = new String[3];
         res[0] = packageName;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "dumpsys", "package", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys", "package", packageName);
         List<String> output = executor.execute(cmd);
 
 
@@ -682,7 +682,7 @@ public class Device
             downloadFileFromJar(SpecialKeywords.PROXY_SETTER_RES_PATH, targetFile);
             installApp(proxySetterFileName);
         }
-        String deviceUdid = getUdid();
+        String deviceUdid = getAdbName();
         LOGGER.info("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "am", "start", "-n",
                 "tk.elevenk.proxysetter/.MainActivity", "-e", "host", host, "-e", "port", port, "-e", "ssid", ssid, "-e", "key", password);
@@ -698,4 +698,13 @@ public class Device
             LOGGER.error("Error during copying of file from the resources. ".concat(e.getMessage()));
         }
     }
+    
+    private String getAdbName() {
+    	if (remoteURL != null) {
+    		return remoteURL;
+    	} else {
+    		return udid;
+    	}
+    }
+
 }
