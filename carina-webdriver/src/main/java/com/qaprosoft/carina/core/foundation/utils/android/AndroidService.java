@@ -1,23 +1,6 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.Direction;
-import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps.FakeGpsPage;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
-import io.appium.java_client.android.AndroidDriver;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +14,25 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
+import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps.FakeGpsPage;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
+import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
+
+import io.appium.java_client.android.AndroidDriver;
 
 public class AndroidService {
 
@@ -105,10 +106,10 @@ public class AndroidService {
      * @return String command output in one line
      */
     public String executeAbdCommand(String command) {
-        String udid = DevicePool.getDeviceUdid();
-        if (!udid.isEmpty()) {
-            // add udid reference
-            command = "-s " + udid + " " + command;
+        String deviceName = DevicePool.getDevice().getAdbName();
+        if (!deviceName.isEmpty()) {
+            // add remoteURL/udid reference
+            command = "-s " + deviceName + " " + command;
         }
 
         String result = "";
@@ -292,9 +293,9 @@ public class AndroidService {
      */
     public List<Notification> getNotifications(boolean withLogger) {
         String[] getNotificationsCmd = null;
-        String udid = DevicePool.getDeviceUdid();
-        if (!udid.isEmpty()) {
-            getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", udid, "shell", "dumpsys", "notification");
+        String deviceName = DevicePool.getDevice().getAdbName();
+        if (!deviceName.isEmpty()) {
+            getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", deviceName, "shell", "dumpsys", "notification");
         } else {
             getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "shell", "dumpsys", "notification");
         }

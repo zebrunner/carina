@@ -699,7 +699,7 @@ public class Device
         }
     }
     
-    private String getAdbName() {
+    public String getAdbName() {
     	if (remoteURL != null) {
     		return remoteURL;
     	} else {
