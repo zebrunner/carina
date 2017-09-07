@@ -195,7 +195,7 @@ public class DevicePool
 			{
 				for (Device device : DEVICES)
 				{
-					if (udid.contains(device.getUdid()))
+					if (device.getUdid().equalsIgnoreCase(udid))
 					{
 						if (THREAD_2_DEVICE_MAP.containsValue(device))
 						{
