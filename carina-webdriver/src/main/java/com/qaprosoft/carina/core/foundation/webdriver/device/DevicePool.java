@@ -317,7 +317,7 @@ public class DevicePool
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
 			if (GRID_ENABLED)
 			{
-				device.disconnectRemote();
+				//device.disconnectRemote();
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
