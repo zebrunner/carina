@@ -456,8 +456,7 @@ public class Device
 
         String packageName = "";
         
-        //TODO: restore verification when aapt will be installed
-/*        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
+        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
         List<String> output = executor.execute(cmd);
         // parse output command and get appropriate data
 
@@ -469,7 +468,7 @@ public class Device
                 packageName = outputs[1]; //package
             }
         }
-*/
+
         return packageName;
     }
     
@@ -601,8 +600,7 @@ public class Device
         res[1] = "";
         res[2] = "";
         
-        //TODO: restore appt verification
-/*        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
+        String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
         List<String> output = executor.execute(cmd);
         // parse output command and get appropriate data
 
@@ -616,7 +614,7 @@ public class Device
                 res[2] = outputs[5]; //versionName
             }
         }
-*/
+
         return res;
     }
 
