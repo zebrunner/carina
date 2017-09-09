@@ -203,7 +203,7 @@ public class Device
 		executor.execute(cmd);
 		pause(1);
 		
-		String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "device");
+		String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
 		executor.execute(cmd2);
 		
 		//TODO: add several attempt of connect until device appear among connected devices
