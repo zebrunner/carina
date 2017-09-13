@@ -85,10 +85,12 @@ public class AliceRecognition implements IRecognition
 	public RecognitionMetaType recognize(Label label, String caption, File screenshot)
 	{
 		RecognitionMetaType result = null;
-		
+
+		// send request anyway to Alice for recognition to record this particular screen
 		Response<List<RecognitionMetaType>> response = client.recognize(screenshot);
 		
-		if(response.getStatus() == 200) 
+		// try to search only if AI label and caption are provided
+		if(response.getStatus() == 200 && label != null && caption != null) 
 		{
 			result = response.getObject().stream()
 				.filter(r -> r.getCaption().contains(caption) && r.getLabel().equals(label.getLabelName()))
