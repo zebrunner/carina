@@ -49,6 +49,8 @@ public class DevicePool
 	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
 
 	private static final Device nullDevice = new Device("", "", "", "", "", "");
+	
+	private static ThreadLocal<Device> curDevice = new ThreadLocal<Device>();
 
 	protected static synchronized void addDevice()
 	{
@@ -274,6 +276,8 @@ public class DevicePool
 			throw new RuntimeException(String.format(msg, allModels));
 		}
 
+		//register current device to be able to transfer it into Zafira at the end of the test
+		setCurrentDevice(freeDevice); 
 		return freeDevice;
 
 	}
@@ -424,4 +428,13 @@ public class DevicePool
 			e.printStackTrace();
 		}
 	}
+	
+	private static void setCurrentDevice(Device device) {
+		curDevice.set(device);
+	}
+	
+	public static Device getCurrentDevice() {
+		return curDevice.get();
+	}
+
 }
