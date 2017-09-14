@@ -430,11 +430,21 @@ public class DevicePool
 	}
 	
 	private static void setCurrentDevice(Device device) {
+		LOGGER.info("Set current device to '" + device.getName() + "'");
 		curDevice.set(device);
 	}
 	
 	public static Device getCurrentDevice() {
-		return curDevice.get();
+		Device device = curDevice.get();
+		if (device == null) {
+			LOGGER.info("Current device is null!");
+			device = nullDevice;
+		} else if (device.getName().isEmpty()) {
+			LOGGER.info("Current device name is empty! nullDevice was used");
+		} else {
+			LOGGER.info("Current device name is '" + device.getName() + "'");
+		}
+		return device;
 	}
 
 }

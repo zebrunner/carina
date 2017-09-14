@@ -54,12 +54,10 @@ public class ZafiraConfigurator implements IConfigurator
 
         // add custom arguments from current mobile device
 		Device device = DevicePool.getCurrentDevice();
-		if (device != null) {
-			if (!device.getName().isEmpty()) {
-				conf.getArg().add(buildArgumentType("device", device.getName()));
-				conf.getArg().add(buildArgumentType("platform", device.getOs()));
-				conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
-			}
+		if (!device.getName().isEmpty()) {
+			conf.getArg().add(buildArgumentType("device", device.getName()));
+			conf.getArg().add(buildArgumentType("platform", device.getOs()));
+			conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
 		}
         return conf;
     }
