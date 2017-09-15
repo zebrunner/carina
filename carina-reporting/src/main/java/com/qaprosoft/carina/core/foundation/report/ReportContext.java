@@ -289,6 +289,8 @@ public class ReportContext
 				throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath() + " and/or " + thumbDir.getAbsolutePath());
 			}
 		}
+		
+		testDirectory.set(testDir);
 		return testDir;
 	}
 	
