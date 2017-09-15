@@ -411,6 +411,9 @@ public class ExtendedWebElement {
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
+        } catch (NoSuchElementException e) {
+        	//don't write exception even in debug mode
+        	result = false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             result = false;
