@@ -279,7 +279,7 @@ public class ReportContext
 		if (testDir == null) {
 			long uniqueDirName = System.currentTimeMillis();
 			String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
-			LOGGER.info("1st request for test dir. Just generate unique folder: " + directory);
+			System.out.println("1st request for test dir. Just generate unique folder: " + directory);
 
 			testDir = new File(directory);
 			File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
