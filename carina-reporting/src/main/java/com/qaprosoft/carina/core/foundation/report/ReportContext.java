@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -277,7 +278,8 @@ public class ReportContext
 	public static synchronized File getTestDir() {
 		File testDir = testDirectory.get();
 		if (testDir == null) {
-			long uniqueDirName = System.currentTimeMillis();
+			String uniqueDirName = UUID.randomUUID().toString();
+			
 			String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
 			System.out.println("1st request for test dir. Just generate unique folder: " + directory);
 
@@ -307,7 +309,6 @@ public class ReportContext
 			// test. Extra after method/class/suite custom messages will be
 			// logged into the next test.log file 
 			testDirectory.remove();
-
 			
 			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test + "-2"));
 			if (newTestDir.exists()) {
@@ -316,7 +317,7 @@ public class ReportContext
 			}
 			testDir.renameTo(newTestDir);
 		} else {
-			LOGGER.error("Unexpected case with absece of test.log for '" + test + "'" );
+			LOGGER.error("Unexpected case with absence of test.log for '" + test + "'" );
 		}
 		return testDir;
 	}
