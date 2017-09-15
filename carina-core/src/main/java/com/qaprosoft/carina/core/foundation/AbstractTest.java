@@ -286,6 +286,7 @@ public abstract class AbstractTest // extends DriverHelper
 
             Artifacts.clearArtifacts();
 
+            //TODO: remove reference onto the ThredaLogAppender
             try {
                 ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
                 if (tla != null) {
