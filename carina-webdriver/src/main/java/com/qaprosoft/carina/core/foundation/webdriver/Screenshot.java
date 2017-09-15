@@ -110,6 +110,7 @@ public class Screenshot
 	            break;
 	        }
 	    }
+	    capture2(driver, isTakeScreenshotRules, comment, false);
 	    return capture(driver, isTakeScreenshotRules, comment, false);
     }
 	
@@ -136,6 +137,7 @@ public class Screenshot
 	 */
 	public static String captureFailure(WebDriver driver, String comment)
 	{
+		capture2(driver, true, comment, true);
 		return capture(driver, true, comment, true);
 	}
 	
@@ -149,6 +151,7 @@ public class Screenshot
 	 */
 	public static String captureFullSize(WebDriver driver, String comment)
 	{
+		capture2(driver, true /*explicitly make full size screenshot*/, comment, true);
 		return capture(driver, true /*explicitly make full size screenshot*/, comment, true);
 	}
 	
@@ -162,6 +165,7 @@ public class Screenshot
 	 */
 	public static String capture(WebDriver driver, String comment)
 	{
+		capture2(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false);
 		return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false);
 	}
 
@@ -177,6 +181,7 @@ public class Screenshot
 	@Deprecated
 	public static String capture(WebDriver driver, boolean isTakeScreenshot)
 	{
+		capture2(driver, isTakeScreenshot, "", false);
 		return capture(driver, isTakeScreenshot, "", false);
 
 	}
@@ -195,8 +200,8 @@ public class Screenshot
 	@Deprecated
 	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)
 	{
+		capture2(driver, isTakeScreenshot, comment, false);
 		return capture(driver, isTakeScreenshot, comment, false);
-
 	}
 	
 	
@@ -332,6 +337,95 @@ public class Screenshot
 
 				// Uploading screenshot to Amazon S3
 				uploadToAmazonS3(test, screenPath, screenName, comment);
+
+				// add screenshot comment to collector
+				TestLogCollector.addScreenshotComment(screenName, comment);
+
+			} catch (IOException e) {
+				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+			} catch (Exception e) {
+				LOGGER.error("Unable to capture screenshot!", e);
+			}
+		}
+		return screenName;
+	}
+	
+	
+	/**
+	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+	 * 
+	 * @param driver
+	 *            instance used for capturing.
+	 * @param isTakeScreenshot
+	 *            perform actual capture or not
+	 * @param comment
+	 * 			  String
+	 * @param fullSize
+	 * 			  Boolean
+	 * @return screenshot name.
+	 */
+	
+	private static String capture2(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
+		String screenName = "";
+		
+		// TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
+		// For the rest of cases returned previous implementation
+
+		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
+			if (driver == null) {
+				LOGGER.warn("Unable to capture screenshot as driver is null.");
+				return null;
+			}
+			if (driver.toString().contains("null")) {
+				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
+				return null;
+			}
+
+			try {
+				// Define test screenshot root
+				File testScreenRootDir = ReportContext.getTestDir();
+
+				// Capture full page screenshot and resize
+				//TODO: implement naming strategy for screenshots wihtout test names
+				//String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+				screenName = System.currentTimeMillis() + ".png";
+				String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+
+				WebDriver augmentedDriver = driver;
+				if (!driver.toString().contains("AppiumNativeDriver")) {
+					// do not augment for Appium 1.x anymore
+					augmentedDriver = new DriverAugmenter().augment(driver);
+				}
+				
+				BufferedImage screen;
+
+				//Create screenshot
+				if (fullSize) {
+					screen = takeFullScreenshot(driver, augmentedDriver);
+				} else {
+					screen = takeVisibleScreenshot(driver, augmentedDriver);
+				}
+
+				BufferedImage thumbScreen = screen;
+
+				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+					resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+				}
+
+				ImageIO.write(screen, "PNG", new File(screenPath));
+
+				// Create screenshot thumbnail
+				String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
+						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
+
+				// Uploading screenshot to Amazon S3
+				// TODO: restore amazon integration. Ideally move it into the
+				// async calls closer to the end of test to upload whole bundle
+				//uploadToAmazonS3(test, screenPath, screenName, comment);
 
 				// add screenshot comment to collector
 				TestLogCollector.addScreenshotComment(screenName, comment);

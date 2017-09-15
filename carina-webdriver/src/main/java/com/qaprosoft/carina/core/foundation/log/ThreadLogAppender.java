@@ -103,14 +103,6 @@ public class ThreadLogAppender extends AppenderSkeleton
 		}
 	}
 	
-	public void closeResources()
-	{
-		for(String test : test2file.keySet())
-		{
-			closeResource(test);
-		}
-	}
-	
 	@Override
 	public void close()
 	{

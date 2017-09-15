@@ -640,11 +640,14 @@ public class AbstractTestListener extends TestArgsListener
 		}
 		try
 		{
+			//TODO: [VD] do we really need to close ThreadLogAppender resources here!
 			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
 			if (tla != null)
 			{
 				tla.closeResource(test);
 			}
+			
+			
 		} catch (Throwable e)
 		{
 			LOGGER.error("close log appender was not successful.");

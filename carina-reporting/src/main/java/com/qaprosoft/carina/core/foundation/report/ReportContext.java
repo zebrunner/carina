@@ -55,6 +55,8 @@ public class ReportContext
 	private static File metaDataDirectory;
 	
 	private static long rootID;
+	
+	private static final ThreadLocal<File> testDirectory = new ThreadLocal<File> ();
 
 	public static long getRootID() {
 		return rootID;
@@ -235,7 +237,7 @@ public class ReportContext
 	}
 
 	/**
-	 * Crates new screenshot directory at first call otherwise returns created
+	 * Creates new screenshot directory at first call otherwise returns created
 	 * directory. Directory is specific for any new test launch.
 	 * 
 	 * @param test
@@ -265,6 +267,55 @@ public class ReportContext
 		}
 		return screenDir;
 	}
+
+	/**
+	 * Creates new test directory at first call otherwise returns created
+	 * directory. Directory is specific for any new test launch.
+	 * 
+	 * @return test log/screenshot folder.
+	 */
+	public static File getTestDir() {
+		File testDir = testDirectory.get();
+		if (testDir == null) {
+			//1st request for test dir. Just generate unique folder and return it
+			long uniqueDirName = System.currentTimeMillis();
+			String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
+			testDir = new File(directory);
+			File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
+			
+			if (!thumbDir.mkdirs())
+			{
+				throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath() + " and/or " + thumbDir.getAbsolutePath());
+			}
+		}
+		return testDir;
+	}
+	
+	/**
+	 * Rename test directory from unique number to valid human readable content
+	 * using test method name. 
+	 * 
+	 * @return test log/screenshot folder.
+	 */
+	public static File renameTestDir(String test) {
+		File testDir = testDirectory.get();
+		if (testDir != null) {
+			// remove info about old directory to register new one for the next
+			// test. Extra after method/class/suite custom messages will be
+			// logged into the next test.log file 
+			testDirectory.remove();
+
+			
+			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test + "-2"));
+			if (newTestDir.exists()) {
+				throw new RuntimeException("Absolutely the same test log/screesnhot folder already exist: "
+						+ newTestDir.getAbsolutePath());
+			}
+			testDir.renameTo(newTestDir);
+		}
+		return testDir;
+	}
+	
 
 	/**
 	 * Removes emailable html report and oldest screenshots directories according to history size defined
