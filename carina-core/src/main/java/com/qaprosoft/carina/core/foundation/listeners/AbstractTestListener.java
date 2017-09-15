@@ -419,11 +419,11 @@ public class AbstractTestListener extends TestArgsListener
 		{
 			// adding passed test
 			long passedTestId = getMethodId(passedTest);
-			LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
+			//LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
 			passedTestIds.add(passedTestId);
 		}
 
-		LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
+		//LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
 
 		Set<Long> failedTestIds = new HashSet<>();
 		for (ITestResult failedTest : context.getFailedTests().getAllResults())
@@ -437,16 +437,16 @@ public class AbstractTestListener extends TestArgsListener
 			if (failedTestIds.contains(failedTestId)
 					|| passedTestIds.contains(failedTestId))
 			{
-				LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
+				//LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
 				testsToBeRemoved.add(failedTest);
 			} else
 			{
-				LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
+				//LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
 				failedTestIds.add(failedTestId);
 			}
 		}
 
-		LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
+		//LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
 		// finally delete all tests that are marked for removal
 		for (Iterator<ITestResult> iterator = context.getFailedTests()
 				.getAllResults().iterator(); iterator.hasNext();)
@@ -454,7 +454,7 @@ public class AbstractTestListener extends TestArgsListener
 			ITestResult testResult = iterator.next();
 			if (testsToBeRemoved.contains(testResult))
 			{
-				LOGGER.debug("Removing test from context: " + testResult.getName());
+				//LOGGER.debug("Removing test from context: " + testResult.getName());
 				iterator.remove();
 			}
 		}
