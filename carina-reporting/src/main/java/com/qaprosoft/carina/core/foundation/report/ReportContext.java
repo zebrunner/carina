@@ -274,7 +274,7 @@ public class ReportContext
 	 * 
 	 * @return test log/screenshot folder.
 	 */
-	public static File getTestDir() {
+	public static synchronized File getTestDir() {
 		File testDir = testDirectory.get();
 		if (testDir == null) {
 			//1st request for test dir. Just generate unique folder and return it
@@ -297,7 +297,7 @@ public class ReportContext
 	 * 
 	 * @return test log/screenshot folder.
 	 */
-	public static File renameTestDir(String test) {
+	public static synchronized File renameTestDir(String test) {
 		File testDir = testDirectory.get();
 		if (testDir != null) {
 			// remove info about old directory to register new one for the next
