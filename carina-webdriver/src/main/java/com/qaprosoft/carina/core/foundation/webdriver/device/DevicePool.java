@@ -437,12 +437,12 @@ public class DevicePool
 	public static Device getCurrentDevice() {
 		Device device = curDevice.get();
 		if (device == null) {
-			LOGGER.info("Current device is null!");
+			LOGGER.debug("Current device is null!");
 			device = nullDevice;
 		} else if (device.getName().isEmpty()) {
-			LOGGER.info("Current device name is empty! nullDevice was used");
+			LOGGER.debug("Current device name is empty! nullDevice was used");
 		} else {
-			LOGGER.info("Current device name is '" + device.getName() + "'");
+			LOGGER.debug("Current device name is '" + device.getName() + "'");
 		}
 		return device;
 	}
