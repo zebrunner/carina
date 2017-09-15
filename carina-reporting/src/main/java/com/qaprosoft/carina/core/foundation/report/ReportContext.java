@@ -275,7 +275,7 @@ public class ReportContext
 	 * 
 	 * @return test log/screenshot folder.
 	 */
-	public static synchronized File getTestDir() {
+	public static File getTestDir() {
 		File testDir = testDirectory.get();
 		if (testDir == null) {
 			String uniqueDirName = UUID.randomUUID().toString();
@@ -302,7 +302,7 @@ public class ReportContext
 	 * 
 	 * @return test log/screenshot folder.
 	 */
-	public static synchronized File renameTestDir(String test) {
+	public static File renameTestDir(String test) {
 		File testDir = testDirectory.get();
 		if (testDir != null) {
 			// remove info about old directory to register new one for the next
