@@ -277,9 +277,10 @@ public class ReportContext
 	public static synchronized File getTestDir() {
 		File testDir = testDirectory.get();
 		if (testDir == null) {
-			//1st request for test dir. Just generate unique folder and return it
 			long uniqueDirName = System.currentTimeMillis();
 			String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
+			LOGGER.info("1st request for test dir. Just generate unique folder: " + directory);
+
 			testDir = new File(directory);
 			File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
 			
@@ -312,6 +313,8 @@ public class ReportContext
 						+ newTestDir.getAbsolutePath());
 			}
 			testDir.renameTo(newTestDir);
+		} else {
+			LOGGER.error("Unexpected case with absece of test.log for '" + test + "'" );
 		}
 		return testDir;
 	}
