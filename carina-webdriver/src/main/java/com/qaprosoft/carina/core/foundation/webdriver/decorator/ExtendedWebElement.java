@@ -145,7 +145,7 @@ public class ExtendedWebElement {
 		
 		LOGGER.debug("There is null WebElement object. Trying to find dynamic element using By: " + by.toString());
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(1);
+		setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			wait.until((Function<WebDriver, Object>) dr -> {
@@ -406,7 +406,7 @@ public class ExtendedWebElement {
         final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
@@ -475,7 +475,7 @@ public class ExtendedWebElement {
     public boolean clickIfPresent(long timeout) {
         boolean result;
         WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(timeout).isDisplayed());
@@ -976,7 +976,7 @@ public class ExtendedWebElement {
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         ExtendedWebElement element;
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
@@ -1010,7 +1010,7 @@ public class ExtendedWebElement {
         List<WebElement> webElements = new ArrayList<WebElement>();
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
@@ -1061,7 +1061,7 @@ public class ExtendedWebElement {
         LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
