@@ -15,20 +15,24 @@
  */
 package com.qaprosoft.carina.core.gui;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.WebDriver;
-
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import org.openqa.selenium.WebDriver;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.RectangleReadOnly;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * All page POJO objects should extend this abstract page to get extra logic.
@@ -92,21 +96,16 @@ public abstract class AbstractPage extends AbstractUIObject
 
 		// Define test screenshot root
 		String test = "";
-		if (TestNamingUtil.isTestNameRegistered())
-		{
+		if (TestNamingUtil.isTestNameRegistered()) {
 			test = TestNamingUtil.getTestNameByThread();
-		} else
-		{
+		} else {
 			test = TestNamingUtil.getCanonicTestNameByThread();
 		}
-
-		if (test == null || StringUtils.isEmpty(test))
-		{
-			LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
-			return null;
+		if (test == null || StringUtils.isEmpty(test)) {
+			test = "undefined";
 		}
-
-		File testRootDir = ReportContext.getTestDir(test);
+		
+		File testRootDir = ReportContext.getTestDir();
 		File artifactsFolder = ReportContext.getArtifactsFolder();
 
 		String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();

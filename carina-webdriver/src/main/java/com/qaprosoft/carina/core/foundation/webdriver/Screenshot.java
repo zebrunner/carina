@@ -291,13 +291,11 @@ public class Screenshot
 				} else {
 					test = TestNamingUtil.getCanonicTestNameByThread();
 				}
-
 				if (test == null || StringUtils.isEmpty(test)) {
-					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
-					return null;
+					test = "undefined";
 				}
 
-				File testScreenRootDir = ReportContext.getTestDir(test);
+				File testScreenRootDir = ReportContext.getTestDir();
 
 				// Capture full page screenshot and resize
 				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
@@ -448,7 +446,8 @@ public class Screenshot
 		}
 		// TODO: not good solution...
 		Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
-		String testName = ReportContext.getTestDir(test).getName();
+		
+		String testName = test.replaceAll("[^a-zA-Z0-9.-]", "_");
 		String key = runId + "/" + testName + "/" + screenName;
 		if (runId == -1)
 		{

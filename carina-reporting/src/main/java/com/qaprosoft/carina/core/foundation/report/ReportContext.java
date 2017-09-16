@@ -237,37 +237,6 @@ public class ReportContext
 		FileUtils.copyFile(source, artifact);
 	}
 
-	/**
-	 * Creates new screenshot directory at first call otherwise returns created
-	 * directory. Directory is specific for any new test launch.
-	 * 
-	 * @param test
-	 *            = name of test.
-	 * @return test screenshot folder.
-	 */
-	public static synchronized File getTestDir(String test)
-	{
-		if (test == null) {
-			test = "unknown";
-		}
-		String directory = String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_") + "-2");
-		File screenDir = new File(directory);
-		if (!screenDir.exists())
-		{
-			boolean isCreated = screenDir.mkdirs();
-			if (!isCreated)
-			{
-				throw new RuntimeException("Folder not created: " + screenDir.getAbsolutePath());
-			}
-			File thumbDir = new File(screenDir.getAbsolutePath() + "/thumbnails");
-			isCreated = thumbDir.mkdir();
-			if (!isCreated)
-			{
-				throw new RuntimeException("Folder not created: " + thumbDir.getAbsolutePath());
-			}
-		}
-		return screenDir;
-	}
 
 	/**
 	 * Creates new test directory at first call otherwise returns created
@@ -488,11 +457,13 @@ public class ReportContext
 	{
 		// TODO: find unified solution for screenshots presence determination. Combine it with AbstractTestListener->createTestResult code
 		String link = "";
-		if (FileUtils.listFiles(ReportContext.getTestDir(test), new String[] { "png" }, false).isEmpty()) {
+		if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
 			// no png screenshot files at all
 			return link;
 		}
 		
+		
+		//TODO: remove reference using "String test" argument
 		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
@@ -516,7 +487,7 @@ public class ReportContext
 	public static String getTestLogLink(String test)
 	{
 		String link = "";
-		File testLogFile = new File(ReportContext.getTestDir(test) + "/" + "test.log");
+		File testLogFile = new File(ReportContext.getTestDir() + "/" + "test.log");
 		if (!testLogFile.exists()) {
 			// no test.log file at all
 			return link;

@@ -157,6 +157,8 @@ public class ExtendedWebElement {
 				return false;
 			});
 			// summary.log(Messager.ELEMENT_FOUND.info(name));
+		} catch (TimeoutException e) {
+			//do nothing
 		} catch (Exception e) {
 			element = null;
 			// summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
