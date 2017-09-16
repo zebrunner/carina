@@ -411,7 +411,7 @@ public class ExtendedWebElement {
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | TimeoutException e) {
         	//don't write exception even in debug mode
         	result = false;
         } catch (Exception e) {
@@ -451,6 +451,8 @@ public class ExtendedWebElement {
                 try {
                 	element = findElement(timeout);
                     return element.isDisplayed() && element.getText().contains(decryptedText);
+                } catch (NoSuchElementException | TimeoutException e) {
+                	return false;
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage(), e.getCause());
                     return false;
@@ -482,6 +484,8 @@ public class ExtendedWebElement {
             String msg = Messager.ELEMENT_CLICKED.info(getName());
             summary.log(msg);
             result = true;
+        } catch (NoSuchElementException | TimeoutException e) {
+        	return false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             result = false;
@@ -1020,6 +1024,8 @@ public class ExtendedWebElement {
 
             });
             webElements = this.getElement().findElements(by);
+        } catch (NoSuchElementException | TimeoutException e) {
+        	//do nothing
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             //do nothing
