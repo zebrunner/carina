@@ -280,11 +280,14 @@ public class ReportContext
 			testDirectory.remove();
 			
 			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
-			if (newTestDir.exists()) {
+			/*if (newTestDir.exists()) {
 				throw new RuntimeException("Absolutely the same test log/screesnhot folder already exist: "
 						+ newTestDir.getAbsolutePath());
 			}
-			testDir.renameTo(newTestDir);
+			testDir.renameTo(newTestDir);*/
+			if (!newTestDir.exists()) {
+				testDir.renameTo(newTestDir);
+			}		
 		} else {
 			LOGGER.error("Unexpected case with absence of test.log for '" + test + "'" );
 		}
