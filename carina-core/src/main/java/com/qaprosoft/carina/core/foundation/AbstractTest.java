@@ -59,7 +59,6 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactor
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender2;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -290,12 +289,7 @@ public abstract class AbstractTest // extends DriverHelper
             try {
                 ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
                 if (tla != null) {
-                    tla.closeResource(test);
-                }
-                
-                ThreadLogAppender2 tla2 = (ThreadLogAppender2) Logger.getRootLogger().getAppender("ThreadLogAppender2");
-                if (tla2 != null) {
-                    tla2.close();
+                    tla.close();
                 }
 
             } catch (NoSuchMethodError e) {

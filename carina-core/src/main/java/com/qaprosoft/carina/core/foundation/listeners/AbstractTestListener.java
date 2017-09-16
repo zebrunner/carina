@@ -34,7 +34,6 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -363,7 +362,6 @@ public class AbstractTestListener extends TestArgsListener
 		} else
 		{
 			failItem(result, Messager.TEST_FAILED);
-			closeLogAppender(test);
 		}
 
 		// TestNamingUtil.releaseTestInfoByThread();
@@ -577,7 +575,7 @@ public class AbstractTestListener extends TestArgsListener
 			}
 		}
 
-		if (!FileUtils.listFiles(ReportContext.getTestDir(test), new String[]
+		if (!FileUtils.listFiles(ReportContext.getTestDir(), new String[]
 		{ "png" }, false).isEmpty())
 		{
 			if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS))
@@ -630,29 +628,6 @@ public class AbstractTestListener extends TestArgsListener
 			}
 		}
 		return stackTrace;
-	}
-
-	private void closeLogAppender(String test)
-	{
-		if (test == null) {
-			LOGGER.error("Unable to close appender for null test!");
-			return;
-		}
-		try
-		{
-			//TODO: [VD] do we really need to close ThreadLogAppender resources here!
-			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-			if (tla != null)
-			{
-				tla.closeResource(test);
-			}
-			
-			
-		} catch (Throwable e)
-		{
-			LOGGER.error("close log appender was not successful.");
-			e.printStackTrace();
-		}
 	}
 
 	private TestResultItem getConfigFailure()
