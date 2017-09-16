@@ -84,6 +84,10 @@ public class AbstractTestListener extends TestArgsListener
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 
 		TestNamingUtil.releaseTestInfoByThread();
+		
+        // rename unique testDir location using valid test name
+        ReportContext.renameTestDir(test);
+
 	}
 
 	private String failItem(ITestResult result, Messager messager)
@@ -115,6 +119,10 @@ public class AbstractTestListener extends TestArgsListener
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread();
+		
+        // rename unique testDir location using valid test name
+        ReportContext.renameTestDir(test);
+
 		return errorMessage;
 	}
 
@@ -197,6 +205,11 @@ public class AbstractTestListener extends TestArgsListener
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 		TestNamingUtil.releaseTestInfoByThread();
+		
+        // rename unique testDir location using valid test name
+        ReportContext.renameTestDir(test);
+
+        
 		return errorMessage;
 	}
 	
