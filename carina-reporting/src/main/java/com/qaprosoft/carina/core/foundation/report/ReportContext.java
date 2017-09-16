@@ -250,7 +250,7 @@ public class ReportContext
 		if (test == null) {
 			test = "unknown";
 		}
-		String directory = String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+		String directory = String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_") + "-2");
 		File screenDir = new File(directory);
 		if (!screenDir.exists())
 		{
@@ -310,7 +310,7 @@ public class ReportContext
 			// logged into the next test.log file 
 			testDirectory.remove();
 			
-			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test + "-2"));
+			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 			if (newTestDir.exists()) {
 				throw new RuntimeException("Absolutely the same test log/screesnhot folder already exist: "
 						+ newTestDir.getAbsolutePath());
