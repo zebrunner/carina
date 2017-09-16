@@ -295,9 +295,10 @@ public abstract class AbstractTest // extends DriverHelper
             } catch (NoSuchMethodError e) {
                 LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
             }
-            
-            // rename unique testDir location using valid test name
-            ReportContext.renameTestDir(test);
+
+            //TODO: moved to AbstractTestListener for testing
+//            // rename unique testDir location using valid test name
+//            ReportContext.renameTestDir(test);
 
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
