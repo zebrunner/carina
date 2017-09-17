@@ -1420,7 +1420,7 @@ public class DriverHelper {
 		if (driver != null) {
 			return driver;
 		}
-		LOGGER.error("Unable to find driver in DriverHelper without DriverPool!");
+		LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
 		
 		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {

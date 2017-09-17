@@ -86,7 +86,7 @@ public class ProcessBuilderExecutor {
 
     @Override
     protected void finalize() throws Throwable {
-        LOGGER.debug("finalize");
+        //LOGGER.debug("finalize");
         try {
             gc();
         } finally {
