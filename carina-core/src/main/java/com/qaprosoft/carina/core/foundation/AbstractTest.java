@@ -58,7 +58,6 @@ import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -236,6 +235,8 @@ public abstract class AbstractTest // extends DriverHelper
     public void executeAfterTestMethod(ITestResult result) {
 
         try {
+        	apiMethodBuilder.close();
+        	
             DriverMode driverMode = Configuration.getDriverMode();
 
             if (driverMode == DriverMode.METHOD_MODE) {
@@ -259,7 +260,6 @@ public abstract class AbstractTest // extends DriverHelper
                 return;
             }
 
-            String test = TestNamingUtil.getCanonicalTestName(result);
             List<String> tickets = Jira.getTickets(result);
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
             Jira.updateAfterTest(result);
@@ -284,15 +284,6 @@ public abstract class AbstractTest // extends DriverHelper
             Jira.clearTickets();
 
             Artifacts.clearArtifacts();
-
-            try {
-                ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-                if (tla != null) {
-                    tla.closeResource(test);
-                }
-            } catch (NoSuchMethodError e) {
-                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-            }
 
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
@@ -374,6 +365,8 @@ public abstract class AbstractTest // extends DriverHelper
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
+            
+            LOGGER.debug("Generating email report...");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
@@ -386,6 +379,7 @@ public abstract class AbstractTest // extends DriverHelper
                 default:
                     //do nothing
             }
+            LOGGER.debug("Finish email report generation.");
             
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());

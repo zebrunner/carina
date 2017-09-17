@@ -37,6 +37,7 @@ public class Device
 	private String seleniumServer;
 
 	private String testId;
+	private String remoteURL;
 	
 	private boolean isAppInstalled = false;
 	
@@ -75,8 +76,8 @@ public class Device
 		this.osVersion = osVersion;
 		this.udid = udid;
 		this.seleniumServer = seleniumServer;
-	}
 
+	}
 
 	public String getName()
 	{
@@ -126,6 +127,14 @@ public class Device
 	public void setSeleniumServer(String seleniumServer)
 	{
 		this.seleniumServer = seleniumServer;
+	}
+	
+	public String getRemoteURL() {
+		return remoteURL;
+	}
+
+	public void setRemoteURL(String remoteURL) {
+		this.remoteURL = remoteURL;
 	}
 
 	public boolean isPhone()
@@ -185,6 +194,34 @@ public class Device
 		return name.isEmpty() || seleniumServer.isEmpty();
 	}
 
+	public void connectRemote() {
+		if (isNull())
+			return;
+
+		LOGGER.info("adb connect " + getRemoteURL());
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
+		executor.execute(cmd);
+		pause(1);
+		
+		String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
+		executor.execute(cmd2);
+		
+		//TODO: add several attempt of connect until device appear among connected devices
+		// quick workaround to do double connect...
+		executor.execute(cmd);
+		executor.execute(cmd2);
+	}
+	
+	public void disconnectRemote() {
+		if (isNull())
+			return;
+
+		LOGGER.info("adb disconnect " + getRemoteURL());
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
+		executor.execute(cmd);
+	}
+	
+	
     public int startRecording(String pathToFile) {
         if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
             return -1;
@@ -195,7 +232,7 @@ public class Device
         
         dropFile(pathToFile);
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "screenrecord", "--bit-rate", "1000000", "--verbose", pathToFile);
 
         try {
             ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
@@ -222,7 +259,7 @@ public class Device
         if (this.isNull())
         	return;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "rm", pathToFile);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "rm", pathToFile);
         executor.execute(cmd);
     }
     
@@ -246,7 +283,7 @@ public class Device
     }
     
     public List<String> getInstalledPackages() {
-        String deviceUdid = getUdid();
+        String deviceUdid = getAdbName();
         LOGGER.info("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list", "packages");
         LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
@@ -262,7 +299,7 @@ public class Device
         if (isNull())
         	return;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "pull", pathFrom, pathTo);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "pull", pathFrom, pathTo);
         executor.execute(cmd);
     }
     
@@ -271,7 +308,7 @@ public class Device
     private Boolean getScreenState() {
         // determine current screen status
         // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "dumpsys",
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys",
                 "input_method");
         List<String> output = executor.execute(cmd);
 
@@ -327,7 +364,7 @@ public class Device
             return;
         }
         if (screenState) {
-			String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "input",
+			String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "input",
 					"keyevent", "26");
             executor.execute(cmd);
 
@@ -363,7 +400,7 @@ public class Device
         }
 
         if (!screenState) {
-            String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell",
+            String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell",
                     "input", "keyevent", "26");
             executor.execute(cmd);
 
@@ -385,7 +422,7 @@ public class Device
 		if (isNull())
 			return;
 
-		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "input",
+		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "input",
 				"keyevent", String.valueOf(key));
 		executor.execute(cmd);
 	}
@@ -416,7 +453,7 @@ public class Device
         //adb -s UDID shell pm clear com.myfitnesspal.android
         String packageName = getApkPackageName(app);
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "pm", "clear", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "pm", "clear", packageName);
         executor.execute(cmd);
     }
     
@@ -426,10 +463,12 @@ public class Device
         // output:
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
 
+        String packageName = "";
+        
         String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
         List<String> output = executor.execute(cmd);
         // parse output command and get appropriate data
-        String packageName = "";
+
 
         for (String line : output) {
             if (line.contains("versionCode") && line.contains("versionName")) {
@@ -447,7 +486,7 @@ public class Device
         	return;
 
         //adb -s UDID uninstall com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "uninstall", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "uninstall", packageName);
         executor.execute(cmd);
     }
 
@@ -456,7 +495,7 @@ public class Device
         	return;
 
         //adb -s UDID install com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", apkPath);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "install", "-r", apkPath);
         executor.execute(cmd);
     }
 
@@ -465,7 +504,7 @@ public class Device
         	return;
 
         //adb -s UDID install com.myfitnesspal.android
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "install", "-r", apkPath);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "install", "-r", apkPath);
         executor.execute(cmd);
     }
     
@@ -531,7 +570,7 @@ public class Device
         String[] res = new String[3];
         res[0] = packageName;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getUdid(), "shell", "dumpsys", "package", packageName);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys", "package", packageName);
         List<String> output = executor.execute(cmd);
 
 
@@ -565,10 +604,15 @@ public class Device
         // output:
         // package: name='com.myfitnesspal.android' versionCode='9025' versionName='develop-QA' platformBuildVersionName='6.0-2704002'
 
+        String[] res = new String[3];
+        res[0] = "";
+        res[1] = "";
+        res[2] = "";
+        
         String[] cmd = CmdLine.insertCommandsAfter("aapt dump badging".split(" "), apkFile);
         List<String> output = executor.execute(cmd);
         // parse output command and get appropriate data
-        String[] res = new String[3];
+
 
         for (String line : output) {
             if (line.contains("versionCode") && line.contains("versionName")) {
@@ -647,7 +691,7 @@ public class Device
             downloadFileFromJar(SpecialKeywords.PROXY_SETTER_RES_PATH, targetFile);
             installApp(proxySetterFileName);
         }
-        String deviceUdid = getUdid();
+        String deviceUdid = getAdbName();
         LOGGER.info("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "am", "start", "-n",
                 "tk.elevenk.proxysetter/.MainActivity", "-e", "host", host, "-e", "port", port, "-e", "ssid", ssid, "-e", "key", password);
@@ -663,4 +707,13 @@ public class Device
             LOGGER.error("Error during copying of file from the resources. ".concat(e.getMessage()));
         }
     }
+    
+    public String getAdbName() {
+    	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
+    		return remoteURL;
+    	} else {
+    		return udid;
+    	}
+    }
+
 }

@@ -5,53 +5,43 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
  *  This appender logs groups test outputs by test method so they don't mess up each other even they runs in parallel.
  */
 public class ThreadLogAppender extends AppenderSkeleton
 {
-	private final ConcurrentHashMap<String, BufferedWriter> test2file = new ConcurrentHashMap<String, BufferedWriter>();
+	//single buffer for each thread test.log file 
+	private final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<BufferedWriter> (); 
+
 
 	@Override
 	public synchronized void append(LoggingEvent event)
 	{
-		if (!ReportContext.isBaseDireCreated()) {
+		//TODO: [VD] OBLIGATORY double check and create separate unit test for this case
+/*		if (!ReportContext.isBaseDireCreated()) {
 			System.out.println(event.getMessage().toString());
 			return;
-		}
+		}*/
+		
 		try
 		{
-			String test = "";
-			if (TestNamingUtil.isTestNameRegistered()) {
-				test = TestNamingUtil.getTestNameByThread();
-			} else {
-				test = TestNamingUtil.getCanonicTestNameByThread();
+			
+			BufferedWriter fw = testLogBuffer.get();
+			if (fw == null) {
+				// 1st request to log something for this thread/test
+			    File testLogFile = new File(ReportContext.getTestDir() + "/test.log");
+				if (!testLogFile.exists())
+					testLogFile.createNewFile();
+				fw = new BufferedWriter(new FileWriter(testLogFile, true));
+				testLogBuffer.set(fw);
 			}
 
-			if (test == null || StringUtils.isEmpty(test)) {
-				System.out.println(event.getMessage().toString());
-				//don't write any message into the log if thread is not associated anymore with test
-				return;
-			}
-			
-			BufferedWriter fw = test2file.get(test);
-			if (fw == null)
-			{
-			    File testLogFile = new File(ReportContext.getTestDir(test) + "/test.log");
-			    if (!testLogFile.exists()) testLogFile.createNewFile();
-				fw = new BufferedWriter(new FileWriter(testLogFile));
-				test2file.put(test, fw);
-			}
 			if (event != null) {
 				//append time, thread, class name and device name if any
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //2016-05-26 04:39:16
@@ -67,7 +57,9 @@ public class ThreadLogAppender extends AppenderSkeleton
 				
 				
 
-				String deviceName = DevicePool.getDevice().getName();
+				// TODO: review and implement valid device name logging
+				// String deviceName = DevicePool.getDevice().getName();
+				String deviceName = "";
 				if (!deviceName.isEmpty()) {
 					deviceName = " [" + deviceName + "] ";
 				}
@@ -89,31 +81,20 @@ public class ThreadLogAppender extends AppenderSkeleton
 		
 	}
 	
-	public void closeResource(String test)
+	@Override
+	public void close()
 	{
 		try
 		{
-			if (test2file.get(test) != null) {
-				test2file.get(test).close();
-				test2file.remove(test);
+			BufferedWriter fw = testLogBuffer.get();
+			if (fw != null) {
+				fw.close();
+				testLogBuffer.remove();
 			}
 		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	public void closeResources()
-	{
-		for(String test : test2file.keySet())
-		{
-			closeResource(test);
-		}
-	}
-	
-	@Override
-	public void close()
-	{
 	}
 
 	@Override

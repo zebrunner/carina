@@ -196,7 +196,6 @@ public class Screenshot
 	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)
 	{
 		return capture(driver, isTakeScreenshot, comment, false);
-
 	}
 	
 	
@@ -280,23 +279,12 @@ public class Screenshot
 
 			try {
 				// Define test screenshot root
-				String test = "";
-				if (TestNamingUtil.isTestNameRegistered()) {
-					test = TestNamingUtil.getTestNameByThread();
-				} else {
-					test = TestNamingUtil.getCanonicTestNameByThread();
-				}
-
-				if (test == null || StringUtils.isEmpty(test)) {
-					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
-					return null;
-				}
-
-				File testScreenRootDir = ReportContext.getTestDir(test);
+				File testScreenRootDir = ReportContext.getTestDir();
 
 				// Capture full page screenshot and resize
-				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
-				screenName = fileID + ".png";
+				//TODO: implement naming strategy for screenshots wihtout test names
+				//String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+				screenName = System.currentTimeMillis() + ".png";
 				String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
 				WebDriver augmentedDriver = driver;
@@ -329,8 +317,20 @@ public class Screenshot
 				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
+				
 				// Uploading screenshot to Amazon S3
+				
+				// TODO: Move upload to S3 into the async calls closer to the end of test to upload whole bundle
+				// Also investigate possibility to remove rederence onto the test name
+				String test = "";
+				if (TestNamingUtil.isTestNameRegistered()) {
+					test = TestNamingUtil.getTestNameByThread();
+				} else {
+					test = TestNamingUtil.getCanonicTestNameByThread();
+				}
+				if (test == null || StringUtils.isEmpty(test)) {
+					test = "undefined";
+				}
 				uploadToAmazonS3(test, screenPath, screenName, comment);
 
 				// add screenshot comment to collector
@@ -354,7 +354,8 @@ public class Screenshot
 		}
 		// TODO: not good solution...
 		Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
-		String testName = ReportContext.getTestDir(test).getName();
+		
+		String testName = test.replaceAll("[^a-zA-Z0-9.-]", "_");
 		String key = runId + "/" + testName + "/" + screenName;
 		if (runId == -1)
 		{

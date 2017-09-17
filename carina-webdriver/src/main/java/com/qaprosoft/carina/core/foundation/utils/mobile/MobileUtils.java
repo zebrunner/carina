@@ -1,17 +1,17 @@
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
+import org.apache.log4j.Logger;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
+
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
 
-import org.apache.log4j.Logger;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
+import io.appium.java_client.AppiumDriver;
 
 public class MobileUtils {
     protected static final Logger LOGGER = Logger.getLogger(MobileUtils.class);

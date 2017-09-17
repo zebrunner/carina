@@ -17,6 +17,8 @@ import com.pubnub.api.PubnubException;
 import com.qaprosoft.carina.core.foundation.grid.GridRequest.Operation;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /**
  * DeviceGrid communicates over PubNub with grid queue and provides connect/diconnect device functionality.
@@ -48,9 +50,9 @@ public class DeviceGrid
 	 *            - unique test id generated bu UUID
 	 * @param deviceModels
 	 *            - list of possible devices to get from STF
-	 * @return device udid
+	 * @return Device object
 	 */
-	public static String connectDevice(String testId, List<String> deviceModels)
+	public static Device connectDevice(String testId, List<String> deviceModels)
 	{
 		Pubnub punub = new Pubnub(PKEY, SKEY);
 		GridCallback gridCallback = new GridCallback(testId);
@@ -82,8 +84,14 @@ public class DeviceGrid
 		{
 			punub.unsubscribeAll();
 		}
-
-		return gridCallback.getUdid();
+		String udid = gridCallback.getUdid();
+		String remoteURL = gridCallback.getRemoteURL();
+		
+		Device device = DevicePool.findDevice(udid);
+		// init remoteURL value using dynamic data from STF
+		device.setRemoteURL(remoteURL);
+		
+		return device;
 	}
 
 	/**
@@ -143,6 +151,7 @@ public class DeviceGrid
 	{
 		private String udid;
 		private String testId;
+		private String remoteURL;
 
 		public GridCallback(String testId)
 		{
@@ -162,6 +171,7 @@ public class DeviceGrid
 					if (rs.isConnected())
 					{
 						udid = rs.getSerial();
+						remoteURL = rs.getRemoteConnectURL();
 // 						TODO: implement event logging
 //						ZafiraIntegrator.markEventReceived(new EventType(Type.CONNECT_DEVICE, GRID_SESSION_ID, testId));
 						LOGGER.info("Device found in grid by UDID: " + udid);
@@ -177,6 +187,12 @@ public class DeviceGrid
 		{
 			return udid;
 		}
+
+		public String getRemoteURL() 
+		{
+			return remoteURL;
+		}
+		
 	}
 
 	private static JSONObject toJsonObject(Object object)
