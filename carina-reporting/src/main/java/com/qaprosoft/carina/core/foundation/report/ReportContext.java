@@ -483,6 +483,7 @@ public class ReportContext
 	 * @param test test name
 	 * @return - URL to test log folder.
 	 */
+	//TODO: refactor removing "test" argument
 	public static String getTestLogLink(String test)
 	{
 		String link = "";
@@ -512,6 +513,7 @@ public class ReportContext
 	 * @param test test name
 	 * @return - URL to test log folder.
 	 */
+	// TODO: refactor removing "test" argument
 	public static String getTestVideoLink(String test)
 	{
 		String link = "";
@@ -585,25 +587,4 @@ public class ReportContext
 		return link;
 	}
 
-/*	private static void appendTestLogArtifacts(File sourceFolder, File targetFolder)
-	{
-		try
-		{
-			// Lists all files in folder
-			File fList[] = sourceFolder.listFiles();
-			for (int i = 0; i < fList.length; i++) {
-				if (fList[i].getName().equalsIgnoreCase("test.log")) {
-					// append test.log content if any
-					
-					continue;
-				}
-				File targetFile = new File(targetFolder.getAbsoluteFile() + "/" + fList[i].getName());
-		        fList[i].renameTo(targetFile);
-			}
-		}
-		catch (Exception e)
-		{
-			LOGGER.error("Exception discovered during test log/screenshot artifacts move! " + e);
-		}
-	}*/
 }
