@@ -34,7 +34,6 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -227,10 +226,6 @@ public class AbstractTestListener extends TestArgsListener
 	private void afterTest(ITestResult result) {
 		//register configuration step as test artifact
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		
-		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
-		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));
-		
 		ReportContext.renameTestDir(test);
 		TestNamingUtil.releaseTestInfoByThread();
 	}
