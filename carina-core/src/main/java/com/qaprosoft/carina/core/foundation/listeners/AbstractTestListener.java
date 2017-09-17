@@ -83,7 +83,6 @@ public class AbstractTestListener extends TestArgsListener
 				.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 
-		TestNamingUtil.releaseTestInfoByThread();
 	}
 
 	private String failItem(ITestResult result, Messager messager)
@@ -114,7 +113,6 @@ public class AbstractTestListener extends TestArgsListener
 		}
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
 
@@ -131,7 +129,6 @@ public class AbstractTestListener extends TestArgsListener
 		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
 
@@ -196,7 +193,6 @@ public class AbstractTestListener extends TestArgsListener
 				.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
 	
@@ -221,6 +217,14 @@ public class AbstractTestListener extends TestArgsListener
 	}
 	
 	private void afterConfiguration(ITestResult result) {
+/*		//register configuration step as test artifact
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
+		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));*/
+		TestNamingUtil.releaseTestInfoByThread();
+	}
+	
+	private void afterTest(ITestResult result) {
 		//register configuration step as test artifact
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
@@ -335,6 +339,7 @@ public class AbstractTestListener extends TestArgsListener
 		passItem(result, Messager.TEST_PASSED);
 
 		// TestNamingUtil.releaseTestInfoByThread();
+		afterTest(result);
 		super.onTestSuccess(result);
 	}
 
@@ -365,6 +370,7 @@ public class AbstractTestListener extends TestArgsListener
 		}
 
 		// TestNamingUtil.releaseTestInfoByThread();
+		afterTest(result);
 		super.onTestFailure(result);
 	}
 
@@ -390,7 +396,7 @@ public class AbstractTestListener extends TestArgsListener
 		}
 
 		skipItem(result, Messager.TEST_SKIPPED);
-		// TestNamingUtil.releaseTestInfoByThread();
+		afterTest(result);
 		super.onTestSkipped(result);
 	}
 
