@@ -39,6 +39,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
+/*
+ 	Be careful with LOGGER usage here because potentially it could do recursive call together with ThreadLogAppender functionality
+ */
 
 public class ReportContext
 {
@@ -104,7 +107,7 @@ public class ReportContext
 		return baseDirectory;
 	}
 	
-	public static boolean isBaseDireCreated() {
+	public static boolean isBaseDirCreated() {
 		return baseDirectory != null;
 	}
 	public static synchronized File getTempDir()
@@ -251,7 +254,7 @@ public class ReportContext
 			String uniqueDirName = UUID.randomUUID().toString();
 			
 			String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
-			System.out.println("1st request for test dir. Just generate unique folder: " + directory);
+			//System.out.println("First request for test dir. Just generate unique folder: " + directory);
 
 			testDir = new File(directory);
 			File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
@@ -316,7 +319,6 @@ public class ReportContext
 			//remove old emailable report
 			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
-			// if file doesnt exists, then create it
 			if (reportFile.exists()) {
 				reportFile.delete();
 			}
@@ -355,44 +357,31 @@ public class ReportContext
 					}
 					catch (IOException e)
 					{
-						LOGGER.error(e.getMessage());
+						LOGGER.error(e.getMessage(), e);
 					}
 				}
 			}
 		}
 	}
 
-	public static void removeTestReport(String test)
-	{
-		try
-		{
-			File toDelete = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-			FileUtils.deleteDirectory(toDelete);
-		}
-		catch (IOException e)
-		{
-			LOGGER.error(e.getMessage());
-		}
-	}
-	
-	public static void removeTestScreenshots(String test)
+	public static void removeTestScreenshots()
 	{
 		try
 		{
 			// Lists all files in folder
-			File parentFolder = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			File parentFolder = ReportContext.getTestDir();
 			File fList[] = parentFolder.listFiles();
 			for (int i = 0; i < fList.length; i++) {
 			    if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".mp4") || fList[i].getName().endsWith(".html")) {
 			        fList[i].delete();
 			    }
 			}
-			File thumbnailsFolder = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_") + "/thumbnails");
-			thumbnailsFolder.delete();
+			File thumbnailsFolder = new File(parentFolder.getAbsoluteFile() + "/thumbnails");
+			FileUtils.deleteDirectory(thumbnailsFolder);
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Exception discovered during screenshots/video removing! " + e.getMessage());
+			LOGGER.error("Exception discovered during screenshots/video removing! " + e);
 		}
 	}
 	

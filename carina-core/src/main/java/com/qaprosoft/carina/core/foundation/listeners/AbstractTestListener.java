@@ -227,10 +227,11 @@ public class AbstractTestListener extends TestArgsListener
 	private void afterTest(ITestResult result) {
 		//register configuration step as test artifact
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		ReportContext.renameTestDir(test);
 		
 		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
 		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));
+		
+		ReportContext.renameTestDir(test);
 		TestNamingUtil.releaseTestInfoByThread();
 	}
 
@@ -588,7 +589,7 @@ public class AbstractTestListener extends TestArgsListener
 			{
 				// remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve
 				// cooperation with CI tools
-				ReportContext.removeTestScreenshots(test);
+				ReportContext.removeTestScreenshots();
 			} else
 			{
 				linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
