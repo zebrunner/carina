@@ -27,16 +27,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
+/*
+ 	Be careful with LOGGER usage here because potentially it could do recursive call together with ThreadLogAppender functionality
+ */
 
 public class ReportContext
 {
@@ -55,6 +60,8 @@ public class ReportContext
 	private static File metaDataDirectory;
 	
 	private static long rootID;
+	
+	private static final ThreadLocal<File> testDirectory = new ThreadLocal<File> ();
 
 	public static long getRootID() {
 		return rootID;
@@ -100,7 +107,7 @@ public class ReportContext
 		return baseDirectory;
 	}
 	
-	public static boolean isBaseDireCreated() {
+	public static boolean isBaseDirCreated() {
 		return baseDirectory != null;
 	}
 	public static synchronized File getTempDir()
@@ -234,37 +241,69 @@ public class ReportContext
 		FileUtils.copyFile(source, artifact);
 	}
 
+
 	/**
-	 * Crates new screenshot directory at first call otherwise returns created
+	 * Creates new test directory at first call otherwise returns created
 	 * directory. Directory is specific for any new test launch.
 	 * 
-	 * @param test
-	 *            = name of test.
-	 * @return test screenshot folder.
+	 * @return test log/screenshot folder.
 	 */
-	public static synchronized File getTestDir(String test)
-	{
-		if (test == null) {
-			test = "unknown";
-		}
-		String directory = String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-		File screenDir = new File(directory);
-		if (!screenDir.exists())
-		{
-			boolean isCreated = screenDir.mkdirs();
-			if (!isCreated)
+	public static File getTestDir() {
+		File testDir = testDirectory.get();
+		if (testDir == null) {
+			String uniqueDirName = UUID.randomUUID().toString();
+			
+			String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
+			//System.out.println("First request for test dir. Just generate unique folder: " + directory);
+
+			testDir = new File(directory);
+			File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
+			
+			if (!thumbDir.mkdirs())
 			{
-				throw new RuntimeException("Folder not created: " + screenDir.getAbsolutePath());
-			}
-			File thumbDir = new File(screenDir.getAbsolutePath() + "/thumbnails");
-			isCreated = thumbDir.mkdir();
-			if (!isCreated)
-			{
-				throw new RuntimeException("Folder not created: " + thumbDir.getAbsolutePath());
+				throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath() + " and/or " + thumbDir.getAbsolutePath());
 			}
 		}
-		return screenDir;
+		
+		testDirectory.set(testDir);
+		return testDir;
 	}
+	
+	/**
+	 * Rename test directory from unique number to valid human readable content
+	 * using test method name. 
+	 * 
+	 * @return test log/screenshot folder.
+	 */
+	public static File renameTestDir(String test) {
+		File testDir = testDirectory.get();
+		if (testDir != null) {
+			// remove info about old directory to register new one for the next
+			// test. Extra after method/class/suite custom messages will be
+			// logged into the next test.log file 
+			testDirectory.remove();
+			
+			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
+
+			if (!newTestDir.exists()) {
+				// close ThreadLogAppender resources before renaming
+	            try {
+	                ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+	                if (tla != null) {
+	                    tla.close();
+	                }
+
+	            } catch (NoSuchMethodError e) {
+	                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
+	            }
+				testDir.renameTo(newTestDir);
+			}
+		} else {
+			LOGGER.error("Unexpected case with absence of test.log for '" + test + "'" );
+		}
+		return testDir;
+	}
+	
 
 	/**
 	 * Removes emailable html report and oldest screenshots directories according to history size defined
@@ -280,7 +319,6 @@ public class ReportContext
 			//remove old emailable report
 			File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
 					Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), SpecialKeywords.HTML_REPORT));
-			// if file doesnt exists, then create it
 			if (reportFile.exists()) {
 				reportFile.delete();
 			}
@@ -319,44 +357,31 @@ public class ReportContext
 					}
 					catch (IOException e)
 					{
-						LOGGER.error(e.getMessage());
+						LOGGER.error(e.getMessage(), e);
 					}
 				}
 			}
 		}
 	}
 
-	public static void removeTestReport(String test)
-	{
-		try
-		{
-			File toDelete = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-			FileUtils.deleteDirectory(toDelete);
-		}
-		catch (IOException e)
-		{
-			LOGGER.error(e.getMessage());
-		}
-	}
-	
-	public static void removeTestScreenshots(String test)
+	public static void removeTestScreenshots()
 	{
 		try
 		{
 			// Lists all files in folder
-			File parentFolder = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+			File parentFolder = ReportContext.getTestDir();
 			File fList[] = parentFolder.listFiles();
 			for (int i = 0; i < fList.length; i++) {
 			    if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".mp4") || fList[i].getName().endsWith(".html")) {
 			        fList[i].delete();
 			    }
 			}
-			File thumbnailsFolder = new File(ReportContext.getBaseDir() + "/" + test.replaceAll("[^a-zA-Z0-9.-]", "_") + "/thumbnails");
-			thumbnailsFolder.delete();
+			File thumbnailsFolder = new File(parentFolder.getAbsoluteFile() + "/thumbnails");
+			FileUtils.deleteDirectory(thumbnailsFolder);
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Exception discovered during screenshots/video removing! " + e.getMessage());
+			LOGGER.error("Exception discovered during screenshots/video removing! " + e);
 		}
 	}
 	
@@ -431,11 +456,13 @@ public class ReportContext
 	{
 		// TODO: find unified solution for screenshots presence determination. Combine it with AbstractTestListener->createTestResult code
 		String link = "";
-		if (FileUtils.listFiles(ReportContext.getTestDir(test), new String[] { "png" }, false).isEmpty()) {
+		if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
 			// no png screenshot files at all
 			return link;
 		}
 		
+		
+		//TODO: remove reference using "String test" argument
 		if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
 			//remove report url and make link relative
 			//link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
@@ -456,10 +483,11 @@ public class ReportContext
 	 * @param test test name
 	 * @return - URL to test log folder.
 	 */
+	//TODO: refactor removing "test" argument
 	public static String getTestLogLink(String test)
 	{
 		String link = "";
-		File testLogFile = new File(ReportContext.getTestDir(test) + "/" + "test.log");
+		File testLogFile = new File(ReportContext.getTestDir() + "/" + "test.log");
 		if (!testLogFile.exists()) {
 			// no test.log file at all
 			return link;
@@ -485,6 +513,7 @@ public class ReportContext
 	 * @param test test name
 	 * @return - URL to test log folder.
 	 */
+	// TODO: refactor removing "test" argument
 	public static String getTestVideoLink(String test)
 	{
 		String link = "";

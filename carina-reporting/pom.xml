@@ -25,7 +25,7 @@
 		<target.version>1.8</target.version>
 
 		<javax-mail.version>1.4</javax-mail.version>
-		<zafira-client.version>3.0.6</zafira-client.version>
+		<zafira-client.version>3.0.16</zafira-client.version>
 		<monte-repack.version>1.0</monte-repack.version>
 		<json-simple.version>1.1</json-simple.version>
 

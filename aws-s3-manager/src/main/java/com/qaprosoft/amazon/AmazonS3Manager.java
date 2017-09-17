@@ -307,7 +307,7 @@ public class AmazonS3Manager {
 	 * @param file (local file name)
 	 */
 	public void download(final String bucketName, final String key, final File file) {
-		download(bucketName, key, file, 30);
+		download(bucketName, key, file, 10);
 	}
 	/**
 	 * Method to download file from s3 to local file system

@@ -49,6 +49,8 @@ public class DevicePool
 	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
 
 	private static final Device nullDevice = new Device("", "", "", "", "", "");
+	
+	private static ThreadLocal<Device> curDevice = new ThreadLocal<Device>();
 
 	protected static synchronized void addDevice()
 	{
@@ -172,6 +174,70 @@ public class DevicePool
 			R.CONFIG.put(Parameter.MOBILE_DEVICE_TYPE.getKey(), device.getType().toString());
 		}
 	}
+	
+	public static Device findDevice(String udid) {
+		LOGGER.info("Looking for device with udid: " + udid);
+		if (StringUtils.isEmpty(udid)) {
+			throw new RuntimeException(String.format("Unable to find device from pool using empty udid!"));
+		}
+
+		Device freeDevice = nullDevice;
+		for (Device device : DEVICES)
+		{
+			if (device.getUdid().equalsIgnoreCase(udid))
+			{
+				if (THREAD_2_DEVICE_MAP.containsValue(device))
+				{
+					String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
+					device.disconnectRemote();
+					DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
+					throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
+				}
+				freeDevice = device;
+				break;
+			}
+		}
+		if (freeDevice == nullDevice) {
+			// TODO: improve loggers about device type, family etc
+			String allModels = StringUtils.join(DEVICE_MODELS, "+");
+			String msg = "Not found free device among %s devices!";
+			throw new RuntimeException(String.format(msg, allModels));
+		}
+		return freeDevice;
+	}
+	
+	private static Device findDevice() {
+		Device freeDevice = nullDevice;
+		int count = 0;
+		boolean found = false;
+		while (++count < 100 && !found)
+		{
+			for (Device device : DEVICES)
+			{
+				if (!THREAD_2_DEVICE_MAP.containsValue(device))
+				{
+					// current thread doesn't have ignored devices
+					freeDevice = device;
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
+			}
+		}
+		
+		if (freeDevice == nullDevice) {
+			// TODO: improve loggers about device type, family etc
+			String allModels = StringUtils.join(DEVICE_MODELS, "+");
+			String msg = "Not found free device among %s devices for "
+					+ Configuration.getInt(Parameter.INIT_RETRY_INTERVAL) * count + " seconds!";
+			throw new RuntimeException(String.format(msg, allModels));
+		}
+		
+		return freeDevice;
+	}
 
 	public static Device registerDevice()
 	{
@@ -189,51 +255,20 @@ public class DevicePool
 			String allModels = StringUtils.join(DEVICE_MODELS, "+");
 			LOGGER.info(
 					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
-			final String udid = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
-			if (!StringUtils.isEmpty(udid))
-			{
-				for (Device device : DEVICES)
-				{
-					if (device.getUdid().equalsIgnoreCase(udid))
-					{
-						if (THREAD_2_DEVICE_MAP.containsValue(device))
-						{
-							String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
-							DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
-							throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
-						}
-						device.setTestId(testId);
-						freeDevice = device;
-						break;
-					}
-				}
+
+			freeDevice = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
+			//TODO: remove if operator and MOBILE_STF_DOCKER_CONTAINER property whe all clients moved to the dockerized cloud solution
+			if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
+				freeDevice.connectRemote();
 			}
 		} else
 		{
-			int count = 0;
-			boolean found = false;
-			while (++count < 100 && !found)
-			{
-				for (Device device : DEVICES)
-				{
-					if (!THREAD_2_DEVICE_MAP.containsValue(device))
-					{
-						// current thread doesn't have ignored devices
-						device.setTestId(testId);
-						freeDevice = device;
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-				{
-					pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
-				}
-			}
+			freeDevice = findDevice();
 		}
 
 		if (freeDevice != nullDevice)
 		{
+			freeDevice.setTestId(testId);
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
 			String msg = "found device %s-%s for test %s";
 			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid(), testId));
@@ -245,6 +280,8 @@ public class DevicePool
 			throw new RuntimeException(String.format(msg, allModels));
 		}
 
+		//register current device to be able to transfer it into Zafira at the end of the test
+		setCurrentDevice(freeDevice); 
 		return freeDevice;
 
 	}
@@ -288,6 +325,8 @@ public class DevicePool
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
 			if (GRID_ENABLED)
 			{
+				// no need to disconnect as closing STF session automatically disconnect adb session for this device 
+				//device.disconnectRemote();
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
@@ -394,4 +433,23 @@ public class DevicePool
 			e.printStackTrace();
 		}
 	}
+	
+	private static void setCurrentDevice(Device device) {
+		LOGGER.info("Set current device to '" + device.getName() + "'");
+		curDevice.set(device);
+	}
+	
+	public static Device getCurrentDevice() {
+		Device device = curDevice.get();
+		if (device == null) {
+			LOGGER.debug("Current device is null!");
+			device = nullDevice;
+		} else if (device.getName().isEmpty()) {
+			LOGGER.debug("Current device name is empty! nullDevice was used");
+		} else {
+			LOGGER.debug("Current device name is '" + device.getName() + "'");
+		}
+		return device;
+	}
+
 }

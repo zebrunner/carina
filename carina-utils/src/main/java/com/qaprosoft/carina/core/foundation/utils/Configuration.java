@@ -264,6 +264,8 @@ public class Configuration
 		
 		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout"),
 		
+		MOBILE_STF_DOCKER_CONTAINER("mobile_stf_docker_container"),
+		
 		MOBILE_DEVICES("mobile_devices"),
 		
 		MOBILE_TOOLS_HOME("mobile_tools_home"),
