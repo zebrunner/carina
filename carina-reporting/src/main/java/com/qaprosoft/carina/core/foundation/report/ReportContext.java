@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
@@ -280,32 +281,19 @@ public class ReportContext
 			testDirectory.remove();
 			
 			File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
-			/*if (newTestDir.exists()) {
-				throw new RuntimeException("Absolutely the same test log/screesnhot folder already exist: "
-						+ newTestDir.getAbsolutePath());
-			}
-			testDir.renameTo(newTestDir);*/
-			boolean renamed = false;
+
 			if (!newTestDir.exists()) {
+				// close ThreadLogAppender resources before renaming
+	            try {
+	                ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+	                if (tla != null) {
+	                    tla.close();
+	                }
+
+	            } catch (NoSuchMethodError e) {
+	                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
+	            }
 				testDir.renameTo(newTestDir);
-				renamed = true;
-			} else {
-				// create secondary folder "name-2" etc for the same names
-				int maxCount = Configuration.getInt(Parameter.RETRY_COUNT);
-				for (int i = 1; i < maxCount; i++) {
-					newTestDir = new File(
-							String.format("%s/%s-%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_"), i));
-					if (!newTestDir.exists()) {
-						testDir.renameTo(newTestDir);
-						renamed = true;
-					} else {
-						LOGGER.warn("Test log/screenshot directory already exist: " + newTestDir.getAbsolutePath());
-					}
-				}
-				if (!renamed) {
-					throw new RuntimeException("Test log directory was not created even with retry logic: "
-							+ newTestDir.getAbsolutePath());
-				}
 			}
 		} else {
 			LOGGER.error("Unexpected case with absence of test.log for '" + test + "'" );
@@ -608,4 +596,25 @@ public class ReportContext
 		return link;
 	}
 
+/*	private static void appendTestLogArtifacts(File sourceFolder, File targetFolder)
+	{
+		try
+		{
+			// Lists all files in folder
+			File fList[] = sourceFolder.listFiles();
+			for (int i = 0; i < fList.length; i++) {
+				if (fList[i].getName().equalsIgnoreCase("test.log")) {
+					// append test.log content if any
+					
+					continue;
+				}
+				File targetFile = new File(targetFolder.getAbsoluteFile() + "/" + fList[i].getName());
+		        fList[i].renameTo(targetFile);
+			}
+		}
+		catch (Exception e)
+		{
+			LOGGER.error("Exception discovered during test log/screenshot artifacts move! " + e);
+		}
+	}*/
 }

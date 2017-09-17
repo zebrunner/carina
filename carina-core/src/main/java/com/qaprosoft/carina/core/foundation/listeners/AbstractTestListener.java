@@ -227,6 +227,8 @@ public class AbstractTestListener extends TestArgsListener
 	private void afterTest(ITestResult result) {
 		//register configuration step as test artifact
 		String test = TestNamingUtil.getCanonicalTestName(result);
+		ReportContext.renameTestDir(test);
+		
 		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
 		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));
 		TestNamingUtil.releaseTestInfoByThread();
@@ -367,10 +369,9 @@ public class AbstractTestListener extends TestArgsListener
 		} else
 		{
 			failItem(result, Messager.TEST_FAILED);
+			afterTest(result);
 		}
-
-		// TestNamingUtil.releaseTestInfoByThread();
-		afterTest(result);
+		
 		super.onTestFailure(result);
 	}
 
@@ -404,7 +405,6 @@ public class AbstractTestListener extends TestArgsListener
 	public void onFinish(ITestContext context)
 	{
 		removeIncorrectlyFailedTests(context);
-		// printContextTestsSummary(context);
 		super.onFinish(context);
 	}
 

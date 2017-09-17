@@ -10,7 +10,6 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 /*
  *  This appender logs groups test outputs by test method so they don't mess up each other even they runs in parallel.
@@ -39,7 +38,7 @@ public class ThreadLogAppender extends AppenderSkeleton
 			    File testLogFile = new File(ReportContext.getTestDir() + "/test.log");
 				if (!testLogFile.exists())
 					testLogFile.createNewFile();
-				fw = new BufferedWriter(new FileWriter(testLogFile));
+				fw = new BufferedWriter(new FileWriter(testLogFile, true));
 				testLogBuffer.set(fw);
 			}
 
@@ -58,7 +57,9 @@ public class ThreadLogAppender extends AppenderSkeleton
 				
 				
 
-				String deviceName = DevicePool.getDevice().getName();
+				// TODO: review and implement valid device name logging
+				// String deviceName = DevicePool.getDevice().getName();
+				String deviceName = "";
 				if (!deviceName.isEmpty()) {
 					deviceName = " [" + deviceName + "] ";
 				}
