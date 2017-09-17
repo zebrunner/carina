@@ -365,6 +365,8 @@ public abstract class AbstractTest // extends DriverHelper
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
+            
+            LOGGER.debug("Generating email report...");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
@@ -377,6 +379,7 @@ public abstract class AbstractTest // extends DriverHelper
                 default:
                     //do nothing
             }
+            LOGGER.debug("Finish email report generation.");
             
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
