@@ -133,10 +133,7 @@ public class ZafiraConfigurator implements IConfigurator
 
 	@Override
 	public Set<TestArtifactType> getArtifacts(ITestResult test) {
-		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
-		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
         // Generate additional artifacts links on test run
-
         test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
         TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
         TestRail.clearCases();
