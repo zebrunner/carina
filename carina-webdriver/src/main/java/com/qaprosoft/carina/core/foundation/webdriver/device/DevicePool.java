@@ -253,8 +253,14 @@ public class DevicePool
 		if (GRID_ENABLED)
 		{
 			String allModels = StringUtils.join(DEVICE_MODELS, "+");
+			LOGGER.info(
+					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
+
 			freeDevice = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
-			freeDevice.connectRemote();
+			//TODO: remove if operator and MOBILE_STF_DOCKER_CONTAINER property whe all clients moved to the dockerized cloud solution
+			if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
+				freeDevice.connectRemote();
+			}
 		} else
 		{
 			freeDevice = findDevice();
@@ -319,6 +325,7 @@ public class DevicePool
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
 			if (GRID_ENABLED)
 			{
+				// no need to disconnect as closing STF session automatically disconnect adb session for this device 
 				//device.disconnectRemote();
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
