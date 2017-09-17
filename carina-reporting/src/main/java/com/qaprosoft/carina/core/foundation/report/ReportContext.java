@@ -285,9 +285,28 @@ public class ReportContext
 						+ newTestDir.getAbsolutePath());
 			}
 			testDir.renameTo(newTestDir);*/
+			boolean renamed = false;
 			if (!newTestDir.exists()) {
 				testDir.renameTo(newTestDir);
-			}		
+				renamed = true;
+			} else {
+				// create secondary folder "name-2" etc for the same names
+				int maxCount = Configuration.getInt(Parameter.RETRY_COUNT);
+				for (int i = 1; i < maxCount; i++) {
+					newTestDir = new File(
+							String.format("%s/%s-%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_"), i));
+					if (!newTestDir.exists()) {
+						testDir.renameTo(newTestDir);
+						renamed = true;
+					} else {
+						LOGGER.warn("Test log/screenshot directory already exist: " + newTestDir.getAbsolutePath());
+					}
+				}
+				if (!renamed) {
+					throw new RuntimeException("Test log directory was not created even with retry logic: "
+							+ newTestDir.getAbsolutePath());
+				}
+			}
 		} else {
 			LOGGER.error("Unexpected case with absence of test.log for '" + test + "'" );
 		}
