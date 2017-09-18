@@ -44,7 +44,6 @@
 		<module>cryptotool</module>
 		<module>carina-webdriver</module>
 		<module>aws-s3-manager</module>
-		<!--module>carina-grid</module-->
 		<module>carina-core</module>
 	</modules>
 

@@ -59,7 +59,6 @@ public abstract class AbstractUIObject extends DriverHelper
 		super(driver);
 		ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext);
 		PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
-		summary.setPrefix(this.getClass().getSimpleName());
 	}
 
 	/**
