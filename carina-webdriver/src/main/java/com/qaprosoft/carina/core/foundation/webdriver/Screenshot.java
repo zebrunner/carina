@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -33,7 +35,6 @@ import org.openqa.selenium.WebDriver;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -56,6 +57,9 @@ public class Screenshot
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
 	private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+	
+	// Collects screenshot comments. Screenshot comments are associated using screenshot file name.
+	private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 	
 	/**
 	 * Adds screenshot rule
@@ -112,6 +116,36 @@ public class Screenshot
 	    }
 	    return capture(driver, isTakeScreenshotRules, comment, false);
     }
+	
+	/**
+	 * Stores comment for screenshot.
+	 *
+     * @param screenId screenId id
+     * @param msg message
+	 *            
+	 */
+	private static void addScreenshotComment(String screenId, String msg)
+	{
+		if (!StringUtils.isEmpty(screenId))
+		{
+			screenSteps.put(screenId, msg);
+		}
+	}
+
+	/**
+	 * Return comment for screenshot.
+	 * 
+	 * @param screenId Screen Id
+	 *            
+	 * @return screenshot comment
+	 */
+	public static String getScreenshotComment(String screenId)
+	{
+		String comment = "";
+		if (screenSteps.containsKey(screenId))
+			comment = screenSteps.get(screenId);
+		return comment;
+	}
 	
 	/**
 	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
@@ -334,7 +368,7 @@ public class Screenshot
 				uploadToAmazonS3(test, screenPath, screenName, comment);
 
 				// add screenshot comment to collector
-				TestLogCollector.addScreenshotComment(screenName, comment);
+				addScreenshotComment(screenName, comment);
 
 			} catch (IOException e) {
 				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);

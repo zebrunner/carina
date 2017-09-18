@@ -82,7 +82,6 @@
 		<dependency>
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
-			<version>${appium.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.code.gson</groupId>
