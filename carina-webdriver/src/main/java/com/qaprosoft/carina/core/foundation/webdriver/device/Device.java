@@ -709,7 +709,7 @@ public class Device
     }
     
     public String getAdbName() {
-    	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
+    	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER) && remoteURL != null) {
     		return remoteURL;
     	} else {
     		return udid;
