@@ -23,9 +23,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 public class DSBean
 {
