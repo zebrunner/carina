@@ -434,6 +434,7 @@ public class Configuration
 		return DriverMode.valueOf(get(Parameter.DRIVER_MODE).trim().toUpperCase());
 	}
 	
+	@Deprecated
 	public static Locale getLocale()
 	{
 		Locale locale = null;
