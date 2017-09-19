@@ -8,14 +8,12 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CsvDataSourceParameters {
-    String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.CsvDataProvider";
+public @interface XlsDataSourceParameters {
+    String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.XlsDataProvider";
 
-    String path();
+    String path() default "";
 
-    char separator() default ',';
-
-    char quote() default '"';
+    String sheet() default "";
 
     String dsArgs() default "";
 
@@ -31,8 +29,6 @@ public @interface CsvDataSourceParameters {
     
     String jiraColumn() default "";
     
-    String spiraColumn() default "";
-    
     String testRailColumn() default "";
     
     String testMethodColumn() default "";
@@ -42,5 +38,4 @@ public @interface CsvDataSourceParameters {
 	String bugColumn() default "";
 
 	String[] doNotRunTestNames() default {};
-
 }

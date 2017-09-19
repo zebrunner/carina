@@ -67,7 +67,6 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
@@ -225,8 +224,6 @@ public abstract class AbstractTest // extends DriverHelper
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
                                         ITestContext context) throws Throwable {
         // do nothing for now
-        Spira.registerStepsFromAnnotation(testMethod);
-        
         apiMethodBuilder = new APIMethodBuilder();
     }
     
@@ -264,10 +261,6 @@ public abstract class AbstractTest // extends DriverHelper
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
             Jira.updateAfterTest(result);
 
-
-            // Populate Spira Steps
-            Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), tickets);
-            Spira.clear();
 
             // Populate TestRail Cases
 
@@ -326,9 +319,6 @@ public abstract class AbstractTest // extends DriverHelper
 
             // Update JIRA
             Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
-
-            // Update Spira
-            Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, startDate);
 
             //generate and send email report by Zafira to test group of people
             String emailList = Configuration.get(Parameter.EMAIL_LIST);

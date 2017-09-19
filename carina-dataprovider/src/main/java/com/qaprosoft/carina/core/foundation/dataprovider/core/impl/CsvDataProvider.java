@@ -17,7 +17,6 @@ import org.testng.ITestNGMethod;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
@@ -34,7 +33,6 @@ public class CsvDataProvider extends BaseDataProvider {
     private String executeColumn; 
     private String executeValue;
     private String jiraColumn;
-    private String spiraColumn;
     private String testRailColumn;
     private String testMethodColumn;
     private String testMethodOwnerColumn;
@@ -58,7 +56,6 @@ public class CsvDataProvider extends BaseDataProvider {
         quote = parameters.quote();
         
         jiraColumn = parameters.jiraColumn();
-        spiraColumn = parameters.spiraColumn();
         testRailColumn = parameters.testRailColumn();
         testMethodColumn = parameters.testMethodColumn();
         testMethodOwnerColumn = parameters.testMethodOwnerColumn();
@@ -180,16 +177,6 @@ public class CsvDataProvider extends BaseDataProvider {
 			// add bug id from csv datasource to special hashMap
 			addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
-            //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
-            // // add spira steps from xls datasource to special hashMap
-            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-
-            
-            if (!spiraColumn.isEmpty()) {
-            	//register Spira ID values from DataProvider
-            	Spira.setSteps(csvRow.get(spiraColumn));
-            }
-            
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             
@@ -204,7 +191,6 @@ public class CsvDataProvider extends BaseDataProvider {
      * obligatory add to mapper all columns for DataProvider artifacts like:
      * executeColumn - filter column
      * jiraColumn
-     * spiraColumn
      * testRailColumn
      * testMethodColumn
      * testMethodOwnerColumn
@@ -227,7 +213,6 @@ public class CsvDataProvider extends BaseDataProvider {
 
     	mapper.put(executeColumn, getIndex(executeColumn, headers));
     	mapper.put(jiraColumn, getIndex(jiraColumn, headers));
-    	mapper.put(spiraColumn, getIndex(spiraColumn, headers));
     	mapper.put(testRailColumn, getIndex(testRailColumn, headers));
     	mapper.put(testMethodColumn, getIndex(testMethodColumn, headers));
     	mapper.put(testMethodOwnerColumn, getIndex(testMethodOwnerColumn, headers));
