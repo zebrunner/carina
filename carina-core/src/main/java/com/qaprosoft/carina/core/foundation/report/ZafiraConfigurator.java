@@ -36,7 +36,7 @@ public class ZafiraConfigurator implements IConfigurator
 {
 	protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
     private List<String> uniqueKeys = Arrays.asList(R.CONFIG.get("unique_testrun_fields").split(","));
-
+    
     @Override
     public ConfigurationType getConfiguration()
     {
@@ -53,13 +53,12 @@ public class ZafiraConfigurator implements IConfigurator
         }
 
         // add custom arguments from current mobile device
-        Device device = DevicePool.getDevice();
-        if (!device.getName().isEmpty())
-        {
-            conf.getArg().add(buildArgumentType("device", device.getName()));
-            conf.getArg().add(buildArgumentType("platform", device.getOs()));
-            conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
-        }
+		Device device = DevicePool.getCurrentDevice();
+		if (!device.getName().isEmpty()) {
+			conf.getArg().add(buildArgumentType("device", device.getName()));
+			conf.getArg().add(buildArgumentType("platform", device.getOs()));
+			conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
+		}
         return conf;
     }
 
