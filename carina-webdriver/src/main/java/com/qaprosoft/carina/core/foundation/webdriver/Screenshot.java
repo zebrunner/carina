@@ -35,10 +35,10 @@ import org.openqa.selenium.WebDriver;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;

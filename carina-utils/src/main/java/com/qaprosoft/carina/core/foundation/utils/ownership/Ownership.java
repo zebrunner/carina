@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class Ownership 
 {

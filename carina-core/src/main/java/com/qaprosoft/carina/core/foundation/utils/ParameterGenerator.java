@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;

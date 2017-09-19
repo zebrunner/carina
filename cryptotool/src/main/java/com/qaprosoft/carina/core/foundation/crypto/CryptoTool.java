@@ -29,7 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class CryptoTool {
 	private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);

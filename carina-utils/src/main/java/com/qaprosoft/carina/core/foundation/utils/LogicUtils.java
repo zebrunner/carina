@@ -21,6 +21,8 @@ import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+
 public class LogicUtils
 {
 	private static Random random;

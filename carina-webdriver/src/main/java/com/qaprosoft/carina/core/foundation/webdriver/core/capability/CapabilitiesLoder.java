@@ -9,8 +9,8 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
  * Created by yauhenipatotski on 10/26/15.

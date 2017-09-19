@@ -23,7 +23,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.xml.XmlTest;
 
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 
 public class XMLNameStrategy implements INamingStrategy
