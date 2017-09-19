@@ -8,9 +8,9 @@ import org.junit.Test;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
-public class CustomCapabilityMatcherTest
+public class MobileCapabilityMatcherTest
 {
-	private CustomCapabilityMatcher matcher = new CustomCapabilityMatcher();
+	private MobileCapabilityMatcher matcher = new MobileCapabilityMatcher();
 	
 	@Test
 	public void testPlatformName()
