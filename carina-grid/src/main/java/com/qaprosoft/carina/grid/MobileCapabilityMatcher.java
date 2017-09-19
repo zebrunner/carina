@@ -21,6 +21,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.internal.utils.DefaultCapabilityMatcher;
 
+import com.qaprosoft.carina.grid.integration.STF;
+
 import io.appium.java_client.remote.MobileCapabilityType;
 
 /**
@@ -29,7 +31,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class CustomCapabilityMatcher extends DefaultCapabilityMatcher
+public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 {
 	@Override
 	public boolean matches(Map<String, Object> nodeCapability, Map<String, Object> requestedCapability)
@@ -141,6 +143,13 @@ public class CustomCapabilityMatcher extends DefaultCapabilityMatcher
 				}
 			}
 		}
+		
+		// STF integration that checks device status
+		if(STF.isRunning() && nodeCapability.containsKey("udid"))
+		{
+			return STF.isDeviceAvailable(String.valueOf(nodeCapability.get("udid")));
+		}
+		
 		return true;
 	}
 	
