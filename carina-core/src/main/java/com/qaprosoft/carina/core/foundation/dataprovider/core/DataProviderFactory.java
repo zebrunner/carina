@@ -14,11 +14,11 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.exceptions.GroupByException;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 
 /**
  * Created by Patotsky on 16.12.2014.
