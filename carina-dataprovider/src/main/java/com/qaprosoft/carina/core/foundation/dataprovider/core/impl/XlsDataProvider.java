@@ -13,7 +13,6 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByM
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
-import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
@@ -55,10 +54,6 @@ public class XlsDataProvider extends BaseDataProvider {
         
         if (!parameters.jiraColumn().isEmpty())
         	jiraColumn = parameters.jiraColumn();
-        
-        String spiraColumn = "";
-        if (!parameters.spiraColumn().isEmpty())
-        	spiraColumn = parameters.spiraColumn();
         
         String testRailColumn = "";
         if (!parameters.testRailColumn().isEmpty())
@@ -144,18 +139,6 @@ public class XlsDataProvider extends BaseDataProvider {
 			// add bug id from xls datasource to special hashMap
 			addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
 
-            //TODO: need restore spiraArgsMap manipulations as transfering spiraIDes from DataProvider should be corrupted 
-            // // add spira steps from xls datasource to special hashMap
-            // addValueToSpecialMap(spiraArgsMap, spiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
-            
-            if (spiraColumn != null) {
-                if (!spiraColumn.isEmpty()) {
-                	//register Spira ID values from DataProvider
-                	Spira.setSteps(xlsRow.get(spiraColumn));
-                }
-            }    	
-
-            
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
            

@@ -27,14 +27,10 @@
 		<api-tools.version>1.0.11</api-tools.version>
 
 		<jira-client.version>0.5</jira-client.version>
-		<opencsv.version>1.7</opencsv.version>
 
 		<cucumber.testng.version>1.2.4</cucumber.testng.version>
 		<cucumber.java.version>1.2.4</cucumber.java.version>
 		<cucumber.reporting>2.6.3</cucumber.reporting>
-
-		<reflections.version>0.9.11</reflections.version>
-		<apache-poi.version>3.11-beta3</apache-poi.version>
 
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 
@@ -46,6 +42,11 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>browsermobproxy</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-dataprovider</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-utils</artifactId>
@@ -68,31 +69,6 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 
-		<!-- Reflections -->
-		<dependency>
-		    <groupId>org.reflections</groupId>
-		    <artifactId>reflections</artifactId>
-			<version>${reflections.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>dom4j</groupId>
-					<artifactId>dom4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- CSV -->
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>${opencsv.version}</version>
-		</dependency>
-
-
 		<!-- api-tools -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
@@ -104,17 +80,6 @@
 					<artifactId>guava</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>${apache-poi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>${apache-poi.version}</version>
 		</dependency>
 
 		<!-- Jira -->

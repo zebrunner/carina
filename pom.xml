@@ -38,6 +38,7 @@
 
 	<modules>
 		<module>carina-commons</module>
+		<module>carina-dataprovider</module>
 		<module>browsermobproxy</module>
 		<module>carina-utils</module>
 		<module>carina-reporting</module>
@@ -161,6 +162,13 @@
 				<artifactId>carina-commons</artifactId>
 				<version>1.0-SNAPSHOT</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.qaprosoft</groupId>
+				<artifactId>carina-dataprovider</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+
 
 			<dependency>
 				<groupId>com.qaprosoft</groupId>

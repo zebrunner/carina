@@ -303,19 +303,6 @@ public class Configuration
 
 		TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
 
-		// spira
-		SPIRA_URL("spira_url"),
-		
-		SPIRA_USER("spira_user"),
-		
-		SPIRA_PASSWORD("spira_password"),
-		
-		SPIRA_UPDATER("spira_updater"),
-		
-		SPIRA_RELEASE_ID("spira_release_id"),
-		
-		SPIRA_TESTSET_ID("spira_testset_id"),
-		
 		//zafira
 		ZAFIRA_GRID_ENABLED("zafira_grid_enabled"),
 		
