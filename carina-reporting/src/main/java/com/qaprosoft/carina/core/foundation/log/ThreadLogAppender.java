@@ -12,7 +12,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 
 /*
- *  This appender logs groups test outputs by test method so they don't mess up each other even they runs in parallel.
+ *  This appender log groups test outputs by test method/test thread so they don't mess up each other even they runs in parallel.
  */
 public class ThreadLogAppender extends AppenderSkeleton
 {
@@ -55,17 +55,8 @@ public class ThreadLogAppender extends AppenderSkeleton
 				
 				String logLevel = event.getLevel().toString();
 				
-				
-
-				// TODO: review and implement valid device name logging
-				// String deviceName = DevicePool.getDevice().getName();
-				String deviceName = "";
-				if (!deviceName.isEmpty()) {
-					deviceName = " [" + deviceName + "] ";
-				}
-				
-				String message = "[%s] [%s] [%s] [%s]%s %s";
-				fw.write(String.format(message, time, fileName, threadId, logLevel, deviceName, event.getMessage().toString()));
+				String message = "[%s] [%s] [%s] [%s] %s";
+				fw.write(String.format(message, time, fileName, threadId, logLevel, event.getMessage().toString()));
 			} else {
 				fw.write("null");
 			}
