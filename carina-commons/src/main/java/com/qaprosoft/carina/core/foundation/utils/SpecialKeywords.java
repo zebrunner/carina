@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qaprosoft.carina.core.foundation.commons;
+package com.qaprosoft.carina.core.foundation.utils;
 
 /**
  * Special keywords used in framework.
  * 
  * @author Alex Khursevich
  */
+@Deprecated
 public class SpecialKeywords
 {
 	public static final String IGNORE = "$ignore";

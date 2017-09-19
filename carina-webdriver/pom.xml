@@ -32,6 +32,7 @@
 		<apache-http.version>4.4</apache-http.version>
 		<pubnub.version>3.7.10</pubnub.version>
 		<itext.version>5.0.6</itext.version>
+		<reflections.version>0.9.11</reflections.version>
 
 	</properties>
 
@@ -139,7 +140,7 @@
 			<version>${itext.version}</version>
 		</dependency>
 
-    <!-- AI integration -->
+		<!-- AI integration -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>alice-client</artifactId>
@@ -148,6 +149,24 @@
 		  <groupId>org.apache.commons</groupId>
 		  <artifactId>commons-configuration2</artifactId>
 		</dependency>
+
+		<!-- Reflections -->
+		<dependency>
+		    <groupId>org.reflections</groupId>
+		    <artifactId>reflections</artifactId>
+			<version>${reflections.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>dom4j</groupId>
+					<artifactId>dom4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 
 	</dependencies>
 

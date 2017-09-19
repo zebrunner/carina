@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qaprosoft.carina.core.foundation.report.spira;
+package com.qaprosoft.carina.core.foundation.utils;
 
-import java.util.List;
-
-import org.testng.ITestResult;
-
-import com.qaprosoft.carina.core.foundation.report.TestResultType;
-
-
-public class DefaultSpiraUpdater implements ISpiraUpdater
+/*
+ * HTML - base html tags and attributes
+ * 
+ * @author: Aliakse_Khursevich (hursevich@gmail.com)
+ * 
+ */
+@Deprecated
+public class HTML
 {
+	public static final String ID = "id";
 
-	@Override
-	public void updateAfterSuite(String testClass, TestResultType testResult, String message, String testName, long startDate) {
-		// DO nothing by default
-		
-	}
+	public static final String HREF = "href";
 
-	@Override
-	public void updateAfterTest(ITestResult result, String errorMessager, List<String> jiraTickets) {
-		// TODO Auto-generated method stub
-		
-	}
+	public static final String CLASS = "class";
 
+	public static final String ALT = "alt";
+
+	public static final String ACTION = "action";
+
+	public static final String SRC = "src";
+
+	public static final String TITLE = "title";
+
+	public static final String VALUE = "value";
+
+	public static final String MAX_LENGTH = "maxlength";
 }

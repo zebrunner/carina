@@ -6,9 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This defines the 'SpiraTestCase' annotation used to specify the Spira TestCase id,
- * project and release information for the test being executed
- * 
+ * This defines the 'TestRailSuite' annotation used to specify the TestRail Suite id and project for the test being executed
  */
 @Retention(value= RetentionPolicy.RUNTIME)
 @Target(value= ElementType.TYPE)
