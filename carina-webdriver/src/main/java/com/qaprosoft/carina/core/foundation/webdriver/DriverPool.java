@@ -307,6 +307,7 @@ public final class DriverPool {
 					// TODO: investigate do we need transfer device to factory or not
 					drv = DriverFactory.create(name, capabilities, seleniumHost);
 				} else {
+					seleniumHost = Configuration.get(Parameter.SELENIUM_HOST);
 					drv = DriverFactory.create(name);
 				}
 				registerDriver(drv, name);
