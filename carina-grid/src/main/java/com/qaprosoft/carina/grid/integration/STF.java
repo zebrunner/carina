@@ -59,23 +59,22 @@ public class STF
 	public static boolean isDeviceAvailable(String udid)
 	{
 		boolean available = false;
-		if(isRunning())
-		{
-			Response<Devices> rs = INSTANCE.client.getAllDevices();
-			if(rs.getStatus() == 200)
-			{
-				for(STFDevice device : rs.getObject().getDevices())
-				{
-					if(udid.equals(device.getSerial()))
-					{
-						available = device.getPresent() && device.getReady() && !device.getUsing() && device.getOwner() == null;
-						break;
+		if (isRunning()) {
+			try {
+				Response<Devices> rs = INSTANCE.client.getAllDevices();
+				if (rs.getStatus() == 200) {
+					for (STFDevice device : rs.getObject().getDevices()) {
+						if (udid.equals(device.getSerial())) {
+							available = device.getPresent() && device.getReady() && !device.getUsing()
+									&& device.getOwner() == null;
+							break;
+						}
 					}
+				} else {
+					LOGGER.error("Unable to get devices status HTTP status: " + rs.getStatus());
 				}
-			}
-			else
-			{
-				LOGGER.error("Unable to get devices status HTTP status: " + rs.getStatus());
+			} catch (Exception e) {
+				LOGGER.error("Unable to get devices status HTTP status via udid: " + udid, e);
 			}
 		}
 		return available;
