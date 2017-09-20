@@ -430,7 +430,11 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     private String getSuiteFileName(ITestContext context) {
+    	//TODO: investigate why we need such method and suite file name at all
         String fileName = context.getSuite().getXmlSuite().getFileName();
+        if (fileName == null) {
+        	fileName = "undefined";
+        }
         LOGGER.debug("Full suite file name: " + fileName);
         if (fileName.contains("\\")) {
             fileName = fileName.replaceAll("\\\\", "/");
