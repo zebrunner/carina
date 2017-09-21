@@ -1,10 +1,9 @@
 package com.qaprosoft.carina.grid.integration;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.zafira.client.STFClient;
 import com.qaprosoft.zafira.models.stf.Devices;
@@ -18,7 +17,7 @@ import com.qaprosoft.zafira.models.stf.STFDevice;
  */
 public class STF
 {
-	private static Logger LOGGER = LoggerFactory.getLogger(STF.class);
+	private static Logger LOGGER = Logger.getLogger(STF.class.getName());
 
 	private static final Long STF_TIMEOUT = 3600L;
 	
@@ -32,6 +31,8 @@ public class STF
 	{
 		String serviceURL = System.getProperty("STF_URL");
 		String authToken = System.getProperty("STF_TOKEN");
+		LOGGER.info("*********************************");
+		LOGGER.info("Credentials for STF: " + serviceURL + " / " + authToken);
 		if (!StringUtils.isEmpty(serviceURL) && !StringUtils.isEmpty(authToken))
 		{
 			this.client = new STFClient(serviceURL, authToken);
@@ -42,13 +43,14 @@ public class STF
 			}
 			else
 			{
-				LOGGER.error("STF connection error");
+				LOGGER.info("STF connection error");
 			}
 		}
 		else
 		{
-			LOGGER.error("Set STF_URL and STF_TOKEN to use STF integration");
+			LOGGER.info("Set STF_URL and STF_TOKEN to use STF integration");
 		}
+		LOGGER.info("*********************************");
     }
 	
 	public static boolean isRunning()
@@ -71,10 +73,10 @@ public class STF
 						}
 					}
 				} else {
-					LOGGER.error("Unable to get devices status HTTP status: " + rs.getStatus());
+					LOGGER.info("Unable to get devices status HTTP status: " + rs.getStatus());
 				}
 			} catch (Exception e) {
-				LOGGER.error("Unable to get devices status HTTP status via udid: " + udid, e);
+				LOGGER.info("Unable to get devices status HTTP status via udid: " + udid);
 			}
 		}
 		return available;
