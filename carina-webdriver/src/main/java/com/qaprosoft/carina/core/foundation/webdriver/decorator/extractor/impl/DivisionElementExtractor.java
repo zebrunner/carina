@@ -1,0 +1,96 @@
+package com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.AbstractElementExtractor;
+
+public class DivisionElementExtractor extends AbstractElementExtractor {
+
+    private Logger LOGGER = Logger.getLogger(DivisionElementExtractor.class);
+
+    @Override
+    public ExtendedWebElement getElementsByCoordinates(int x, int y) {
+        String elementName = String.format("Element founded by x:%d - y:%d", x, y);
+        WebDriver driver = DriverPool.getDriver();
+        List<WebElement> elements = getEndLevelElements(driver);
+        WebElement tempElement;
+        int index = 0;
+        int isLower;
+        Rectangle tempRect;
+        while (elements.size() != 1) {
+            index = (int) (Math.round(elements.size() / 2));
+            tempElement = elements.get(index);
+            tempRect = getRect(tempElement);
+            isLower = isLower(tempRect, y);
+            LOGGER.debug("Is Lower: " + isLower);
+            if (isInside(tempRect, x, y) || isLower == 0) {
+                break;
+            }
+            if (isLower == 1) {
+                elements = elements.subList(index, elements.size());
+            } else {
+                elements = elements.subList(0, index);
+            }
+        }
+        LOGGER.debug("Index: " + index);
+
+        if (elements.size() == 1) {
+            return generateExtenedElement(elements, driver, elementName);
+        }
+
+        return generateExtenedElement(checkBoundaryElements(elements, x, y, index), driver, elementName);
+    }
+
+    /**
+     * Method to check boundary elements since there is a chance that there are
+     * some elements in the same 'y' range
+     * 
+     * @param elements
+     * @param x
+     * @param y
+     * @param index
+     * @return
+     */
+    private List<WebElement> checkBoundaryElements(List<WebElement> elements, int x, int y, int index) {
+        LOGGER.debug(String.format("Index: %d.", index));
+        List<WebElement> elementsFirstPart = elements.subList(0, index);
+        List<WebElement> elementsSecondPart = elements.subList(index, elements.size());
+        List<WebElement> elementsInside = new ArrayList<WebElement>();
+        WebElement element;
+        Rectangle tempRect;
+        for (int i = elementsFirstPart.size() - 1; i >= 0; i--) {
+            element = elementsFirstPart.get(i);
+            tempRect = getRect(element);
+            if (isInside(tempRect, x, y)) {
+                elementsInside.add(element);
+            } else if (tempRect.y > y) {
+                // stop validation as soon as 'y' coordinate will be out of
+                // element's location
+                break;
+            }
+        }
+
+        for (int i = 0; i < elementsSecondPart.size(); i++) {
+            element = elementsSecondPart.get(i);
+            tempRect = getRect(element);
+
+            if (isInside(tempRect, x, y)) {
+                elementsInside.add(element);
+            } else if (tempRect.y + tempRect.height < y) {
+                // stop validation as soon as 'y' coordinate will be out of
+                // element's location
+                break;
+            }
+        }
+        return elementsInside;
+    }
+
+}

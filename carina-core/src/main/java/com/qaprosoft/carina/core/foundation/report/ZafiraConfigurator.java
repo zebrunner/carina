@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.report;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
@@ -7,7 +8,6 @@ import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership.OwnerType;
@@ -133,10 +133,7 @@ public class ZafiraConfigurator implements IConfigurator
 
 	@Override
 	public Set<TestArtifactType> getArtifacts(ITestResult test) {
-		Artifacts.add("Log", ReportContext.getTestLogLink(getTestName(test)));
-		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(getTestName(test)));
         // Generate additional artifacts links on test run
-
         test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
         TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
         TestRail.clearCases();

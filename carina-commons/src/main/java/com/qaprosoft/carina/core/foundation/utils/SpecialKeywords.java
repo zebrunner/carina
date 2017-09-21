@@ -20,6 +20,7 @@ package com.qaprosoft.carina.core.foundation.utils;
  * 
  * @author Alex Khursevich
  */
+@Deprecated
 public class SpecialKeywords
 {
 	public static final String IGNORE = "$ignore";
@@ -70,11 +71,6 @@ public class SpecialKeywords
 	public static final String TEST_FAILURE_MESSAGE = "testFailureMessage";
 	public static final String UUID = "UUID";
 	public static final String VIDEO_FILE_NAME = "/sdcard/test_record.mp4";
-	
-	public static final String SPIRA_RELEASE_ID = "SPIRA_RELEASE_ID";
-	public static final String SPIRA_TESTSET_ID = "SPIRA_TESTSET_ID";
-	public static final String SPIRA_TESTCASE_ID = "SPIRA_TESTCASE_ID";
-	public static final String SPIRA_TESTSTEP_ID = "SPIRA_TESTSTEP_ID";
 	
 	public static final String HTML_REPORT = "emailable-report.html";
 	public static final String NULL = "NULL";

@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -33,11 +35,10 @@ import org.openqa.selenium.WebDriver;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
@@ -56,6 +57,9 @@ public class Screenshot
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
 	private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+	
+	// Collects screenshot comments. Screenshot comments are associated using screenshot file name.
+	private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 	
 	/**
 	 * Adds screenshot rule
@@ -112,6 +116,36 @@ public class Screenshot
 	    }
 	    return capture(driver, isTakeScreenshotRules, comment, false);
     }
+	
+	/**
+	 * Stores comment for screenshot.
+	 *
+     * @param screenId screenId id
+     * @param msg message
+	 *            
+	 */
+	private static void addScreenshotComment(String screenId, String msg)
+	{
+		if (!StringUtils.isEmpty(screenId))
+		{
+			screenSteps.put(screenId, msg);
+		}
+	}
+
+	/**
+	 * Return comment for screenshot.
+	 * 
+	 * @param screenId Screen Id
+	 *            
+	 * @return screenshot comment
+	 */
+	public static String getScreenshotComment(String screenId)
+	{
+		String comment = "";
+		if (screenSteps.containsKey(screenId))
+			comment = screenSteps.get(screenId);
+		return comment;
+	}
 	
 	/**
 	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
@@ -196,7 +230,6 @@ public class Screenshot
 	public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment)
 	{
 		return capture(driver, isTakeScreenshot, comment, false);
-
 	}
 	
 	
@@ -280,23 +313,12 @@ public class Screenshot
 
 			try {
 				// Define test screenshot root
-				String test = "";
-				if (TestNamingUtil.isTestNameRegistered()) {
-					test = TestNamingUtil.getTestNameByThread();
-				} else {
-					test = TestNamingUtil.getCanonicTestNameByThread();
-				}
-
-				if (test == null || StringUtils.isEmpty(test)) {
-					LOGGER.warn("Unable to capture screenshot as Test Name was not found.");
-					return null;
-				}
-
-				File testScreenRootDir = ReportContext.getTestDir(test);
+				File testScreenRootDir = ReportContext.getTestDir();
 
 				// Capture full page screenshot and resize
-				String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
-				screenName = fileID + ".png";
+				//TODO: implement naming strategy for screenshots wihtout test names
+				//String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+				screenName = System.currentTimeMillis() + ".png";
 				String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
 				WebDriver augmentedDriver = driver;
@@ -329,12 +351,24 @@ public class Screenshot
 				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
+				
 				// Uploading screenshot to Amazon S3
+				
+				// TODO: Move upload to S3 into the async calls closer to the end of test to upload whole bundle
+				// Also investigate possibility to remove rederence onto the test name
+				String test = "";
+				if (TestNamingUtil.isTestNameRegistered()) {
+					test = TestNamingUtil.getTestNameByThread();
+				} else {
+					test = TestNamingUtil.getCanonicTestNameByThread();
+				}
+				if (test == null || StringUtils.isEmpty(test)) {
+					test = "undefined";
+				}
 				uploadToAmazonS3(test, screenPath, screenName, comment);
 
 				// add screenshot comment to collector
-				TestLogCollector.addScreenshotComment(screenName, comment);
+				addScreenshotComment(screenName, comment);
 
 			} catch (IOException e) {
 				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
@@ -354,7 +388,8 @@ public class Screenshot
 		}
 		// TODO: not good solution...
 		Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
-		String testName = ReportContext.getTestDir(test).getName();
+		
+		String testName = test.replaceAll("[^a-zA-Z0-9.-]", "_");
 		String key = runId + "/" + testName + "/" + screenName;
 		if (runId == -1)
 		{

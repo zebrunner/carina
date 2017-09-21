@@ -35,6 +35,7 @@ public class CucumberBaseTest extends CucumberRunner {
         LOGGER.info("In  @After takeScreenshotOfFailure");
         if (scenario.isFailed()) {
             LOGGER.error("Cucumber Scenario FAILED! Creating screenshot.");
+            //TODO: remove reference onto the DriverPool reusing functionality from Screenshot object!
             byte[] screenshot = ((TakesScreenshot) DriverPool.getDriver()).getScreenshotAs(OutputType.BYTES);
             screenshot = ImageProcessing.imageResize(screenshot);
             scenario.embed(screenshot, "image/png"); //stick it in the report

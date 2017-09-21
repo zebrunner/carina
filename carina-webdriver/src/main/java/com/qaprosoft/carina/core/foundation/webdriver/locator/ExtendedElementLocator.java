@@ -126,8 +126,9 @@ public class ExtendedElementLocator implements ElementLocator
 					LOGGER.error("Unable to find element: " + e.getMessage());
 				}
 			}
+			
 			// Finding element using AI tool
-			if(element == null && (aiLabel != null && aiCaption != null && AliceRecognition.INSTANCE.isEnabled()))
+			if(element == null && AliceRecognition.INSTANCE.isEnabled())
 			{
 				element = findElementByAI(driver, aiLabel, aiCaption);
 			}
