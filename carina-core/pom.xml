@@ -39,28 +39,27 @@
 	<dependencies>
 		<!-- Carina Core sub-modules -->
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>browsermobproxy</artifactId>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-proxy</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-dataprovider</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>cryptotool</artifactId>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-crypto</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-webdriver</artifactId>
 		</dependency>
 
