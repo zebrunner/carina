@@ -167,7 +167,7 @@ public class IosUtils extends MobileUtils {
     /**
      * Swipe down
      * 
-     * @param duration
+     * @param duration int
      */
     public static void swipeDown(final int duration) {
         WebDriver driver = DriverPool.getDriver();

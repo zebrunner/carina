@@ -52,8 +52,9 @@ public abstract class AbstractElementExtractor {
     /**
      * Method extracts all end level elements (elements have no children) which
      * are on the screen
-     * 
-     * @return list List<WebElement> 
+     *
+     * @param driver WebDriver
+     * @return list List 
      */
     public List<WebElement> getEndLevelElements(WebDriver driver) {
         return driver.findElements(By.xpath("//*[count(./*)=0]"));
