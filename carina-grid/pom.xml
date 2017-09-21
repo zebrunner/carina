@@ -20,6 +20,8 @@
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <source.version>1.8</source.version>
 	    <target.version>1.8</target.version>
+
+	    <apache-http.version>4.5.3</apache-http.version>
 	</properties>
 	
 	<dependencies>
@@ -38,6 +40,13 @@
 	            </exclusion>
 	        </exclusions>
 	    </dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${apache-http.version}</version>
+		</dependency>
+
 	</dependencies>
 	
 	<build>
