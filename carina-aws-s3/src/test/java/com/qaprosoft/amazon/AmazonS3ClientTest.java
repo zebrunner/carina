@@ -1,4 +1,4 @@
-package com.qaprosoft.utils.amazon;
+package com.qaprosoft.amazon;
 
 
 import org.testng.Assert;
