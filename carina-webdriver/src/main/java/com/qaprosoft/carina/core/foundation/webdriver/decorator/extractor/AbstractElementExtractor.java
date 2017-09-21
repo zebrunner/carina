@@ -8,10 +8,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public abstract class AbstractElementExtractor {
 
@@ -21,13 +18,13 @@ public abstract class AbstractElementExtractor {
         return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
     }
 
-    /**
-     * Method to generate rectangle for the element since current version of
-     * appium driver throws unimplemented exception
-     * 
-     * @param element
-     * @return
-     */
+	/**
+	 * Method to generate rectangle for the element since current version of
+	 * appium driver throws unimplemented exception
+	 * 
+	 * @param element WebElement
+	 * @return Rectangle
+	 */
     public Rectangle getRect(WebElement element) {
         return new Rectangle(element.getLocation(), element.getSize());
     }
@@ -36,9 +33,9 @@ public abstract class AbstractElementExtractor {
      * Method return 1 in case if y is lower than element, -1 if higher, 0 - if
      * 'y' within the element's range
      * 
-     * @param element
-     * @param y
-     * @return
+     * @param rect Rectangle
+     * @param y int
+     * @return int
      */
     public int isLower(Rectangle rect, int y) {
         LOGGER.debug(String.format("isLower(): Rectangle: x - %d. y - %d. Width: %d, height: %d", rect.x, rect.y, rect.width, rect.height));
@@ -56,7 +53,7 @@ public abstract class AbstractElementExtractor {
      * Method extracts all end level elements (elements have no children) which
      * are on the screen
      * 
-     * @return
+     * @return list List<WebElement> 
      */
     public List<WebElement> getEndLevelElements(WebDriver driver) {
         return driver.findElements(By.xpath("//*[count(./*)=0]"));
