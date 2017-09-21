@@ -298,7 +298,7 @@ public abstract class AbstractTest // extends DriverHelper
 
             String browser = getBrowser();
             String deviceName = getDeviceName();
-            String suiteName = getSuiteName(context);
+            //String suiteName = getSuiteName(context);
             String title = getTitle(context);
 
             TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
@@ -535,7 +535,7 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     @DataProvider(name = "SingleDataProvider")
-	public Object[][] createDataSingeThread(final ITestNGMethod testMethod,
+	public Object[][] createDataSingleThread(final ITestNGMethod testMethod,
                                             ITestContext context) {
 		Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
 		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
