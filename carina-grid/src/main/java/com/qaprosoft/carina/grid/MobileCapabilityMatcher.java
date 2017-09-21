@@ -23,8 +23,6 @@ import org.openqa.grid.internal.utils.DefaultCapabilityMatcher;
 
 import com.qaprosoft.carina.grid.integration.STF;
 
-import io.appium.java_client.remote.MobileCapabilityType;
-
 /**
  * Custom selenium capability matcher for mobile grid.
  * {@link https://nishantverma.gitbooks.io/appium-for-android/understanding_desired_capabilities.html}
@@ -33,13 +31,18 @@ import io.appium.java_client.remote.MobileCapabilityType;
  */
 public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 {
+    private static final String PLATFORM_NAME = "platformName";
+    private static final String PLATFORM_VERSION = "platformVersion";
+    private static final String DEVICE_NAME = "deviceName";
+    private static final String UDID = "udid";
+	
 	@Override
 	public boolean matches(Map<String, Object> nodeCapability, Map<String, Object> requestedCapability)
 	{
-		if(requestedCapability.containsKey(MobileCapabilityType.PLATFORM_NAME) 
-		   || requestedCapability.containsKey(MobileCapabilityType.PLATFORM_VERSION)
-		   || requestedCapability.containsKey(MobileCapabilityType.DEVICE_NAME)
-		   || requestedCapability.containsKey(MobileCapabilityType.UDID))
+		if(requestedCapability.containsKey(PLATFORM_NAME) 
+		   || requestedCapability.containsKey(PLATFORM_VERSION)
+		   || requestedCapability.containsKey(DEVICE_NAME)
+		   || requestedCapability.containsKey(UDID))
 		{
 			// Mobile-based capabilities
 			return extensionCapabilityCheck(nodeCapability, requestedCapability);
@@ -63,13 +66,13 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 			{
 				switch (key)
 				{
-				case MobileCapabilityType.PLATFORM_NAME:
+				case PLATFORM_NAME:
 					if(actualValue != null && !StringUtils.equalsIgnoreCase(actualValue, expectedValue))
 					{
 						return false;
 					}
 					break;
-				case MobileCapabilityType.PLATFORM_VERSION:
+				case PLATFORM_VERSION:
 					if(actualValue != null)
 					{
 						// Limited interval: 6.1.1-7.0
@@ -126,13 +129,13 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 						}
 					}
 					break;
-				case MobileCapabilityType.DEVICE_NAME:
+				case DEVICE_NAME:
 					if(actualValue != null && !Arrays.asList(expectedValue.split(",")).contains(actualValue))
 					{
 						return false;
 					}
 					break;
-				case MobileCapabilityType.UDID:
+				case UDID:
 					if(actualValue != null && !Arrays.asList(expectedValue.split(",")).contains(actualValue))
 					{
 						return false;

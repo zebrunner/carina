@@ -27,10 +27,6 @@
 	        <groupId>org.seleniumhq.selenium</groupId>
 	        <artifactId>selenium-server</artifactId>
 	    </dependency>
-	    <dependency>
-	        <groupId>io.appium</groupId>
-	        <artifactId>java-client</artifactId>
-	    </dependency>
 	    <!-- Zafira -->
 	    <dependency>
 	        <groupId>com.qaprosoft</groupId>
