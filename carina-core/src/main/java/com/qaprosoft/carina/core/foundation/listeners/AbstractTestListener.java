@@ -32,9 +32,9 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -48,7 +48,6 @@ import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -84,7 +83,6 @@ public class AbstractTestListener extends TestArgsListener
 				.push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
 
-		TestNamingUtil.releaseTestInfoByThread();
 	}
 
 	private String failItem(ITestResult result, Messager messager)
@@ -115,7 +113,6 @@ public class AbstractTestListener extends TestArgsListener
 		}
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
 
@@ -132,7 +129,6 @@ public class AbstractTestListener extends TestArgsListener
 		messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
 
@@ -197,7 +193,6 @@ public class AbstractTestListener extends TestArgsListener
 				.push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
 
 		result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-		TestNamingUtil.releaseTestInfoByThread();
 		return errorMessage;
 	}
 	
@@ -222,10 +217,21 @@ public class AbstractTestListener extends TestArgsListener
 	}
 	
 	private void afterConfiguration(ITestResult result) {
-		//register configuration step as test artifact
+/*		//register configuration step as test artifact
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
-		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));
+		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));*/
+		TestNamingUtil.releaseTestInfoByThread();
+	}
+	
+	private void afterTest(ITestResult result) {
+		//register configuration step as test artifact
+		String test = TestNamingUtil.getCanonicalTestName(result);
+		
+		Artifacts.add("Log", ReportContext.getTestLogLink(test));
+		Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
+		
+		ReportContext.renameTestDir(test);
 		TestNamingUtil.releaseTestInfoByThread();
 	}
 
@@ -336,6 +342,7 @@ public class AbstractTestListener extends TestArgsListener
 		passItem(result, Messager.TEST_PASSED);
 
 		// TestNamingUtil.releaseTestInfoByThread();
+		afterTest(result);
 		super.onTestSuccess(result);
 	}
 
@@ -363,10 +370,9 @@ public class AbstractTestListener extends TestArgsListener
 		} else
 		{
 			failItem(result, Messager.TEST_FAILED);
-			closeLogAppender(test);
+			afterTest(result);
 		}
-
-		// TestNamingUtil.releaseTestInfoByThread();
+		
 		super.onTestFailure(result);
 	}
 
@@ -392,7 +398,7 @@ public class AbstractTestListener extends TestArgsListener
 		}
 
 		skipItem(result, Messager.TEST_SKIPPED);
-		// TestNamingUtil.releaseTestInfoByThread();
+		afterTest(result);
 		super.onTestSkipped(result);
 	}
 
@@ -400,7 +406,6 @@ public class AbstractTestListener extends TestArgsListener
 	public void onFinish(ITestContext context)
 	{
 		removeIncorrectlyFailedTests(context);
-		// printContextTestsSummary(context);
 		super.onFinish(context);
 	}
 
@@ -419,11 +424,11 @@ public class AbstractTestListener extends TestArgsListener
 		{
 			// adding passed test
 			long passedTestId = getMethodId(passedTest);
-			LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
+			//LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
 			passedTestIds.add(passedTestId);
 		}
 
-		LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
+		//LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
 
 		Set<Long> failedTestIds = new HashSet<>();
 		for (ITestResult failedTest : context.getFailedTests().getAllResults())
@@ -437,16 +442,16 @@ public class AbstractTestListener extends TestArgsListener
 			if (failedTestIds.contains(failedTestId)
 					|| passedTestIds.contains(failedTestId))
 			{
-				LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
+				//LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
 				testsToBeRemoved.add(failedTest);
 			} else
 			{
-				LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
+				//LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
 				failedTestIds.add(failedTestId);
 			}
 		}
 
-		LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
+		//LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
 		// finally delete all tests that are marked for removal
 		for (Iterator<ITestResult> iterator = context.getFailedTests()
 				.getAllResults().iterator(); iterator.hasNext();)
@@ -454,7 +459,7 @@ public class AbstractTestListener extends TestArgsListener
 			ITestResult testResult = iterator.next();
 			if (testsToBeRemoved.contains(testResult))
 			{
-				LOGGER.debug("Removing test from context: " + testResult.getName());
+				//LOGGER.debug("Removing test from context: " + testResult.getName());
 				iterator.remove();
 			}
 		}
@@ -577,14 +582,14 @@ public class AbstractTestListener extends TestArgsListener
 			}
 		}
 
-		if (!FileUtils.listFiles(ReportContext.getTestDir(test), new String[]
+		if (!FileUtils.listFiles(ReportContext.getTestDir(), new String[]
 		{ "png" }, false).isEmpty())
 		{
 			if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS))
 			{
 				// remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve
 				// cooperation with CI tools
-				ReportContext.removeTestScreenshots(test);
+				ReportContext.removeTestScreenshots();
 			} else
 			{
 				linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
@@ -630,26 +635,6 @@ public class AbstractTestListener extends TestArgsListener
 			}
 		}
 		return stackTrace;
-	}
-
-	private void closeLogAppender(String test)
-	{
-		if (test == null) {
-			LOGGER.error("Unable to close appender for null test!");
-			return;
-		}
-		try
-		{
-			ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-			if (tla != null)
-			{
-				tla.closeResource(test);
-			}
-		} catch (Throwable e)
-		{
-			LOGGER.error("close log appender was not successful.");
-			e.printStackTrace();
-		}
 	}
 
 	private TestResultItem getConfigFailure()

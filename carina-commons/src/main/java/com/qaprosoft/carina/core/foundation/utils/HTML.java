@@ -21,6 +21,7 @@ package com.qaprosoft.carina.core.foundation.utils;
  * @author: Aliakse_Khursevich (hursevich@gmail.com)
  * 
  */
+@Deprecated
 public class HTML
 {
 	public static final String ID = "id";

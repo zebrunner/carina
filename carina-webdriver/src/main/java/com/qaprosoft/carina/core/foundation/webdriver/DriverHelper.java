@@ -15,33 +15,40 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.carina.core.gui.AbstractPage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.carina.core.gui.AbstractPage;
 
 
 /**
@@ -63,8 +70,6 @@ public class DriverHelper {
 
 	protected long timer;
 
-	protected TestLogHelper summary;
-
 	protected WebDriver driver;
 
 	protected CryptoTool cryptoTool;
@@ -73,7 +78,6 @@ public class DriverHelper {
 
 	public DriverHelper() {
 		cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-		summary = new TestLogHelper(UUID.randomUUID().toString());
 	}
 	
 	public DriverHelper(WebDriver driver) {
@@ -86,8 +90,6 @@ public class DriverHelper {
 		
 		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		
-		// Initializes test log container dedicated to WebDriver instance.
-		summary = new TestLogHelper(driver);
 	}
 
 	// --------------------------------------------------------------------------
@@ -608,7 +610,6 @@ public class DriverHelper {
 		isElementPresent(extendedWebElement);
 		pressEnterSafe(extendedWebElement, true);
 		String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
-		summary.log(msg);
 		Screenshot.capture(getDriver(), msg);
 	}
 
@@ -649,7 +650,6 @@ public class DriverHelper {
 				pressEnterSafe(extendedWebElement, false);
 			} else {
 				String msg = Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator());
-				summary.log(msg);
 				throw new RuntimeException(msg, e);
 			}
 		}
@@ -719,12 +719,10 @@ public class DriverHelper {
 		try {
 			drv.manage().window().maximize();
 		} catch (Exception e) {
-			summary.log(e.getMessage());
-			// e.printStackTrace();
+			LOGGER.error(e.getMessage(), e);
 		}
 
 		String msg = Messager.OPEN_URL.info(url);
-		summary.log(msg);
 		Screenshot.capture(driver, msg);
 	}
 
@@ -740,7 +738,7 @@ public class DriverHelper {
 		decryptedURL = decryptedURL.startsWith("http") ? decryptedURL : Configuration.get(Parameter.URL) + decryptedURL;
 		WebDriver drv = getDriver();
 		if (LogicUtils.isURLEqual(decryptedURL, drv.getCurrentUrl())) {
-			summary.log(Messager.EXPECTED_URL.info(drv.getCurrentUrl()));
+			Messager.EXPECTED_URL.info(drv.getCurrentUrl());
 			return true;
 		} else {
 			Messager.UNEXPECTED_URL.error(expectedURL, drv.getCurrentUrl());
@@ -788,10 +786,10 @@ public class DriverHelper {
 		try {
 			wait.until((Function<WebDriver, Object>) dr -> drv.getTitle().contains(decryptedExpectedTitle));
 			result = true;
-			summary.log(Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), expectedTitle));
+			Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), expectedTitle);
 		} catch (Exception e) {
 			result = false;
-			summary.log(Messager.TITLE_NOT_CORERECT.error(drv.getCurrentUrl(), expectedTitle, drv.getTitle()));
+			Messager.TITLE_NOT_CORERECT.error(drv.getCurrentUrl(), expectedTitle, drv.getTitle());
 		}
 		return result;
 	}
@@ -811,10 +809,10 @@ public class DriverHelper {
 		Pattern p = Pattern.compile(decryptedExpectedPattern);
 		Matcher m = p.matcher(actual);
 		if (m.find()) {
-			summary.log(Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), actual));
+			Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), actual);
 			result = true;
 		} else {
-			summary.log(Messager.TITLE_DOES_NOT_MATCH_TO_PATTERN.error(drv.getCurrentUrl(), expectedPattern, actual));
+			Messager.TITLE_DOES_NOT_MATCH_TO_PATTERN.error(drv.getCurrentUrl(), expectedPattern, actual);
 			result = false;
 		}
 		return result;
@@ -825,7 +823,7 @@ public class DriverHelper {
 	 */
 	public void navigateBack() {
 		getDriver().navigate().back();
-		summary.log(Messager.BACK.info());
+		Messager.BACK.info();
 	}
 
 	/**
@@ -833,7 +831,7 @@ public class DriverHelper {
 	 */
 	public void refresh() {
 		getDriver().navigate().refresh();
-		summary.log(Messager.REFRESH.info());
+		Messager.REFRESH.info();
 	}
 
 	/**
@@ -993,10 +991,9 @@ public class DriverHelper {
 			}
 
 			String msg = Messager.HOVER_IMG.info(extendedWebElement.getName());
-			summary.log(msg);
 			Screenshot.capture(drv, msg);
 		} else {
-			summary.log(Messager.ELEMENT_NOT_HOVERED.error(extendedWebElement.getNameWithLocator()));
+			Messager.ELEMENT_NOT_HOVERED.error(extendedWebElement.getNameWithLocator());
 		}
 	}
 
@@ -1018,7 +1015,6 @@ public class DriverHelper {
 		Actions action = new Actions(drv);
 		action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
 		String msg = Messager.HOVER_IMG.info(elementName);
-		summary.log(msg);
 		Screenshot.capture(drv, msg);
 	}
 
@@ -1076,11 +1072,9 @@ public class DriverHelper {
 			}
 
 			String msg = Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
-			summary.log(msg);
 			Screenshot.capture(drv, msg);
 		} else {
-			summary.log(Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(),
-					to.getNameWithLocator()));
+			Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(), to.getNameWithLocator());
 		}
 	}
 
@@ -1101,11 +1095,9 @@ public class DriverHelper {
 					.build().perform();
 			String msg = Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX),
 					String.valueOf(moveY));
-			summary.log(msg);
 			Screenshot.capture(drv, msg);
 		} else {
-			summary.log(Messager.SLIDER_NOT_MOVED.error(slider.getNameWithLocator(), String.valueOf(moveX),
-					String.valueOf(moveY)));
+			Messager.SLIDER_NOT_MOVED.error(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
 		}
 	}
 
@@ -1187,7 +1179,6 @@ public class DriverHelper {
 				"document.getElementById('%s').contentWindow.document.getElementById('%s').innerHTML='%s'", frame, id,
 				decryptedText));
 		String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
-		summary.log(msg);
 		Screenshot.capture(drv, msg);
 	}
 
@@ -1200,7 +1191,6 @@ public class DriverHelper {
 						.format("document.contentWindow.getElementsByTagName('ol')[0].getElementsByTagName('li')[1].getElementsByClassName('CodeMirror-lines')[0].getElementsByTagName('div')[0].getElementsByTagName('div')[2].innerHTML=<pre><span class='cm-plsql-word'>'%s'</span></pre>",
 								decryptedText));
 		String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
-		summary.log(msg);
 		Screenshot.capture(drv, msg);
 	}
 
@@ -1366,10 +1356,10 @@ public class DriverHelper {
 		try {
 			wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
 			element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
-			summary.log(Messager.ELEMENT_FOUND.info(name));
+			Messager.ELEMENT_FOUND.info(name);
 		} catch (Exception e) {
 			element = null;
-			summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
+			Messager.ELEMENT_NOT_FOUND.error(name);
 			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
 		}
@@ -1420,7 +1410,7 @@ public class DriverHelper {
 		if (driver != null) {
 			return driver;
 		}
-		LOGGER.error("Unable to find driver in DriverHelper without DriverPool!");
+		LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
 		
 		long currentThreadId = Thread.currentThread().getId();
 		if (driver == null || driver.toString().contains("null")) {

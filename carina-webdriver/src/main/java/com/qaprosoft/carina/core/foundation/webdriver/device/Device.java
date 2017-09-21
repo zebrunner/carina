@@ -10,10 +10,10 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
@@ -709,7 +709,7 @@ public class Device
     }
     
     public String getAdbName() {
-    	if (remoteURL != null) {
+    	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER) && remoteURL != null) {
     		return remoteURL;
     	} else {
     		return udid;
