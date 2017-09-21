@@ -4,7 +4,8 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>aws-s3-manager</artifactId>
+	<groupId>com.qaprosoft.carina</groupId>
+	<artifactId>carina-aws-s3</artifactId>
 	<packaging>jar</packaging>
 
 	<name>AWS S3 Helper Utility</name>
@@ -31,7 +32,7 @@
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 
