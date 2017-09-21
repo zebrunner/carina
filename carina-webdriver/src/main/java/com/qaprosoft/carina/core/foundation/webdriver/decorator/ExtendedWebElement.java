@@ -54,13 +54,12 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.log.TestLogHelper;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
@@ -84,8 +83,6 @@ public class ExtendedWebElement {
 
     private long timer;
 
-    private TestLogHelper summary;
-
     private CryptoTool cryptoTool;
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
@@ -108,7 +105,6 @@ public class ExtendedWebElement {
     public ExtendedWebElement(WebElement element, WebDriver driver) {
         this.element = element;
         this.driver = driver;
-        summary = new TestLogHelper(driver);
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
     }
 
@@ -145,7 +141,7 @@ public class ExtendedWebElement {
 		
 		LOGGER.debug("There is null WebElement object. Trying to find dynamic element using By: " + by.toString());
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(1);
+		setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			wait.until((Function<WebDriver, Object>) dr -> {
@@ -157,6 +153,8 @@ public class ExtendedWebElement {
 				return false;
 			});
 			// summary.log(Messager.ELEMENT_FOUND.info(name));
+		} catch (TimeoutException e) {
+			//do nothing
 		} catch (Exception e) {
 			element = null;
 			// summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
@@ -255,7 +253,6 @@ public class ExtendedWebElement {
         captureElements();
         clickSafe(timeout, true);
         String msg = Messager.ELEMENT_CLICKED.info(getName());
-        summary.log(msg);
         try {
             Screenshot.capture(getDriver(), msg);
         } catch (Exception e) {
@@ -270,7 +267,6 @@ public class ExtendedWebElement {
     public void doubleClick() {
         doubleClickSafe(true);
         String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(getName());
-        summary.log(msg);
         try {
             Screenshot.capture(getDriver(), msg);
         } catch (Exception e) {
@@ -310,7 +306,6 @@ public class ExtendedWebElement {
                 doubleClickSafe(false);
             } else {
                 String msg = Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator());
-                summary.log(msg);
                 throw new RuntimeException(msg, e);
             }
         }
@@ -332,12 +327,9 @@ public class ExtendedWebElement {
             action.moveToElement(element).contextClick(element).build().perform();
 
             msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
-            summary.log(msg);
-
             res = true;
         } catch (Exception e) {
             msg = Messager.ELEMENT_NOT_RIGHT_CLICKED.info(getName());
-            summary.log(msg);
             LOGGER.error(e.getMessage());
         }
 
@@ -366,11 +358,9 @@ public class ExtendedWebElement {
             executor.executeScript("arguments[0].click();", elem);
 
             msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
-            summary.log(msg);
             res = true;
         } catch (Exception e) {
             msg = Messager.HIDDEN_ELEMENT_NOT_CLICKED.info(getName());
-            summary.log(msg);
             LOGGER.error(e.getMessage());
         }
         try {
@@ -406,11 +396,14 @@ public class ExtendedWebElement {
         final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
+        } catch (NoSuchElementException | TimeoutException e) {
+        	//don't write exception even in debug mode
+        	result = false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             result = false;
@@ -448,17 +441,19 @@ public class ExtendedWebElement {
                 try {
                 	element = findElement(timeout);
                     return element.isDisplayed() && element.getText().contains(decryptedText);
+                } catch (NoSuchElementException | TimeoutException e) {
+                	return false;
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage(), e.getCause());
                     return false;
                 }
             });
             result = true;
-            summary.log(Messager.ELEMENT_WITH_TEXT_PRESENT.info(getName(), text));
+            Messager.ELEMENT_WITH_TEXT_PRESENT.info(getName(), text);
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             result = false;
-            summary.log(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.error(getNameWithLocator(), text));
+            Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.error(getNameWithLocator(), text);
         }
         return result;
     }
@@ -470,15 +465,16 @@ public class ExtendedWebElement {
     public boolean clickIfPresent(long timeout) {
         boolean result;
         WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> findElement(timeout).isDisplayed());
             captureElements();
             element.click();
-            String msg = Messager.ELEMENT_CLICKED.info(getName());
-            summary.log(msg);
+            Messager.ELEMENT_CLICKED.info(getName());
             result = true;
+        } catch (NoSuchElementException | TimeoutException e) {
+        	return false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             result = false;
@@ -506,17 +502,14 @@ public class ExtendedWebElement {
             element.clear();
             element.sendKeys(decryptedText);
             msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-            summary.log(msg);
         } catch (StaleElementReferenceException e) {
             element = findStaleElement();
             LOGGER.debug(e.getMessage(), e.getCause());
             element.clear();
             element.sendKeys(decryptedText);
             msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-            summary.log(msg);
         } catch (Exception e) {
             msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
-            summary.log(msg);
             throw new RuntimeException(msg, e);
         }
         Screenshot.capture(drv, msg);
@@ -583,7 +576,6 @@ public class ExtendedWebElement {
                 clickSafe(timeout, false);
             } else {
                 String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
-                summary.log(msg);
                 throw new RuntimeException(msg, reason);
             }
         }
@@ -625,10 +617,8 @@ public class ExtendedWebElement {
             wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
             element.sendKeys(decryptedFilePath);
             msg = Messager.FILE_ATTACHED.info(filePath);
-            summary.log(msg);
         } catch (Exception e) {
             msg = Messager.FILE_NOT_ATTACHED.error(filePath);
-            summary.log(msg);
             throw new RuntimeException(msg, e);
         }
         Screenshot.capture(drv, msg);
@@ -643,7 +633,6 @@ public class ExtendedWebElement {
         if (isElementPresent() && !findElement(EXPLICIT_TIMEOUT).isSelected()) {
             click();
             String msg = Messager.CHECKBOX_CHECKED.info(getName());
-            summary.log(msg);
             Screenshot.capture(getDriver(), msg);
         }
     }
@@ -657,7 +646,6 @@ public class ExtendedWebElement {
         if (isElementPresent() && findElement(EXPLICIT_TIMEOUT).isSelected()) {
             click();
             String msg = Messager.CHECKBOX_UNCHECKED.info(getName());
-            summary.log(msg);
             Screenshot.capture(getDriver(), msg);
         }
     }
@@ -739,7 +727,6 @@ public class ExtendedWebElement {
             msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(selectText, getNameWithLocator());
             e.printStackTrace();
         }
-        summary.log(msg);
         Screenshot.capture(drv, msg);
 
         return isSelected;
@@ -810,7 +797,6 @@ public class ExtendedWebElement {
             msg = Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), getNameWithLocator());
             e.printStackTrace();
         }
-        summary.log(msg);
         Screenshot.capture(drv, msg);
 
         return isSelected;
@@ -855,7 +841,6 @@ public class ExtendedWebElement {
             msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator());
             e.printStackTrace();
         }
-        summary.log(msg);
         Screenshot.capture(drv, msg);
 
         return isSelected;
@@ -891,7 +876,6 @@ public class ExtendedWebElement {
             msg = Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), getNameWithLocator());
             e.printStackTrace();
         }
-        summary.log(msg);
         Screenshot.capture(drv, msg);
 
         return isSelected;
@@ -969,7 +953,7 @@ public class ExtendedWebElement {
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         ExtendedWebElement element;
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
@@ -1003,7 +987,7 @@ public class ExtendedWebElement {
         List<WebElement> webElements = new ArrayList<WebElement>();
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> {
@@ -1017,6 +1001,8 @@ public class ExtendedWebElement {
 
             });
             webElements = this.getElement().findElements(by);
+        } catch (NoSuchElementException | TimeoutException e) {
+        	//do nothing
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             //do nothing
@@ -1052,7 +1038,7 @@ public class ExtendedWebElement {
         LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(1);
+        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
@@ -1129,15 +1115,12 @@ public class ExtendedWebElement {
             ExpectedConditions.elementToBeClickable(locator);
             (new WebDriverWait(drv, timeout)).until(ExpectedConditions.elementToBeClickable(locator));
             msg = Messager.ELEMENT_BECOME_CLICKABLE.info(getName());
-            summary.log(msg);
         } catch (TimeoutException ex) {
             msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
-            summary.log(msg);
             LOGGER.error(ex);
             res = false;
         } catch (Exception e) {
             msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
-            summary.log(msg);
             LOGGER.error(e);
             res = false;
         }
@@ -1173,15 +1156,12 @@ public class ExtendedWebElement {
             ExpectedConditions.elementToBeClickable(locator);
             (new WebDriverWait(drv, timeout)).until(ExpectedConditions.visibilityOfElementLocated(locator));
             msg = Messager.ELEMENT_BECOME_VISIBLE.info(getName());
-            summary.log(msg);
         } catch (TimeoutException ex) {
             msg = Messager.ELEMENT_NOT_BECOME_VISIBLE.info(getName());
-            summary.log(msg);
             LOGGER.error(ex);
             res = false;
         } catch (Exception e) {
             msg = Messager.ELEMENT_NOT_BECOME_VISIBLE.info(getName());
-            summary.log(msg);
             LOGGER.error(e);
             res = false;
         }

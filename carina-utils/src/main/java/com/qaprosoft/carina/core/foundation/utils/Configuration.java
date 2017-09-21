@@ -26,6 +26,8 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+
 /**
  * Configuration utility.
  * 
@@ -264,6 +266,8 @@ public class Configuration
 		
 		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout"),
 		
+		MOBILE_STF_DOCKER_CONTAINER("mobile_stf_docker_container"),
+		
 		MOBILE_DEVICES("mobile_devices"),
 		
 		MOBILE_TOOLS_HOME("mobile_tools_home"),
@@ -299,19 +303,6 @@ public class Configuration
 
 		TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
 
-		// spira
-		SPIRA_URL("spira_url"),
-		
-		SPIRA_USER("spira_user"),
-		
-		SPIRA_PASSWORD("spira_password"),
-		
-		SPIRA_UPDATER("spira_updater"),
-		
-		SPIRA_RELEASE_ID("spira_release_id"),
-		
-		SPIRA_TESTSET_ID("spira_testset_id"),
-		
 		//zafira
 		ZAFIRA_GRID_ENABLED("zafira_grid_enabled"),
 		
@@ -432,6 +423,7 @@ public class Configuration
 		return DriverMode.valueOf(get(Parameter.DRIVER_MODE).trim().toUpperCase());
 	}
 	
+	@Deprecated
 	public static Locale getLocale()
 	{
 		Locale locale = null;

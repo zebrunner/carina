@@ -55,10 +55,10 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -67,7 +67,6 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.spira.Spira;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
@@ -76,7 +75,6 @@ import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -226,8 +224,6 @@ public abstract class AbstractTest // extends DriverHelper
     public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
                                         ITestContext context) throws Throwable {
         // do nothing for now
-        Spira.registerStepsFromAnnotation(testMethod);
-        
         apiMethodBuilder = new APIMethodBuilder();
     }
     
@@ -236,6 +232,8 @@ public abstract class AbstractTest // extends DriverHelper
     public void executeAfterTestMethod(ITestResult result) {
 
         try {
+        	apiMethodBuilder.close();
+        	
             DriverMode driverMode = Configuration.getDriverMode();
 
             if (driverMode == DriverMode.METHOD_MODE) {
@@ -259,15 +257,10 @@ public abstract class AbstractTest // extends DriverHelper
                 return;
             }
 
-            String test = TestNamingUtil.getCanonicalTestName(result);
             List<String> tickets = Jira.getTickets(result);
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
             Jira.updateAfterTest(result);
 
-
-            // Populate Spira Steps
-            Spira.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE), tickets);
-            Spira.clear();
 
             // Populate TestRail Cases
 
@@ -284,15 +277,6 @@ public abstract class AbstractTest // extends DriverHelper
             Jira.clearTickets();
 
             Artifacts.clearArtifacts();
-
-            try {
-                ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-                if (tla != null) {
-                    tla.closeResource(test);
-                }
-            } catch (NoSuchMethodError e) {
-                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-            }
 
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
@@ -314,7 +298,7 @@ public abstract class AbstractTest // extends DriverHelper
 
             String browser = getBrowser();
             String deviceName = getDeviceName();
-            String suiteName = getSuiteName(context);
+            //String suiteName = getSuiteName(context);
             String title = getTitle(context);
 
             TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
@@ -335,9 +319,6 @@ public abstract class AbstractTest // extends DriverHelper
 
             // Update JIRA
             Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
-
-            // Update Spira
-            Spira.updateAfterSuite(this.getClass().getName(), testResult, title + "; " + getCIJobReference(), suiteName, startDate);
 
             //generate and send email report by Zafira to test group of people
             String emailList = Configuration.get(Parameter.EMAIL_LIST);
@@ -374,6 +355,8 @@ public abstract class AbstractTest // extends DriverHelper
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
+            
+            LOGGER.debug("Generating email report...");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
@@ -386,6 +369,7 @@ public abstract class AbstractTest // extends DriverHelper
                 default:
                     //do nothing
             }
+            LOGGER.debug("Finish email report generation.");
             
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
@@ -446,7 +430,11 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     private String getSuiteFileName(ITestContext context) {
+    	//TODO: investigate why we need such method and suite file name at all
         String fileName = context.getSuite().getXmlSuite().getFileName();
+        if (fileName == null) {
+        	fileName = "undefined";
+        }
         LOGGER.debug("Full suite file name: " + fileName);
         if (fileName.contains("\\")) {
             fileName = fileName.replaceAll("\\\\", "/");
@@ -547,7 +535,7 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     @DataProvider(name = "SingleDataProvider")
-	public Object[][] createDataSingeThread(final ITestNGMethod testMethod,
+	public Object[][] createDataSingleThread(final ITestNGMethod testMethod,
                                             ITestContext context) {
 		Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
 		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);

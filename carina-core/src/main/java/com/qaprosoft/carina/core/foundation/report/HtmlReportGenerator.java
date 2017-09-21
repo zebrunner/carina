@@ -26,12 +26,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.log.TestLogCollector;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZipManager;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class HtmlReportGenerator
 {
@@ -86,7 +86,7 @@ public class HtmlReportGenerator
 					image = image.replace("onload=\"\"", "onload=\"this.click()\"");
 				}
 				
-				String title = TestLogCollector.getScreenshotComment(imgNames.get(i));
+				String title = Screenshot.getScreenshotComment(imgNames.get(i));
 				if (title == null) 
 				{
 					title = "";
@@ -103,8 +103,7 @@ public class HtmlReportGenerator
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			LOGGER.error(e.getMessage());
-			LOGGER.error(e.getStackTrace().toString());
+			LOGGER.error(e.getMessage(), e);
 		}
 	}
 

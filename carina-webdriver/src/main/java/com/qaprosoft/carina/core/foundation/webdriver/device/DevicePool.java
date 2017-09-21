@@ -28,11 +28,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
 public class DevicePool
@@ -255,8 +255,12 @@ public class DevicePool
 			String allModels = StringUtils.join(DEVICE_MODELS, "+");
 			LOGGER.info(
 					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
+
 			freeDevice = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
-			freeDevice.connectRemote();
+			//TODO: remove if operator and MOBILE_STF_DOCKER_CONTAINER property whe all clients moved to the dockerized cloud solution
+			if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
+				freeDevice.connectRemote();
+			}
 		} else
 		{
 			freeDevice = findDevice();
@@ -321,6 +325,7 @@ public class DevicePool
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
 			if (GRID_ENABLED)
 			{
+				// no need to disconnect as closing STF session automatically disconnect adb session for this device 
 				//device.disconnectRemote();
 				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 			}
@@ -437,12 +442,12 @@ public class DevicePool
 	public static Device getCurrentDevice() {
 		Device device = curDevice.get();
 		if (device == null) {
-			LOGGER.info("Current device is null!");
+			LOGGER.debug("Current device is null!");
 			device = nullDevice;
 		} else if (device.getName().isEmpty()) {
-			LOGGER.info("Current device name is empty! nullDevice was used");
+			LOGGER.debug("Current device name is empty! nullDevice was used");
 		} else {
-			LOGGER.info("Current device name is '" + device.getName() + "'");
+			LOGGER.debug("Current device name is '" + device.getName() + "'");
 		}
 		return device;
 	}

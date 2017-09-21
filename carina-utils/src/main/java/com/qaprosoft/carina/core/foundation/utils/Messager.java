@@ -22,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.Reporter;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+
 /**
  * ReportMessage is used for reporting informational and error messages both
  * using logger and testsNG Reporter.
