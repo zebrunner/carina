@@ -618,8 +618,21 @@ public abstract class AbstractTest // extends DriverHelper
 			if (s3LocalStorage.isEmpty()) {
 				// generate Pre-Signed url for next 5 hours and put it as argument to mobile_app property
 				URL url = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, 1000 * 60 * 60 * 5);
-				R.CONFIG.put(Parameter.MOBILE_APP.getKey(), url.getFile());
+				R.CONFIG.put(Parameter.MOBILE_APP.getKey(), url.toString());
 				LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+				
+				
+				String tempUrl = url.toString();
+				int start = tempUrl.lastIndexOf("/");
+				int finish = tempUrl.indexOf("?");
+				
+				if (finish > start && start > 0 && finish > 0) {
+					tempUrl = tempUrl.substring(start + 1, finish);
+					String appVersion = Configuration.get(Parameter.APP_VERSION);
+					if (appVersion.equals("latest") || appVersion.isEmpty()) {
+						R.CONFIG.put(Parameter.APP_VERSION.getKey(), tempUrl);
+					}
+				}
 			} else {
 				// download file from AWS to local storage
 
