@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -613,27 +614,37 @@ public abstract class AbstractTest // extends DriverHelper
 			S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
 
 			String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
-
-			String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
-			File file = new File(fileName);
-
-			// verify maybe requested artifact with the same size was already
-			// download
-			if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
-				LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
-			} else {
-				LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s", bucketName, key,
-						file.getAbsolutePath()));
-				AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
-			}
-
-			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
-			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
 			
-			//try to redefine app_version if it's value is latest or empty
-			String appVersion = Configuration.get(Parameter.APP_VERSION);
-			if (appVersion.equals("latest") || appVersion.isEmpty()) {
-				R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+			if (s3LocalStorage.isEmpty()) {
+				// generate Pre-Signed url for next 5 hours and put it as argument to mobile_app property
+				URL url = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, 1000 * 60 * 60 * 5);
+				R.CONFIG.put(Parameter.MOBILE_APP.getKey(), url.getFile());
+				LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+			} else {
+				// download file from AWS to local storage
+
+
+				String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
+				File file = new File(fileName);
+	
+				// verify maybe requested artifact with the same size was already
+				// download
+				if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
+					LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+				} else {
+					LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s", bucketName, key,
+							file.getAbsolutePath()));
+					AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
+				}
+	
+				R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+				LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+				
+				//try to redefine app_version if it's value is latest or empty
+				String appVersion = Configuration.get(Parameter.APP_VERSION);
+				if (appVersion.equals("latest") || appVersion.isEmpty()) {
+					R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+				}
 			}
 		}
 	}
