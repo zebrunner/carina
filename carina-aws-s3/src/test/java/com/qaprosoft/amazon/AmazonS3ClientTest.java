@@ -3,13 +3,10 @@ package com.qaprosoft.amazon;
 
 import java.net.URL;
 
-import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class AmazonS3ClientTest {
-	protected static final Logger LOGGER = Logger
-			.getLogger(AmazonS3ClientTest.class);
 
 	@Test()
 	public void testS3ManagerInit() {
@@ -100,7 +97,10 @@ public class AmazonS3ClientTest {
 	@Test()
 	public void testgeneratePreSignURL() {
 			URL url = AmazonS3Manager.getInstance().generatePreSignUrl("carina.qaprosoft.com", "test.txt", 1000*60*10);
-			LOGGER.info(url.toString());
+			System.out.println(url.toString());
+//			Example: 
+//			https://carina.qaprosoft.com.s3.amazonaws.com/test.txt?AWSAccessKeyId=AKIAIF43YTFM7RWG7EVQ&Expires=1506266253&Signature=um7fDD2cZmTKLd%2BLZYs0Yq2%2Fc50%3D
+			//TODO: add verification that file is accessible without creds
 	}
 
 }
