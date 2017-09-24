@@ -1,6 +1,7 @@
 package com.qaprosoft.amazon;
 
 import java.io.File;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,11 +9,13 @@ import org.apache.log4j.Logger;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -338,6 +341,30 @@ public class AmazonS3Manager {
 			throw new RuntimeException("File wasn't downloaded from s3. See log: ".concat(e.getMessage()));
 		}
 		//tx.shutdownNow();
+	}
+	
+	
+	/**
+	 * Method to generate pre-signed object URL to s3 object
+	 * @param bucketName
+	 * @param key (example: android/apkFolder/ApkName.apk)
+	 * @param ms espiration time in ms, i.e. 1 hour is 1000*60*60
+	 * @return url String pre-signed URL
+	 */
+	public URL generatePreSignUrl(final String bucketName, final String key, long ms) {
+		
+		java.util.Date expiration = new java.util.Date();
+		long msec = expiration.getTime();
+		msec += ms;
+		expiration.setTime(msec);
+		             
+		GeneratePresignedUrlRequest generatePresignedUrlRequest = 
+		              new GeneratePresignedUrlRequest(bucketName, key);
+		generatePresignedUrlRequest.setMethod(HttpMethod.GET);
+		generatePresignedUrlRequest.setExpiration(expiration);
+		             
+		URL url = s3client.generatePresignedUrl(generatePresignedUrlRequest);
+		return url;
 	}
 	
 	/*

@@ -1,12 +1,15 @@
 package com.qaprosoft.amazon;
 
 
+import java.net.URL;
+
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.amazon.AmazonS3Manager;
-
 public class AmazonS3ClientTest {
+	protected static final Logger LOGGER = Logger
+			.getLogger(AmazonS3ClientTest.class);
 
 	@Test()
 	public void testS3ManagerInit() {
@@ -92,6 +95,12 @@ public class AmazonS3ClientTest {
 		} catch (RuntimeException e) {
 			// Expected failure
 		}
+	}
+	
+	@Test()
+	public void testgeneratePreSignURL() {
+			URL url = AmazonS3Manager.getInstance().generatePreSignUrl("carina.qaprosoft.com", "test.txt", 1000*60*10);
+			LOGGER.info(url.toString());
 	}
 
 }
