@@ -61,14 +61,15 @@ public class Device
 		this.osVersion = params[3];
 		this.udid = params[4];
 		this.seleniumServer = params[5];
+		this.remoteURL = params[6];
 	}
 	
 	public Device()
 	{
-		this(null, null, null, null, null, null);
+		this(null, null, null, null, null, null, null);
 	}
 
-	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer)
+	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer, String remoteURL)
 	{
 		this.name = name;
 		this.type = type;
@@ -76,7 +77,7 @@ public class Device
 		this.osVersion = osVersion;
 		this.udid = udid;
 		this.seleniumServer = seleniumServer;
-
+		this.remoteURL = remoteURL;
 	}
 
 	public String getName()

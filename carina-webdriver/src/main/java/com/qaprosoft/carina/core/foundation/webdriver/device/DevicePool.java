@@ -48,7 +48,7 @@ public class DevicePool
 
 	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
 
-	private static final Device nullDevice = new Device("", "", "", "", "", "");
+	private static final Device nullDevice = new Device("", "", "", "", "", "", "");
 	
 	private static ThreadLocal<Device> curDevice = new ThreadLocal<Device>();
 
@@ -59,7 +59,8 @@ public class DevicePool
 				Configuration.get(Parameter.MOBILE_PLATFORM_NAME),
 				Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
 				Configuration.get(Parameter.MOBILE_DEVICE_UDID),
-				Configuration.get(Parameter.SELENIUM_HOST));
+				Configuration.get(Parameter.SELENIUM_HOST),
+				"");
 		DEVICES.add(device);
 		DEVICE_MODELS.add(device.getName());
 		String msg = "Registered single device into the DevicePool: %s - %s";
@@ -107,7 +108,7 @@ public class DevicePool
         	}
         	String seleniumServer = propertiesMap.get("core.selenium_host");
         	
-        	addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer));
+        	addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer, ""));
         }
 
 	}
@@ -115,7 +116,8 @@ public class DevicePool
 	public static synchronized void addDevices()
 	{
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
-				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
+				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 			return;
 		}
 			

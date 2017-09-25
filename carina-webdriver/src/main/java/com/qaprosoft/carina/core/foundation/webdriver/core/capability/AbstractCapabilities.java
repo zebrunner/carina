@@ -1,7 +1,9 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
@@ -12,6 +14,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 public abstract class AbstractCapabilities {
     protected static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
@@ -46,7 +49,18 @@ public abstract class AbstractCapabilities {
     	if (extraCapabilities != null) {
     		capabilities.merge(extraCapabilities);
     	}
-		
+    	
+    	//read all properties from config.properties and use "web.*" to redefine base capability
+    	final String web = "web.";
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+			if (entry.getKey().startsWith(web)) {
+				String cap = entry.getKey().replaceAll(web, "");
+				capabilities.setCapability(cap, R.CONFIG.get(entry.getKey()));
+			}
+		}
+
         return capabilities;
     }
     
