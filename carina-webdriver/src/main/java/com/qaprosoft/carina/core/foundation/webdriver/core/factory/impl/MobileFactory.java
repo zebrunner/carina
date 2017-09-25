@@ -15,7 +15,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileGridCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileNativeCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobilePoolCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileWebCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -46,7 +45,6 @@ public class MobileFactory extends AbstractFactory {
         DesiredCapabilities capabilities = getCapabilities(name, device);
         try {
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
 					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 				if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 					// use uiautomator2 for Android 7
@@ -107,10 +105,7 @@ public class MobileFactory extends AbstractFactory {
             } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
                     && Configuration.get(Configuration.Parameter.BROWSER).isEmpty()) {
             	capabilities = new MobileNativeCapabilities().getCapability(name);
-            } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
-            	//TODO: ensure that mobile_pool works for web testing too!
-            	capabilities = new MobilePoolCapabilities().getCapability(name, device);            	
-            }else {
+            } else {
                 throw new RuntimeException("Unsupported driver type:" + driverType);
             }
         }

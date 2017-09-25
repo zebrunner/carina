@@ -29,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -45,8 +44,6 @@ public class DevicePool
 
 	private static final List<Device> DEVICES = Collections.synchronizedList(new ArrayList<Device>());
 	private static final List<String> DEVICE_MODELS = Collections.synchronizedList(new ArrayList<String>());
-
-	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
 
 	private static final Device nullDevice = new Device("", "", "", "", "", "", "");
 	
@@ -116,7 +113,6 @@ public class DevicePool
 	public static synchronized void addDevices()
 	{
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
-				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
 				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 			return;
 		}
@@ -192,7 +188,6 @@ public class DevicePool
 				{
 					String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
 					device.disconnectRemote();
-					DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 					throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
 				}
 				freeDevice = device;
@@ -256,25 +251,13 @@ public class DevicePool
 	public static Device registerDevice()
 	{
 		Long threadId = Thread.currentThread().getId();
-		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
+		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
 		{
 			return nullDevice;
 		}
 
 		final String testId = UUID.randomUUID().toString();
-		Device freeDevice = nullDevice;
-		if (GRID_ENABLED)
-		{
-			String allModels = StringUtils.join(DEVICE_MODELS, "+");
-			LOGGER.info(
-					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
-
-			freeDevice = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
-		} else
-		{
-			freeDevice = findDevice();
-		}
+		Device freeDevice = findDevice();
 
 		if (freeDevice != nullDevice)
 		{
@@ -333,12 +316,6 @@ public class DevicePool
 		if (THREAD_2_DEVICE_MAP.containsKey(threadId))
 		{
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
-			if (GRID_ENABLED)
-			{
-				// no need to disconnect as closing STF session automatically disconnect adb session for this device 
-				//device.disconnectRemote();
-				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
-			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
 			String msg = "Disconnected device '%s - %s' for test '%s'; thread '%s'";
 			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), device.getTestId(), threadId));
@@ -360,8 +337,7 @@ public class DevicePool
 			type = getDevice().getType();
 		} else
 		{
-			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
+			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
 					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID))
 			{
 				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID))
