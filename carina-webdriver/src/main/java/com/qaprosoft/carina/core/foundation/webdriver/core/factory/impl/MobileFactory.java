@@ -65,7 +65,7 @@ public class MobileFactory extends AbstractFactory {
 					
 					//TODO: refactor code to remote mobile_devices pool reference at all.
 					//String sid = ((RemoteWebDriver) driver).getSessionId().toString();
-					String udid = driver.getCapabilities().getCapability("udid").toString();
+					String udid = driver.getCapabilities().getCapability("deviceUDID").toString();
 					device = DevicePool.findDevice(udid);
 					device.connectRemote();
 					
