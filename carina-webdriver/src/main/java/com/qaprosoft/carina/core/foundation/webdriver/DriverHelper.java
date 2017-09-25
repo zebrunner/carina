@@ -1407,7 +1407,7 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
-		if (driver != null) {
+		if (driver != null && !driver.toString().contains("null")) {
 			return driver;
 		}
 		LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
