@@ -231,11 +231,10 @@ public abstract class AbstractTest // extends DriverHelper
     
     @AfterMethod(alwaysRun = true)
     public void executeAfterTestMethod(ITestResult result) {
-    	if (apiMethodBuilder == null) {
-			apiMethodBuilder = new APIMethodBuilder();
-		}
         try {
-        	apiMethodBuilder.close();
+        	if (apiMethodBuilder != null) {
+        		apiMethodBuilder.close();
+        	}
         	
             DriverMode driverMode = Configuration.getDriverMode();
 
