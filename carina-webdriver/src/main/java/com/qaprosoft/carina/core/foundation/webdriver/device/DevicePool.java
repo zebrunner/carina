@@ -241,6 +241,18 @@ public class DevicePool
 		return freeDevice;
 	}
 
+	public static void registerDevice(Device freeDevice) {
+		if (freeDevice != nullDevice)
+		{
+			Long threadId = Thread.currentThread().getId();
+			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
+		} else
+		{
+			throw new RuntimeException("Unable to register null Device for the test!");
+		}
+		
+	}
+	
 	public static Device registerDevice()
 	{
 		Long threadId = Thread.currentThread().getId();
@@ -259,10 +271,6 @@ public class DevicePool
 					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
 
 			freeDevice = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
-			//TODO: remove if operator and MOBILE_STF_DOCKER_CONTAINER property whe all clients moved to the dockerized cloud solution
-			if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
-				freeDevice.connectRemote();
-			}
 		} else
 		{
 			freeDevice = findDevice();
