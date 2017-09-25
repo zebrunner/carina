@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -90,494 +89,495 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
  * 
  * @author Alex Khursevich
  */
-@Listeners({AbstractTestListener.class})
+@Listeners({ AbstractTestListener.class })
 public abstract class AbstractTest // extends DriverHelper
 {
-    protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
+	protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
-    protected APIMethodBuilder apiMethodBuilder;
+	protected APIMethodBuilder apiMethodBuilder;
 
-    protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
-    protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+	protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
+	protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
-    protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
-    protected static final String XML_SUITE_NAME = " (%s)";
+	protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
+	protected static final String XML_SUITE_NAME = " (%s)";
 
-    protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
-    
-    // 3rd party integrations
-    protected String browserVersion = "";
-    protected long startDate;
+	protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
 
-    @BeforeSuite(alwaysRun = true)
-    public void executeBeforeTestSuite(ITestContext context) throws Throwable {
-    	
-    	DevicePool.addDevices();
+	// 3rd party integrations
+	protected String browserVersion = "";
+	protected long startDate;
 
-        // Add shutdown hook
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-        // Set log4j properties
-        PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
-        // Set SoapUI log4j properties
-        System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
+	@BeforeSuite(alwaysRun = true)
+	public void executeBeforeTestSuite(ITestContext context) throws Throwable {
 
-        try {
-            Logger root = Logger.getRootLogger();
-            Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-            while (allLoggers.hasMoreElements()) {
-                Category tmpLogger = (Category) allLoggers.nextElement();
-                if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-                    tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-                }
-            }
-        } catch (NoSuchMethodError e) {
-            LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-        }
+		DevicePool.addDevices();
 
-        startDate = new Date().getTime();
-        LOGGER.info(Configuration.asString());
-        // Configuration.validateConfiguration();
+		// Add shutdown hook
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+		// Set log4j properties
+		PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
+		// Set SoapUI log4j properties
+		System.setProperty("soapui.log4j.config", "./src/main/resources/soapui-log4j.xml");
 
-        LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-        context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-        LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+		try {
+			Logger root = Logger.getRootLogger();
+			Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+			while (allLoggers.hasMoreElements()) {
+				Category tmpLogger = (Category) allLoggers.nextElement();
+				if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
+					tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+				}
+			}
+		} catch (NoSuchMethodError e) {
+			LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
+		}
 
-        // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
-        int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
-        if (count > 0) {
-            LOGGER.debug("Updated 'data_provider_thread_count' from "
-                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
-            context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
-        } else {
-            LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
-            LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-        }
+		startDate = new Date().getTime();
+		LOGGER.info(Configuration.asString());
+		// Configuration.validateConfiguration();
 
-        LOGGER.debug("Default data_provider_thread_count="
-                + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-        LOGGER.debug("Updated data_provider_thread_count="
-                + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+		LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+		context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+		LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
 
-        if (!Configuration.isNull(Parameter.URL)) {
-            if (!Configuration.get(Parameter.URL).isEmpty()) {
-                RestAssured.baseURI = Configuration.get(Parameter.URL);
-            }
-        }
+		// update DataProviderThreadCount if any property is provided otherwise
+		// sync with value from suite xml file
+		int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+		if (count > 0) {
+			LOGGER.debug("Updated 'data_provider_thread_count' from "
+					+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
+			context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
+		} else {
+			LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+			R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
+					String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
+			LOGGER.debug("Updated 'data_provider_thread_count': "
+					+ Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+		}
 
-        try {
-            L10N.init();
-        } catch (Exception e) {
-            LOGGER.error("L10N bundle is not initialized successfully!", e);
-        }
+		LOGGER.debug("Default data_provider_thread_count="
+				+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+		LOGGER.debug("Updated data_provider_thread_count="
+				+ context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
 
-        try {
-            I18N.init();
-        } catch (Exception e) {
-            LOGGER.error("I18N bundle is not initialized successfully!", e);
-        }
+		if (!Configuration.isNull(Parameter.URL)) {
+			if (!Configuration.get(Parameter.URL).isEmpty()) {
+				RestAssured.baseURI = Configuration.get(Parameter.URL);
+			}
+		}
 
-        try {
-            L10Nparser.init();
-        } catch (Exception e) {
-            LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
-        }
+		try {
+			L10N.init();
+		} catch (Exception e) {
+			LOGGER.error("L10N bundle is not initialized successfully!", e);
+		}
 
-        try {
-        	TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
-        } catch (Exception e) {
-        	LOGGER.error("TestRail is not initialized successfully!", e);
-        }
+		try {
+			I18N.init();
+		} catch (Exception e) {
+			LOGGER.error("I18N bundle is not initialized successfully!", e);
+		}
+
+		try {
+			L10Nparser.init();
+		} catch (Exception e) {
+			LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
+		}
+
+		try {
+			TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
+		} catch (Exception e) {
+			LOGGER.error("TestRail is not initialized successfully!", e);
+		}
 
 		try {
 			if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
 				updateS3AppPath();
 			}
 		} catch (Exception e) {
-            LOGGER.error("AWS S3 client is not initialized successfully!", e);
+			LOGGER.error("AWS S3 client is not initialized successfully!", e);
 		}
 
-        
-        // moved from UITest->executeBeforeTestSuite
-        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty()) {
-            //redefine core properties using custom capabilities file
-        	Map<String, String> properties = Configuration.loadCoreProperties(customCapabilities);
-            //reregister device if mobile core properties are redefined 
-            DevicePool.addDevice(properties);
-        }
-    }
-    
-    @BeforeClass(alwaysRun = true)
-    public void executeBeforeTestClass(ITestContext context) throws Throwable {
-        // do nothing for now
-    }
+		// moved from UITest->executeBeforeTestSuite
+		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+		if (!customCapabilities.isEmpty()) {
+			// redefine core properties using custom capabilities file
+			Map<String, String> properties = Configuration.loadCoreProperties(customCapabilities);
+			// reregister device if mobile core properties are redefined
+			DevicePool.addDevice(properties);
+		}
+	}
 
-    @AfterClass(alwaysRun = true)
-    public void executeAfterTestClass(ITestContext context) throws Throwable {
-        if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
-            LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
-            quitDrivers();
-        }
-    }
+	@BeforeClass(alwaysRun = true)
+	public void executeBeforeTestClass(ITestContext context) throws Throwable {
+		// do nothing for now
+	}
 
-    @BeforeMethod(alwaysRun = true)
-    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
-                                        ITestContext context) throws Throwable {
-        // do nothing for now
-        apiMethodBuilder = new APIMethodBuilder();
-    }
-    
-    
-    @AfterMethod(alwaysRun = true)
-    public void executeAfterTestMethod(ITestResult result) {
+	@AfterClass(alwaysRun = true)
+	public void executeAfterTestClass(ITestContext context) throws Throwable {
+		if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
+			LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
+			quitDrivers();
+		}
+	}
 
-        try {
-        	apiMethodBuilder.close();
-        	
-            DriverMode driverMode = Configuration.getDriverMode();
+	@BeforeMethod(alwaysRun = true)
+	public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable {
+		// do nothing for now
+		apiMethodBuilder = new APIMethodBuilder();
+	}
 
-            if (driverMode == DriverMode.METHOD_MODE) {
-                LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
-                quitDrivers();
-            }
+	@AfterMethod(alwaysRun = true)
+	public void executeAfterTestMethod(ITestResult result) {
 
+		if (apiMethodBuilder == null) {
+			apiMethodBuilder = new APIMethodBuilder();
+		}
 
-            // TODO: improve later removing duplicates with AbstractTestListener
-            //handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
-            if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                    && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-                // [VD] it is prohibited to release TestInfoByThread in this place.!
-                return;
-            }
+		try {
+			apiMethodBuilder.close();
 
-            //handle AbstractTest->SkipExecution
-            if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                    && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
-                // [VD] it is prohibited to release TestInfoByThread in this place.!
-                return;
-            }
+			DriverMode driverMode = Configuration.getDriverMode();
 
-            List<String> tickets = Jira.getTickets(result);
-            result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
-            Jira.updateAfterTest(result);
+			if (driverMode == DriverMode.METHOD_MODE) {
+				LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
+				quitDrivers();
+			}
 
+			// TODO: improve later removing duplicates with AbstractTestListener
+			// handle Zafira already passed exception for re-run and do nothing.
+			// maybe return should be enough
+			if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+					&& result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+				// [VD] it is prohibited to release TestInfoByThread in this
+				// place.!
+				return;
+			}
 
-            // Populate TestRail Cases
+			// handle AbstractTest->SkipExecution
+			if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+					&& result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
+				// [VD] it is prohibited to release TestInfoByThread in this
+				// place.!
+				return;
+			}
 
-            if (!R.ZAFIRA.getBoolean("zafira_enabled")){
-                result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
-                TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-                TestRail.clearCases();
-            }
+			List<String> tickets = Jira.getTickets(result);
+			result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
+			Jira.updateAfterTest(result);
 
-            //we shouldn't deregister info here as all retries will not work
-            //TestNamingUtil.releaseZafiraTest();
+			// Populate TestRail Cases
 
-            // clear jira tickets to be sure that next test is not affected.
-            Jira.clearTickets();
+			if (!R.ZAFIRA.getBoolean("zafira_enabled")) {
+				result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
+				TestRail.updateAfterTest(result,
+						(String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+				TestRail.clearCases();
+			}
 
-            Artifacts.clearArtifacts();
+			// we shouldn't deregister info here as all retries will not work
+			// TestNamingUtil.releaseZafiraTest();
 
-        } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
-            e.printStackTrace();
-        }
+			// clear jira tickets to be sure that next test is not affected.
+			Jira.clearTickets();
 
-    }
+			Artifacts.clearArtifacts();
 
-    @AfterSuite(alwaysRun = true)
-    public void executeAfterTestSuite(ITestContext context) {
-        try {
-            if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
-                LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
-                quitDrivers();                
-            }
+		} catch (Exception e) {
+			LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
+			e.printStackTrace();
+		}
 
-            ReportContext.removeTempDir(); //clean temp artifacts directory
-            HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
+	}
 
-            String browser = getBrowser();
-            String deviceName = getDeviceName();
-            //String suiteName = getSuiteName(context);
-            String title = getTitle(context);
+	@AfterSuite(alwaysRun = true)
+	public void executeAfterTestSuite(ITestContext context) {
+		try {
+			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
+				LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
+				quitDrivers();
+			}
 
-            TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-            String status = testResult.getName();
+			ReportContext.removeTempDir(); // clean temp artifacts directory
+			HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
-            title = status + ": " + title;
+			String browser = getBrowser();
+			String deviceName = getDeviceName();
+			// String suiteName = getSuiteName(context);
+			String title = getTitle(context);
 
-            String env = "";
-            if (!Configuration.isNull(Parameter.ENV)) {
-                env = Configuration.get(Parameter.ENV);
-            }
+			TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
+			String status = testResult.getName();
 
-            if (!Configuration.get(Parameter.URL).isEmpty()) {
-                env += " - <a href='" + Configuration.get(Parameter.URL) + "'>" + Configuration.get(Parameter.URL) + "</a>";
-            }
+			title = status + ": " + title;
 
-            ReportContext.getTempDir().delete();
+			String env = "";
+			if (!Configuration.isNull(Parameter.ENV)) {
+				env = Configuration.get(Parameter.ENV);
+			}
 
-            // Update JIRA
-            Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
+			if (!Configuration.get(Parameter.URL).isEmpty()) {
+				env += " - <a href='" + Configuration.get(Parameter.URL) + "'>" + Configuration.get(Parameter.URL)
+						+ "</a>";
+			}
 
-            //generate and send email report by Zafira to test group of people
-            String emailList = Configuration.get(Parameter.EMAIL_LIST);
-            String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
-            String senderEmail = Configuration.get(Parameter.SENDER_EMAIL);
-            String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD);
+			ReportContext.getTempDir().delete();
 
-            // Generate and send email report using regular method
-            EmailReportGenerator report = new EmailReportGenerator(title, env,
-                    Configuration.get(Parameter.APP_VERSION), deviceName,
-                    browser, DateUtils.now(), DateUtils.timeDiff(startDate), getCIJobReference(),
-                    EmailReportItemCollector.getTestResults(),
-                    EmailReportItemCollector.getCreatedItems());
+			// Update JIRA
+			Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 
-            String emailContent = report.getEmailBody();
+			// generate and send email report by Zafira to test group of people
+			String emailList = Configuration.get(Parameter.EMAIL_LIST);
+			String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
+			String senderEmail = Configuration.get(Parameter.SENDER_EMAIL);
+			String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD);
 
-			 
-            if (!R.ZAFIRA.getBoolean("zafira_enabled")) {
-            	//Do not send email if run is running with enabled Zafira
-	            EmailManager.send(title, emailContent,
-	                    emailList,
-	                    senderEmail,
-	                    senderPassword);
-	
-	            if (testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()) {
-	                EmailManager.send(title, emailContent,
-	                        failureEmailList,
-	                        senderEmail,
-	                        senderPassword);
-	            }
-            }
+			// Generate and send email report using regular method
+			EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),
+					deviceName, browser, DateUtils.now(), DateUtils.timeDiff(startDate), getCIJobReference(),
+					EmailReportItemCollector.getTestResults(), EmailReportItemCollector.getCreatedItems());
 
-            // Store emailable report under emailable-report.html
-            ReportContext.generateHtmlReport(emailContent);
+			String emailContent = report.getEmailBody();
 
-            printExecutionSummary(EmailReportItemCollector.getTestResults());
-            
-            LOGGER.debug("Generating email report...");
+			if (!R.ZAFIRA.getBoolean("zafira_enabled")) {
+				// Do not send email if run is running with enabled Zafira
+				EmailManager.send(title, emailContent, emailList, senderEmail, senderPassword);
 
-            TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-            switch (suiteResult) {
-                case SKIP_ALL:
-                    Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
-                    break;
-                case SKIP_ALL_ALREADY_PASSED:
-                    LOGGER.info("Nothing was executed in rerun mode because all tests already passed and registered in Zafira Repoting Service!");
-                    break;
-                default:
-                    //do nothing
-            }
-            LOGGER.debug("Finish email report generation.");
-            
-        } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
-            e.printStackTrace();
-        }
+				if (testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()) {
+					EmailManager.send(title, emailContent, failureEmailList, senderEmail, senderPassword);
+				}
+			}
 
-    }
+			// Store emailable report under emailable-report.html
+			ReportContext.generateHtmlReport(emailContent);
 
+			printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-    private String getDeviceName() {
-        String deviceName = "Desktop";
+			LOGGER.debug("Generating email report...");
 
-        if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
-            //Samsung - Android 4.4.2; iPhone - iOS 7
-            String deviceTemplate = "%s - %s %s";
-            deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
-        }
+			TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
+			switch (suiteResult) {
+			case SKIP_ALL:
+				Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
+				break;
+			case SKIP_ALL_ALREADY_PASSED:
+				LOGGER.info(
+						"Nothing was executed in rerun mode because all tests already passed and registered in Zafira Repoting Service!");
+				break;
+			default:
+				// do nothing
+			}
+			LOGGER.debug("Finish email report generation.");
 
-        return deviceName;
-    }
+		} catch (Exception e) {
+			LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
+			e.printStackTrace();
+		}
 
-    protected String getBrowser() {
-        String browser = "";
-        if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
-            browser = Configuration.get(Parameter.BROWSER);
-        }
+	}
 
-        if (!browserVersion.isEmpty()) {
-            browser = browser + " " + browserVersion;
-        }
+	private String getDeviceName() {
+		String deviceName = "Desktop";
 
-        return browser;
-    }
+		if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+			// Samsung - Android 4.4.2; iPhone - iOS 7
+			String deviceTemplate = "%s - %s %s";
+			deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME),
+					Configuration.get(Parameter.MOBILE_PLATFORM_NAME),
+					Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
+		}
 
-    protected String getTitle(ITestContext context) {
-        String browser = getBrowser();
-        if (!browser.isEmpty()) {
-            browser = " " + browser; //insert the space before
-        }
-        String device = getDeviceName();
+		return deviceName;
+	}
 
-        String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV) : Configuration.get(Parameter.URL);
+	protected String getBrowser() {
+		String browser = "";
+		if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
+			browser = Configuration.get(Parameter.BROWSER);
+		}
 
-        String title = "";
-        String app_version = "";
+		if (!browserVersion.isEmpty()) {
+			browser = browser + " " + browserVersion;
+		}
 
-        if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
-            // if nothing is specified then title will contain nothing
-            app_version = Configuration.get(Parameter.APP_VERSION) + " - ";
-        }
+		return browser;
+	}
 
-        String suiteName = getSuiteName(context);
-        String xmlFile = getSuiteFileName(context);
+	protected String getTitle(ITestContext context) {
+		String browser = getBrowser();
+		if (!browser.isEmpty()) {
+			browser = " " + browser; // insert the space before
+		}
+		String device = getDeviceName();
 
-        title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, device, browser);
+		String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV)
+				: Configuration.get(Parameter.URL);
 
-        return title;
-    }
+		String title = "";
+		String app_version = "";
 
-    private String getSuiteFileName(ITestContext context) {
-    	//TODO: investigate why we need such method and suite file name at all
-        String fileName = context.getSuite().getXmlSuite().getFileName();
-        if (fileName == null) {
-        	fileName = "undefined";
-        }
-        LOGGER.debug("Full suite file name: " + fileName);
-        if (fileName.contains("\\")) {
-            fileName = fileName.replaceAll("\\\\", "/");
-        }
-        fileName = StringUtils.substringAfterLast(fileName, "/");
-        LOGGER.debug("Short suite file name: " + fileName);
-        return fileName;
-    }
+		if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
+			// if nothing is specified then title will contain nothing
+			app_version = Configuration.get(Parameter.APP_VERSION) + " - ";
+		}
 
-    protected String getSuiteName(ITestContext context) {
+		String suiteName = getSuiteName(context);
+		String xmlFile = getSuiteFileName(context);
 
-        String suiteName = "";
+		title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, device,
+				browser);
 
-        if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
-            suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context.getSuite().getXmlSuite().getName()
-                    : Configuration.get(Parameter.SUITE_NAME);
-        } else {
-            suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
-        }
+		return title;
+	}
 
-        String appender = getSuiteNameAppender();
-        if (appender != null && !appender.isEmpty()) {
-            suiteName = suiteName + " - " + appender;
-        }
+	private String getSuiteFileName(ITestContext context) {
+		// TODO: investigate why we need such method and suite file name at all
+		String fileName = context.getSuite().getXmlSuite().getFileName();
+		if (fileName == null) {
+			fileName = "undefined";
+		}
+		LOGGER.debug("Full suite file name: " + fileName);
+		if (fileName.contains("\\")) {
+			fileName = fileName.replaceAll("\\\\", "/");
+		}
+		fileName = StringUtils.substringAfterLast(fileName, "/");
+		LOGGER.debug("Short suite file name: " + fileName);
+		return fileName;
+	}
 
-        return suiteName;
-    }
+	protected String getSuiteName(ITestContext context) {
 
-    protected void setSuiteNameAppender(String appender) {
-        suiteNameAppender.set(appender);
-    }
+		String suiteName = "";
 
-    protected String getSuiteNameAppender() {
-        return suiteNameAppender.get();
-    }
+		if (context.getSuite().getXmlSuite() != null
+				&& !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
+			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context.getSuite().getXmlSuite().getName()
+					: Configuration.get(Parameter.SUITE_NAME);
+		} else {
+			suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title")
+					: Configuration.get(Parameter.SUITE_NAME);
+		}
 
-    private void printExecutionSummary(List<TestResultItem> tris) {
-        Messager.INROMATION
-                .info("**************** Test execution summary ****************");
-        int num = 1;
-        for (TestResultItem tri : tris) {
-            String failReason = tri.getFailReason();
-            if (failReason == null) {
-                failReason = "";
-            }
+		String appender = getSuiteNameAppender();
+		if (appender != null && !appender.isEmpty()) {
+			suiteName = suiteName + " - " + appender;
+		}
 
-            if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
-                    && !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
-                String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots())
-                        ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
-                reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
-                Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(),
-                        reportLinks);
-            }
-        }
-    }
+		return suiteName;
+	}
 
-    private String getCIJobReference() {
-        String ciTestJob = null;
-        if (!Configuration.isNull(Parameter.CI_URL)
-                && !Configuration.isNull(Parameter.CI_BUILD)) {
-            ciTestJob = Configuration.get(Parameter.CI_URL)
-                    + Configuration.get(Parameter.CI_BUILD);
-        }
-        return ciTestJob;
-    }
+	protected void setSuiteNameAppender(String appender) {
+		suiteNameAppender.set(appender);
+	}
 
-    /**
-     * Redefine Jira tickets from test.
-     *
-     * @param tickets to set
-     */
-    @Deprecated
-    protected void setJiraTicket(String... tickets) {
-        List<String> jiraTickets = new ArrayList<String>();
-        for (String ticket : tickets) {
-            jiraTickets.add(ticket);
-        }
-        Jira.setTickets(jiraTickets);
-    }
+	protected String getSuiteNameAppender() {
+		return suiteNameAppender.get();
+	}
 
-    /**
-     * Redefine TestRails cases from test.
-     *
-     * @param cases to set
-     */
-    protected void setTestRailCase(String... cases) {
-       TestRail.setCasesID(cases);
-    }
+	private void printExecutionSummary(List<TestResultItem> tris) {
+		Messager.INROMATION.info("**************** Test execution summary ****************");
+		int num = 1;
+		for (TestResultItem tri : tris) {
+			String failReason = tri.getFailReason();
+			if (failReason == null) {
+				failReason = "";
+			}
 
+			if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
+					&& !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
+				String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots())
+						? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
+				reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
+				Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(),
+						reportLinks);
+			}
+		}
+	}
 
-    @DataProvider(name = "DataProvider", parallel = true)
-	public Object[][] createData(final ITestNGMethod testMethod, ITestContext context)
-	{
+	private String getCIJobReference() {
+		String ciTestJob = null;
+		if (!Configuration.isNull(Parameter.CI_URL) && !Configuration.isNull(Parameter.CI_BUILD)) {
+			ciTestJob = Configuration.get(Parameter.CI_URL) + Configuration.get(Parameter.CI_BUILD);
+		}
+		return ciTestJob;
+	}
+
+	/**
+	 * Redefine Jira tickets from test.
+	 *
+	 * @param tickets
+	 *            to set
+	 */
+	@Deprecated
+	protected void setJiraTicket(String... tickets) {
+		List<String> jiraTickets = new ArrayList<String>();
+		for (String ticket : tickets) {
+			jiraTickets.add(ticket);
+		}
+		Jira.setTickets(jiraTickets);
+	}
+
+	/**
+	 * Redefine TestRails cases from test.
+	 *
+	 * @param cases
+	 *            to set
+	 */
+	protected void setTestRailCase(String... cases) {
+		TestRail.setCasesID(cases);
+	}
+
+	@DataProvider(name = "DataProvider", parallel = true)
+	public Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {
 		Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
 		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
-        return objects;
-    }
+		return objects;
+	}
 
-    @DataProvider(name = "SingleDataProvider")
-	public Object[][] createDataSingleThread(final ITestNGMethod testMethod,
-                                            ITestContext context) {
+	@DataProvider(name = "SingleDataProvider")
+	public Object[][] createDataSingleThread(final ITestNGMethod testMethod, ITestContext context) {
 		Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
 		Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
-        return objects;
-    }
+		return objects;
+	}
 
-    /**
-     * Pause for specified timeout.
-     *
-     * @param timeout in seconds.
-     */
+	/**
+	 * Pause for specified timeout.
+	 *
+	 * @param timeout
+	 *            in seconds.
+	 */
 
-    public void pause(long timeout) {
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+	public void pause(long timeout) {
+		try {
+			Thread.sleep(timeout * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public void pause(Double timeout) {
-        try {
-            timeout = timeout * 1000;
-            long miliSec = timeout.longValue();
-            Thread.sleep(miliSec);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+	public void pause(Double timeout) {
+		try {
+			timeout = timeout * 1000;
+			long miliSec = timeout.longValue();
+			Thread.sleep(miliSec);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-    protected void putS3Artifact(String key, String path) {
-        AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
-    }
+	protected void putS3Artifact(String key, String path) {
+		AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
+	}
 
-    protected S3Object getS3Artifact(String bucket, String key) {
-        return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);
-    }
+	protected S3Object getS3Artifact(String bucket, String key) {
+		return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);
+	}
 
-    protected S3Object getS3Artifact(String key) {
-        return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
-    }
+	protected S3Object getS3Artifact(String key) {
+		return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
+	}
 
 	/**
 	 * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
@@ -642,78 +642,77 @@ public abstract class AbstractTest // extends DriverHelper
 		}
 	}
 
-    protected void setBug(String id) {
-        String test = TestNamingUtil.getTestNameByThread();
-        TestNamingUtil.associateBug(test, id);
-    }
+	protected void setBug(String id) {
+		String test = TestNamingUtil.getTestNameByThread();
+		TestNamingUtil.associateBug(test, id);
+	}
 
-    protected void skipExecution(String message) {
-        throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
-    }
+	protected void skipExecution(String message) {
+		throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
+	}
 
+	// --------------------------------------------------------------------------
+	// Web Drivers
+	// --------------------------------------------------------------------------
+	protected WebDriver getDriver() {
+		return getDriver(DriverPool.DEFAULT);
+	}
 
-    // --------------------------------------------------------------------------
-    // Web Drivers
-    // --------------------------------------------------------------------------
-    protected WebDriver getDriver() {
-        return getDriver(DriverPool.DEFAULT);
-    }
+	protected WebDriver getDriver(String name) {
+		WebDriver drv = DriverPool.getDriver(name);
+		if (drv == null) {
+			Assert.fail("Unable to find driver by name: " + name);
+		}
+		return drv;
+	}
 
-    protected WebDriver getDriver(String name) {
-        WebDriver drv = DriverPool.getDriver(name);
-        if (drv == null) {
-            Assert.fail("Unable to find driver by name: " + name);
-        }
-        return drv;
-    }
+	protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+		WebDriver drv = DriverPool.getDriver(name, capabilities, seleniumHost);
+		if (drv == null) {
+			Assert.fail("Unable to find driver by name: " + name);
+		}
+		return drv;
+	}
 
-    protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
-        WebDriver drv = DriverPool.getDriver(name, capabilities, seleniumHost);
-        if (drv == null) {
-            Assert.fail("Unable to find driver by name: " + name);
-        }
-        return drv;
-    }
+	protected static void quitDrivers() {
+		DriverPool.quitDrivers();
+	}
 
-    protected static void quitDrivers() {
-        DriverPool.quitDrivers();
-    }
+	public static class ShutdownHook extends Thread {
 
+		private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
 
-    public static class ShutdownHook extends Thread {
+		private void generateMetadata() {
+			Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
+			if (allData.size() > 0) {
+				LOGGER.debug("Generating collected metadada start...");
+			}
+			for (String key : allData.keySet()) {
+				LOGGER.debug("Creating... medata for '" + key + "' object...");
+				File file = new File(
+						ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + key.hashCode() + ".json");
+				PrintWriter out = null;
+				try {
+					out = new PrintWriter(file);
+				} catch (FileNotFoundException e) {
+					LOGGER.error("Unable to write metadata to json file: " + file.getAbsolutePath(), e);
+				}
+				out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
+				out.flush();
+				LOGGER.debug("Created medata for '" + key + "' object...");
+			}
 
-        private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
+			if (allData.size() > 0) {
+				LOGGER.debug("Generating collected metadada finish...");
+			}
+		}
 
-        private void generateMetadata() {
-            Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
-            if (allData.size() > 0) {
-            	LOGGER.debug("Generating collected metadada start...");
-            }
-            for (String key : allData.keySet()) {
-            	LOGGER.debug("Creating... medata for '" + key + "' object...");
-                File file = new File(ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + key.hashCode() + ".json");
-                PrintWriter out = null;
-                try {
-                    out = new PrintWriter(file);
-                } catch (FileNotFoundException e) {
-                	LOGGER.error("Unable to write metadata to json file: " + file.getAbsolutePath(), e);
-                }
-                out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
-                out.flush();
-            	LOGGER.debug("Created medata for '" + key + "' object...");
-            }
-            
-            if (allData.size() > 0) {
-            	LOGGER.debug("Generating collected metadada finish...");
-            }
-        }
+		@Override
+		public void run() {
+			LOGGER.debug("Running shutdown hook");
+			generateMetadata();
+		}
 
-        @Override
-        public void run() {
-            LOGGER.debug("Running shutdown hook");
-            generateMetadata();
-        }
+	}
 
-    }
-    
 }
