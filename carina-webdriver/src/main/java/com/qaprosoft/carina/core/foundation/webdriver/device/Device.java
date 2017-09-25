@@ -710,6 +710,7 @@ public class Device
     }
     
     public String getAdbName() {
+    	//TODO: remove reference onto MOBILE_STF_DOCKER_CONTAINER and variable itself
     	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER) && remoteURL != null) {
     		return remoteURL;
     	} else {
