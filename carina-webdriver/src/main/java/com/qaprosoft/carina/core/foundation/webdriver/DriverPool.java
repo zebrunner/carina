@@ -166,15 +166,15 @@ public final class DriverPool {
 	 */
 	public static WebDriver restartDriver(boolean isSameDevice) {
 		WebDriver drv = getDriver(DEFAULT);
-		Device device = DevicePool.getDevice();
+		Device device = null;
+		if (isSameDevice) {
+			device = DevicePool.getDevice();
+		}
 		
 		try {
 			LOGGER.debug("Driver restarting..." + drv);
 			deregisterDriver(DEFAULT);
-
-			if (!isSameDevice) {
-				DevicePool.deregisterDevice();
-			}
+			DevicePool.deregisterDevice();
 
 			drv.quit();
 			LOGGER.debug("Driver exited during restart..." + drv);
