@@ -62,6 +62,10 @@
 			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-webdriver</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-hockeyapp</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
