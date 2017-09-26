@@ -26,7 +26,6 @@
 		<target.version>1.8</target.version>
 
 		<guava.version>21.0</guava.version>
-		<appium.version>5.0.38</appium.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
