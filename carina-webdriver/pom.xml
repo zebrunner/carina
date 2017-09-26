@@ -26,12 +26,11 @@
 		<target.version>1.8</target.version>
 
 		<guava.version>21.0</guava.version>
-		<appium.version>5.0.0-BETA8</appium.version>
+		<appium.version>5.0.38</appium.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
-		<pubnub.version>3.7.10</pubnub.version>
 		<itext.version>5.0.6</itext.version>
 		<reflections.version>0.9.11</reflections.version>
 
@@ -126,12 +125,6 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 			<version>${apache-http.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.pubnub</groupId>
-			<artifactId>pubnub</artifactId>
-			<version>${pubnub.version}</version>
 		</dependency>
 
 		<!--iText for pdf -->
