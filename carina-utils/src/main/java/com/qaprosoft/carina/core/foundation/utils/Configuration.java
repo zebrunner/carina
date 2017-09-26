@@ -338,6 +338,11 @@ public class Configuration
 		
 		S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
 		
+		//HockeyApp token
+		HOCKEYAPP_TOKEN("hockeyapp_token"),
+		
+		HOCKEYAPP_LOCAL_STORAGE("hockeyapp_local_storage"),
+		
 		//For localization parser
 		ADD_NEW_LOCALIZATION("add_new_localization"), 
 		

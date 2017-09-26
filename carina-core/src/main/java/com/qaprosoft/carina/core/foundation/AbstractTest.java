@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -84,6 +83,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.hockeyapp.HockeyAppManager;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -189,14 +189,7 @@ public abstract class AbstractTest // extends DriverHelper
         	LOGGER.error("TestRail is not initialized successfully!", e);
         }
 
-		try {
-			if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-				updateS3AppPath();
-			}
-		} catch (Exception e) {
-            LOGGER.error("AWS S3 client is not initialized successfully!", e);
-		}
-
+        updateAppPath();
         
         // moved from UITest->executeBeforeTestSuite
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
@@ -579,6 +572,60 @@ public abstract class AbstractTest // extends DriverHelper
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    private void updateAppPath() {
+    	
+		try {
+			if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+				updateS3AppPath();
+			}
+		} catch (Exception e) {
+            LOGGER.error("AWS S3 manager is not initialized successfully!", e);
+		}
+
+		try {
+			if (!Configuration.get(Parameter.HOCKEYAPP_TOKEN).isEmpty()) {
+				updateHockeyAppPath();
+			}
+		} catch (Exception e) {
+            LOGGER.error("HockeyApp manager is not initialized successfully!", e);
+		}
+    	
+    }
+	/**
+	 * Method to update MOBILE_APP path in case if apk is located in Hockey App.
+	 */
+	private void updateHockeyAppPath() {
+		// hockeyapp://appName/platformName/buildType/version
+		Pattern HOCKEYAPP_PATTERN = Pattern.compile("hockeyapp:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
+		String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+		Matcher matcher = HOCKEYAPP_PATTERN.matcher(mobileAppPath);
+		
+		LOGGER.info("Analyzing if mobile_app is located on HockeyApp...");
+		if (matcher.find()) {
+			LOGGER.info("app artifact is located on HockeyApp...");
+			String appName = matcher.group(1);
+			String platformName = matcher.group(2);
+			String buildType = matcher.group(3);
+			String version = matcher.group(4);
+			
+			
+			String hockeyAppLocalStorage = Configuration.get(Parameter.HOCKEYAPP_LOCAL_STORAGE);
+			// download file from HockeyApp to local storage
+			
+			File file = HockeyAppManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType, version);
+
+			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+
+			// try to redefine app_version if it's value is latest or empty
+			String appVersion = Configuration.get(Parameter.APP_VERSION);
+			if (appVersion.equals("latest") || appVersion.isEmpty()) {
+				R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+			}
+		}
+
+	}
+			
 	/**
 	 * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
 	 */
