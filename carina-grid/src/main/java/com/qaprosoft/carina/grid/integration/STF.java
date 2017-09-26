@@ -82,12 +82,12 @@ public class STF
 		return available;
 	}
 	
-	public synchronized static boolean reserveDevice(String udid)
+	public static boolean reserveDevice(String udid)
 	{
 		return INSTANCE.client.reserveDevice(udid,  TimeUnit.SECONDS.toMillis(STF_TIMEOUT));		
 	}
 	
-	public synchronized static boolean returnDevice(String udid)
+	public static boolean returnDevice(String udid)
 	{
 		return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
 	}
