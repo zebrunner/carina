@@ -313,12 +313,9 @@ public final class DriverPool {
 				registerDriver(drv, name);
 
 				init = true;
-				long threadId = Thread.currentThread().getId();
-				// push custom device name and threadId for log4j default messages
+				// push custom device name  for log4j default messages
 				if (!device.isNull()) {
-					NDC.push(" [" + device.getName() + "] [" + threadId + "] ");
-				} else {
-					NDC.push(" [" + threadId + "] ");
+					NDC.push(" [" + device.getName() + "] ");
 				}
 
 				LOGGER.debug("initDriver finish...");
