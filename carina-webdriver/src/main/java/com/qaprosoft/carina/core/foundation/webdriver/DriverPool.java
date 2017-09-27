@@ -143,7 +143,7 @@ public final class DriverPool {
 		}
 
 		if (drv == null) {
-			LOGGER.warn("Starting new driver as nothing was found in the pool");
+			LOGGER.debug("Starting new driver as nothing was found in the pool");
 			drv = createDriver(name, capabilities, seleniumHost, null);
 		}
 		return drv;
