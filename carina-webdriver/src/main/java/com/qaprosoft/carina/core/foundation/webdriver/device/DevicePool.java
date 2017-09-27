@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -186,7 +185,7 @@ public class DevicePool
 			{
 				if (THREAD_2_DEVICE_MAP.containsValue(device))
 				{
-					String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
+					String msg = "Slenium HUB returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
 					device.disconnectRemote();
 					throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
 				}
@@ -256,15 +255,13 @@ public class DevicePool
 			return nullDevice;
 		}
 
-		final String testId = UUID.randomUUID().toString();
 		Device freeDevice = findDevice();
 
 		if (freeDevice != nullDevice)
 		{
-			freeDevice.setTestId(testId);
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
-			String msg = "found device %s-%s for test %s";
-			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid(), testId));
+			String msg = "found device %s-%s";
+			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid()));
 		} else
 		{
 			// TODO: improve loggers about device type, family etc
@@ -317,8 +314,8 @@ public class DevicePool
 		{
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
 			THREAD_2_DEVICE_MAP.remove(threadId);
-			String msg = "Disconnected device '%s - %s' for test '%s'; thread '%s'";
-			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), device.getTestId(), threadId));
+			String msg = "Disconnected device '%s - %s'; thread '%s'";
+			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), threadId));
 		}
 	}
 
