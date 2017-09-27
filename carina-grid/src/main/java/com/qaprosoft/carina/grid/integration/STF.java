@@ -82,6 +82,7 @@ public class STF
 		return available;
 	}
 	
+	//TODO: why do we have boolean as return value here and below
 	public static boolean reserveDevice(String udid)
 	{
 		return INSTANCE.client.reserveDevice(udid,  TimeUnit.SECONDS.toMillis(STF_TIMEOUT));		
@@ -89,6 +90,8 @@ public class STF
 	
 	public static boolean returnDevice(String udid)
 	{
-		return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
+		//TODO: investigate why we had INSTANCE.client.remoteDisconnectDevice(udid)
+		//return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
+		return INSTANCE.client.returnDevice(udid);
 	}
 }
