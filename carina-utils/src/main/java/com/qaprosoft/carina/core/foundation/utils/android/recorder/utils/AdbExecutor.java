@@ -62,7 +62,7 @@ public class AdbExecutor {
     }
 
 
-
+    @Deprecated
     public List<String> getAttachedDevices() {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;

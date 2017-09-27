@@ -61,12 +61,18 @@ public class MobileFactory extends AbstractFactory {
 					}
 					driver = new AndroidDriver<AndroidElement>(new URL(selenium), capabilities);
 					
-					//TODO: refactor code to remote mobile_devices pool reference at all.
-					//String sid = ((RemoteWebDriver) driver).getSessionId().toString();
-					String udid = driver.getCapabilities().getCapability("deviceUDID").toString();
-					device = DevicePool.findDevice(udid);
-					device.connectRemote();
 
+					String udid = device.getUdid();
+					if (device.isNull()) {
+						//that's a case with Selenium Hub and device can be determined using udid from capabilities
+						
+						//TODO: refactor code to remote mobile_devices pool reference at all.
+						//String sid = ((RemoteWebDriver) driver).getSessionId().toString();
+						udid = driver.getCapabilities().getCapability("deviceUDID").toString();
+						device = DevicePool.findDevice(udid);
+						device.connectRemote();	
+					}
+					
 					//register current device with 
 					DevicePool.registerDevice(device);
 				} else if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
