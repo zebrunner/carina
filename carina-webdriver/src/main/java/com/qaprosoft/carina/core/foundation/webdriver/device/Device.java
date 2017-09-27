@@ -36,7 +36,6 @@ public class Device
 	private String udid;
 	private String seleniumServer;
 
-	private String testId;
 	private String remoteURL;
 	
 	private boolean isAppInstalled = false;
@@ -151,16 +150,6 @@ public class Device
 	public boolean isTv()
 	{
 		return type.equalsIgnoreCase(SpecialKeywords.TV);
-	}
-
-	public String getTestId()
-	{
-		return testId;
-	}
-
-	public void setTestId(String testId)
-	{
-		this.testId = testId;
 	}
 
 	public Type getType()
