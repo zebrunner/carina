@@ -436,5 +436,9 @@ public class DevicePool
 		}
 		return device;
 	}
+	
+	public static void removeCurrentDevice() {
+		curDevice.remove();
+	}
 
 }
