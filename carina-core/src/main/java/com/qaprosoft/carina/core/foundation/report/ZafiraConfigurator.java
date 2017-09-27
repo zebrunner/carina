@@ -58,6 +58,9 @@ public class ZafiraConfigurator implements IConfigurator
 			conf.getArg().add(buildArgumentType("device", device.getName()));
 			conf.getArg().add(buildArgumentType("platform", device.getOs()));
 			conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
+			
+			//unregister current device so it doesn't appear for the next step
+			DevicePool.removeCurrentDevice();
 		}
         return conf;
     }
