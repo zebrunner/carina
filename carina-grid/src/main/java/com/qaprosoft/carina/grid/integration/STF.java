@@ -90,8 +90,7 @@ public class STF
 	
 	public static boolean returnDevice(String udid)
 	{
-		//TODO: investigate why we had INSTANCE.client.remoteDisconnectDevice(udid)
-		//return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
-		return INSTANCE.client.returnDevice(udid);
+		// it seems like return and remote disconnect guarantee that device becomes free asap
+		return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
 	}
 }
