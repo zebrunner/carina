@@ -240,6 +240,7 @@ public class DevicePool
 		{
 			Long threadId = Thread.currentThread().getId();
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
+			LOGGER.info("register device fot current thread id: " + threadId + "; device: '" + freeDevice.getName() + "'");
 			//register current device to be able to transfer it into Zafira at the end of the test
 			setCurrentDevice(freeDevice); 
 		} else
