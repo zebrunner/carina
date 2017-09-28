@@ -70,11 +70,10 @@ public class MobileFactory extends AbstractFactory {
 						//String sid = ((RemoteWebDriver) driver).getSessionId().toString();
 						udid = driver.getCapabilities().getCapability("deviceUDID").toString();
 						device = DevicePool.findDevice(udid);
-						device.connectRemote();	
+						device.connectRemote();
+						//register current device with 
+						DevicePool.registerDevice(device);
 					}
-					
-					//register current device with 
-					DevicePool.registerDevice(device);
 				} else if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 					driver = new IOSDriver<IOSElement>(new URL(selenium), capabilities);
 				}
