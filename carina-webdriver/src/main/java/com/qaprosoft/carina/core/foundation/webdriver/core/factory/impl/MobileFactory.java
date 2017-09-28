@@ -68,8 +68,11 @@ public class MobileFactory extends AbstractFactory {
 						
 						//TODO: refactor code to remote mobile_devices pool reference at all.
 						//String sid = ((RemoteWebDriver) driver).getSessionId().toString();
+						LOGGER.info("Selenium hub+stf feature is enabled.");
 						udid = driver.getCapabilities().getCapability("deviceUDID").toString();
+						LOGGER.info("Detected device uuid from driver capabilities: " + udid);
 						device = DevicePool.findDevice(udid);
+						LOGGER.info("Detected device by uuid from driver capabilities: " + device.getName());
 						device.connectRemote();
 						//register current device with 
 						DevicePool.registerDevice(device);
