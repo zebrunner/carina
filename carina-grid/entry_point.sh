@@ -22,6 +22,7 @@ function shutdown {
 java ${JAVA_OPTS} -DSTF_URL=$STF_URL -DSTF_TOKEN=$STF_TOKEN -cp /opt/selenium/selenium-server-standalone.jar:/opt/selenium/carina-grid.jar \
   org.openqa.grid.selenium.GridLauncherV3 \
   -role hub \
+  -servlets com.qaprosoft.carina.grid.servlets.DeviceInfo \
   -hubConfig $CONF \
   ${SE_OPTS} &
 NODE_PID=$!

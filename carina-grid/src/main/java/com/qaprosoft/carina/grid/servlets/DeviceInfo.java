@@ -40,6 +40,11 @@ public class DeviceInfo extends RegistryBasedServlet
 {
 	private static final long serialVersionUID = -4451997550655113756L;
 
+	public DeviceInfo() 
+	{
+        this(null);
+    }
+	
 	public DeviceInfo(Registry registry)
 	{
 		super(registry);
