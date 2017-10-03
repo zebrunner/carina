@@ -28,6 +28,7 @@ import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.TestSession;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qaprosoft.carina.grid.integration.STF;
 import com.qaprosoft.zafira.models.stf.STFDevice;
 
@@ -82,7 +83,7 @@ public class DeviceInfo extends RegistryBasedServlet
 					if(device != null)
 					{
 						response.setStatus(HttpStatus.SC_OK);
-						response.getWriter().print(device);
+						response.getWriter().print(new ObjectMapper().writeValueAsString(device));
 					    response.getWriter().close();
 					}
 				}
