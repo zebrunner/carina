@@ -4,6 +4,12 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -19,6 +25,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobil
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.zafira.models.stf.STFDevice;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -30,23 +37,23 @@ public class MobileFactory extends AbstractFactory {
     @Override
     public WebDriver create(String name, Device device) {
 
-        String selenium = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+        String seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
         String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
-        String mobile_platform_name = Configuration.get(Configuration.Parameter.MOBILE_PLATFORM_NAME);
+        String mobilePlatformName = Configuration.get(Configuration.Parameter.MOBILE_PLATFORM_NAME);
 
         if (device != null && !device.isNull()) {
-        	selenium = device.getSeleniumServer();
-        	LOGGER.debug("selenium_host: " + selenium);
+        	seleniumHost = device.getSeleniumServer();
+        	LOGGER.debug("selenium_host: " + seleniumHost);
         }
         
-        LOGGER.debug("selenium: " + selenium);
+        LOGGER.debug("selenium: " + seleniumHost);
         
         RemoteWebDriver driver = null;
         DesiredCapabilities capabilities = getCapabilities(name, device);
         try {
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
 					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
-				if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 					// use uiautomator2 for Android 7
 					if (Configuration.getBoolean(Configuration.Parameter.ENABLE_AUTOMATOR2) && Configuration
 							.get(Configuration.Parameter.MOBILE_PLATFORM_VERSION).trim().startsWith("7.")) {
@@ -59,29 +66,25 @@ public class MobileFactory extends AbstractFactory {
 							&& !Configuration.getBoolean(Configuration.Parameter.MOBILE_APP_UNINSTALL)) {
 						capabilities.setCapability("app", "");
 					}
-					driver = new AndroidDriver<AndroidElement>(new URL(selenium), capabilities);
+					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
 					
-
-					String udid = device.getUdid();
-					if (device.isNull()) {
-						//that's a case with Selenium Hub and device can be determined using udid from capabilities
-						
-						//TODO: refactor code to remote mobile_devices pool reference at all.
-						//String sid = ((RemoteWebDriver) driver).getSessionId().toString();
-						LOGGER.info("Selenium hub+stf feature is enabled.");
-						udid = driver.getCapabilities().getCapability("deviceUDID").toString();
-						LOGGER.info("Detected device uuid from driver capabilities: " + udid);
-						device = DevicePool.findDevice(udid);
-						LOGGER.info("Detected device by uuid from driver capabilities: " + device.getName());
-						device.connectRemote();
-						//register current device with 
-						DevicePool.registerDevice(device);
+					if (device.isNull()) 
+					{
+						STFDevice info = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+						if(info != null)
+						{
+							LOGGER.info("Selenium hub+stf feature is enabled.");
+							device = new Device(info.getModel(), "phone", info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
+							LOGGER.info("Detected device by uuid from driver capabilities: " + device.getName());
+							device.connectRemote();
+							DevicePool.registerDevice(device);
+						}
 					}
-				} else if (mobile_platform_name.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
-					driver = new IOSDriver<IOSElement>(new URL(selenium), capabilities);
+				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
+					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
 				}
 			} else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
-                driver = new RemoteWebDriver(new URL(selenium), capabilities);
+                driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
             } else {
                 throw new RuntimeException("Unsupported browser");
             }
@@ -119,8 +122,25 @@ public class MobileFactory extends AbstractFactory {
         }
         
 		return capabilities;
-
     }
-
-
+    
+    private STFDevice getDeviceInfo(String seleniumHost, String sessionId)
+	{
+		STFDevice device = null;
+		try
+		{
+			HttpClient client = HttpClientBuilder.create().build();
+	        HttpGet request = new HttpGet(seleniumHost.split("wd")[0] + "grid/admin/DeviceInfo?session=" + sessionId);
+	        HttpResponse response = client.execute(request);
+	        
+	        ObjectMapper mapper = new ObjectMapper();
+	        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	        device =  mapper.readValue(response.getEntity().getContent(), STFDevice.class);
+		}
+		catch (Exception e) 
+		{
+			LOGGER.error("Unable to get device info: " + e.getMessage());
+		}
+		return device;
+	}
 }
