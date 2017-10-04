@@ -36,7 +36,6 @@ public class Device
 	private String udid;
 	private String seleniumServer;
 
-	private String testId;
 	private String remoteURL;
 	
 	private boolean isAppInstalled = false;
@@ -61,14 +60,15 @@ public class Device
 		this.osVersion = params[3];
 		this.udid = params[4];
 		this.seleniumServer = params[5];
+		this.remoteURL = params[6];
 	}
 	
 	public Device()
 	{
-		this(null, null, null, null, null, null);
+		this(null, null, null, null, null, null, null);
 	}
 
-	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer)
+	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer, String remoteURL)
 	{
 		this.name = name;
 		this.type = type;
@@ -76,7 +76,7 @@ public class Device
 		this.osVersion = osVersion;
 		this.udid = udid;
 		this.seleniumServer = seleniumServer;
-
+		this.remoteURL = remoteURL;
 	}
 
 	public String getName()
@@ -150,16 +150,6 @@ public class Device
 	public boolean isTv()
 	{
 		return type.equalsIgnoreCase(SpecialKeywords.TV);
-	}
-
-	public String getTestId()
-	{
-		return testId;
-	}
-
-	public void setTestId(String testId)
-	{
-		this.testId = testId;
 	}
 
 	public Type getType()
@@ -709,6 +699,7 @@ public class Device
     }
     
     public String getAdbName() {
+    	//TODO: remove reference onto MOBILE_STF_DOCKER_CONTAINER and variable itself
     	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER) && remoteURL != null) {
     		return remoteURL;
     	} else {

@@ -143,7 +143,7 @@ public final class DriverPool {
 		}
 
 		if (drv == null) {
-			LOGGER.warn("Starting new driver as nothing was found in the pool");
+			LOGGER.debug("Starting new driver as nothing was found in the pool");
 			drv = createDriver(name, capabilities, seleniumHost, null);
 		}
 		return drv;
@@ -166,15 +166,15 @@ public final class DriverPool {
 	 */
 	public static WebDriver restartDriver(boolean isSameDevice) {
 		WebDriver drv = getDriver(DEFAULT);
-		Device device = DevicePool.getDevice();
+		Device device = null;
+		if (isSameDevice) {
+			device = DevicePool.getDevice();
+		}
 		
 		try {
 			LOGGER.debug("Driver restarting..." + drv);
 			deregisterDriver(DEFAULT);
-
-			if (!isSameDevice) {
-				DevicePool.deregisterDevice();
-			}
+			DevicePool.deregisterDevice();
 
 			drv.quit();
 			LOGGER.debug("Driver exited during restart..." + drv);
@@ -313,12 +313,9 @@ public final class DriverPool {
 				registerDriver(drv, name);
 
 				init = true;
-				long threadId = Thread.currentThread().getId();
-				// push custom device name and threadId for log4j default messages
+				// push custom device name  for log4j default messages
 				if (!device.isNull()) {
-					NDC.push(" [" + device.getName() + "] [" + threadId + "] ");
-				} else {
-					NDC.push(" [" + threadId + "] ");
+					NDC.push(" [" + device.getName() + "] ");
 				}
 
 				LOGGER.debug("initDriver finish...");

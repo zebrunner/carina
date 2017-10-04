@@ -37,7 +37,7 @@ public enum R
 	API("api.properties"),
 	
 	CONFIG("config.properties"),
-
+	
 	TESTDATA("testdata.properties"),
 
 	EMAIL("email.properties"),
@@ -156,6 +156,10 @@ public enum R
 		path = StringUtils.replaceChars(path, "/", "\\");
 		path = StringUtils.replaceChars(path, "!", "");
 		return path;
+	}
+	
+	public Properties getProperties() {
+		return propertiesHolder.get(resourceFile);
 	}
 	
 }

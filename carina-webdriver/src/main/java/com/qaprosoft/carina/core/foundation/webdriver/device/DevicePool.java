@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.grid.DeviceGrid;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -46,9 +44,7 @@ public class DevicePool
 	private static final List<Device> DEVICES = Collections.synchronizedList(new ArrayList<Device>());
 	private static final List<String> DEVICE_MODELS = Collections.synchronizedList(new ArrayList<String>());
 
-	private static final boolean GRID_ENABLED = Configuration.getBoolean(Parameter.ZAFIRA_GRID_ENABLED);
-
-	private static final Device nullDevice = new Device("", "", "", "", "", "");
+	private static final Device nullDevice = new Device("", "", "", "", "", "", "");
 	
 	private static ThreadLocal<Device> curDevice = new ThreadLocal<Device>();
 
@@ -59,7 +55,8 @@ public class DevicePool
 				Configuration.get(Parameter.MOBILE_PLATFORM_NAME),
 				Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
 				Configuration.get(Parameter.MOBILE_DEVICE_UDID),
-				Configuration.get(Parameter.SELENIUM_HOST));
+				Configuration.get(Parameter.SELENIUM_HOST),
+				"");
 		DEVICES.add(device);
 		DEVICE_MODELS.add(device.getName());
 		String msg = "Registered single device into the DevicePool: %s - %s";
@@ -107,7 +104,7 @@ public class DevicePool
         	}
         	String seleniumServer = propertiesMap.get("core.selenium_host");
         	
-        	addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer));
+        	addDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer, ""));
         }
 
 	}
@@ -115,7 +112,7 @@ public class DevicePool
 	public static synchronized void addDevices()
 	{
 		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
-				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)) {
+				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 			return;
 		}
 			
@@ -188,9 +185,8 @@ public class DevicePool
 			{
 				if (THREAD_2_DEVICE_MAP.containsValue(device))
 				{
-					String msg = "STF Grid returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
+					String msg = "Slenium HUB returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
 					device.disconnectRemote();
-					DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
 					throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
 				}
 				freeDevice = device;
@@ -239,39 +235,36 @@ public class DevicePool
 		return freeDevice;
 	}
 
+	public static void registerDevice(Device freeDevice) {
+		if (freeDevice != nullDevice)
+		{
+			Long threadId = Thread.currentThread().getId();
+			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
+			LOGGER.info("register device fot current thread id: " + threadId + "; device: '" + freeDevice.getName() + "'");
+			//register current device to be able to transfer it into Zafira at the end of the test
+			setCurrentDevice(freeDevice); 
+		} else
+		{
+			throw new RuntimeException("Unable to register null Device for the test!");
+		}
+		
+	}
+	
 	public static Device registerDevice()
 	{
 		Long threadId = Thread.currentThread().getId();
-		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-				&& !Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
+		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
 		{
 			return nullDevice;
 		}
 
-		final String testId = UUID.randomUUID().toString();
-		Device freeDevice = nullDevice;
-		if (GRID_ENABLED)
-		{
-			String allModels = StringUtils.join(DEVICE_MODELS, "+");
-			LOGGER.info(
-					"Looking for available device among: " + allModels + " using Zafira Grid. Default timeout 10 min.");
-
-			freeDevice = DeviceGrid.connectDevice(testId, DEVICE_MODELS);
-			//TODO: remove if operator and MOBILE_STF_DOCKER_CONTAINER property whe all clients moved to the dockerized cloud solution
-			if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER)) {
-				freeDevice.connectRemote();
-			}
-		} else
-		{
-			freeDevice = findDevice();
-		}
+		Device freeDevice = findDevice();
 
 		if (freeDevice != nullDevice)
 		{
-			freeDevice.setTestId(testId);
 			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
-			String msg = "found device %s-%s for test %s";
-			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid(), testId));
+			String msg = "found device %s-%s";
+			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid()));
 		} else
 		{
 			// TODO: improve loggers about device type, family etc
@@ -323,15 +316,9 @@ public class DevicePool
 		if (THREAD_2_DEVICE_MAP.containsKey(threadId))
 		{
 			Device device = THREAD_2_DEVICE_MAP.get(threadId);
-			if (GRID_ENABLED)
-			{
-				// no need to disconnect as closing STF session automatically disconnect adb session for this device 
-				//device.disconnectRemote();
-				DeviceGrid.disconnectDevice(device.getTestId(), device.getUdid());
-			}
 			THREAD_2_DEVICE_MAP.remove(threadId);
-			String msg = "Disconnected device '%s - %s' for test '%s'; thread '%s'";
-			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), device.getTestId(), threadId));
+			String msg = "Disconnected device '%s - %s'; thread '%s'";
+			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), threadId));
 		}
 	}
 
@@ -350,8 +337,7 @@ public class DevicePool
 			type = getDevice().getType();
 		} else
 		{
-			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
-					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
+			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
 					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID))
 			{
 				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID))
@@ -451,5 +437,9 @@ public class DevicePool
 		}
 		return device;
 	}
+//	
+//	public static void removeCurrentDevice() {
+//		curDevice.remove();
+//	}
 
 }

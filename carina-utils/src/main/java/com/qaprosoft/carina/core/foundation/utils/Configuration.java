@@ -304,18 +304,7 @@ public class Configuration
 		TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
 
 		//zafira
-		ZAFIRA_GRID_ENABLED("zafira_grid_enabled"),
-		
-		ZAFIRA_GRID_PKEY("zafira_grid_pkey"),
-		
-		ZAFIRA_GRID_SKEY("zafira_grid_skey"),
-		
-		ZAFIRA_GRID_CHANNEL("zafira_grid_channel"),
-		
-		ZAFIRA_GRID_LOGGING("zafira_grid_logging"),
-		
-		ZAFIRA_GRID_TIMEOUT("zafira_grid_timeout"),
-
+		//TODO: it seems like git_branch/git_commit and git_url can be removed
 		GIT_BRANCH("git_branch"),
 		
 		GIT_COMMIT("git_commit"),
