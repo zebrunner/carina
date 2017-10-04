@@ -104,7 +104,6 @@ public class DriverFactory {
 		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
 			factory = new DesktopFactory();
 		} else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_POOL)
 				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 			factory = new MobileFactory();
 		} else {

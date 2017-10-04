@@ -21,7 +21,7 @@ public class ThreadLogAppender extends AppenderSkeleton
 
 
 	@Override
-	public synchronized void append(LoggingEvent event)
+	public void append(LoggingEvent event)
 	{
 		//TODO: [VD] OBLIGATORY double check and create separate unit test for this case
 /*		if (!ReportContext.isBaseDireCreated()) {

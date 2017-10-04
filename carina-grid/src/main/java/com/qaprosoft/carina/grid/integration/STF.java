@@ -20,13 +20,13 @@ public class STF
 	private static Logger LOGGER = Logger.getLogger(STF.class.getName());
 
 	private static final Long STF_TIMEOUT = 3600L;
-	
+
 	private STFClient client;
-	
+
 	private static boolean running = false;
-	
+
 	public final static STF INSTANCE = new STF();
-	
+
 	private STF()
 	{
 		String serviceURL = System.getProperty("STF_URL");
@@ -36,59 +36,91 @@ public class STF
 		if (!StringUtils.isEmpty(serviceURL) && !StringUtils.isEmpty(authToken))
 		{
 			this.client = new STFClient(serviceURL, authToken);
-			if(this.client.getAllDevices().getStatus() == 200)
+			if (this.client.getAllDevices().getStatus() == 200)
 			{
 				running = true;
 				LOGGER.info("STF connection established");
-			}
-			else
+			} else
 			{
 				LOGGER.info("STF connection error");
 			}
-		}
-		else
+		} else
 		{
 			LOGGER.info("Set STF_URL and STF_TOKEN to use STF integration");
 		}
 		LOGGER.info("*********************************");
-    }
-	
+	}
+
 	public static boolean isRunning()
 	{
 		return running;
 	}
-	
+
 	public static boolean isDeviceAvailable(String udid)
 	{
 		boolean available = false;
-		if (isRunning()) {
-			try {
+		if (isRunning())
+		{
+			try
+			{
 				Response<Devices> rs = INSTANCE.client.getAllDevices();
-				if (rs.getStatus() == 200) {
-					for (STFDevice device : rs.getObject().getDevices()) {
-						if (udid.equals(device.getSerial())) {
+				if (rs.getStatus() == 200)
+				{
+					for (STFDevice device : rs.getObject().getDevices())
+					{
+						if (udid.equals(device.getSerial()))
+						{
 							available = device.getPresent() && device.getReady() && !device.getUsing()
 									&& device.getOwner() == null;
 							break;
 						}
 					}
-				} else {
+				} else
+				{
 					LOGGER.info("Unable to get devices status HTTP status: " + rs.getStatus());
 				}
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				LOGGER.info("Unable to get devices status HTTP status via udid: " + udid);
 			}
 		}
 		return available;
 	}
-	
-	public synchronized static boolean reserveDevice(String udid)
+
+	public static STFDevice getDevice(String udid)
 	{
-		return INSTANCE.client.reserveDevice(udid,  TimeUnit.SECONDS.toMillis(STF_TIMEOUT));		
+		STFDevice device = null;
+		if (isRunning())
+		{
+			try
+			{
+				Response<STFDevice> rs = INSTANCE.client.getDevice(udid);
+				if (rs.getStatus() == 200)
+				{
+					device = rs.getObject();
+				}
+			} catch (Exception e)
+			{
+				LOGGER.info("Unable to get device HTTP status via udid: " + udid);
+			}
+		}
+		return device;
 	}
-	
-	public synchronized static boolean returnDevice(String udid)
+
+	// TODO: why do we have boolean as return value here and below
+	public static boolean reserveDevice(String udid)
 	{
+		boolean status = INSTANCE.client.reserveDevice(udid, TimeUnit.SECONDS.toMillis(STF_TIMEOUT));
+		if (status)
+		{
+			status = INSTANCE.client.remoteConnectDevice(udid).getStatus() == 200;
+		}
+		return status;
+	}
+
+	public static boolean returnDevice(String udid)
+	{
+		// it seems like return and remote disconnect guarantee that device becomes free asap
 		return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
 	}
 }

@@ -92,7 +92,6 @@ public class SpecialKeywords
 	public static final String INVOCATION_COUNTER = " (" + INV_COUNT + "=%s)";
 	public static final String DESKTOP = "desktop";
 	public static final String MOBILE = "mobile";
-	public static final String MOBILE_POOL = "mobile_pool";
 	public static final String MOBILE_GRID = "mobile_grid";
 
 	public static final String CUSTOM = "custom";
