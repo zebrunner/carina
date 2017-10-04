@@ -54,10 +54,8 @@ public class MobileFactory extends AbstractFactory {
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
 					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-					// use uiautomator2 for Android 7
-					if (Configuration.getBoolean(Configuration.Parameter.ENABLE_AUTOMATOR2) && Configuration
-							.get(Configuration.Parameter.MOBILE_PLATFORM_VERSION).trim().startsWith("7.")) {
-						LOGGER.debug("uiautomator2 will be enabled for Android 7");
+					if (Configuration.getBoolean(Configuration.Parameter.ENABLE_AUTOMATOR2)) {
+						LOGGER.debug("uiautomator2 will be enabled");
 						capabilities.setCapability("automationName", "uiautomator2");
 					}
 					// handler in case app was installed via adb and there is no
