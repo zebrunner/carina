@@ -110,6 +110,8 @@ public class AndroidService {
         if (!deviceName.isEmpty()) {
             // add remoteURL/udid reference
             command = "-s " + deviceName + " " + command;
+        } else {
+        	LOGGER.warn("nullDevice detected fot current thread!");
         }
 
         String result = "";
