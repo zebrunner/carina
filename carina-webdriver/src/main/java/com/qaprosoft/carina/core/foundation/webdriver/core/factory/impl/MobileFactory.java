@@ -54,10 +54,6 @@ public class MobileFactory extends AbstractFactory {
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
 					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
 				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-					if (Configuration.getBoolean(Configuration.Parameter.ENABLE_AUTOMATOR2)) {
-						LOGGER.debug("uiautomator2 will be enabled");
-						capabilities.setCapability("automationName", "uiautomator2");
-					}
 					// handler in case app was installed via adb and there is no
 					// need to sign app using appium
 					if (Configuration.getBoolean(Configuration.Parameter.MOBILE_APP_INSTALL)
