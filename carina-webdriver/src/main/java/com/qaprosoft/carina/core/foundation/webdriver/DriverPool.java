@@ -284,7 +284,7 @@ public final class DriverPool {
 				//TODO: move browsermob startup to this location
 				startProxy();
 
-				if (device.isNull()) {
+/*				if (device.isNull()) {
 					// find and register device from the DevicePool
 					device = DevicePool.registerDevice();
 					
@@ -297,7 +297,7 @@ public final class DriverPool {
 					
 					// verify if valid build is already installed and uninstall only in case of any difference 
 					device.reinstallApp();
-				}
+				}*/
 
 
 				if (!device.isNull()) {

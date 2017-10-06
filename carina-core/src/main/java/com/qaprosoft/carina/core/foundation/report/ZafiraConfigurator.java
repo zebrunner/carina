@@ -52,15 +52,25 @@ public class ZafiraConfigurator implements IConfigurator
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
         }
 
+		long threadId = Thread.currentThread().getId();
+		
         // add custom arguments from current mobile device
-		Device device = DevicePool.getCurrentDevice();
+		Device device = DevicePool.getDevice();
 		if (!device.getName().isEmpty()) {
-			conf.getArg().add(buildArgumentType("device", device.getName()));
-			conf.getArg().add(buildArgumentType("platform", device.getOs()));
-			conf.getArg().add(buildArgumentType("platform_version", device.getOsVersion()));
+			String deviceName = device.getName();
+			String deviceOs = device.getOs();
+			String deviceOsVersion = device.getOsVersion();
+			
+			conf.getArg().add(buildArgumentType("device", deviceName));
+			conf.getArg().add(buildArgumentType("platform", deviceOs));
+			conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
+			
+			LOGGER.info("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
 			
 //			//unregister current device so it doesn't appear for the next step
 //			DevicePool.removeCurrentDevice();
+		} else {
+			LOGGER.error("Unable to detect current device for threadId: " + threadId);
 		}
         return conf;
     }

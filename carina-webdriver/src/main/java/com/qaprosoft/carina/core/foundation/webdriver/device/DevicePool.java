@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -32,6 +31,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 public class DevicePool
 {
@@ -39,10 +39,9 @@ public class DevicePool
 
 	private static final Pattern HOST_PATTERN = Pattern.compile(".*http:\\/\\/(.*):.*");
 
-	private static final Map<Long, Device> THREAD_2_DEVICE_MAP = Collections.synchronizedMap(new HashMap<Long, Device>());
+	//private static final Map<Long, Device> THREAD_2_DEVICE_MAP = Collections.synchronizedMap(new HashMap<Long, Device>());
 
 	private static final List<Device> DEVICES = Collections.synchronizedList(new ArrayList<Device>());
-	private static final List<String> DEVICE_MODELS = Collections.synchronizedList(new ArrayList<String>());
 
 	private static final Device nullDevice = new Device("", "", "", "", "", "", "");
 	
@@ -58,26 +57,8 @@ public class DevicePool
 				Configuration.get(Parameter.SELENIUM_HOST),
 				"");
 		DEVICES.add(device);
-		DEVICE_MODELS.add(device.getName());
 		String msg = "Registered single device into the DevicePool: %s - %s";
 		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));
-	}
-
-	public static synchronized void removeDevice()
-	{
-		removeDevice(getDevice());
-	}
-
-	public static synchronized void removeDevice(Device device)
-	{
-		if (device == nullDevice)
-		{
-			LOGGER.error("Unable to unregister NULL device!");
-			return;
-		}
-		DEVICES.remove(device);
-		DEVICE_MODELS.remove(device.getName());
-		LOGGER.info("Removed device from the DevicePool: " + device.getName());
 	}
 
 	public static synchronized List<Device> getDevices() {
@@ -86,7 +67,6 @@ public class DevicePool
 	
 	public static synchronized void addDevice(Device device) {
 		DEVICES.add(device);
-		DEVICE_MODELS.add(device.getName());
 		String msg = "Registered single device into the DevicePool: %s - %s";
 		LOGGER.info(String.format(msg, device.getName(), device.getUdid()));
 	}
@@ -145,7 +125,6 @@ public class DevicePool
 			}
 			Device device = new Device(args);
 			DEVICES.add(device);
-			DEVICE_MODELS.add(device.getName());
 			String msg = "Added device into the DevicePool: %s - %s. Devices count: %s";
 			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), DEVICES.size()));
 		}
@@ -183,66 +162,24 @@ public class DevicePool
 		{
 			if (device.getUdid().equalsIgnoreCase(udid))
 			{
-				if (THREAD_2_DEVICE_MAP.containsValue(device))
-				{
-					String msg = "Slenium HUB returned busy device as it exists in THREAD_2_DEVICE_MAP: %s - %s!";
-					device.disconnectRemote();
-					throw new RuntimeException(String.format(msg, device.getName(), device.getUdid()));
-				}
 				freeDevice = device;
 				break;
 			}
 		}
 		if (freeDevice == nullDevice) {
 			// TODO: improve loggers about device type, family etc
-			String allModels = StringUtils.join(DEVICE_MODELS, "+");
-			String msg = "Not found free device among %s devices!";
-			throw new RuntimeException(String.format(msg, allModels));
+			throw new RuntimeException("Not found free device!");
 		}
 		return freeDevice;
 	}
 	
-	private static Device findDevice() {
-		Device freeDevice = nullDevice;
-		int count = 0;
-		boolean found = false;
-		while (++count < 100 && !found)
-		{
-			for (Device device : DEVICES)
-			{
-				if (!THREAD_2_DEVICE_MAP.containsValue(device))
-				{
-					// current thread doesn't have ignored devices
-					freeDevice = device;
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
-			}
-		}
-		
-		if (freeDevice == nullDevice) {
-			// TODO: improve loggers about device type, family etc
-			String allModels = StringUtils.join(DEVICE_MODELS, "+");
-			String msg = "Not found free device among %s devices for "
-					+ Configuration.getInt(Parameter.INIT_RETRY_INTERVAL) * count + " seconds!";
-			throw new RuntimeException(String.format(msg, allModels));
-		}
-		
-		return freeDevice;
-	}
-
 	public static void registerDevice(Device freeDevice) {
 		if (freeDevice != nullDevice)
 		{
-			Long threadId = Thread.currentThread().getId();
-			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
-			LOGGER.info("register device fot current thread id: " + threadId + "; device: '" + freeDevice.getName() + "'");
 			//register current device to be able to transfer it into Zafira at the end of the test
-			setCurrentDevice(freeDevice); 
+			setDevice(freeDevice);
+			Long threadId = Thread.currentThread().getId();
+			LOGGER.info("register device fot current thread id: " + threadId + "; device: '" + freeDevice.getName() + "'");
 		} else
 		{
 			throw new RuntimeException("Unable to register null Device for the test!");
@@ -250,81 +187,25 @@ public class DevicePool
 		
 	}
 	
-	public static Device registerDevice()
-	{
-		Long threadId = Thread.currentThread().getId();
-		if (!Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE))
-		{
-			return nullDevice;
-		}
-
-		Device freeDevice = findDevice();
-
-		if (freeDevice != nullDevice)
-		{
-			THREAD_2_DEVICE_MAP.put(threadId, freeDevice);
-			String msg = "found device %s-%s";
-			LOGGER.info(String.format(msg, freeDevice.getName(), freeDevice.getUdid()));
-		} else
-		{
-			// TODO: improve loggers about device type, family etc
-			String allModels = StringUtils.join(DEVICE_MODELS, "+");
-			String msg = "Not found free device among %s devices for 10 minutes!";
-			throw new RuntimeException(String.format(msg, allModels));
-		}
-
-		//register current device to be able to transfer it into Zafira at the end of the test
-		setCurrentDevice(freeDevice); 
-		return freeDevice;
-
-	}
-
 	public static Device getDevice()
 	{
-		Device device = nullDevice;
-
 		long threadId = Thread.currentThread().getId();
-		if (THREAD_2_DEVICE_MAP.containsKey(threadId))
-		{
-			device = THREAD_2_DEVICE_MAP.get(threadId);
-		}
-		return device;
-	}
-
-	public static Device getDevice(String udid)
-	{
-		Device device = nullDevice;
-		for (Device dev : DEVICES)
-		{
-			if (dev.getUdid().equalsIgnoreCase(udid))
-			{
-				device = dev;
-				break;
-			}
-		}
-		if (device == nullDevice)
-		{
-			String msg = "Not found device by udid among registered pool of %s devices!";
-			throw new RuntimeException(String.format(msg, udid, DEVICES.size()));
+		String test = TestNamingUtil.getTestNameByThread();
+		Device device = curDevice.get();
+		if (device == null) {
+			LOGGER.info("Current device is null for test '" + test + "', thread: " + threadId);
+			device = nullDevice;
+		} else if (device.getName().isEmpty()) {
+			LOGGER.info("Current device name is empty! nullDevice was used for test '" + test + "', thread: " + threadId);
+		} else {
+			LOGGER.info("Current device name is '" + device.getName() + "' for test '" + test + "', thread: " + threadId);
 		}
 		return device;
 	}
 
 	public static void deregisterDevice()
 	{
-		Long threadId = Thread.currentThread().getId();
-		if (THREAD_2_DEVICE_MAP.containsKey(threadId))
-		{
-			Device device = THREAD_2_DEVICE_MAP.get(threadId);
-			THREAD_2_DEVICE_MAP.remove(threadId);
-			String msg = "Disconnected device '%s - %s'; thread '%s'";
-			LOGGER.info(String.format(msg, device.getName(), device.getUdid(), threadId));
-		}
-	}
-
-	public static String getDeviceUdid()
-	{
-		return (getDevice() != nullDevice) ? getDevice().getUdid() : Configuration.get(Parameter.MOBILE_DEVICE_UDID);
+		removeDevice();
 	}
 
 	public static Type getDeviceType()
@@ -403,43 +284,15 @@ public class DevicePool
 		return nullDevice;
 	}
 
-	/**
-	 * Pause for specified timeout.
-	 * 
-	 * @param timeout
-	 *            in seconds.
-	 */
-	private static void pause(long timeout)
-	{
-		try
-		{
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	private static void setCurrentDevice(Device device) {
-		LOGGER.info("Set current device to '" + device.getName() + "'");
+	private static void setDevice(Device device) {
+		String test = TestNamingUtil.getTestNameByThread();
+		long threadId = Thread.currentThread().getId();
+		LOGGER.info("Set current device to '" + device.getName() + "' test '" + test + "', thread: " + threadId);
 		curDevice.set(device);
 	}
 	
-	public static Device getCurrentDevice() {
-		Device device = curDevice.get();
-		if (device == null) {
-			LOGGER.debug("Current device is null!");
-			device = nullDevice;
-		} else if (device.getName().isEmpty()) {
-			LOGGER.debug("Current device name is empty! nullDevice was used");
-		} else {
-			LOGGER.debug("Current device name is '" + device.getName() + "'");
-		}
-		return device;
+	private static void removeDevice() {
+		curDevice.remove();
 	}
-//	
-//	public static void removeCurrentDevice() {
-//		curDevice.remove();
-//	}
 
 }
