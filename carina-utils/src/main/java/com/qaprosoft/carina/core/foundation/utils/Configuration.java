@@ -272,8 +272,6 @@ public class Configuration
 		
 		MOBILE_TOOLS_HOME("mobile_tools_home"),
 		
-		ENABLE_AUTOMATOR2("enable_uiautomator2"),
-		
 		// video recording and uploading to Dropbox
 		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
