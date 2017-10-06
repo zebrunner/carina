@@ -21,14 +21,16 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
         if (deviceName != null)
             capabilities.setCapability("deviceName", deviceName);
 
-        capabilities.setCapability("automationName", automationName);
         capabilities.setCapability("newCommandTimeout", commandTimeout);
 
 
         if (gridMode) {
+        	//do not set automationName for the grid
             capabilities.setCapability("platform", platform);
             capabilities.setCapability("version", platformVersion);
             capabilities.setCapability("browserName", deviceName);
+        } else {
+            capabilities.setCapability("automationName", automationName);
         }
 
         if (browserName != null)
