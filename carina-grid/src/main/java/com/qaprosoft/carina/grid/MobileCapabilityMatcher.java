@@ -148,7 +148,8 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 		}
 		
 		// STF integration that checks device status
-		if(STF.isRunning() && nodeCapability.containsKey("udid"))
+		String platform = (String) requestedCapability.get("platform");
+		if(STF.isRunning() && nodeCapability.containsKey("udid") && !"iOS".equalsIgnoreCase(platform))
 		{
 			return STF.isDeviceAvailable(String.valueOf(nodeCapability.get("udid")));
 		}
