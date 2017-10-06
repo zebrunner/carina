@@ -38,7 +38,8 @@ public class MobileRemoteProxy extends DefaultRemoteProxy
 	public void beforeSession(TestSession session) 
 	{
 		super.beforeSession(session);
-		if(STF.isRunning() && session.getSlot().getCapabilities().containsKey("udid"))
+		String platform = (String) session.getRequestedCapabilities().get("platform");
+		if(STF.isRunning() && session.getSlot().getCapabilities().containsKey("udid") && !"iOS".equalsIgnoreCase(platform))
 		{
 			STF.reserveDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
 		}
@@ -48,7 +49,8 @@ public class MobileRemoteProxy extends DefaultRemoteProxy
 	public void afterSession(TestSession session) 
 	{
 		super.afterSession(session);
-		if(STF.isRunning() && session.getSlot().getCapabilities().containsKey("udid"))
+		String platform = (String) session.getRequestedCapabilities().get("platform");
+		if(STF.isRunning() && session.getSlot().getCapabilities().containsKey("udid") && !"iOS".equalsIgnoreCase(platform))
 		{
 			STF.returnDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
 		}
