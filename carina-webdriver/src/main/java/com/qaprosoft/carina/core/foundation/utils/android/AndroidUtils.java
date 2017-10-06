@@ -800,7 +800,7 @@ public class AndroidUtils extends MobileUtils {
         executor = new AdbExecutor();
         String[] initCmd = executor.getDefaultCmd();
         LOGGER.debug("Init cmd: ".concat(initCmd.toString()));
-        String deviceUdid = DevicePool.getDeviceUdid();
+        String deviceUdid = DevicePool.getDevice().getUdid();
 
         LOGGER.info("Device udid: ".concat(deviceUdid));
         if (!deviceUdid.isEmpty()) {
