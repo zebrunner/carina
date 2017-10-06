@@ -65,7 +65,7 @@ public class Device
 	
 	public Device()
 	{
-		this(null, null, null, null, null, null, null);
+		this("", "", "", "", "", "", "");
 	}
 
 	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer, String remoteURL)

@@ -112,8 +112,6 @@ public abstract class AbstractTest // extends DriverHelper
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) throws Throwable {
     	
-    	DevicePool.addDevices();
-
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         // Set log4j properties
@@ -192,12 +190,12 @@ public abstract class AbstractTest // extends DriverHelper
         updateAppPath();
         
         // moved from UITest->executeBeforeTestSuite
+        //TODO: investigate later howto incorporate browserStack device registration better
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
             //redefine core properties using custom capabilities file
         	Map<String, String> properties = Configuration.loadCoreProperties(customCapabilities);
-            //reregister device if mobile core properties are redefined 
-            DevicePool.addDevice(properties);
+            DevicePool.registerDevice(properties);
         }
     }
     
