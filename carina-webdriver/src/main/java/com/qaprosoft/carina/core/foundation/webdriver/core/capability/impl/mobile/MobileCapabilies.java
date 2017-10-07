@@ -16,11 +16,6 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
                                                         String automationName, String commandTimeout, String browserName, String app, String appActivity, String appPackage) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         
-        capabilities.setCapability("platformName", platform);
-        capabilities.setCapability("platformVersion", platformVersion);
-        if (deviceName != null)
-            capabilities.setCapability("deviceName", deviceName);
-
         capabilities.setCapability("newCommandTimeout", commandTimeout);
 
 
@@ -31,6 +26,11 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
             capabilities.setCapability("browserName", deviceName);
         } else {
             capabilities.setCapability("automationName", automationName);
+            capabilities.setCapability("platformName", platform);
+            capabilities.setCapability("platformVersion", platformVersion);
+            if (deviceName != null) {
+                capabilities.setCapability("deviceName", deviceName);
+            }
         }
 
         if (browserName != null)
