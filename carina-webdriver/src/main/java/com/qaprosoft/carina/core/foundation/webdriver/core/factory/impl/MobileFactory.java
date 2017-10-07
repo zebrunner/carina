@@ -60,6 +60,7 @@ public class MobileFactory extends AbstractFactory {
 							&& !Configuration.getBoolean(Configuration.Parameter.MOBILE_APP_UNINSTALL)) {
 						capabilities.setCapability("app", "");
 					}
+					LOGGER.info("capabilities.getPlatform(): " + capabilities.getPlatform());
 					LOGGER.info("platformName: " +  capabilities.getCapability("platformName"));
 					LOGGER.info("platform: " +  capabilities.getCapability("platform"));
 					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
