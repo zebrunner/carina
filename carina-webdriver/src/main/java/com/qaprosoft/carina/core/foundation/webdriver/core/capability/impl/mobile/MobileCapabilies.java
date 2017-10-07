@@ -24,6 +24,7 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
             capabilities.setCapability("platform", platform);
             capabilities.setCapability("version", platformVersion);
             capabilities.setCapability("browserName", deviceName);
+            capabilities.setCapability("deviceName", "*");
         } else {
             capabilities.setCapability("automationName", automationName);
             capabilities.setCapability("platformName", platform);
