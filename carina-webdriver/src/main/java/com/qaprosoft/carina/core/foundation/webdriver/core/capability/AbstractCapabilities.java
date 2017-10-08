@@ -43,6 +43,9 @@ public abstract class AbstractCapabilities {
 			capabilities.setCapability(CapabilityType.PROXY, proxy);
 		}
 		
+		// add capabilities based on dynamic _config.properties variables
+		capabilities = initCustomCapabilities(capabilities);
+		
 		//handle variant with extra capabilities from external property file
     	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
     			
@@ -50,20 +53,28 @@ public abstract class AbstractCapabilities {
     		capabilities.merge(extraCapabilities);
     	}
     	
-    	//read all properties from config.properties and use "web.*" to redefine base capability
-    	final String web = "web.";
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-			if (entry.getKey().startsWith(web)) {
-				String cap = entry.getKey().replaceAll(web, "");
-				capabilities.setCapability(cap, R.CONFIG.get(entry.getKey()));
-			}
-		}
-
         return capabilities;
     }
     
+	protected DesiredCapabilities initCustomCapabilities(DesiredCapabilities capabilities) {
+		// TODO: completely redesign capabilities factory
+		// 1. driver_type value can be used to determine prefix like "mobile." or "mobile_grid." or "desktop."
+		// 2. read all properties which starts from current prefix and add them into desired capabilities.
+		// 3. remove all hardcoded logic with out own carina naming like mobile_device_name etc
+
+		// read all properties from config.properties and use "mobile.*" to redefine base capability
+		final String prefix = Configuration.get(Parameter.DRIVER_TYPE).toLowerCase() + ".";
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
+		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+			if (entry.getKey().toLowerCase().startsWith(prefix)) {
+				String cap = entry.getKey().replaceAll(prefix, "");
+				capabilities.setCapability(cap, R.CONFIG.get(entry.getKey()));
+			}
+		}
+		return capabilities;
+	}
+
     protected DesiredCapabilities getExtraCapabilities() {
 		//handle variant with extra capabilities from external property file
     	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
