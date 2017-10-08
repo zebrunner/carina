@@ -1,12 +1,8 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public abstract class MobileCapabilies extends AbstractCapabilities {
@@ -17,7 +13,6 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         
         capabilities.setCapability("newCommandTimeout", commandTimeout);
-
 
         if (gridMode) {
         	//do not set automationName for the grid
@@ -50,6 +45,10 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
                 capabilities.setCapability("appPackage", appPackage);
         }
         
+        
+		// add capabilities based on dynamic _config.properties variables
+		capabilities = initCustomCapabilities(capabilities);
+
 		//handle variant with extra capabilities from external property file
     	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
     			
@@ -57,18 +56,6 @@ public abstract class MobileCapabilies extends AbstractCapabilities {
     		capabilities.merge(extraCapabilities);
     	}
     	
-
-		// read all properties from config.properties and use "mobile.*" to
-		// redefine base capability
-		final String mobile = "mobile.";
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
-		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-			if (entry.getKey().startsWith(mobile)) {
-				String cap = entry.getKey().replaceAll(mobile, "");
-				capabilities.setCapability(cap, R.CONFIG.get(entry.getKey()));
-			}
-		}
         return capabilities;
     }
 
