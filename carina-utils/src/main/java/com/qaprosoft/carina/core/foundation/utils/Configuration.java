@@ -444,13 +444,14 @@ public class Configuration
 			}
 		}
 		
+		asString.append("\n------------- Driver capabilities -----------\n");
 		// read all properties from config.properties and use "mobile.*" or "mobile_grid.*" or "desktop.*" etc
 		final String prefix = Configuration.get(Parameter.DRIVER_TYPE).toLowerCase() + ".";
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
 			if (entry.getKey().toLowerCase().startsWith(prefix)) {
-				asString.append(String.format("%s=%s\n", entry.getKey().replaceAll(prefix, ""), R.CONFIG.get(entry.getKey())));
+				asString.append(String.format("%s=%s\n", entry.getKey(), R.CONFIG.get(entry.getKey())));
 			}
 		}
 		
