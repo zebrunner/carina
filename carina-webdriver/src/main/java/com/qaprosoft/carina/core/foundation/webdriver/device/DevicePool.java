@@ -87,12 +87,12 @@ public class DevicePool
 		String test = TestNamingUtil.getTestNameByThread();
 		Device device = currentDevice.get();
 		if (device == null) {
-			LOGGER.info("Current device is null for test '" + test + "', thread: " + threadId);
+			LOGGER.debug("Current device is null for test '" + test + "', thread: " + threadId);
 			device = nullDevice;
 		} else if (device.getName().isEmpty()) {
-			LOGGER.info("Current device name is empty! nullDevice was used for test '" + test + "', thread: " + threadId);
+			LOGGER.debug("Current device name is empty! nullDevice was used for test '" + test + "', thread: " + threadId);
 		} else {
-			LOGGER.info("Current device name is '" + device.getName() + "' for test '" + test + "', thread: " + threadId);
+			LOGGER.debug("Current device name is '" + device.getName() + "' for test '" + test + "', thread: " + threadId);
 		}
 		return device;
 	}
@@ -141,7 +141,7 @@ public class DevicePool
 	private static void setDevice(Device device) {
 		String test = TestNamingUtil.getTestNameByThread();
 		long threadId = Thread.currentThread().getId();
-		LOGGER.info("Set current device to '" + device.getName() + "' test '" + test + "', thread: " + threadId);
+		LOGGER.debug("Set current device to '" + device.getName() + "' test '" + test + "', thread: " + threadId);
 		currentDevice.set(device);
 	}
 	
