@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -36,12 +37,14 @@ public class DevicePool
 	public static Device registerDevice(Device device) {
 		if (device == nullDevice) {
 			//analyze if it is local mobile run
+			//TODO: move "mobile.*" into constants keywords
 			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-				device = new Device(Configuration.get(Parameter.MOBILE_DEVICE_NAME),
+				device = new Device(R.CONFIG.get("mobile.deviceName"),
 						Configuration.get(Parameter.MOBILE_DEVICE_TYPE),
-						Configuration.get(Parameter.MOBILE_PLATFORM_NAME),
-						Configuration.get(Parameter.MOBILE_PLATFORM_VERSION),
-						Configuration.get(Parameter.MOBILE_DEVICE_UDID), Configuration.get(Parameter.SELENIUM_HOST),
+						R.CONFIG.get("mobile.platformName"),
+						R.CONFIG.get("mobile.platformName"), 
+						R.CONFIG.get("mobile.udid"), 
+						Configuration.get(Parameter.SELENIUM_HOST),
 						"");
 			}
 		}

@@ -82,6 +82,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
 
@@ -377,8 +378,9 @@ public abstract class AbstractTest // extends DriverHelper
 
         if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
             //Samsung - Android 4.4.2; iPhone - iOS 7
+        	Device device = DevicePool.getDevice();
             String deviceTemplate = "%s - %s %s";
-            deviceName = String.format(deviceTemplate, Configuration.get(Parameter.MOBILE_DEVICE_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_NAME), Configuration.get(Parameter.MOBILE_PLATFORM_VERSION));
+            deviceName = String.format(deviceTemplate, device.getName(), device.getOs(), device.getOsVersion());
         }
 
         return deviceName;

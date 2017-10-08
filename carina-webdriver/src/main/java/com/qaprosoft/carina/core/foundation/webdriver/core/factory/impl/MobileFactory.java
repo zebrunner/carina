@@ -19,9 +19,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileGridCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileNativeCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileWebCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -60,9 +58,7 @@ public class MobileFactory extends AbstractFactory {
 							&& !Configuration.getBoolean(Configuration.Parameter.MOBILE_APP_UNINSTALL)) {
 						capabilities.setCapability("app", "");
 					}
-					LOGGER.info("capabilities.getPlatform(): " + capabilities.getPlatform());
-					LOGGER.info("platformName: " +  capabilities.getCapability("platformName"));
-					LOGGER.info("platform: " +  capabilities.getCapability("platform"));
+
 					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
 					
 					if (device.isNull()) 
@@ -105,17 +101,12 @@ public class MobileFactory extends AbstractFactory {
         } else {
             String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
 
-            if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
-            	capabilities = new MobileGridCapabilities().getCapability(name);
-            } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-                    && !Configuration.get(Configuration.Parameter.BROWSER).isEmpty()) {
-            	capabilities = new MobileWebCapabilities().getCapability(name);
-            } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-                    && Configuration.get(Configuration.Parameter.BROWSER).isEmpty()) {
-            	capabilities = new MobileNativeCapabilities().getCapability(name);
-            } else {
-                throw new RuntimeException("Unsupported driver type:" + driverType);
-            }
+			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
+					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
+				capabilities = new MobileCapabilies().getCapability(name);
+			} else {
+				throw new RuntimeException("Unsupported driver type:" + driverType);
+			}
         }
         
 		return capabilities;
