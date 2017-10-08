@@ -240,13 +240,7 @@ public class Configuration
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
         
         // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_DEVICE_NAME("mobile_device_name"), 
-        
         MOBILE_PLATFORM_NAME("mobile_platform_name"),
-        
-        MOBILE_PLATFORM_VERSION("mobile_platform_version"),
-        
-        MOBILE_AUTOMATION_NAME("mobile_automation_name"), // Selendroid 
         
         MOBILE_APP("mobile_app"),
         
@@ -260,20 +254,9 @@ public class Configuration
         
         MOBILE_APPIUM_RESTART("mobile_appium_restart"),
         
-        MOBILE_APP_ACTIVITY("mobile_app_activity"),
-        
-		MOBILE_APP_PACKAGE("mobile_app_package"), 
-		
-		MOBILE_NEW_COMMAND_TIMEOUT("mobile_new_command_timeout"),
-		
 		MOBILE_STF_DOCKER_CONTAINER("mobile_stf_docker_container"),
 		
-		MOBILE_DEVICES("mobile_devices"),
-		
 		MOBILE_TOOLS_HOME("mobile_tools_home"),
-		
-		// video recording and uploading to Dropbox
-		MOBILE_DEVICE_UDID("mobile_device_udid"),
 		
 		MOBILE_DEVICE_TYPE("mobile_device_type"),
 		
