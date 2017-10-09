@@ -616,6 +616,9 @@ public abstract class AbstractTest // extends DriverHelper
 			File file = HockeyAppManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType, version);
 
 			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
+			R.CONFIG.put(Configuration.get(Parameter.DRIVER_TYPE) + ".app", file.getAbsolutePath());
+			
+			
 			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
 
 			// try to redefine app_version if it's value is latest or empty
