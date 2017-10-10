@@ -339,7 +339,7 @@ public class Device
 
 
     public void screenOff() {
-        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+        if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             return;
         }
         if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
@@ -373,7 +373,7 @@ public class Device
 
 
     public void screenOn() {
-        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+        if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             return;
         }
 
@@ -430,7 +430,7 @@ public class Device
     }
     
     public void clearAppData(String app) {
-        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+        if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             return;
         }
         
@@ -499,7 +499,7 @@ public class Device
     }
     
     public void reinstallApp() {
-        if (!Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+        if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             return;
         }
 

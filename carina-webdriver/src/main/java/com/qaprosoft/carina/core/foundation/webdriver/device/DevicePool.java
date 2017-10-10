@@ -112,11 +112,11 @@ public class DevicePool
 			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
 					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID))
 			{
-				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.ANDROID))
+				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID))
 				{
 					type = Type.ANDROID_PHONE;
 				}
-				if (Configuration.get(Parameter.MOBILE_PLATFORM_NAME).equalsIgnoreCase(SpecialKeywords.IOS))
+				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.IOS))
 				{
 					if (Configuration.get(Parameter.MOBILE_DEVICE_TYPE).equalsIgnoreCase(SpecialKeywords.TABLET))
 					{
