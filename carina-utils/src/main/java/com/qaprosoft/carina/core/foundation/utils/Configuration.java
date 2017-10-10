@@ -240,8 +240,6 @@ public class Configuration
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
         
         // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_PLATFORM_NAME("mobile_platform_name"),
-        
         MOBILE_APP("mobile_app"),
         
         MOBILE_APP_PREUPGRADE("mobile_app_preupgrade"),
@@ -511,5 +509,22 @@ public class Configuration
         }
         
         return propertiesMap;
+    }
+    
+    public static String getPlatform() {
+    	// default "platform=value" should be used to determine current platform 
+    	String platform = Configuration.get(Parameter.PLATFORM);
+    	
+    	//redefine platform if mobile.platform is available
+    	String prefix = Configuration.get(Parameter.DRIVER_TYPE) + ".";
+    	if (!R.CONFIG.get(prefix + "platform").isEmpty()) {
+    		platform = R.CONFIG.get(prefix + "platform");
+    	}
+
+    	//redefine platform if mobile.platformName is available
+    	if (!R.CONFIG.get(prefix + "platformName").isEmpty()) {
+    		platform = R.CONFIG.get(prefix + "platformName");
+    	}
+    	return platform;
     }
 }

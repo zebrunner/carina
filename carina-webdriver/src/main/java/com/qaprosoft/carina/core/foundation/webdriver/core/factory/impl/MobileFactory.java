@@ -37,7 +37,7 @@ public class MobileFactory extends AbstractFactory {
 
         String seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
         String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
-        String mobilePlatformName = Configuration.get(Configuration.Parameter.MOBILE_PLATFORM_NAME);
+        String mobilePlatformName = Configuration.getPlatform();
 
         if (device != null && !device.isNull()) {
         	seleniumHost = device.getSeleniumServer();
