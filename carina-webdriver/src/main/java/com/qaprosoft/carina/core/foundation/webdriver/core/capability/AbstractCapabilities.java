@@ -68,8 +68,11 @@ public abstract class AbstractCapabilities {
 		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
 			if (entry.getKey().toLowerCase().startsWith(prefix)) {
-				String cap = entry.getKey().replaceAll(prefix, "");
-				capabilities.setCapability(cap, R.CONFIG.get(entry.getKey()));
+				String value = R.CONFIG.get(entry.getKey());
+				if (!value.isEmpty()) {
+					String cap = entry.getKey().replaceAll(prefix, "");
+					capabilities.setCapability(cap, value);
+				}
 			}
 		}
 		return capabilities;
