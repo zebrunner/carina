@@ -25,7 +25,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
@@ -100,11 +99,10 @@ public class DriverFactory {
 	public static WebDriver create(String testName, Device device) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
-		String driverType = Configuration.get(Parameter.DRIVER_TYPE);
+		String driverType = Configuration.getDriverType();
 		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
 			factory = new DesktopFactory();
-		} else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-				|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
+		} else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 			factory = new MobileFactory();
 		} else {
 			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");

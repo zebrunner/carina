@@ -36,7 +36,7 @@ public class MobileFactory extends AbstractFactory {
     public WebDriver create(String name, Device device) {
 
         String seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
-        String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
+        String driverType = Configuration.getDriverType();
         String mobilePlatformName = Configuration.getPlatform();
 
         if (device != null && !device.isNull()) {
@@ -49,8 +49,8 @@ public class MobileFactory extends AbstractFactory {
         RemoteWebDriver driver = null;
         DesiredCapabilities capabilities = getCapabilities(name, device);
         try {
-			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
+			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+				//TODO: remove later this logic
 				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 					// handler in case app was installed via adb and there is no
 					// need to sign app using appium
@@ -99,14 +99,7 @@ public class MobileFactory extends AbstractFactory {
         if (!customCapabilities.isEmpty()) {
         	capabilities = new CapabilitiesLoder().loadCapabilities(customCapabilities);
         } else {
-            String driverType = Configuration.get(Configuration.Parameter.DRIVER_TYPE);
-
-			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)
-					|| driverType.equalsIgnoreCase(SpecialKeywords.MOBILE_GRID)) {
-				capabilities = new MobileCapabilies().getCapability(name);
-			} else {
-				throw new RuntimeException("Unsupported driver type:" + driverType);
-			}
+			capabilities = new MobileCapabilies().getCapability(name);
         }
         
 		return capabilities;

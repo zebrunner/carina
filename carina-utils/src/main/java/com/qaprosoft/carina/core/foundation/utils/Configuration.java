@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /**
  * Configuration utility.
@@ -103,8 +102,6 @@ public class Configuration
 		BROWSER_VERSION("browser_version"),
 
 		SELENIUM_HOST("selenium_host"),
-		
-		DRIVER_TYPE("driver_type"),
 		
 		DRIVER_MODE("driver_mode"),
 		
@@ -425,8 +422,8 @@ public class Configuration
 		}
 		
 		asString.append("\n------------- Driver capabilities -----------\n");
-		// read all properties from config.properties and use "mobile.*" or "mobile_grid.*" or "desktop.*" etc
-		final String prefix = Configuration.get(Parameter.DRIVER_TYPE).toLowerCase() + ".";
+		// read all properties from config.properties and use "capabilities.*"
+		final String prefix = SpecialKeywords.CAPABILITIES + ".";
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
@@ -514,8 +511,8 @@ public class Configuration
     	// default "platform=value" should be used to determine current platform 
     	String platform = Configuration.get(Parameter.PLATFORM);
     	
-    	//redefine platform if mobile.platform is available
-    	String prefix = Configuration.get(Parameter.DRIVER_TYPE) + ".";
+    	//redefine platform if capabilities.platform is available
+    	String prefix = SpecialKeywords.CAPABILITIES + ".";
     	if (!R.CONFIG.get(prefix + "platform").isEmpty()) {
     		platform = R.CONFIG.get(prefix + "platform");
     	}
@@ -528,10 +525,20 @@ public class Configuration
     }
     
     
+	public static String getDriverType() {
+		String platform = getPlatform();
+		String mobileType = SpecialKeywords.DESKTOP;
+		if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
+			mobileType = SpecialKeywords.MOBILE;
+		}
+		return mobileType;
+	}
+    
+    
     public static String getMobileApp() {
-    	//redefine platform if mobile.app or mobile_grid.app is available
+    	//redefine platform if capabilities.app is available
     	String mobileApp = "";
-    	String prefix = Configuration.get(Parameter.DRIVER_TYPE) + ".";
+    	String prefix = SpecialKeywords.CAPABILITIES + ".";
     	if (!R.CONFIG.get(prefix + "app").isEmpty()) {
     		mobileApp = R.CONFIG.get(prefix + "app");
     	}
@@ -539,8 +546,7 @@ public class Configuration
     }
     
     public static void setMobileApp(String mobileApp) {
-    	R.CONFIG.put(Configuration.get(Parameter.DRIVER_TYPE) + ".app", mobileApp);
+    	R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".app", mobileApp);
     }
-    
-    
+   
 }
