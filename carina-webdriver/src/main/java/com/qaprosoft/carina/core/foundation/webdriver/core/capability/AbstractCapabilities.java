@@ -87,7 +87,6 @@ public abstract class AbstractCapabilities {
 				}
 			}
 		}
-		
 		//TODO: remove code duplicate
 		LOGGER.info("Analyze system  properties for capabilities.*");
 		@SuppressWarnings({ "unchecked", "rawtypes" })
