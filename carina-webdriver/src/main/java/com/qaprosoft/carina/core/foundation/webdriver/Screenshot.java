@@ -448,7 +448,7 @@ public class Screenshot
 	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot;
 		if (driver.getClass().toString().contains("java_client") || 
-				Configuration.get(Parameter.DRIVER_TYPE).contains(SpecialKeywords.MOBILE)) {
+				Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
 			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
 			screenShot = ImageIO.read(screenshot);
 		} else {
