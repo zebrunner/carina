@@ -680,7 +680,6 @@ public abstract class AbstractTest // extends DriverHelper
 			}
 
 			Configuration.setMobileApp(file.getAbsolutePath());
-			LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
 
 			// try to redefine app_version if it's value is latest or empty
 			String appVersion = Configuration.get(Parameter.APP_VERSION);
