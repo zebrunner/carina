@@ -75,9 +75,12 @@ public abstract class AbstractCapabilities {
 		}
 		
 		// read all env variables and redefine capabilities.* items
+		LOGGER.info("Analyze env variable for capabilities.*");
 		for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+			LOGGER.info("var: " + entry.getKey());
 			if (entry.getKey().toLowerCase().startsWith(prefix)) {
 				String value = entry.getValue();
+				LOGGER.info("value: " + value);
 				if (value != null && !value.isEmpty()) {
 					String cap = entry.getKey().replaceAll(prefix, "");
 					capabilities.setCapability(cap, value);
