@@ -88,8 +88,25 @@ public abstract class AbstractCapabilities {
 			}
 		}
 		
+		//TODO: remove code duplicate
+		LOGGER.info("Analyze system  properties for capabilities.*");
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Map<String, String> properties = new HashMap(System.getProperties());
+		for (Map.Entry<String, String> entry : properties.entrySet()) {
+			LOGGER.info("var: " + entry.getKey());
+			if (entry.getKey().toLowerCase().startsWith(prefix)) {
+				String value = entry.getValue();
+				LOGGER.info("value: " + value);
+				if (value != null && !value.isEmpty()) {
+					String cap = entry.getKey().replaceAll(prefix, "");
+					capabilities.setCapability(cap, value);
+				}
+			}
+		}
+		
 		return capabilities;
 	}
+	
 
     protected DesiredCapabilities getExtraCapabilities() {
 		//handle variant with extra capabilities from external property file
