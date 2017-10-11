@@ -371,7 +371,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     }
 
     protected String getFileName() {
-        String path = Configuration.get(Configuration.Parameter.MOBILE_APP);
+        String path = Configuration.getMobileApp();
         if (!path.isEmpty()) {
             File file = new File(path);
             return file.getName();
