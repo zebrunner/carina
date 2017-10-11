@@ -284,9 +284,11 @@ public final class DriverPool {
 				//TODO: move browsermob startup to this location
 				startProxy();
 
-				// by default device could be nullDevice
-				device = DevicePool.registerDevice(device);
 				
+				// by default device could be nullDevice
+				//device = DevicePool.registerDevice(device);
+				
+				//TODO: remove or move device manipulation to MobileFactory
 				// for local runs try to init device from _config.properties
 				if (!device.isNull()) {
 					// turn on mobile device display if necessary. action can be done after registering available device with thread
