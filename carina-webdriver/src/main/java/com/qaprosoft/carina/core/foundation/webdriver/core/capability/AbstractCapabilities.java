@@ -91,7 +91,6 @@ public abstract class AbstractCapabilities {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, String> properties = new HashMap(System.getProperties());
 		for (Map.Entry<String, String> entry : properties.entrySet()) {
-			LOGGER.info("var: " + entry.getKey());
 			if (entry.getKey().toLowerCase().startsWith(prefix)) {
 				String value = entry.getValue();
 				if (value != null && !value.isEmpty()) {
