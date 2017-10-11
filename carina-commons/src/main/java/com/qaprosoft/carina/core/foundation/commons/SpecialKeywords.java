@@ -91,7 +91,6 @@ public class SpecialKeywords
 	public static final String INVOCATION_COUNTER = " (" + INV_COUNT + "=%s)";
 	public static final String DESKTOP = "desktop";
 	public static final String MOBILE = "mobile";
-	public static final String MOBILE_GRID = "mobile_grid";
 
 	public static final String CUSTOM = "custom";
 
@@ -129,5 +128,10 @@ public class SpecialKeywords
 	// ------------- PROXY PROPERTIES ---------------------------------
 	public static final String PROXY_SETTER_PACKAGE = "tk.elevenk.proxysetter";
 	public static final String PROXY_SETTER_RES_PATH = "app/proxy-setter-debug-0.2.apk";
+	
+	
+	
+	// ------------- CAPABILITIES PROPERTIES --------------------------
+	public static final String CAPABILITIES = "capabilities";	
 	
 }

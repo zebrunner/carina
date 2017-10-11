@@ -582,7 +582,7 @@ public class ExtendedWebElement {
     }
 
     public void scrollTo() {
-        if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+        if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
             return;
         }

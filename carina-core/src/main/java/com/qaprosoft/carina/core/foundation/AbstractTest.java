@@ -373,10 +373,11 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
 
+    //TODO: remove this private method
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (Configuration.get(Parameter.DRIVER_TYPE).toLowerCase().contains(SpecialKeywords.MOBILE)) {
+        if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             //Samsung - Android 4.4.2; iPhone - iOS 7
         	Device device = DevicePool.getDevice();
             String deviceTemplate = "%s - %s %s";

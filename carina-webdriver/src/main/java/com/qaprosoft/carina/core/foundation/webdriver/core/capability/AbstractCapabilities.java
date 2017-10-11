@@ -11,6 +11,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -44,7 +45,7 @@ public abstract class AbstractCapabilities {
 		}
 		
 		// add capabilities based on dynamic _config.properties variables
-		capabilities = initCustomCapabilities(capabilities);
+		capabilities = initCapabilities(capabilities);
 		
 		//handle variant with extra capabilities from external property file
     	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
@@ -56,14 +57,11 @@ public abstract class AbstractCapabilities {
         return capabilities;
     }
     
-	protected DesiredCapabilities initCustomCapabilities(DesiredCapabilities capabilities) {
-		// TODO: completely redesign capabilities factory
-		// 1. driver_type value can be used to determine prefix like "mobile." or "mobile_grid." or "desktop."
-		// 2. read all properties which starts from current prefix and add them into desired capabilities.
-		// 3. remove all hardcoded logic with out own carina naming like mobile_device_name etc
+	protected DesiredCapabilities initCapabilities(DesiredCapabilities capabilities) {
+		// read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
 
-		// read all properties from config.properties and use "mobile.*" to redefine base capability
-		final String prefix = Configuration.get(Parameter.DRIVER_TYPE).toLowerCase() + ".";
+		// read all properties from config.properties and use "capabilities.*" to redefine capability
+		final String prefix = SpecialKeywords.CAPABILITIES + ".";
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
@@ -75,6 +73,18 @@ public abstract class AbstractCapabilities {
 				}
 			}
 		}
+		
+		// read all env variables and redefine capabilities.* items
+		for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+			if (entry.getKey().toLowerCase().startsWith(prefix)) {
+				String value = entry.getValue();
+				if (value != null && !value.isEmpty()) {
+					String cap = entry.getKey().replaceAll(prefix, "");
+					capabilities.setCapability(cap, value);
+				}
+			}
+		}
+		
 		return capabilities;
 	}
 

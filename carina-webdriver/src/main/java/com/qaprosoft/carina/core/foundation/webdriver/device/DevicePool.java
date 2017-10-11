@@ -37,13 +37,14 @@ public class DevicePool
 	public static Device registerDevice(Device device) {
 		if (device == nullDevice) {
 			//analyze if it is local mobile run
-			//TODO: move "mobile.*" into constants keywords
-			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-				device = new Device(R.CONFIG.get("mobile.deviceName"),
+			if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+				final String prefix = SpecialKeywords.CAPABILITIES + ".";
+				
+				device = new Device(R.CONFIG.get(prefix + "deviceName"),
 						Configuration.get(Parameter.MOBILE_DEVICE_TYPE),
-						R.CONFIG.get("mobile.platformName"),
-						R.CONFIG.get("mobile.platformName"), 
-						R.CONFIG.get("mobile.udid"), 
+						R.CONFIG.get(prefix + "platformName"),
+						R.CONFIG.get(prefix + "platformVersion"), 
+						R.CONFIG.get(prefix + "udid"), 
 						Configuration.get(Parameter.SELENIUM_HOST),
 						"");
 			}
@@ -109,12 +110,18 @@ public class DevicePool
 			type = getDevice().getType();
 		} else
 		{
-			if (Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE)
-					|| Configuration.get(Parameter.DRIVER_TYPE).equalsIgnoreCase(SpecialKeywords.MOBILE_GRID))
+			if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE))
 			{
 				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID))
 				{
-					type = Type.ANDROID_PHONE;
+					//TODO: remove Parameter.MOBILE_DEVICE_TYPE later
+					if (Configuration.get(Parameter.MOBILE_DEVICE_TYPE).equalsIgnoreCase(SpecialKeywords.TABLET))
+					{
+						type = Type.ANDROID_TABLET;
+					} else
+					{
+						type = Type.ANDROID_PHONE;
+					}
 				}
 				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.IOS))
 				{
