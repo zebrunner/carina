@@ -59,6 +59,7 @@ public class DevicePool
 	}
 	
 	public static void registerDevice(Map<String, String> propertiesMap) {
+		//TODO: refactor capability names 
         if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
         	//add device from custom capabilities to the devicePool
         	String deviceName = propertiesMap.get("core.mobile_device_name");
@@ -102,7 +103,6 @@ public class DevicePool
 	//TODO: move it to Device class
 	public static Type getDeviceType()
 	{
-		// specify default value based on existing _config.properties parameters
 		Type type = Type.DESKTOP;
 
 		if (getDevice() != nullDevice)
@@ -110,6 +110,7 @@ public class DevicePool
 			type = getDevice().getType();
 		} else
 		{
+			// specify default value based on existing _config.properties parameters
 			if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE))
 			{
 				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID))
