@@ -426,7 +426,7 @@ public class Device
     }
     
     public void clearAppData() {
-    	clearAppData(Configuration.get(Parameter.MOBILE_APP));
+    	clearAppData(Configuration.getMobileApp());
     }
     
     public void clearAppData(String app) {
@@ -506,7 +506,7 @@ public class Device
         if (isNull())
         	return;
         
-        String mobileApp = Configuration.get(Parameter.MOBILE_APP);
+        String mobileApp = Configuration.getMobileApp();
         String oldMobileApp = Configuration.get(Parameter.MOBILE_APP_PREUPGRADE);
         
 		if (!oldMobileApp.isEmpty()) {
@@ -517,7 +517,7 @@ public class Device
 
         if (Configuration.getBoolean(Parameter.MOBILE_APP_UNINSTALL)) {
             // explicit reinstall the apk
-            String[] apkVersions = getApkVersion(mobileApp); // Configuration.get(Parameter.MOBILE_APP)
+            String[] apkVersions = getApkVersion(mobileApp);
             if (apkVersions != null) {
                 String appPackage = apkVersions[0];
 
