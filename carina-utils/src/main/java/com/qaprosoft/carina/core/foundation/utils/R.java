@@ -127,6 +127,7 @@ public enum R
 		String value = 
 				CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key) : propertiesHolder.get(resourceFile).getProperty(key);
 		// TODO: why we return empty instead of null?
+				// [VD] as designed empty MUST be returned
 		return value != null ? value : StringUtils.EMPTY;
 	}
 	
