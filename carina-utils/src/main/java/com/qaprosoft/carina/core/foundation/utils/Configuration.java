@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /**
  * Configuration utility.
@@ -240,8 +241,6 @@ public class Configuration
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
         
         // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_APP("mobile_app"),
-        
         MOBILE_APP_PREUPGRADE("mobile_app_preupgrade"),
         
         MOBILE_APP_UNINSTALL("mobile_app_uninstall"),
@@ -527,4 +526,21 @@ public class Configuration
     	}
     	return platform;
     }
+    
+    
+    public static String getMobileApp() {
+    	//redefine platform if mobile.app or mobile_grid.app is available
+    	String mobileApp = "";
+    	String prefix = Configuration.get(Parameter.DRIVER_TYPE) + ".";
+    	if (!R.CONFIG.get(prefix + "app").isEmpty()) {
+    		mobileApp = R.CONFIG.get(prefix + "app");
+    	}
+    	return mobileApp;
+    }
+    
+    public static void setMobileApp(String mobileApp) {
+    	R.CONFIG.put(Configuration.get(Parameter.DRIVER_TYPE) + ".app", mobileApp);
+    }
+    
+    
 }

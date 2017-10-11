@@ -598,7 +598,7 @@ public abstract class AbstractTest // extends DriverHelper
 	private void updateHockeyAppPath() {
 		// hockeyapp://appName/platformName/buildType/version
 		Pattern HOCKEYAPP_PATTERN = Pattern.compile("hockeyapp:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
-		String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+		String mobileAppPath = Configuration.getMobileApp();
 		Matcher matcher = HOCKEYAPP_PATTERN.matcher(mobileAppPath);
 		
 		LOGGER.info("Analyzing if mobile_app is located on HockeyApp...");
@@ -615,11 +615,9 @@ public abstract class AbstractTest // extends DriverHelper
 			
 			File file = HockeyAppManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType, version);
 
-			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
-			R.CONFIG.put(Configuration.get(Parameter.DRIVER_TYPE) + ".app", file.getAbsolutePath());
+			Configuration.setMobileApp(file.getAbsolutePath());
 			
-			
-			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+			LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
 
 			// try to redefine app_version if it's value is latest or empty
 			String appVersion = Configuration.get(Parameter.APP_VERSION);
@@ -635,12 +633,11 @@ public abstract class AbstractTest // extends DriverHelper
 	 */
 	private void updateS3AppPath() {
 		Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
-		// get app path to be sure that we need(do not need) to download app
-		// from s3 bucket
-		String mobileAppPath = Configuration.get(Parameter.MOBILE_APP);
+		// get app path to be sure that we need(do not need) to download app from s3 bucket
+		String mobileAppPath = Configuration.getMobileApp();
 		Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
 
-		LOGGER.info("Analyzing if mobile_app is located on S3...");
+		LOGGER.info("Analyzing if mobile app is located on S3...");
 		if (matcher.find()) {
 			LOGGER.info("app artifact is located on s3...");
 			String bucketName = matcher.group(1);
@@ -681,8 +678,8 @@ public abstract class AbstractTest // extends DriverHelper
 				AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
 			}
 
-			R.CONFIG.put(Parameter.MOBILE_APP.getKey(), file.getAbsolutePath());
-			LOGGER.info("Updated mobile_app: " + Configuration.get(Parameter.MOBILE_APP));
+			Configuration.setMobileApp(file.getAbsolutePath());
+			LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
 
 			// try to redefine app_version if it's value is latest or empty
 			String appVersion = Configuration.get(Parameter.APP_VERSION);
