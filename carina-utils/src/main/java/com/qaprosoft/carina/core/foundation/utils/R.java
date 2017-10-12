@@ -97,22 +97,22 @@ public enum R
 					}
 				}
 				
-				final String prefix = SpecialKeywords.CAPABILITIES + ".";
-				// read all java arguments and redefine capabilities.* items
-				LOGGER.debug("Analyze system  properties for capabilities.*");
-				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Map<String, String> javaProperties = new HashMap(System.getProperties());
-				for (Map.Entry<String, String> entry : javaProperties.entrySet()) {
-					if (entry.getKey().toLowerCase().startsWith(prefix)) {
-						String value = entry.getValue();
-						if (!StringUtils.isEmpty(value)) {
-							LOGGER.debug("var: " + entry.getKey() + "=" + value);
-							String key = entry.getKey().replaceAll(prefix, "");
-							properties.put(key, value);
+				if (resource.resourceFile.contains("config.properties")) {
+					//TODO: investigate if we needed env variables analysis using System.getenv() as well
+					final String prefix = SpecialKeywords.CAPABILITIES + ".";
+					// read all java arguments and redefine capabilities.* items
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					Map<String, String> javaProperties = new HashMap(System.getProperties());
+					for (Map.Entry<String, String> entry : javaProperties.entrySet()) {
+						String key = entry.getKey();
+						if (key.toLowerCase().startsWith(prefix)) {
+							String value = entry.getValue();
+							if (!StringUtils.isEmpty(value)) {
+								properties.put(key, value);
+							}
 						}
 					}
 				}
-				
 				propertiesHolder.put(resource.resourceFile, properties);
 			} 
 			catch (Exception e)
