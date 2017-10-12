@@ -547,7 +547,6 @@ public class Configuration
     
     public static void setMobileApp(String mobileApp) {
     	R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".app", mobileApp);
-    	System.setProperty(SpecialKeywords.CAPABILITIES + ".app", mobileApp);
     	LOGGER.info("Updated mobile app: " + mobileApp);
     }
    

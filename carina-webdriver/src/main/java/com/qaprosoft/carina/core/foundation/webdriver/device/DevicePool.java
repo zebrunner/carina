@@ -42,7 +42,7 @@ public class DevicePool
 				
 				device = new Device(R.CONFIG.get(prefix + "deviceName"),
 						Configuration.get(Parameter.MOBILE_DEVICE_TYPE),
-						R.CONFIG.get(prefix + "platformName"),
+						Configuration.getPlatform(),
 						R.CONFIG.get(prefix + "platformVersion"), 
 						R.CONFIG.get(prefix + "udid"), 
 						Configuration.get(Parameter.SELENIUM_HOST),
@@ -62,11 +62,11 @@ public class DevicePool
 		//TODO: refactor capability names 
         if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
         	//add device from custom capabilities to the devicePool
-        	String deviceName = propertiesMap.get("core.mobile_device_name");
-        	String deviceType = propertiesMap.get("core.mobile_device_type");
-        	String devicePlatform = propertiesMap.get("core.mobile_platform_name");
-        	String devicePlatformVersion = propertiesMap.get("core.mobile_platform_version");
-        	String deviceUdid = propertiesMap.get("core.mobile_platform_udid");
+        	String deviceName = propertiesMap.get("core.deviceName");
+        	String deviceType = propertiesMap.get("core.deviceType");
+        	String devicePlatform = propertiesMap.get("core.platformName");
+        	String devicePlatformVersion = propertiesMap.get("core.platformVersion");
+        	String deviceUdid = propertiesMap.get("core.udid");
         	if (deviceUdid == null) {
         		deviceUdid = "";
         	}

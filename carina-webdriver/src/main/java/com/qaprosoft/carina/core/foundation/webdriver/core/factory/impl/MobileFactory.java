@@ -67,6 +67,7 @@ public class MobileFactory extends AbstractFactory {
 						if(info != null)
 						{
 							LOGGER.info("Selenium hub+stf feature is enabled.");
+							//TODO: remove hardcoded "phone" declaration using new STFDevice info object
 							device = new Device(info.getModel(), "phone", info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
 							LOGGER.info("Detected device by uuid from driver capabilities: " + device.getName());
 							device.connectRemote();

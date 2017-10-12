@@ -42,27 +42,6 @@ public class Device
 	
 	AdbExecutor executor = new AdbExecutor();
 
-	public Device(String args)
-	{
-		// Samsung_S4|ANDROID|4.4.2|5ece160b|4729|4730|http://localhost:4725/wd/hub
-		LOGGER.debug("mobile_device_args: " + args);
-		args = args.replaceAll("&#124", "|");
-		LOGGER.debug("mobile_device_args: " + args);
-
-		String[] params = args.split("\\|");
-
-		// TODO: organize verification onto the params count
-		this.name = params[0];
-		LOGGER.debug("mobile_device_name: " + name);
-		this.type = params[1];
-		LOGGER.debug("mobile_device_type: " + params[1]);
-		this.os = params[2];
-		this.osVersion = params[3];
-		this.udid = params[4];
-		this.seleniumServer = params[5];
-		this.remoteURL = params[6];
-	}
-	
 	public Device()
 	{
 		this("", "", "", "", "", "", "");
