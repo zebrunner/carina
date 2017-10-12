@@ -248,8 +248,6 @@ public class Configuration
         
         MOBILE_APPIUM_RESTART("mobile_appium_restart"),
         
-		MOBILE_STF_DOCKER_CONTAINER("mobile_stf_docker_container"),
-		
 		MOBILE_TOOLS_HOME("mobile_tools_home"),
 		
 		MOBILE_DEVICE_TYPE("mobile_device_type"),

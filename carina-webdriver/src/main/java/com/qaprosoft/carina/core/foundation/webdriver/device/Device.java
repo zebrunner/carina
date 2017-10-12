@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -678,8 +679,7 @@ public class Device
     }
     
     public String getAdbName() {
-    	//TODO: remove reference onto MOBILE_STF_DOCKER_CONTAINER and variable itself
-    	if (Configuration.getBoolean(Parameter.MOBILE_STF_DOCKER_CONTAINER) && remoteURL != null) {
+    	if (!StringUtils.isEmpty(remoteURL)) {
     		return remoteURL;
     	} else {
     		return udid;
