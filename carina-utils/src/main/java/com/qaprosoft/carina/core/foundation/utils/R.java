@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 
 /**
@@ -93,6 +94,22 @@ public enum R
 					if(!StringUtils.isEmpty(systemValue))
 					{
 						properties.put(key, systemValue);
+					}
+				}
+				
+				final String prefix = SpecialKeywords.CAPABILITIES + ".";
+				// read all java arguments and redefine capabilities.* items
+				LOGGER.debug("Analyze system  properties for capabilities.*");
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				Map<String, String> javaProperties = new HashMap(System.getProperties());
+				for (Map.Entry<String, String> entry : javaProperties.entrySet()) {
+					if (entry.getKey().toLowerCase().startsWith(prefix)) {
+						String value = entry.getValue();
+						if (!StringUtils.isEmpty(value)) {
+							LOGGER.debug("var: " + entry.getKey() + "=" + value);
+							String key = entry.getKey().replaceAll(prefix, "");
+							properties.put(key, value);
+						}
 					}
 				}
 				
