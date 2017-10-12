@@ -130,4 +130,8 @@ public class SpecialKeywords
 	public static final String PROXY_SETTER_PACKAGE = "tk.elevenk.proxysetter";
 	public static final String PROXY_SETTER_RES_PATH = "app/proxy-setter-debug-0.2.apk";
 	
+	// ------------- STF PROPERTIES ---------------------------------
+	public static final String STF_ENABLED = "STF_ENABLED";
+	public static final String STF_URL = "STF_URL";
+	public static final String STF_TOKEN = "STF_TOKEN";
 }
