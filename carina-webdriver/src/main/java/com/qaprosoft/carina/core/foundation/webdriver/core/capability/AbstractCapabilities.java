@@ -74,33 +74,6 @@ public abstract class AbstractCapabilities {
 			}
 		}
 		
-		// read all env variables and redefine capabilities.* items
-		LOGGER.debug("Analyze env variable for capabilities.*");
-		for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
-			if (entry.getKey().toLowerCase().startsWith(prefix)) {
-				String value = entry.getValue();
-				if (value != null && !value.isEmpty()) {
-					LOGGER.debug("var: " + entry.getKey() + "=" + value);
-					String cap = entry.getKey().replaceAll(prefix, "");
-					capabilities.setCapability(cap, value);
-				}
-			}
-		}
-		//TODO: remove code duplicate
-		LOGGER.debug("Analyze system  properties for capabilities.*");
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Map<String, String> properties = new HashMap(System.getProperties());
-		for (Map.Entry<String, String> entry : properties.entrySet()) {
-			if (entry.getKey().toLowerCase().startsWith(prefix)) {
-				String value = entry.getValue();
-				if (value != null && !value.isEmpty()) {
-					LOGGER.debug("var: " + entry.getKey() + "=" + value);
-					String cap = entry.getKey().replaceAll(prefix, "");
-					capabilities.setCapability(cap, value);
-				}
-			}
-		}
-		
 		return capabilities;
 	}
 	
