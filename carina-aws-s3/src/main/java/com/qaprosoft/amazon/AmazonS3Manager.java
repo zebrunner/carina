@@ -158,6 +158,7 @@ public class AmazonS3Manager {
 	 * @param key
 	 *            - S3 storage path. Example:
 	 *            DEMO/TestSuiteName/TestMethodName/file.txt
+	 * @return S3Object
 	 */
 	public S3Object get(String bucket, String key) {
 		// S3Object s3object = null;
@@ -262,6 +263,7 @@ public class AmazonS3Manager {
 	 * @param pattern
 	 *            - pattern to find single build artifact Example:
 	 *            .*prod-google-release.*
+	 * @return S3ObjectSummary
 	 */
 	public S3ObjectSummary getLatestBuildArtifact(String bucket, String key, Pattern pattern) {
 		if (pattern == null) {
@@ -305,7 +307,7 @@ public class AmazonS3Manager {
 	
 	/**
 	 * Method to download file from s3 to local file system
-	 * @param bucketName
+	 * @param bucketName AWS S3 bucket name
 	 * @param key (example: android/apkFolder/ApkName.apk)
 	 * @param file (local file name)
 	 */
@@ -314,7 +316,7 @@ public class AmazonS3Manager {
 	}
 	/**
 	 * Method to download file from s3 to local file system
-	 * @param bucketName
+	 * @param bucketName AWS S3 bucket name
 	 * @param key (example: android/apkFolder/ApkName.apk)
 	 * @param file (local file name)
 	 * @param pollingInterval (polling interval in sec for S3 download status determination)
@@ -346,7 +348,7 @@ public class AmazonS3Manager {
 	
 	/**
 	 * Method to generate pre-signed object URL to s3 object
-	 * @param bucketName
+	 * @param bucketName AWS S3 bucket name
 	 * @param key (example: android/apkFolder/ApkName.apk)
 	 * @param ms espiration time in ms, i.e. 1 hour is 1000*60*60
 	 * @return url String pre-signed URL
