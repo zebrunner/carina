@@ -271,7 +271,8 @@ public class ReportContext
 	
 	/**
 	 * Rename test directory from unique number to valid human readable content
-	 * using test method name. 
+	 * using test method name.
+	 * @param test name
 	 * 
 	 * @return test log/screenshot folder.
 	 */

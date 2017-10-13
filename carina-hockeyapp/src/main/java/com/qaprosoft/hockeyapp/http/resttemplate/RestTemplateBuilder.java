@@ -83,6 +83,7 @@ public class RestTemplateBuilder {
 
     /**
      * http://stackoverflow.com/questions/27603782/java-spring-resttemplate-character-encoding
+     * @return RestTemplateBuilder 
      */
 	public RestTemplateBuilder withUtf8EncodingMessageConverter() {
 		withMessageConverter(new StringHttpMessageConverter(Charset.forName("UTF-8")));
