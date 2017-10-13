@@ -25,7 +25,6 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 		<aws-java-sdk.version>1.10.30</aws-java-sdk.version>
-		<junit.version>4.11</junit.version>
 
 	</properties>
 
@@ -49,7 +48,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
 		</dependency>
 
 
