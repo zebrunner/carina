@@ -70,7 +70,7 @@ public class ZafiraConfigurator implements IConfigurator
 //			//unregister current device so it doesn't appear for the next step
 //			DevicePool.removeCurrentDevice();
 		} else {
-			LOGGER.error("Unable to detect current device for threadId: " + threadId);
+			LOGGER.warn("Unable to detect current device for threadId: " + threadId);
 		}
         return conf;
     }
