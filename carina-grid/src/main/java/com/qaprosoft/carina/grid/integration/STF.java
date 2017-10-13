@@ -1,10 +1,13 @@
 package com.qaprosoft.carina.grid.integration;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.grid.Platform;
 import com.qaprosoft.zafira.client.STFClient;
 import com.qaprosoft.zafira.models.stf.Devices;
 import com.qaprosoft.zafira.models.stf.Response;
@@ -29,8 +32,8 @@ public class STF
 
 	private STF()
 	{
-		String serviceURL = System.getProperty("STF_URL");
-		String authToken = System.getProperty("STF_TOKEN");
+		String serviceURL = System.getProperty(SpecialKeywords.STF_URL);
+		String authToken = System.getProperty(SpecialKeywords.STF_TOKEN);
 		LOGGER.info("*********************************");
 		LOGGER.info("Credentials for STF: " + serviceURL + " / " + authToken);
 		if (!StringUtils.isEmpty(serviceURL) && !StringUtils.isEmpty(authToken))
@@ -122,5 +125,36 @@ public class STF
 	{
 		// it seems like return and remote disconnect guarantee that device becomes free asap
 		return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
+	}
+	
+	public static boolean isSTFRequired(Map<String, Object> nodeCapability, Map<String, Object> requestedCapability)
+	{
+		boolean status = true;
+		
+		// STF integration not established
+		if(status && !STF.isRunning())
+		{
+			status = false;
+		}
+		
+		// User may pass desired capability STF_ENABLED=false for local run
+		if(status && (requestedCapability.containsKey(SpecialKeywords.STF_ENABLED) && "false".equalsIgnoreCase((String) requestedCapability.get(SpecialKeywords.STF_ENABLED))))
+		{
+			status = false;
+		}
+		
+		// STF integration is not available for iOS devices for now
+		if(status && Platform.IOS.equals(Platform.fromCapabilities(requestedCapability)))
+		{
+			status = false;
+		}
+		
+		// Appium node should contain UDID capability to be identified in STF
+		if(status && !nodeCapability.containsKey("udid"))
+		{
+			status = false;
+		}
+		
+		return status;
 	}
 }
