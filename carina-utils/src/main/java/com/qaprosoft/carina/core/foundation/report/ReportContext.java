@@ -336,28 +336,21 @@ public class ReportContext
 			
 			int maxHistory = Configuration.getInt(Parameter.MAX_SCREENSHOOT_HISTORY);
 
-			if (screenshotFolders.size() + 1 > maxHistory && maxHistory != 0)
-			{
-				Comparator<File> comp = new Comparator<File>()
-				{
+			if (maxHistory > 0 && screenshotFolders.size() + 1 > maxHistory && maxHistory != 0) {
+				Comparator<File> comp = new Comparator<File>() {
 					@Override
-					public int compare(File file1, File file2)
-					{
+					public int compare(File file1, File file2) {
 						return file2.getName().compareTo(file1.getName());
 					}
 				};
 				Collections.sort(screenshotFolders, comp);
-				for (int i = maxHistory - 1; i < screenshotFolders.size(); i++)
-				{
+				for (int i = maxHistory - 1; i < screenshotFolders.size(); i++) {
 					if (screenshotFolders.get(i).getName().equals("gallery-lib")) {
 						continue;
 					}
-					try
-					{
+					try {
 						FileUtils.deleteDirectory(screenshotFolders.get(i));
-					}
-					catch (IOException e)
-					{
+					} catch (IOException e) {
 						LOGGER.error(e.getMessage(), e);
 					}
 				}
