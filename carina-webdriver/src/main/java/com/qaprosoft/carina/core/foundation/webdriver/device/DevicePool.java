@@ -55,7 +55,7 @@ public class DevicePool
 		//register current device to be able to transfer it into Zafira at the end of the test
 		setDevice(device);
 		Long threadId = Thread.currentThread().getId();
-		LOGGER.debug("register device fot current thread id: " + threadId + "; device: '" + device.getName() + "'");
+		LOGGER.info("register device fot current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
 		return device;
 	}
