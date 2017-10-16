@@ -18,6 +18,7 @@ import org.testng.Assert;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
@@ -32,7 +33,7 @@ import io.appium.java_client.ios.IOSElement;
 
 public class MobileFactory extends AbstractFactory {
 
-    @Override
+	@Override
     public WebDriver create(String name, Device device) {
 
         String seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
@@ -66,13 +67,23 @@ public class MobileFactory extends AbstractFactory {
 						STFDevice info = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
 						if(info != null)
 						{
-							LOGGER.info("Selenium hub+stf feature is enabled.");
-							//TODO: remove hardcoded "phone" declaration using new STFDevice info object
-							device = new Device(info.getModel(), "phone", info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
-							LOGGER.info("Detected device by uuid from driver capabilities: " + device.getName());
-							device.connectRemote();
-							DevicePool.registerDevice(device);
+							//run using ci or custom user...
+							if (R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED)) {
+								LOGGER.debug("Selenium hub+stf feature is enabled.");
+								//TODO: remove hardcoded "phone" declaration using new STFDevice info object
+								device = new Device(info.getModel(), "phone", info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
+								device.connectRemote();
+							} else {
+								String deviceType = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE);
+								String remoteURL = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_REMOTE_URL);
+								//set udid and remote URL as null as in this case we should explicitly connect device
+								device = new Device(info.getModel(), deviceType, info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, remoteURL);
+							}
+						} else {
+							//fully local run. Read device info from capabilities only
+							device = DevicePool.initDevice();
 						}
+						DevicePool.registerDevice(device);
 					}
 				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);

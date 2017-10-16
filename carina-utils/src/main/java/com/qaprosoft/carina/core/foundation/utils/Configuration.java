@@ -250,8 +250,6 @@ public class Configuration
         
 		MOBILE_TOOLS_HOME("mobile_tools_home"),
 		
-		MOBILE_DEVICE_TYPE("mobile_device_type"),
-		
 		MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
 		
 		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 

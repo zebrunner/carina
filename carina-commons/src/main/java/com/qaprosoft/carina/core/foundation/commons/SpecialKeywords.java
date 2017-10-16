@@ -129,8 +129,15 @@ public class SpecialKeywords
 	public static final String PROXY_SETTER_PACKAGE = "tk.elevenk.proxysetter";
 	public static final String PROXY_SETTER_RES_PATH = "app/proxy-setter-debug-0.2.apk";
     
-    // ------------- CAPABILITIES PROPERTIES --------------------------
-    public static final String CAPABILITIES = "capabilities";
+	// ------------- CAPABILITIES PROPERTIES --------------------------
+	public static final String CAPABILITIES = "capabilities";
+	public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
+	public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
+	public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
+	public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
+	public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";
+	public static final String MOBILE_DEVICE_REMOTE_URL = "capabilities.remoteURL";
+	
 	
 	// ------------- STF PROPERTIES ---------------------------------
 	public static final String STF_ENABLED = "STF_ENABLED";

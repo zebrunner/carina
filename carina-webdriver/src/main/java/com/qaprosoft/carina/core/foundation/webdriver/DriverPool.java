@@ -285,9 +285,6 @@ public final class DriverPool {
 				startProxy();
 
 				
-				// by default device could be nullDevice
-				//device = DevicePool.registerDevice(device);
-				
 				//TODO: remove or move device manipulation to MobileFactory
 				// for local runs try to init device from _config.properties
 				if (!device.isNull()) {

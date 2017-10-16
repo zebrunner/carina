@@ -422,7 +422,7 @@ public class Device
 
         //adb -s UDID shell pm clear com.myfitnesspal.android
         String packageName = getApkPackageName(app);
-
+        
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "pm", "clear", packageName);
         executor.execute(cmd);
     }
@@ -681,8 +681,10 @@ public class Device
     public String getAdbName() {
     	if (!StringUtils.isEmpty(remoteURL)) {
     		return remoteURL;
-    	} else {
+    	} else if (!StringUtils.isEmpty(remoteURL)) {
     		return udid;
+    	} else {
+    		return "";
     	}
     }
 
