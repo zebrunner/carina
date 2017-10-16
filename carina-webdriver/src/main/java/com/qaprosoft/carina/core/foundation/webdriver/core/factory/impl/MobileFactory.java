@@ -69,7 +69,7 @@ public class MobileFactory extends AbstractFactory {
 						{
 							//run using ci or custom user...
 							if (R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED)) {
-								LOGGER.debug("Selenium hub+stf feature is enabled.");
+								LOGGER.info("Selenium hub+stf feature is enabled.");
 								//TODO: remove hardcoded "phone" declaration using new STFDevice info object
 								device = new Device(info.getModel(), "phone", info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
 								device.connectRemote();
