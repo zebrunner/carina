@@ -61,7 +61,9 @@ public class PlaceholderResolver
 		}
 		else
 		{
-			LOGGER.warn("Value not resolved by key: " + key);
+			if (!key.startsWith(SpecialKeywords.CAPABILITIES)) {
+				LOGGER.warn("Value not resolved by key: " + key);
+			}
 		}
 		return value;
 	}

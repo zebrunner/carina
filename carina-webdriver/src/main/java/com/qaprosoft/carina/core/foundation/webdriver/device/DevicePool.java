@@ -88,15 +88,14 @@ public class DevicePool
 	public static Device getDevice()
 	{
 		long threadId = Thread.currentThread().getId();
-		String test = TestNamingUtil.getTestNameByThread();
 		Device device = currentDevice.get();
 		if (device == null) {
-			LOGGER.debug("Current device is null for test '" + test + "', thread: " + threadId);
+			LOGGER.debug("Current device is null for thread: " + threadId);
 			device = nullDevice;
 		} else if (device.getName().isEmpty()) {
-			LOGGER.debug("Current device name is empty! nullDevice was used for test '" + test + "', thread: " + threadId);
+			LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
 		} else {
-			LOGGER.debug("Current device name is '" + device.getName() + "' for test '" + test + "', thread: " + threadId);
+			LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
 		}
 		return device;
 	}
