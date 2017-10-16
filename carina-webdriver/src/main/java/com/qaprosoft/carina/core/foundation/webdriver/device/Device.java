@@ -154,7 +154,12 @@ public class Device
 			}
 			return Type.IOS_PHONE;
 		}
-		throw new RuntimeException("Incorrect driver type. Please, check config file.");
+		throw new RuntimeException("Incorrect driver type. Please, check config file for " + toString());
+	}
+	
+	public String toString() {
+		return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; selenium: %s; remoteURL: %s", name,
+				type, os, osVersion, udid, seleniumServer, remoteURL);
 	}
 	
 	public boolean isNull() {
