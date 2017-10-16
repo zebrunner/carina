@@ -255,17 +255,17 @@ public class ExtendedWebElement {
     /**
      * Get element attribute.
      *
-     * @param attribute name
+     * @param name of attribute
      * @return String text
      */
-    public String getAttribute(String attributeName) {
+    public String getAttribute(String name) {
         String attribute = null;
 		try {
-			attribute = findElement(EXPLICIT_TIMEOUT).getAttribute(attributeName);
+			attribute = findElement(EXPLICIT_TIMEOUT).getAttribute(name);
 		} catch (StaleElementReferenceException e) {
 			LOGGER.debug(e.getMessage(), e.getCause());
 			element = findStaleElement();
-			attribute = element.getAttribute(attributeName);
+			attribute = element.getAttribute(name);
 		}
 
         return attribute;
