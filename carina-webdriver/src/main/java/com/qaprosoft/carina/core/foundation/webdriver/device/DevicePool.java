@@ -21,9 +21,8 @@ import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 public class DevicePool
@@ -34,26 +33,29 @@ public class DevicePool
 	
 	private static ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
 
-	public static Device registerDevice(Device device) {
-		if (device == nullDevice) {
-			//analyze if it is local mobile run
-			if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-				final String prefix = SpecialKeywords.CAPABILITIES + ".";
-				
-				device = new Device(R.CONFIG.get(prefix + "deviceName"),
-						Configuration.get(Parameter.MOBILE_DEVICE_TYPE),
-						Configuration.getPlatform(),
-						R.CONFIG.get(prefix + "platformVersion"), 
-						R.CONFIG.get(prefix + "udid"), 
-						Configuration.get(Parameter.SELENIUM_HOST),
-						"");
-			}
+	@Deprecated
+	//TODO: refactor code to avoid init device from capabilities only
+	public static Device initDevice() {
+		Device device = nullDevice;
+		//register device from local capabilities only
+		if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+			device = new Device(R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME),
+					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE),
+					Configuration.getPlatform(),
+					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION), 
+					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID), 
+					Configuration.get(Parameter.SELENIUM_HOST),
+					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_REMOTE_URL));
 		}
-		
+		return device;
+	}
+
+
+	public static Device registerDevice(Device device) {
 		//register current device to be able to transfer it into Zafira at the end of the test
 		setDevice(device);
 		Long threadId = Thread.currentThread().getId();
-		LOGGER.info("register device fot current thread id: " + threadId + "; device: '" + device.getName() + "'");
+		LOGGER.debug("register device fot current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
 		return device;
 	}
@@ -97,49 +99,6 @@ public class DevicePool
 			LOGGER.debug("Current device name is '" + device.getName() + "' for test '" + test + "', thread: " + threadId);
 		}
 		return device;
-	}
-
-
-	//TODO: move it to Device class
-	public static Type getDeviceType()
-	{
-		Type type = Type.DESKTOP;
-
-		if (getDevice() != nullDevice)
-		{
-			type = getDevice().getType();
-		} else
-		{
-			// specify default value based on existing _config.properties parameters
-			if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE))
-			{
-				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID))
-				{
-					//TODO: remove Parameter.MOBILE_DEVICE_TYPE later
-					if (Configuration.get(Parameter.MOBILE_DEVICE_TYPE).equalsIgnoreCase(SpecialKeywords.TABLET))
-					{
-						type = Type.ANDROID_TABLET;
-					} else
-					{
-						type = Type.ANDROID_PHONE;
-					}
-				}
-				if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.IOS))
-				{
-					if (Configuration.get(Parameter.MOBILE_DEVICE_TYPE).equalsIgnoreCase(SpecialKeywords.TABLET))
-					{
-						type = Type.IOS_TABLET;
-					} else
-					{
-						type = Type.IOS_PHONE;
-					}
-				}
-			} else
-			{
-				LOGGER.error("Unable to get device type! 'DESKTOP' type will be returned by default!");
-			}
-		}
-		return type;
 	}
 
 	public static Device getNullDevice() {
