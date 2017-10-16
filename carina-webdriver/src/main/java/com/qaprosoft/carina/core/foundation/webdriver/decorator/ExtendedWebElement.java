@@ -198,6 +198,11 @@ public class ExtendedWebElement {
         this.name = name;
     }
 
+    /**
+     * Get element text.
+     *
+     * @return String text
+     */
     public String getText() {
         String text = null;
 		try {
@@ -211,6 +216,48 @@ public class ExtendedWebElement {
         return text;
     }
 
+    /**
+     * Get element location.
+     *
+     * @return Point location
+     */
+    public Point getLocation() {
+    	Point point = null;
+		try {
+			point = findElement(EXPLICIT_TIMEOUT).getLocation();
+		} catch (StaleElementReferenceException e) {
+			LOGGER.debug(e.getMessage(), e.getCause());
+			element = findStaleElement();
+			point = element.getLocation();
+		}
+
+        return point;
+    }
+    
+    /**
+     * Get element size.
+     *
+     * @return Dimension size
+     */
+    public Dimension getSize() {
+    	Dimension dim = null;
+		try {
+			dim = findElement(EXPLICIT_TIMEOUT).getSize();
+		} catch (StaleElementReferenceException e) {
+			LOGGER.debug(e.getMessage(), e.getCause());
+			element = findStaleElement();
+			dim = element.getSize();
+		}
+
+        return dim;
+    }
+    
+    /**
+     * Get element attribute.
+     *
+     * @param attribute name
+     * @return String text
+     */
     public String getAttribute(String attributeName) {
         String attribute = null;
 		try {
@@ -224,6 +271,11 @@ public class ExtendedWebElement {
         return attribute;
     }
 
+    /**
+     * Get element By.
+     *
+     * @return By by
+     */
     public By getBy() {
         return by;
     }
@@ -263,7 +315,6 @@ public class ExtendedWebElement {
     /**
      * Double Clicks on element.
      */
-
     public void doubleClick() {
         doubleClickSafe(true);
         String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(getName());
@@ -349,6 +400,7 @@ public class ExtendedWebElement {
      *
      * @return boolean true if there is no errors.
      */
+    //TODO: [VD] returning boolean is not good way
     public boolean clickHiddenElement() {
         String msg = "Hidden Element Click";
         boolean res = false;
@@ -432,6 +484,13 @@ public class ExtendedWebElement {
         return isElementWithTextPresent(text, EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Check that element with text present.
+     *
+     * @param text of element to check.
+     * @param timeout - timeout.
+     * @return element with text existence status.
+     */
     public boolean isElementWithTextPresent(final String text, long timeout) {
         boolean result;
         final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
@@ -458,10 +517,21 @@ public class ExtendedWebElement {
         return result;
     }
 
+    /**
+     * Click onto element if it present.
+     *
+     * @return boolean return true if clicked
+     */
     public boolean clickIfPresent() {
         return clickIfPresent(EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Click onto element if it present.
+     *
+     * @param timeout - timeout
+     * @return boolean return true if clicked
+     */
     public boolean clickIfPresent(long timeout) {
         boolean result;
         WebDriver drv = getDriver();
@@ -518,7 +588,6 @@ public class ExtendedWebElement {
     /**
      * Set implicit timeout to default IMPLICIT_TIMEOUT value.
      */
-
     public void setImplicitTimeout() {
         setImplicitTimeout(IMPLICIT_TIMEOUT);
     }
@@ -528,7 +597,6 @@ public class ExtendedWebElement {
      *
      * @param timeout in seconds. Minimal value - 1 second
      */
-
     public void setImplicitTimeout(long timeout) {
         if (timeout < 1) {
             timeout = 1;
@@ -581,6 +649,9 @@ public class ExtendedWebElement {
         }
     }
 
+    /**
+     * Scroll to element (applied only for desktop).
+     */
     public void scrollTo() {
         if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
