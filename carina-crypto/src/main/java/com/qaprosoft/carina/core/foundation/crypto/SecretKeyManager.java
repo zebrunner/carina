@@ -25,15 +25,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 
 public class SecretKeyManager
 {
-	private static final Logger LOGGER = Logger.getLogger(SecretKeyManager.class);
-	
 	public static SecretKey generateKey(String keyType, int size) throws NoSuchAlgorithmException 
 	{
-		LOGGER.debug("generating key use algorithm: '" + keyType + "'; size: " + size);
+		//LOGGER.debug("generating key use algorithm: '" + keyType + "'; size: " + size);
 		KeyGenerator keyGenerator = KeyGenerator.getInstance(keyType);
 	    keyGenerator.init(size);
 	    SecretKey key = keyGenerator.generateKey();
