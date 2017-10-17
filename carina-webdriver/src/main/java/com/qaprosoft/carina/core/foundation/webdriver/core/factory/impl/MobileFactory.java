@@ -70,7 +70,6 @@ public class MobileFactory extends AbstractFactory {
 							//run using ci or custom user...
 							if (R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED)) {
 								LOGGER.info("Selenium hub+stf feature is enabled.");
-								//TODO: remove hardcoded "phone" declaration using new STFDevice info object
 								device = new Device(info.getModel(), info.getDeviceType(), info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
 								device.connectRemote();
 							} else {
@@ -87,6 +86,9 @@ public class MobileFactory extends AbstractFactory {
 					}
 				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
+					//TODO: read from capabilities and init device
+					device = DevicePool.initDevice();
+					DevicePool.registerDevice(device);
 				}
 			} else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
