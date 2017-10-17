@@ -82,6 +82,10 @@ public class DeviceInfo extends RegistryBasedServlet
 					STFDevice device = STF.getDevice((String) cap.get("udid"));
 					if(device != null)
 					{
+						if(session.getSlot().getCapabilities().containsKey("deviceType"))
+						{
+							device.setDeviceType((String)session.getSlot().getCapabilities().get("deviceType"));
+						}
 						response.setStatus(HttpStatus.SC_OK);
 						response.getWriter().print(new ObjectMapper().writeValueAsString(device));
 					    response.getWriter().close();
