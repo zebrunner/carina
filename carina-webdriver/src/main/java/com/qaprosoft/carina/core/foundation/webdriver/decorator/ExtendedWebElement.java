@@ -68,6 +68,8 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
+//TODO: [VD] removed deprecated constructor and DriverPool import
+// Also refactor screenshots capturing using listener approach to be able to remove it as well
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
 
