@@ -371,10 +371,10 @@ public class AbstractTestListener extends TestArgsListener
 		{
 			failItem(result, Messager.TEST_FAILED);
 			afterTest(result);
+			RetryCounter.resetCounter();
 		}
 		
 		super.onTestFailure(result);
-		RetryCounter.resetCounter();
 	}
 
 	@Override
