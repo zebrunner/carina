@@ -1,10 +1,13 @@
 package com.qaprosoft.carina.core.foundation.retry;
 
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
+@Listeners({AbstractTestListener.class})
 public class RetryTest {
 	
 	@Test
