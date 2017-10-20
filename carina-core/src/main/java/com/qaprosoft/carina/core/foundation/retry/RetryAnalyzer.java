@@ -22,15 +22,13 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
     public static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
 
     public boolean retry(ITestResult result) {
-    	String test = TestNamingUtil.getCanonicalTestName(result);
-        if (RetryCounter.getRunCount(test) < getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
-            RetryCounter.incrementRunCount(test);
+        if (RetryCounter.getRunCount() < getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
+            RetryCounter.incrementRunCount();
             return true;
         }
         return false;
