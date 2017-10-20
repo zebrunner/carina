@@ -233,7 +233,6 @@ public class AbstractTestListener extends TestArgsListener
 		
 		ReportContext.renameTestDir(test);
 		TestNamingUtil.releaseTestInfoByThread();
-		RetryCounter.resetCounter();
 	}
 
 	@Override
