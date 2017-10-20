@@ -9,14 +9,14 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class RetryTest {
 	
-	@Test
+	@Test(priority = 1)
 	public void testInitRetryCounter() {
 		RetryCounter.initCounter();
 		int count = RetryCounter.getRunCount();
 		Assert.assertEquals(count, 0);
 	}
 	
-	@Test
+	@Test(priority = 2)
 	public void testDoubleInitRetryCounter() {
 		RetryCounter.initCounter();
 		RetryCounter.initCounter();
@@ -24,7 +24,7 @@ public class RetryTest {
 		Assert.assertEquals(count, 0);
 	}
 	
-	@Test
+	@Test(priority = 3)
 	public void testRetryCounter() {
 		RetryCounter.initCounter();
 		RetryCounter.incrementRunCount();
@@ -32,7 +32,7 @@ public class RetryTest {
 		Assert.assertEquals(count, 1);
 	}
 
-	@Test
+	@Test(priority = 4)
 	public void testGetMaxRetryCountForTest() {
 		R.CONFIG.put("retry_count", "1");
 		Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
