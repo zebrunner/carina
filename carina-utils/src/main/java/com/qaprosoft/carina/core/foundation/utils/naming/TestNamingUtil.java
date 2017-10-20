@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
-import java.lang.reflect.Method;
-import java.util.Date;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +22,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -42,16 +39,7 @@ public class TestNamingUtil
 
 	// private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
 	private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
-	private static final ConcurrentHashMap<Long, String> threadId2CanonicTestName = new ConcurrentHashMap<Long, String>(); // map
-																															// to
-																															// store
-																															// test
-																															// names
-																															// without
-																															// configuration
-																															// steps
 
-	private static final ConcurrentHashMap<String, Long> testName2StartDate = new ConcurrentHashMap<String, Long>();
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
 
 	private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
@@ -65,11 +53,6 @@ public class TestNamingUtil
 		{
 			throw new RuntimeException("Can't create naming strategy: " + R.CONFIG.get("naming_strategy"));
 		}
-	}
-
-	public static String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
-	{
-		return StringEscapeUtils.escapeHtml4(namingStrategy.getCanonicalTestNameBeforeTest(xmlTest, testMethod));
 	}
 
 	public static String getCanonicalTestName(ITestResult result)
@@ -119,7 +102,6 @@ public class TestNamingUtil
 		}
 		stack.push(test);
 		threadId2TestName.put(threadId, stack);
-		testName2StartDate.put(test, new Date().getTime());
 		return test;
 	}
 
@@ -190,31 +172,6 @@ public class TestNamingUtil
 		}
 
 		return stack.get(stack.size() - 1);
-	}
-
-	public static Long getTestStartDate(String test)
-	{
-		Long startDate = testName2StartDate.get(test);
-		if (startDate == null)
-		{
-			LOGGER.warn("Unable to find start date for test: '" + test + "'!");
-		}
-		return startDate;
-	}
-
-	public static synchronized void associateCanonicTestName(String test)
-	{
-		threadId2CanonicTestName.put(Thread.currentThread().getId(), test);
-	}
-
-	public static String getCanonicTestNameByThread()
-	{
-		return getCanonicTestNameByThread(Thread.currentThread().getId());
-	}
-
-	public static String getCanonicTestNameByThread(long threadId)
-	{
-		return threadId2CanonicTestName.get(threadId);
 	}
 
 	public static synchronized void associateBug(String testName, String id)
