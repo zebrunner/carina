@@ -33,6 +33,19 @@ public class RetryTest {
 	}
 
 	@Test(priority = 4)
+	public void testResetRetryCount() {
+		RetryCounter.initCounter();
+		RetryCounter.incrementRunCount();
+		int count = RetryCounter.getRunCount();
+		Assert.assertEquals(count, 1);
+		
+		RetryCounter.resetCounter();
+		count = RetryCounter.getRunCount();
+		Assert.assertEquals(count, 0);
+	}
+	
+	
+	@Test(priority = 5)
 	public void testGetMaxRetryCountForTest() {
 		R.CONFIG.put("retry_count", "1");
 		Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
