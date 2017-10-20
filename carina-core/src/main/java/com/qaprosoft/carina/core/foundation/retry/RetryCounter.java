@@ -54,16 +54,6 @@ public class RetryCounter
 		runCount.set(++count);
 	}
 	
-	public static void decrementRunCount()
-	{
-		int count = 0;
-		if (runCount.get() != null) {
-			// retryCounter already init for current thread
-			count = runCount.get();
-		}
-		runCount.set(++count);
-	}
-	
 	public static void resetCounter()
 	{
 		//explicitly set runCount to 0 for current thread
