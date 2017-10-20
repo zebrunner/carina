@@ -37,6 +37,8 @@
         <!-- Others -->
         <monte-repack.version>1.0</monte-repack.version>
         <json-simple.version>1.1</json-simple.version>
+
+	<rest-assured.version>2.9.0</rest-assured.version>
     </properties>
 
     <modules>
@@ -292,6 +294,11 @@
                 <artifactId>json-simple</artifactId>
                 <version>${json-simple.version}</version>
             </dependency>
+	    <dependency>
+	        <groupId>com.jayway.restassured</groupId>
+		<artifactId>rest-assured</artifactId>
+		<version>${rest-assured.version}</version>
+	    </dependency>
         </dependencies>
     </dependencyManagement>
 
