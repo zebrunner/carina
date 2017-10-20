@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2017 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package com.qaprosoft.carina.core.foundation.retry;
 
 /**
- * ThreadLocal<Integer> that stores run count of tests, used in {@link com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener}.
+ * ThreadLocal that stores run count of tests, used in {@link com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener}.
  * 
  * @author Alex Khursevich (hursevch@gmail.com)
  */
