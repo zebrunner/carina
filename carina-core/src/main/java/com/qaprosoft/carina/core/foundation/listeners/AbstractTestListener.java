@@ -233,6 +233,7 @@ public class AbstractTestListener extends TestArgsListener
 		
 		ReportContext.renameTestDir(test);
 		TestNamingUtil.releaseTestInfoByThread();
+		RetryCounter.resetCounter();
 	}
 
 	@Override
@@ -344,7 +345,6 @@ public class AbstractTestListener extends TestArgsListener
 		// TestNamingUtil.releaseTestInfoByThread();
 		afterTest(result);
 		super.onTestSuccess(result);
-		RetryCounter.resetCounter();
 	}
 
 	@Override
@@ -371,7 +371,6 @@ public class AbstractTestListener extends TestArgsListener
 		{
 			failItem(result, Messager.TEST_FAILED);
 			afterTest(result);
-			RetryCounter.resetCounter();
 		}
 		
 		super.onTestFailure(result);
@@ -401,7 +400,6 @@ public class AbstractTestListener extends TestArgsListener
 		skipItem(result, Messager.TEST_SKIPPED);
 		afterTest(result);
 		super.onTestSkipped(result);
-		RetryCounter.resetCounter();
 	}
 
 	@Override
