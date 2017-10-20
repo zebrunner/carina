@@ -15,26 +15,17 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.xml.XmlTest;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 
 public class XMLNameStrategy implements INamingStrategy
 {
-	
-	@Override
-	public String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
-	{
-		return xmlTest.getName();
-	}
-
 	@Override
 	public String getCanonicalTestName(ITestResult result) {
 		//verify if testName is already registered with thread then return it back

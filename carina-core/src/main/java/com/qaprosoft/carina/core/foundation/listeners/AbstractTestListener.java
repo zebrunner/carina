@@ -63,7 +63,8 @@ public class AbstractTestListener extends TestArgsListener
 
 	private void startItem(ITestResult result, Messager messager)
 	{
-
+		RetryCounter.initCounter();
+		
 		String test = TestNamingUtil.getCanonicalTestName(result);
 		test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId());
 
@@ -217,10 +218,6 @@ public class AbstractTestListener extends TestArgsListener
 	}
 	
 	private void afterConfiguration(ITestResult result) {
-/*		//register configuration step as test artifact
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		Artifacts.add("LOG-" + test, ReportContext.getTestLogLink(test));
-		Artifacts.add("DEMO-" + test, ReportContext.getTestScreenshotsLink(test));*/
 		TestNamingUtil.releaseTestInfoByThread();
 	}
 	
@@ -247,8 +244,6 @@ public class AbstractTestListener extends TestArgsListener
 		
 		// added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
 		TestNamingUtil.releaseTestInfoByThread();
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		TestNamingUtil.associateCanonicTestName(test);
 		
 		super.beforeConfiguration(result);
 	}
@@ -328,12 +323,9 @@ public class AbstractTestListener extends TestArgsListener
 		// obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in
 		// onTestSkipped method
 		TestNamingUtil.releaseTestInfoByThread();
-		String test = TestNamingUtil.getCanonicalTestName(result);
-		RetryCounter.initCounter();
 
 		startItem(result, Messager.TEST_STARTED);
 
-		TestNamingUtil.associateCanonicTestName(test);
 	}
 
 	@Override
