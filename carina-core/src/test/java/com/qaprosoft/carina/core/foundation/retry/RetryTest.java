@@ -1,7 +1,7 @@
 package com.qaprosoft.carina.core.foundation.retry;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -38,7 +38,7 @@ public class RetryTest {
 		Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
 	}
 	
-	@AfterTest
+	@AfterMethod
 	public void resetCounter() {
 		RetryCounter.resetCounter();
 	}
