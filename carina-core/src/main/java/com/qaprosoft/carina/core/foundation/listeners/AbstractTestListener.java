@@ -329,7 +329,7 @@ public class AbstractTestListener extends TestArgsListener
 		// onTestSkipped method
 		TestNamingUtil.releaseTestInfoByThread();
 		String test = TestNamingUtil.getCanonicalTestName(result);
-		RetryCounter.initCounter(test);
+		RetryCounter.initCounter();
 
 		startItem(result, Messager.TEST_STARTED);
 
@@ -344,6 +344,7 @@ public class AbstractTestListener extends TestArgsListener
 		// TestNamingUtil.releaseTestInfoByThread();
 		afterTest(result);
 		super.onTestSuccess(result);
+		RetryCounter.resetCounter();
 	}
 
 	@Override
@@ -351,8 +352,7 @@ public class AbstractTestListener extends TestArgsListener
 	{
 		String test = TestNamingUtil.getTestNameByThread();
 		
-		// String test = TestNamingUtil.getCanonicalTestName(result);
-		int count = RetryCounter.getRunCount(test);
+		int count = RetryCounter.getRunCount();
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
 
@@ -374,6 +374,7 @@ public class AbstractTestListener extends TestArgsListener
 		}
 		
 		super.onTestFailure(result);
+		RetryCounter.resetCounter();
 	}
 
 	@Override
@@ -400,6 +401,7 @@ public class AbstractTestListener extends TestArgsListener
 		skipItem(result, Messager.TEST_SKIPPED);
 		afterTest(result);
 		super.onTestSkipped(result);
+		RetryCounter.resetCounter();
 	}
 
 	@Override

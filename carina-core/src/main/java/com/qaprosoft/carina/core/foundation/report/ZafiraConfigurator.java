@@ -129,7 +129,7 @@ public class ZafiraConfigurator implements IConfigurator
     @Override
     public int getRunCount(ITestResult test)
     {
-        return RetryCounter.getRunCount(getTestName(test));
+        return RetryCounter.getRunCount();
     }
 
     @Override

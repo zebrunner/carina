@@ -15,42 +15,59 @@
  */
 package com.qaprosoft.carina.core.foundation.retry;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Map that stores run count of tests, used in {@link com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener}.
+ * ThreadLocal<Integer> that stores run count of tests, used in {@link com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener}.
  * 
  * @author Alex Khursevich (hursevch@gmail.com)
  */
 public class RetryCounter
 {
-	private static Map<String, Integer> runCountMap;
+	private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
 
-	static
+	public static void initCounter()
 	{
-		runCountMap = new HashMap<String, Integer>();
-	}
-
-	public static void initCounter(String test)
-	{
-		if(runCountMap.containsKey(test))
+		if (runCount.get() != null) {
+			// retryCounter already init for current thread
 			return;
-		
-		runCountMap.put(test, 0);
-	}
-	
-	public static Integer getRunCount(String test)
-	{
-		return runCountMap.containsKey(test) ? runCountMap.get(test) : 0;
-	}
-	
-	public static void incrementRunCount(String test)
-	{
-		if(runCountMap.containsKey(test))
-		{
-			Integer count = runCountMap.get(test) + 1;
-			runCountMap.put(test, count);
 		}
+		runCount.set(0);
 	}
+	
+	public static Integer getRunCount()
+	{
+		int count = 0;
+		if (runCount.get() != null) {
+			// retryCounter already init for current thread
+			count = runCount.get();
+		}
+
+		return count;
+	}
+	
+	public static void incrementRunCount()
+	{
+		int count = 0;
+		if (runCount.get() != null) {
+			// retryCounter already init for current thread
+			count = runCount.get();
+		}
+		runCount.set(++count);
+	}
+	
+	public static void decrementRunCount()
+	{
+		int count = 0;
+		if (runCount.get() != null) {
+			// retryCounter already init for current thread
+			count = runCount.get();
+		}
+		runCount.set(++count);
+	}
+	
+	public static void resetCounter()
+	{
+		//explicitly set runCount to 0 for current thread
+		runCount.set(0);
+	}
+
 }
