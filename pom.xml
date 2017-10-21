@@ -43,6 +43,7 @@
 
     <modules>
         <module>carina-commons</module>
+        <module>carina-api</module>
         <module>carina-dataprovider</module>
         <module>carina-proxy</module>
         <module>carina-utils</module>
@@ -162,6 +163,11 @@
             <dependency>
                 <groupId>com.qaprosoft.carina</groupId>
                 <artifactId>carina-commons</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qaprosoft.carina</groupId>
+                <artifactId>carina-api</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
