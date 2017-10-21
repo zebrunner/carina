@@ -24,6 +24,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
@@ -87,12 +88,14 @@ public class TestNamingUtil
 		}
 		testName2Counter.put(test, count);
 
-		if (count > 1)
+		//don't use invCount for tests during retry
+		if (count > 1  && RetryCounter.getRunCount() == 0)
 		{
 			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
 			test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", count));
 		}
 
+		//TODO: analyze how to use stack for retries
 		Stack<String> stack = new Stack<String>();
 
 		if (threadId2TestName.containsKey(threadId))
@@ -103,21 +106,6 @@ public class TestNamingUtil
 		stack.push(test);
 		threadId2TestName.put(threadId, stack);
 		return test;
-	}
-
-	public static synchronized void decreaseRetryCounter(String test)
-	{
-		// introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
-		// getInvocationCount() value
-		if (test == null) {
-			LOGGER.error("Unable to decrease retry counter for null test.");
-			return;
-		}
-		if (testName2Counter.containsKey(test))
-		{
-			int count = testName2Counter.get(test) - 1;
-			testName2Counter.put(test, count);
-		}
 	}
 
 	public static synchronized void releaseTestInfoByThread()

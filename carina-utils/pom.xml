@@ -30,6 +30,8 @@
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
 
+		<jira-client.version>0.5</jira-client.version>
+
 	</properties>
 
 	<dependencies>
@@ -37,6 +39,10 @@
 		<dependency>
 			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
 		<!-- Other dependencies -->
@@ -96,6 +102,12 @@
 		    <version>${joda-time.version}</version>
 		</dependency>
 
+		<!-- Jira -->
+		<dependency>
+			<groupId>net.rcarz</groupId>
+			<artifactId>jira-client</artifactId>
+			<version>${jira-client.version}</version>
+		</dependency>
 
 	</dependencies>
 

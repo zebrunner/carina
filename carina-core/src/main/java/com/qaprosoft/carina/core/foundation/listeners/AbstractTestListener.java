@@ -341,8 +341,6 @@ public class AbstractTestListener extends TestArgsListener
 	@Override
 	public void onTestFailure(ITestResult result)
 	{
-		String test = TestNamingUtil.getTestNameByThread();
-		
 		int count = RetryCounter.getRunCount();
 		int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
 		LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
@@ -356,7 +354,6 @@ public class AbstractTestListener extends TestArgsListener
 
 		if (count < maxCount && retry != null && !Jira.isRetryDisabled(result))
 		{
-			TestNamingUtil.decreaseRetryCounter(test);
 			failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
 		} else
 		{
