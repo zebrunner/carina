@@ -488,6 +488,7 @@ public abstract class AbstractTest // extends DriverHelper
         }
     }
 
+    //TODO: remove method and CI_* arguments from core
     private String getCIJobReference() {
         String ciTestJob = null;
         if (!Configuration.isNull(Parameter.CI_URL)
