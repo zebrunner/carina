@@ -66,12 +66,10 @@
 			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-api</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-
 		<!-- Cucumber -->
 		<dependency>
 			<groupId>info.cukes</groupId>
