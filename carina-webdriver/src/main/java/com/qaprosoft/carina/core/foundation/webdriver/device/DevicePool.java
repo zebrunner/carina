@@ -23,7 +23,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 public class DevicePool
 {
@@ -105,9 +104,8 @@ public class DevicePool
 	}
 
 	private static void setDevice(Device device) {
-		String test = TestNamingUtil.getTestNameByThread();
 		long threadId = Thread.currentThread().getId();
-		LOGGER.debug("Set current device to '" + device.getName() + "' test '" + test + "', thread: " + threadId);
+		LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
 		currentDevice.set(device);
 	}
 	

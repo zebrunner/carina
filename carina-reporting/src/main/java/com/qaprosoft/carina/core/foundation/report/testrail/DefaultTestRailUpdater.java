@@ -175,7 +175,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
 
             long threadId = Thread.currentThread().getId();
             LOGGER.info("Updater Thread: " + (threadId));
-            String test = TestNamingUtil.getCanonicTestNameByThread();
+            String test = TestNamingUtil.getTestNameByThread();
 
             if (test == null) {
                 LOGGER.error("Unable to identify test name by threadId: " + threadId);

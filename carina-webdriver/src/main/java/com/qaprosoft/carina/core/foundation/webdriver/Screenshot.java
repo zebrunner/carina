@@ -360,9 +360,6 @@ public class Screenshot
 				if (TestNamingUtil.isTestNameRegistered()) {
 					test = TestNamingUtil.getTestNameByThread();
 				} else {
-					test = TestNamingUtil.getCanonicTestNameByThread();
-				}
-				if (test == null || StringUtils.isEmpty(test)) {
 					test = "undefined";
 				}
 				uploadToAmazonS3(test, screenPath, screenName, comment);
