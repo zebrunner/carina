@@ -16,8 +16,6 @@
 package com.qaprosoft.carina.core.foundation.retry;
 
 /**
- * ThreadLocal that stores run count of tests, used in {@link com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener}.
- * 
  * @author Alex Khursevich (hursevch@gmail.com)
  */
 public class RetryCounter
