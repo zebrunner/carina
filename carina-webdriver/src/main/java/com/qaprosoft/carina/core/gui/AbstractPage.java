@@ -32,7 +32,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * All page POJO objects should extend this abstract page to get extra logic.
@@ -99,9 +98,6 @@ public abstract class AbstractPage extends AbstractUIObject
 		if (TestNamingUtil.isTestNameRegistered()) {
 			test = TestNamingUtil.getTestNameByThread();
 		} else {
-			test = TestNamingUtil.getCanonicTestNameByThread();
-		}
-		if (test == null || StringUtils.isEmpty(test)) {
 			test = "undefined";
 		}
 		

@@ -15,16 +15,11 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
-import java.lang.reflect.Method;
-
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.xml.XmlTest;
 
 public interface INamingStrategy
 {
-	String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod);
-
 	String getCanonicalTestName(ITestResult result);
 	
 	String getCanonicalTestMethodName(ITestResult result);
