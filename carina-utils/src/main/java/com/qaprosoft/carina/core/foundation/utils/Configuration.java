@@ -93,8 +93,6 @@ public class Configuration
 		
 		ENV_ARG_RESOLVER("env_arg_resolver"),
 		
-		DEVELOP("develop"), 
-		
 		PLATFORM("platform"),
 
 		BROWSER("browser"),
@@ -193,33 +191,13 @@ public class Configuration
 		
 		TIME_FORMAT("time_format"),
 		
-		IS_API("is_api"),
-		
-		LOAD_SETTINGS("load_settings"),
-		
 		CRYPTO_KEY_PATH("crypto_key_path"),
 		
 		SUITE_NAME("suite_name"),
 
-		CI_RUN_ID("ci_run_id"),
-		
 		CI_URL("ci_url"),
 		
 		CI_BUILD("ci_build"),		
-		
-		CI_BUILD_CAUSE("ci_build_cause"),
-		
-		CI_PARENT_URL("ci_parent_url"),
-		
-		CI_PARENT_BUILD("ci_parent_build"),
-		
-		CI_USER_ID("ci_user_id"),
-		
-		CI_USER_FIRST_NAME("ci_user_first_name"),
-		
-		CI_USER_LAST_NAME("ci_user_last_name"),
-		
-		CI_USER_EMAIL("ci_user_email"),
 		
 		JIRA_UPDATER("jira_updater"),
 		
@@ -256,10 +234,6 @@ public class Configuration
 		
 		VIDEO_RECORDING("video_recording"),
 		
-		ADB_HOST("adb_host"),
-		
-		ADB_PORT("adb_port"),
-
 		//TestRail
 
 		TESTRAIL_URL("testrail_url"),
@@ -274,16 +248,6 @@ public class Configuration
 
 		TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
 
-		//zafira
-		//TODO: it seems like git_branch/git_commit and git_url can be removed
-		GIT_BRANCH("git_branch"),
-		
-		GIT_COMMIT("git_commit"),
-		
-		GIT_URL("git_url"),
-
-		UNIQUE_TESTRUN_FIELDS("unique_testrun_fields"),
-		
 		//Amazon
 		S3_BUCKET_NAME("s3_bucket_name"),
 		
@@ -323,10 +287,6 @@ public class Configuration
 
 		CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder"),
 		
-//		SSH_USERNAME("ssh_username"),
-		
-//		ADB_PATH("adb_path"),
-
 		// TLS
 		TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
 		
