@@ -15,8 +15,6 @@
  */
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -29,10 +27,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -48,44 +42,6 @@ public class DriverFactory {
 
     private static final Device nullDevice = new Device();
 
-
-    @SuppressWarnings("rawtypes")
-	public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
-        RemoteWebDriver driver = null;
-        try {
-            if (capabilities.getCapability("automationName") == null)
-                driver = new RemoteWebDriver(new URL(selenium_host), capabilities);
-            else {
-                String platform;
-                if (capabilities.getCapability("platform") != null) {
-                    platform = capabilities.getCapability("platform").toString();
-                } else if (capabilities.getCapability("platformName") != null) {
-                    platform = capabilities.getCapability("platformName").toString();
-                } else {
-                    throw new RuntimeException("Unable to identify platform type using platform and platformName capabilities for test: " + testName);
-                }
-
-                if (platform.toLowerCase().equals("android")) {
-                    driver = new AndroidDriver(new URL(selenium_host), capabilities);
-                } else if (platform.toLowerCase().equals("ios")) {
-                    driver = new IOSDriver(new URL(selenium_host), capabilities);
-                } else {
-                    throw new RuntimeException("Undefined platform type for mobile driver test: " + testName);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("Unable to initialize extra driver!\r\n" + e.getMessage());
-        }
-        
-		if (driver == null) {
-			LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
-		    DevicePool.deregisterDevice();
-			throw new RuntimeException("Page isn't created. Driver isn't initialized.");
-		}
-
-        return driver;
-    }
-
     /**
      * Creates driver instance for specified test.
      *
@@ -93,10 +49,10 @@ public class DriverFactory {
      * @return RemoteWebDriver instance
      */
     public static WebDriver create(String testName) {
-        return create(testName, nullDevice);
+        return create(testName, nullDevice, null, null);
     }
 
-	public static WebDriver create(String testName, Device device) {
+	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String selenium_host) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
 		String driverType = Configuration.getDriverType();
@@ -107,7 +63,7 @@ public class DriverFactory {
 		} else {
 			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
 		}
-		WebDriver drv = factory.create(testName, device);
+		WebDriver drv = factory.create(testName, device, capabilities, selenium_host);
 		LOGGER.debug("DriverFactory finish...");
 		return drv;
 	}

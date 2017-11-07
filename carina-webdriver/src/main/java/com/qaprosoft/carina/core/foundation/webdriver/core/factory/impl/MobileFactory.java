@@ -34,9 +34,11 @@ import io.appium.java_client.ios.IOSElement;
 public class MobileFactory extends AbstractFactory {
 
 	@Override
-    public WebDriver create(String name, Device device) {
+    public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
 
-        String seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+		if (seleniumHost == null) {
+			seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+		}
         String driverType = Configuration.getDriverType();
         String mobilePlatformName = Configuration.getPlatform();
 
@@ -48,7 +50,9 @@ public class MobileFactory extends AbstractFactory {
         LOGGER.debug("selenium: " + seleniumHost);
         
         RemoteWebDriver driver = null;
-        DesiredCapabilities capabilities = getCapabilities(name, device);
+		if (capabilities == null) {
+			capabilities = getCapabilities(name, device);
+		}
         try {
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 				//TODO: remove later this logic
@@ -114,6 +118,10 @@ public class MobileFactory extends AbstractFactory {
         	capabilities = new CapabilitiesLoder().loadCapabilities(customCapabilities);
         } else {
 			capabilities = new MobileCapabilies().getCapability(name);
+        }
+        
+        if (!device.isNull()) {
+        	capabilities.setCapability("udid", device.getUdid());
         }
         
 		return capabilities;

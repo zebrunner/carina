@@ -35,6 +35,7 @@ public class Device
 	private String os;
 	private String osVersion;
 	private String udid;
+	@Deprecated
 	private String seleniumServer;
 
 	private String remoteURL;
