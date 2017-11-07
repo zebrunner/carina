@@ -144,7 +144,7 @@ public final class DriverPool {
 
 		if (drv == null) {
 			LOGGER.debug("Starting new driver as nothing was found in the pool");
-			drv = createDriver(name, capabilities, seleniumHost, null);
+			drv = createDriver(name, capabilities, seleniumHost, DevicePool.getNullDevice());
 		}
 		return drv;
 	}
@@ -188,7 +188,6 @@ public final class DriverPool {
 		} finally {
 			NDC.pop();
 		}
-
 
 		//start default driver. Device can be nullDevice...
 		return createDriver(DEFAULT, null, null, device);
@@ -273,10 +272,6 @@ public final class DriverPool {
 		Throwable init_throwable = null;
 		
 		
-		if (device == null) {
-			device = DevicePool.getNullDevice();
-		}
-		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
 		while (!init & count++ < maxCount) {
@@ -288,7 +283,7 @@ public final class DriverPool {
 
 				
 				//TODO: remove or move device manipulation to MobileFactory
-				// for local runs try to init device from _config.properties
+				// for local runs try to init device from capabilities
 				if (!device.isNull()) {
 					// turn on mobile device display if necessary. action can be done after registering available device with thread
 					// there is no sense to clean cache and reinstall app if we request dedicated device
@@ -299,16 +294,9 @@ public final class DriverPool {
 					
 					// verify if valid build is already installed and uninstall only in case of any difference 
 					device.reinstallApp();
-
-					seleniumHost = device.getSeleniumServer();
-					drv = DriverFactory.create(name, device);
-				} else if (capabilities != null && seleniumHost != null) {
-					// TODO: investigate do we need transfer device to factory or not
-					drv = DriverFactory.create(name, capabilities, seleniumHost);
-				} else {
-					seleniumHost = Configuration.get(Parameter.SELENIUM_HOST);
-					drv = DriverFactory.create(name);
 				}
+				
+				drv = DriverFactory.create(name, device, capabilities, seleniumHost);
 				registerDriver(drv, name);
 
 				init = true;

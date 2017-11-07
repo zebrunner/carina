@@ -582,7 +582,7 @@ public abstract class AbstractTest // extends DriverHelper
 				updateS3AppPath();
 			}
 		} catch (Exception e) {
-            LOGGER.error("AWS S3 manager is not initialized successfully!", e);
+            LOGGER.error("AWS S3 manager exception detected!", e);
 		}
 
 		try {
@@ -590,7 +590,7 @@ public abstract class AbstractTest // extends DriverHelper
 				updateHockeyAppPath();
 			}
 		} catch (Exception e) {
-            LOGGER.error("HockeyApp manager is not initialized successfully!", e);
+            LOGGER.error("HockeyApp manager exception detected!", e);
 		}
     	
     }
