@@ -687,7 +687,7 @@ public class Device
     public String getAdbName() {
     	if (!StringUtils.isEmpty(remoteURL)) {
     		return remoteURL;
-    	} else if (!StringUtils.isEmpty(remoteURL)) {
+    	} else if (!StringUtils.isEmpty(udid)) {
     		return udid;
     	} else {
     		return "";
