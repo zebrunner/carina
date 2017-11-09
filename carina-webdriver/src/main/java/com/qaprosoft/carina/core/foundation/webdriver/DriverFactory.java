@@ -52,6 +52,10 @@ public class DriverFactory {
         return create(testName, nullDevice, null, null);
     }
 
+    public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
+    	return create(testName, nullDevice, capabilities, selenium_host);
+    }
+    
 	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String selenium_host) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
