@@ -105,7 +105,7 @@ public class AndroidService {
      * @param command String
      * @return String command output in one line
      */
-    public String executeAbdCommand(String command) {
+    public String executeAdbCommand(String command) {
         String deviceName = DevicePool.getDevice().getAdbName();
         if (!deviceName.isEmpty()) {
             // add remoteURL/udid reference
@@ -136,6 +136,14 @@ public class AndroidService {
     }
 
     /**
+     * press Home button to open home screen
+     */
+
+    public void gotoAndroidHome() {
+        executeAdbCommand("shell input keyevent 3");
+    }
+
+    /**
      * openApp
      *
      * @param pkg String
@@ -151,7 +159,7 @@ public class AndroidService {
      * @param app String
      */
     public void openApp(String app) {
-        executeAbdCommand("shell am start -n " + app);
+        executeAdbCommand("shell am start -n " + app);
     }
 
     /**
@@ -167,7 +175,7 @@ public class AndroidService {
          * String packageName = executor.getApkPackageName(String apkFile);
          * executor.clearAppData(Device device, String appPackage);
          */
-        String result = executeAbdCommand("shell pm clear " + appPackageName);
+        String result = executeAdbCommand("shell pm clear " + appPackageName);
 
         if (result.contains("Success")) {
             LOGGER.info("Cache was cleared correctly");
@@ -202,7 +210,7 @@ public class AndroidService {
      * @return String
      */
     public String getCurrentDeviceFocus() {
-        String result = executeAbdCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
+        String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
         return result;
     }
 
@@ -247,14 +255,14 @@ public class AndroidService {
             }
         }
 
-        executeAbdCommand("install " + filePath);
+        executeAdbCommand("install " + filePath);
     }
 
     /**
      * Open Development Settings on device
      */
     public void openDeveloperOptions() {
-        executeAbdCommand("shell am start -n com.android.settings/.DevelopmentSettings");
+        executeAdbCommand("shell am start -n com.android.settings/.DevelopmentSettings");
     }
 
     // End of Common Methods
@@ -265,14 +273,14 @@ public class AndroidService {
      * expandStatusBar
      */
     public void expandStatusBar() {
-        executeAbdCommand("shell service call statusbar 1");
+        executeAdbCommand("shell service call statusbar 1");
     }
 
     /**
      * collapseStatusBar
      */
     public void collapseStatusBar() {
-        executeAbdCommand("shell service call statusbar 2");
+        executeAdbCommand("shell service call statusbar 2");
     }
 
     // TODO: move notifications methods into separate class if possible. Maybe
@@ -609,18 +617,18 @@ public class AndroidService {
         String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language " + language;
 
         LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
-        String expandOutput = executeAbdCommand(setLocalizationChangePermissionCmd);
+        String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
 
         if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
             LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
             installApk(LANGUAGE_CHANGE_APP_PATH, true);
-            expandOutput = executeAbdCommand(setLocalizationChangePermissionCmd);
+            expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
         }
 
         LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
 
         LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
-        String changeLocaleOutput = executeAbdCommand(setLocalizationCmd);
+        String changeLocaleOutput = executeAdbCommand(setLocalizationCmd);
         LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : " + changeLocaleOutput);
 
         if (waitTime > 0) {
@@ -667,7 +675,7 @@ public class AndroidService {
      * @return String
      */
     public String getDeviceLanguage() {
-        return executeAbdCommand("shell getprop persist.sys.language");
+        return executeAdbCommand("shell getprop persist.sys.language");
     }
     // End Language Change section
 
@@ -825,8 +833,8 @@ public class AndroidService {
             value = "1";
         }
 
-        executeAbdCommand("shell settings put global auto_time " + value);
-        executeAbdCommand("shell settings put global auto_time_zone " + value);
+        executeAdbCommand("shell settings put global auto_time " + value);
+        executeAdbCommand("shell settings put global auto_time_zone " + value);
     }
 
     /**
@@ -850,21 +858,21 @@ public class AndroidService {
                      // thread
         DeviceTimeZone dt = new DeviceTimeZone();
 
-        String value = executeAbdCommand("shell settings get global auto_time");
+        String value = executeAdbCommand("shell settings get global auto_time");
         if (value.contains("0")) {
             dt.setAutoTime(false);
         } else {
             dt.setAutoTime(true);
         }
 
-        value = executeAbdCommand("shell settings get global auto_time_zone");
+        value = executeAdbCommand("shell settings get global auto_time_zone");
         if (value.contains("0")) {
             dt.setAutoTimezone(false);
         } else {
             dt.setAutoTimezone(true);
         }
 
-        value = executeAbdCommand("shell settings get system time_12_24");
+        value = executeAdbCommand("shell settings get system time_12_24");
         if (value.contains("12")) {
             dt.setTimeFormat(TimeFormat.FORMAT_12);
         } else {
@@ -872,7 +880,7 @@ public class AndroidService {
         }
 
         if (defaultTZ.isEmpty()) {
-            value = executeAbdCommand("shell getprop persist.sys.timezone");
+            value = executeAdbCommand("shell getprop persist.sys.timezone");
             if (!value.isEmpty()) {
                 dt.setTimezone(value);
             }
@@ -880,7 +888,7 @@ public class AndroidService {
             dt.setTimezone(defaultTZ);
         }
 
-        value = executeAbdCommand("shell date -s %mynow%");
+        value = executeAdbCommand("shell date -s %mynow%");
         LOGGER.info(value);
         if (!value.isEmpty()) {
             value = convertDateInCorrectString(parseOutputDate(value));
@@ -902,7 +910,7 @@ public class AndroidService {
      * @return String
      */
     public String getDeviceActualTimeZone() {
-        String value = executeAbdCommand("shell getprop persist.sys.timezone");
+        String value = executeAdbCommand("shell getprop persist.sys.timezone");
         if (!value.isEmpty()) {
             LOGGER.info(value);
         }
@@ -989,6 +997,22 @@ public class AndroidService {
     }
 
     // End of TimeZone change sections
+    
+    /**
+     * Open camera on device
+     */    
+    public void openCamera() {
+        LOGGER.info("Camera will be opened");
+        executeAdbCommand("shell am start -a android.media.action.IMAGE_CAPTURE");
+    }
+    
+    /**
+     * Android camera should be already opened
+     */
+    public void takePhoto() {
+        LOGGER.info("Will take photo");
+        executeAdbCommand("shell input keyevent KEYCODE_CAMERA");
+    }
 
     // Private section
 
@@ -1044,30 +1068,30 @@ public class AndroidService {
         if (dt.isAutoTime()) {
             autoTime = "1";
         }
-        executeAbdCommand("shell settings put global auto_time " + autoTime);
+        executeAdbCommand("shell settings put global auto_time " + autoTime);
 
         if (dt.isAutoTimezone()) {
             autoTimeZone = "1";
         }
-        executeAbdCommand("shell settings put global auto_time_zone " + autoTimeZone);
+        executeAdbCommand("shell settings put global auto_time_zone " + autoTimeZone);
 
         setSystemTime(dt.getTimeFormat());
 
         if (!dt.getTimezone().isEmpty()) {
-            executeAbdCommand("shell setprop persist.sys.timezone \"" + dt.getTimezone() + "\"");
+            executeAdbCommand("shell setprop persist.sys.timezone \"" + dt.getTimezone() + "\"");
         }
 
         if (dt.isRefreshDeviceTime()) {
-            executeAbdCommand("shell am broadcast -a android.intent.action.TIME_SET");
+            executeAdbCommand("shell am broadcast -a android.intent.action.TIME_SET");
         }
 
         if (dt.isChangeDateTime() && !dt.getSetDeviceDateTime().isEmpty()) {
             // Try to set date for device but it will not work on not rooted
             // devices
-            executeAbdCommand("shell date " + dt.getSetDeviceDateTime());
+            executeAdbCommand("shell date " + dt.getSetDeviceDateTime());
         }
 
-        String actualDT = executeAbdCommand("shell date -s %mynow%");
+        String actualDT = executeAdbCommand("shell date -s %mynow%");
         LOGGER.info(actualDT);
         return actualDT;
     }
@@ -1270,11 +1294,11 @@ public class AndroidService {
         switch (timeFormat) {
         case FORMAT_12:
             LOGGER.info("Set 12 hours format");
-            executeAbdCommand("shell settings put system time_12_24 12");
+            executeAdbCommand("shell settings put system time_12_24 12");
             break;
         case FORMAT_24:
             LOGGER.info("Set 24 hours format");
-            executeAbdCommand("shell settings put system time_12_24 24");
+            executeAdbCommand("shell settings put system time_12_24 24");
             break;
         }
     }
