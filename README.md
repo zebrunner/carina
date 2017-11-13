@@ -1,7 +1,19 @@
 Carina Automation Framework
 ==================
+Carian is Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB appications, REST services, Databases.
 
-Java-based framework that uses best open-source solutions like Selenium and appium for Web, Mobile, API test automation.
+* Carina framework is build on the top of most popular open-source solutions like Selenium, Appium, TestNG which reduces dependability on specific technology stack.
+
+* Carina covers all popular browsers (IE, Safari, Chrome, Firefox) and mobile devices (iOS/Android). Special feature for mobile domain: it reuses test automation code between IOS/Android by 70-80%.
+
+* As far as our framework is build in Java it is cross-platform. Tests may be easily executed both on Unix or Windows machines all you need is JDK 8 installed.
+
+* Framework supports different types of databases both relational and nonrelational (MySQL, SQL Server, Oracle, PostgreSQL), providing amazing experience of DAO layer implementation using MyBastis ORM framework.
+
+* API testing is based on Freemarker template engine that enables great flexibility in generating REST requests and responses dynamically changed by incoming arguments. 
+
+
+
 
 
 ## Git configuration.  
