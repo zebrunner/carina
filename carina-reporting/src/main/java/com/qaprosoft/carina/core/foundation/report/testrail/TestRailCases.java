@@ -1,4 +1,3 @@
-
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
 import java.lang.annotation.Retention;
@@ -13,5 +12,5 @@ import java.lang.annotation.Target;
 @Target(value=java.lang.annotation.ElementType.METHOD)
 public @interface TestRailCases
 {
-    String testCasesId();
+	String testCasesId();
 }

@@ -62,10 +62,10 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     @SuppressWarnings("rawtypes")
     public DefaultTestRailUpdater() {
 
-        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-        user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
-        password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD),
-                CRYPTO_PATTERN);
+		cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+		user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
+		password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD),
+				CRYPTO_PATTERN);
 
         url = Configuration.get(Configuration.Parameter.TESTRAIL_URL);
         apiClient = new APIClient(url);
@@ -217,11 +217,11 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
                     // do not add untested status as it is specified by default and can't be added using standard put request
     /*                for (String _case : cases) {
                         if (isSuiteContainTestCase(result, _case)) {
-                            LOGGER.info("SKIP: case " + _case + " was found!");
-                            testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.UNTESTED, userId, " ");
-                            testCasesStatus.put(_case.trim(), testCaseResult);
-                        }
-                    }*/
+	                        LOGGER.info("SKIP: case " + _case + " was found!");
+	                        testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.UNTESTED, userId, " ");
+	                        testCasesStatus.put(_case.trim(), testCaseResult);
+	                    }
+	                }*/
                     break;
                 case ITestResult.FAILURE:
                     boolean foundFailureStep = false;
@@ -276,14 +276,14 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             if (testCasesStatus.size() > 0) {
                 JSONArray newResult = (JSONArray) apiClient.sendRequest(Results.addResultsWithLinks(runId, testCasesStatus));
                 for (Object trResult : newResult) {
-                    
+                	
                     @SuppressWarnings("rawtypes")
-                    Map responseMap = (HashMap) trResult;
+					Map responseMap = (HashMap) trResult;
                     String testId = responseMap.get("test_id").toString();
                     Object testInfo = apiClient.sendRequest(TestInfo.getTestInfo(testId));
                     
                     @SuppressWarnings("rawtypes")
-                    Object testCaseName = ((HashMap) testInfo).get("title");
+					Object testCaseName = ((HashMap) testInfo).get("title");
                     LOGGER.debug("testCaseName: " + testCaseName.toString());
                     
                     testId = ((HashMap) trResult).get("test_id").toString();

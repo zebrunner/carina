@@ -10,7 +10,7 @@ import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 public class Runs {
 
     @SuppressWarnings("unchecked")
-    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID){
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID){
         JSONObject obj=new JSONObject();
         obj.put("suite_id",suite_id);
         obj.put("name",name);
@@ -19,7 +19,7 @@ public class Runs {
         return new Request(obj,"add_run/"+projectID,"POST");
     }
     @SuppressWarnings("unchecked")
-    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId){
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId){
         JSONObject obj=new JSONObject();
         obj.put("suite_id",suite_id);
         obj.put("name",name);
@@ -31,7 +31,7 @@ public class Runs {
 
 
     @SuppressWarnings("unchecked")
-    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, String desc){
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, String desc){
         JSONObject obj=new JSONObject();
         obj.put("suite_id",suite_id);
         obj.put("name",name);
@@ -53,14 +53,14 @@ public class Runs {
     }
     
     @SuppressWarnings("unchecked")
-    public static Request deleteRun(int run_id){
+	public static Request deleteRun(int run_id){
         JSONObject obj=new JSONObject();
         obj.put("run_id",run_id);
         return new Request(obj,"delete_run/"+run_id,"POST");
     }
     
     @SuppressWarnings("unchecked")
-    public static Request closeRun(int run_id){
+	public static Request closeRun(int run_id){
         JSONObject obj=new JSONObject();
         obj.put("run_id",run_id);
         return new Request(obj,"close_run/"+run_id,"POST");
