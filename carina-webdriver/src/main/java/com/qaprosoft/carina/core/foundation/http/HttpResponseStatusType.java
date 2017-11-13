@@ -26,6 +26,7 @@ public enum HttpResponseStatusType
 	CREATED_201(201, "Created"),
 	ACCEPTED_202(202, "Accepted"),
 	NO_CONTENT_204(204, "No Content"),
+	NOT_MODIFIED_304(304, "Not Modified"),
 	BAD_REQUEST_400(400, "Bad Request"),
 	UNAUTHORIZED_401(401, "Unauthorized"),
 	FORBIDDEN_403(403, "Forbidden"),
