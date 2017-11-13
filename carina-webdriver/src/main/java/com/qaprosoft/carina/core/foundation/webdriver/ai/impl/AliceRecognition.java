@@ -36,63 +36,71 @@ import com.qaprosoft.carina.core.foundation.webdriver.ai.IRecognition;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 
 /**
- * AliceRecognition - initializes Alice HTTP client and processes response
- * results.
+ * AliceRecognition - initializes Alice HTTP client and processes response results.
  * 
  * @author akhursevich
  */
-public class AliceRecognition implements IRecognition {
-    public static final AliceRecognition INSTANCE = new AliceRecognition();
+public class AliceRecognition implements IRecognition
+{
+	public static final AliceRecognition INSTANCE = new AliceRecognition();
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AliceRecognition.class);
+	
+	private static final String ALICE_PROPERTIES = "alice.properties";
+	private static final String ALICE_ENABLED = "alice_enabled";
+	private static final String ALICE_SERVICE_URL = "alice_service_url";
+	private static final String ALICE_ACCESS_TOKEN = "alice_access_token";
+	
+	private boolean enabled = false;
+	
+	private AliceClient client;
+	
+	private AliceRecognition()
+	{
+		try
+		{
+			CombinedConfiguration config = new CombinedConfiguration(new MergeCombiner());
+			config.addConfiguration(new SystemConfiguration());
+			config.addConfiguration(new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
+				    					  .configure(new Parameters().properties().setFileName(ALICE_PROPERTIES)).getConfiguration());
+				
+			this.enabled = config.getBoolean(ALICE_ENABLED, false);
+			String url = config.getString(ALICE_SERVICE_URL, null); 
+			String accessToken = config.getString(ALICE_ACCESS_TOKEN, null); 
+		
+			if(enabled && !StringUtils.isEmpty(url) && !StringUtils.isEmpty(accessToken))
+			{
+				this.client = new AliceClient(url);
+				this.client.setAuthToken(accessToken);
+				this.enabled = this.client.isAvailable();
+			}
+		}
+		catch (Exception e) 
+		{
+			LOGGER.error("Unable to initialize Alice: " + e.getMessage());
+		}
+	};
+	
+	@Override
+	public RecognitionMetaType recognize(Label label, String caption, File screenshot)
+	{
+		RecognitionMetaType result = null;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AliceRecognition.class);
+		// send request anyway to Alice for recognition to record this particular screen
+		Response<List<RecognitionMetaType>> response = client.recognize(screenshot);
+		
+		// try to search only if AI label and caption are provided
+		if(response.getStatus() == 200 && label != null && caption != null) 
+		{
+			result = response.getObject().stream()
+				.filter(r -> r.getCaption().contains(caption) && r.getLabel().equals(label.getLabelName()))
+				.findAny().orElse(null);
+		}
+		return result;
+	}
 
-    private static final String ALICE_PROPERTIES = "alice.properties";
-    private static final String ALICE_ENABLED = "alice_enabled";
-    private static final String ALICE_SERVICE_URL = "alice_service_url";
-    private static final String ALICE_ACCESS_TOKEN = "alice_access_token";
-
-    private boolean enabled = false;
-
-    private AliceClient client;
-
-    private AliceRecognition() {
-        try {
-            CombinedConfiguration config = new CombinedConfiguration(new MergeCombiner());
-            config.addConfiguration(new SystemConfiguration());
-            config.addConfiguration(new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
-                    .configure(new Parameters().properties().setFileName(ALICE_PROPERTIES)).getConfiguration());
-
-            this.enabled = config.getBoolean(ALICE_ENABLED, false);
-            String url = config.getString(ALICE_SERVICE_URL, null);
-            String accessToken = config.getString(ALICE_ACCESS_TOKEN, null);
-
-            if (enabled && !StringUtils.isEmpty(url) && !StringUtils.isEmpty(accessToken)) {
-                this.client = new AliceClient(url);
-                this.client.setAuthToken(accessToken);
-                this.enabled = this.client.isAvailable();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Unable to initialize Alice: " + e.getMessage());
-        }
-    };
-
-    @Override
-    public RecognitionMetaType recognize(Label label, String caption, File screenshot) {
-        RecognitionMetaType result = null;
-
-        // send request anyway to Alice for recognition to record this
-        // particular screen
-        Response<List<RecognitionMetaType>> response = client.recognize(screenshot);
-
-        // try to search only if AI label and caption are provided
-        if (response.getStatus() == 200 && label != null && caption != null) {
-            result = response.getObject().stream().filter(r -> r.getCaption().contains(caption) && r.getLabel().equals(label.getLabelName()))
-                    .findAny().orElse(null);
-        }
-        return result;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
 }

@@ -6,21 +6,21 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class MobileCapabilies extends AbstractCapabilities {
 
-    @Override
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+	@Override
+	public DesiredCapabilities getCapability(String testName) {
+		DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        // add capabilities based on dynamic _config.properties variables
-        capabilities = initCapabilities(capabilities);
+		// add capabilities based on dynamic _config.properties variables
+		capabilities = initCapabilities(capabilities);
 
-        // handle variant with extra capabilities from external property file
-        DesiredCapabilities extraCapabilities = getExtraCapabilities();
+		// handle variant with extra capabilities from external property file
+		DesiredCapabilities extraCapabilities = getExtraCapabilities();
 
-        if (extraCapabilities != null) {
-            capabilities.merge(extraCapabilities);
-        }
+		if (extraCapabilities != null) {
+			capabilities.merge(extraCapabilities);
+		}
 
-        return capabilities;
-    }
+		return capabilities;
+	}
 
 }

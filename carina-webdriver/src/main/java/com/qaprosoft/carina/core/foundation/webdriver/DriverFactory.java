@@ -53,24 +53,25 @@ public class DriverFactory {
     }
 
     public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
-        return create(testName, nullDevice, capabilities, selenium_host);
+    	return create(testName, nullDevice, capabilities, selenium_host);
     }
+    
+	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String selenium_host) {
+		LOGGER.debug("DriverFactory start...");
+		AbstractFactory factory;
+		String driverType = Configuration.getDriverType();
+		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+			factory = new DesktopFactory();
+		} else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+			factory = new MobileFactory();
+		} else {
+			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
+		}
+		WebDriver drv = factory.create(testName, device, capabilities, selenium_host);
+		LOGGER.debug("DriverFactory finish...");
+		return drv;
+	}
 
-    public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String selenium_host) {
-        LOGGER.debug("DriverFactory start...");
-        AbstractFactory factory;
-        String driverType = Configuration.getDriverType();
-        if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
-            factory = new DesktopFactory();
-        } else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-            factory = new MobileFactory();
-        } else {
-            throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
-        }
-        WebDriver drv = factory.create(testName, device, capabilities, selenium_host);
-        LOGGER.debug("DriverFactory finish...");
-        return drv;
-    }
 
     public static String getBrowserName(WebDriver driver) {
         Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();

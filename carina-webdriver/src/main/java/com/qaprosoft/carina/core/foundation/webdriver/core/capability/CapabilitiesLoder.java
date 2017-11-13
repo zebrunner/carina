@@ -19,23 +19,24 @@ public class CapabilitiesLoder {
 
     private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoder.class);
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public DesiredCapabilities loadCapabilities(String fileName) {
 
         LOGGER.info("Loading capabilities:");
         Properties props = new Properties();
         URL baseResource = ClassLoader.getSystemResource(fileName);
-        try {
-            if (baseResource != null) {
-                props.load(baseResource.openStream());
-                LOGGER.info("Custom capabilities properties loaded: " + fileName);
-            } else {
-                throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
-        }
-
+		try {
+			if(baseResource != null)
+			{
+				props.load(baseResource.openStream());
+				LOGGER.info("Custom capabilities properties loaded: " + fileName);
+			} else {
+				throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");	
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
+		}
+		
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         Map<String, String> capabilitiesMap = new HashMap(props);
@@ -45,12 +46,10 @@ public class CapabilitiesLoder {
                 valueFromEnv = System.getProperty(entry.getKey());
                 String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
 
-                LOGGER.info("Set custom driver capability: " + entry.getKey() + "; value: " + value);
-                capabilities.setCapability(entry.getKey(), value);
-                // add each custom capability to properties generating new
-                // key-value pair to be able to change some env specific data
-                // later
-                R.CONFIG.put(entry.getKey(), value);
+            	LOGGER.info("Set custom driver capability: " + entry.getKey() + "; value: " + value);
+            	capabilities.setCapability(entry.getKey(), value);
+            	//add each custom capability to properties generating new key-value pair to be able to change some env specific data later
+            	R.CONFIG.put(entry.getKey(), value);
             }
         }
 
