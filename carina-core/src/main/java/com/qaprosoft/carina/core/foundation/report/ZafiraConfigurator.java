@@ -34,7 +34,7 @@ import java.util.Set;
  */
 public class ZafiraConfigurator implements IConfigurator
 {
-    protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
+	protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
     private List<String> uniqueKeys = Arrays.asList(R.CONFIG.get("unique_testrun_fields").split(","));
     
     @Override
@@ -52,26 +52,26 @@ public class ZafiraConfigurator implements IConfigurator
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
         }
 
-        long threadId = Thread.currentThread().getId();
-        
+		long threadId = Thread.currentThread().getId();
+		
         // add custom arguments from current mobile device
-        Device device = DevicePool.getDevice();
-        if (!device.getName().isEmpty()) {
-            String deviceName = device.getName();
-            String deviceOs = device.getOs();
-            String deviceOsVersion = device.getOsVersion();
-            
-            conf.getArg().add(buildArgumentType("device", deviceName));
-            conf.getArg().add(buildArgumentType("platform", deviceOs));
-            conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
-            
-            LOGGER.info("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
-            
-//          //unregister current device so it doesn't appear for the next step
-//          DevicePool.removeCurrentDevice();
-        } else {
-            LOGGER.warn("Unable to detect current device for threadId: " + threadId);
-        }
+		Device device = DevicePool.getDevice();
+		if (!device.getName().isEmpty()) {
+			String deviceName = device.getName();
+			String deviceOs = device.getOs();
+			String deviceOsVersion = device.getOsVersion();
+			
+			conf.getArg().add(buildArgumentType("device", deviceName));
+			conf.getArg().add(buildArgumentType("platform", deviceOs));
+			conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
+			
+			LOGGER.info("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
+			
+//			//unregister current device so it doesn't appear for the next step
+//			DevicePool.removeCurrentDevice();
+		} else {
+			LOGGER.warn("Unable to detect current device for threadId: " + threadId);
+		}
         return conf;
     }
 
@@ -100,11 +100,11 @@ public class ZafiraConfigurator implements IConfigurator
     }
     
     @Override
-    public String getSecondaryOwner(ITestResult test) 
+	public String getSecondaryOwner(ITestResult test) 
     {
-            // TODO: re-factor that
+    		// TODO: re-factor that
         return Ownership.getMethodOwner(test, OwnerType.SECONDARY);
-    }
+	}
 
     @Override
     public String getTestName(ITestResult test)
@@ -144,18 +144,18 @@ public class ZafiraConfigurator implements IConfigurator
         return DriverMode.valueOf(R.CONFIG.get("driver_mode").toUpperCase());
     }
 
-    @Override
-    public Set<TestArtifactType> getArtifacts(ITestResult test) {
+	@Override
+	public Set<TestArtifactType> getArtifacts(ITestResult test) {
         // Generate additional artifacts links on test run
         test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
         TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
         TestRail.clearCases();
         return Artifacts.getArtifacts();
-    }
-    
-    @Override
-    public String getReportEmails() {
-        // This code is invoked only from ZafiraListener i.e. Zafira integration is already enabled!
-        return  Configuration.get(Parameter.EMAIL_LIST);
-    }
+	}
+	
+	@Override
+	public String getReportEmails() {
+		// This code is invoked only from ZafiraListener i.e. Zafira integration is already enabled!
+		return  Configuration.get(Parameter.EMAIL_LIST);
+	}
 }
