@@ -471,15 +471,26 @@ public class Screenshot {
      * 
      * @return screenshot image
      */
-    public static BufferedImage takeScreenshotForColorComparation(WebDriver driver, String location) throws IOException {
+    public static BufferedImage takeScreenshotForColorComparation(WebDriver driver, String location) {
         WebDriver augmentedDriver = getAugmentedDriver();
-        BufferedImage image = takeVisibleScreenshot(driver, augmentedDriver);
+        BufferedImage image = null;
+        try {
+            image = takeVisibleScreenshot(driver, augmentedDriver);
+        } catch (IOException e) {
+            LOGGER.info("Unable to do screenshot!");
+        }
         if (!location.equals("")) {
             String screenName = System.currentTimeMillis() + ".png";
             String screenPath = location + "/" + screenName;
             File screenFile = new File(screenPath);
-            ImageIO.write(image, "png", screenFile);
-        }
+            try {
+                ImageIO.write(image, "png", screenFile);
+            } catch (IOException e) {
+                LOGGER.info("Unable to save screenshot here: " + screenPath);
+            }
+            LOGGER.info("Screenshot is saved here: " + screenPath);
+        } else
+            LOGGER.info("Screenshot wouldn't be saved!");
         return image;
     }
 }

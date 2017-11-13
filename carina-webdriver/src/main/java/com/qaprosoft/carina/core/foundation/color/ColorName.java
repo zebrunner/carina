@@ -28,6 +28,14 @@ public class ColorName {
         this.name = name;
     }
 
+    /**
+     * Compute MSE - Mean squared error
+     * 
+     * @param pixR
+     * @param pixG
+     * @param pixB
+     * @return
+     */
     public int computeMSE(int pixR, int pixG, int pixB) {
         return (int) (((pixR - r) * (pixR - r) + (pixG - g) * (pixG - g) + (pixB - b) * (pixB - b)) / 3);
     }
@@ -69,6 +77,10 @@ public class ColorName {
         if (obj == null) {
             return false;
         }
+        if (this == obj)
+            return true;
+        if (getClass() != obj.getClass())
+            return false;
         final ColorName other = (ColorName) obj;
         if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
             return false;

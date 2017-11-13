@@ -16,7 +16,7 @@ import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
 
 public class ColorUtils {
 
-    private static String COLOR_XML = "color2.xml";
+    private static String COLOR_XML = "color.xml";
     public static ArrayList<ColorName> colorNames = new ArrayList<ColorName>();
     protected static final Logger LOGGER = Logger.getLogger(ColorUtils.class);
 
@@ -24,20 +24,20 @@ public class ColorUtils {
         if (colorNames.size() == 0) {
             InputStream in = ColorUtils.class.getResourceAsStream(COLOR_XML);
             File file = null;
-            try {
-                file = stream2file(in);
-            } catch (IOException e) {
-                LOGGER.info("Can't transform inputStream to file");
-            }
+            file = stream2file(in);
             colorNames = ((ColorList) MarshallerHelper.unmarshall(file, ColorList.class)).getListOfColors();
         }
     }
 
-    private static File stream2file(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("tempfile", "xml");
-        tempFile.deleteOnExit();
-        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+    private static File stream2file(InputStream in) {
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("tempfile", "xml");
+            tempFile.deleteOnExit();
+            FileOutputStream out = new FileOutputStream(tempFile);
             IOUtils.copy(in, out);
+        } catch (IOException e) {
+            LOGGER.info("Can't transform inputStream to file");
         }
         return tempFile;
     }

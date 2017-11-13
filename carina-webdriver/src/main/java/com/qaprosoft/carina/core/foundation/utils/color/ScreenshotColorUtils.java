@@ -28,7 +28,7 @@ public class ScreenshotColorUtils {
      * @param y - y-cooordinate of point
      * @return boolean
      */
-    public static boolean compareColorWithColorOnExapleByCoordinates(String path, int x, int y) {
+    public static boolean compareColorWithColorByCoordinates(String path, int x, int y) {
         File testScreenShot = new File(path);
         BufferedImage image = null;
         try {
@@ -38,6 +38,8 @@ public class ScreenshotColorUtils {
         }
         ColorName colorFromExample = getColorFromImageByCoordinates(x, y, image);
         ColorName colorFromDevice = getColorFromDeviceScreenByCoordinates(x, y);
+        LOGGER.info("Coordinates: x=" + x + ", y=" + y + ". Compare colors: from example image - " + colorFromExample.getName()
+                + " from device screen -" + colorFromDevice.getName());
         if (colorFromExample.equals(colorFromDevice))
             return true;
         return false;
@@ -60,7 +62,7 @@ public class ScreenshotColorUtils {
      */
     public static boolean compareColorOfElementWithExample(String path, WebElement element) {
         int[] coordinates = getCenterOfElement(element);
-        return compareColorWithColorOnExapleByCoordinates(path, coordinates[0], coordinates[1]);
+        return compareColorWithColorByCoordinates(path, coordinates[0], coordinates[1]);
     }
 
     /**
@@ -71,11 +73,7 @@ public class ScreenshotColorUtils {
      */
     public static ColorName getColorFromDeviceScreenByCoordinates(int x, int y) {
         BufferedImage image = null;
-        try {
-            image = Screenshot.takeScreenshotForColorComparation(DriverPool.getDriver(), "");
-        } catch (IOException e) {
-            LOGGER.info("Screenshot can't be done!");
-        }
+        image = Screenshot.takeScreenshotForColorComparation(DriverPool.getDriver(), "");
         return getColorFromImageByCoordinates(x, y, image);
 
     }
