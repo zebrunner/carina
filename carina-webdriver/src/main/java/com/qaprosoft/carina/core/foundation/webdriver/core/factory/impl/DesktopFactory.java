@@ -27,11 +27,16 @@ public class DesktopFactory extends AbstractFactory
 	private static final String PREFIX_NIX = "/bin/bash -c ";
 
 	@Override
-	public WebDriver create(String name, Device device)
+	public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost)
 	{
 		RemoteWebDriver driver = null;
-		String selenium = Configuration.get(Parameter.SELENIUM_HOST);
-		DesiredCapabilities capabilities = getCapabilities(name);
+		if (seleniumHost == null) {
+			seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+		}
+		
+		if (capabilities == null) {
+			capabilities = getCapabilities(name);
+		}
 		if (staticCapabilities != null)
 		{
 			LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
@@ -40,7 +45,7 @@ public class DesktopFactory extends AbstractFactory
 
 		try
 		{
-			driver = new RemoteWebDriver(new URL(selenium), capabilities);
+			driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
 		} catch (UnreachableBrowserException e) {
 			// try to restart selenium hub
 			restartAll(PREFIX_WIN, RESTART_ALL_BAT_PATH);

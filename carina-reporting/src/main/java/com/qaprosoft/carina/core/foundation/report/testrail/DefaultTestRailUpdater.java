@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -33,7 +33,6 @@ import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestInfo;
 import com.qaprosoft.carina.core.foundation.report.testrail.dto.Users;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 public class DefaultTestRailUpdater implements ITestRailUpdater {
@@ -62,10 +61,9 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     @SuppressWarnings("rawtypes")
     public DefaultTestRailUpdater() {
 
-		cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-		user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
-		password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD),
-				CRYPTO_PATTERN);
+        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+        user = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_USER), CRYPTO_PATTERN);
+        password = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.TESTRAIL_PASSWORD), CRYPTO_PATTERN);
 
         url = Configuration.get(Configuration.Parameter.TESTRAIL_URL);
         apiClient = new APIClient(url);
@@ -82,7 +80,6 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             userId = Integer.parseInt(((HashMap) obj).get("id").toString());
         }
 
-
     }
 
     @SuppressWarnings("rawtypes")
@@ -92,7 +89,8 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
         int[] suitesID = getSuiteId(context, testClass);
         int[] projectsID = getProjectId(context, testClass);
 
-        //verify that count of suites and projects is the same otherwise raise exception!
+        // verify that count of suites and projects is the same otherwise raise
+        // exception!
         if (suitesID.length != projectsID.length) {
             Assert.fail("Unable to update testrail as count of declared suites and projects is not the same in xml file!");
         }
@@ -106,7 +104,6 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             if (suiteID == -1 || projectID == -1) {
                 return;
             }
-
 
             JSONArray jsonArray = (JSONArray) apiClient.sendRequest(Milestones.getMilestones(projectID));
             String milestoneName = Configuration.get(Configuration.Parameter.TESTRAIL_MILESTONE);
@@ -122,7 +119,6 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
 
             }
 
-
             LOGGER.info("Suite ID: " + suiteID + "\n Project ID: " + projectID + "\nUser ID:  " + userId);
 
             int MAX_CHAR = 250;
@@ -130,16 +126,14 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             int maxLength = (title.length() < MAX_CHAR) ? title.length() : MAX_CHAR;
             title = title.substring(0, maxLength);
 
-
-
             runsId.add(Integer.parseInt(((HashMap) getRun(title, suiteID, projectID)).get("id").toString()));
-            //TODO: add milestones verification/adding
+            // TODO: add milestones verification/adding
 
-
-            initSuiteCases(suiteID, projectID); //put into the cache set of testcases for each suite/project
+            initSuiteCases(suiteID, projectID); // put into the cache set of
+                                                // testcases for each
+                                                // suite/project
         }
     }
-
 
     private Object getRun(String title, int suiteID, int projectID) {
         JSONArray allRuns = (JSONArray) apiClient.sendRequest(Runs.getRuns(projectID));
@@ -149,16 +143,15 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
                 return run;
             }
         }
-        // TODO: combine both variants of Runs.addRun into the single method which can register with and w/o milestones
+        // TODO: combine both variants of Runs.addRun into the single method
+        // which can register with and w/o milestones
         if (milestoneId > 0) {
             return apiClient.sendRequest(Runs.addRun(suiteID, title, userId, projectID, milestoneId));
         } else {
             return apiClient.sendRequest(Runs.addRun(suiteID, title, userId, projectID));
         }
 
-
     }
-
 
     @Override
     public void updateAfterTest(ITestResult result, String errorMessage) {
@@ -175,7 +168,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
 
             long threadId = Thread.currentThread().getId();
             LOGGER.info("Updater Thread: " + (threadId));
-            String test = TestNamingUtil.getCanonicTestNameByThread();
+            String test = TestNamingUtil.getTestNameByThread();
 
             if (test == null) {
                 LOGGER.error("Unable to identify test name by threadId: " + threadId);
@@ -191,10 +184,13 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
 
             LOGGER.info("Comment is: ".concat(comment));
 
-            @SuppressWarnings("unchecked") List<String> cases = (List<String>) result.getAttribute(SpecialKeywords.TESTRAIL_CASES_ID);
-            if (cases == null) return;
+            @SuppressWarnings("unchecked")
+            List<String> cases = (List<String>) result.getAttribute(SpecialKeywords.TESTRAIL_CASES_ID);
+            if (cases == null)
+                return;
 
-            if (errorMessage == null) errorMessage = "";
+            if (errorMessage == null)
+                errorMessage = "";
 
             HashMap<String, TestCaseResult> testCasesStatus = new HashMap<String, TestCaseResult>();
             TestCaseResult testCaseResult;
@@ -202,90 +198,95 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             String elapsedTime = String.valueOf(delta / 1000L);
             String version = getFileName();
             switch (result.getStatus()) {
-                case ITestResult.SUCCESS:
-                    //all Cases  passed
-                    for (String _case : cases) {
-                        if (isSuiteContainTestCase(suiteId, _case)) {
-                            LOGGER.info("PASS: case " + _case + " was found!");
-                            testCaseResult = new TestCaseResult(version, elapsedTime, " ", TestStatus.PASSED, userId, " ");
-                            testCasesStatus.put(_case.trim(), testCaseResult);
+            case ITestResult.SUCCESS:
+                // all Cases passed
+                for (String _case : cases) {
+                    if (isSuiteContainTestCase(suiteId, _case)) {
+                        LOGGER.info("PASS: case " + _case + " was found!");
+                        testCaseResult = new TestCaseResult(version, elapsedTime, " ", TestStatus.PASSED, userId, " ");
+                        testCasesStatus.put(_case.trim(), testCaseResult);
+                    }
+                }
+                break;
+            case ITestResult.SKIP:
+                // [IV] QAA-323 Investigate TestRail API Exception
+                // "results.status_id uses an invalid status (Untested)
+                // do not add untested status as it is specified by default and
+                // can't be added using standard put request
+                /*
+                 * for (String _case : cases) { if
+                 * (isSuiteContainTestCase(result, _case)) {
+                 * LOGGER.info("SKIP: case " + _case + " was found!");
+                 * testCaseResult = new TestCaseResult(version, elapsedTime,
+                 * comment, TestStatus.UNTESTED, userId, " ");
+                 * testCasesStatus.put(_case.trim(), testCaseResult); } }
+                 */
+                break;
+            case ITestResult.FAILURE:
+                boolean foundFailureStep = false;
+
+                // identify failure step and mark before cases as Passed, after
+                // them as Blocked
+                // if there is no way to identify failure step then mark all
+                // cases as Failed
+                for (String _case : cases) {
+                    if (isSuiteContainTestCase(suiteId, _case)) {
+                        LOGGER.info("FAILURE: case " + _case + " was found!");
+                        if (errorMessage.contains(_case.trim())) {
+                            foundFailureStep = true;
                         }
                     }
-                    break;
-                case ITestResult.SKIP:
-                    // [IV] QAA-323 Investigate TestRail API Exception "results.status_id uses an invalid status (Untested)
-                    // do not add untested status as it is specified by default and can't be added using standard put request
-    /*                for (String _case : cases) {
-                        if (isSuiteContainTestCase(result, _case)) {
-	                        LOGGER.info("SKIP: case " + _case + " was found!");
-	                        testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.UNTESTED, userId, " ");
-	                        testCasesStatus.put(_case.trim(), testCaseResult);
-	                    }
-	                }*/
-                    break;
-                case ITestResult.FAILURE:
-                    boolean foundFailureStep = false;
-
-                    //identify failure step and mark before cases as Passed, after them as Blocked
-                    //if there is no way to identify failure step then mark all cases as Failed
+                }
+                if (!foundFailureStep) {
                     for (String _case : cases) {
                         if (isSuiteContainTestCase(suiteId, _case)) {
                             LOGGER.info("FAILURE: case " + _case + " was found!");
-                            if (errorMessage.contains(_case.trim())) {
-                                foundFailureStep = true;
-                            }
+                            testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.FAILED, userId, " ");
+                            testCasesStatus.put(_case.trim(), testCaseResult);
                         }
                     }
-                    if (!foundFailureStep) {
-                        for (String _case : cases) {
-                            if (isSuiteContainTestCase(suiteId, _case)) {
-                                LOGGER.info("FAILURE: case " + _case + " was found!");
+                } else {
+                    foundFailureStep = false;
+                    for (String _case : cases) {
+                        _case = _case.trim();
+                        if (isSuiteContainTestCase(suiteId, _case)) {
+                            LOGGER.info("FAILURE: case " + _case + " was founded!");
+                            if (errorMessage.contains(_case)) {
+                                foundFailureStep = true;
                                 testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.FAILED, userId, " ");
                                 testCasesStatus.put(_case.trim(), testCaseResult);
-                            }
-                        }
-                    } else {
-                        foundFailureStep = false;
-                        for (String _case : cases) {
-                            _case = _case.trim();
-                            if (isSuiteContainTestCase(suiteId, _case)) {
-                                LOGGER.info("FAILURE: case " + _case + " was founded!");
-                                if (errorMessage.contains(_case)) {
-                                    foundFailureStep = true;
-                                    testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.FAILED, userId, " ");
-                                    testCasesStatus.put(_case.trim(), testCaseResult);
 
+                            } else {
+                                if (!foundFailureStep) {
+                                    testCaseResult = new TestCaseResult(version, elapsedTime, " ", TestStatus.PASSED, userId, " ");
+                                    testCasesStatus.put(_case.trim(), testCaseResult);
                                 } else {
-                                    if (!foundFailureStep) {
-                                        testCaseResult = new TestCaseResult(version, elapsedTime, " ", TestStatus.PASSED, userId, " ");
-                                        testCasesStatus.put(_case.trim(), testCaseResult);
-                                    } else {
-                                        testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.BLOCKED, userId, " ");
-                                        testCasesStatus.put(_case.trim(), testCaseResult);
-                                    }
+                                    testCaseResult = new TestCaseResult(version, elapsedTime, comment, TestStatus.BLOCKED, userId, " ");
+                                    testCasesStatus.put(_case.trim(), testCaseResult);
                                 }
                             }
                         }
                     }
-                    break;
-                default:
-                    break;
+                }
+                break;
+            default:
+                break;
             }
 
             LOGGER.info(Results.addResultsWithLinks(runId, testCasesStatus).getJsonObject().toJSONString());
             if (testCasesStatus.size() > 0) {
                 JSONArray newResult = (JSONArray) apiClient.sendRequest(Results.addResultsWithLinks(runId, testCasesStatus));
                 for (Object trResult : newResult) {
-                	
+
                     @SuppressWarnings("rawtypes")
-					Map responseMap = (HashMap) trResult;
+                    Map responseMap = (HashMap) trResult;
                     String testId = responseMap.get("test_id").toString();
                     Object testInfo = apiClient.sendRequest(TestInfo.getTestInfo(testId));
-                    
+
                     @SuppressWarnings("rawtypes")
-					Object testCaseName = ((HashMap) testInfo).get("title");
+                    Object testCaseName = ((HashMap) testInfo).get("title");
                     LOGGER.debug("testCaseName: " + testCaseName.toString());
-                    
+
                     testId = ((HashMap) trResult).get("test_id").toString();
                     LOGGER.debug("url: " + url + "/index.php?/tests/view/" + testId);
                     Artifacts.add(testId, url + "/index.php?/tests/view/" + testId);
@@ -299,7 +300,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     private int[] getProjectId(ITestContext context, String className) {
         String projects = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
         if (projects != null) {
-            //split by comma and trim values before converting to int
+            // split by comma and trim values before converting to int
             String[] project = projects.split(",");
             int[] projectsId = new int[project.length];
             for (int i = 0; i < project.length; i++) {
@@ -307,7 +308,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             }
             return projectsId;
         }
-        //from annotation we support only single project id declaration!
+        // from annotation we support only single project id declaration!
         int projectId = -1;
         Class<?> testClass;
         try {
@@ -315,7 +316,6 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             if (testClass.isAnnotationPresent(TestRailSuite.class)) {
                 TestRailSuite classAnnotation = testClass.getAnnotation(TestRailSuite.class);
                 projectId = classAnnotation.projectId();
-
 
             }
         } catch (ClassNotFoundException e) {
@@ -327,11 +327,10 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
         return projectsId;
     }
 
-
     private int[] getSuiteId(ITestContext context, String className) {
         String suites = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
         if (suites != null) {
-            //split by comma and trim values before converting to int
+            // split by comma and trim values before converting to int
             String[] suite = suites.split(",");
             int[] suitesId = new int[suite.length];
             for (int i = 0; i < suite.length; i++) {
@@ -339,7 +338,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             }
             return suitesId;
         }
-        //from annotation we support only single test suite declaration! 
+        // from annotation we support only single test suite declaration!
         int testSuiteId = -1;
         Class<?> testClass;
         try {
@@ -357,8 +356,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
         return suitesId;
     }
 
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public int getMilestoneID(JSONArray jsonArray, String milestoneName) {
         for (Object o : jsonArray) {
             String nameValue = ((HashMap<String, String>) o).get("name");
@@ -371,7 +369,7 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
     }
 
     protected String getFileName() {
-        String path = Configuration.get(Configuration.Parameter.MOBILE_APP);
+        String path = Configuration.getMobileApp();
         if (!path.isEmpty()) {
             File file = new File(path);
             return file.getName();
@@ -404,7 +402,6 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             return lcs;
         }
     }
-
 
     private boolean isSuiteContainTestCase(int suiteId, String testCase) {
         if (testCase.isEmpty()) {

@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.core.foundation.utils.ios;
 
-import java.time.Duration;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -12,7 +11,6 @@ import org.openqa.selenium.WebElement;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
@@ -169,7 +167,7 @@ public class IosUtils extends MobileUtils {
     /**
      * Swipe down
      * 
-     * @param duration
+     * @param duration int
      */
     public static void swipeDown(final int duration) {
         WebDriver driver = DriverPool.getDriver();

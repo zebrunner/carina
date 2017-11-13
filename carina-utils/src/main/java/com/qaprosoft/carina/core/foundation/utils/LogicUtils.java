@@ -21,77 +21,64 @@ import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
-public class LogicUtils
-{
-	private static Random random;
-	
-	static
-	{
-		random = new Random();
-	}
-	
-	public static boolean isURLEqual(String url1, String url2)
-	{
-		url1 = StringUtils.replace(url1, "https://", "http://");
-		url2 = StringUtils.replace(url2, "https://", "http://");
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
-		url1 = StringUtils.removeEnd(url1, "/");
-		url2 = StringUtils.removeEnd(url2, "/");
+public class LogicUtils {
+    private static Random random;
 
-		url1 = url1.contains("?") ? url1.substring(0, url1.indexOf("?")) : url1;
-		url2 = url2.contains("?") ? url2.substring(0, url2.indexOf("?")) : url2;
+    static {
+        random = new Random();
+    }
 
-		if (url1.contains(SpecialKeywords.IGNORE) || url2.contains(SpecialKeywords.IGNORE))
-		{
-			String[] urlAr1 = url1.split("/");
-			String[] urlAr2 = url2.split("/");
-			return compareWithIgnore(urlAr1, urlAr2);
-		}
-		return url1.equals(url2);
-	}
+    public static boolean isURLEqual(String url1, String url2) {
+        url1 = StringUtils.replace(url1, "https://", "http://");
+        url2 = StringUtils.replace(url2, "https://", "http://");
 
-	public static boolean isAllTrue(boolean... cases)
-	{
-		for (int i = 0; i < cases.length; i++)
-		{
-			if (!cases[i])
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+        url1 = StringUtils.removeEnd(url1, "/");
+        url2 = StringUtils.removeEnd(url2, "/");
 
-	private static boolean compareWithIgnore(String[] urlAr1, String[] urlAr2)
-	{
+        url1 = url1.contains("?") ? url1.substring(0, url1.indexOf("?")) : url1;
+        url2 = url2.contains("?") ? url2.substring(0, url2.indexOf("?")) : url2;
 
-		if (urlAr1 != null && urlAr2 != null && urlAr1.length == urlAr2.length)
-		{
+        if (url1.contains(SpecialKeywords.IGNORE) || url2.contains(SpecialKeywords.IGNORE)) {
+            String[] urlAr1 = url1.split("/");
+            String[] urlAr2 = url2.split("/");
+            return compareWithIgnore(urlAr1, urlAr2);
+        }
+        return url1.equals(url2);
+    }
 
-			for (int i = 0; i < urlAr1.length; i++)
-			{
-				if (SpecialKeywords.IGNORE.equals(urlAr1[i]) || SpecialKeywords.IGNORE.equals(urlAr2[i]))
-				{
-					continue;
-				} else if (!urlAr1[i].equalsIgnoreCase(urlAr2[i]))
-				{
-					return false;
-				}
-			}
-			return true;
-		} else
-		{
-			return false;
-		}
-	}
+    public static boolean isAllTrue(boolean... cases) {
+        for (int i = 0; i < cases.length; i++) {
+            if (!cases[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	public static int getRandomNumber(int max)
-	{
-		return max == 0 ? 0 : random.nextInt(max);
-	}
+    private static boolean compareWithIgnore(String[] urlAr1, String[] urlAr2) {
 
-	public static WebElement selectRandomElement(List<WebElement> elements)
-	{
-		return elements != null ? elements.get(getRandomNumber(elements.size())) : null;
-	}
+        if (urlAr1 != null && urlAr2 != null && urlAr1.length == urlAr2.length) {
+
+            for (int i = 0; i < urlAr1.length; i++) {
+                if (SpecialKeywords.IGNORE.equals(urlAr1[i]) || SpecialKeywords.IGNORE.equals(urlAr2[i])) {
+                    continue;
+                } else if (!urlAr1[i].equalsIgnoreCase(urlAr2[i])) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static int getRandomNumber(int max) {
+        return max == 0 ? 0 : random.nextInt(max);
+    }
+
+    public static WebElement selectRandomElement(List<WebElement> elements) {
+        return elements != null ? elements.get(getRandomNumber(elements.size())) : null;
+    }
 }

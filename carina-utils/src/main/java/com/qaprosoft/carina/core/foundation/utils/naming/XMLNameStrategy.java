@@ -15,112 +15,98 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.xml.XmlTest;
 
-import com.qaprosoft.carina.core.foundation.utils.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
+public class XMLNameStrategy implements INamingStrategy {
+    @Override
+    public String getCanonicalTestName(ITestResult result) {
+        // verify if testName is already registered with thread then return it
+        // back
+        if (TestNamingUtil.isTestNameRegistered()) {
+            return TestNamingUtil.getTestNameByThread();
+        }
 
-public class XMLNameStrategy implements INamingStrategy
-{
-	
-	@Override
-	public String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
-	{
-		return xmlTest.getName();
-	}
+        String testName = "";
 
-	@Override
-	public String getCanonicalTestName(ITestResult result) {
-		//verify if testName is already registered with thread then return it back
-		if (TestNamingUtil.isTestNameRegistered()) {
-			return TestNamingUtil.getTestNameByThread();
-		}
-		
-		String testName = ""; 
-		
-		@SuppressWarnings("unchecked")
-		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
-		
-		if (testnameMap != null) {
-			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
-			if (testnameMap.containsKey(testHash)) {
-				testName = testnameMap.get(testHash);
-			}
-		}
-		
-		if (testName.isEmpty()) {
-			testName = result.getTestContext().getCurrentXmlTest().getName();
-		}
-		
-		
-		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
-				result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
-			//AUTO-274 "Pass"ing status set on emailable report when a test step fails
-			String methodUID = "";
-			for (int i=0; i<result.getParameters().length; i++) {
-				  if (result.getParameters()[i] != null) {
-					  if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
-						  methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
-						  break; //first TUID: parameter is used
-					  }
-				  }
-			}
-			if (!methodUID.isEmpty()) {
-				testName = methodUID + " - " + testName;
-			}
-		}
-		
-		return appendTestMethodName(testName, result.getMethod());
-	}
-	
-	@Override
-	public String getCanonicalTestMethodName(ITestResult result)
-	{
-		String testMethodName = result.getMethod().getMethodName();
-		@SuppressWarnings("unchecked")
-		Map<Object[], String> testMethodNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP);
-		
-		if (testMethodNameMap != null) {
-			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
-			if (testMethodNameMap.containsKey(testHash)) {
-				testMethodName = testMethodNameMap.get(testHash);
-			}
-		}
-		
-		return testMethodName; 
-	}
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
 
-	@Override
-	public String getPackageName(ITestResult result)
-	{
-		return result.getMethod().getRealClass().getPackage().getName();
-	}
+        if (testnameMap != null) {
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (testnameMap.containsKey(testHash)) {
+                testName = testnameMap.get(testHash);
+            }
+        }
 
-	@Override
-	public String appendTestMethodName(String testName, ITestNGMethod m)
-	{
-		int invocationID = -1;
-		if (m.getInvocationCount() > 1)
-		{
-			invocationID = m.getCurrentInvocationCount() + 1;
-		}
+        if (testName.isEmpty()) {
+            testName = result.getTestContext().getCurrentXmlTest().getName();
+        }
 
-		if (invocationID != -1)
-		{
-			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
-			testName = testName + " - " + m.getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
-		} else
-		{
-			testName = testName + " - " + m.getMethodName();
-		}
+        if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER)
+                || result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
+            // AUTO-274 "Pass"ing status set on emailable report when a test
+            // step fails
+            String methodUID = "";
+            for (int i = 0; i < result.getParameters().length; i++) {
+                if (result.getParameters()[i] != null) {
+                    if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
+                        methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+                        break; // first TUID: parameter is used
+                    }
+                }
+            }
+            if (!methodUID.isEmpty()) {
+                testName = methodUID + " - " + testName;
+            }
+        }
 
-		return testName;
-	}
-	
+        return appendTestMethodName(testName, result.getMethod());
+    }
+
+    @Override
+    public String getCanonicalTestMethodName(ITestResult result) {
+        String testMethodName = result.getMethod().getMethodName();
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> testMethodNameMap = (Map<Object[], String>) result.getTestContext()
+                .getAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP);
+
+        if (testMethodNameMap != null) {
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (testMethodNameMap.containsKey(testHash)) {
+                testMethodName = testMethodNameMap.get(testHash);
+            }
+        }
+
+        return testMethodName;
+    }
+
+    @Override
+    public String getPackageName(ITestResult result) {
+        return result.getMethod().getRealClass().getPackage().getName();
+    }
+
+    @Override
+    public String appendTestMethodName(String testName, ITestNGMethod m) {
+        int invocationID = -1;
+        if (m.getInvocationCount() > 1) {
+            invocationID = m.getCurrentInvocationCount() + 1;
+        }
+
+        if (invocationID != -1) {
+            // TODO: analyze if "InvCount=nnnn" is already present in name and
+            // don't append it one more time
+            testName = testName + " - " + m.getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
+        } else {
+            testName = testName + " - " + m.getMethodName();
+        }
+
+        return testName;
+    }
+
 }

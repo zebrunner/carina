@@ -511,7 +511,6 @@ public class AndroidUtils extends MobileUtils {
         boolean bothWay = false;
         Direction oppositeDirection = Direction.DOWN;
         try {
-            WebDriver driver = DriverPool.getDriver();
             if (extendedWebElement.isElementPresent(1)) {
                 LOGGER.info("Element already present");
                 return true;
@@ -801,7 +800,7 @@ public class AndroidUtils extends MobileUtils {
         executor = new AdbExecutor();
         String[] initCmd = executor.getDefaultCmd();
         LOGGER.debug("Init cmd: ".concat(initCmd.toString()));
-        String deviceUdid = DevicePool.getDeviceUdid();
+        String deviceUdid = DevicePool.getDevice().getUdid();
 
         LOGGER.info("Device udid: ".concat(deviceUdid));
         if (!deviceUdid.isEmpty()) {

@@ -15,46 +15,30 @@
  */
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
-import java.lang.reflect.Method;
-
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.xml.XmlTest;
 
-public class ClassMethodNameStategy implements INamingStrategy
-{
-	@Override
-	public String getCanonicalTestNameBeforeTest(XmlTest xmlTest, Method testMethod)
-	{
-		String clazz = testMethod.getDeclaringClass().getSimpleName();
-		String method = testMethod.getName();
-		return String.format("%s.%s", clazz, method);
-	}
+public class ClassMethodNameStategy implements INamingStrategy {
+    @Override
+    public String getCanonicalTestName(ITestResult result) {
+        String clazz = result.getMethod().getRealClass().getSimpleName();
+        String method = result.getMethod().getMethodName();
+        return String.format("%s.%s", clazz, method);
+    }
 
-	@Override
-	public String getCanonicalTestName(ITestResult result)
-	{
-		String clazz = result.getMethod().getRealClass().getSimpleName();
-		String method = result.getMethod().getMethodName();
-		return String.format("%s.%s", clazz, method);
-	}
-	
-	@Override
-	public String getCanonicalTestMethodName(ITestResult result)
-	{
-		return result.getMethod().getMethodName();
-	}
+    @Override
+    public String getCanonicalTestMethodName(ITestResult result) {
+        return result.getMethod().getMethodName();
+    }
 
-	@Override
-	public String getPackageName(ITestResult result)
-	{
-		return result.getMethod().getRealClass().getPackage().getName();
-	}
+    @Override
+    public String getPackageName(ITestResult result) {
+        return result.getMethod().getRealClass().getPackage().getName();
+    }
 
-	@Override
-	public String appendTestMethodName(String testName, ITestNGMethod m)
-	{
-		// do nothing additional
-		return testName;
-	}
+    @Override
+    public String appendTestMethodName(String testName, ITestNGMethod m) {
+        // do nothing additional
+        return testName;
+    }
 }

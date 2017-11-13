@@ -13,9 +13,7 @@ import org.apache.log4j.Logger;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 
 /**
- * Created by YP.
- * Date: 8/19/2014
- * Time: 12:32 AM
+ * Created by YP. Date: 8/19/2014 Time: 12:32 AM
  */
 public class ProcessBuilderExecutor {
 
@@ -86,7 +84,7 @@ public class ProcessBuilderExecutor {
 
     @Override
     protected void finalize() throws Throwable {
-        LOGGER.debug("finalize");
+        // LOGGER.debug("finalize");
         try {
             gc();
         } finally {

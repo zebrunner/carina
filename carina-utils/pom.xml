@@ -4,13 +4,13 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qaprosoft</groupId>
+	<groupId>com.qaprosoft.carina</groupId>
 	<artifactId>carina-utils</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Carina Core Utils</name>
 	<description>Set of useful carina core utilities.</description>
+
 
 	<parent>
 		<groupId>com.qaprosoft</groupId>
@@ -18,7 +18,6 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,17 +27,28 @@
 
 		<pdfbox.version>1.8.7</pdfbox.version>
 		<jackson-databind.version>2.8.9</jackson-databind.version>
-		<rest-assured.version>2.9.0</rest-assured.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
+
+		<jira-client.version>0.5</jira-client.version>
 
 	</properties>
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-commons</artifactId>
+		 <!--	<version>1.0-SNAPSHOT</version>
+			<scope>runtime</scope> -->
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-crypto</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
 		<!-- Other dependencies -->
@@ -62,6 +72,11 @@
 			<artifactId>selenium-java</artifactId>
 		</dependency>
 
+		<dependency>
+		    <groupId>com.jayway.restassured</groupId>
+		    <artifactId>rest-assured</artifactId>
+		</dependency>
+
 		<!-- Test utilities -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -82,12 +97,6 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.jayway.restassured</groupId>
-		    <artifactId>rest-assured</artifactId>
-		    <version>${rest-assured.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongo-java-driver.version}</version>
@@ -99,6 +108,12 @@
 		    <version>${joda-time.version}</version>
 		</dependency>
 
+		<!-- Jira -->
+		<dependency>
+			<groupId>net.rcarz</groupId>
+			<artifactId>jira-client</artifactId>
+			<version>${jira-client.version}</version>
+		</dependency>
 
 	</dependencies>
 

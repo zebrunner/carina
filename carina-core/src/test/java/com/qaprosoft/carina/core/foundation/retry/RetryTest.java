@@ -1,71 +1,57 @@
 package com.qaprosoft.carina.core.foundation.retry;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class RetryTest {
-	
-	@Test
-	public void testIncrementNotExistedTestRetryCounter() {
-		String test = "test";
-		RetryCounter.incrementRunCount(test);
-		// count should be 0 anyway
-		int count = RetryCounter.getRunCount(test);
-		Assert.assertEquals(count, 0);
-	}
-	
-	@Test
-	public void testInitRetryCounter() {
-		String test = "testInitRetryCounter";
-		RetryCounter.initCounter(test);
-		int count = RetryCounter.getRunCount(test);
-		Assert.assertEquals(count, 0);
 
-	}
-	
-	@Test
-	public void testDoubleInitRetryCounter() {
-		String test = "testDoubleInitRetryCounter";
-		RetryCounter.initCounter(test);
-		RetryCounter.initCounter(test);
-		int count = RetryCounter.getRunCount(test);
-		Assert.assertEquals(count, 0);
-	}
-	
-	@Test
-	public void testRetryCounter() {
-		String test = "testRetryCounter";
-		RetryCounter.initCounter(test);
-		RetryCounter.incrementRunCount(test);
-		int count = RetryCounter.getRunCount(test);
-		Assert.assertEquals(count, 1);
-	}
+    @Test(priority = 1)
+    public void testInitRetryCounter() {
+        RetryCounter.initCounter();
+        int count = RetryCounter.getRunCount();
+        Assert.assertEquals(count, 0);
+    }
 
-	@Test
-	public void testGetMaxRetryCountForTest() {
-		R.CONFIG.put("retry_count", "1");
-		Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
-	}
+    @Test(priority = 2)
+    public void testDoubleInitRetryCounter() {
+        RetryCounter.initCounter();
+        RetryCounter.initCounter();
+        int count = RetryCounter.getRunCount();
+        Assert.assertEquals(count, 0);
+    }
 
-/*	@AfterMethod
-	public void testRetryAnalyzer(ITestResult result) {
-		if (result.getMethod().getMethodName().equals("testRetryCounter")) {
-	
-			String test = TestNamingUtil.getCanonicalTestName(result);
-			R.CONFIG.put("retry_count", "1");
-			R.CONFIG.put("track_known_issues", "true");
-			
-			RetryCounter.initCounter(test);
-			int count = RetryCounter.getRunCount(test);
-			Assert.assertEquals(count, 0);
+    @Test(priority = 3)
+    public void testRetryCounter() {
+        RetryCounter.initCounter();
+        RetryCounter.incrementRunCount();
+        int count = RetryCounter.getRunCount();
+        Assert.assertEquals(count, 1);
+    }
 
-			Assert.assertEquals(retryAnalyzer.retry(result), true);
-			count = RetryCounter.getRunCount(test);
-			Assert.assertEquals(count, 1);
-			Assert.assertEquals(retryAnalyzer.retry(result), false);
-		}
-	}
-*/
+    @Test(priority = 4)
+    public void testResetRetryCount() {
+        RetryCounter.initCounter();
+        RetryCounter.incrementRunCount();
+        int count = RetryCounter.getRunCount();
+        Assert.assertEquals(count, 1);
+
+        RetryCounter.resetCounter();
+        count = RetryCounter.getRunCount();
+        Assert.assertEquals(count, 0);
+    }
+
+    @Test(priority = 5)
+    public void testGetMaxRetryCountForTest() {
+        R.CONFIG.put("retry_count", "1");
+        Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
+    }
+
+    @AfterMethod
+    public void resetCounter() {
+        RetryCounter.resetCounter();
+    }
+
 }

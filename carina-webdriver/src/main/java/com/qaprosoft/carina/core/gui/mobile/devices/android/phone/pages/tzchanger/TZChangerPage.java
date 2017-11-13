@@ -40,7 +40,7 @@ public class TZChangerPage extends MobileAbstractPage {
     public boolean selectTimeZone(String timezone) {
         int defaultSwipeTime = 30;
 
-        String baseTimezoneText = timezone;
+        //String baseTimezoneText = timezone;
         boolean selected = false;
         String tz = "";
 

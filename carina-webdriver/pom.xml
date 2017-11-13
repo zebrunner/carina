@@ -4,9 +4,8 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qaprosoft</groupId>
+	<groupId>com.qaprosoft.carina</groupId>
 	<artifactId>carina-webdriver</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Carina WebDriver Core</name>
@@ -27,38 +26,40 @@
 		<target.version>1.8</target.version>
 
 		<guava.version>21.0</guava.version>
-		<appium.version>5.0.0-BETA8</appium.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
-		<aws-s3-manager.version>1.2.15</aws-s3-manager.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
-		<pubnub.version>3.7.10</pubnub.version>
 		<itext.version>5.0.6</itext.version>
+		<reflections.version>0.9.11</reflections.version>
 
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>browsermobproxy</artifactId>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-proxy</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>cryptotool</artifactId>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.qaprosoft.carina</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.qaprosoft.carina</groupId>
+			<artifactId>carina-aws-s3</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -66,9 +67,15 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 		</dependency>
+
 
 		<!-- Guava -->
 		<dependency>
@@ -81,7 +88,6 @@
 		<dependency>
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
-			<version>${appium.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.code.gson</groupId>
@@ -95,13 +101,6 @@
 			<artifactId>imgscalr-lib</artifactId>
 			<version>${imgscalr-lib.version}</version>
 			<type>jar</type>
-		</dependency>
-
-		<!-- Amazon -->
-		<dependency>
-			<groupId>com.qaprosoft.amazon</groupId>
-			<artifactId>aws-s3-manager</artifactId>
-			<version>${aws-s3-manager.version}</version>
 		</dependency>
 
 		<dependency>
@@ -133,18 +132,40 @@
 			<version>${apache-http.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.pubnub</groupId>
-			<artifactId>pubnub</artifactId>
-			<version>${pubnub.version}</version>
-		</dependency>
-
 		<!--iText for pdf -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>${itext.version}</version>
 		</dependency>
+
+		<!-- AI integration -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>alice-client</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-configuration2</artifactId>
+		</dependency>
+
+		<!-- Reflections -->
+		<dependency>
+		    <groupId>org.reflections</groupId>
+		    <artifactId>reflections</artifactId>
+			<version>${reflections.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>dom4j</groupId>
+					<artifactId>dom4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 
 	</dependencies>
 
