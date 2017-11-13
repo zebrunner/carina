@@ -39,7 +39,7 @@
         <monte-repack.version>1.0</monte-repack.version>
         <json-simple.version>1.1</json-simple.version>
 
-	      <rest-assured.version>2.9.0</rest-assured.version>
+          <rest-assured.version>2.9.0</rest-assured.version>
     </properties>
 
     <modules>
