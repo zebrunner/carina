@@ -32,237 +32,256 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  */
 
 public enum Messager {
-    TEST_STARTED(
-            "\r\n" + "======================================================================================================================================\r\n"
-                    + "INFO:%s TEST [%s] STARTED at [%s]"),
+	TEST_STARTED(
+			"\r\n" +
+			"======================================================================================================================================\r\n" +
+			"INFO:%s TEST [%s] STARTED at [%s]"),
 
-    TEST_PASSED("\r\n" + "INFO:%s TEST [%s] PASSED at [%s] \r\n"
-            + "======================================================================================================================================"),
+	TEST_PASSED(
+			"\r\n" +
+			"INFO:%s TEST [%s] PASSED at [%s] \r\n" +
+			"======================================================================================================================================"),			
 
-    TEST_SKIPPED("\r\n" + "INFO:%s TEST [%s] SKIPPED at [%s] - %s\r\n"
-            + "======================================================================================================================================"),
+	TEST_SKIPPED(
+			"\r\n" +
+			"INFO:%s TEST [%s] SKIPPED at [%s] - %s\r\n" +
+			"======================================================================================================================================"),
 
-    TEST_SKIPPED_AS_ALREADY_PASSED("\r\n" + "INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s]\r\n"
-            + "======================================================================================================================================"),
+	TEST_SKIPPED_AS_ALREADY_PASSED(
+			"\r\n" +
+			"INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s]\r\n" +
+			"======================================================================================================================================"),
 
-    TEST_FAILED("\r\n" + "INFO:%s TEST [%s] FAILED at [%s] - %s\r\n"
-            + "======================================================================================================================================"),
+	TEST_FAILED(
+			"\r\n" +
+			"INFO:%s TEST [%s] FAILED at [%s] - %s\r\n" +
+			"======================================================================================================================================"),
 
-    RETRY_RETRY_FAILED("\r\n" + "INFO:%s TEST [%s] RETRY %s of %s FAILED - %s\r\n"
-            + "--------------------------------------------------------------------------------------------------------------------------------------"),
+	RETRY_RETRY_FAILED(
+			"\r\n" +
+			"INFO:%s TEST [%s] RETRY %s of %s FAILED - %s\r\n" +
+			"--------------------------------------------------------------------------------------------------------------------------------------"),
 
-    CONFIG_STARTED("INFO:%s CONFIG [%s] START at [%s]"),
+	CONFIG_STARTED(
+			"INFO:%s CONFIG [%s] START at [%s]"),
 
-    CONFIG_PASSED("INFO:%s CONFIG [%s] PASS at [%s]"),
+	CONFIG_PASSED(
+			"INFO:%s CONFIG [%s] PASS at [%s]"),
 
-    CONFIG_SKIPPED("INFO:%s CONFIG [%s] SKIP at [%s] - %s"),
+	CONFIG_SKIPPED(
+			"INFO:%s CONFIG [%s] SKIP at [%s] - %s"),
+			
+	CONFIG_FAILED(
+			"INFO:%s CONFIG [%s] FAIL at [%s] - %s"),
+					
+	TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
-    CONFIG_FAILED("INFO:%s CONFIG [%s] FAIL at [%s] - %s"),
+	OPEN_URL("INFO: url '%s' is opened."),
 
-    TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
+	VALIDATION_FAIL("FAIL: '%s' !"),
 
-    OPEN_URL("INFO: url '%s' is opened."),
+	INROMATION("INFO: '%s'."),
 
-    VALIDATION_FAIL("FAIL: '%s' !"),
+	ERROR("ERROR: '%s'!"),
 
-    INROMATION("INFO: '%s'."),
+	PAUSE("INFO: pause for '%s' seconds."),
 
-    ERROR("ERROR: '%s'!"),
+	BACK("INFO: navigate to previous page performed."),
 
-    PAUSE("INFO: pause for '%s' seconds."),
+	REFRESH("INFO: refresh performed."),
 
-    BACK("INFO: navigate to previous page performed."),
+	EXPECTED_URL("PASS: url '%s' is correct."),
 
-    REFRESH("INFO: refresh performed."),
+	UNEXPECTED_URL("FAIL: wrong URL, expected '%s' but actual '%s'!"),
 
-    EXPECTED_URL("PASS: url '%s' is correct."),
+	ELEMENT_PRESENT("PASS: element '%s' presents."),
 
-    UNEXPECTED_URL("FAIL: wrong URL, expected '%s' but actual '%s'!"),
+	ELEMENT_NOT_PRESENT("FAIL: element '%s' does not present!"),
 
-    ELEMENT_PRESENT("PASS: element '%s' presents."),
+	ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' does not present"),
 
-    ELEMENT_NOT_PRESENT("FAIL: element '%s' does not present!"),
+	ELEMENT_WITH_ATTRIBUTE_PRESENT("PASS: element '%s' with attribute '%s' = '%s' presents."),
 
-    ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' does not present"),
+	ELEMENT_WITH_ATTRIBUTE_NOT_PRESENT("FAIL: element '%s' with attribute '%s' = '%s' does not present!"),
 
-    ELEMENT_WITH_ATTRIBUTE_PRESENT("PASS: element '%s' with attribute '%s' = '%s' presents."),
+	ELEMENT_WITH_TEXT_PRESENT("PASS: element '%s' with text '%s' presents."),
 
-    ELEMENT_WITH_ATTRIBUTE_NOT_PRESENT("FAIL: element '%s' with attribute '%s' = '%s' does not present!"),
+	ELEMENT_WITH_TEXT_NOT_PRESENT("FAIL: element '%s' with text: '%s' does not present!"),
 
-    ELEMENT_WITH_TEXT_PRESENT("PASS: element '%s' with text '%s' presents."),
+	UNEXPECTED_ELEMENT_PRESENT("FAIL: unexpected element '%s' presents!"),
 
-    ELEMENT_WITH_TEXT_NOT_PRESENT("FAIL: element '%s' with text: '%s' does not present!"),
+	UNEXPECTED_ELEMENT_WITH_TEXT_PRESENT("FAIL: unexpected element '%s' with text '%s' presents!"),
+	
+	ELEMENT_BECOME_CLICKABLE("PASS: element '%s' become clickable."),
 
-    UNEXPECTED_ELEMENT_PRESENT("FAIL: unexpected element '%s' presents!"),
+	ELEMENT_NOT_BECOME_CLICKABLE("FAIL: element '%s' is not become clickable before timeout!"),
+	
+	ELEMENT_BECOME_VISIBLE("PASS: element '%s' become visible."),
 
-    UNEXPECTED_ELEMENT_WITH_TEXT_PRESENT("FAIL: unexpected element '%s' with text '%s' presents!"),
+	ELEMENT_NOT_BECOME_VISIBLE("FAIL: element '%s' is not become visible before timeout!"),
 
-    ELEMENT_BECOME_CLICKABLE("PASS: element '%s' become clickable."),
+	ELEMENT_CLICKED("PASS: element '%s' is clicked."),
 
-    ELEMENT_NOT_BECOME_CLICKABLE("FAIL: element '%s' is not become clickable before timeout!"),
+	ELEMENT_NOT_CLICKED("FAIL: element '%s' is not clicked!"),
+	
+	ELEMENT_FOUND("PASS: element '%s' is found."),
 
-    ELEMENT_BECOME_VISIBLE("PASS: element '%s' become visible."),
+	ELEMENT_NOT_FOUND("FAIL: element '%s' is not found!"),
 
-    ELEMENT_NOT_BECOME_VISIBLE("FAIL: element '%s' is not become visible before timeout!"),
+	ELEMENT_DOUBLE_CLICKED("PASS: element '%s' is double clicked."),
 
-    ELEMENT_CLICKED("PASS: element '%s' is clicked."),
+	ELEMENT_NOT_DOUBLE_CLICKED("FAIL: element '%s' is not double clicked!"),
+	
+	ELEMENT_RIGHT_CLICKED("PASS: element '%s' is right clicked."),
 
-    ELEMENT_NOT_CLICKED("FAIL: element '%s' is not clicked!"),
+	ELEMENT_NOT_RIGHT_CLICKED("FAIL: element '%s' is not right clicked!"),
 
-    ELEMENT_FOUND("PASS: element '%s' is found."),
+	HIDDEN_ELEMENT_CLICKED("PASS: hidden element '%s' is clicked."),
 
-    ELEMENT_NOT_FOUND("FAIL: element '%s' is not found!"),
+	HIDDEN_ELEMENT_NOT_CLICKED("FAIL: hidden element '%s' is not clicked!"),
+	
+	ELEMENT_HOVERED("PASS: element '%s' is hovered."),
 
-    ELEMENT_DOUBLE_CLICKED("PASS: element '%s' is double clicked."),
+	ELEMENT_NOT_HOVERED("FAIL: element '%s' is not hovered!"),
 
-    ELEMENT_NOT_DOUBLE_CLICKED("FAIL: element '%s' is not double clicked!"),
+	ELEMENTS_DRAGGED_AND_DROPPED("PASS: element '%s' is dragged and dropped to '%s'."),
 
-    ELEMENT_RIGHT_CLICKED("PASS: element '%s' is right clicked."),
+	ELEMENTS_NOT_DRAGGED_AND_DROPPED("FAIL: element '%s' is not dragged and dropped to '%s'!"),
 
-    ELEMENT_NOT_RIGHT_CLICKED("FAIL: element '%s' is not right clicked!"),
+	KEYS_SEND_TO_ELEMENT("PASS: keys '%s' are sent to element '%s'."),
 
-    HIDDEN_ELEMENT_CLICKED("PASS: hidden element '%s' is clicked."),
+	KEYS_NOT_SEND_TO_ELEMENT("FAIL: keys '%s' are not sent to element '%s'!"),
 
-    HIDDEN_ELEMENT_NOT_CLICKED("FAIL: hidden element '%s' is not clicked!"),
+	TITLE_CORERECT("PASS: page '%s' has correct title '%s'."),
 
-    ELEMENT_HOVERED("PASS: element '%s' is hovered."),
+	TITLE_NOT_CORERECT("FAIL: unexpected title for page '%s', expected '%s' but actual '%s'!"),
 
-    ELEMENT_NOT_HOVERED("FAIL: element '%s' is not hovered!"),
+	TITLE_DOES_NOT_MATCH_TO_PATTERN("FAIL: unexpected title for page '%s', expected pattern is '%s' but actual '%s'!"),
 
-    ELEMENTS_DRAGGED_AND_DROPPED("PASS: element '%s' is dragged and dropped to '%s'."),
+	STEPS_TO_REPRODUCE("Steps to reproduce test failure: \r\n%s"),
 
-    ELEMENTS_NOT_DRAGGED_AND_DROPPED("FAIL: element '%s' is not dragged and dropped to '%s'!"),
+	FILE_ATTACHED("PASS: file '%s' is attached."),
 
-    KEYS_SEND_TO_ELEMENT("PASS: keys '%s' are sent to element '%s'."),
+	FILE_NOT_ATTACHED("FAIL: file '%s' is not attached."),
 
-    KEYS_NOT_SEND_TO_ELEMENT("FAIL: keys '%s' are not sent to element '%s'!"),
+	SELECT_TEXT("PASS: text '%s' was selected in %s."),
 
-    TITLE_CORERECT("PASS: page '%s' has correct title '%s'."),
+	SELECT_INDEX("PASS: index '%s' was selected in %s."),
 
-    TITLE_NOT_CORERECT("FAIL: unexpected title for page '%s', expected '%s' but actual '%s'!"),
+	TEST_FAILURES("Test failures: \r\n%s"),
 
-    TITLE_DOES_NOT_MATCH_TO_PATTERN("FAIL: unexpected title for page '%s', expected pattern is '%s' but actual '%s'!"),
+	TEST_CONFIGURATION("INFO: Test configuration: Browser='%s'; Base URL='%s'; Grid host='%s'."),
 
-    STEPS_TO_REPRODUCE("Steps to reproduce test failure: \r\n%s"),
+	HOVER_IMG("PASS: img '%s' was hovered"),
 
-    FILE_ATTACHED("PASS: file '%s' is attached."),
+	ALERT_ACCEPTED("PASS: alert was accepted."),
 
-    FILE_NOT_ATTACHED("FAIL: file '%s' is not attached."),
+	ALERT_NOT_ACCEPTED("FAIL: alert was not accepted!"),
 
-    SELECT_TEXT("PASS: text '%s' was selected in %s."),
+	ALERT_CANCELED("PASS: alert was cancelled."),
 
-    SELECT_INDEX("PASS: index '%s' was selected in %s."),
+	ALERT_NOT_CANCELED("FAIL: alert was not cancelled!"),
 
-    TEST_FAILURES("Test failures: \r\n%s"),
+	SELECT_BY_TEXT_PERFORMED("PASS: text '%s' was selected in '%s'."),
 
-    TEST_CONFIGURATION("INFO: Test configuration: Browser='%s'; Base URL='%s'; Grid host='%s'."),
+	SELECT_BY_TEXT_NOT_PERFORMED("FAIL: text '%s' was NOT selected in '%s'."),
 
-    HOVER_IMG("PASS: img '%s' was hovered"),
+	SELECT_BY_MATCHER_TEXT_PERFORMED("PASS: value by matcher '%s' was selected in '%s'."),
 
-    ALERT_ACCEPTED("PASS: alert was accepted."),
+	SELECT_BY_MATCHER_TEXT_NOT_PERFORMED("FAIL: value by matcher '%s' was NOT selected in '%s'."),
 
-    ALERT_NOT_ACCEPTED("FAIL: alert was not accepted!"),
+	SELECT_BY_INDEX_PERFORMED("PASS: index '%s' was selected in '%s'."),
 
-    ALERT_CANCELED("PASS: alert was cancelled."),
+	SELECT_BY_INDEX_NOT_PERFORMED("FAIL: index '%s' was NOT selected in '%s'."),
 
-    ALERT_NOT_CANCELED("FAIL: alert was not cancelled!"),
+	CHECKBOX_CHECKED("PASS: checkbox '%s' was checked."),
 
-    SELECT_BY_TEXT_PERFORMED("PASS: text '%s' was selected in '%s'."),
+	CHECKBOX_UNCHECKED("PASS: index '%s' was unchecked."),
 
-    SELECT_BY_TEXT_NOT_PERFORMED("FAIL: text '%s' was NOT selected in '%s'."),
+	SLIDER_MOVED("PASS: silder '%s' was moved by offset X:'%s' Y:'%s'."),
 
-    SELECT_BY_MATCHER_TEXT_PERFORMED("PASS: value by matcher '%s' was selected in '%s'."),
+	SLIDER_NOT_MOVED("FAIL: silder '%s' was moved by offset X:'%s' Y:'%s'!");
 
-    SELECT_BY_MATCHER_TEXT_NOT_PERFORMED("FAIL: value by matcher '%s' was NOT selected in '%s'."),
+	private static final Logger LOGGER = Logger.getLogger(Messager.class);
 
-    SELECT_BY_INDEX_PERFORMED("PASS: index '%s' was selected in '%s'."),
+	private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
-    SELECT_BY_INDEX_NOT_PERFORMED("FAIL: index '%s' was NOT selected in '%s'."),
+	private String pattern;
 
-    CHECKBOX_CHECKED("PASS: checkbox '%s' was checked."),
+	Messager(String pattern) {
+		this.pattern = pattern;
+	}
 
-    CHECKBOX_UNCHECKED("PASS: index '%s' was unchecked."),
+	public String getMessage(String... args) {
+		return create(args);
+	}
 
-    SLIDER_MOVED("PASS: silder '%s' was moved by offset X:'%s' Y:'%s'."),
+	/**
+	 * Logs info message using message pattern and incoming parameters.
+	 * 
+	 * @param args
+	 *            for insert into patterns
+	 * @return generated message
+	 */
+	public String info(String... args) {
+		String message = create(args);
+		LOGGER.info(message);
+		return message;
+	}
 
-    SLIDER_NOT_MOVED("FAIL: silder '%s' was moved by offset X:'%s' Y:'%s'!");
+	/**
+	 * Logs error message and adds message to TestNG report.
+	 * 
+	 * @param args
+	 *            for insert into patterns
+	 * @return generated message
+	 */
+	public String error(String... args) {
+		String message = create(args);
+		Reporter.log(message);
+		LOGGER.error(message);
+		return message;
+	}
 
-    private static final Logger LOGGER = Logger.getLogger(Messager.class);
+	/**
+	 * Logs info message and adds message to TestNG report.
+	 * 
+	 * @param args
+	 *            for insert into patterns
+	 * @return generated message
+	 */
+	public String report(String... args) {
+		String message = create(args);
+		Reporter.log(message);
+		return message;
+	}
 
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-
-    private String pattern;
-
-    Messager(String pattern) {
-        this.pattern = pattern;
-    }
-
-    public String getMessage(String... args) {
-        return create(args);
-    }
-
-    /**
-     * Logs info message using message pattern and incoming parameters.
-     * 
-     * @param args for insert into patterns
-     * @return generated message
-     */
-    public String info(String... args) {
-        String message = create(args);
-        LOGGER.info(message);
-        return message;
-    }
-
-    /**
-     * Logs error message and adds message to TestNG report.
-     * 
-     * @param args for insert into patterns
-     * @return generated message
-     */
-    public String error(String... args) {
-        String message = create(args);
-        Reporter.log(message);
-        LOGGER.error(message);
-        return message;
-    }
-
-    /**
-     * Logs info message and adds message to TestNG report.
-     * 
-     * @param args for insert into patterns
-     * @return generated message
-     */
-    public String report(String... args) {
-        String message = create(args);
-        Reporter.log(message);
-        return message;
-    }
-
-    /**
-     * Generates error message using message pattern and incoming parameters.
-     * 
-     * @param args for insert into pattern
-     * @return generated message
-     */
-    private String create(String... args) {
-        String message = "";
-        try {
-            // Changes symbols to '*' if starts with 'crypto_'
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] != null) {
-                    Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
-                    if (matcher.find()) {
-                        int start = args[i].indexOf(":") + 1;
-                        int end = args[i].indexOf("}");
-                        args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
-                    }
-                }
-            }
-            message = String.format(pattern, (Object[]) args);
-        } catch (Exception e) {
-            LOGGER.error("Report message creation error!");
-            e.printStackTrace();
-        }
-        return message;
-    }
+	/**
+	 * Generates error message using message pattern and incoming parameters.
+	 * 
+	 * @param args
+	 *            for insert into pattern
+	 * @return generated message
+	 */
+	private String create(String... args) {
+		String message = "";
+		try {
+			// Changes symbols to '*' if starts with 'crypto_'
+			for (int i = 0; i < args.length; i++) {
+				if (args[i] != null) {
+					Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
+					if (matcher.find()) {
+						int start = args[i].indexOf(":") + 1;
+						int end = args[i].indexOf("}");
+						args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
+					}
+				}
+			}
+			message = String.format(pattern, (Object[]) args);
+		} catch (Exception e) {
+			LOGGER.error("Report message creation error!");
+			e.printStackTrace();
+		}
+		return message;
+	}
 }

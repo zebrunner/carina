@@ -29,8 +29,8 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
  * 
  * @author Alex Khursevich
  */
-public interface IJiraUpdater {
-    void updateAfterTest(JiraClient jira, ITestResult result) throws Exception;
-
-    void updateAfterSuite(JiraClient jira, ITestContext context, List<TestResultItem> results) throws Exception;
+public interface IJiraUpdater
+{
+	void updateAfterTest(JiraClient jira, ITestResult result) throws Exception;
+	void updateAfterSuite(JiraClient jira, ITestContext context, List<TestResultItem> results)  throws Exception;
 }

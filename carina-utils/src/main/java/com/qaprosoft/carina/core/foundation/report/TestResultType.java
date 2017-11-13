@@ -20,45 +20,53 @@ package com.qaprosoft.carina.core.foundation.report;
  * 
  * @author Aliaksei_Khursevich (hursevich@gmail.com)
  */
-public enum TestResultType {
-    PASS("PASSED"), PASS_WITH_KNOWN_ISSUES("PASSED (known issues)"), FAIL("FAILED"), SKIP("SKIPPED"), SKIP_ALL("SKIP_ALL"), SKIP_ALL_ALREADY_PASSED(
-            "SKIP_ALL_ALREADY_PASSED");
+public enum TestResultType
+{
+	PASS("PASSED"),
+	PASS_WITH_KNOWN_ISSUES("PASSED (known issues)"),
+	FAIL("FAILED"),
+	SKIP("SKIPPED"),
+	SKIP_ALL("SKIP_ALL"),
+	SKIP_ALL_ALREADY_PASSED("SKIP_ALL_ALREADY_PASSED");
 
-    private String result;
 
-    int passed;
-    int failed;
-    int skipped;
+	private String result;
+	
+	int passed;
+	int failed;
+	int skipped;
 
-    TestResultType(String result) {
-        this.result = result;
-    }
+	TestResultType(String result)
+	{
+		this.result = result;
+	}
+	
+	public String getName()
+	{
+		return result;
+	}
+	
+	public int getPassed() {
+		return passed;
+	}
 
-    public String getName() {
-        return result;
-    }
+	public void setPassed(int passed) {
+		this.passed = passed;
+	}
 
-    public int getPassed() {
-        return passed;
-    }
+	public int getFailed() {
+		return failed;
+	}
 
-    public void setPassed(int passed) {
-        this.passed = passed;
-    }
+	public void setFailed(int failed) {
+		this.failed = failed;
+	}
 
-    public int getFailed() {
-        return failed;
-    }
+	public int getSkipped() {
+		return skipped;
+	}
 
-    public void setFailed(int failed) {
-        this.failed = failed;
-    }
-
-    public int getSkipped() {
-        return skipped;
-    }
-
-    public void setSkipped(int skipped) {
-        this.skipped = skipped;
-    }
+	public void setSkipped(int skipped) {
+		this.skipped = skipped;
+	}
 }

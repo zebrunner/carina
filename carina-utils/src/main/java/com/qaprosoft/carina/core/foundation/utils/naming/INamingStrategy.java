@@ -18,12 +18,13 @@ package com.qaprosoft.carina.core.foundation.utils.naming;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
-public interface INamingStrategy {
-    String getCanonicalTestName(ITestResult result);
+public interface INamingStrategy
+{
+	String getCanonicalTestName(ITestResult result);
+	
+	String getCanonicalTestMethodName(ITestResult result);
 
-    String getCanonicalTestMethodName(ITestResult result);
+	String getPackageName(ITestResult result);
 
-    String getPackageName(ITestResult result);
-
-    String appendTestMethodName(String testName, ITestNGMethod m);
+	String appendTestMethodName(String testName, ITestNGMethod m);
 }
