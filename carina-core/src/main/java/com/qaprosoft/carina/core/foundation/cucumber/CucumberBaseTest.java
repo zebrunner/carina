@@ -11,6 +11,7 @@ import org.openqa.selenium.TakesScreenshot;
 
 public class CucumberBaseTest extends CucumberRunner {
 
+
     /**
      * Check is it Cucumber Test or not.
      *
@@ -24,8 +25,8 @@ public class CucumberBaseTest extends CucumberRunner {
     }
 
     /**
-     * take Screenshot Of Failure - this step should be added manually in common
-     * step definition files if it will not be executed automatically
+     * take Screenshot Of Failure - this step should be added manually in common step definition
+     * files if it will not be executed automatically
      *
      * @param scenario Scenario
      */
@@ -34,11 +35,10 @@ public class CucumberBaseTest extends CucumberRunner {
         LOGGER.info("In  @After takeScreenshotOfFailure");
         if (scenario.isFailed()) {
             LOGGER.error("Cucumber Scenario FAILED! Creating screenshot.");
-            // TODO: remove reference onto the DriverPool reusing functionality
-            // from Screenshot object!
+            //TODO: remove reference onto the DriverPool reusing functionality from Screenshot object!
             byte[] screenshot = ((TakesScreenshot) DriverPool.getDriver()).getScreenshotAs(OutputType.BYTES);
             screenshot = ImageProcessing.imageResize(screenshot);
-            scenario.embed(screenshot, "image/png"); // stick it in the report
+            scenario.embed(screenshot, "image/png"); //stick it in the report
         }
 
     }
