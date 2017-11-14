@@ -4,7 +4,7 @@ bin
 .classpath
 /test-output
 /.settings
-*/.settings
+**/.settings
 /com
 /application.log
 /sql.log

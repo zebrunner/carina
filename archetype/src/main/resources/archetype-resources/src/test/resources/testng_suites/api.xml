@@ -1,0 +1,60 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite verbose="1" name="Carina Demo Tests - API sample tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
+
+	<parameter name="suiteOwner" value="demo" />
+	<parameter name="zafira_project" value="unknown" />
+	<parameter name="jenkinsJobCreation" value="true" />
+	<parameter name="jenkinsJobFolder" value="DEMO" />
+	<parameter name="jenkinsJobName" value="API-Demo-Test" />
+	<parameter name="jenkinsEnvironments" value="DEMO" />
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
+
+	<listeners>
+		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer" />
+	</listeners>
+
+	<test name="User API tests">
+		<classes>
+			<class name="${package}.carina.demo.APISampleTest" />
+		</classes>
+	</test>
+
+	<test name="Sum operation test">
+		<classes>
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
+				<methods>
+					<include name="testSumOperation"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+	<test name="Multiply operation test">
+		<classes>
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
+				<methods>
+					<include name="testMuliplyOperation"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+
+	<test name="Substract operation test">
+		<parameter name="a" value="12"/>
+		<parameter name="b" value="3"/>
+		<parameter name="c" value="9"/>
+		<classes>
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
+				<methods>
+					<include name="testSubstractOperation"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+</suite>
