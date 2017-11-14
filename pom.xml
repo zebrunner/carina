@@ -32,7 +32,7 @@
         <appium.version>5.0.0-BETA9</appium.version>
         <!-- Qaprosoft integrations -->
         <zafira-client.version>3.0.28</zafira-client.version>
-        <alice-client.version>1.0.2</alice-client.version>
+        <alice-client.version>1.0.7</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
         <!-- Others -->
