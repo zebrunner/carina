@@ -12,11 +12,18 @@ Carian is Java-based test automation framework that unites all testing layers: M
 
 * API testing is based on Freemarker template engine that enables great flexibility in generating REST requests and responses dynamically changed by incoming arguments. 
 
+## Сontents
+* [Initial setup](Initial-setup)
+* [Project structure](Project-structure)
+* [Configuration and execution](Configuration-and-execution)
+* [Web UI automation](Web-UI-automation)
+* [Web services API automation](Web-services-API-automation)
+* [Mobile automation](Mobile-automation)
+* [Database access setup](DB-access)
+* [Data-providers usage](Data-providers)
 
 
-
-
-## Git configuration.  
+## Git configuration 
 1). **Fork repository** `https://github.com/qaprosoft/carina` to your own user.
 
 2). **Clone your fork to your local machine**:
