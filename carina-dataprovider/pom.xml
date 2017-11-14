@@ -4,7 +4,7 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qaprosoft.carina</groupId>
+	<groupId>com.qaprosoft</groupId>
 	<artifactId>carina-dataprovider</artifactId>
 	<packaging>jar</packaging>
 
@@ -32,12 +32,12 @@
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-commons</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 

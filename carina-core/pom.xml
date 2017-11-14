@@ -35,35 +35,35 @@
 	<dependencies>
 		<!-- Carina Core sub-modules -->
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-proxy</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-dataprovider</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-webdriver</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-hockeyapp</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft.carina</groupId>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-api</artifactId>
 		</dependency>
 		<dependency>
