@@ -25,6 +25,7 @@
         <commons-io.version>2.5</commons-io.version>
         <commons-codec.version>1.9</commons-codec.version>
         <commons-configuration2.version>2.1</commons-configuration2.version>
+        <httpclient.version>4.5.3</httpclient.version>
         <!-- Selenium -->
         <selenium-java.version>3.4.0</selenium-java.version>
         <selenium-server.version>3.4.0</selenium-server.version>
@@ -38,7 +39,7 @@
         <monte-repack.version>1.0</monte-repack.version>
         <json-simple.version>1.1</json-simple.version>
 
-	<rest-assured.version>2.9.0</rest-assured.version>
+	      <rest-assured.version>2.9.0</rest-assured.version>
     </properties>
 
     <modules>
@@ -300,11 +301,16 @@
                 <artifactId>json-simple</artifactId>
                 <version>${json-simple.version}</version>
             </dependency>
-	    <dependency>
-	        <groupId>com.jayway.restassured</groupId>
-		<artifactId>rest-assured</artifactId>
-		<version>${rest-assured.version}</version>
-	    </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.restassured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${rest-assured.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
