@@ -13,7 +13,7 @@ Carina is Java-based test automation framework that unites all testing layers: M
 * API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses dynamically changed by incoming arguments. 
 
 ## Сontents
-* [Initial setup](Initial-setup)
+* [Initial setup](#initial-setup)
 * [Project structure](Project-structure)
 * [Configuration and execution](Configuration-and-execution)
 * [Web UI automation](Web-UI-automation)
@@ -22,8 +22,87 @@ Carina is Java-based test automation framework that unites all testing layers: M
 * [Database access setup](DB-access)
 * [Data-providers usage](Data-providers)
 
+## Initial setup
+* Install and configure JDK 1.8+
+* Install and configure [Apache Maven 3.5.2+](http://maven.apache.org/)
+* Download and start latest [Selenium standalone server](http://www.seleniumhq.org/download/)
+* Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
 
-## Git configuration 
+### Generating project
+The easiest way to initialize new project is to you Carina archetype, you will get correct project structure along with test samples. 
+First clone archetype repo:
+```
+git clone https://github.com/qaprosoft/carina-archetype.git
+```
+Navigate to cloned repo and execute:
+```
+mvn install
+```
+Now go to folder where you need to generate new project and execute (do not forget to set groupId, artifactId, name, url, version):
+```
+mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
+                       -DarchetypeArtifactId=carina \
+                       -DarchetypeVersion=1.0 \
+                       -DgroupId=<your_groupId> \ 
+                       -DartifactId=<your_artifactId> \ 
+                       -Dname="<you_proj_name>" \
+                       -Durl=<your_proj_url> \
+                       -Dversion=<your_proj_version>
+```
+The command should be executed without '\' symbols on one line, leaving single white space between the attributes. If any attribute contains spaces, it should be set in quoted(e.g.: -Dname="Hello World"). In the Maven command listed above, you have to specify 5 attributes while the first 3 should be left unchanged. Let's go through these attributes:
+<table> 
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+		<th>Example</th>
+	</tr>
+	<tr>
+		<td>-DgroupId</td>
+		<td>Company domain in reverce order</td>
+		<td>com.qaprosoft</td>
+	</tr>
+	<tr>
+		<td>-DartifactId</td>
+		<td>Java project name</td>
+		<td>carina-qa</td>
+	</tr>
+	<tr>
+		<td>-Dname</td>
+		<td>Name with more details</td>
+		<td>"Carina Test Automation"</td>
+	</tr>
+	<tr>
+		<td>-Durl</td>
+		<td>Company URL</td>
+		<td>http://qaprosoft.com</td>
+	</tr>
+	<tr>
+		<td>-Dversion</td>
+		<td>Project version</td>
+		<td>1.0</td>
+	</tr>
+</table>
+
+### Import to Eclipse
+If generation finishes successfully, you should see a new project folder with a name equal to the artifactId attribute specified during generation, so navigate to that folder (where pom.xml is located) and execute the following Maven task:
+```
+mvn clean eclipse:eclipse
+```
+Using this command, Maven should resolve all dependencies, downloading required libraries to your local repository and generating Eclipse classpath. Before importing a new project to Eclipse, you must link your IDE with your Maven repository by executing the following task:
+```
+mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
+```
+Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you may import generated projects such as "Existing Java Project" into Eclipse IDE.
+Generate eclipse workspace using command:
+```
+mvn clean eclipse:eclipse
+```
+Now you are ready to import project into eclipse.
+
+![Eclipse view](https://github.com/qaprosoft/carina-demo/blob/gh-pages/img/001-Initial-setup.png?raw=true)
+
+
+### Git configuration 
 1). **Fork repository** `https://github.com/qaprosoft/carina` to your own user.
 
 2). **Clone your fork to your local machine**:
