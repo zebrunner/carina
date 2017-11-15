@@ -340,9 +340,7 @@ All project configuration properties are located in **_config.properties** file.
 		<td>mobile_devices</td>
 		<td>Information about using device, divided by ";" for different devices and "|" for different parametrs</td>
                 <td>{must_override}</td>
-		<td>;Sumsung J5|phone|ANDROID
-                     |5.1|759b543c
-                     |http://localhost:4723/wd/hub</td>
+		<td>;Sumsung J5|phone|ANDROID|5.1|759b543c|http://localhost:4723/wd/hub</td>
 	</tr>
         <tr>
 		<td>mobile_platform_name</td>
@@ -376,7 +374,7 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
         <tr>
 		<td>mobile_device_udid</td>
-		<td>Unique Device ID</th>
+		<td>Unique Device ID</td>
                 <td>{must_override}</td>
 		<td>759b543c</td>
 	</tr>
