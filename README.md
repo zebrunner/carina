@@ -309,8 +309,237 @@ TODO
 TODO
 
 ## Mobile automation
-TODO
+All project configuration properties are located in **_config.properties** file. In the table below we are providing description for the mobile project parametrs (you may see most of main parametrs [here](https://github.com/qaprosoft/carina-demo/wiki/Configuration-and-execution)):
+<table> 
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+                <th>Default value</th>
+		<th>Example</th>
+	</tr>
+        <tr>
+		<td>driver_type</td>
+		<td>Type of driver which is needed for automation</th>
+                <td>{must_override}</td>
+		<td>mobile</td>
+	</tr>
+        <tr>
+		<td>mobile_device_name</td>
+		<td>Device name for report</th>
+                <td>{must_override}</td>
+		<td>Sumsung_Galaxy_J5</td>
+	</tr>
+        <tr>
+		<td>mobile_device_type</td>
+		<td>Type of device</th>
+                <td>{must_override}</td>
+		<td>phone</td>
+	</tr>
+        <tr>
+		<td>mobile_devices</td>
+		<td>Information about using device, divided by ";" for different devices and "|" for different parametrs</th>
+                <td>{must_override}</td>
+		<td>;Sumsung J5|phone|ANDROID
+                     |5.1|759b543c
+                     |http://localhost:4723/wd/hub</td>
+	</tr>
+        <tr>
+		<td>mobile_platform_name</td>
+		<td>Name of using mobile platform</th>
+                <td>{must_override}</td>
+		<td>Android/iOS</td>
+	</tr>
+        <tr>
+		<td>mobile_platform_version</td>
+		<td>Version of mobile platform</th>
+                <td>{must_override}</td>
+		<td>6.0.1</td>
+	</tr>
+        <tr>
+		<td>mobile_automation_name</td>
+		<td>Name of programm using for automation</th>
+                <td>{must_override}</td>
+		<td>Appium</td>
+	</tr>
+        <tr>
+		<td>mobile_app</td>
+		<td>Path application which is tested, should be the same as in Appium settings</th>
+                <td>{must_override}</td>
+		<td>D:/application.apk</td>
+	</tr>
+        <tr>
+		<td>mobile_app</td>
+		<td>New implicit timeout in seconds to wait for element for mobile automation</th>
+                <td>120</td>
+		<td>180</td>
+	</tr>
+        <tr>
+		<td>mobile_device_udid</td>
+		<td>Unique Device ID</th>
+                <td>{must_override}</td>
+		<td>759b543c</td>
+	</tr>
+</table>
 
+### Examples:
+1) For Android:
+```
+#=============== Android Mobile ======================#
+mobile_devices=;Sumsung Galaxy J5|phone|ANDROID|5.1|192.168.56.101:5555|http://localhost:4723/wd/hub
+mobile_device_type=phone
+mobile_device_name=Sumsung Galaxy J5
+mobile_platform_name=Android
+mobile_platform_version=5.1.1
+mobile_browser_name=NULL
+mobile_automation_name=Appium
+mobile_app=D:/application1.apk
+mobile_new_command_timeout=180
+mobile_device_udid=759b543c
+#=====================================================#
+```
+2) For iOS:
+```
+#=================== iOS Mobile ======================#
+mobile_devices=;iPhone 6|phone|iOS|9.3||http://0.0.0.0:4723/wd/hub
+mobile_device_name=iPhone 6
+mobile_platform_name=iOS
+mobile_platform_version=9.3
+#mobile_automation_name=Appium
+mobile_app=/Users/administrator/Downloads/Record.app
+mobile_new_command_timeout=180
+mobile_device_udid=4addd1a575612c6036012dc9f83b925aa11e115a
+#=====================================================#
+```
+
+### ExtendedWebElement
+
+ExtendedWebElement is an extended version of selenium WebElement which you can find in org.openqa.selenium package. The best thing in using ExtendedWebElement is that you can use both all old methods of WebElement and new more comfortable Carina methods.
+
+### How to find ExtendedWebElement?
+
+The simpliest way to find ExtendedWebElement is using annotation @FindBy. The @FindBy annotation is used to locate one or more ExtendedWebElements using a single criterion. The list of criterions is standart:
+* className
+* css
+* how...using
+* id
+* linkText
+* name
+* partialLinkText
+* tagName
+* xpath
+
+### Example:
+```   
+    @FindBy(name = "Hybrid")
+    private ExtendedWebElement hybridUnits;
+
+    @FindBy(id = "com.ua.record.debug:id/spinner_text")
+    private List <ExtendedWebElement> unitsVersions;
+```   
+
+### ExtededWebElement's methods
+Most usable methods are reperesented in the table bellow:
+<table>
+   <tr>
+      <th>Method</th>
+      <th>Return type</th>
+      <th>Description</th>
+   </tr>
+   <tr>
+      <td>getName()</td>
+      <td>String</td>
+      <td>Get the name of this element</td>
+   </tr>
+   <tr>
+      <td>getText()</td>
+      <td>String</td>
+      <td>Get the visible innerText of this element</td>
+   </tr>
+   <tr>
+      <td>getAttribute()</td>
+      <td>String</td>
+      <td>Get the value of a the given attribute of this element</td>
+   </tr>
+   <tr>
+      <td>click()</td>
+      <td>void</td>
+      <td>Click on element</td>
+   </tr>
+   <tr>
+      <td>doubleClick()</td>
+      <td>void</td>
+      <td>Double click on element</td>
+   </tr>
+   <tr>
+      <td>isElementPresent()</td>
+      <td>boolean</td>
+      <td>Is element present or not?</td>
+   </tr>
+   <tr>
+      <td>isElementPresent(long timeout)</td>
+      <td>boolean</td>
+      <td>Is element present or not during the timeout in seconds?</td>
+   </tr>
+   <tr>
+      <td>isElementNotPresent(long timeout)</td>
+      <td>boolean</td>
+      <td>Is element not present during the timeout in seconds?</td>
+   </tr>
+   <tr>
+      <td>isElementWithTextPresent(String text)</td>
+      <td>boolean</td>
+      <td>Is element with text present or not?</td>
+   </tr>
+   <tr>
+      <td>isElementWithTextPresent(String text, long timeout)</td>
+      <td>boolean</td>
+      <td>Is element with text present or not during the timeout in seconds?</td>
+   </tr>
+   <tr>
+      <td>clickIfPresent</td>
+      <td>boolean</td>
+      <td>Click on element if it's presented, return true if click is performed</td>
+   </tr>
+   <tr>
+      <td>type(String text)</td>
+      <td>void</td>
+      <td>Clear the value of field and simulate typing the text</td>
+   </tr>
+   <tr>
+      <td>scrollTo()</td>
+      <td>void</td>
+      <td>Scroll page until the element could be located</td>
+   </tr>
+   <tr>
+      <td>check()</td>
+      <td>void</td>
+      <td>If element is checkable it will be checked</td>
+   </tr>
+   <tr>
+      <td>uncheck()</td>
+      <td>void</td>
+      <td>If element is checkable it will be unchecked</td>
+   </tr>
+   <tr>
+      <td>isCheck()</td>
+      <td>boolean</td>
+      <td>If element is checkable return is the element checked or not </td>
+   </tr>
+   <tr>
+      <td>tapWithCoordinates(double x, double y)</td>
+      <td>void</td>
+      <td>Tap on screen using the given cordinates </td>
+   </tr>
+</table>
+
+### How to use WebDriver methods?
+You can simple transform ExtendedWebElement to WebElement using getElement() method. After this it's possible to operate with standart WebElement methods.
+
+### Example:
+```   
+   Point point = element.getElement().getLocation();
+   Dimension dim = element.getElement().getSize();
+```   
 ## Database access setup
 TODO
 
