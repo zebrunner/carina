@@ -309,7 +309,7 @@ TODO
 TODO
 
 ## Mobile automation
-All project configuration properties are located in **_config.properties** file. In the table below we are providing description for the mobile project parametrs (you may see most of main parametrs [here](https://github.com/qaprosoft/carina-demo/wiki/Configuration-and-execution)):
+All project configuration properties are located in **_config.properties** file. In the table below we are providing description for the mobile project parametrs:
 <table> 
 	<tr>
 		<th>Attribute</th>
@@ -381,8 +381,7 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 </table>
 
-### Examples:
-1) For Android:
+### For Android:
 ```
 #=============== Android Mobile ======================#
 mobile_devices=;Sumsung Galaxy J5|phone|ANDROID|5.1|192.168.56.101:5555|http://localhost:4723/wd/hub
@@ -397,7 +396,8 @@ mobile_new_command_timeout=180
 mobile_device_udid=759b543c
 #=====================================================#
 ```
-2) For iOS:
+
+### For iOS:
 ```
 #=================== iOS Mobile ======================#
 mobile_devices=;iPhone 6|phone|iOS|9.3||http://0.0.0.0:4723/wd/hub
@@ -415,8 +415,6 @@ mobile_device_udid=4addd1a575612c6036012dc9f83b925aa11e115a
 
 ExtendedWebElement is an extended version of selenium WebElement which you can find in org.openqa.selenium package. The best thing in using ExtendedWebElement is that you can use both all old methods of WebElement and new more comfortable Carina methods.
 
-### How to find ExtendedWebElement?
-
 The simpliest way to find ExtendedWebElement is using annotation @FindBy. The @FindBy annotation is used to locate one or more ExtendedWebElements using a single criterion. The list of criterions is standart:
 * className
 * css
@@ -428,7 +426,6 @@ The simpliest way to find ExtendedWebElement is using annotation @FindBy. The @F
 * tagName
 * xpath
 
-### Example:
 ```   
     @FindBy(name = "Hybrid")
     private ExtendedWebElement hybridUnits;
@@ -439,6 +436,7 @@ The simpliest way to find ExtendedWebElement is using annotation @FindBy. The @F
 
 ### ExtededWebElement's methods
 Most usable methods are reperesented in the table bellow:
+
 <table>
    <tr>
       <th>Method</th>
@@ -534,12 +532,11 @@ Most usable methods are reperesented in the table bellow:
 
 ### How to use WebDriver methods?
 You can simple transform ExtendedWebElement to WebElement using getElement() method. After this it's possible to operate with standart WebElement methods.
-
-### Example:
 ```   
    Point point = element.getElement().getLocation();
    Dimension dim = element.getElement().getSize();
 ```   
+
 ## Database access setup
 TODO
 
