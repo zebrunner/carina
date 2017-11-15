@@ -8,6 +8,32 @@
   <packaging>maven-archetype</packaging>
   <url>http://www.qaprosoft.com/</url>
   <name>carina-archetype</name>
+  <description>Carina Archetype</description>
+
+  <licenses>
+    <license>
+      <name>Apache Software License v2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Alex Khursevich</name>
+      <email>alex@qaprosoft.com</email>
+      <organization>Qaprosoft</organization>
+      <organizationUrl>http://qaprosoft.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Vadim Delendin</name>
+      <email>vadim@qaprosoft.com</email>
+      <organization>Qaprosoft</organization>
+      <organizationUrl>http://qaprosoft.com</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <url>https://github.com/qaprosoft/carina.git</url>
+  </scm>
 
   <build>
     <extensions>
@@ -26,6 +52,22 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <distributionManagement>
