@@ -14,13 +14,16 @@ Carina is Java-based test automation framework that unites all testing layers: M
 
 ## Сontents
 * [Initial setup](#initial-setup)
-* [Project structure](Project-structure)
-* [Configuration and execution](Configuration-and-execution)
-* [Web UI automation](Web-UI-automation)
-* [Web services API automation](Web-services-API-automation)
-* [Mobile automation](Mobile-automation)
-* [Database access setup](DB-access)
-* [Data-providers usage](Data-providers)
+* [Project structure](#project-structure)
+* [Configuration and execution](#configuration-and-execution)
+* [Web UI automation](#web-ui-automation)
+* [Web services API automation](#web-services-api-automation)
+* [Mobile automation](#mobile-automation)
+* [Database access setup](#db-access)
+* [Data-providers usage](#data-providers)
+* [Git configuration](#git-configuration)
+* [License](#license)
+
 
 ## Initial setup
 * Install and configure JDK 1.8+
@@ -29,19 +32,10 @@ Carina is Java-based test automation framework that unites all testing layers: M
 * Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
 
 ### Generating project
-The easiest way to initialize new project is to you Carina archetype, you will get correct project structure along with test samples. 
-First clone archetype repo:
-```
-git clone https://github.com/qaprosoft/carina-archetype.git
-```
-Navigate to cloned repo and execute:
-```
-mvn install
-```
-Now go to folder where you need to generate new project and execute (do not forget to set groupId, artifactId, name, url, version):
+The easiest way to initialize new project is to you Carina archetype, you will get correct project structure along with test sample, use Carina archetype to generate your project:
 ```
 mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
-                       -DarchetypeArtifactId=carina \
+                       -DarchetypeArtifactId=carina-archetype \
                        -DarchetypeVersion=1.0 \
                        -DgroupId=<your_groupId> \ 
                        -DartifactId=<your_artifactId> \ 
@@ -49,7 +43,7 @@ mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -Durl=<your_proj_url> \
                        -Dversion=<your_proj_version>
 ```
-The command should be executed without '\' symbols on one line, leaving single white space between the attributes. If any attribute contains spaces, it should be set in quoted(e.g.: -Dname="Hello World"). In the Maven command listed above, you have to specify 5 attributes while the first 3 should be left unchanged. Let's go through these attributes:
+If any attribute contains spaces, it should be set in quoted(e.g.: -Dname="Hello World"). In the Maven command listed above, you have to specify 5 attributes while the first 3 should be left unchanged. Let's go through these attributes:
 <table> 
 	<tr>
 		<th>Attribute</th>
@@ -102,7 +96,228 @@ Now you are ready to import project into eclipse.
 ![Eclipse view](https://github.com/qaprosoft/carina-demo/blob/gh-pages/img/001-Initial-setup.png?raw=true)
 
 
-### Git configuration 
+## Project structure
+Carina test project is structured as standard Maven project:
+```
+carina-demo
+|-- pom.xml
+|-- src/test/java        
+|-- src/test/resources
+    |-- api
+    |-- testng_suites
+    |-- xls
+|-- src/main/java
+|-- src/main/resources
+    |-- l18n
+```
+
+* **src/test/java** - contains test classes organized using TestNG annotations
+
+![src/test/java](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/002-Project-structure.png)
+
+* **src/test/resources** - contains TestNG xml files, API templates and XLS data-providers
+
+![src/test/resources](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/003-Project-structure.png)
+
+* **src/main/java** - contains page object classes, API domains and additional utilities
+
+![src/main/java](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/004-Project-structure.png)
+
+* **src/main/resources** - contains l18n bundles, configuration properties files and MyBastis profiles if needed
+
+![src/main/resources](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/005-Project-structure.png)
+
+
+## Configuration and execution
+There are multiple properties files located in src/main/resources:
+* **_api.properties** - API test endpoints reference
+* **_config.properties** - global test configuration
+* **_database.properties** - database connection properties
+* **_email.properties** - emailable reports config
+* **_testdata.properties** - test user credentials
+
+All properties may be retrieved in test using R class:
+```
+R.API.get("GetUserMethods")
+R.CONFIG.get("browser")
+R.DATABASE.get("db.url")
+R.EMAIL.get("title")
+R.TESTDATA.get("user.email")
+```
+
+All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of parameters:
+<table> 
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+                <th>Default value</th>
+		<th>Example</th>
+	</tr>
+	<tr>
+		<td>url</td>
+		<td>Base application URL</td>
+		<td>{must_override}</td>
+		<td>http://carina.com/</td>
+	</tr>
+	<tr>
+		<td>browser</td>
+		<td>Browser for testing</td>
+		<td>chrome</td>
+		<td>chrome / firefox / iexplore</td>
+	</tr>
+	<tr>
+		<td>selenium_host</td>
+		<td>Selenium server host</td>
+		<td>{must_override}</td>
+		<td>http://localhost:4444/wd/hub</td>
+	</tr>
+	<tr>
+		<td>app_version</td>
+		<td>Application version for reporting</td>
+		<td>n/a</td>
+		<td>Carina Release 1.2.5</td>
+	</tr>
+	<tr>
+		<td>locale</td>
+		<td>Locale for testing</td>
+		<td>US</td>
+		<td>GB,DE,FR</td>
+	</tr>
+	<tr>
+		<td>implicit_timeout</td>
+		<td>Implicit timeout in seconds to wait for element</td>
+		<td>10</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>retry_timeout</td>
+		<td>Timeout between calling HTML DOM for the element</td>
+		<td>2</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>auto_screenshot</td>
+		<td>Global switch for taking screenshots</td>
+		<td>true</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
+		<td>take_only_fail_screenshot</td>
+		<td>Take only one screenshot of failed step</td>
+		<td>false</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
+		<td>keep_all_screenshots</td>
+		<td>Keep screenshots even for passed tests</td>
+		<td>false</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>report_url</td>
+		<td>Direct HTTP link to Jenkins workspace report folder</td>
+		<td>n/a</td>
+		<td>http://localhost:8888/job/my project/ws/reports/screenshots</td>
+	</tr>
+	<tr>
+		<td>max_screen_history</td>
+		<td>Max number of reports in history</td>
+		<td>10</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>jira_url</td>
+		<td>JIRA base URL for direct links with bugs description</td>
+		<td>n/a</td>
+		<td>https://jira.carina.com/browse/</td>
+	</tr>
+	<tr>
+		<td>email_list</td>
+		<td>Comma-separated list of emails for reports</td>
+		<td>{must_override}</td>
+		<td>u1@gmail.com,u2@gmail.com</td>
+	</tr>
+	<tr>
+		<td>sender_email</td>
+		<td>Gmail account for reports sending</td>
+		<td>{must_override}</td>
+		<td>carina.qareport</td>
+	</tr>
+	<tr>
+		<td>sender_pswd</td>
+		<td>Gmail password for reports sending</td>
+		<td>{must_override}</td>
+		<td>pwd123</td>
+	</tr>
+	<tr>
+		<td>jenkins_url</td>
+		<td>Jenkins URL for job reference in report</td>
+		<td>NULL</td>
+		<td>http://localhost:8080</td>
+	</tr>
+	<tr>
+		<td>jenkins_job</td>
+		<td>Name of Jenkins job for the reference in report</td>
+		<td>NULL</td>
+		<td>carina-demo</td>
+	</tr>
+</table>
+
+Most of the properties may be read in the following way:
+```
+Configuration.get(Parameter.URL) // returns string value
+Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
+Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
+Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
+```
+
+### Environment specific configuration
+In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need specify the following properties in _config.properties:
+```
+env=DEMO
+STAG.url=http://stag-app-server.com
+PROD.url=http://prod-app-server.com
+```
+
+And get env-specific argument in test in the following way:
+```
+Configuration.getEnvArg("url")
+```
+As a result you switch between environments just changing env argument in _config.properties file.
+
+### Execution
+There are a few options to execute the test, you may run test suite from Eclipse IDE or initiate test execution from the console using the Maven Surefire plugin built into the Carina framework. Before running tests make sure you downloaded selenium standalone server jar file and started it by the following command:
+```
+java -jar selenium-server-standalone-2.53.0.jar
+```
+
+To run the test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
+
+![Execution from Eclipse IDE](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/006-Configuration-and-execution.png)
+
+
+To run the same test suite from the console, navigate to the test project root (where pom.xml is located) and execute the following command:
+
+```
+mvn clean -Dsuite=api test
+```
+
+## Web UI automation
+TODO
+
+## Web services API automation
+TODO
+
+## Mobile automation
+TODO
+
+## Database access setup
+TODO
+
+## Data-providers usage
+TODO
+
+## Git configuration 
 1). **Fork repository** `https://github.com/qaprosoft/carina` to your own user.
 
 2). **Clone your fork to your local machine**:
@@ -125,9 +340,7 @@ And then after adding files (`git add` ...) use `git commit` (add description) a
     
 And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "**Compare & Pull Request**"
 
-
-License
------------
+## License
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Documentation and Site - [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/deed.en_US)
