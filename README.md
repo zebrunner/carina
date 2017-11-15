@@ -1,6 +1,6 @@
 Carina Automation Framework
 ==================
-Carian is Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB appications, REST services, Databases.
+Carina is Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB appications, REST services, Databases.
 
 * Carina framework is build on the top of most popular open-source solutions like Selenium, Appium, TestNG which reduces dependability on specific technology stack.
 
