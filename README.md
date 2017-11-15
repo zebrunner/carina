@@ -309,7 +309,8 @@ TODO
 TODO
 
 ## Mobile automation
-All project configuration properties are located in **_config.properties** file. In the table below we are providing description for the mobile project parametrs:
+All project configuration properties are located in config.properties file. In the table below we are providing description for the mobile project parametrs:
+
 <table> 
 	<tr>
 		<th>Attribute</th>
@@ -560,11 +561,11 @@ TODO
 
 7). `git checkout -b work_local_branch upstream/master`
 
-And then after adding files (`git add` ...) use `git commit` (add description) and then **push**:
+And then after adding files (`git add` ...) use `git commit` (add description) and then`push`:
 
     git push origin work_local_branch:work_remote_branch
     
-And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "**Compare & Pull Request**"
+And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "Compare & Pull Request"
 
 ## License
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
