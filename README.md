@@ -309,7 +309,7 @@ TODO
 TODO
 
 ## Mobile automation
-All project configuration properties are located in config.properties file. In the table below we are providing description for the mobile project parametrs:
+All project configuration properties are located in **_config.properties** file. In the table below we are providing description for the mobile project parametrs:
 
 <table> 
 	<tr>
@@ -320,25 +320,25 @@ All project configuration properties are located in config.properties file. In t
 	</tr>
         <tr>
 		<td>driver_type</td>
-		<td>Type of driver which is needed for automation</th>
+		<td>Type of driver which is needed for automation</td>
                 <td>{must_override}</td>
 		<td>mobile</td>
 	</tr>
         <tr>
 		<td>mobile_device_name</td>
-		<td>Device name for report</th>
+		<td>Device name for report</td>
                 <td>{must_override}</td>
 		<td>Sumsung_Galaxy_J5</td>
 	</tr>
         <tr>
 		<td>mobile_device_type</td>
-		<td>Type of device</th>
+		<td>Type of device</td>
                 <td>{must_override}</td>
 		<td>phone</td>
 	</tr>
         <tr>
 		<td>mobile_devices</td>
-		<td>Information about using device, divided by ";" for different devices and "|" for different parametrs</th>
+		<td>Information about using device, divided by ";" for different devices and "|" for different parametrs</td>
                 <td>{must_override}</td>
 		<td>;Sumsung J5|phone|ANDROID
                      |5.1|759b543c
@@ -346,31 +346,31 @@ All project configuration properties are located in config.properties file. In t
 	</tr>
         <tr>
 		<td>mobile_platform_name</td>
-		<td>Name of using mobile platform</th>
+		<td>Name of using mobile platform</td>
                 <td>{must_override}</td>
 		<td>Android/iOS</td>
 	</tr>
         <tr>
 		<td>mobile_platform_version</td>
-		<td>Version of mobile platform</th>
+		<td>Version of mobile platform</td>
                 <td>{must_override}</td>
 		<td>6.0.1</td>
 	</tr>
         <tr>
 		<td>mobile_automation_name</td>
-		<td>Name of programm using for automation</th>
+		<td>Name of programm using for automation</td>
                 <td>{must_override}</td>
 		<td>Appium</td>
 	</tr>
         <tr>
 		<td>mobile_app</td>
-		<td>Path application which is tested, should be the same as in Appium settings</th>
+		<td>Path application which is tested, should be the same as in Appium settings</td>
                 <td>{must_override}</td>
 		<td>D:/application.apk</td>
 	</tr>
         <tr>
 		<td>mobile_app</td>
-		<td>New implicit timeout in seconds to wait for element for mobile automation</th>
+		<td>New implicit timeout in seconds to wait for element for mobile automation</td>
                 <td>120</td>
 		<td>180</td>
 	</tr>
