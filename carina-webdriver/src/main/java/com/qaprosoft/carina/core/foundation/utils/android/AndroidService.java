@@ -605,9 +605,21 @@ public class AndroidService {
     public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
         boolean status = false;
 
+        String initLanguage = language;
+
+        String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+
+        if(currentAndroidVersion.contains("7.") || currentAndroidVersion.contains("6.")) {
+            LOGGER.info("On Android 6+ we should change locale instead of Language. Based on first part of Locale code");
+            if (language.contains("_")) {
+                language = language.split("_")[0];
+            }
+        }
+
         language = language.toLowerCase();
 
-        if (getDeviceLanguage().toLowerCase().contains(language)) {
+
+        if (language.contains(getDeviceLanguage().toLowerCase())) {
             LOGGER.info("Device already have expected language.");
             return true;
         }
@@ -639,26 +651,26 @@ public class AndroidService {
         if (changeConfig) {
             String loc;
             String lang;
-            if (language.contains("_")) {
-                lang = language.split("_")[0];
-                loc = language.split("_")[1];
+            if (initLanguage.contains("_")) {
+                lang = initLanguage.split("_")[0];
+                loc = initLanguage.split("_")[1];
             } else {
-                lang = language;
-                loc = language;
+                lang = initLanguage;
+                loc = initLanguage;
             }
             LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
             R.CONFIG.put("locale", loc);
             R.CONFIG.put("language", lang);
         }
 
-        if (getDeviceLanguage().toLowerCase().contains(language)) {
+        if (language.contains(getDeviceLanguage().toLowerCase())) {
             status = true;
         } else {
             if (getDeviceLanguage().isEmpty()) {
                 LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
-                String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+                currentAndroidVersion = DevicePool.getDevice().getOsVersion();
                 LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
                     LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
@@ -675,7 +687,11 @@ public class AndroidService {
      * @return String
      */
     public String getDeviceLanguage() {
-        return executeAdbCommand("shell getprop persist.sys.language");
+        String locale = executeAdbCommand("shell getprop persist.sys.language");
+        if(locale.isEmpty()) {
+            locale = executeAdbCommand("shell getprop persist.sys.locale");
+        }
+        return locale;
     }
     // End Language Change section
 
