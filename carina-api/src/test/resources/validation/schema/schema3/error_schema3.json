@@ -1,0 +1,4 @@
+Validation against Json schema failed: 
+[/items/0/item]: object has missing required properties (["id","version"])
+[/items/1/item]: object has missing required properties (["version"])
+[/items/1/item/id]: instance type (boolean) does not match any allowed primitive type (allowed: ["string"])

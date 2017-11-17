@@ -1,0 +1,34 @@
+{
+    "adverseActionModels": [
+        {
+            "aaDoc": {
+                "fileName": "vCC4ZL5Jfm",
+                "fileFormat": "PDF",
+                "fileLocation": "/Rahul"
+            },
+            "aaGuid": "e3c82b31-346c-49fb-9f97-1143dd892619",
+            "aaReasons": [
+                {
+                    "reasonCode": "reasonCode",
+                    "descTxt": "Test reason Code"
+                }
+            ],
+            "custAppGuid": "Test2"
+        },
+        {
+            "aaDoc": {
+                "fileName": "vCC4ZL5Jfm",
+                "fileFormat": "PDF",
+                "fileLocation": "/Raise"
+            },
+            "aaGuid": "e3c82b31-346c-49fb-9f97-1143dd892621",
+            "aaReasons": [
+                {
+                    "reasonCode": "reasonCode",
+                    "descTxt": "Test reason Code"
+                }
+            ],
+            "custAppGuid": "Test2"
+        }
+    ]
+}

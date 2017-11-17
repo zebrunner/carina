@@ -1,0 +1,105 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "additionalProperties": false,
+    "definitions": {},
+    "id": "http://example.com/example.json",
+    "properties": {
+        "content": {
+            "id": "/properties/content",
+            "items": {
+                "additionalProperties": false,
+                "id": "/properties/content/items",
+                "properties": {
+                    "brand": {
+                        "id": "/properties/content/items/properties/brand",
+                        "type": "string"
+                    },
+                    "clientAddress": {
+                        "id": "/properties/content/items/properties/clientAddress",
+                        "type": "string"
+                    },
+                    "clientCity": {
+                        "id": "/properties/content/items/properties/clientCity",
+                        "type": "string"
+                    },
+                    "clientDisplayName": {
+                        "id": "/properties/content/items/properties/clientDisplayName",
+                        "type": "string"
+                    },
+                    "clientFirstName": {
+                        "id": "/properties/content/items/properties/clientFirstName",
+                        "type": "string"
+                    },
+                    "clientLastName": {
+                        "id": "/properties/content/items/properties/clientLastName",
+                        "type": "string"
+                    },
+                    "clientName": {
+                        "id": "/properties/content/items/properties/clientName",
+                        "type": "string"
+                    },
+                    "clientPhone": {
+                        "id": "/properties/content/items/properties/clientPhone",
+                        "type": "string"
+                    },
+                    "clientRegistrationDate": {
+                        "id": "/properties/content/items/properties/clientRegistrationDate",
+                        "type": "string"
+                    },
+                    "clientState": {
+                        "id": "/properties/content/items/properties/clientState",
+                        "type": "string"
+                    },
+                    "clientZip": {
+                        "id": "/properties/content/items/properties/clientZip",
+                        "type": "string"
+                    },
+                    "id": {
+                        "id": "/properties/content/items/properties/id",
+                        "type": "integer"
+                    },
+                    "inPilot": {
+                        "id": "/properties/content/items/properties/inPilot",
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "clientPhone",
+                    "clientLastName",
+                    "clientZip",
+                    "clientDisplayName",
+                    "id",
+                    "clientAddress",
+                    "inPilot",
+                    "clientCity",
+                    "clientState",
+                    "clientRegistrationDate",
+                    "brand",
+                    "clientName",
+                    "clientFirstName"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "pageNumber": {
+            "id": "/properties/pageNumber",
+            "type": "integer"
+        },
+        "pageSize": {
+            "id": "/properties/pageSize",
+            "type": "integer"
+        },
+        "totalElements": {
+            "id": "/properties/totalElements",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "content",
+        "pageNumber",
+        "totalElements",
+        "pageSize"
+    ],
+    "type": "object"
+}

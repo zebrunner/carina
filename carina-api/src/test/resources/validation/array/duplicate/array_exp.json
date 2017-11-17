@@ -1,0 +1,34 @@
+{
+    "adverseActionModels": [
+        {
+            "aaDoc": {
+                "fileName": "vCC4ZL5Jfm",
+                "fileFormat": "PDF",
+                "fileLocation": "/Rahul"
+            },
+            "aaGuid": "skip",
+            "aaReasons": [
+                {
+                    "reasonCode": "reasonCode",
+                    "descTxt": "Test reason Code"
+                }
+            ],
+            "custAppGuid": "Test2"
+        },
+        {
+            "aaDoc": {
+                "fileName": "vCC4ZL5Jfm",
+                "fileFormat": "PDF",
+                "fileLocation": "/Rahul"
+            },
+            "aaGuid": "skip",
+            "aaReasons": [
+                {
+                    "reasonCode": "reasonCode",
+                    "descTxt": "Test reason Code"
+                }
+            ],
+            "custAppGuid": "Test2"
+        }
+    ]
+}

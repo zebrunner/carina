@@ -1,0 +1,37 @@
+{
+    "totalElements": "skip",
+    "pageNumber": "skip",
+    "pageSize": "skip",
+    "content": [
+        {
+            "id": skip,
+            "brand": "skip",
+            "clientName": "1st Impression Orthodontics",
+            "clientDisplayName": "1st Impression Orthodontics (Colin Gibson)",
+            "clientFirstName": "Colin",
+            "clientLastName": "Gibson55",
+            "clientAddress": "1333 W 120th Ave Ste 303-err",
+            "clientCity": "Westminster",
+            "clientState": "CO",
+            "clientZip": "80234",
+            "clientPhone": "3034522277",
+            "clientRegistrationDate": "2007-11-15T00:00:00.000-05:00",
+            "inPilot": false
+        },
+        {
+            "id": "skip",
+            "brand": "skip",
+            "clientName": "Test-err",
+            "clientDisplayName": "skip",
+            "clientFirstName": "Jeffrey",
+            "clientLastName": "skip",
+            "clientAddress": "skip",
+            "clientCity": "skip",
+            "clientState": "skip",
+            "clientZip": "skip",
+            "clientPhone": "skip",
+            "clientRegistrationDate": "skip",
+            "inPilot": "skip"
+        }
+    ]
+}
