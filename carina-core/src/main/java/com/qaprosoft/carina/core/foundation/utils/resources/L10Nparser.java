@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.resources;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -92,6 +93,8 @@ public class L10Nparser {
 	public static Properties prop = new Properties();
 
 	public static String propFileName = "";
+
+	private static String encoding = "ISO-8859-1";
 
 	protected static final int BASIC_WAIT_SHORT_TIMEOUT = 5;
 
@@ -271,7 +274,7 @@ public class L10Nparser {
 	/**
 	 * check Localization Text. Will work ONLY if locKey is equal to element
 	 * Name and element is Public
-	 * 
+	 *
 	 * @param elem
 	 *            ExtendedWebElement
 	 * @param skipMissed
@@ -279,7 +282,22 @@ public class L10Nparser {
 	 * @return boolean
 	 */
 	public static boolean checkLocalizationText(ExtendedWebElement elem, boolean skipMissed) {
-		if (elem.isElementPresent(BASIC_WAIT_SHORT_TIMEOUT)) {
+		return checkLocalizationText(elem, skipMissed, BASIC_WAIT_SHORT_TIMEOUT);
+	}
+
+	/**
+	 * check Localization Text. Will work ONLY if locKey is equal to element
+	 * Name and element is Public
+	 * 
+	 * @param elem
+	 *            ExtendedWebElement
+	 * @param skipMissed
+	 *            - boolean - if true - will ignore missed elements.
+	 * @param timeout - timeout for element presence waiting.
+	 * @return boolean
+	 */
+	public static boolean checkLocalizationText(ExtendedWebElement elem, boolean skipMissed, int timeout) {
+		if (elem.isElementPresent(timeout)) {
 			String elemText = elem.getText();
 			String locKey = elem.getName();
 			return checkLocalizationText(elemText, locKey);
@@ -296,7 +314,7 @@ public class L10Nparser {
 	/**
 	 * check Localization Text. Will work ONLY if locKey is equal to element
 	 * Name and element is Public
-	 * 
+	 *
 	 * @param elem
 	 *            ExtendedWebElement
 	 * @param locKey
@@ -304,12 +322,26 @@ public class L10Nparser {
 	 * @return boolean
 	 */
 	public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey) {
-		if (elem.isElementPresent(BASIC_WAIT_SHORT_TIMEOUT)) {
+		return checkLocalizationText(elem, locKey, BASIC_WAIT_SHORT_TIMEOUT);
+	}
+
+	/**
+	 * check Localization Text. Will work ONLY if locKey is equal to element
+	 * Name and element is Public
+	 * 
+	 * @param elem
+	 *            ExtendedWebElement
+	 * @param locKey
+	 *            String
+	 * @param timeout - timeout for element presence waiting.
+	 * @return boolean
+	 */
+	public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey, int timeout) {
+		if (elem.isElementPresent(timeout)) {
 			String elemText = elem.getText();
 			return checkLocalizationText(elemText, locKey);
 		} else {
 			LOGGER.info("Expected element not present. Please check:" + elem);
-
 		}
 		return false;
 	}
@@ -324,25 +356,50 @@ public class L10Nparser {
 	 * @return boolean
 	 */
 	public static boolean checkLocalizationText(String expectedText, String locKey) {
-		boolean ret = false;
-		ret = expectedText.contains(L10N.getText(locKey, actualLocale));
-		if (!ret) {
+		String l10n_default = L10N.getText(locKey, actualLocale);
+		String l10n_utf = L10N.getUTFText(locKey, actualLocale);
+
+		boolean ret = expectedText.contains(l10n_default);
+		boolean ret_utf = expectedText.contains(l10n_utf);
+
+		if (!ret && !ret_utf) {
 			if (!newLocalization) {
-				LOGGER.error("Actual text should be localized and be equal to: '" + L10N.getText(locKey, actualLocale)
-						+ "'. But currently it is '" + expectedText + "'.");
-				assertErrorMsg = "Expected: '" + L10N.getText(locKey, actualLocale) + "', length="
-						+ L10N.getText(locKey, actualLocale).length() + ". Actually: '" + expectedText + "', length="
-						+ expectedText.length() + ".";
+				LOGGER.error(
+						"Actual text should be localized and be equal to: '" + l10n_default + "'. Or to: '" + l10n_utf + "'. But currently it is '"
+								+ expectedText + "'.");
+				assertErrorMsg =
+						"Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Or '" + l10n_utf + "', length=" + l10n_utf.length()
+								+ ". Actually: '" + expectedText + "', length=" + expectedText.length() + ".";
+				return false;
 			} else {
 				String newItem = locKey + "=" + expectedText;
 				LOGGER.info("Making new localization string: " + newItem);
 				newLocList.add(newItem);
 				prop.setProperty(locKey, expectedText);
-
 				return true;
 			}
+		} else {
+			if (ret) {
+				LOGGER.info("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
+			}
+			if (ret_utf) {
+				LOGGER.info("Found localization text '" + expectedText + "' in UTF-8 encoding : " + l10n_utf);
+			}
+			return true;
 		}
-		return ret;
+
+	}
+
+	/**
+	 * check MultipleLocalization
+	 *
+	 * @param localizationCheckList
+	 *            - ExtendedWebElement[] should be set on required page with all
+	 *            needed public elements
+	 * @return boolean
+	 */
+	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList) {
+		return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT);
 	}
 
 	/**
@@ -351,14 +408,15 @@ public class L10Nparser {
 	 * @param localizationCheckList
 	 *            - ExtendedWebElement[] should be set on required page with all
 	 *            needed public elements
+	 * @param timeout - timeout for element presence waiting.
 	 * @return boolean
 	 */
-	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList) {
+	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, int timeout) {
 		boolean ret = true;
 		String returnAssertErrorMsg = "";
 		assertErrorMsg = "";
 		for (ExtendedWebElement elem : localizationCheckList) {
-			if (!checkLocalizationText(elem)) {
+			if (!checkLocalizationText(elem,true, timeout)) {
 				ret = false;
 				returnAssertErrorMsg = returnAssertErrorMsg + " \n" + assertErrorMsg;
 			}
@@ -391,9 +449,15 @@ public class L10Nparser {
 					LOGGER.info("propFileName:=" + propFileName);
 				}
 
-				OutputStream output = new FileOutputStream(propFileName);
-				prop.store(output, null);
-				output.close();
+				String encoding = getLocalizationSaveEncoding();
+				if (encoding.contains("UTF")) {
+					prop.store(new OutputStreamWriter(
+							new FileOutputStream(propFileName), "UTF-8"), null);
+				} else {
+					OutputStream output = new FileOutputStream(propFileName);
+					prop.store(output, null);
+					output.close();
+				}
 
 			} catch (Exception e) {
 				LOGGER.error(e);
@@ -402,7 +466,20 @@ public class L10Nparser {
 		} else {
 			LOGGER.debug("There is no new localization for saving.");
 		}
+	}
 
+	/**
+	 * get Localization Save Encoding
+	 * @return String
+	 */
+	private static String getLocalizationSaveEncoding() {
+		try {
+			encoding = Configuration.get(Parameter.ADD_NEW_LOCALIZATION_ENCODING);
+		} catch (Exception e) {
+			LOGGER.error("There is no localization encoding parameter in config property.");
+		}
+		LOGGER.info("Will use encoding: " + encoding);
+		return encoding.toUpperCase();
 	}
 
 }
