@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.foundation.api.ssl;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.ssl.SSLContextBuilder;
 
 public class PutDocTest
 {
