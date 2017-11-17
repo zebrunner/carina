@@ -172,7 +172,9 @@ public class Configuration
 		RETRY_COUNT("retry_count"),
 
 		ENABLE_L10N("enable_l10n"),
-		
+
+		L10N_ENCODING("l10n_encoding"),
+
 		LOCALE("locale"),
 		
 		ENABLE_I18N("enable_i18n"),
@@ -268,8 +270,10 @@ public class Configuration
 		HOCKEYAPP_LOCAL_STORAGE("hockeyapp_local_storage"),
 		
 		//For localization parser
-		ADD_NEW_LOCALIZATION("add_new_localization"), 
-		
+		ADD_NEW_LOCALIZATION("add_new_localization"),
+
+		ADD_NEW_LOCALIZATION_ENCODING("add_new_localization_encoding"),
+
 		ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
 		
 		ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
