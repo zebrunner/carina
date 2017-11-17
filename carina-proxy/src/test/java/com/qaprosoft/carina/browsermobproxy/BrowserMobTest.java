@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.proxy.SystemProxy;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
@@ -24,6 +25,7 @@ public class BrowserMobTest {
 		R.CONFIG.put("proxy_set_to_system", "true");
 		
 		ProxyPool.setupBrowserMobProxy();
+		SystemProxy.setupProxy();
 
 		BrowserMobProxy proxy = ProxyPool.getProxy();
 		proxy.addHeader(header, headerValue);
