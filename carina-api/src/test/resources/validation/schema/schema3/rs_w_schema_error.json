@@ -1,0 +1,88 @@
+{
+  "items": [
+    {
+      "type": "food",
+      "item": {
+        "nutritional_contents": {
+          "sugar": 0.0,
+          "fiber": 0.0,
+          "saturated_fat": 0.0,
+          "protein": 0.0,
+          "energy": {
+            "unit": "calories",
+            "value": 0.0
+          },
+          "carbohydrates": 0.0,
+          "sodium": 0.0,
+          "calcium": 0.0,
+          "monounsaturated_fat": 0.0,
+          "vitamin_c": 0.0,
+          "cholesterol": 0.0,
+          "fat": 0.0,
+          "iron": 0.0,
+          "polyunsaturated_fat": 0.0,
+          "potassium": 0.0,
+          "vitamin_a": 0.0,
+          "trans_fat": 0.0
+        },
+        "description": "Water",
+        "public": true,
+        "user_id": "93739305324157",
+        "serving_sizes": [
+          {
+            "nutrition_multiplier": 1.0,
+            "id": "134019801706341",
+            "unit": "cup",
+            "value": 1.0,
+            "index": 0
+          }
+        ],
+        "type": "food",
+        "verified": false,
+        "deleted": false
+      }
+    },
+    {
+      "type": "food",
+      "item": {
+        "nutritional_contents": {
+          "sugar": 0.0,
+          "fiber": 0.0,
+          "saturated_fat": 0.0,
+          "protein": 0.0,
+          "energy": {
+            "unit": "calories",
+            "value": 0.0
+          },
+          "carbohydrates": 0.0,
+          "sodium": 2.0,
+          "calcium": 0.2,
+          "monounsaturated_fat": 0.0,
+          "vitamin_c": 0.0,
+          "cholesterol": 0.0,
+          "fat": 0.0,
+          "iron": 0.0,
+          "polyunsaturated_fat": 0.0,
+          "potassium": 0.0,
+          "vitamin_a": 0.0,
+          "trans_fat": 0.0
+        },
+        "description": "Water - Municipal",
+        "public": true,
+        "user_id": "133476501057389",
+        "id": true,
+        "serving_sizes": [
+          {
+            "nutrition_multiplier": 2.37,
+            "id": "138406964039669",
+            "unit": "cup (8 fl oz)",
+            "value": 1.0,
+            "index": 0
+          }
+        ],
+        "type": "food",
+        "verified": true,
+        "deleted": false
+      }
+    }]
+}

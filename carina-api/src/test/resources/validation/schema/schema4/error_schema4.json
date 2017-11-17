@@ -1,0 +1,5 @@
+Validation against Json schema failed: 
+[/content/0]: object has missing required properties (["clientFirstName"])
+[/content/1]: object instance has properties which are not allowed by the schema: ["not_exp"]
+[/content/1/clientZip]: instance type (integer) does not match any allowed primitive type (allowed: ["string"])
+[/pageNumber]: instance type (string) does not match any allowed primitive type (allowed: ["integer"])

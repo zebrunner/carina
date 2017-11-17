@@ -1,0 +1,15 @@
+{
+    "email": "carrie@tlcqa.com",
+    "name": "Office of D.J. Dailey, DDS",
+    "siteAuthorization": "practice",
+    "status": "Active",
+    "loggedIn": true,
+    "relatedId": 101265,
+    "id": 10623,
+    "site": "LCPS",
+    "create": false,
+    "passwordChange": false,
+    "clientIds": [
+        101265
+    ]
+}

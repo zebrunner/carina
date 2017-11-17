@@ -1,0 +1,84 @@
+{
+    "username": "selenium84062803",
+    "goal_statement": null,
+    "first_name": "selenium",
+    "last_name": "first-friend",
+    "display_name": "selenium first-friend",
+    "last_initial": "f.",
+    "introduction": "Auto-statement-4510519678",
+    "gender": "F",
+    "time_zone": "Europe/Minsk",
+    "_links": {
+        "stats": [
+            {
+                "href": "/v7.1/user_stats/84062803/?aggregate_by_period=month",
+                "id": "84062803",
+                "name": "month"
+            },
+            {
+                "href": "/v7.1/user_stats/84062803/?aggregate_by_period=day",
+                "id": "84062803",
+                "name": "day"
+            },
+            {
+                "href": "/v7.1/user_stats/84062803/?aggregate_by_period=week",
+                "id": "84062803",
+                "name": "week"
+            },
+            {
+                "href": "/v7.1/user_stats/84062803/?aggregate_by_period=year",
+                "id": "84062803",
+                "name": "year"
+            },
+            {
+                "href": "/v7.1/user_stats/84062803/?aggregate_by_period=lifetime",
+                "id": "84062803",
+                "name": "lifetime"
+            }
+        ],
+        "privacy": [
+            {
+                "href": "/v7.1/privacy_option/1/",
+                "id": "1",
+                "name": "profile"
+            }
+        ],
+        "image": [
+            {
+                "href": "/v7.1/user_profile_photo/84062803/",
+                "id": "84062803",
+                "name": "user_profile_photo"
+            }
+        ],
+        "documentation": [
+            {
+                "href": "https://developer.underarmour.com/docs/v71_User"
+            }
+        ],
+        "user_achievements": [
+            {
+                "href": "/v7.1/user_achievement/?user=84062803"
+            }
+        ],
+        "workouts": [
+            {
+                "href": "/v7.1/workout/?user=84062803&order_by=-start_datetime"
+            }
+        ],
+        "self": [
+            {
+                "href": "/v7.1/user/84062803/",
+                "id": "84062803"
+            }
+        ]
+    },
+    "location": {
+        "country": "CA",
+        "region": "",
+        "locality": "Vancouver"
+    },
+    "hobbies": "",
+    "profile_statement": "",
+    "id": 84062803,
+    "date_joined": "2016-02-22T18:21:09+00:00"
+}

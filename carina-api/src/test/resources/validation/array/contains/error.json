@@ -1,0 +1,9 @@
+content[0].clientAddress
+Expected: 1333 W 120th Ave Ste 303-err
+     got: 1333 W 120th Ave Ste 303
+ ; content[0].clientLastName
+Expected: Gibson55
+     got: Gibson
+ ; content[1].clientName
+Expected: Test-err
+     got: Test

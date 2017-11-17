@@ -1,0 +1,19 @@
+{
+    "adverseActionModels": [
+        {
+            "aaDoc": {
+                "fileName": "vCC4ZL5Jfm",
+                "fileFormat": "PDF",
+                "fileLocation": "/Philipp"
+            },
+            "aaGuid": "e3c82b31-346c-49fb-9f97-1143dd892619",
+            "aaReasons": [
+                {
+                    "reasonCode": "reasonCode",
+                    "descTxt": "Test reason Code"
+                }
+            ],
+            "custAppGuid": "Test5"
+        }
+    ]
+}
