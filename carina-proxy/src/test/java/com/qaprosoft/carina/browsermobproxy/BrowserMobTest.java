@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.httpclient;
+package com.qaprosoft.carina.browsermobproxy;
 
 import java.util.Map;
 
@@ -6,11 +6,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
@@ -25,15 +23,15 @@ public class BrowserMobTest {
 		R.CONFIG.put("browsermob_port", "0");
 		R.CONFIG.put("proxy_set_to_system", "true");
 		
-		HttpClient.setupProxy();
+		ProxyPool.setupBrowserMobProxy();
 
-		BrowserMobProxy proxy = DriverPool.getProxy();
+		BrowserMobProxy proxy = ProxyPool.getProxy();
 		proxy.addHeader(header, headerValue);
 	}
 	
 	@Test
 	public void testIsBrowserModStarted() {
-		Assert.assertTrue(DriverPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
+		Assert.assertTrue(ProxyPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
 	}
 	
 	@Test
@@ -44,12 +42,12 @@ public class BrowserMobTest {
 
 	@Test
 	public void testBrowserModProxyHeader() {
-		Map<String, String> headers = DriverPool.getProxy().getAllHeaders();
+		Map<String, String> headers = ProxyPool.getProxy().getAllHeaders();
 		Assert.assertTrue(headers.containsKey(header), "There is no custom header: " + header);
 		Assert.assertTrue(headers.get(header).equals(headerValue), "There is no custom header value: " + headerValue);
 		
-		DriverPool.getProxy().removeHeader(header);
-		if (DriverPool.getProxy().getAllHeaders().size() != 0) {
+		ProxyPool.getProxy().removeHeader(header);
+		if (ProxyPool.getProxy().getAllHeaders().size() != 0) {
 			Assert.fail("Custom header was not removed: " + header);
 		}
 	}

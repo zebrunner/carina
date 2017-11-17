@@ -13,43 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qaprosoft.carina.core.foundation.http;
+package com.qaprosoft.carina.core.foundation.utils;
 
-/*
- * HTTP method types.
- * 
- * @author Alex Khursevich
- */
-public enum HttpMethodType
-{
-	HEAD(1, "HEAD"),
-	GET(2, "GET"),
-	PUT(3, "PUT"),
-	POST(4, "POST"),
-	DELETE(5, "DELETE"),
-	PATCH(6, "PATCH");
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-	private int code;
-	private String name;
+import org.apache.log4j.Logger;
 
-	HttpMethodType(int code, String name)
-	{
-		this.code = code;
-		this.name = name;
+public class NetworkUtil {
+	
+	protected static final Logger LOGGER = Logger.getLogger(NetworkUtil.class);
+
+	public static String getIpAddress() {
+		String currentIP = "0.0.0.0"; // localhost
+		try {
+			currentIP = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
+		}
+
+		return currentIP;
 	}
-
-	public int getCode()
-	{
-		return code;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public HttpMethodType get(String name)
-	{
-		return valueOf(name);
-	}
+	
 }

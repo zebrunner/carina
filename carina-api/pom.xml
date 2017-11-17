@@ -32,7 +32,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-webdriver</artifactId>
+			<artifactId>carina-utils</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-proxy</artifactId>
 		</dependency>
 
 		<dependency>

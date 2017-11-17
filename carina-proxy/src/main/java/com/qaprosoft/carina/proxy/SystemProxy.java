@@ -13,80 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qaprosoft.carina.core.foundation.http;
+package com.qaprosoft.carina.proxy;
 
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.jayway.restassured.response.Response;
-import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
-import net.lightbody.bmp.BrowserMobProxy;
-
-/*
- * HttpClient - sends HTTP request with specified parameters and returns response.
- * 
- * @author Alex Khursevich
- */
-public class HttpClient
-{
-	protected static final Logger LOGGER = Logger.getLogger(HttpClient.class);
+public class SystemProxy {
 	
-	public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType)
-	{
-		Response response = null;
-		setupProxy();
-		switch (methodType)
-		{
-		case HEAD:
-			response = request.head(methodPath);
-			break;
-		case GET:
-			response = request.get(methodPath);
-			break;
-		case PUT:
-			response = request.put(methodPath);
-			break;
-		case POST:
-			response = request.post(methodPath);
-			break;
-		case DELETE:
-			response = request.delete(methodPath);
-			break;
-		case PATCH:
-			response = request.patch(methodPath);
-			break;
-		default:
-			throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
-		}
+	protected static final Logger LOGGER = Logger.getLogger(SystemProxy.class);
 
-		return response;
-	}
-	
 	public static void setupProxy()
 	{
-		if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
-			BrowserMobProxy proxy = DriverPool.startProxy();
-			Integer port = proxy.getPort();
-
-			String currentIP = HttpClient.getIpAddress();
-			LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
-			
-			R.CONFIG.put("proxy_host", currentIP);
-			R.CONFIG.put("proxy_port", port.toString());
-			R.CONFIG.put("proxy_protocols", "http");
-			
-		}
-
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 		
@@ -123,15 +65,5 @@ public class HttpClient
 			}
 		}
 	}
-
-	public static String getIpAddress() {
-		String currentIP = "0.0.0.0"; // localhost
-		try {
-			currentIP = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
-		}
-
-		return currentIP;
-	}
+	
 }

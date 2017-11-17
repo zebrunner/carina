@@ -1,11 +1,10 @@
-package com.qaprosoft.carina.core.foundation.httpclient;
+package com.qaprosoft.carina.proxy;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class SystemProxyTest {
@@ -38,7 +37,7 @@ public class SystemProxyTest {
 	@Test
 	public void testHttpSystemProxy() {
 		R.CONFIG.put("proxy_protocols", "http");
-		HttpClient.setupProxy();
+		SystemProxy.setupProxy();
 		Assert.assertEquals(System.getProperty("http.proxyHost"), host);
 		Assert.assertEquals(System.getProperty("http.proxyPort"), port);
 		
@@ -54,7 +53,7 @@ public class SystemProxyTest {
 	@Test
 	public void testHttpsSystemProxy() {
 		R.CONFIG.put("proxy_protocols", "https");
-		HttpClient.setupProxy();
+		SystemProxy.setupProxy();
 		Assert.assertEquals(System.getProperty("https.proxyHost"), host);
 		Assert.assertEquals(System.getProperty("https.proxyPort"), port);
 
@@ -70,7 +69,7 @@ public class SystemProxyTest {
 	@Test
 	public void testFtpSystemProxy() {
 		R.CONFIG.put("proxy_protocols", "ftp");
-		HttpClient.setupProxy();
+		SystemProxy.setupProxy();
 		Assert.assertEquals(System.getProperty("ftp.proxyHost"), host);
 		Assert.assertEquals(System.getProperty("ftp.proxyPort"), port);
 
@@ -86,7 +85,7 @@ public class SystemProxyTest {
 	@Test
 	public void testSocksSystemProxy() {
 		R.CONFIG.put("proxy_protocols", "socks");
-		HttpClient.setupProxy();
+		SystemProxy.setupProxy();
 		Assert.assertEquals(System.getProperty("socksProxyHost"), host);
 		Assert.assertEquals(System.getProperty("socksProxyPort"), port);
 

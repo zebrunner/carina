@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qaprosoft.carina.core.foundation.http;
+package com.qaprosoft.carina.core.foundation.api.http;
 
 /*
- * HTTP response types.
+ * HTTP method types.
  * 
  * @author Alex Khursevich
  */
-public enum HttpResponseStatusType
+public enum HttpMethodType
 {
-	OK_200(200, "OK"),
-	CREATED_201(201, "Created"),
-	ACCEPTED_202(202, "Accepted"),
-	NO_CONTENT_204(204, "No Content"),
-	NOT_MODIFIED_304(304, "Not Modified"),
-	BAD_REQUEST_400(400, "Bad Request"),
-	UNAUTHORIZED_401(401, "Unauthorized"),
-	FORBIDDEN_403(403, "Forbidden"),
-	NOT_FOUND_404(404, "Not Found"),
-	CONFLICT_409(409, "Conflict"),
-	UNSUPPORTED_MEDIA_TYPE_415(415, "Unsupported Media Type"),
-	EXPECTATION_FAILED_417(417, "Expectation Failed"),
-	UNPROCESSABLE_ENTITY_422(422, "Unprocessable Entity");
+	HEAD(1, "HEAD"),
+	GET(2, "GET"),
+	PUT(3, "PUT"),
+	POST(4, "POST"),
+	DELETE(5, "DELETE"),
+	PATCH(6, "PATCH");
 
 	private int code;
-	private String message;
+	private String name;
 
-	HttpResponseStatusType(int code, String message)
+	HttpMethodType(int code, String name)
 	{
 		this.code = code;
-		this.message = message;
+		this.name = name;
 	}
 
 	public int getCode()
@@ -50,8 +43,13 @@ public enum HttpResponseStatusType
 		return code;
 	}
 
-	public String getMessage()
+	public String getName()
 	{
-		return message;
+		return name;
+	}
+
+	public HttpMethodType get(String name)
+	{
+		return valueOf(name);
 	}
 }

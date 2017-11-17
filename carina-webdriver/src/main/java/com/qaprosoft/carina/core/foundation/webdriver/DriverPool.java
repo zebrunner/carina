@@ -27,17 +27,13 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-
-import net.lightbody.bmp.BrowserMobProxy;
 
 public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
@@ -47,8 +43,7 @@ public final class DriverPool {
 	protected static WebDriver single_driver;
 
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
-	private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
-	
+
 	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
 	
 	/**
@@ -279,7 +274,7 @@ public final class DriverPool {
 				LOGGER.debug("initDriver start...");
 				
 				//TODO: move browsermob startup to this location
-				startProxy();
+				ProxyPool.startProxy();
 
 				
 				//TODO: remove or move device manipulation to MobileFactory
@@ -548,123 +543,4 @@ public final class DriverPool {
 		}
 	}
 
-	// ------------------------- BOWSERMOB PROXY ---------------------
-	// TODO: investigate possibility to return interface to support JettyProxy
-	/**
-	 * start BrowserMobProxy Server
-	 * 
-	 * @return BrowserMobProxy
-	 * 
-	 */
-	public static BrowserMobProxy startProxy() {
-		if (!Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
-			return null;
-		}
-		// integrate browserMob proxy if required here
-		BrowserMobProxy proxy = null;
-		long threadId = Thread.currentThread().getId();
-		if (proxies.containsKey(threadId)) {
-			proxy = proxies.get(threadId);
-		} else {
-			proxy = ProxyPool.createProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
-			proxies.put(Thread.currentThread().getId(), proxy);
-		}
-		
-		if (!proxy.isStarted()) {
-			LOGGER.info("Starting BrowserMob proxy...");
-			proxy.start(Configuration.getInt(Parameter.BROWSERMOB_PORT));
-		} else {
-			LOGGER.info("BrowserMob proxy is already started on port " + proxy.getPort());
-		}
-
-		Integer port = proxy.getPort();
-
-		String currentIP = HttpClient.getIpAddress();
-		LOGGER.warn("Set http/https proxy settings ONLY to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
-
-		//TODO: double check mobile proxy support
-		R.CONFIG.put("proxy_host", currentIP);
-		R.CONFIG.put("proxy_port", port.toString());
-		R.CONFIG.put("proxy_protocols", "http,https");
-
-		return proxy;
-	}
-
-	// https://github.com/lightbody/browsermob-proxy/issues/264 'started' flag is not set to false after stopping BrowserMobProxyServer
-	// Due to the above issue we can't control BrowserMob isRunning state and shouldn't stop it
-	// TODO: investigate possibility to clean HAR files if necessary
-	
-	/**
-	 * stop BrowserMobProxy Server
-	 * 
-	 */
-	/*
-	public static void stopProxy() {
-		long threadId = Thread.currentThread().getId();
-
-		LOGGER.debug("stopProxy starting...");
-		if (proxies.containsKey(threadId)) {
-			BrowserMobProxy proxy = proxies.get(threadId);
-			if (proxy != null) {
-				LOGGER.debug("Found registered proxy by thread: " + threadId);
-
-				if (proxy.isStarted()) {
-					LOGGER.info("Stopping BrowserMob proxy...");
-					proxy.stop();
-				} else {
-					LOGGER.info("Stopping BrowserMob proxy skipped as it is not started.");
-				}
-			}
-			proxies.remove(threadId);
-		}
-		LOGGER.debug("stopProxy finished...");
-	}*/
-
-	/**
-	 * get registered BrowserMobProxy Server
-	 * 
-	 * @return BrowserMobProxy
-	 * 
-	 */
-	public static BrowserMobProxy getProxy() {
-		BrowserMobProxy proxy = null;
-		long threadId = Thread.currentThread().getId();
-		if (proxies.containsKey(threadId)) {
-			proxy = proxies.get(threadId);
-		} else {
-			Assert.fail("There is not registered BrowserMobProxy for thread: " + threadId);
-		}
-		return proxy;
-	}
-	
-	/**
-	 * return true if proxy is already registered
-	 * 
-	 * @return boolean
-	 * 
-	 */
-	public static boolean isProxyRegistered() {
-		long threadId = Thread.currentThread().getId();
-		return proxies.containsKey(threadId);
-	}
-
-	/**
-	 * register custom BrowserMobProxy Server
-	 * 
-	 * @param proxy
-	 *            custom BrowserMobProxy
-	 * 
-	 */
-	public static void registerProxy(BrowserMobProxy proxy) {
-		long threadId = Thread.currentThread().getId();
-		if (proxies.containsKey(threadId)) {
-			LOGGER.warn("Existing proxy is detected and will be overriten");
-			// No sense to stop as it is not supported
-			proxies.remove(threadId);
-		}
-		
-		LOGGER.info("Register custom proxy with thread: " + threadId);
-		proxies.put(threadId, proxy);
-	}
-	
 }

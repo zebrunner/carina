@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.httpclient;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 public class HttpResponseStatusTypeTest {
 	

@@ -11,10 +11,11 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.proxy.SystemProxy;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public abstract class AbstractCapabilities {
@@ -95,8 +96,8 @@ public abstract class AbstractCapabilities {
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 		
-		HttpClient.setupProxy();
-		
+		ProxyPool.setupBrowserMobProxy();
+		SystemProxy.setupProxy();
 
 		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
 			
