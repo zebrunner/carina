@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -22,9 +23,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Platfor
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.ProcessBuilderExecutor;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.appium.status.AppiumStatus;
 
-//Motorola|ANDROID|4.4|T01130FJAD|http://localhost:4725/wd/hub;Samsung_S4|ANDROID|4.4.2|5ece160b|http://localhost:4729/wd/hub;
 public class Device
 {
 	private static final Logger LOGGER = Logger.getLogger(Device.class);
@@ -35,8 +34,6 @@ public class Device
 	private String os;
 	private String osVersion;
 	private String udid;
-	@Deprecated
-	private String seleniumServer;
 
 	private String remoteURL;
 	
@@ -44,20 +41,30 @@ public class Device
 	
 	AdbExecutor executor = new AdbExecutor();
 
+	
 	public Device()
 	{
-		this("", "", "", "", "", "", "");
+		this("", "", "", "", "", "");
 	}
 
-	public Device(String name, String type, String os, String osVersion, String udid, String seleniumServer, String remoteURL)
+	public Device(String name, String type, String os, String osVersion, String udid, String remoteURL)
 	{
 		this.name = name;
 		this.type = type;
 		this.os = os;
 		this.osVersion = osVersion;
 		this.udid = udid;
-		this.seleniumServer = seleniumServer;
 		this.remoteURL = remoteURL;
+	}
+	
+	public Device(Capabilities capabilities)
+	{
+		this.name = capabilities.getCapability("deviceName").toString();
+		this.type = capabilities.getCapability("deviceType").toString();
+		this.udid = capabilities.getCapability("udid").toString();
+
+		this.os = capabilities.getCapability("platformName").toString();
+		this.osVersion = capabilities.getCapability("platformVersion").toString();
 	}
 
 	public String getName()
@@ -100,16 +107,6 @@ public class Device
 		this.udid = udid;
 	}
 
-	public String getSeleniumServer()
-	{
-		return seleniumServer;
-	}
-
-	public void setSeleniumServer(String seleniumServer)
-	{
-		this.seleniumServer = seleniumServer;
-	}
-	
 	public String getRemoteURL() {
 		return remoteURL;
 	}
@@ -118,6 +115,12 @@ public class Device
 		this.remoteURL = remoteURL;
 	}
 
+	
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+	
 	public boolean isPhone()
 	{
 		return type.equalsIgnoreCase(SpecialKeywords.PHONE);
@@ -159,15 +162,15 @@ public class Device
 	}
 	
 	public String toString() {
-		return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; selenium: %s; remoteURL: %s", name,
-				type, os, osVersion, udid, seleniumServer, remoteURL);
+		return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; remoteURL: %s", name,
+				type, os, osVersion, udid, remoteURL);
 	}
 	
 	public boolean isNull() {
-		if (name == null || seleniumServer == null) {
+		if (name == null) {
 			return true;
 		}
-		return name.isEmpty() || seleniumServer.isEmpty();
+		return name.isEmpty();
 	}
 
 	public void connectRemote() {
@@ -603,55 +606,6 @@ public class Device
         return res;
     }
 
-    
-    public void restartAppium() {
-        if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
-            return;
-        
-        if (isNull())
-        	return;
-
-        stopAppium();
-        startAppium();
-    }
-
-    // TODO: think about moving shutdown/startup scripts into external property and make it cross platform 
-    public void stopAppium() {
-        if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
-            return;
-        
-        if (isNull())
-        	return;
-
-        LOGGER.info("Stopping appium...");
-
-        String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/stopNodeAppium.sh";
-        String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), getUdid());
-        List<String> output = executor.execute(cmd);
-        for (String line : output) {
-            LOGGER.debug(line);
-        }
-    }
-
-    public void startAppium() {
-        if (!Configuration.getBoolean(Parameter.MOBILE_APPIUM_RESTART))
-            return;
-        
-        if (isNull())
-        	return;
-
-        LOGGER.info("Starting appium...");
-
-        String cmdLine = Configuration.get(Parameter.MOBILE_TOOLS_HOME) + "/startNodeAppium.sh";
-        String[] cmd = CmdLine.insertCommandsAfter(cmdLine.split(" "), getUdid(), "&");
-        List<String> output = executor.execute(cmd);
-        for (String line : output) {
-            LOGGER.debug(line);
-        }
-
-        AppiumStatus.waitStartup(getSeleniumServer(), 30);
-    }
-    
     public List<String> execute(String[] cmd) {
     	return executor.execute(cmd);
     }

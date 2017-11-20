@@ -20,9 +20,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class DevicePool
 {
@@ -31,23 +28,6 @@ public class DevicePool
 	private static final Device nullDevice = new Device();
 	
 	private static ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
-
-	@Deprecated
-	//TODO: refactor code to avoid init device from capabilities only
-	public static Device initDevice() {
-		Device device = nullDevice;
-		//register device from local capabilities only
-		if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-			device = new Device(R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME),
-					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE),
-					Configuration.getPlatform(),
-					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION), 
-					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID), 
-					Configuration.get(Parameter.SELENIUM_HOST),
-					R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_REMOTE_URL));
-		}
-		return device;
-	}
 
 
 	public static Device registerDevice(Device device) {
@@ -71,9 +51,7 @@ public class DevicePool
         	if (deviceUdid == null) {
         		deviceUdid = "";
         	}
-        	String seleniumServer = propertiesMap.get("core.selenium_host");
-        	
-        	setDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, seleniumServer, ""));
+        	setDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, ""));
         }
 	}
 	

@@ -42,11 +42,6 @@ public class MobileFactory extends AbstractFactory {
         String driverType = Configuration.getDriverType();
         String mobilePlatformName = Configuration.getPlatform();
 
-        if (device != null && !device.isNull()) {
-        	seleniumHost = device.getSeleniumServer();
-        	LOGGER.debug("selenium_host: " + seleniumHost);
-        }
-        
         LOGGER.debug("selenium: " + seleniumHost);
         
         RemoteWebDriver driver = null;
@@ -66,34 +61,37 @@ public class MobileFactory extends AbstractFactory {
 
 					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
 					
-					if (device.isNull()) 
-					{
-						STFDevice info = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
-						if(info != null)
-						{
-							//run using ci or custom user...
-							if (R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED)) {
-								LOGGER.info("Selenium hub+stf feature is enabled.");
-								device = new Device(info.getModel(), info.getDeviceType(), info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, (String)info.getRemoteConnectUrl());
-								device.connectRemote();
-							} else {
-								String deviceType = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE);
-								String remoteURL = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_REMOTE_URL);
-								//set udid and remote URL as null as in this case we should explicitly connect device
-								device = new Device(info.getModel(), deviceType, info.getPlatform(), info.getVersion(), info.getSerial(), seleniumHost, remoteURL);
-							}
-						} else {
-							//fully local run. Read device info from capabilities only
-							device = DevicePool.initDevice();
-						}
-						DevicePool.registerDevice(device);
-					}
 				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
-					//TODO: read from capabilities and init device
-					device = DevicePool.initDevice();
+				}
+				
+				if (device.isNull()) 
+				{
+					// init device object from capabilities properties only
+					device = new Device(driver.getCapabilities());
+					
+					boolean stfEnabled = R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+							
+					if (stfEnabled) {
+						STFDevice info = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+						device.setRemoteURL((String)info.getRemoteConnectUrl());
+						device.connectRemote();
+					} else {
+						//STF can be used in manual mode. In this case redefine deviceType and udid using values from config.properties
+						String deviceType = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE);
+						if (!deviceType.isEmpty()) {
+							device.setType(deviceType);
+						}
+						
+						String remoteURL = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_REMOTE_URL);
+						if (!remoteURL.isEmpty()) {
+							device.setRemoteURL(remoteURL);
+						}
+
+					}
 					DevicePool.registerDevice(device);
 				}
+
 			} else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
             } else {
