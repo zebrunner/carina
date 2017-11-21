@@ -68,8 +68,11 @@ public class MobileFactory extends AbstractFactory {
 				if (device.isNull()) 
 				{
 					//TODO: double check that local run with direct appium works fine
-					device = (Device) getDeviceInfo(seleniumHost, driver.getSessionId().toString());
-					if (device == null) {
+					RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+					if (remoteDevice != null) {
+						device = new Device(remoteDevice);
+					}
+					else {
 						device = new Device(driver.getCapabilities());
 					}
 					

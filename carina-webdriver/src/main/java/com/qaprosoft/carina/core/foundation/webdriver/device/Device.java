@@ -49,6 +49,16 @@ public class Device extends RemoteDevice
 		setRemoteURL(remoteURL);
 	}
 	
+	public Device(RemoteDevice remoteDevice)
+	{
+		setName(remoteDevice.getName());
+		setType(remoteDevice.getType());
+		setOs(remoteDevice.getOs());
+		setOsVersion(remoteDevice.getOsVersion());
+		setUdid(remoteDevice.getUdid());
+		setRemoteURL(remoteDevice.getRemoteURL());
+	}
+	
 	public Device(Capabilities capabilities)
 	{
 		setName(capabilities.getCapability("deviceName").toString());
