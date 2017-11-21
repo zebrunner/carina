@@ -67,27 +67,15 @@ public class MobileFactory extends AbstractFactory {
 				
 				if (device.isNull()) 
 				{
-					// init device object from capabilities properties only
-					device = new Device(driver.getCapabilities());
+					//TODO: double check that local run with direct appium works fine
+					device = (Device) getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+					if (device == null) {
+						device = new Device(driver.getCapabilities());
+					}
 					
 					boolean stfEnabled = R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-							
 					if (stfEnabled) {
-						RemoteDevice info = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
-						device.setRemoteURL(info.getRemoteURL());
 						device.connectRemote();
-					} else {
-						//STF can be used in manual mode. In this case redefine deviceType and udid using values from config.properties
-						String deviceType = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE);
-						if (!deviceType.isEmpty()) {
-							device.setType(deviceType);
-						}
-						
-						String remoteURL = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_REMOTE_URL);
-						if (!remoteURL.isEmpty()) {
-							device.setRemoteURL(remoteURL);
-						}
-
 					}
 					DevicePool.registerDevice(device);
 				}
@@ -127,7 +115,7 @@ public class MobileFactory extends AbstractFactory {
     
     private RemoteDevice getDeviceInfo(String seleniumHost, String sessionId)
 	{
-    		RemoteDevice device = null;
+    	RemoteDevice device = null;
 		try
 		{
 			HttpClient client = HttpClientBuilder.create().build();
