@@ -143,7 +143,7 @@ public class NotificationPage extends MobileAbstractPage {
     public String getItemText(int num) {
         try {
             LOGGER.info("Visible text:" + lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).size());
-            if (DevicePool.getDevice().getType() == DeviceType.Type.ANDROID_TABLET) {
+            if (DevicePool.getDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET) {
                 try {
                     if (lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).isElementNotPresent(1)) {
                         return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Phone_Locator_Text)).getText();

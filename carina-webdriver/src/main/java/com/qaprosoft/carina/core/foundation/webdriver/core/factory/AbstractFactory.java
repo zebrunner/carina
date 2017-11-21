@@ -10,7 +10,7 @@ public abstract class AbstractFactory {
     protected static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
 
     public  WebDriver create(String testName) {
-        return create(testName, new Device(), null, null);
+        return create(testName, null, null, null);
     }
 
     abstract public WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String seleniumHost);

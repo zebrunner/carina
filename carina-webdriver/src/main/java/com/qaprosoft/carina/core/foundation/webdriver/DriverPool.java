@@ -284,7 +284,6 @@ public final class DriverPool {
 					// there is no sense to clean cache and reinstall app if we request dedicated device
 					device.screenOn();
 					
-					device.restartAppium();
 					device.clearAppData();
 					
 					// verify if valid build is already installed and uninstall only in case of any difference 

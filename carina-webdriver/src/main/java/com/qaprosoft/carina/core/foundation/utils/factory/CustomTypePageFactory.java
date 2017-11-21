@@ -56,7 +56,7 @@ public class CustomTypePageFactory {
 				.getSubTypesOf(parentClass);
 		LOGGER.debug("Relatives classes count:" + setClasses.size());
 		Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
-		Type screenType = DevicePool.getDevice().getType();
+		Type screenType = DevicePool.getDevice().getDeviceType();
 		
 		Device device = DevicePool.getDevice();
 		// default version in case if it is desktop driver

@@ -226,10 +226,6 @@ public class Configuration
         
         MOBILE_APP_CLEAR_CACHE("mobile_app_clear_cache"),
         
-        MOBILE_APPIUM_RESTART("mobile_appium_restart"),
-        
-		MOBILE_TOOLS_HOME("mobile_tools_home"),
-		
 		MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
 		
 		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 
