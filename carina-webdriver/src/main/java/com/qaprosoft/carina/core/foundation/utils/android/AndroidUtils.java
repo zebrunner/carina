@@ -787,48 +787,10 @@ public class AndroidUtils extends MobileUtils {
      * @return boolean
      */
     public static boolean setDeviceLanguage(String language) {
-        boolean status = false;
 
-        String[] setLocalizationChangePermissionCmd;
+        AndroidService executor = AndroidService.getInstance();
 
-        String[] setLocalizationCmd;
-
-        AdbExecutor executor;
-
-        language = language.toLowerCase();
-
-        executor = new AdbExecutor();
-        String[] initCmd = executor.getDefaultCmd();
-        LOGGER.debug("Init cmd: ".concat(initCmd.toString()));
-        String deviceUdid = DevicePool.getDevice().getUdid();
-
-        LOGGER.info("Device udid: ".concat(deviceUdid));
-        if (!deviceUdid.isEmpty()) {
-            setLocalizationChangePermissionCmd = CmdLine.insertCommandsAfter(initCmd, "-s", deviceUdid, "shell", "pm", "grant",
-                    "net.sanapeli.adbchangelanguage", "android.permission.CHANGE_CONFIGURATION");
-            setLocalizationCmd = CmdLine.insertCommandsAfter(initCmd, "-s", deviceUdid, "shell", "am", "start", "-n",
-                    "net.sanapeli.adbchangelanguage/.AdbChangeLanguage", "-e", "language", language);
-        } else {
-            setLocalizationChangePermissionCmd = CmdLine.insertCommandsAfter(initCmd, "shell", "pm", "grant", "net.sanapeli.adbchangelanguage",
-                    "android.permission.CHANGE_CONFIGURATION");
-            setLocalizationCmd = CmdLine.insertCommandsAfter(initCmd, "shell", "am", "start", "-n",
-                    "net.sanapeli.adbchangelanguage/.AdbChangeLanguage", "-e", "language", language);
-
-        }
-
-        LOGGER.info("Set localization change permission using apk 'ADB Change Language_v0.52' cmd: "
-                + CmdLine.arrayToString(setLocalizationChangePermissionCmd));
-
-        LOGGER.info("Set localization change to '" + language + "' using apk 'ADB Change Language_v0.52' cmd: "
-                + CmdLine.arrayToString(setLocalizationCmd));
-
-        LOGGER.info("Try set localization change permission with following cmd:" + CmdLine.arrayToString(setLocalizationChangePermissionCmd));
-        List<String> expandOutput = executor.execute(setLocalizationChangePermissionCmd);
-        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
-
-        LOGGER.info("Try set localization to '" + language + "' with following cmd:" + CmdLine.arrayToString(setLocalizationCmd));
-        List<String> changeLocaleOutput = executor.execute(setLocalizationCmd);
-        LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk': " + changeLocaleOutput);
+        boolean status = executor.setDeviceLanguage(language);
 
         return status;
     }

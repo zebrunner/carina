@@ -609,18 +609,14 @@ public class AndroidService {
 
         String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
 
-        if(currentAndroidVersion.contains("7.") || currentAndroidVersion.contains("6.")) {
-            LOGGER.info("On Android 6+ we should change locale instead of Language. Based on first part of Locale code");
-            if (language.contains("_")) {
-                language = language.split("_")[0];
-            }
-        }
+        LOGGER.info("Do not concat language for Android. Keep: " + language);
+        language=language.replace("_","-");
+        LOGGER.info("Refactor language to : " + language);
 
-        language = language.toLowerCase();
+        String actualDeviceLanguage = getDeviceLanguage();
 
-
-        if (language.contains(getDeviceLanguage().toLowerCase())) {
-            LOGGER.info("Device already have expected language.");
+        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
+            LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
             return true;
         }
 
@@ -663,7 +659,9 @@ public class AndroidService {
             R.CONFIG.put("language", lang);
         }
 
-        if (language.contains(getDeviceLanguage().toLowerCase())) {
+        actualDeviceLanguage = getDeviceLanguage();
+        LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
+        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
             status = true;
         } else {
             if (getDeviceLanguage().isEmpty()) {
