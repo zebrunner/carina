@@ -983,7 +983,7 @@ public class AndroidService {
 
         String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
-        if (currentAndroidVersion.contains("7.") || (DevicePool.getDevice().getType() == DeviceType.Type.ANDROID_TABLET)) {
+        if (currentAndroidVersion.contains("7.") || (DevicePool.getDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET)) {
             LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
             workflow = ChangeTimeZoneWorkflow.APK;
         }

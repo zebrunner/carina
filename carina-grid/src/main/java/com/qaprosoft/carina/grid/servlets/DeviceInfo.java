@@ -29,6 +29,7 @@ import org.openqa.grid.internal.TestSession;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.grid.integration.STF;
 import com.qaprosoft.zafira.models.stf.STFDevice;
 
@@ -79,17 +80,22 @@ public class DeviceInfo extends RegistryBasedServlet
 				Map<String, Object> cap = session.getSlot().getCapabilities();
 				if(cap.containsKey("udid"))
 				{
-					STFDevice device = STF.getDevice((String) cap.get("udid"));
-					if(device != null)
+					RemoteDevice device = new RemoteDevice(); 
+					device.setName((String) cap.get("deviceName"));
+					device.setOs((String) cap.get("platformName"));
+					device.setOsVersion((String) cap.get("platformVersion"));
+					device.setType((String) cap.get("deviceType"));
+					device.setUdid((String) cap.get("udid"));
+					
+					STFDevice stfDevice = STF.getDevice(device.getUdid());
+					if(stfDevice != null)
 					{
-						if(session.getSlot().getCapabilities().containsKey("deviceType"))
-						{
-							device.setDeviceType((String)session.getSlot().getCapabilities().get("deviceType"));
-						}
-						response.setStatus(HttpStatus.SC_OK);
-						response.getWriter().print(new ObjectMapper().writeValueAsString(device));
-					    response.getWriter().close();
+						device.setRemoteURL((String) stfDevice.getRemoteConnectUrl());
 					}
+					
+					response.setStatus(HttpStatus.SC_OK);
+					response.getWriter().print(new ObjectMapper().writeValueAsString(device));
+				    response.getWriter().close();
 				}
 			}
 		}
