@@ -235,7 +235,7 @@ public class L10Nparser {
 	 * @return String with path + PropertyFileName
 	 */
 	private static String getPropertyFileName(String localName) {
-		String ret = "";
+		String ret;
 		String add_new_loc_path = "null";
 		String add_new_loc_name = "null";
 		try {
@@ -282,7 +282,7 @@ public class L10Nparser {
 	 * @return boolean
 	 */
 	public static boolean checkLocalizationText(ExtendedWebElement elem, boolean skipMissed) {
-		return checkLocalizationText(elem, skipMissed, BASIC_WAIT_SHORT_TIMEOUT);
+		return checkLocalizationText(elem, skipMissed, BASIC_WAIT_SHORT_TIMEOUT, false);
 	}
 
 	/**
@@ -294,13 +294,14 @@ public class L10Nparser {
 	 * @param skipMissed
 	 *            - boolean - if true - will ignore missed elements.
 	 * @param timeout - timeout for element presence waiting.
+	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
 	 * @return boolean
 	 */
-	public static boolean checkLocalizationText(ExtendedWebElement elem, boolean skipMissed, int timeout) {
+	public static boolean checkLocalizationText(ExtendedWebElement elem, boolean skipMissed, int timeout, boolean skipPunctuationAndNumbers) {
 		if (elem.isElementPresent(timeout)) {
 			String elemText = elem.getText();
 			String locKey = elem.getName();
-			return checkLocalizationText(elemText, locKey);
+			return checkLocalizationText(elemText, locKey, skipPunctuationAndNumbers);
 		} else {
 			LOGGER.info("Expected element not present. Please check: " + elem);
 			if (skipMissed) {
@@ -322,7 +323,7 @@ public class L10Nparser {
 	 * @return boolean
 	 */
 	public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey) {
-		return checkLocalizationText(elem, locKey, BASIC_WAIT_SHORT_TIMEOUT);
+		return checkLocalizationText(elem, locKey, BASIC_WAIT_SHORT_TIMEOUT, false);
 	}
 
 	/**
@@ -334,12 +335,13 @@ public class L10Nparser {
 	 * @param locKey
 	 *            String
 	 * @param timeout - timeout for element presence waiting.
+	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
 	 * @return boolean
 	 */
-	public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey, int timeout) {
+	public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey, int timeout, boolean skipPunctuationAndNumbers) {
 		if (elem.isElementPresent(timeout)) {
 			String elemText = elem.getText();
-			return checkLocalizationText(elemText, locKey);
+			return checkLocalizationText(elemText, locKey, skipPunctuationAndNumbers);
 		} else {
 			LOGGER.info("Expected element not present. Please check:" + elem);
 		}
@@ -353,9 +355,10 @@ public class L10Nparser {
 	 *            String
 	 * @param locKey
 	 *            String
+	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
 	 * @return boolean
 	 */
-	public static boolean checkLocalizationText(String expectedText, String locKey) {
+	public static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
 		String l10n_default = L10N.getText(locKey, actualLocale);
 		String l10n_utf = L10N.getUTFText(locKey, actualLocale);
 
@@ -372,6 +375,10 @@ public class L10Nparser {
 								+ ". Actually: '" + expectedText + "', length=" + expectedText.length() + ".";
 				return false;
 			} else {
+				if(skipPunctuationAndNumbers) {
+					expectedText = expectedText.replaceAll("[0-9]","");
+					expectedText = expectedText.replace("!","").replace("\u0085","").replace("…","");
+				}
 				String newItem = locKey + "=" + expectedText;
 				LOGGER.info("Making new localization string: " + newItem);
 				newLocList.add(newItem);
@@ -380,14 +387,13 @@ public class L10Nparser {
 			}
 		} else {
 			if (ret) {
-				LOGGER.info("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
+				LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
 			}
 			if (ret_utf) {
 				LOGGER.info("Found localization text '" + expectedText + "' in UTF-8 encoding : " + l10n_utf);
 			}
 			return true;
 		}
-
 	}
 
 	/**
@@ -399,7 +405,20 @@ public class L10Nparser {
 	 * @return boolean
 	 */
 	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList) {
-		return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT);
+		return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT, false);
+	}
+
+	/**
+	 * check MultipleLocalization
+	 *
+	 * @param localizationCheckList
+	 *            - ExtendedWebElement[] should be set on required page with all
+	 *            needed public elements
+	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
+	 * @return boolean
+	 */
+	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList,  boolean skipPunctuationAndNumbers) {
+		return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT, false);
 	}
 
 	/**
@@ -409,14 +428,15 @@ public class L10Nparser {
 	 *            - ExtendedWebElement[] should be set on required page with all
 	 *            needed public elements
 	 * @param timeout - timeout for element presence waiting.
+	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
 	 * @return boolean
 	 */
-	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, int timeout) {
+	public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, int timeout, boolean skipPunctuationAndNumbers) {
 		boolean ret = true;
 		String returnAssertErrorMsg = "";
 		assertErrorMsg = "";
 		for (ExtendedWebElement elem : localizationCheckList) {
-			if (!checkLocalizationText(elem,true, timeout)) {
+			if (!checkLocalizationText(elem,true, timeout, skipPunctuationAndNumbers)) {
 				ret = false;
 				returnAssertErrorMsg = returnAssertErrorMsg + " \n" + assertErrorMsg;
 			}
