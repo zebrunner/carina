@@ -355,15 +355,23 @@ public class L10Nparser {
 	 *            String
 	 * @param locKey
 	 *            String
-	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
+	 * @param skipPunctuationAndNumbers - if true - there will be no numbers and
+	 *                                    tricky punctuation in l10n values and in checking.
+	 *                                    As well as validation will be case insensitive.
 	 * @return boolean
 	 */
 	public static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
 		String l10n_default = L10N.getText(locKey, actualLocale);
 		String l10n_utf = L10N.getUTFText(locKey, actualLocale);
+		boolean ret,ret_utf;
 
-		boolean ret = expectedText.contains(l10n_default);
-		boolean ret_utf = expectedText.contains(l10n_utf);
+		if(skipPunctuationAndNumbers) {
+			ret = removeNumbersAndPunctuation(expectedText).toLowerCase().contains(removeNumbersAndPunctuation(l10n_default).toLowerCase());
+			ret_utf = removeNumbersAndPunctuation(expectedText).toLowerCase().contains(removeNumbersAndPunctuation(l10n_utf).toLowerCase());
+		} else {
+			ret = expectedText.contains(l10n_default);
+			ret_utf = expectedText.contains(l10n_utf);
+		}
 
 		if (!ret && !ret_utf) {
 			if (!newLocalization) {
@@ -376,8 +384,7 @@ public class L10Nparser {
 				return false;
 			} else {
 				if(skipPunctuationAndNumbers) {
-					expectedText = expectedText.replaceAll("[0-9]","");
-					expectedText = expectedText.replace("!","").replace("\u0085","").replace("…","");
+					expectedText = removeNumbersAndPunctuation(expectedText);
 				}
 				String newItem = locKey + "=" + expectedText;
 				LOGGER.info("Making new localization string: " + newItem);
@@ -394,6 +401,21 @@ public class L10Nparser {
 			}
 			return true;
 		}
+	}
+
+	/**
+	 * removeNumbersAndPunctuation from L10n string
+	 * @param str String
+	 * @return String
+	 */
+	private static String removeNumbersAndPunctuation(String str) {
+		try {
+			str = str.replaceAll("[0-9]", "");
+			str = str.replace("!", "").replace("\u0085", "").replace("…", "");
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+		return str;
 	}
 
 	/**
