@@ -366,8 +366,8 @@ public class L10Nparser {
 		boolean ret,ret_utf;
 
 		if(skipPunctuationAndNumbers) {
-			ret = expectedText.toLowerCase().contains(l10n_default.toLowerCase());
-			ret_utf = expectedText.toLowerCase().contains(l10n_utf.toLowerCase());
+			ret = removeNumbersAndPunctuation(expectedText).toLowerCase().contains(removeNumbersAndPunctuation(l10n_default).toLowerCase());
+			ret_utf = removeNumbersAndPunctuation(expectedText).toLowerCase().contains(removeNumbersAndPunctuation(l10n_utf).toLowerCase());
 		} else {
 			ret = expectedText.contains(l10n_default);
 			ret_utf = expectedText.contains(l10n_utf);
@@ -384,8 +384,7 @@ public class L10Nparser {
 				return false;
 			} else {
 				if(skipPunctuationAndNumbers) {
-					expectedText = expectedText.replaceAll("[0-9]","");
-					expectedText = expectedText.replace("!","").replace("\u0085","").replace("…","");
+					expectedText = removeNumbersAndPunctuation(expectedText);
 				}
 				String newItem = locKey + "=" + expectedText;
 				LOGGER.info("Making new localization string: " + newItem);
@@ -402,6 +401,21 @@ public class L10Nparser {
 			}
 			return true;
 		}
+	}
+
+	/**
+	 * removeNumbersAndPunctuation from L10n string
+	 * @param str String
+	 * @return String
+	 */
+	private static String removeNumbersAndPunctuation(String str) {
+		try {
+			str = str.replaceAll("[0-9]", "");
+			str = str.replace("!", "").replace("\u0085", "").replace("…", "");
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+		return str;
 	}
 
 	/**
