@@ -68,6 +68,7 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
+import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -214,12 +215,16 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
-                                        ITestContext context) throws Throwable {
+    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable {
+
+        // handle expected skip
+        if (ExpectedSkipManager.getInstance().isSkip(testMethod, context)) {
+            skipExecution("Based on rule listed above");
+        }
+
         // do nothing for now
         apiMethodBuilder = new APIMethodBuilder();
     }
-    
     
     @AfterMethod(alwaysRun = true)
     public void executeAfterTestMethod(ITestResult result) {
