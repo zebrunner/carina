@@ -215,14 +215,13 @@ public abstract class AbstractTest // extends DriverHelper
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod,
-                                        ITestContext context) throws Throwable {
-    	
-		// handle expected skip
-		if(ExpectedSkipManager.getInstance().isSkip(testMethod, context)) {
-			skipExecution("Based on rule listed above");
-		}
-    		
+    public void executeBeforeTestMethod(XmlTest xmlTest, Method testMethod, ITestContext context) throws Throwable {
+
+        // handle expected skip
+        if (ExpectedSkipManager.getInstance().isSkip(testMethod, context)) {
+            skipExecution("Based on rule listed above");
+        }
+
         // do nothing for now
         apiMethodBuilder = new APIMethodBuilder();
     }
