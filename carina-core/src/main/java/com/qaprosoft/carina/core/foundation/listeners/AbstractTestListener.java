@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -603,6 +604,18 @@ public class AbstractTestListener extends TestArgsListener
 			errorMessage = getFullStackTrace(thr);
 			message = thr.getMessage();
 			result.getTestContext().setAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE, message);
+		}
+		
+		// handle in case of failed config (exclusion of expected skip)
+		if (errorMessage.isEmpty()) {
+			String methodName;
+			Collection<ITestResult> results = result.getTestContext().getSkippedConfigurations().getAllResults();
+			for (ITestResult resultItem : results) {
+				methodName = resultItem.getMethod().getMethodName();
+				if (methodName.equals(SpecialKeywords.BEFORE_TEST_METHOD)) {
+					errorMessage = getFullStackTrace(resultItem.getThrowable());
+				}
+			}
 		}
 
 		return errorMessage;

@@ -86,6 +86,7 @@ public class SpecialKeywords
 	public static final String BUG_ARGS_MAP = "bugArgsMap";
 	public static final String DO_NOT_RUN_TESTS = "doNotRunTests";
 	
+	public static final String BEFORE_TEST_METHOD = "executeBeforeTestMethod";
 	
 	public static final String INV_COUNT = "InvCount";
 	public static final String INVOCATION_COUNTER = " (" + INV_COUNT + "=%s)";
