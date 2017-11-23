@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.skip.rule;
+package com.qaprosoft.carina.core.foundation.rule;
 
 /**
  * Rule for handling of conditional cases: expectedSkips, etc.

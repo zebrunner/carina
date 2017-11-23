@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import com.qaprosoft.carina.core.foundation.skip.rule.IRule;
+import com.qaprosoft.carina.core.foundation.rule.IRule;
 
 public class ExpectedSkipManager {
 

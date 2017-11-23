@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.qaprosoft.carina.core.foundation.skip.rule.IRule;
+import com.qaprosoft.carina.core.foundation.rule.IRule;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ TYPE, METHOD })
