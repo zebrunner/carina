@@ -48,7 +48,7 @@ public class ExpectedSkipManager {
                 }
             } catch (InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Error during skip rules initialization: ".concat(rule.getName()));
-                LOGGER.error("Error msg: ".concat(e.getMessage()));
+                LOGGER.error("Error msg: ".concat(e.getMessage()), e);
             }
         }
         return false;
@@ -119,7 +119,7 @@ public class ExpectedSkipManager {
                 rules.addAll(Arrays.asList(testClass.getAnnotation(ExpectedSkip.class).rules()));
             }
             Method[] methods = testClass.getDeclaredMethods();
-            // verify if dependend method is marked as expected skip
+            // verify if dependent method is marked as expected skip
             for (Method method : methods) {
                 if (shortName.equalsIgnoreCase(method.getName()) && method.isAnnotationPresent(ExpectedSkip.class)) {
                     LOGGER.debug("Method is annotated with @ExpectedSkip: ".concat(methodName));
