@@ -50,15 +50,7 @@ public class MobileFactory extends AbstractFactory {
 		}
         try {
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-				//TODO: remove later this logic
 				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-					// handler in case app was installed via adb and there is no
-					// need to sign app using appium
-					if (Configuration.getBoolean(Configuration.Parameter.MOBILE_APP_INSTALL)
-							&& !Configuration.getBoolean(Configuration.Parameter.MOBILE_APP_UNINSTALL)) {
-						capabilities.setCapability("app", "");
-					}
-
 					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
 					
 				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {

@@ -16,7 +16,6 @@ import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
@@ -29,7 +28,6 @@ public class Device extends RemoteDevice
 {
 	private static final Logger LOGGER = Logger.getLogger(Device.class);
 
-	private boolean isAppInstalled = false;
 	
 	AdbExecutor executor = new AdbExecutor();
 
@@ -370,9 +368,6 @@ public class Device extends RemoteDevice
             return;
         }
         
-        if (!Configuration.getBoolean(Parameter.MOBILE_APP_CLEAR_CACHE))
-            return;
-
         if (isNull())
         	return;
 
@@ -434,7 +429,7 @@ public class Device extends RemoteDevice
         executor.execute(cmd);
     }
     
-    public void reinstallApp() {
+/*    public void reinstallApp() {
         if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             return;
         }
@@ -486,7 +481,7 @@ public class Device extends RemoteDevice
         	installApp(mobileApp);
         	isAppInstalled = true;
         }
-    }
+    }*/
     
     public String[] getInstalledApkVersion(String packageName) {
         //adb -s UDID shell dumpsys package PACKAGE | grep versionCode

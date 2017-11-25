@@ -66,11 +66,8 @@ public class ZafiraConfigurator implements IConfigurator
 			conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
 			
 			LOGGER.info("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
-			
-//			//unregister current device so it doesn't appear for the next step
-//			DevicePool.removeCurrentDevice();
 		} else {
-			LOGGER.warn("Unable to detect current device for threadId: " + threadId);
+			LOGGER.debug("Unable to detect current device for threadId: " + threadId);
 		}
         return conf;
     }
