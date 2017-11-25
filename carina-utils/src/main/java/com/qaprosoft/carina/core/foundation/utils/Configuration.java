@@ -218,14 +218,6 @@ public class Configuration
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
         
         // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_APP_PREUPGRADE("mobile_app_preupgrade"),
-        
-        MOBILE_APP_UNINSTALL("mobile_app_uninstall"),
-        
-        MOBILE_APP_INSTALL("mobile_app_install"),
-        
-        MOBILE_APP_CLEAR_CACHE("mobile_app_clear_cache"),
-        
 		MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
 		
 		//DROPBOX_ACCESS_TOKEN("dropbox_access_token"), 

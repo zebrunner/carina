@@ -166,6 +166,6 @@ public class TestRail
 
 	public static void clearCases() {
 
-		casesIds.set(new ArrayList());
+		casesIds.set(new ArrayList<String>());
 	}
 }

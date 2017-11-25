@@ -276,20 +276,6 @@ public final class DriverPool {
 				//TODO: move browsermob startup to this location
 				ProxyPool.startProxy();
 
-				
-				//TODO: remove or move device manipulation to MobileFactory
-				// for local runs try to init device from capabilities
-				if (!device.isNull()) {
-					// turn on mobile device display if necessary. action can be done after registering available device with thread
-					// there is no sense to clean cache and reinstall app if we request dedicated device
-					device.screenOn();
-					
-					device.clearAppData();
-					
-					// verify if valid build is already installed and uninstall only in case of any difference 
-					device.reinstallApp();
-				}
-				
 				drv = DriverFactory.create(name, device, capabilities, seleniumHost);
 				registerDriver(drv, name);
 
