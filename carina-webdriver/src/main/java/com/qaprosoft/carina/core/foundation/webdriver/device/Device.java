@@ -140,9 +140,11 @@ public class Device extends RemoteDevice
 		if (isNull())
 			return;
 
-		LOGGER.info("adb disconnect " + getRemoteURL());
-		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
-		executor.execute(cmd);
+		// [VD] No need to do adb command as stopping STF session do it correctly 
+//		LOGGER.info("adb disconnect " + getRemoteURL());
+//		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
+//		executor.execute(cmd);
+		
 	}
 	
 	
