@@ -31,15 +31,14 @@
         <selenium-server.version>3.4.0</selenium-server.version>
         <appium.version>5.0.0-BETA9</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>3.0.18-SNAPSHOT</zafira-client.version>
+        <zafira-client.version>3.0.33</zafira-client.version>
         <alice-client.version>1.0.2</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
         <!-- Others -->
         <monte-repack.version>1.0</monte-repack.version>
         <json-simple.version>1.1</json-simple.version>
-
-	      <rest-assured.version>2.9.0</rest-assured.version>
+        <rest-assured.version>2.9.0</rest-assured.version>
     </properties>
 
     <modules>
