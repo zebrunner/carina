@@ -269,7 +269,7 @@ public final class DriverPool {
 		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
-		while (!init & count++ < maxCount) {
+		while (!init && count++ < maxCount) {
 			try {
 				LOGGER.debug("initDriver start...");
 				

@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
+import io.appium.java_client.MobileDriver;
+import io.appium.java_client.TouchAction;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -12,6 +14,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.AppiumDriver;
+
+import java.time.Duration;
 
 public class MobileUtils {
     protected static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
@@ -349,5 +353,23 @@ public class MobileUtils {
      */
     public static void swipeCoord(int startX, int startY, int endX, int endY) {
         swipeCoord(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
+    }
+
+    /**
+     * Example of swipe By TouchAction (platform independent)
+     * Should be checked on different applications.
+     * If ok and will work on latest java-appium-client than all swipe methods should be updated.
+     *
+     * @param startx int
+     * @param starty int
+     * @param endx int
+     * @param endy int
+     * @param duration int Millis
+     */
+    public static void swipeByTouchAction(int startx, int starty, int endx, int endy, int duration) {
+        int xOffset = endx - startx;
+        int yOffset = endy - starty;
+        new TouchAction((MobileDriver<?>) DriverPool.getDriver()).press(startx, starty).waitAction(Duration.ofMillis(duration))
+                .moveTo(xOffset, yOffset).release().perform();
     }
 }
