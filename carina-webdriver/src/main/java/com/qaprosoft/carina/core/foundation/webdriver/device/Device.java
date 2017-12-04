@@ -604,7 +604,8 @@ public class Device extends RemoteDevice
      * Related apps will be uninstall just once for a test launch.
      */
     public void uninstallRelatedApps() {
-        if (Configuration.getBoolean(Parameter.UNINSTALL_RELATED_APPS) && !clearedDeviceUdids.contains(getUdid())) {
+        if (getOs().equalsIgnoreCase(Type.ANDROID_PHONE.getFamily()) && Configuration.getBoolean(Parameter.UNINSTALL_RELATED_APPS)
+                && !clearedDeviceUdids.contains(getUdid())) {
             String mobileApp = Configuration.getMobileApp();
             LOGGER.debug("Current mobile app: ".concat(mobileApp));
             String mobilePackage;
