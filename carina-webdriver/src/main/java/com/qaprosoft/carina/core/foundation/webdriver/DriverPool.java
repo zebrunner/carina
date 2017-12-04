@@ -161,7 +161,7 @@ public final class DriverPool {
 	 */
 	public static WebDriver restartDriver(boolean isSameDevice) {
 		WebDriver drv = getDriver(DEFAULT);
-		Device device = null;
+		Device device = DevicePool.getNullDevice();
 		if (isSameDevice) {
 			device = DevicePool.getDevice();
 		}
