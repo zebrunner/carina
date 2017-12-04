@@ -3,9 +3,11 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +18,7 @@ import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
@@ -28,6 +31,11 @@ public class Device extends RemoteDevice
 {
 	private static final Logger LOGGER = Logger.getLogger(Device.class);
 
+	/**
+     * ENABLED only in case of availability of parameter - 'uninstall_related_apps'.
+     * Store udids of devices where related apps were uninstalled
+     */
+    private static List<String> clearedDeviceUdids = new ArrayList<>();
 	
 	AdbExecutor executor = new AdbExecutor();
 
@@ -583,13 +591,51 @@ public class Device extends RemoteDevice
     }
     
     public String getAdbName() {
-    	if (!StringUtils.isEmpty(getRemoteURL())) {
-    		return getRemoteURL();
-    	} else if (!StringUtils.isEmpty(getUdid())) {
-    		return getUdid();
-    	} else {
-    		return "";
-    	}
+        if (!StringUtils.isEmpty(getRemoteURL())) {
+            return getRemoteURL();
+        } else if (!StringUtils.isEmpty(getUdid())) {
+            return getUdid();
+        } else {
+            return "";
+        }
+    }
+    
+    /**
+     * Related apps will be uninstall just once for a test launch.
+     */
+    public void uninstallRelatedApps() {
+        if (Configuration.getBoolean(Parameter.UNINSTALL_RELATED_APPS) && !clearedDeviceUdids.contains(getUdid())) {
+            String mobileApp = Configuration.getMobileApp();
+            LOGGER.debug("Current mobile app: ".concat(mobileApp));
+            String mobilePackage;
+            try {
+                mobilePackage = getApkPackageName(mobileApp);
+            } catch (Exception e) {
+                LOGGER.info("Error during extraction of package using aapt. It will be extracted from config");
+                mobilePackage = R.CONFIG.get(SpecialKeywords.MOBILE_APP_PACKAGE);
+            }
+            LOGGER.debug("Current mobile package: ".concat(mobilePackage));
+            // in general it has following naming convention:
+            // com.projectname.app
+            // so we need to remove all apps realted to 1 project
+            String projectName = mobilePackage.split("\\.")[1];
+            LOGGER.debug("Apps related to current project will be uninstalled. Extracted project: ".concat(projectName));
+            List<String> installedPackages = getInstalledPackages();
+            // extracted package syntax: package:com.project.app            
+            installedPackages.parallelStream().filter(packageName -> packageName.matches(String.format(".*\\.%s\\..*", projectName)))
+                    .collect(Collectors.toList()).forEach((k) -> uninstallApp(k.split(":")[1]));
+            LOGGER.debug("Mobile app will be installed again");
+            installApp(mobileApp);
+            String activity = R.CONFIG.get(SpecialKeywords.MOBILE_APP_ACITIVTY);
+            LOGGER.debug("Extracted activity: ".concat(activity));
+            execute(CmdLine.insertCommandsBefore(String.format("shell am start -n %s/%s", mobilePackage, activity).split(" "), "adb", "-s",
+                    getUdid()));
+            clearedDeviceUdids.add(getUdid());
+            LOGGER.debug("Udids of devices where applciation was already reinstalled: ".concat(clearedDeviceUdids.toString()));
+        } else {
+            LOGGER.debug("Related apps had been already uninstalled or flag uninstall_related_apps is disabled.");
+        }
+        
     }
 
 }

@@ -74,7 +74,8 @@ public class MobileFactory extends AbstractFactory {
 					}
 					DevicePool.registerDevice(device);
 				}
-
+				// will be performed just in case uninstall_related_apps flag marked as true
+				device.uninstallRelatedApps();
 			} else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
             } else {
