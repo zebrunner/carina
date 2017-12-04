@@ -35,9 +35,10 @@ public class ExpectedSkipManager {
      * Return decision whether this tests should be skipped or not - based on
      * rules
      * 
-     * @param testMethod
-     * @param context
-     * @return isSkip
+     * @param testMethod test method annotated with @ExpectedSkip
+     * @param context tests context which is used for rules collection from
+     * initial and dependent methods
+     * @return isSkip decision whether test should be skipped
      */
     public boolean isSkip(Method testMethod, ITestContext context) {
         for (Class<? extends IRule> rule : collectRules(testMethod, context)) {
