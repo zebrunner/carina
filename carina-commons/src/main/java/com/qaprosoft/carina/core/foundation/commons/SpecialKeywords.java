@@ -138,6 +138,8 @@ public class SpecialKeywords
 	public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
 	public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";
 	public static final String MOBILE_DEVICE_REMOTE_URL = "capabilities.remoteURL";
+	public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
+	public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
 	
 	
 	// ------------- STF PROPERTIES ---------------------------------

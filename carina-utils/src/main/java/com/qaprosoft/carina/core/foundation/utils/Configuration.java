@@ -285,7 +285,9 @@ public class Configuration
 		//HealthCheck
 		HEALTH_CHECK_CLASS("health_check_class"),
 		
-		HEALTH_CHECK_METHODS("health_check_methods")
+		HEALTH_CHECK_METHODS("health_check_methods"),
+		
+		UNINSTALL_RELATED_APPS("uninstall_related_apps")
 		;
 
 		private final String key;
