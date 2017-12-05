@@ -17,29 +17,6 @@
     <suite>api</suite>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>qaprosoft_releases</id>
-      <name>Qaprosoft Releases</name>
-      <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
-      <releases>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>qaprosoft_snapshots</id>
-      <name>Qaprosoft Snapshots</name>
-      <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>com.qaprosoft</groupId>

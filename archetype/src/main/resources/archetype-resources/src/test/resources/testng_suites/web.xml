@@ -7,7 +7,7 @@
 
 	<parameter name="suiteOwner" value="demo"/>
 
-	<parameter name="zafira_project" value="unknown" />
+	<parameter name="zafira_project" value="UNKNOWN" />
 	<parameter name="jenkinsJobCreation" value="true" />
 	<parameter name="jenkinsJobFolder" value="DEMO" />
 	<parameter name="jenkinsJobName" value="Web-Demo-Test" />
@@ -24,11 +24,5 @@
 			<class name="${package}.carina.demo.WebSampleTest" />
 		</classes>
 	</test>
-
-	<!-- test name="AI login tests">
-		<classes>
-			<class name="${package}.carina.demo.AISampleTest" />
-		</classes>
-	</test -->
 
 </suite>
