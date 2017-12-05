@@ -627,6 +627,8 @@ public class Device extends RemoteDevice
                     .collect(Collectors.toList()).forEach((k) -> uninstallApp(k.split(":")[1]));
             LOGGER.debug("Mobile app will be installed again");
             installApp(mobileApp);
+            // clear device cache one more time after reinstall of the application           
+            clearAppData(mobileApp);
             String activity = R.CONFIG.get(SpecialKeywords.MOBILE_APP_ACITIVTY);
             LOGGER.debug("Extracted activity: ".concat(activity));
             execute(CmdLine.insertCommandsBefore(String.format("shell am start -n %s/%s", mobilePackage, activity).split(" "), "adb", "-s",
