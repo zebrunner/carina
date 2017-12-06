@@ -608,13 +608,14 @@ public class Device extends RemoteDevice
                 && !clearedDeviceUdids.contains(getUdid())) {
             String mobileApp = Configuration.getMobileApp();
             LOGGER.debug("Current mobile app: ".concat(mobileApp));
-            String mobilePackage;
+            String tempPackage;
             try {
-                mobilePackage = getApkPackageName(mobileApp);
+                tempPackage = getApkPackageName(mobileApp);
             } catch (Exception e) {
                 LOGGER.info("Error during extraction of package using aapt. It will be extracted from config");
-                mobilePackage = R.CONFIG.get(SpecialKeywords.MOBILE_APP_PACKAGE);
+                tempPackage = R.CONFIG.get(SpecialKeywords.MOBILE_APP_PACKAGE);
             }
+            final String mobilePackage = tempPackage;
             LOGGER.debug("Current mobile package: ".concat(mobilePackage));
             // in general it has following naming convention:
             // com.projectname.app
@@ -623,16 +624,10 @@ public class Device extends RemoteDevice
             LOGGER.debug("Apps related to current project will be uninstalled. Extracted project: ".concat(projectName));
             List<String> installedPackages = getInstalledPackages();
             // extracted package syntax: package:com.project.app            
-            installedPackages.parallelStream().filter(packageName -> packageName.matches(String.format(".*\\.%s\\..*", projectName)))
-                    .collect(Collectors.toList()).forEach((k) -> uninstallApp(k.split(":")[1]));
-            LOGGER.debug("Mobile app will be installed again");
-            installApp(mobileApp);
-            // clear device cache one more time after reinstall of the application           
-            clearAppData(mobileApp);
-            String activity = R.CONFIG.get(SpecialKeywords.MOBILE_APP_ACITIVTY);
-            LOGGER.debug("Extracted activity: ".concat(activity));
-            execute(CmdLine.insertCommandsBefore(String.format("shell am start -n %s/%s", mobilePackage, activity).split(" "), "adb", "-s",
-                    getUdid()));
+            installedPackages.parallelStream()
+                    .filter(packageName -> (packageName.matches(String.format(".*\\.%s\\..*", projectName))
+                            && !packageName.equalsIgnoreCase(String.format("package:%s", mobilePackage))))
+                    .collect(Collectors.toList()).forEach((k) -> uninstallApp(k.split(":")[1]));         
             clearedDeviceUdids.add(getUdid());
             LOGGER.debug("Udids of devices where applciation was already reinstalled: ".concat(clearedDeviceUdids.toString()));
         } else {
