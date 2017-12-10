@@ -21,7 +21,7 @@
     <repository>
       <id>qaprosoft_releases</id>
       <name>Qaprosoft Releases</name>
-      <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
+      <url>http://ci.qaprosoft.com/nexus/content/repositories/releases/</url>
       <releases>
       </releases>
       <snapshots>
@@ -31,7 +31,7 @@
     <repository>
       <id>qaprosoft_snapshots</id>
       <name>Qaprosoft Snapshots</name>
-      <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+      <url>http://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
       <releases>
         <enabled>false</enabled>
       </releases>

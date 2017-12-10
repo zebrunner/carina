@@ -59,7 +59,7 @@
         <repository>
             <id>qaprosoft_releases</id>
             <name>Qaprosoft Releases</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
+            <url>http://ci.qaprosoft.com/nexus/content/repositories/releases/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -70,7 +70,7 @@
         <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -81,7 +81,7 @@
         <repository>
             <id>qaprosoft_3rdparty</id>
             <name>Qaprosoft Thirdparty</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/thirdparty/</url>
+            <url>http://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
         </repository>
     </repositories>
 
@@ -317,12 +317,12 @@
         <repository>
             <id>deploymentRepo</id>
             <name>Qaprosoft Releases</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/releases/</url>
+            <url>http://ci.qaprosoft.com/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>deploymentRepo</id>
             <name>Qaprosoft Snapshots</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
