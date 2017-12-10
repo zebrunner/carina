@@ -343,8 +343,19 @@ public class MobileUtils {
      * @param starty int
      */
     public static void tap(int startx, int starty) {
+    	tap(startx, starty, 1000);
+    }
+    
+    /**
+     * Tap with TouchAction by coordinates
+     *
+     * @param startx int
+     * @param starty int
+     * @param duration int
+     */
+    public static void tap(int startx, int starty, int duration) {
         TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
-        touchAction.tap(startx, starty).perform();
+        touchAction.tap(startx, starty).waitAction(Duration.ofMillis(duration)).perform();
     }
 
     /**
