@@ -174,10 +174,10 @@ public final class DriverPool {
 			}
 
 			drv.quit();
-			LOGGER.debug("Driver exited during restart..." + drv);
+			LOGGER.debug("Driver exited during restart...");
 		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found" + drv);
+			LOGGER.debug("unable to quit as sesion was not found!");
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver restart: ", e);
 		} finally {
