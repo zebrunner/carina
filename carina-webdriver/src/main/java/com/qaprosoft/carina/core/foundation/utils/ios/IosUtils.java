@@ -59,7 +59,7 @@ public class IosUtils extends MobileUtils {
                 LOGGER.info(String.format("Choosen wrong direction: %s! Please, use UP or DOWN", direction.toString()));
             while (countSwipes-- > 0) {
                 LOGGER.info("Remain attemps to swipe: " + countSwipes);
-                driver.swipe(screenWidth, screenHeight / 2, screenWidth, coordinateToSwipe, 1500);
+                swipe(screenWidth, screenHeight / 2, screenWidth, coordinateToSwipe, 1500);
             }
         } catch (Exception e) {
             LOGGER.info("Can not swipe");
@@ -137,7 +137,7 @@ public class IosUtils extends MobileUtils {
         int x = driver.manage().window().getSize().width / 2;
         int y = driver.manage().window().getSize().height;
         LOGGER.info("Swipe up will be executed.");
-        ((IOSDriver<?>) driver).swipe(x, y / 2, x, y * 4 / 5, duration);
+        swipe(x, y / 2, x, y * 4 / 5, duration);
     }
 
     /**
@@ -174,7 +174,7 @@ public class IosUtils extends MobileUtils {
         int x = driver.manage().window().getSize().width / 2;
         int y = driver.manage().window().getSize().height / 2;
         LOGGER.info("Swipe down will be executed.");
-        ((IOSDriver<?>) driver).swipe(x, y, x, y / 2, duration);
+        swipe(x, y, x, y / 2, duration);
     }
 
 }

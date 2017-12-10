@@ -20,11 +20,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.PressesKeyCode;
-import io.appium.java_client.SwipeElementDirection;
 import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDeviceActionShortcuts;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 
@@ -69,17 +66,10 @@ public class AndroidUtils extends MobileUtils {
         } catch (Exception e) {
             LOGGER.error("Exception during pressKeyCode:", e);
             try {
-                LOGGER.info("Press key code by old method: " + keyCode);
-                ((AndroidDeviceActionShortcuts) DriverPool.getDriver()).pressKeyCode(keyCode);
-                return true;
-            } catch (Exception err) {
-                LOGGER.error("Exception during pressKeyCode with old method:", err);
-                try {
-                    LOGGER.info("Press key code by javaScript: " + keyCode);
-                    executeKeyEvent(keyCode);
-                } catch (Exception err2) {
-                    LOGGER.error("Exception during pressKeyCode with JavaScript:", err2);
-                }
+                LOGGER.info("Press key code by javaScript: " + keyCode);
+                executeKeyEvent(keyCode);
+            } catch (Exception err2) {
+                LOGGER.error("Exception during pressKeyCode with JavaScript:", err2);
             }
         }
         return false;
@@ -239,64 +229,6 @@ public class AndroidUtils extends MobileUtils {
     }
 
     /**
-     * tap And Swipe specific ExtendedWebElement element to required direction
-     *
-     * @param elem ExtendedWebElement
-     * @param direction SwipeElementDirection
-     * @param duration of swipe (int)
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean tapAndSwipe(ExtendedWebElement elem, SwipeElementDirection direction, int duration) {
-        return tapAndSwipe(elem.getBy(), direction, duration);
-    }
-
-    /**
-     * tap And Swipe specific element to left by default
-     *
-     * @param elem By
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean tapAndSwipe(By elem) {
-        return tapAndSwipe(elem, SwipeElementDirection.LEFT, 1000);
-    }
-
-    /**
-     * tap And Swipe specific element to required direction
-     *
-     * @param elem By
-     * @param direction SwipeElementDirection
-     * @param duration of swipe (int)
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean tapAndSwipe(By elem, SwipeElementDirection direction, int duration) {
-        MobileElement element;
-        WebDriver driver = DriverPool.getDriver();
-        try {
-            element = (MobileElement) driver.findElement(elem);
-            element.swipe(direction, duration);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Exception occurred when " + "element.swipe(SwipeElementDirection." + direction.toString() + ", " + duration + ")  "
-                    + "was provided in tapAndSwipe functionality. Error: " + e.getLocalizedMessage());
-        }
-        return false;
-    }
-
-    /**
-     * swipe Up
-     *
-     * @param elem By
-     * @param time int
-     */
-    @Deprecated
-    public static void swipeUp(By elem, int time) {
-        tapAndSwipe(elem, SwipeElementDirection.UP, time);
-    }
-
-    /**
      * swipe In Container
      *
      * @param elem - scrollable container
@@ -364,7 +296,7 @@ public class AndroidUtils extends MobileUtils {
             LOGGER.debug(
                     "Direction:" + direction + ". Try #" + i + ". Points: X1Y1=" + pointX1 + ", " + pointY1 + ", X2Y2=" + pointX2 + ", " + pointY2);
             try {
-                ((AndroidDriver<?>) driver).swipe(pointX1, pointY1, pointX2, pointY2, duration);
+                swipe(pointX1, pointY1, pointX2, pointY2, duration);
             } catch (Exception e) {
                 LOGGER.error("Exception: " + e);
             }
@@ -387,7 +319,7 @@ public class AndroidUtils extends MobileUtils {
             LOGGER.info("Swipe down");
             while (!extendedWebElement.isElementPresent(1) && ++i <= 10) {
                 LOGGER.debug("Swipe down. Attempt #" + i);
-                ((AndroidDriver<?>) driver).swipe((int) (x * 0.1), (int) (y * 0.9), (int) (x * 0.1), (int) (y * 0.2), 2000);
+                swipe((int) (x * 0.1), (int) (y * 0.9), (int) (x * 0.1), (int) (y * 0.2), 2000);
 
             }
             if (!extendedWebElement.isElementPresent(1)) {
@@ -397,7 +329,7 @@ public class AndroidUtils extends MobileUtils {
                 y = driver.manage().window().getSize().getHeight();
                 while (!extendedWebElement.isElementPresent(1) && ++i <= 10) {
                     LOGGER.debug("Swipe up. Attempt #" + i);
-                    ((AndroidDriver<?>) driver).swipe((int) (x * 0.1), (int) (y * 0.2), (int) (x * 0.1), (int) (y * 0.9), 2000);
+                    swipe((int) (x * 0.1), (int) (y * 0.2), (int) (x * 0.1), (int) (y * 0.9), 2000);
                 }
             }
             return extendedWebElement.isElementPresent(1);
