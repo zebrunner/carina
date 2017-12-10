@@ -112,7 +112,7 @@ public abstract class AbstractTest // extends DriverHelper
     protected long startDate;
 
     @BeforeSuite(alwaysRun = true)
-    public void executeBeforeTestSuite(ITestContext context) throws Throwable {
+    public void executeBeforeTestSuite(ITestContext context) {
     	
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
