@@ -1,7 +1,7 @@
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.TouchAction;
+import java.time.Duration;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -11,11 +11,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
-import io.appium.java_client.AppiumDriver;
-
-import java.time.Duration;
+import io.appium.java_client.MobileDriver;
+import io.appium.java_client.TouchAction;
 
 public class MobileUtils {
     protected static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
@@ -77,7 +75,6 @@ public class MobileUtils {
      * @param duration int
      * @return boolean
      */
-    @SuppressWarnings({ "rawtypes", "incomplete-switch" })
     public static boolean swipeInDevice(ExtendedWebElement element, Direction direction, double minCoefficient, double maxCoefficient, int duration) {
         if (element.isElementNotPresent(5)) {
             LOGGER.warn("Cannot swipe! Impossible to find element " + element.getName());
@@ -119,12 +116,12 @@ public class MobileUtils {
             endx = startx;
             endy = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));
             break;
+		default:
+			throw new RuntimeException("Unsupported direction: " + direction);
         }
         LOGGER.debug(String.format("Swipe from (X = %d; Y = %d) to (X = %d; Y = %d)", startx, starty, endx, endy));
         try {
-            WebDriver driver = DriverPool.getDriver();
-
-            ((AppiumDriver) driver).swipe(startx, starty, endx, endy, duration);
+            swipe(startx, starty, endx, endy, duration);
             return true;
         } catch (Exception e) {
             LOGGER.error(String.format("Error during Swipe from (X = %d; Y = %d) to (X = %d; Y = %d): %s", startx, starty, endx, endy, e));
@@ -225,58 +222,6 @@ public class MobileUtils {
     }
 
     /**
-     * swipeUntilElementPresence
-     * 
-     * @param element ExtendedWebElement
-     * @param times int
-     * @param duration int
-     * @return boolean
-     */
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int times, int duration) {
-        WebDriver driver = DriverPool.getDriver();
-        Dimension scrSize;
-        int x;
-        int y;
-        boolean isPresent = element.isElementPresent(1);
-        LOGGER.info("Swipe down to element: ".concat(element.toString()));
-        while (!isPresent && times-- > 0) {
-            LOGGER.debug("Element not present! Swipe down will be executed.");
-            LOGGER.debug("Page source: ".concat(driver.getPageSource()));
-            scrSize = driver.manage().window().getSize();
-            x = scrSize.width / 2;
-            // swipe coordinates for ios should be less than for android to
-            // avoid elements' skipping
-            if (!DevicePool.getDevice().getOs().equalsIgnoreCase("android")) {
-                y = scrSize.height / 4;
-            } else {
-                y = scrSize.height / 2;
-            }
-            ((AppiumDriver<?>) driver).swipe(x, y, x, y / 2, duration);
-            LOGGER.info("Swipe was executed. Attempts remain: " + times);
-            isPresent = element.isElementPresent(1);
-            LOGGER.info("Result: " + isPresent);
-        }
-        if (!isPresent) {
-            LOGGER.info("Swipe up to element: ".concat(element.toString()));
-            while (!isPresent && times-- > 0) {
-                LOGGER.debug("Element not present! Swipe up will be executed.");
-                scrSize = driver.manage().window().getSize();
-                x = scrSize.width / 2;
-                y = scrSize.height / 2;
-                ((AppiumDriver<?>) driver).swipe(x, y / 2, x, y, duration);
-                LOGGER.info("Swipe was executed. Attempts remain: " + times);
-                isPresent = element.isElementPresent(1);
-                LOGGER.info("Result: " + isPresent);
-            }
-        }
-        return isPresent;
-    }
-
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int times) {
-        return swipeUntilElementPresence(element, times, 500);
-    }
-
-    /**
      * swipeInDevice
      * 
      * @param direction Direction
@@ -323,7 +268,7 @@ public class MobileUtils {
         }
         LOGGER.debug(String.format("Swipe from (X = %d; Y = %d) to (X = %d; Y = %d)", startx, starty, endx, endy));
         try {
-            ((AppiumDriver<?>) driver).swipe(startx, starty, endx, endy, duration);
+            swipe(startx, starty, endx, endy, duration);
         } catch (Exception e) {
             LOGGER.error(String.format("Error during Swipe from (X = %d; Y = %d) to (X = %d; Y = %d): %s", startx, starty, endx, endy, e));
         }
@@ -339,8 +284,7 @@ public class MobileUtils {
      * @param duration int
      */
     public static void swipeCoord(int startX, int startY, int endX, int endY, int duration) {
-        WebDriver driver = DriverPool.getDriver();
-        ((AppiumDriver<?>) driver).swipe(startX, startY, endX, endY, duration);
+    	swipe(startX, startY, endX, endY, duration);
     }
 
     /**
@@ -352,9 +296,108 @@ public class MobileUtils {
      * @param endY int
      */
     public static void swipeCoord(int startX, int startY, int endX, int endY) {
-        swipeCoord(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
+        swipe(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
     }
 
+    
+    public static boolean scrollTo(ExtendedWebElement element, int swipeTimes) {
+        boolean isPresent = element.isElementPresent(2);
+        LOGGER.info("Swipe to element: ".concat(element.getNameWithLocator().toString()));
+
+        try {
+            int defaultSwipeTimes = swipeTimes;
+            while (!isPresent && swipeTimes-- > 0) {
+                LOGGER.debug("Element not present! Swipe up will be executed.");
+                swipeInDevice(Direction.UP, 1000);
+                LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
+                isPresent = element.isElementPresent(1);
+                LOGGER.info("Result: " + isPresent);
+            }
+
+            if (!isPresent) {
+                LOGGER.info("Swipe down to element: ".concat(element.getNameWithLocator().toString()));
+                swipeTimes = defaultSwipeTimes;
+
+                while (!isPresent && swipeTimes-- > 0) {
+                    LOGGER.debug("Element not present! Swipe down will be executed.");
+                    swipeInDevice(Direction.DOWN, 1000);
+                    LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
+                    isPresent = element.isElementPresent(1);
+                    LOGGER.info("Result: " + isPresent);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+
+        return isPresent;
+    }
+    
+    
+    // *************************** TouchActions ********************************* //
+
+    /**
+     * Tap with TouchAction by coordinates
+     *
+     * @param startx int
+     * @param starty int
+     */
+    public static void tap(int startx, int starty) {
+        TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
+        touchAction.tap(startx, starty).perform();
+    }
+
+    /**
+     * swipeUntilElementPresence Using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param times int
+     * @return boolean
+     */
+    public static boolean swipeUntilElementPresence(final ExtendedWebElement element) {
+    	return swipeUntilElementPresence(element, 20, 200);
+    }
+    
+    /**
+     * swipeUntilElementPresence Using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param times int
+     * @return boolean
+     */
+    public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int times) {
+    	return swipeUntilElementPresence(element, times, 200);
+    }
+    /**
+     * swipeUntilElementPresence Using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param times int
+     * @return boolean
+     */
+    public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int times, int duration) {
+        WebDriver driver = DriverPool.getDriver();
+        Dimension scrSize = driver.manage().window().getSize();
+        int x = scrSize.width / 2;
+        int y = scrSize.height / 2;
+        boolean isPresent = element.isElementPresent(1);
+        if (!isPresent) {
+            swipe(x, y / 2, x, y * 3 / 2, duration);
+            isPresent = element.isElementPresent(1);
+        }
+        LOGGER.info("Swipe down to element: ".concat(element.getBy().toString()));
+        while (!isPresent && times-- > 0) {
+            LOGGER.debug("Element not present! Swipe down will be executed.");
+
+            swipe(x, y * 9 / 10, x, -200, duration);
+            LOGGER.info("Swipe was executed. Attempts remain: " + times);
+            isPresent = element.isElementPresent(1);
+            LOGGER.info("Result: " + isPresent);
+        }
+        return isPresent;
+    }
+
+    
     /**
      * Example of swipe By TouchAction (platform independent)
      * Should be checked on different applications.
@@ -366,7 +409,7 @@ public class MobileUtils {
      * @param endy int
      * @param duration int Millis
      */
-    public static void swipeByTouchAction(int startx, int starty, int endx, int endy, int duration) {
+    public static void swipe(int startx, int starty, int endx, int endy, int duration) {
         int xOffset = endx - startx;
         int yOffset = endy - starty;
         new TouchAction((MobileDriver<?>) DriverPool.getDriver()).press(startx, starty).waitAction(Duration.ofMillis(duration))

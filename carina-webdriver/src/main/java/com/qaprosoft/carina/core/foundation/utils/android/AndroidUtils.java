@@ -3,12 +3,10 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -16,12 +14,9 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
@@ -132,28 +127,6 @@ public class AndroidUtils extends MobileUtils {
     }
 
     /**
-     * scrollTo specified text using findElementByAndroidUIAutomator solution
-     *
-     * @param text - String
-     * @return boolean
-     */
-    /*
-     * @Deprecated public static boolean scrollTo1(final String text) { boolean
-     * scrolled = false; int repeat = 1; int tries = 3; // TODO: investigate how
-     * to: // AndroidUIAutomator("setMaxSearchSwipes(200)"); do { try {
-     * LOGGER.info("Scroll to '" + text +
-     * "' using findElementByAndroidUIAutomator."); ((AndroidDriver<?>)
-     * DriverPool.getDriver())
-     * .findElementByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\""
-     * + text + "\").instance(0))"); scrolled = true; } catch (Exception e) {
-     * LOGGER.warn("Exception occurred for scroll operation!  " + String.format(
-     * "For try #'%s'. Scrolling to text '%s'", repeat, text)); repeat++;
-     * scrolled = false; } } while (!scrolled && repeat < tries);
-     * 
-     * return scrolled; }
-     */
-
-    /**
      * scrollTo specified text
      *
      * @param text - String
@@ -174,46 +147,6 @@ public class AndroidUtils extends MobileUtils {
         return scrolled;
     }
 
-    /**
-     * swipe Until Element Presence
-     *
-     * @param element ExtendedWebElement
-     * @return boolean
-     */
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element) {
-        int swipeTimes = 20;
-        WebDriver driver = DriverPool.getDriver();
-        Dimension scrSize;
-        int x;
-        int y;
-        boolean isPresent = element.isElementPresent(MINIMUM_TIMEOUT);
-        LOGGER.info("Swipe down to element: ".concat(element.toString()));
-        while (!isPresent && swipeTimes-- > 0) {
-            LOGGER.debug("Element not present! Swipe down will be executed.");
-            scrSize = driver.manage().window().getSize();
-            x = scrSize.width / 2;
-            y = scrSize.height / 2;
-            ((AndroidDriver<?>) driver).swipe(x, y, x, y / 2, 500);
-            LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
-            isPresent = element.isElementPresent(1);
-            LOGGER.info("Result: " + isPresent);
-        }
-        if (!isPresent) {
-            LOGGER.info("Swipe up to element: ".concat(element.toString()));
-            swipeTimes = 20;
-            while (!isPresent && swipeTimes-- > 0) {
-                LOGGER.debug("Element not present! Swipe up will be executed.");
-                scrSize = driver.manage().window().getSize();
-                x = scrSize.width / 2;
-                y = scrSize.height / 2;
-                ((AndroidDriver<?>) driver).swipe(x, y / 2, x, y, 500);
-                LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
-                isPresent = element.isElementPresent(1);
-                LOGGER.info("Result: " + isPresent);
-            }
-        }
-        return isPresent;
-    }
 
     /**
      * universal Scroll To text with different methods
@@ -222,6 +155,7 @@ public class AndroidUtils extends MobileUtils {
      * @param containerElement ExtendedWebElement
      * @return boolean
      */
+    @Deprecated
     public static boolean universalScrollToBase(String scrollToText, ExtendedWebElement containerElement) {
         return universalScrollToBase(scrollToText, containerElement, 3, false);
     }
@@ -236,6 +170,7 @@ public class AndroidUtils extends MobileUtils {
      * @param oldMethod boolean
      * @return boolean
      */
+    @Deprecated
     public static boolean universalScrollToBase(String scrollToText, ExtendedWebElement containerElement, int tries, boolean oldMethod) {
         boolean scrolled = false;
         if ((tries > 0) && (!oldMethod)) {
@@ -311,6 +246,7 @@ public class AndroidUtils extends MobileUtils {
      * @param duration of swipe (int)
      * @return boolean
      */
+    @Deprecated
     public static boolean tapAndSwipe(ExtendedWebElement elem, SwipeElementDirection direction, int duration) {
         return tapAndSwipe(elem.getBy(), direction, duration);
     }
@@ -321,6 +257,7 @@ public class AndroidUtils extends MobileUtils {
      * @param elem By
      * @return boolean
      */
+    @Deprecated
     public static boolean tapAndSwipe(By elem) {
         return tapAndSwipe(elem, SwipeElementDirection.LEFT, 1000);
     }
@@ -333,6 +270,7 @@ public class AndroidUtils extends MobileUtils {
      * @param duration of swipe (int)
      * @return boolean
      */
+    @Deprecated
     public static boolean tapAndSwipe(By elem, SwipeElementDirection direction, int duration) {
         MobileElement element;
         WebDriver driver = DriverPool.getDriver();
@@ -353,6 +291,7 @@ public class AndroidUtils extends MobileUtils {
      * @param elem By
      * @param time int
      */
+    @Deprecated
     public static void swipeUp(By elem, int time) {
         tapAndSwipe(elem, SwipeElementDirection.UP, time);
     }
@@ -365,6 +304,7 @@ public class AndroidUtils extends MobileUtils {
      * @param direction -Direction {LEFT, RIGHT, UP, DOWN}
      * @param duration - duration in msec.
      */
+    @Deprecated
     public static void swipeInContainer(ExtendedWebElement elem, int times, Direction direction, int duration) {
 
         // Default direction left
@@ -465,32 +405,6 @@ public class AndroidUtils extends MobileUtils {
             LOGGER.info("Error happen during scrollTo ExtendedWebElement: " + e);
             return true;
         }
-    }
-
-    /**
-     * swipe Coordinates
-     *
-     * @param startX int
-     * @param startY int
-     * @param endX int
-     * @param endY int
-     * @param duration int
-     */
-    public static void swipeCoord(int startX, int startY, int endX, int endY, int duration) {
-        WebDriver driver = DriverPool.getDriver();
-        ((AndroidDriver<?>) driver).swipe(startX, startY, endX, endY, duration);
-    }
-
-    /**
-     * swipe Coordinates
-     *
-     * @param startX int
-     * @param startY int
-     * @param endX int
-     * @param endY int
-     */
-    public static void swipeCoord(int startX, int startY, int endX, int endY) {
-        swipeCoord(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
     }
 
     /**
@@ -598,7 +512,7 @@ public class AndroidUtils extends MobileUtils {
     public static boolean longPress(ExtendedWebElement element) {
         try {
             WebDriver driver = DriverPool.getDriver();
-            TouchAction action = new TouchAction((MobileDriver) driver);
+            TouchAction action = new TouchAction((MobileDriver<?>) driver);
             action.longPress(element.getElement()).release().perform();
             return true;
         } catch (Exception e) {
@@ -633,6 +547,7 @@ public class AndroidUtils extends MobileUtils {
      * @param tries int
      * @return boolean
      */
+    @Deprecated
     private static boolean newScrollTo(String scrollToText, ExtendedWebElement containerElement, int tries) {
         boolean scrolled = false;
 
@@ -671,6 +586,7 @@ public class AndroidUtils extends MobileUtils {
      * @param containerElement ExtendedWebElement
      * @return boolean
      */
+    @Deprecated
     public static boolean universalScrollToExtended(String scrollToText, ExtendedWebElement containerElement) {
         return universalScrollToExtended(scrollToText, containerElement, 3, false);
     }
@@ -685,6 +601,7 @@ public class AndroidUtils extends MobileUtils {
      * @param oldMethod - if true - will try to execute old methods.
      * @return boolean
      */
+    @Deprecated
     public static boolean universalScrollToExtended(String scrollToText, ExtendedWebElement containerElement, int tries, boolean oldMethod) {
 
         // Set oldMethod to false for trying use as much as possible solutions
@@ -713,6 +630,7 @@ public class AndroidUtils extends MobileUtils {
      * @param oldMethod - if true try to call old methods
      * @return boolean
      */
+    @Deprecated
     public static boolean universalScrollTo(String scrollToText, ExtendedWebElement containerElement, int tries, boolean oldMethod) {
         return universalScrollToExtended(scrollToText, containerElement, tries, oldMethod);
     }
@@ -724,42 +642,9 @@ public class AndroidUtils extends MobileUtils {
      * @param containerElement ExtendedWebElement
      * @return boolean
      */
+    @Deprecated
     public static boolean universalScrollTo(String scrollToText, ExtendedWebElement containerElement) {
         return universalScrollToExtended(scrollToText, containerElement, 3, false);
-    }
-
-    // TODO temporary decision. If it works it should be moved to carina
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int times) {
-        WebDriver driver = DriverPool.getDriver();
-        Dimension scrSize;
-        int x;
-        int y;
-        boolean isPresent = element.isElementPresent(1);
-        LOGGER.info("Swipe down to element: ".concat(element.toString()));
-        while (!isPresent && times-- > 0) {
-            LOGGER.debug("Element not present! Swipe down will be executed.");
-            scrSize = driver.manage().window().getSize();
-            x = scrSize.width / 2;
-            y = scrSize.height / 2;
-            ((AndroidDriver<?>) driver).swipe(x, y, x, y / 2, 500);
-            LOGGER.info("Swipe was executed. Attempts remain: " + times);
-            isPresent = element.isElementPresent(1);
-            LOGGER.info("Result: " + isPresent);
-        }
-        if (!isPresent) {
-            LOGGER.info("Swipe up to element: ".concat(element.toString()));
-            while (!isPresent && times-- > 0) {
-                LOGGER.debug("Element not present! Swipe up will be executed.");
-                scrSize = driver.manage().window().getSize();
-                x = scrSize.width / 2;
-                y = scrSize.height / 2;
-                ((AndroidDriver<?>) driver).swipe(x, y / 2, x, y, 500);
-                LOGGER.info("Swipe was executed. Attempts remain: " + times);
-                isPresent = element.isElementPresent(1);
-                LOGGER.info("Result: " + isPresent);
-            }
-        }
-        return isPresent;
     }
 
     /**
