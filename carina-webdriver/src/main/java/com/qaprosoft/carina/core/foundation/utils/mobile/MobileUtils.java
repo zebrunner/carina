@@ -351,7 +351,6 @@ public class MobileUtils {
      * swipeUntilElementPresence Using TouchActions
      * 
      * @param element ExtendedWebElement
-     * @param times int
      * @return boolean
      */
     public static boolean swipeUntilElementPresence(final ExtendedWebElement element) {
@@ -373,6 +372,7 @@ public class MobileUtils {
      * 
      * @param element ExtendedWebElement
      * @param times int
+     * @param duration int
      * @return boolean
      */
     public static boolean swipeUntilElementPresence(final ExtendedWebElement element, int times, int duration) {
