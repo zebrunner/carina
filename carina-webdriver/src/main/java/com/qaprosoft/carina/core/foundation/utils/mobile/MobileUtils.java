@@ -440,8 +440,14 @@ public class MobileUtils {
      * @param duration int Millis
      */
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
+    	WebDriver drv = DriverPool.getDriver();
+    	Dimension scrSize = drv.manage().window().getSize();
+    	//explicitly limit range of coordinates
+    	endx = Math.max(endx, scrSize.width);
+    	endy = Math.max(endy, scrSize.height);
+		
     	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " +  + endy + "; duration: " + duration);
-        new TouchAction((MobileDriver<?>) DriverPool.getDriver()).press(startx, starty).waitAction(Duration.ofMillis(duration))
+        new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
                 .moveTo(endx, endy).release().perform();
     }
 }
