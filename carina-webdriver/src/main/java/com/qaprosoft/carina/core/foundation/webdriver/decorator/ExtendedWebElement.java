@@ -450,6 +450,7 @@ public class ExtendedWebElement {
         final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
+        Exception undefinedException = null;
         setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
@@ -460,9 +461,15 @@ public class ExtendedWebElement {
         	result = false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
+            undefinedException = e;
             result = false;
         }
         setImplicitTimeout();
+        
+        if (undefinedException != null) {
+        	throw new RuntimeException(undefinedException);
+        }
+        
         return result;
     }
 
