@@ -441,9 +441,7 @@ public class MobileUtils {
      */
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
     	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " +  + endy + "; duration: " + duration);
-        int xOffset = endx - startx;
-        int yOffset = endy - starty;
         new TouchAction((MobileDriver<?>) DriverPool.getDriver()).press(startx, starty).waitAction(Duration.ofMillis(duration))
-                .moveTo(xOffset, yOffset).release().perform();
+                .moveTo(endx, endy).release().perform();
     }
 }
