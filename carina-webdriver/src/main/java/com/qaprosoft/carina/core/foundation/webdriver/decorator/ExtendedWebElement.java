@@ -466,9 +466,10 @@ public class ExtendedWebElement {
         }
         setImplicitTimeout();
         
-        if (undefinedException != null) {
-        	throw new RuntimeException(undefinedException);
-        }
+		if (undefinedException != null && undefinedException.getMessage() != null
+				&& !undefinedException.getMessage().startsWith("Unable to find dynamic element using")) {
+			LOGGER.error(undefinedException.getMessage(), undefinedException);
+		}
         
         return result;
     }
