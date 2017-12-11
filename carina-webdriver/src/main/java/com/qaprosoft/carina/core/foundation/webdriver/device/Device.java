@@ -103,7 +103,7 @@ public class Device extends RemoteDevice
 			}
 			return Type.ANDROID_PHONE;
 		} 
-		else if (getOs().equalsIgnoreCase(SpecialKeywords.IOS))
+		else if (getOs().equalsIgnoreCase(SpecialKeywords.IOS) || getOs().equalsIgnoreCase(SpecialKeywords.MAC))
 		{
 			if (isTablet())
 			{
