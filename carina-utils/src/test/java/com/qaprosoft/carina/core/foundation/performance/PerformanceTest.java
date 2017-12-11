@@ -67,6 +67,7 @@ public class PerformanceTest {
 	}
 
 	private void pause(Double timeout) {
+		LOGGER.info("Will wait for " + timeout + " seconds");
 		try {
 			timeout = timeout * 1000;
 			long miliSec = timeout.longValue();
@@ -74,5 +75,6 @@ public class PerformanceTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		LOGGER.info("Pause is overed. Keep going..");
 	}
 }

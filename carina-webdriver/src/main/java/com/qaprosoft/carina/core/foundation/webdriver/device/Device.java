@@ -362,11 +362,13 @@ public class Device extends RemoteDevice
 	}
     
     public void pause(long timeout) {
+	LOGGER.info("Will wait for " + timeout + " seconds");
         try {
             Thread.sleep(timeout * 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+	LOGGER.info("Pause is overed. Keep going..");
     }
     
     public void clearAppData() {
