@@ -27,8 +27,8 @@
         <commons-configuration2.version>2.1</commons-configuration2.version>
         <httpclient.version>4.5.3</httpclient.version>
         <!-- Selenium -->
-        <selenium-java.version>3.4.0</selenium-java.version>
-        <selenium-server.version>3.4.0</selenium-server.version>
+        <selenium-java.version>3.5.3</selenium-java.version>
+        <selenium-server.version>3.5.3</selenium-server.version>
         <appium.version>5.0.4</appium.version>
         <!-- Qaprosoft integrations -->
         <zafira-client.version>3.0.33</zafira-client.version>
