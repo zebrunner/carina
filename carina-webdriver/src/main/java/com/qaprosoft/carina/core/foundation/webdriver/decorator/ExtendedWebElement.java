@@ -453,8 +453,7 @@ public class ExtendedWebElement {
         setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
-        	//TODO: [VD] Analyze how removing isDisplayed() affects UI Web tests!!!
-            wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout));
+            wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
         } catch (NoSuchElementException | TimeoutException e) {
         	//don't write exception even in debug mode
