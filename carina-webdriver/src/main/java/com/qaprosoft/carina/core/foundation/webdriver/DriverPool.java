@@ -173,7 +173,10 @@ public final class DriverPool {
 				DevicePool.deregisterDevice();
 			}
 
-			drv.quit();
+			if (drv != null && !drv.toString().contains("null")) {
+				//no sense to quit if it is already gone
+				drv.quit();
+			}
 			LOGGER.debug("Driver exited during restart...");
 		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
@@ -218,13 +221,16 @@ public final class DriverPool {
 			LOGGER.debug("Driver exiting..." + drv);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
-			drv.quit();
+			if (drv != null && !drv.toString().contains("null")) {
+				//no sense to quit if it is already gone
+				drv.quit();
+			}
 			LOGGER.debug("Driver exited..." + drv);
 		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
 			LOGGER.debug("unable to quit as sesion was not found" + drv);
 		} catch (Exception e) {
-			LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
+			LOGGER.warn("Error discovered during driver quit: " + e.getMessage(), e);
 		} finally {
 			// TODO analyze how to forcibly kill session on device
 			NDC.pop();
