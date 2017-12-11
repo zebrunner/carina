@@ -167,7 +167,7 @@ public final class DriverPool {
 		}
 		
 		try {
-			LOGGER.debug("Driver restarting..." + drv);
+			LOGGER.debug("Driver restarting...");
 			deregisterDriver(DEFAULT);
 			if (!isSameDevice) {
 				DevicePool.deregisterDevice();
@@ -218,17 +218,17 @@ public final class DriverPool {
 		}
 
 		try {
-			LOGGER.debug("Driver exiting..." + drv);
+			LOGGER.debug("Driver exiting..." + name);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
 			if (drv != null && !drv.toString().contains("null")) {
 				//no sense to quit if it is already gone
 				drv.quit();
 			}
-			LOGGER.debug("Driver exited...");
+			LOGGER.debug("Driver exited..." + name);
 		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found!");
+			LOGGER.debug("unable to quit as sesion was not found! " + name);
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver quit: " + e.getMessage(), e);
 		} finally {

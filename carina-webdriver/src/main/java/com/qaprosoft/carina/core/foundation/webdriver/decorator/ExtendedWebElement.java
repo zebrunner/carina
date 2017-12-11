@@ -558,6 +558,7 @@ public class ExtendedWebElement {
             LOGGER.debug(e.getMessage(), e.getCause());
             result = false;
         }
+        //TODO: make returning implicit timeout with verification that driver is still alive...
         setImplicitTimeout();
         return result;
     }
