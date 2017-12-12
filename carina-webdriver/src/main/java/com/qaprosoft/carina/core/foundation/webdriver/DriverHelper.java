@@ -351,7 +351,6 @@ public class DriverHelper {
 	@Deprecated
 	public boolean isElementPresent(String elementName, final By by, long timeout) {
 		boolean result;
-		setImplicitTimeout(1);
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
@@ -360,7 +359,6 @@ public class DriverHelper {
 		} catch (Exception e) {
 			result = false;
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return result;
 	}
 
@@ -1355,7 +1353,6 @@ public class DriverHelper {
 	public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		ExtendedWebElement element;
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
@@ -1364,10 +1361,8 @@ public class DriverHelper {
 		} catch (Exception e) {
 			element = null;
 			Messager.ELEMENT_NOT_FOUND.error(name);
-			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return element;
 	}
 
@@ -1379,7 +1374,6 @@ public class DriverHelper {
 		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
 		List<WebElement> webElements = new ArrayList<WebElement>();
 
-		setImplicitTimeout(1);
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
@@ -1402,7 +1396,6 @@ public class DriverHelper {
 
 			extendedWebElements.add(new ExtendedWebElement(element, name, drv));
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return extendedWebElements;
 	}
 
