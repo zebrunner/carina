@@ -433,6 +433,8 @@ public class MobileUtils {
      * @param endy int
      * @param duration int Millis
      */
+    @Deprecated
+    //TODO: [VD] temporary moved to deprecated to make it protected or private
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
     	WebDriver drv = DriverPool.getDriver();
     	Dimension scrSize = drv.manage().window().getSize();

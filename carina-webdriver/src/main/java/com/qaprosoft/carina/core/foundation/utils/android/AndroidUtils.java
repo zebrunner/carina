@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +25,7 @@ import io.appium.java_client.PressesKeyCode;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.android.AndroidKeyCode;
 
 /**
  * Useful Android utilities. For usage: import
@@ -406,6 +408,43 @@ public class AndroidUtils extends MobileUtils {
             LOGGER.info("Keyboard was already hided or error occurs: " + e);
         }
     }
+    
+    public static void pressBack() {
+        ((AndroidDriver<?>) DriverPool.getDriver()).pressKeyCode(AndroidKeyCode.BACK);
+    }
+
+    /**
+     * Pressing "search" key of Android keyboard by coordinates.
+     * <p>
+     * Tested at Nexus 6P Android 8.0.0 standard keyboard. Coefficients of
+     * coordinates for other devices and custom keyboards could be different.
+     * <p>
+     * Following options are not working: 1.
+     * AndroidDriver.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH); 2.
+     * searchEditText.sendKeys("textToSearch" + "\n")
+     */
+    public static void pressSearchKey() {
+        pressBottomRightKey();
+    }
+
+    public static void pressNextKey() {
+        pressBottomRightKey();
+    }
+
+    /**
+     * Pressing bottom right button on the keyboard by coordinates: "search",
+     * "ok", "next", etc. - various keys appear at this position. Tested at
+     * Nexus 6P Android 8.0.0 standard keyboard. Coefficients of coordinates for
+     * other devices and custom keyboards could be different.
+     */
+    public static void pressBottomRightKey() {
+    	WebDriver driver = DriverPool.getDriver();
+    	Dimension size = driver.manage().window().getSize();
+        int height =  size.getHeight();
+        int width = size.getWidth();
+
+        new TouchAction((AndroidDriver<?>) driver).tap(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue()).perform();
+    }
 
     /**
      * wait Until Element Not Present
@@ -607,5 +646,5 @@ public class AndroidUtils extends MobileUtils {
 
         return status;
     }
-
+    
 }
