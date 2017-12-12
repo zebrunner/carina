@@ -443,8 +443,18 @@ public class MobileUtils {
     	WebDriver drv = DriverPool.getDriver();
     	Dimension scrSize = drv.manage().window().getSize();
     	//explicitly limit range of coordinates
-    	endx = Math.max(endx, scrSize.width - 1);
-    	endy = Math.max(endy, scrSize.height - 1);
+    	if (endx > startx) {
+    		endx = Math.max(endx, scrSize.width - 1);
+    	} else {
+    		endx = Math.max(1, endx);
+    	}
+    	
+    	if (endy > starty) {
+    		endy = Math.max(endy, scrSize.height - 1);
+    	} else {
+    		endy = Math.max(1, endy);
+    	}
+    	
 		
     	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " +  + endy + "; duration: " + duration);
         new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
