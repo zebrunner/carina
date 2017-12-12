@@ -11,7 +11,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
@@ -392,20 +391,15 @@ public class MobileUtils {
     	Dimension scrSize;
     	int x;
     	int y;
-    	boolean isPresent = element.isElementPresent(1);
+    	LOGGER.debug("Verify if element present before swipe: ".concat(element.toString()));
+    	boolean isPresent = element.isElementPresent(2);
     	LOGGER.info("Swipe down to element: ".concat(element.toString()));
 		while (!isPresent && times-- > 0) {
 			LOGGER.debug("Element not present! Swipe down will be executed.");
 			LOGGER.debug("Page source: ".concat(driver.getPageSource()));
 			scrSize = driver.manage().window().getSize();
 			x = scrSize.width / 2;
-			// swipe coordinates for ios should be less than for android to
-			// avoid elements' skipping
-			if (!DevicePool.getDevice().getOs().equalsIgnoreCase("android")) {
-				y = scrSize.height / 4;
-			} else {
-				y = scrSize.height / 2;
-			}
+			y = scrSize.height / 2;
 			swipe(x, y, x, y / 2, duration);
 			LOGGER.info("Swipe was executed. Attempts remain: " + times);
 			isPresent = element.isElementPresent(1);
@@ -456,7 +450,7 @@ public class MobileUtils {
     	}
     	
 		
-    	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " +  + endy + "; duration: " + duration);
+    	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy + "; duration: " + duration);
         new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
                 .moveTo(endx, endy).release().perform();
     }
