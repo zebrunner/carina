@@ -37,6 +37,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -355,13 +356,14 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			setImplicitTimeout(Math.max(1, Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
-			wait.until((Function<WebDriver, Object>) dr -> !dr.findElements(by).isEmpty() && dr.findElement(by).isDisplayed());
+			//setImplicitTimeout(Math.max(1, Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
+			//wait.until((Function<WebDriver, Object>) dr -> !dr.findElements(by).isEmpty() && dr.findElement(by).isDisplayed());
+			wait.until(ExpectedConditions.presenceOfElementLocated(by));
 			result = true;
 		} catch (Exception e) {
 			result = false;
 		} finally {
-			setImplicitTimeout(IMPLICIT_TIMEOUT);	
+			//setImplicitTimeout(IMPLICIT_TIMEOUT);	
 		}
 		
 		return result;

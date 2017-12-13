@@ -446,22 +446,28 @@ public class ExtendedWebElement {
             timeout = 1;
         }
         
-        final long finalTimeout = timeout;
+        //final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
-        	setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
-            wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
+        	LOGGER.debug("isElementPresent: starting...");
+        	//setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
+            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
+            //wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
+            LOGGER.debug("isElementPresent: finished true...");
         } catch (NoSuchElementException | TimeoutException e) {
         	//don't write exception even in debug mode
+        	LOGGER.debug("isElementPresent: NoSuchElementException | TimeoutException e...", e);
         	result = false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
+            LOGGER.debug("isElementPresent: Exception e...", e);
             result = false;
         } finally {
-        	setImplicitTimeout();	
+        	LOGGER.debug("isElementPresent: finally");
+        	//setImplicitTimeout();	
         }
         
         
@@ -616,7 +622,9 @@ public class ExtendedWebElement {
         }
 
         try {
+        	LOGGER.debug("setImplicitTimeout: starting... value: " + timeout);
             getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+            LOGGER.debug("setImplicitTimeout: finished. " + timeout);
         } catch (Exception e) {
             LOGGER.error("Unable to set implicit timeout to " + timeout, e);
             //getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);

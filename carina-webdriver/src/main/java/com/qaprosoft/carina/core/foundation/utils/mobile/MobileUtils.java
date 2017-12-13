@@ -118,7 +118,7 @@ public class MobileUtils {
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, Direction direction, 
 			int swipeTimes) {
 
-		boolean isPresent = element.isElementPresent(2);
+		boolean isPresent = element.isElementPresent(1);
 		LOGGER.info("Swipe to element: ".concat(element.getNameWithLocator().toString()));
 
 		Direction oppositeDirection = Direction.DOWN;
@@ -284,7 +284,7 @@ public class MobileUtils {
      */
     //swipeUntilElementPresence -> swipeTillElement
     public static boolean swipeTillElement(final ExtendedWebElement element) {
-    	return swipeTillElement(element, 20, 200);
+    	return swipeTillElement(element, 5, 200);
     }
     
     /**
@@ -307,18 +307,15 @@ public class MobileUtils {
      */
     public static boolean swipeTillElement(final ExtendedWebElement element, int times, int duration) {
     	WebDriver driver = DriverPool.getDriver();
-    	Dimension scrSize;
-    	int x;
-    	int y;
+    	Dimension scrSize = driver.manage().window().getSize();
+    	int x = scrSize.width / 2;;
+    	int y = scrSize.height / 2;
     	LOGGER.debug("Verify if element present before swipe: ".concat(element.toString()));
-    	boolean isPresent = element.isElementPresent(2);
+    	boolean isPresent = element.isElementPresent(1);
     	LOGGER.info("Swipe down to element: ".concat(element.toString()));
 		while (!isPresent && times-- > 0) {
 			LOGGER.debug("Element not present! Swipe down will be executed.");
-			LOGGER.debug("Page source: ".concat(driver.getPageSource()));
-			scrSize = driver.manage().window().getSize();
-			x = scrSize.width / 2;
-			y = scrSize.height / 2;
+			//LOGGER.debug("Page source: ".concat(driver.getPageSource()));
 			swipe(x, y, x, y / 2, duration);
 			LOGGER.info("Swipe was executed. Attempts remain: " + times);
 			isPresent = element.isElementPresent(1);
@@ -328,9 +325,6 @@ public class MobileUtils {
 			LOGGER.info("Swipe up to element: ".concat(element.toString()));
 			while (!isPresent && times-- > 0) {
 				LOGGER.debug("Element not present! Swipe up will be executed.");
-				scrSize = driver.manage().window().getSize();
-				x = scrSize.width / 2;
-				y = scrSize.height / 2;
 				swipe(x, y / 2, x, y, duration);
 				LOGGER.info("Swipe was executed. Attempts remain: " + times);
 				isPresent = element.isElementPresent(1);
@@ -380,7 +374,6 @@ public class MobileUtils {
     	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy + "; duration: " + duration);
         new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
                 .moveTo(endx, endy).release().perform();
-        
         
         LOGGER.debug("Finished swipe...");
     }
@@ -454,7 +447,6 @@ public class MobileUtils {
     public static boolean scrollTo(ExtendedWebElement element, int swipeTimes) {
     	return swipeTillElement(element, swipeTimes);
     }
-    
     
 
 }
