@@ -34,7 +34,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1044,11 +1043,11 @@ public class DriverHelper {
 	 */
 	public void silentAlert() {
 		WebDriver drv = getDriver();
-		if (!(drv instanceof HtmlUnitDriver)) {
-			((JavascriptExecutor) drv).executeScript("window.alert = function(msg) { return true; }");
-			((JavascriptExecutor) drv).executeScript("window.confirm = function(msg) { return true; }");
-			((JavascriptExecutor) drv).executeScript("window.prompt = function(msg) { return true; }");
-		}
+
+		((JavascriptExecutor) drv).executeScript("window.alert = function(msg) { return true; }");
+		((JavascriptExecutor) drv).executeScript("window.confirm = function(msg) { return true; }");
+		((JavascriptExecutor) drv).executeScript("window.prompt = function(msg) { return true; }");
+
 	}
 
 	/**

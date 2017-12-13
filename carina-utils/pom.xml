@@ -67,6 +67,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.sun.jna</groupId>
+			<artifactId>jna</artifactId>
+	    	</dependency>
+
+		<dependency>
 		    <groupId>com.jayway.restassured</groupId>
 		    <artifactId>rest-assured</artifactId>
 		</dependency>

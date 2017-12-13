@@ -441,7 +441,7 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent(long timeout) {
         boolean result;
-        if (timeout <= 0) {
+        if (timeout < 1) {
             LOGGER.warn("Timeout should be bigger than 0.");
             timeout = 1;
         }

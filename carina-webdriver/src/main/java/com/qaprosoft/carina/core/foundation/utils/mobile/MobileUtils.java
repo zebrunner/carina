@@ -315,7 +315,8 @@ public class MobileUtils {
     	LOGGER.info("Swipe down to element: ".concat(element.toString()));
 		while (!isPresent && times-- > 0) {
 			LOGGER.debug("Element not present! Swipe down will be executed.");
-			//LOGGER.debug("Page source: ".concat(driver.getPageSource()));
+			//kep driver.getPageSource() to reread object tree
+			LOGGER.debug("Page source: ".concat(driver.getPageSource()));
 			swipe(x, y, x, y / 2, duration);
 			LOGGER.info("Swipe was executed. Attempts remain: " + times);
 			isPresent = element.isElementPresent(1);
