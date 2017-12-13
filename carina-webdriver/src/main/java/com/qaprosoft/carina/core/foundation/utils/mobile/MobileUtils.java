@@ -357,8 +357,12 @@ public class MobileUtils {
      * @param duration int Millis
      */
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
+    	LOGGER.debug("Starting swipe...");
     	WebDriver drv = DriverPool.getDriver();
+    	
+    	LOGGER.debug("Getting driver dimension size...");
     	Dimension scrSize = drv.manage().window().getSize();
+    	LOGGER.debug("Finished driver dimension size...");
     	//explicitly limit range of coordinates
     	if (endx > startx) {
     		endx = Math.max(endx, scrSize.width - 1);
@@ -376,6 +380,9 @@ public class MobileUtils {
     	LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy + "; duration: " + duration);
         new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
                 .moveTo(endx, endy).release().perform();
+        
+        
+        LOGGER.debug("Finished swipe...");
     }
     
     /**
