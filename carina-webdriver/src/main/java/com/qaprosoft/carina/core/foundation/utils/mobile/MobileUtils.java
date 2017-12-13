@@ -55,20 +55,6 @@ public class MobileUtils {
         swipeInDevice(element, direction, 0.01, 0.99, 500);
     }
 
-
-	/**
-	 * swipeInContainerTillElement
-	 * 
-	 * @param element
-	 *            ExtendedWebElement
-	 * @param container
-	 *            ExtendedWebElement
-	 * @return boolean
-	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container) {
-		return swipeInContainerTillElement(element, container, 10);
-	}
-
 	/**
 	 * swipeInContainerTillElement
 	 * 
@@ -80,9 +66,39 @@ public class MobileUtils {
 	 *            int
 	 * @return boolean
 	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
-			int swipeTimes) {
+	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, int swipeTimes) {
 		return swipeInContainerTillElement(element, container, Direction.UP, swipeTimes);
+	}
+	
+
+	/**
+	 * swipeInContainerTillElement
+	 * 
+	 * @param element
+	 *            ExtendedWebElement
+	 * @param container
+	 *            ExtendedWebElement
+	 * @return boolean
+	 */
+	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container) {
+		return swipeInContainerTillElement(element, container, Direction.UP);
+	}
+
+	/**
+	 * swipeInContainerTillElement
+	 * 
+	 * @param element
+	 *            ExtendedWebElement
+	 * @param container
+	 *            ExtendedWebElement
+	 * @param direction
+	 *            can be Direction.DOWN, Direction.UP, Direction.LEFT or
+	 *            Direction.RIGHT
+	 * @return boolean
+	 */
+	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
+			Direction direction) {
+		return swipeInContainerTillElement(element, container, direction, 10);
 	}
 
 	/**
@@ -340,8 +356,6 @@ public class MobileUtils {
      * @param endy int
      * @param duration int Millis
      */
-    @Deprecated
-    //TODO: [VD] temporary moved to deprecated to make it protected or private
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
     	WebDriver drv = DriverPool.getDriver();
     	Dimension scrSize = drv.manage().window().getSize();
