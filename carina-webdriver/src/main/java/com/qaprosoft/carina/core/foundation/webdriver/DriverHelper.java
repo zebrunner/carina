@@ -117,7 +117,7 @@ public class DriverHelper {
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			LOGGER.error("Unable to set implicit timeout to " + timeout, e);
-			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+			//getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		}
 	}
 
@@ -351,14 +351,19 @@ public class DriverHelper {
 	@Deprecated
 	public boolean isElementPresent(String elementName, final By by, long timeout) {
 		boolean result;
+		
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(Math.max(1, Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 			wait.until((Function<WebDriver, Object>) dr -> !dr.findElements(by).isEmpty() && dr.findElement(by).isDisplayed());
 			result = true;
 		} catch (Exception e) {
 			result = false;
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);	
 		}
+		
 		return result;
 	}
 
@@ -1353,8 +1358,10 @@ public class DriverHelper {
 	public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		ExtendedWebElement element;
 		final WebDriver drv = getDriver();
+		
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(Math.max(1, Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 			wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
 			element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
 			Messager.ELEMENT_FOUND.info(name);
@@ -1362,7 +1369,10 @@ public class DriverHelper {
 			element = null;
 			Messager.ELEMENT_NOT_FOUND.error(name);
 			throw new RuntimeException(e);
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);	
 		}
+		
 		return element;
 	}
 
@@ -1377,6 +1387,7 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(Math.max(1, Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 			wait.until(new Function<WebDriver, Object>() {
 				public Boolean apply(WebDriver dr) {
 					return !drv.findElements(by).isEmpty();
@@ -1385,6 +1396,8 @@ public class DriverHelper {
 			webElements = driver.findElements(by);
 		} catch (Exception e) {
 			// do nothing
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);
 		}
 
 		for (WebElement element : webElements) {
