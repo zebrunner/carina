@@ -453,6 +453,7 @@ public class ExtendedWebElement {
         try {
         	LOGGER.debug("isElementPresent: starting...");
         	//setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
+        	setImplicitTimeout(0);
             wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
             //wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
@@ -467,7 +468,7 @@ public class ExtendedWebElement {
             result = false;
         } finally {
         	LOGGER.debug("isElementPresent: finally");
-        	//setImplicitTimeout();	
+        	setImplicitTimeout();	
         }
         
         
