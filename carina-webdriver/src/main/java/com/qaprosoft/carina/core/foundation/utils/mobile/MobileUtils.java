@@ -245,25 +245,25 @@ public class MobileUtils {
         Dimension dim = driver.manage().window().getSize();
 
         switch (direction) {
-        case LEFT:
+        case RIGHT:
             startx = dim.width / 4;
             starty = dim.height / 2;
             endx = dim.width / 2;
             endy = starty;
             break;
-        case RIGHT:
+        case LEFT:
             startx = dim.width / 2;
             starty = dim.height / 2;
             endx = dim.width / 4;
             endy = starty;
             break;
-        case UP:
+        case DOWN:
             startx = dim.width / 2;
             starty = dim.height / 4;
             endx = startx;
             endy = dim.height / 2;
             break;
-        case DOWN:
+        case UP:
             startx = dim.width / 2;
             starty = dim.height / 2;
             endx = startx;
