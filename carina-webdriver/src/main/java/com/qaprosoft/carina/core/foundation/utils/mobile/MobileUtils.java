@@ -161,14 +161,6 @@ public class MobileUtils {
 			return true;
 		}
 		
-		
-        WebDriver driver = DriverPool.getDriver();
-        Dimension scrSize = driver.manage().window().getSize();
-        int x = scrSize.width / 2;;
-        int y = scrSize.height / 2;
-        
-        
-        
 		Direction oppositeDirection = Direction.DOWN;
 		boolean bothDirections = false;
 
@@ -206,7 +198,7 @@ public class MobileUtils {
 			if (container != null) {
 				swipeInDevice(container, direction, 0.2, 0.8, duration);	
 			} else {
-				swipe(x, y, x, y / 2, duration);
+				swipeInDevice(direction, duration);
 			}
 			
 			LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
@@ -220,7 +212,7 @@ public class MobileUtils {
 			if (container != null) {
 				swipeInDevice(container, oppositeDirection, 0.2, 0.8, duration);
 			} else {
-				swipe(x, y, x, y / 2, duration);
+				swipeInDevice(direction, duration);
 			}
 			LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
 			isPresent = element.isElementPresent(1);
@@ -443,6 +435,7 @@ public class MobileUtils {
      * @param duration int
      * @return boolean
      */
+    //TODO: combine logic with swipeInDevice(direction, duration)
     private static boolean swipeInDevice(ExtendedWebElement element, Direction direction, double minCoefficient, double maxCoefficient, int duration) {
         if (element.isElementNotPresent(5)) {
             LOGGER.warn("Cannot swipe! Impossible to find element " + element.getName());
