@@ -112,16 +112,54 @@ public class MobileUtils {
 	 *            can be Direction.DOWN, Direction.UP, Direction.LEFT or
 	 *            Direction.RIGHT
 	 * @param swipeTimes
+	 *            int
+	 * @return boolean
+	 */
+	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
+			Direction direction, int count) {
+		// TODO: [VD] review default swipe duration time. For container it was
+		// 1000 for regular swipe - 200 ms
+		return swipeInContainerTillElement(element, container, direction, count, 1000);
+	}
+	/**
+	 * swipeInContainerTillElement
+	 * 
+	 * @param element
+	 *            ExtendedWebElement
+	 * @param container
+	 *            ExtendedWebElement
+	 * @param direction
+	 *            can be Direction.DOWN, Direction.UP, Direction.LEFT or
+	 *            Direction.RIGHT
+	 * @param count
+	 *            int
+	 * @param duration
 	 *            int            
 	 * @return boolean
 	 */
+	//TODO: rename later to unified swipeTillElement
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, Direction direction, 
-			int swipeTimes) {
+			int count, int duration) {
 
+		
+		LOGGER.debug("Verify if element present before swipe: " + element.getNameWithLocator().toString());
 		boolean isPresent = element.isElementPresent(1);
-		LOGGER.info("Swipe to element: ".concat(element.getNameWithLocator().toString()));
-
+		if (isPresent) {
+			//no sense to continue;
+			LOGGER.debug("element already present before swipe: " + element.getNameWithLocator().toString());
+			return true;
+		}
+		
+		
+        WebDriver driver = DriverPool.getDriver();
+        Dimension scrSize = driver.manage().window().getSize();
+        int x = scrSize.width / 2;;
+        int y = scrSize.height / 2;
+        
+        
+        
 		Direction oppositeDirection = Direction.DOWN;
+		boolean bothDirections = false;
 
 		switch (direction) {
 		case UP:
@@ -136,34 +174,48 @@ public class MobileUtils {
 		case RIGHT:
 			oppositeDirection = Direction.LEFT;
 			break;
+		case HORIZONTAL:
+			direction = Direction.LEFT;
+			oppositeDirection = Direction.RIGHT;
+			bothDirections = true;
+			break;
+		case VERTICAL:
+			direction = Direction.UP;
+			oppositeDirection = Direction.DOWN;
+			bothDirections = true;
+			break;
 		default:
 			throw new RuntimeException("Unsupported direction for swipeInContainerTillElement: " + direction);
 		}
+		
+		int currentCount = count;
 
-		LOGGER.info("Swipe to element: ".concat(element.getNameWithLocator().toString()));
-
-		int defaultSwipeTimes = swipeTimes;
-		while (!isPresent && swipeTimes-- > 0) {
-			LOGGER.debug("Element not present! Swipe up will be executed.");
-			swipeInDevice(container, direction, 0.2, 0.8, 1000);
-			LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
+		while (!isPresent && currentCount-- > 0) {
+			LOGGER.debug("Element not present! Swipe " + direction + " will be executed to element: " + element.getNameWithLocator().toString());
+			if (container != null) {
+				swipeInDevice(container, direction, 0.2, 0.8, duration);	
+			} else {
+				swipe(x, y, x, y / 2, duration);
+			}
+			
+			LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
 			isPresent = element.isElementPresent(1);
 			LOGGER.info("Result: " + isPresent);
 		}
 
-		if (!isPresent) {
-			LOGGER.info("Swipe down to element: ".concat(element.getNameWithLocator().toString()));
-			swipeTimes = defaultSwipeTimes;
-
-			while (!isPresent && swipeTimes-- > 0) {
-				LOGGER.debug("Element not present! Swipe down will be executed.");
-				swipeInDevice(container, oppositeDirection, 0.2, 0.8, 1000);
-				LOGGER.info("Swipe was executed. Attempts remain: " + swipeTimes);
-				isPresent = element.isElementPresent(1);
-				LOGGER.info("Result: " + isPresent);
+		currentCount = count;
+		while (bothDirections && !isPresent && currentCount-- > 0) {
+			LOGGER.debug("Element not present! Swipe " + oppositeDirection + " will be executed to element: " + element.getNameWithLocator().toString());
+			if (container != null) {
+				swipeInDevice(container, oppositeDirection, 0.2, 0.8, duration);
+			} else {
+				swipe(x, y, x, y / 2, duration);
 			}
+			LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
+			isPresent = element.isElementPresent(1);
+			LOGGER.info("Result: " + isPresent);
 		}
-
+		
 		return isPresent;
 	}
 	
@@ -236,6 +288,7 @@ public class MobileUtils {
      * @param endY int
      * @param duration int
      */
+    @Deprecated
     public static void swipeCoord(int startX, int startY, int endX, int endY, int duration) {
     	swipe(startX, startY, endX, endY, duration);
     }
@@ -248,6 +301,7 @@ public class MobileUtils {
      * @param endX int
      * @param endY int
      */
+    @Deprecated
     public static void swipeCoord(int startX, int startY, int endX, int endY) {
         swipe(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
     }
@@ -306,33 +360,21 @@ public class MobileUtils {
      * @return boolean
      */
     public static boolean swipeTillElement(final ExtendedWebElement element, int times, int duration) {
-    	WebDriver driver = DriverPool.getDriver();
-    	Dimension scrSize = driver.manage().window().getSize();
-    	int x = scrSize.width / 2;;
-    	int y = scrSize.height / 2;
-    	LOGGER.debug("Verify if element present before swipe: ".concat(element.toString()));
-    	boolean isPresent = element.isElementPresent(1);
-    	LOGGER.info("Swipe down to element: ".concat(element.toString()));
-		while (!isPresent && times-- > 0) {
-			LOGGER.debug("Element not present! Swipe down will be executed.");
-			//kep driver.getPageSource() to reread object tree
-			LOGGER.debug("Page source: ".concat(driver.getPageSource()));
-			swipe(x, y, x, y / 2, duration);
-			LOGGER.info("Swipe was executed. Attempts remain: " + times);
-			isPresent = element.isElementPresent(1);
-			LOGGER.info("Result: " + isPresent);
-		}
-		if (!isPresent) {
-			LOGGER.info("Swipe up to element: ".concat(element.toString()));
-			while (!isPresent && times-- > 0) {
-				LOGGER.debug("Element not present! Swipe up will be executed.");
-				swipe(x, y / 2, x, y, duration);
-				LOGGER.info("Swipe was executed. Attempts remain: " + times);
-				isPresent = element.isElementPresent(1);
-				LOGGER.info("Result: " + isPresent);
-			}
-		}
-        return isPresent;
+    	return swipeTillElement(element, Direction.UP, times, duration);
+    }
+    
+    /**
+     * swipeTillElement Using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param times int
+     * @param duration int
+     * @return boolean
+     */
+    public static boolean swipeTillElement(final ExtendedWebElement element, Direction direction, int count, int duration) {
+    	
+    	return swipeInContainerTillElement(element, null, direction, count, duration);
+    	
     }
 
     @Deprecated

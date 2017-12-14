@@ -11,9 +11,8 @@ import org.openqa.selenium.WebElement;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.ios.IOSDriver;
 
 /**
@@ -36,6 +35,30 @@ public class IosUtils extends MobileUtils {
             LOGGER.info("Keyboard was already hided");
         }
     }
+    
+    public static boolean swipeTillElement(ExtendedWebElement element, ExtendedWebElement container, Direction direction, 
+			int count, int duration) {
+    	//TODO: test on real devices to identify if below anomaly exists
+    	//due to the strange behaviour iOS emulator perform swipes in opposite direction by default. So we have to redeclare direction on this level temporary until issue is fixed in appium java client
+		switch (direction) {
+		case UP:
+			direction = Direction.DOWN;
+			break;
+		case DOWN:
+			direction = Direction.UP;
+			break;
+		case LEFT:
+			direction = Direction.RIGHT;
+			break;
+		case RIGHT:
+			direction = Direction.LEFT;
+			break;
+		default:
+			throw new RuntimeException("Unsupported direction for swipeInContainerTillElement: " + direction);
+		}
+		
+    	return swipeInContainerTillElement(element, container, direction, count, duration);
+    }
 
     /**
      * Scroll with swipe for Native Apps
@@ -43,6 +66,7 @@ public class IosUtils extends MobileUtils {
      * @param direction Direction should be UP or DOWN
      * @param countSwipes int
      */
+    @Deprecated
     public static void scrollWithSwipe(Direction direction, int countSwipes) {
         int coordinateToSwipe = 0;
         try {
@@ -67,23 +91,13 @@ public class IosUtils extends MobileUtils {
     }
 
     /**
-     * Tap with TouchAction by coordinates
-     * 
-     * @param startx int
-     * @param starty int
-     */
-    public static void tap(int startx, int starty) {
-        TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
-        touchAction.tap(startx, starty).perform();
-    }
-
-    /**
      * Tap several times using JS
      * 
      * @param startx int
      * @param starty int
      * @param times int
      */
+    @Deprecated
     public static void tap(int startx, int starty, int times) {
         WebDriver driver = DriverPool.getDriver();
 
@@ -104,6 +118,7 @@ public class IosUtils extends MobileUtils {
      * 
      * @param element WebElement
      */
+    @Deprecated
     public static void tapElement(WebElement element) {
         Point point = element.getLocation();
         Dimension size = element.getSize();
@@ -115,6 +130,7 @@ public class IosUtils extends MobileUtils {
      * 
      * @param direction JSDirection
      */
+    @Deprecated
     public static void scrollWithJS(JSDirection direction) {
         try {
             JavascriptExecutor js = (JavascriptExecutor) DriverPool.getDriver();
@@ -132,6 +148,7 @@ public class IosUtils extends MobileUtils {
      * 
      * @param duration int
      */
+    @Deprecated
     public static void swipeUp(final int duration) {
         WebDriver driver = DriverPool.getDriver();
         int x = driver.manage().window().getSize().width / 2;
@@ -146,6 +163,7 @@ public class IosUtils extends MobileUtils {
      * @param times int
      * @param duration int
      */
+    @Deprecated
     public static void swipeUp(final int times, final int duration) {
         for (int i = 0; i < times; i++) {
             swipeUp(duration);
@@ -158,6 +176,7 @@ public class IosUtils extends MobileUtils {
      * @param times int
      * @param duration int
      */
+    @Deprecated
     public static void swipeDown(final int times, final int duration) {
         for (int i = 0; i < times; i++) {
             swipeDown(duration);
@@ -169,6 +188,7 @@ public class IosUtils extends MobileUtils {
      * 
      * @param duration int
      */
+    @Deprecated
     public static void swipeDown(final int duration) {
         WebDriver driver = DriverPool.getDriver();
         int x = driver.manage().window().getSize().width / 2;
