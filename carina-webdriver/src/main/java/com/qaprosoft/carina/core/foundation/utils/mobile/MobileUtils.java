@@ -125,10 +125,11 @@ public class MobileUtils {
 	 *            Direction
 	 * @param count
 	 *            int
-	 * @return boolean
 	 * @see MobileUtils#swipeInContainerTillElement(element, container,
 	 *      direction, count, duration)
+	 * @return boolean
 	 */
+	
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
 			Direction direction, int count) {
 		// TODO: [VD] review default swipe duration time. For container it was
