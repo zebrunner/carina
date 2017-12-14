@@ -46,7 +46,7 @@ public class MobileUtils {
     }
 
     /**
-     * nanoSwipe
+     * nanoSwipe (1% of display) to desired direction
      * 
      * @param element ExtendedWebElement
      * @param direction Direction
@@ -55,65 +55,79 @@ public class MobileUtils {
         swipeInDevice(element, direction, 0.01, 0.99, 500);
     }
 
-	/**
-	 * swipeInContainerTillElement
-	 * 
+    /**
+	 * Scroll inside container in default direction - Direction.UP
+	 * Number of attempts is limited by count argument
+	 * <p>
+	 *
 	 * @param element
 	 *            ExtendedWebElement
 	 * @param container
 	 *            ExtendedWebElement
-	 * @param swipeTimes
+	 * @param count
 	 *            int
 	 * @return boolean
+	 * @see MobileUtils#swipeInContainerTillElement(element, container,
+	 *      direction, count, duration)
 	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, int swipeTimes) {
-		return swipeInContainerTillElement(element, container, Direction.UP, swipeTimes);
+	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, int count) {
+		return swipeInContainerTillElement(element, container, Direction.UP, count);
 	}
 	
 
-	/**
-	 * swipeInContainerTillElement
-	 * 
+    /**
+	 * Scroll inside container in default direction - Direction.UP
+	 * Number of attempts is limited by 10 
+	 * <p>
+	 *
 	 * @param element
 	 *            ExtendedWebElement
 	 * @param container
 	 *            ExtendedWebElement
 	 * @return boolean
+	 * @see MobileUtils#swipeInContainerTillElement(element, container,
+	 *      direction, count, duration)
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container) {
 		return swipeInContainerTillElement(element, container, Direction.UP);
 	}
 
-	/**
-	 * swipeInContainerTillElement
-	 * 
+    /**
+	 * Scroll inside container in specified direction 
+	 * Number of attempts is limited by 10 
+	 * <p>
+	 *
 	 * @param element
 	 *            ExtendedWebElement
 	 * @param container
 	 *            ExtendedWebElement
 	 * @param direction
-	 *            can be Direction.DOWN, Direction.UP, Direction.LEFT or
-	 *            Direction.RIGHT
+	 *            Direction
 	 * @return boolean
+	 * @see MobileUtils#swipeInContainerTillElement(element, container,
+	 *      direction, count, duration)
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
 			Direction direction) {
 		return swipeInContainerTillElement(element, container, direction, 10);
 	}
 
-	/**
-	 * swipeInContainerTillElement
-	 * 
+    /**
+	 * Scroll inside container in specified direction with default pulling timeout in 1000 ms
+	 * Number of attempts is limited by count argument 
+	 * <p>
+	 *
 	 * @param element
 	 *            ExtendedWebElement
 	 * @param container
 	 *            ExtendedWebElement
 	 * @param direction
-	 *            can be Direction.DOWN, Direction.UP, Direction.LEFT or
-	 *            Direction.RIGHT
-	 * @param swipeTimes
+	 *            Direction
+	 * @param count
 	 *            int
 	 * @return boolean
+	 * @see MobileUtils#swipeInContainerTillElement(element, container,
+	 *      direction, count, duration)
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
 			Direction direction, int count) {
@@ -121,21 +135,26 @@ public class MobileUtils {
 		// 1000 for regular swipe - 200 ms
 		return swipeInContainerTillElement(element, container, direction, count, 1000);
 	}
+	
+	
+	
 	/**
-	 * swipeInContainerTillElement
-	 * 
+	 * Scroll to element inside container in specified direction while element
+	 * will not be present on the screen. If element is on the screen already,
+	 * scrolling will not be performed.
+	 * <p>
+	 *
 	 * @param element
-	 *            ExtendedWebElement
+	 *            element to which it will be scrolled
 	 * @param container
-	 *            ExtendedWebElement
+	 *            element, inside which scrolling is expected. null to scroll
 	 * @param direction
-	 *            can be Direction.DOWN, Direction.UP, Direction.LEFT or
-	 *            Direction.RIGHT
+	 *            direction of scrolling. HORIZONTAL and VERTICAL support swiping in both directions automatically 
 	 * @param count
-	 *            int
+	 *            for how long to scroll, ms
 	 * @param duration
-	 *            int            
-	 * @return boolean
+	 *            pulling timeout, ms
+	 * @return boolean  
 	 */
 	//TODO: rename later to unified swipeTillElement
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, Direction direction, 
@@ -345,29 +364,30 @@ public class MobileUtils {
      * swipeTillElement Using TouchActions
      * 
      * @param element ExtendedWebElement
-     * @param times int
+     * @param count int
      * @return boolean
      */
-    public static boolean swipeTillElement(final ExtendedWebElement element, int times) {
-    	return swipeTillElement(element, times, 200);
+    public static boolean swipeTillElement(final ExtendedWebElement element, int count) {
+    	return swipeTillElement(element, count, 200);
     }
     /**
      * swipeTillElement Using TouchActions
      * 
      * @param element ExtendedWebElement
-     * @param times int
+     * @param count int
      * @param duration int
      * @return boolean
      */
-    public static boolean swipeTillElement(final ExtendedWebElement element, int times, int duration) {
-    	return swipeTillElement(element, Direction.UP, times, duration);
+    public static boolean swipeTillElement(final ExtendedWebElement element, int count, int duration) {
+    	return swipeTillElement(element, Direction.UP, count, duration);
     }
     
     /**
      * swipeTillElement Using TouchActions
      * 
      * @param element ExtendedWebElement
-     * @param times int
+     * @param direction Direction
+     * @param count int
      * @param duration int
      * @return boolean
      */
