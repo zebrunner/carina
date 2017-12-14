@@ -67,8 +67,6 @@ public class MobileUtils {
 	 * @param count
 	 *            int
 	 * @return boolean
-	 * @see MobileUtils#swipeInContainerTillElement(element, container,
-	 *      direction, count, duration)
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, int count) {
 		return swipeInContainerTillElement(element, container, Direction.UP, count);
@@ -85,8 +83,6 @@ public class MobileUtils {
 	 * @param container
 	 *            ExtendedWebElement
 	 * @return boolean
-	 * @see MobileUtils#swipeInContainerTillElement(element, container,
-	 *      direction, count, duration)
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container) {
 		return swipeInContainerTillElement(element, container, Direction.UP);
@@ -104,8 +100,6 @@ public class MobileUtils {
 	 * @param direction
 	 *            Direction
 	 * @return boolean
-	 * @see MobileUtils#swipeInContainerTillElement(element, container,
-	 *      direction, count, duration)
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
 			Direction direction) {
@@ -125,11 +119,8 @@ public class MobileUtils {
 	 *            Direction
 	 * @param count
 	 *            int
-	 * @see MobileUtils#swipeInContainerTillElement(element, container,
-	 *      direction, count, duration)
 	 * @return boolean
 	 */
-	
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
 			Direction direction, int count) {
 		// TODO: [VD] review default swipe duration time. For container it was
