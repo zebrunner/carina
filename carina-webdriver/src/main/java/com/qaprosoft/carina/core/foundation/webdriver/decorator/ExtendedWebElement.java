@@ -554,7 +554,7 @@ public class ExtendedWebElement {
 		boolean present = isElementPresent(timeout);
 		if (present) {
 			captureElements();
-			element.click();
+			click();
 			Messager.ELEMENT_CLICKED.info(getName());
 		}
 
@@ -567,30 +567,46 @@ public class ExtendedWebElement {
      * @param text to type.
      */
     public void type(String text) {
+    	type(text, EXPLICIT_TIMEOUT);
+    }
+    
+    /**
+     * Types text to specified element.
+     *
+     * @param text to type.
+     * @param timeout long
+     */
+    public void type(String text, long timeout) {
         captureElements();
         String msg;
         final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-        WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-        try {
-        	setImplicitTimeout(0);
-            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
-            scrollTo();
-            element.clear();
-            element.sendKeys(decryptedText);
-            msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-        } catch (StaleElementReferenceException e) {
-            element = findStaleElement();
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element.clear();
-            element.sendKeys(decryptedText);
-            msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-        } catch (Exception e) {
-            msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
-            throw new RuntimeException(msg, e);
-        } finally {
-        	setImplicitTimeout();
-        }
+        
+		boolean present = isElementPresent(timeout);
+		if (present) {
+			try {
+				element = findElement(0);
+				//TODO: [VD] huge change as it is expected that new selenium can do it automatically for web UI tests
+				// scrollTo();
+				element.clear();
+				element.sendKeys(decryptedText);
+				msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
+			} catch (StaleElementReferenceException e) {
+				//TODO: [VD] think about movement StaleElementReferenceException handler to findElement private method 
+				element = findStaleElement();
+				LOGGER.debug(e.getMessage(), e.getCause());
+				element.clear();
+				element.sendKeys(decryptedText);
+				msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
+			} catch (Exception e) {
+				msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
+				throw new RuntimeException(msg, e);
+			}
+		} else {
+            msg = Messager.ELEMENT_NOT_FOUND.error(text, getNameWithLocator());
+            throw new RuntimeException(msg);
+		}
+
+        WebDriver drv = DriverPool.getDriver();
         Screenshot.capture(drv, msg);
     }
 
