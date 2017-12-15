@@ -446,7 +446,7 @@ public class ExtendedWebElement {
             timeout = 1;
         }
         
-        //final long finalTimeout = timeout;
+        final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
@@ -454,8 +454,8 @@ public class ExtendedWebElement {
         	LOGGER.debug("isElementPresent: starting...");
         	//setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         	setImplicitTimeout(0);
-            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
-            //wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
+            //wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
+            wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
             LOGGER.debug("isElementPresent: finished true...");
         } catch (NoSuchElementException | TimeoutException e) {
@@ -602,7 +602,7 @@ public class ExtendedWebElement {
 				throw new RuntimeException(msg, e);
 			}
 		} else {
-            msg = Messager.ELEMENT_NOT_FOUND.error(text, getNameWithLocator());
+            msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
             throw new RuntimeException(msg);
 		}
 
