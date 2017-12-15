@@ -554,8 +554,8 @@ public class ExtendedWebElement {
         WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
-        	setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
-            wait.until((Function<WebDriver, Object>) dr -> findElement(timeout).isDisplayed());
+        	setImplicitTimeout(0);
+            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
             captureElements();
             element.click();
             Messager.ELEMENT_CLICKED.info(getName());
@@ -586,8 +586,8 @@ public class ExtendedWebElement {
         WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
-        	element = findElement(EXPLICIT_TIMEOUT);
-            wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
+        	setImplicitTimeout(0);
+            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
             scrollTo();
             element.clear();
             element.sendKeys(decryptedText);
@@ -601,6 +601,8 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
             throw new RuntimeException(msg, e);
+        } finally {
+        	setImplicitTimeout();
         }
         Screenshot.capture(drv, msg);
     }
@@ -706,13 +708,15 @@ public class ExtendedWebElement {
         WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
-        	element = findElement(EXPLICIT_TIMEOUT);
-            wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
+        	setImplicitTimeout(0);
+            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
             element.sendKeys(decryptedFilePath);
             msg = Messager.FILE_ATTACHED.info(filePath);
         } catch (Exception e) {
             msg = Messager.FILE_NOT_ATTACHED.error(filePath);
             throw new RuntimeException(msg, e);
+        } finally {
+        	setImplicitTimeout();
         }
         Screenshot.capture(drv, msg);
     }
