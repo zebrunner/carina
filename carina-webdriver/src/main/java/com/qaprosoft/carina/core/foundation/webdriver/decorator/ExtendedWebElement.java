@@ -543,36 +543,23 @@ public class ExtendedWebElement {
         return clickIfPresent(EXPLICIT_TIMEOUT);
     }
 
-    /**
-     * Click onto element if it present.
-     *
-     * @param timeout - timeout
-     * @return boolean return true if clicked
-     */
-    public boolean clickIfPresent(long timeout) {
-        boolean result;
-        WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-        	setImplicitTimeout(0);
-            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
-            captureElements();
-            element.click();
-            Messager.ELEMENT_CLICKED.info(getName());
-            result = true;
-        } catch (NoSuchElementException | TimeoutException e) {
-        	return false;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            result = false;
-        } finally {
-            //TODO: make returning implicit timeout with verification that driver is still alive...
-        	setImplicitTimeout();
-        }
+	/**
+	 * Click onto element if present.
+	 *
+	 * @param timeout
+	 *            - timeout
+	 * @return boolean return true if clicked
+	 */
+	public boolean clickIfPresent(long timeout) {
+		boolean present = isElementPresent(timeout);
+		if (present) {
+			captureElements();
+			element.click();
+			Messager.ELEMENT_CLICKED.info(getName());
+		}
 
-        return result;
-    }
-
+		return present;
+	}
 
     /**
      * Types text to specified element.
