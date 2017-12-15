@@ -341,7 +341,7 @@ public class MobileUtils {
      */
     //swipeUntilElementPresence -> swipeTillElement
     public static boolean swipeTillElement(final ExtendedWebElement element) {
-    	return swipeTillElement(element, 5, 200);
+    	return swipeTillElement(element, 5, 1000);
     }
     
     /**
@@ -352,7 +352,7 @@ public class MobileUtils {
      * @return boolean
      */
     public static boolean swipeTillElement(final ExtendedWebElement element, int count) {
-    	return swipeTillElement(element, count, 200);
+    	return swipeTillElement(element, count, 1000);
     }
     /**
      * swipeTillElement Using TouchActions
