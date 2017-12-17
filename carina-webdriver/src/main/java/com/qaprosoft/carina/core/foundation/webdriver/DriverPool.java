@@ -286,7 +286,12 @@ public final class DriverPool {
 				registerDriver(drv, name);
 
 				init = true;
-				// push custom device name  for log4j default messages
+
+				if (device.isNull()) {
+					//During driver creation we choose device and assign it to the test thread 
+					device = DevicePool.getDevice();
+				}
+				// push custom device name  for log4j default messages				
 				if (!device.isNull()) {
 					NDC.push(" [" + device.getName() + "] ");
 				}
