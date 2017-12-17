@@ -28,8 +28,10 @@ public class MobileUtils {
 
     protected static final int MINIMUM_TIMEOUT = 2;
 
-    protected static final int DEFAULT_SWIPE_TIMEOUT = 1000;
+    private static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
+    private static final int DEFAULT_MAX_SWIPE_COUNT = 5;
 
+    @Deprecated
     public enum JSDirection {
         UP("up"), DOWN("down");
 
@@ -123,9 +125,7 @@ public class MobileUtils {
 	 */
 	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
 			Direction direction, int count) {
-		// TODO: [VD] review default swipe duration time. For container it was
-		// 1000 for regular swipe - 200 ms
-		return swipeInContainerTillElement(element, container, direction, count, 1000);
+		return swipeInContainerTillElement(element, container, direction, count, DEFAULT_TOUCH_ACTION_DURATION);
 	}
 	
 	
@@ -306,7 +306,7 @@ public class MobileUtils {
      */
     @Deprecated
     public static void swipeCoord(int startX, int startY, int endX, int endY) {
-        swipe(startX, startY, endX, endY, DEFAULT_SWIPE_TIMEOUT);
+        swipe(startX, startY, endX, endY, DEFAULT_TOUCH_ACTION_DURATION);
     }
 
     // *************************** TouchActions ********************************* //
@@ -318,7 +318,7 @@ public class MobileUtils {
      * @param starty int
      */
     public static void tap(int startx, int starty) {
-    	tap(startx, starty, 1000);
+    	tap(startx, starty, DEFAULT_TOUCH_ACTION_DURATION);
     }
     
     /**
@@ -341,7 +341,7 @@ public class MobileUtils {
      */
     //swipeUntilElementPresence -> swipeTillElement
     public static boolean swipeTillElement(final ExtendedWebElement element) {
-    	return swipeTillElement(element, 5, 1000);
+    	return swipeTillElement(element, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
     }
     
     /**
@@ -352,8 +352,20 @@ public class MobileUtils {
      * @return boolean
      */
     public static boolean swipeTillElement(final ExtendedWebElement element, int count) {
-    	return swipeTillElement(element, count, 1000);
+    	return swipeTillElement(element, count, DEFAULT_TOUCH_ACTION_DURATION);
     }
+    
+    /**
+     * swipeTillElement Using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param direction Direction
+     * @return boolean
+     */
+    public static boolean swipeTillElement(final ExtendedWebElement element, Direction direction) {
+    	return swipeTillElement(element, direction, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
+    }
+    
     /**
      * swipeTillElement Using TouchActions
      * 
