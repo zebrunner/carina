@@ -679,6 +679,7 @@ public class ExtendedWebElement {
     /**
      * Scroll to element (applied only for desktop).
      */
+    @Deprecated
     public void scrollTo() {
         if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
