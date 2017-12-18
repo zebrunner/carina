@@ -58,6 +58,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
@@ -353,7 +354,7 @@ public class ExtendedWebElement {
             if (e.getMessage().contains("Element is not clickable")) {
                 scrollTo();
             }
-            pause((double) RETRY_TIME / 1000);
+            CommonUtils.pause((double) RETRY_TIME / 1000);
 
             if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000) {
                 doubleClickSafe(false);
@@ -640,7 +641,7 @@ public class ExtendedWebElement {
         }
 
         if (!clicked) {
-			pause((double) RETRY_TIME / 1000);
+        	CommonUtils.pause((double) RETRY_TIME / 1000);
             //repeat again until timeout achieved
             if (System.currentTimeMillis() - timer < timeout * 1000) {
                 clickSafe(timeout, false);
@@ -1397,22 +1398,12 @@ public class ExtendedWebElement {
 	 */
 
 	public void pause(long timeout) {
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		CommonUtils.pause(timeout);
 	}
 
 	public void pause(double timeout)
 	{
-		try
-		{
-			Thread.sleep((long) (timeout * 1000));
-		} catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
+		CommonUtils.pause(timeout);
 	}
 
 }

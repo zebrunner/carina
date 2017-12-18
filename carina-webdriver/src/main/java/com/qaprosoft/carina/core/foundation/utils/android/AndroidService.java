@@ -22,6 +22,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -392,7 +393,7 @@ public class AndroidService {
         int actual = notificationsCount();
         while (actual <= base && ++time < timeout && !foundText) {
             LOGGER.info("Wait for notification. Second: " + time + ". Actual number:" + actual);
-            pause(1);
+            CommonUtils.pause(1);
             actual = notificationsCount();
             foundText = isNotificationWithTextExist(text);
         }
@@ -436,7 +437,7 @@ public class AndroidService {
         int actual = notificationsCount();
         while (actual <= base && ++time < timeout && !foundText) {
             LOGGER.info("Wait for notification. Second: " + time + ". Actual number:" + actual);
-            pause(1);
+            CommonUtils.pause(1);
             actual = notificationsCount();
             foundText = isNotificationPkgExist(pkg);
         }
@@ -468,7 +469,7 @@ public class AndroidService {
         // open notification
         try {
             ((AndroidDriver) getDriver()).openNotifications();
-            pause(2); // wait while notifications are playing animation to
+            CommonUtils.pause(2); // wait while notifications are playing animation to
                       // appear to avoid missed taps
         } catch (Exception e) {
             LOGGER.error(e);
@@ -641,7 +642,7 @@ public class AndroidService {
 
         if (waitTime > 0) {
             LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
-            pause(waitTime);
+            CommonUtils.pause(waitTime);
         }
 
         if (changeConfig) {
@@ -726,7 +727,7 @@ public class AndroidService {
             if (!fakeGpsPage.isOpened(1)) {
                 LOGGER.error("Fake GPS application should be open but wasn't. Force opening.");
                 openApp(activity);
-                pause(2);
+                CommonUtils.pause(2);
             }
             res = fakeGpsPage.locationSearch(location);
             if (res) {
@@ -770,7 +771,7 @@ public class AndroidService {
             if (!fakeGpsPage.isOpened(1)) {
                 LOGGER.error("Fake GPS application should be open but wasn't. Force opening.");
                 openApp(activity);
-                pause(2);
+                CommonUtils.pause(2);
             }
             LOGGER.info("STOP Fake GPS locale");
             res = fakeGpsPage.clickStopFakeGps();
@@ -809,7 +810,7 @@ public class AndroidService {
         while (!isApkOpened && attemps > 0) {
             LOGGER.info("Apk was not open. Attempt to open...");
             openApp(activity);
-            pause(2);
+            CommonUtils.pause(2);
             isApkOpened = checkCurrentDeviceFocus(packageName);
             attemps--;
         }
@@ -818,7 +819,7 @@ public class AndroidService {
             LOGGER.info("Probably APK was not installed correctly. Try to reinstall.");
             installApk(apkPath, true);
             openApp(activity);
-            pause(2);
+            CommonUtils.pause(2);
         }
 
         if (checkCurrentDeviceFocus(packageName)) {
@@ -1301,7 +1302,7 @@ public class AndroidService {
         setSystemTime(timeFormat);
 
         openApp(TZ_CHANGE_APP_ACTIVITY);
-        pause(2);
+        CommonUtils.pause(2);
     }
 
     private void setSystemTime(TimeFormat timeFormat) {
@@ -1363,12 +1364,4 @@ public class AndroidService {
      *
      * @param timeout long
      */
-    private void pause(long timeout) {
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

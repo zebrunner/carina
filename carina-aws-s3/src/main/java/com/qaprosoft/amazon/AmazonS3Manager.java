@@ -26,6 +26,7 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public class AmazonS3Manager {
 	protected static final Logger LOGGER = Logger
@@ -335,7 +336,7 @@ public class AmazonS3Manager {
 			// You can poll your transfer's status to check its progress
 			while (!appDownload.isDone()) {
 				LOGGER.info("		transferred: " +(int) (appDownload.getProgress().getPercentTransferred() + 0.5) + "%" );
-				pause(pollingInterval);
+				CommonUtils.pause(pollingInterval);
 			}
 			LOGGER.info("	State: " + appDownload.getState());
 			//appDownload.waitForCompletion();
@@ -382,14 +383,5 @@ public class AmazonS3Manager {
 	 * 
 	 * System.out.println("    " + line); } }
 	 */
-
-	
-	private void pause(long timeout) {
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
+		
 }

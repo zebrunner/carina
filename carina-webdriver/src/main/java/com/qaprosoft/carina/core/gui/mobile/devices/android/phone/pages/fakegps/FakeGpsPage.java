@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -109,7 +110,7 @@ public class FakeGpsPage extends MobileAbstractPage {
                 inputLocationNew.type(location);
                 ((AndroidDriver<AndroidElement>) getDriver()).pressKeyCode(AndroidKeyCode.ENTER);
                 ((AndroidDriver<AndroidElement>) getDriver()).pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
-                pause(3);
+                CommonUtils.pause(3);
                 return true;
             }
         } else {
