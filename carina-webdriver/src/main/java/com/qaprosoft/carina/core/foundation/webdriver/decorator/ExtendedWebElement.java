@@ -145,7 +145,7 @@ public class ExtendedWebElement {
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			setImplicitTimeout(Math.max(1, Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
+			setImplicitTimeout(0);
 			wait.until((Function<WebDriver, Object>) dr -> {
 				if (!drv.findElements(by).isEmpty()) {
 					LOGGER.debug("Dynamic element was found using By: " + by.toString());
@@ -452,9 +452,7 @@ public class ExtendedWebElement {
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
         	LOGGER.debug("isElementPresent: starting...");
-        	//setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         	setImplicitTimeout(0);
-            //wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
             wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
             LOGGER.debug("isElementPresent: finished true...");
@@ -468,7 +466,7 @@ public class ExtendedWebElement {
             result = false;
         } finally {
         	LOGGER.debug("isElementPresent: finally");
-        	setImplicitTimeout();	
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);	
         }
         
         
@@ -1056,7 +1054,7 @@ public class ExtendedWebElement {
         final WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
-        	setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> {
                 //try to search starting from existing webElement and using driver directly
                 if (!drv.findElements(by).isEmpty()) {
@@ -1071,7 +1069,6 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             element = null;
             //summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
             throw new RuntimeException(e);
         } finally {
         	setImplicitTimeout(IMPLICIT_TIMEOUT);	
@@ -1090,9 +1087,9 @@ public class ExtendedWebElement {
         List<WebElement> webElements = new ArrayList<WebElement>();
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> {
                 //try to search starting from existing webElement and using driver directly
                 if (!drv.findElements(by).isEmpty()) {
@@ -1109,6 +1106,8 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             //do nothing
+        } finally {
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);
         }
 
         for (WebElement element : webElements) {
@@ -1122,7 +1121,6 @@ public class ExtendedWebElement {
 
             extendedWebElements.add(new ExtendedWebElement(element, name, driver));
         }
-        setImplicitTimeout();
         return extendedWebElements;
     }
 
@@ -1141,10 +1139,10 @@ public class ExtendedWebElement {
         LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
-
+        
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> {
                 boolean result = drv.findElements(element.getBy()).size() == 0;
                 if (!result) {
@@ -1158,9 +1156,9 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             // do nothing
+        } finally {
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);
         }
-
-        setImplicitTimeout();
 
     }
 
