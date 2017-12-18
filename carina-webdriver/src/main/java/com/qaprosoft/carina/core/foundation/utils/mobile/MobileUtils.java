@@ -258,16 +258,14 @@ public class MobileUtils {
             endy = starty;
             break;
         case DOWN:
-            startx = dim.width / 2;
-            starty = dim.height / 4;
-            endx = startx;
-            endy = dim.height / 2;
+            startx = endx = dim.width / 2;
+            starty = dim.height / 4; // from 25% of height
+            endy = dim.height * 4 / 5; // to 80% of height
             break;
         case UP:
-            startx = dim.width / 2;
-            starty = dim.height / 2;
-            endx = startx;
-            endy = dim.height / 4;
+            startx = endx = dim.width / 2;
+            starty = dim.height * 4 / 5; // from 80% of height
+            endy = dim.height / 4; // // to 25% of height
             break;
         case HORIZONTAL:
         case VERTICAL:
