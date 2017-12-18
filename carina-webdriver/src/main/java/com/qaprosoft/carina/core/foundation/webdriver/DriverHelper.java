@@ -45,6 +45,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
@@ -756,25 +757,11 @@ public class DriverHelper {
 	 */
 
 	public void pause(long timeout) {
-	        LOGGER.info("Will wait for " + timeout + " seconds");
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	        LOGGER.info("Pause is overed. Keep going..");
+		CommonUtils.pause(timeout);
 	}
 
 	public void pause(Double timeout) {
-	        LOGGER.info("Will wait for " + timeout + " seconds");
-		try {
-			timeout = timeout * 1000;
-			long miliSec = timeout.longValue();
-			Thread.sleep(miliSec);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		LOGGER.info("Pause is overed. Keep going..");
+		CommonUtils.pause(timeout);
 	}
 
 	/**
@@ -847,7 +834,7 @@ public class DriverHelper {
 	 *            before refresh.
 	 */
 	public void refresh(long timeout) {
-		pause(timeout);
+		CommonUtils.pause(timeout);
 		refresh();
 	}
 

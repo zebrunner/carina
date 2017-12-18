@@ -32,6 +32,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -306,7 +307,7 @@ public final class DriverPool {
 						String.format("Driver initialization '%s' FAILED for selenium: %s! Retry %d of %d time - %s",
 								name, seleniumHost, count, maxCount, thr.getMessage()), thr);
 				init_throwable = thr;
-				pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
+				CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
 			}
 		}
 
@@ -343,7 +344,7 @@ public final class DriverPool {
 		Device device = DevicePool.getDevice();
 		if (!device.isNull()) {
 			device.stopRecording(adbVideoRecorderPid.get());
-			pause(3); // very often video from device is black. waiting
+			CommonUtils.pause(3); // very often video from device is black. waiting
 						// before pulling the file
 
 			String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
@@ -532,13 +533,7 @@ public final class DriverPool {
 	 *            in seconds.
 	 */
 	private static void pause(long timeout) {
-		LOGGER.info("Will wait for " + timeout + " seconds");
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		LOGGER.info("Pause is overed. Keep going..");
+		CommonUtils.pause(timeout);
 	}
 
 }
