@@ -393,15 +393,15 @@ public class MobileUtils {
     	double minCoefficient = 0.3;
     	double maxCoefficient = 0.6;
     	
-        // calculate default coefficient based on OS type
-        String os = DevicePool.getDevice().getOs().toLowerCase();
-        if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-        	minCoefficient = 0.25;
-        	maxCoefficient = 0.5;
-        } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)) {
-        	minCoefficient = 0.25;
-        	maxCoefficient = 0.8;
-        }
+		// calculate default coefficient based on OS type
+		String os = DevicePool.getDevice().getOs();
+		if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+			minCoefficient = 0.25;
+			maxCoefficient = 0.5;
+		} else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)) {
+			minCoefficient = 0.25;
+			maxCoefficient = 0.8;
+		}
     	
     	
         switch (direction) {
