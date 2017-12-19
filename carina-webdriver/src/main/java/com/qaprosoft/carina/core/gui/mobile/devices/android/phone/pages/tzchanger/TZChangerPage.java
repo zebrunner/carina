@@ -54,13 +54,13 @@ public class TZChangerPage extends MobileAbstractPage {
         LOGGER.info("Searching for tz: " + tz);
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
-            boolean scrolled = MobileUtils.swipeInContainerTillElement(
+            boolean scrolled = MobileUtils.swipe(
                     format(tzSelectionBase, tz),
                     scrollableContainer, defaultSwipeTime);
             if (!scrolled) {
                 LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
                 defaultSwipeTime = 50;
-                scrolled = MobileUtils.swipeInContainerTillElement(
+                scrolled = MobileUtils.swipe(
                         format(tzSelectionBase, tz),
                         scrollableContainer, defaultSwipeTime);
             }
@@ -71,7 +71,7 @@ public class TZChangerPage extends MobileAbstractPage {
 
 
                 LOGGER.info("Searching for " + timezone);
-                scrolled = MobileUtils.swipeInContainerTillElement(
+                scrolled = MobileUtils.swipe(
                         format(tzSelectionBase, timezone),
                         scrollableContainer, defaultSwipeTime);
                 if (scrolled) {
@@ -82,7 +82,7 @@ public class TZChangerPage extends MobileAbstractPage {
                 } else {
                     LOGGER.error("Did not find timezone by timezone text: " + timezone);
                     defaultSwipeTime = 30;
-                    scrolled = MobileUtils.swipeInContainerTillElement(
+                    scrolled = MobileUtils.swipe(
                             format(tzSelectionBase, timezone),
                             scrollableContainer, defaultSwipeTime);
                     if (scrolled) {

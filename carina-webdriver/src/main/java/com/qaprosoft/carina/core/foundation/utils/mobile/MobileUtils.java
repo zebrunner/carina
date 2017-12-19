@@ -6,11 +6,14 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
@@ -30,35 +33,139 @@ public class MobileUtils {
 
     private static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
     private static final int DEFAULT_MAX_SWIPE_COUNT = 5;
-
-    @Deprecated
-    public enum JSDirection {
-        UP("up"), DOWN("down");
-
-        String directionName;
-
-        JSDirection(String directionName) {
-            this.directionName = directionName;
+    
+    
+    
+    /**
+     * Tap with TouchAction by the center of element
+     *
+     * @param element ExtendedWebElement
+     */
+    public static void tap(ExtendedWebElement element) {
+        Point point = element.getLocation();
+        Dimension size = element.getSize();
+        tap(point.getX() + size.getWidth() / 2, point.getY() + size.getHeight() / 2);
+    }
+    
+    /**
+     * Tap with TouchAction by coordinates with default 1000ms duration
+     *
+     * @param startx int
+     * @param starty int
+     */
+    public static void tap(int startx, int starty) {
+    	tap(startx, starty, DEFAULT_TOUCH_ACTION_DURATION);
+    }
+    
+    
+    /**
+     * tap with TouchActions slowly to imitate log tap on element
+     * @param elem ExtendedWebElement
+     * element
+     */
+    public static void longTap(ExtendedWebElement elem) {
+        int width = elem.getSize().getWidth();
+        int height = elem.getSize().getHeight();
+        
+        int x = elem.getLocation().getX() + width / 2;
+        int y = elem.getLocation().getY() + height / 2;
+        try {
+            MobileUtils.swipe(x, y, x, y, 2500);
+        } catch (Exception e) {
+            LOGGER.error("Exception: " + e);
         }
-
-        public String getName() {
-            return directionName;
+    }
+    
+    /**
+     * Tap and Hold (LongPress) on element
+     *
+     * @param element ExtendedWebElement
+     * @return boolean
+     */
+    public static boolean longPress(ExtendedWebElement element) {
+        try {
+            WebDriver driver = DriverPool.getDriver();
+            TouchAction action = new TouchAction((MobileDriver<?>) driver);
+            action.longPress(element.getElement()).release().perform();
+            return true;
+        } catch (Exception e) {
+            LOGGER.info("Error occurs: " + e);
         }
-
+        return false;
+    }
+    
+    /**
+     * Tap with TouchAction by coordinates with custom duration
+     *
+     * @param startx int
+     * @param starty int
+     * @param duration int
+     */
+    public static void tap(int startx, int starty, int duration) {
+        TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
+        touchAction.tap(startx, starty).waitAction(Duration.ofMillis(duration)).perform();
     }
 
     /**
-     * nanoSwipe (1% of display) to desired direction
+     * swipe till element using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @return boolean
+     */
+    public static boolean swipe(final ExtendedWebElement element) {
+    	return swipe(element, null, Direction.UP, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
+    }
+    
+    /**
+     * swipe till element using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param count int
+     * @return boolean
+     */
+    public static boolean swipe(final ExtendedWebElement element, int count) {
+    	return swipe(element, null, Direction.UP, 10, DEFAULT_TOUCH_ACTION_DURATION);
+    }
+    
+    /**
+     * swipe till element using TouchActions
      * 
      * @param element ExtendedWebElement
      * @param direction Direction
+     * @return boolean
      */
-    public static void nanoSwipe(ExtendedWebElement element, Direction direction) {
-        swipeInDevice(element, direction, 0.01, 0.99, 500);
+    public static boolean swipe(final ExtendedWebElement element, Direction direction) {
+    	return swipe(element, null, direction, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
     }
+    
+    /**
+     * swipe till element using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param count int
+     * @param duration int
+     * @return boolean
+     */
+    public static boolean swipe(final ExtendedWebElement element, int count, int duration) {
+    	return swipe(element, null, Direction.UP, count, duration);
+    }
+    
+    /**
+     * swipe till element using TouchActions
+     * 
+     * @param element ExtendedWebElement
+     * @param direction Direction
+     * @param count int
+     * @param duration int
+     * @return boolean
+     */
+    public static boolean swipe(final ExtendedWebElement element, Direction direction, int count, int duration) {
+    	return swipe(element, null, direction, count, duration);
+    }
+    
 
     /**
-	 * Scroll inside container in default direction - Direction.UP
+	 * Swipe inside container in default direction - Direction.UP
 	 * Number of attempts is limited by count argument
 	 * <p>
 	 *
@@ -70,14 +177,14 @@ public class MobileUtils {
 	 *            int
 	 * @return boolean
 	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, int count) {
-		return swipeInContainerTillElement(element, container, Direction.UP, count);
+	public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, int count) {
+		return swipe(element, container, Direction.UP, count, DEFAULT_TOUCH_ACTION_DURATION);
 	}
 	
 
     /**
-	 * Scroll inside container in default direction - Direction.UP
-	 * Number of attempts is limited by 10 
+	 * Swipe inside container in default direction - Direction.UP
+	 * Number of attempts is limited by 5 
 	 * <p>
 	 *
 	 * @param element
@@ -86,13 +193,13 @@ public class MobileUtils {
 	 *            ExtendedWebElement
 	 * @return boolean
 	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container) {
-		return swipeInContainerTillElement(element, container, Direction.UP);
+	public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container) {
+		return swipe(element, container, Direction.UP, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
 	}
 
     /**
-	 * Scroll inside container in specified direction 
-	 * Number of attempts is limited by 10 
+	 * Swipe inside container in specified direction 
+	 * Number of attempts is limited by 5 
 	 * <p>
 	 *
 	 * @param element
@@ -103,13 +210,12 @@ public class MobileUtils {
 	 *            Direction
 	 * @return boolean
 	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
-			Direction direction) {
-		return swipeInContainerTillElement(element, container, direction, 10);
+	public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction) {
+		return swipe(element, container, direction, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
 	}
 
     /**
-	 * Scroll inside container in specified direction with default pulling timeout in 1000 ms
+	 * Swipe inside container in specified direction with default pulling timeout in 1000ms
 	 * Number of attempts is limited by count argument 
 	 * <p>
 	 *
@@ -123,15 +229,15 @@ public class MobileUtils {
 	 *            int
 	 * @return boolean
 	 */
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container,
-			Direction direction, int count) {
-		return swipeInContainerTillElement(element, container, direction, count, DEFAULT_TOUCH_ACTION_DURATION);
+	public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
+			int count) {
+		return swipe(element, container, direction, count, DEFAULT_TOUCH_ACTION_DURATION);
 	}
 	
 	
 	
 	/**
-	 * Scroll to element inside container in specified direction while element
+	 * Swipe to element inside container in specified direction while element
 	 * will not be present on the screen. If element is on the screen already,
 	 * scrolling will not be performed.
 	 * <p>
@@ -148,8 +254,7 @@ public class MobileUtils {
 	 *            pulling timeout, ms
 	 * @return boolean  
 	 */
-	//TODO: rename later to unified swipeTillElement
-	public static boolean swipeInContainerTillElement(ExtendedWebElement element, ExtendedWebElement container, Direction direction, 
+	public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
 			int count, int duration) {
 
 		
@@ -195,11 +300,7 @@ public class MobileUtils {
 
 		while (!isPresent && currentCount-- > 0) {
 			LOGGER.debug("Element not present! Swipe " + direction + " will be executed to element: " + element.getNameWithLocator().toString());
-			if (container != null) {
-				swipeInDevice(container, direction, 0.2, 0.8, duration);	
-			} else {
-				swipeInDevice(direction, duration);
-			}
+			swipeInDevice(container, direction, duration);	
 			
 			LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
 			isPresent = element.isElementPresent(1);
@@ -209,11 +310,7 @@ public class MobileUtils {
 		currentCount = count;
 		while (bothDirections && !isPresent && currentCount-- > 0) {
 			LOGGER.debug("Element not present! Swipe " + oppositeDirection + " will be executed to element: " + element.getNameWithLocator().toString());
-			if (container != null) {
-				swipeInDevice(container, oppositeDirection, 0.2, 0.8, duration);
-			} else {
-				swipeInDevice(direction, duration);
-			}
+			swipeInDevice(container, oppositeDirection, duration);
 			LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
 			isPresent = element.isElementPresent(1);
 			LOGGER.info("Result: " + isPresent);
@@ -222,184 +319,11 @@ public class MobileUtils {
 		return isPresent;
 	}
 	
-	@Deprecated
-	//TODO: remove after migrating all projects to use valid methods
-	public static boolean swipeInContainerTillElementWithStartDirection(ExtendedWebElement element, ExtendedWebElement container,
-			Direction direction) {
-		return swipeInContainerTillElement(element, container, direction, 10);
-	}
+   
+
 
     /**
-     * swipeInDevice
-     * 
-     * @param direction Direction
-     * @param duration int
-     */
-    public static void swipeInDevice(Direction direction, int duration) {
-        int startx = 0;
-        int starty = 0;
-        int endx = 0;
-        int endy = 0;
-
-        WebDriver driver = DriverPool.getDriver();
-        Dimension dim = driver.manage().window().getSize();
-
-        switch (direction) {
-        case RIGHT:
-            startx = dim.width / 4;
-            starty = dim.height / 2;
-            endx = dim.width / 2;
-            endy = starty;
-            break;
-        case LEFT:
-            startx = dim.width / 2;
-            starty = dim.height / 2;
-            endx = dim.width / 4;
-            endy = starty;
-            break;
-        case DOWN:
-            startx = endx = dim.width / 2;
-            starty = dim.height / 4; // from 25% of height
-            endy = dim.height * 3 / 5; // to 60% of height
-            break;
-        case UP:
-            startx = endx = dim.width / 2;
-            starty = dim.height * 3 / 5; // from 60% of height
-            endy = dim.height / 4; // // to 25% of height
-            break;
-        case HORIZONTAL:
-        case VERTICAL:
-        default:
-        	throw new RuntimeException("Unsupported direction for swipeInDevice: " + direction);
-        }
-        LOGGER.debug(String.format("Swipe from (X = %d; Y = %d) to (X = %d; Y = %d)", startx, starty, endx, endy));
-        try {
-            swipe(startx, starty, endx, endy, duration);
-        } catch (Exception e) {
-            LOGGER.error(String.format("Error during Swipe from (X = %d; Y = %d) to (X = %d; Y = %d): %s", startx, starty, endx, endy, e));
-        }
-    }
-
-    /**
-     * swipe Coordinates
-     *
-     * @param startX int
-     * @param startY int
-     * @param endX int
-     * @param endY int
-     * @param duration int
-     */
-    @Deprecated
-    public static void swipeCoord(int startX, int startY, int endX, int endY, int duration) {
-    	swipe(startX, startY, endX, endY, duration);
-    }
-
-    /**
-     * swipe Coordinates
-     *
-     * @param startX int
-     * @param startY int
-     * @param endX int
-     * @param endY int
-     */
-    @Deprecated
-    public static void swipeCoord(int startX, int startY, int endX, int endY) {
-        swipe(startX, startY, endX, endY, DEFAULT_TOUCH_ACTION_DURATION);
-    }
-
-    // *************************** TouchActions ********************************* //
-
-    /**
-     * Tap with TouchAction by coordinates
-     *
-     * @param startx int
-     * @param starty int
-     */
-    public static void tap(int startx, int starty) {
-    	tap(startx, starty, DEFAULT_TOUCH_ACTION_DURATION);
-    }
-    
-    /**
-     * Tap with TouchAction by coordinates
-     *
-     * @param startx int
-     * @param starty int
-     * @param duration int
-     */
-    public static void tap(int startx, int starty, int duration) {
-        TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
-        touchAction.tap(startx, starty).waitAction(Duration.ofMillis(duration)).perform();
-    }
-
-    /**
-     * swipeTillElement Using TouchActions
-     * 
-     * @param element ExtendedWebElement
-     * @return boolean
-     */
-    //swipeUntilElementPresence -> swipeTillElement
-    public static boolean swipeTillElement(final ExtendedWebElement element) {
-    	return swipeTillElement(element, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
-    }
-    
-    /**
-     * swipeTillElement Using TouchActions
-     * 
-     * @param element ExtendedWebElement
-     * @param count int
-     * @return boolean
-     */
-    public static boolean swipeTillElement(final ExtendedWebElement element, int count) {
-    	return swipeTillElement(element, count, DEFAULT_TOUCH_ACTION_DURATION);
-    }
-    
-    /**
-     * swipeTillElement Using TouchActions
-     * 
-     * @param element ExtendedWebElement
-     * @param direction Direction
-     * @return boolean
-     */
-    public static boolean swipeTillElement(final ExtendedWebElement element, Direction direction) {
-    	return swipeTillElement(element, direction, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
-    }
-    
-    /**
-     * swipeTillElement Using TouchActions
-     * 
-     * @param element ExtendedWebElement
-     * @param count int
-     * @param duration int
-     * @return boolean
-     */
-    public static boolean swipeTillElement(final ExtendedWebElement element, int count, int duration) {
-    	return swipeTillElement(element, Direction.UP, count, duration);
-    }
-    
-    /**
-     * swipeTillElement Using TouchActions
-     * 
-     * @param element ExtendedWebElement
-     * @param direction Direction
-     * @param count int
-     * @param duration int
-     * @return boolean
-     */
-    public static boolean swipeTillElement(final ExtendedWebElement element, Direction direction, int count, int duration) {
-    	
-    	return swipeInContainerTillElement(element, null, direction, count, duration);
-    	
-    }
-
-    @Deprecated
-    public static boolean swipeUntilElementPresence(final ExtendedWebElement element) {
-    	return swipeTillElement(element);
-    }
-    
-    /**
-     * Example of swipe By TouchAction (platform independent)
-     * Should be checked on different applications.
-     * If ok and will work on latest java-appium-client than all swipe methods should be updated.
+     * Swipe by coordinates using TouchAction (platform independent)
      *
      * @param startx int
      * @param starty int
@@ -438,58 +362,81 @@ public class MobileUtils {
     /**
      * swipeInDevice
      * 
-     * @param element ExtendedWebElement
+     * @param container ExtendedWebElement
      * @param direction Direction
-     * @param minCoefficient double
-     * @param maxCoefficient double
      * @param duration int
      * @return boolean
      */
-    //TODO: combine logic with swipeInDevice(direction, duration)
-    private static boolean swipeInDevice(ExtendedWebElement element, Direction direction, double minCoefficient, double maxCoefficient, int duration) {
-        if (element.isElementNotPresent(5)) {
-            LOGGER.warn("Cannot swipe! Impossible to find element " + element.getName());
-            return false;
-        }
+    private static boolean swipeInDevice(ExtendedWebElement container, Direction direction, int duration) {
+
         int startx = 0;
         int starty = 0;
         int endx = 0;
         int endy = 0;
-        String name = element.getName();
+        
+        Point elementLocation = null;
+        Dimension elementDimensions = null;
+        
+    	if (container == null) {
+    		//whole screen/driver is a container!
+    		WebDriver driver = DriverPool.getDriver();
+    		elementLocation = driver.manage().window().getPosition();
+    		elementDimensions = driver.manage().window().getSize();
+    	} else {
+            if (container.isElementNotPresent(5)) {
+                Assert.fail("Cannot swipe! Impossible to find element " + container.getName());
+            }
+            elementLocation = container.getLocation();
+            elementDimensions = container.getSize();
+    	}
 
-        Point elementLocation = element.getElement().getLocation();
-        Dimension elementDimensions = element.getElement().getSize();
-
-        LOGGER.debug(String.format("'%s' location %s", name, elementLocation.toString()));
-        LOGGER.debug(String.format("'%s' size %s", name, elementDimensions.toString()));
+    	double minCoefficient = 0.3;
+    	double maxCoefficient = 0.6;
+    	
+    	// calculate default coefficient based on OS type
+    	switch (DevicePool.getDevice().getOs()) {
+    	case SpecialKeywords.ANDROID:
+    		minCoefficient = 0.25;
+    		maxCoefficient = 0.5;
+    		break;
+    	case SpecialKeywords.IOS:
+    		minCoefficient = 0.25;
+    		maxCoefficient = 0.8;
+    		break;
+    	default:
+    		//do nothing as default coefficients already defined!
+    	}
+    	
+    	
         switch (direction) {
         case LEFT:
+            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
+            
             startx = (int) (elementLocation.getX() + Math.round(maxCoefficient * elementDimensions.getWidth()));
-            starty = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
             endx = (int) (elementLocation.getX() + Math.round(minCoefficient * elementDimensions.getWidth()));
-            endy = starty;
             break;
         case RIGHT:
+            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
+            
             startx = (int) (elementLocation.getX() + Math.round(minCoefficient * elementDimensions.getWidth()));
-            starty = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
             endx = (int) (elementLocation.getX() + Math.round(maxCoefficient * elementDimensions.getWidth()));
-            endy = starty;
             break;
         case UP:
-            startx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            
             starty = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));
-            endx = startx;
             endy = (int) (elementLocation.getY() + Math.round(minCoefficient * elementDimensions.getHeight()));
             break;
         case DOWN:
-            startx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            
             starty = (int) (elementLocation.getY() + Math.round(minCoefficient * elementDimensions.getHeight()));
-            endx = startx;
             endy = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));
             break;
 		default:
 			throw new RuntimeException("Unsupported direction: " + direction);
         }
+        
         LOGGER.debug(String.format("Swipe from (X = %d; Y = %d) to (X = %d; Y = %d)", startx, starty, endx, endy));
         try {
             swipe(startx, starty, endx, endy, duration);
@@ -500,11 +447,55 @@ public class MobileUtils {
         return false;
     }
     
-    
-    @Deprecated
-    public static boolean scrollTo(ExtendedWebElement element, int swipeTimes) {
-    	return swipeTillElement(element, swipeTimes);
+    /**
+     * Swipe up several times
+     * 
+     * @param times int
+     * @param duration int
+     */
+    public static void swipeUp(final int times, final int duration) {
+        for (int i = 0; i < times; i++) {
+            swipeUp(duration);
+        }
     }
     
+    /**
+     * Swipe up
+     * 
+     * @param duration int
+     */
+    public static void swipeUp(final int duration) {
+        WebDriver driver = DriverPool.getDriver();
+        int x = driver.manage().window().getSize().width / 2;
+        int y = driver.manage().window().getSize().height;
+        LOGGER.info("Swipe up will be executed.");
+        //TODO: recalculate based OS if needed or remove this method completely
+        swipe(x, y / 2, x, y * 4 / 5, duration);
+    }
 
+    /**
+     * Swipe down several times
+     * 
+     * @param times int
+     * @param duration int
+     */
+    public static void swipeDown(final int times, final int duration) {
+        for (int i = 0; i < times; i++) {
+            swipeDown(duration);
+        }
+    }
+
+    /**
+     * Swipe down
+     * 
+     * @param duration int
+     */
+    public static void swipeDown(final int duration) {
+        WebDriver driver = DriverPool.getDriver();
+        int x = driver.manage().window().getSize().width / 2;
+        int y = driver.manage().window().getSize().height / 2;
+        LOGGER.info("Swipe down will be executed.");
+        //TODO: recalculate based OS if needed or remove this method completely
+        swipe(x, y, x, y / 2, duration);
+    }
 }

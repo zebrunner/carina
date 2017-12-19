@@ -1,13 +1,7 @@
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications;
 
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
-import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
-import io.appium.java_client.MobileBy;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -16,7 +10,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
+import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
+
+import io.appium.java_client.MobileBy;
 
 public class NotificationPage extends MobileAbstractPage {
 
@@ -206,8 +208,7 @@ public class NotificationPage extends MobileAbstractPage {
                 x1 = point.x + dim.width / 6;
                 x2 = point.x + dim.width * 5 / 6;
                 y1 = y2 = point.y + dim.height / 2;
-                AndroidUtils
-                        .swipeCoord(x1, y1, x2, y2, SWIPE_DURATION);
+                MobileUtils.swipe(x1, y1, x2, y2, SWIPE_DURATION);
             }
         }
     }

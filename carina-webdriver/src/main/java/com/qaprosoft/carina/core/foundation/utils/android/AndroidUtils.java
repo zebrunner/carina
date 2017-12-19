@@ -1,7 +1,5 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
-
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -11,7 +9,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -19,12 +16,9 @@ import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileDriver;
 import io.appium.java_client.PressesKeyCode;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.android.AndroidKeyCode;
 
 /**
@@ -71,159 +65,6 @@ public class AndroidUtils extends MobileUtils {
             }
         }
         return false;
-    }
-
-    /**
-     * scrollTo specified text
-     *
-     * @param text - String
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean scrollTo(final String text) {
-        boolean scrolled = false;
-        int repeat = 1;
-        int tries = 3;
-        // TODO: investigate how to:
-        // AndroidUIAutomator("setMaxSearchSwipes(200)");
-        do {
-            try {
-                LOGGER.info("Scroll to '" + text + "'");
-                ((AndroidDriver<?>) DriverPool.getDriver()).findElementByAndroidUIAutomator(
-                        "new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\"" + text
-                                + "\").instance(0))");
-                scrolled = true;
-            } catch (Exception e) {
-                LOGGER.warn("Exception occurred for scroll operation!  " + String.format("For try #'%s'. Scrolling to text '%s'", repeat, text));
-                repeat++;
-                scrolled = false;
-            }
-        } while (!scrolled && repeat < tries);
-
-        if (!scrolled) {
-            try {
-                LOGGER.info("Another solution Scroll to '" + text + "'");
-
-                scrollToText(text);
-                scrolled = true;
-            } catch (Exception e) {
-                LOGGER.warn("Exception occurred for scroll operation using Solution 2.  " + String.format("Scrolling to text '%s'", text));
-                scrolled = false;
-            }
-        }
-        return scrolled;
-    }
-
-    /**
-     * scrollTo specified text
-     *
-     * @param text - String
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean scrollTo2(final String text) {
-        boolean scrolled = false;
-
-        try {
-            LOGGER.info("Scroll to '" + text + "' using AndroidDriver default solution.");
-            scrollToText(text);
-            scrolled = true;
-        } catch (Exception e) {
-            LOGGER.warn("Exception occurred for scroll operation using Solution 2.  " + String.format("Scrolling to text '%s'", text));
-            scrolled = false;
-        }
-        return scrolled;
-    }
-
-
-    /**
-     * universal Scroll To text with different methods
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean universalScrollToBase(String scrollToText, ExtendedWebElement containerElement) {
-        return universalScrollToBase(scrollToText, containerElement, 3, false);
-    }
-
-    /**
-     * universal Scroll To text with different methods
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @param tries - how much tries should be spent for scrolling. If 0 - it
-     * will be quick check for not present element with scrolling try.
-     * @param oldMethod boolean
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean universalScrollToBase(String scrollToText, ExtendedWebElement containerElement, int tries, boolean oldMethod) {
-        boolean scrolled = false;
-        if ((tries > 0) && (!oldMethod)) {
-            scrolled = AndroidUtils.scrollTo(scrollToText);
-        }
-        if (scrolled) {
-            return true;
-        } else {
-            WebDriver driver = DriverPool.getDriver();
-            LOGGER.info("Scrolling with old scroll method. Just old method:" + oldMethod + ". With " + tries + " tries.");
-            try {
-                try {
-                    driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-                } catch (Exception e) {
-                    LOGGER.error("Strange error with implicitlyWait" + e);
-                }
-
-                RemoteWebElement element = (RemoteWebElement) driver.findElement(By.name(scrollToText));
-                if (element.isDisplayed()) {
-                    try {
-                        driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-                    } catch (Exception e) {
-                        LOGGER.error("Strange error with implicitlyWait" + e);
-                    }
-
-                    return true;
-                }
-            } catch (Exception e) {
-                // restore timeout
-                try {
-                    driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
-                } catch (Exception err) {
-                    LOGGER.error("Strange error with implicitlyWait" + err);
-                }
-            }
-            LOGGER.info(String.format("Scrolling to text '%s', Scroll container: %s", scrollToText, containerElement.getNameWithLocator()));
-
-            try {
-                final HashMap<String, String> scrollMap = new HashMap<String, String>();
-
-                final JavascriptExecutor executor = (JavascriptExecutor) driver;
-                scrollMap.put("text", scrollToText);
-
-                scrollMap.put("element", ((RemoteWebElement) driver.findElement(containerElement.getBy())).getId());
-
-                LOGGER.info(scrollMap);
-                scrolled = false;
-                int i = 0;
-                while (!scrolled && ++i <= tries) {
-                    try {
-                        LOGGER.info("attempt #" + i);
-                        executor.executeScript("mobile: scrollTo", scrollMap);
-                        scrolled = true;
-                    } catch (Exception e) {
-                        LOGGER.warn("Exception occurred for scroll operation! "
-                                + String.format("Scrolling to text '%s', Scroll container: %s", scrollToText, containerElement.getNameWithLocator()));
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("Error happened during call JavascriptExecutor executor : " + e);
-                scrolled = false;
-            }
-        }
-        LOGGER.info("Successfully scrolled to text '" + scrollToText + "': " + scrolled);
-        return scrolled;
     }
 
     /**
@@ -300,104 +141,6 @@ public class AndroidUtils extends MobileUtils {
             }
         }
     }
-
-    /**
-     * Quick solution for scrolling To Button or element.
-     *
-     * @param extendedWebElement ExtendedWebElement
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean scrollTo(final ExtendedWebElement extendedWebElement) {
-        int i = 0;
-        try {
-            WebDriver driver = DriverPool.getDriver();
-            int x = driver.manage().window().getSize().getWidth();
-            int y = driver.manage().window().getSize().getHeight();
-            LOGGER.info("Swipe down");
-            while (!extendedWebElement.isElementPresent(1) && ++i <= 10) {
-                LOGGER.debug("Swipe down. Attempt #" + i);
-                swipe((int) (x * 0.1), (int) (y * 0.9), (int) (x * 0.1), (int) (y * 0.2), 2000);
-
-            }
-            if (!extendedWebElement.isElementPresent(1)) {
-                LOGGER.info("Swipe up");
-                i = 0;
-                x = driver.manage().window().getSize().getWidth();
-                y = driver.manage().window().getSize().getHeight();
-                while (!extendedWebElement.isElementPresent(1) && ++i <= 10) {
-                    LOGGER.debug("Swipe up. Attempt #" + i);
-                    swipe((int) (x * 0.1), (int) (y * 0.2), (int) (x * 0.1), (int) (y * 0.9), 2000);
-                }
-            }
-            return extendedWebElement.isElementPresent(1);
-        } catch (Exception e) {
-            LOGGER.info("Error happen during scrollTo ExtendedWebElement: " + e);
-            return true;
-        }
-    }
-
-    /**
-     * swipe In Container To required Element
-     *
-     * @param extendedWebElement - expected element
-     * @param container - scrollable container
-     * @param direction - Direction {LEFT, RIGHT, UP, DOWN, HORIZONTAL, VERTICAL
-     * }
-     * @param duration - duration
-     * @param times - times
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean swipeInContainerToElement(final ExtendedWebElement extendedWebElement, ExtendedWebElement container, Direction direction,
-            int duration, int times) {
-        int i = 0;
-        boolean bothWay = false;
-        Direction oppositeDirection = Direction.DOWN;
-        try {
-            if (extendedWebElement.isElementPresent(1)) {
-                LOGGER.info("Element already present");
-                return true;
-            }
-
-            if (direction.equals(Direction.HORIZONTAL)) {
-                bothWay = true;
-                direction = Direction.LEFT;
-                oppositeDirection = Direction.RIGHT;
-            } else if (direction.equals(Direction.HORIZONTAL_RIGHT_FIRST)) {
-                bothWay = true;
-                direction = Direction.RIGHT;
-                oppositeDirection = Direction.LEFT;
-            } else if (direction.equals(Direction.VERTICAL_DOWN_FIRST)) {
-                bothWay = true;
-                direction = Direction.DOWN;
-                oppositeDirection = Direction.UP;
-            } else if (direction.equals(Direction.VERTICAL)) {
-                bothWay = true;
-                direction = Direction.UP;
-                oppositeDirection = Direction.DOWN;
-            }
-
-            while (!extendedWebElement.isElementPresent(1) && ++i <= times) {
-                LOGGER.debug("Swipe " + direction.toString());
-                swipeInContainer(container, 1, direction, duration);
-            }
-            if (!extendedWebElement.isElementPresent(1) && bothWay) {
-                LOGGER.info("Swipe in opposite direction");
-                i = 0;
-
-                while (!extendedWebElement.isElementPresent(1) && ++i <= times) {
-                    LOGGER.debug("Swipe " + direction.toString());
-                    swipeInContainer(container, 1, oppositeDirection, duration);
-                }
-            }
-            return extendedWebElement.isElementPresent(1);
-        } catch (Exception e) {
-            LOGGER.info("Error happened during swipe in container for element: " + e);
-            return true;
-        }
-    }
-
     /**
      * Hide keyboard if needed
      */
@@ -471,150 +214,6 @@ public class AndroidUtils extends MobileUtils {
     }
 
     /**
-     * Tap and Hold (LongPress) on element in Android
-     *
-     * @param element ExtendedWebElement
-     * @return boolean
-     */
-    public static boolean longPress(ExtendedWebElement element) {
-        try {
-            WebDriver driver = DriverPool.getDriver();
-            TouchAction action = new TouchAction((MobileDriver<?>) driver);
-            action.longPress(element.getElement()).release().perform();
-            return true;
-        } catch (Exception e) {
-            LOGGER.info("Error occurs: " + e);
-        }
-        return false;
-    }
-
-    @Deprecated
-    public static ExtendedWebElement scrollToText(String text) {
-        AndroidElement androidElement = ((AndroidDriver<AndroidElement>) getDriver()).findElement(
-                MobileBy.AndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
-
-        return new ExtendedWebElement(androidElement, getDriver());
-    }
-
-    @Deprecated
-    public static ExtendedWebElement scrollToText(String scrollViewId, String text) {
-        AndroidElement androidElement = ((AndroidDriver<AndroidElement>) getDriver()).findElement(MobileBy.AndroidUIAutomator(
-                "new UiScrollable(new UiSelector().resourceId(\"" + scrollViewId + "\")).scrollIntoView(new UiSelector().text(\"" + text + "\"));"));
-
-        return new ExtendedWebElement(androidElement, getDriver());
-    }
-
-    /**
-     * newScrollTo. Try to use new java_appium solution. (Unstable) And 2 more
-     * scroll solutions from AndroidUtils.
-     * https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/touch-actions.md
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @param tries int
-     * @return boolean
-     */
-    @Deprecated
-    private static boolean newScrollTo(String scrollToText, ExtendedWebElement containerElement, int tries) {
-        boolean scrolled = false;
-
-        WebDriver driver = DriverPool.getDriver();
-        try {
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            HashMap<String, String> scrollObject = new HashMap<String, String>();
-            scrollObject.put("direction", "down");
-            scrollObject.put("element", ((RemoteWebElement) driver.findElement(containerElement.getBy())).getId());
-            scrollObject.put("text", scrollToText);
-            // scrollObject.put("element", ((RemoteWebElement)
-            // element).getId());
-            js.executeScript("mobile: scroll", scrollObject);
-            scrolled = true;
-        } catch (Exception e) {
-            LOGGER.warn("Exception occurred for scroll operation using new Appium Java client! "
-                    + String.format("Scrolling to text '%s', Scroll container: %s", scrollToText, containerElement.getNameWithLocator()));
-        }
-        /*
-         * if ((tries > 0) && (!scrolled )) {
-         * LOGGER.info("Using scrollTo1 method."); scrolled =
-         * AndroidUtils.scrollTo1(scrollToText); }
-         */
-
-        if (!scrolled) {
-            LOGGER.info("Using scrollTo2 method.");
-            scrolled = AndroidUtils.scrollTo2(scrollToText);
-        }
-        return scrolled;
-    }
-
-    /**
-     * universal Scroll To text with different methods (Extended)
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean universalScrollToExtended(String scrollToText, ExtendedWebElement containerElement) {
-        return universalScrollToExtended(scrollToText, containerElement, 3, false);
-    }
-
-    /**
-     * universal Scroll To text with different methods (Extended)
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @param tries - how much tries should be spent for scrolling. If 0 - it
-     * will be quick check for not present element with scrolling try.
-     * @param oldMethod - if true - will try to execute old methods.
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean universalScrollToExtended(String scrollToText, ExtendedWebElement containerElement, int tries, boolean oldMethod) {
-
-        // Set oldMethod to false for trying use as much as possible solutions
-        // for scrolling.
-        // oldMethod = false;
-
-        boolean scrolled = AndroidUtils.universalScrollToBase(scrollToText, containerElement, tries, oldMethod);
-        if (!scrolled) {
-            LOGGER.info("Try to use 3 more new solutions for scrolling. ");
-            scrolled = newScrollTo(scrollToText, containerElement, tries);
-        }
-
-        if (scrolled) {
-            LOGGER.info("Finally scrolled to text '" + scrollToText + "'.");
-        }
-        return scrolled;
-    }
-
-    /**
-     * universal Scroll To text with different methods
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @param tries - how much tries should be spent for scrolling. If 0 - it
-     * will be quick check for not present element with scrolling try.
-     * @param oldMethod - if true try to call old methods
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean universalScrollTo(String scrollToText, ExtendedWebElement containerElement, int tries, boolean oldMethod) {
-        return universalScrollToExtended(scrollToText, containerElement, tries, oldMethod);
-    }
-
-    /**
-     * universal Scroll To text with different methods
-     *
-     * @param scrollToText String
-     * @param containerElement ExtendedWebElement
-     * @return boolean
-     */
-    @Deprecated
-    public static boolean universalScrollTo(String scrollToText, ExtendedWebElement containerElement) {
-        return universalScrollToExtended(scrollToText, containerElement, 3, false);
-    }
-
-    /**
      * change Android Device Language
      * <p>
      * Url: <a href=
@@ -645,6 +244,11 @@ public class AndroidUtils extends MobileUtils {
         boolean status = executor.setDeviceLanguage(language);
 
         return status;
+    }
+    
+    public static boolean isChecked(final ExtendedWebElement element) {
+		return element.isElementPresent(5)
+				&& (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }
     
 }
