@@ -461,12 +461,8 @@ public class MobileUtils {
      * @param duration int
      */
     public static void swipeUp(final int duration) {
-        WebDriver driver = DriverPool.getDriver();
-        int x = driver.manage().window().getSize().width / 2;
-        int y = driver.manage().window().getSize().height;
         LOGGER.info("Swipe up will be executed.");
-        //TODO: recalculate based OS if needed or remove this method completely
-        swipe(x, y / 2, x, y * 4 / 5, duration);
+        swipeInDevice(null, Direction.UP, duration);
     }
 
     /**
@@ -487,11 +483,7 @@ public class MobileUtils {
      * @param duration int
      */
     public static void swipeDown(final int duration) {
-        WebDriver driver = DriverPool.getDriver();
-        int x = driver.manage().window().getSize().width / 2;
-        int y = driver.manage().window().getSize().height / 2;
         LOGGER.info("Swipe down will be executed.");
-        //TODO: recalculate based OS if needed or remove this method completely
-        swipe(x, y, x, y / 2, duration);
+        swipeInDevice(null, Direction.DOWN, duration);
     }
 }
