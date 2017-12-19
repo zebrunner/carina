@@ -124,7 +124,7 @@ public class MobileUtils {
      * @return boolean
      */
     public static boolean swipe(final ExtendedWebElement element, int count) {
-    	return swipe(element, null, Direction.UP, 10, DEFAULT_TOUCH_ACTION_DURATION);
+    	return swipe(element, null, Direction.UP, count, DEFAULT_TOUCH_ACTION_DURATION);
     }
     
     /**
@@ -399,7 +399,7 @@ public class MobileUtils {
     		minCoefficient = 0.25;
     		maxCoefficient = 0.5;
     		break;
-    	case SpecialKeywords.IOS:
+    	case SpecialKeywords.MAC:
     		minCoefficient = 0.25;
     		maxCoefficient = 0.8;
     		break;
