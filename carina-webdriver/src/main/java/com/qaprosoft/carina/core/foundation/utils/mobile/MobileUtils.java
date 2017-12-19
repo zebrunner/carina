@@ -380,7 +380,7 @@ public class MobileUtils {
     	if (container == null) {
     		//whole screen/driver is a container!
     		WebDriver driver = DriverPool.getDriver();
-    		elementLocation = driver.manage().window().getPosition();
+    		elementLocation = new Point(0, 0); //initial left corner for that case
     		elementDimensions = driver.manage().window().getSize();
     	} else {
             if (container.isElementNotPresent(5)) {
