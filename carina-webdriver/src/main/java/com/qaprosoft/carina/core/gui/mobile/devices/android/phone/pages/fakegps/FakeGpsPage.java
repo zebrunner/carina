@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -109,7 +110,7 @@ public class FakeGpsPage extends MobileAbstractPage {
                 inputLocationNew.type(location);
                 AndroidUtils.pressKeyCode(AndroidKeyCode.ENTER);
                 AndroidUtils.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
-                pause(3);
+                CommonUtils.pause(3);
                 return true;
             }
         } else {
