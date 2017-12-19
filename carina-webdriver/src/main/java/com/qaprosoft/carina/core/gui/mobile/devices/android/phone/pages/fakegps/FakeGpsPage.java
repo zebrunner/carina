@@ -1,16 +1,16 @@
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps;
 
+import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.FindBy;
+
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+
 import io.appium.java_client.android.AndroidKeyCode;
-import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.FindBy;
 
 /**
  * Fake GPS Page
@@ -107,8 +107,8 @@ public class FakeGpsPage extends MobileAbstractPage {
             actionSearch.click();
             if (inputLocationNew.isElementPresent(DELAY)) {
                 inputLocationNew.type(location);
-                ((AndroidDriver<AndroidElement>) getDriver()).pressKeyCode(AndroidKeyCode.ENTER);
-                ((AndroidDriver<AndroidElement>) getDriver()).pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
+                AndroidUtils.pressKeyCode(AndroidKeyCode.ENTER);
+                AndroidUtils.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
                 pause(3);
                 return true;
             }
@@ -137,7 +137,6 @@ public class FakeGpsPage extends MobileAbstractPage {
     }
 
     public void solveMockSettings() {
-        boolean scrolled = false;
 
         if (openSettingsButton.isElementPresent(MINIMAL_TIMEOUT)) {
             openSettingsButton.clickIfPresent(DELAY);
@@ -145,19 +144,11 @@ public class FakeGpsPage extends MobileAbstractPage {
             String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
             LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
             if (currentAndroidVersion.contains("7.")) {
-                scrolled = MobileUtils.swipeInContainerTillElement(allowMock7, devSettingsContainer);
-                if (!scrolled) {
-                    scrolled = AndroidUtils.scrollTo(allowMock7);
-                }
-                if (scrolled) {
-                    allowMock7.clickIfPresent(MINIMAL_TIMEOUT);
-                    fakeGpsPackage.clickIfPresent(DELAY);
-                }
+                MobileUtils.swipe(allowMock7, devSettingsContainer);
+                allowMock7.clickIfPresent(MINIMAL_TIMEOUT);
+                fakeGpsPackage.clickIfPresent(DELAY);
             } else {
-                scrolled = MobileUtils.swipeInContainerTillElement(allowMock, devSettingsContainer);
-                if (!scrolled) {
-                    AndroidUtils.scrollTo(allowMock);
-                }
+                MobileUtils.swipe(allowMock, devSettingsContainer);
                 LOGGER.info("Allow Mock config is present:" + allowMock.isElementPresent(SHORT_TIMEOUT));
                 allowMock.clickIfPresent(MINIMAL_TIMEOUT);
                 fakeGpsPackage.clickIfPresent(DELAY / 3);

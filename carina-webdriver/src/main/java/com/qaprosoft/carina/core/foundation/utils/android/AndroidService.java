@@ -1364,11 +1364,13 @@ public class AndroidService {
      * @param timeout long
      */
     private void pause(long timeout) {
+	LOGGER.info("Will wait for " + timeout + " seconds");
         try {
             Thread.sleep(timeout * 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+	LOGGER.info("Pause is overed. Keep going..");
     }
 
 }

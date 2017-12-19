@@ -44,7 +44,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     public void openTimeZoneSetting() {
         boolean found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
         if (!found) {
-            boolean scrolled = MobileUtils.swipeInContainerTillElement(
+            boolean scrolled = MobileUtils.swipe(
                     selectTimeZone,
                     scrollableContainer);
             if (scrolled) {
@@ -72,13 +72,13 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         //TODO: Think how to cover GMT+3:00 instead of GMT+03:00 on some devices.
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
-            boolean scrolled = MobileUtils.swipeInContainerTillElement(
+            boolean scrolled = MobileUtils.swipe(
                     format(tzSelectionBase, tz),
                     scrollableContainer, defaultSwipeTime);
             if (!scrolled) {
                 LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
                 defaultSwipeTime = 30;
-                scrolled = MobileUtils.swipeInContainerTillElement(
+                scrolled = MobileUtils.swipe(
                         format(tzSelectionBase, tz),
                         scrollableContainer, defaultSwipeTime);
             }
@@ -95,7 +95,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                     }
                     if (!multiTimezoneText) {
                         LOGGER.info("Searching for " + timezone);
-                        scrolled = MobileUtils.swipeInContainerTillElement(
+                        scrolled = MobileUtils.swipe(
                                 format(tzSelectionBase, timezone),
                                 scrollableContainer, defaultSwipeTime);
                         if (scrolled) {
@@ -107,7 +107,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                             selected = true;
                         } else {
                             LOGGER.error("Did not find timezone by timezone text: " + timezone);
-                            scrolled = MobileUtils.swipeInContainerTillElement(
+                            scrolled = MobileUtils.swipe(
                                     format(tzSelectionBase, tz),
                                     scrollableContainer, defaultSwipeTime);
                             if (scrolled) {
@@ -171,7 +171,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @return boolean
      */
     private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
-        boolean scrolled = MobileUtils.swipeInContainerTillElement(
+        boolean scrolled = MobileUtils.swipe(
                 format(tzSelectionBase, timezone),
                 scrollableContainer, defaultSwipeTime);
         if (scrolled) {

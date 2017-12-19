@@ -54,7 +54,6 @@ public class FirefoxCapabilities extends AbstractCapabilities {
 
         profile.setPreference("dom.max_chrome_script_run_time", 0);
         profile.setPreference("dom.max_script_run_time", 0);
-        profile.setEnableNativeEvents(true);
 
 		if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
 				|| "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS))))
