@@ -110,7 +110,8 @@ public class FakeGpsPage extends MobileAbstractPage {
                 inputLocationNew.type(location);
                 AndroidUtils.pressKeyCode(AndroidKeyCode.ENTER);
                 AndroidUtils.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
-                CommonUtils.pause(3);             
+                CommonUtils.pause(3);  
+                return true;
             }
         } else {
             LOGGER.info("Old app");
