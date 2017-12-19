@@ -103,7 +103,7 @@ public class MobileUtils {
      */
     public static void tap(int startx, int starty, int duration) {
         TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
-        touchAction.tap(startx, starty).waitAction(Duration.ofMillis(duration)).perform();
+        touchAction.press(startx, starty).waitAction(Duration.ofMillis(duration)).release().perform();
     }
 
     /**
