@@ -34,7 +34,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
@@ -118,7 +117,7 @@ public class DriverHelper {
 			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			LOGGER.error("Unable to set implicit timeout to " + timeout, e);
-			getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+			//getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 		}
 	}
 
@@ -352,16 +351,19 @@ public class DriverHelper {
 	@Deprecated
 	public boolean isElementPresent(String elementName, final By by, long timeout) {
 		boolean result;
-		setImplicitTimeout(1);
+		
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(0);
 			wait.until((Function<WebDriver, Object>) dr -> !dr.findElements(by).isEmpty() && dr.findElement(by).isDisplayed());
 			result = true;
 		} catch (Exception e) {
 			result = false;
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);	
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
+		
 		return result;
 	}
 
@@ -1026,11 +1028,11 @@ public class DriverHelper {
 	 */
 	public void silentAlert() {
 		WebDriver drv = getDriver();
-		if (!(drv instanceof HtmlUnitDriver)) {
-			((JavascriptExecutor) drv).executeScript("window.alert = function(msg) { return true; }");
-			((JavascriptExecutor) drv).executeScript("window.confirm = function(msg) { return true; }");
-			((JavascriptExecutor) drv).executeScript("window.prompt = function(msg) { return true; }");
-		}
+
+		((JavascriptExecutor) drv).executeScript("window.alert = function(msg) { return true; }");
+		((JavascriptExecutor) drv).executeScript("window.confirm = function(msg) { return true; }");
+		((JavascriptExecutor) drv).executeScript("window.prompt = function(msg) { return true; }");
+
 	}
 
 	/**
@@ -1342,19 +1344,21 @@ public class DriverHelper {
 	public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		ExtendedWebElement element;
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(0);
+		
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(0);
 			wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
 			element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
 			Messager.ELEMENT_FOUND.info(name);
 		} catch (Exception e) {
 			element = null;
 			Messager.ELEMENT_NOT_FOUND.error(name);
-			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);	
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
+		
 		return element;
 	}
 
@@ -1366,10 +1370,10 @@ public class DriverHelper {
 		List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
 		List<WebElement> webElements = new ArrayList<WebElement>();
 
-		setImplicitTimeout(1);
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(0);
 			wait.until(new Function<WebDriver, Object>() {
 				public Boolean apply(WebDriver dr) {
 					return !drv.findElements(by).isEmpty();
@@ -1378,6 +1382,8 @@ public class DriverHelper {
 			webElements = driver.findElements(by);
 		} catch (Exception e) {
 			// do nothing
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);
 		}
 
 		for (WebElement element : webElements) {
@@ -1389,7 +1395,6 @@ public class DriverHelper {
 
 			extendedWebElements.add(new ExtendedWebElement(element, name, drv));
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
 		return extendedWebElements;
 	}
 

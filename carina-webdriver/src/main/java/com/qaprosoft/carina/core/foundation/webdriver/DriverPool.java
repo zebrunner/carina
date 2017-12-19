@@ -168,17 +168,20 @@ public final class DriverPool {
 		}
 		
 		try {
-			LOGGER.debug("Driver restarting..." + drv);
+			LOGGER.debug("Driver restarting...");
 			deregisterDriver(DEFAULT);
 			if (!isSameDevice) {
 				DevicePool.deregisterDevice();
 			}
 
-			drv.quit();
-			LOGGER.debug("Driver exited during restart..." + drv);
+			if (drv != null && !drv.toString().contains("null")) {
+				//no sense to quit if it is already gone
+				drv.quit();
+			}
+			LOGGER.debug("Driver exited during restart...");
 		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found" + drv);
+			LOGGER.debug("unable to quit as sesion was not found!");
 		} catch (Exception e) {
 			LOGGER.warn("Error discovered during driver restart: ", e);
 		} finally {
@@ -216,16 +219,19 @@ public final class DriverPool {
 		}
 
 		try {
-			LOGGER.debug("Driver exiting..." + drv);
+			LOGGER.debug("Driver exiting..." + name);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
-			drv.quit();
-			LOGGER.debug("Driver exited..." + drv);
+			if (drv != null && !drv.toString().contains("null")) {
+				//no sense to quit if it is already gone
+				drv.quit();
+			}
+			LOGGER.debug("Driver exited..." + name);
 		} catch (UnreachableBrowserException e) {
 			//do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found" + drv);
+			LOGGER.debug("unable to quit as sesion was not found! " + name);
 		} catch (Exception e) {
-			LOGGER.warn("Error discovered during driver quit: " + e.getMessage());
+			LOGGER.warn("Error discovered during driver quit: " + e.getMessage(), e);
 		} finally {
 			// TODO analyze how to forcibly kill session on device
 			NDC.pop();
@@ -281,7 +287,12 @@ public final class DriverPool {
 				registerDriver(drv, name);
 
 				init = true;
-				// push custom device name  for log4j default messages
+
+				if (device.isNull()) {
+					//During driver creation we choose device and assign it to the test thread 
+					device = DevicePool.getDevice();
+				}
+				// push custom device name  for log4j default messages				
 				if (!device.isNull()) {
 					NDC.push(" [" + device.getName() + "] ");
 				}

@@ -383,5 +383,4 @@ public class AmazonS3Manager {
 	 * 
 	 * System.out.println("    " + line); } }
 	 */
-		
 }

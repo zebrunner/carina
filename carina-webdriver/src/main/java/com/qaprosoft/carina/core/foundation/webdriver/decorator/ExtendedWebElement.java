@@ -144,9 +144,9 @@ public class ExtendedWebElement {
 		
 		LOGGER.debug("There is null WebElement object. Trying to find dynamic element using By: " + by.toString());
 		final WebDriver drv = getDriver();
-		setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
+			setImplicitTimeout(0);
 			wait.until((Function<WebDriver, Object>) dr -> {
 				if (!drv.findElements(by).isEmpty()) {
 					LOGGER.debug("Dynamic element was found using By: " + by.toString());
@@ -155,16 +155,15 @@ public class ExtendedWebElement {
 				}
 				return false;
 			});
-			// summary.log(Messager.ELEMENT_FOUND.info(name));
 		} catch (TimeoutException e) {
 			//do nothing
 		} catch (Exception e) {
 			element = null;
-			// summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
-			setImplicitTimeout(IMPLICIT_TIMEOUT);
 			throw new RuntimeException(e);
+		} finally {
+			setImplicitTimeout(IMPLICIT_TIMEOUT);			
 		}
-		setImplicitTimeout(IMPLICIT_TIMEOUT);
+
 
 		if (element == null) {
 			throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
@@ -443,7 +442,7 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent(long timeout) {
         boolean result;
-        if (timeout <= 0) {
+        if (timeout < 1) {
             LOGGER.warn("Timeout should be bigger than 0.");
             timeout = 1;
         }
@@ -451,19 +450,33 @@ public class ExtendedWebElement {
         final long finalTimeout = timeout;
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
+        	LOGGER.debug("isElementPresent: starting...");
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
             result = true;
+            LOGGER.debug("isElementPresent: finished true...");
         } catch (NoSuchElementException | TimeoutException e) {
         	//don't write exception even in debug mode
+        	LOGGER.debug("isElementPresent: NoSuchElementException | TimeoutException e...", e);
         	result = false;
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
+            LOGGER.debug("isElementPresent: Exception e...", e);
             result = false;
+        } finally {
+        	LOGGER.debug("isElementPresent: finally");
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);	
         }
-        setImplicitTimeout();
+        
+        
+        //TODO: [VD] try to add error or exception to reraise correctly exception on selenium level!
+/*		if (undefinedException != null && undefinedException.getMessage() != null
+				&& !undefinedException.getMessage().startsWith("Unable to find dynamic element using")) {
+			LOGGER.error(undefinedException.getMessage(), undefinedException);
+		}*/
+        
         return result;
     }
 
@@ -529,33 +542,23 @@ public class ExtendedWebElement {
         return clickIfPresent(EXPLICIT_TIMEOUT);
     }
 
-    /**
-     * Click onto element if it present.
-     *
-     * @param timeout - timeout
-     * @return boolean return true if clicked
-     */
-    public boolean clickIfPresent(long timeout) {
-        boolean result;
-        WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-            wait.until((Function<WebDriver, Object>) dr -> findElement(timeout).isDisplayed());
-            captureElements();
-            element.click();
-            Messager.ELEMENT_CLICKED.info(getName());
-            result = true;
-        } catch (NoSuchElementException | TimeoutException e) {
-        	return false;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            result = false;
-        }
-        setImplicitTimeout();
-        return result;
-    }
+	/**
+	 * Click onto element if present.
+	 *
+	 * @param timeout
+	 *            - timeout
+	 * @return boolean return true if clicked
+	 */
+	public boolean clickIfPresent(long timeout) {
+		boolean present = isElementPresent(timeout);
+		if (present) {
+			captureElements();
+			click();
+			Messager.ELEMENT_CLICKED.info(getName());
+		}
 
+		return present;
+	}
 
     /**
      * Types text to specified element.
@@ -563,28 +566,46 @@ public class ExtendedWebElement {
      * @param text to type.
      */
     public void type(String text) {
+    	type(text, EXPLICIT_TIMEOUT);
+    }
+    
+    /**
+     * Types text to specified element.
+     *
+     * @param text to type.
+     * @param timeout long
+     */
+    public void type(String text, long timeout) {
         captureElements();
         String msg;
         final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-        WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-        try {
-        	element = findElement(EXPLICIT_TIMEOUT);
-            wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
-            scrollTo();
-            element.clear();
-            element.sendKeys(decryptedText);
-            msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-        } catch (StaleElementReferenceException e) {
-            element = findStaleElement();
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element.clear();
-            element.sendKeys(decryptedText);
-            msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-        } catch (Exception e) {
+        
+		boolean present = isElementPresent(timeout);
+		if (present) {
+			try {
+				element = findElement(0);
+				//TODO: [VD] huge change as it is expected that new selenium can do it automatically for web UI tests
+				// scrollTo();
+				element.clear();
+				element.sendKeys(decryptedText);
+				msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
+			} catch (StaleElementReferenceException e) {
+				//TODO: [VD] think about movement StaleElementReferenceException handler to findElement private method 
+				element = findStaleElement();
+				LOGGER.debug(e.getMessage(), e.getCause());
+				element.clear();
+				element.sendKeys(decryptedText);
+				msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
+			} catch (Exception e) {
+				msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
+				throw new RuntimeException(msg, e);
+			}
+		} else {
             msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
-            throw new RuntimeException(msg, e);
-        }
+            throw new RuntimeException(msg);
+		}
+
+        WebDriver drv = DriverPool.getDriver();
         Screenshot.capture(drv, msg);
     }
 
@@ -606,10 +627,12 @@ public class ExtendedWebElement {
         }
 
         try {
+        	LOGGER.debug("setImplicitTimeout: starting... value: " + timeout);
             getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+            LOGGER.debug("setImplicitTimeout: finished. " + timeout);
         } catch (Exception e) {
             LOGGER.error("Unable to set implicit timeout to " + timeout, e);
-            getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+            //getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
         }
     }
 
@@ -655,6 +678,7 @@ public class ExtendedWebElement {
     /**
      * Scroll to element (applied only for desktop).
      */
+    @Deprecated
     public void scrollTo() {
         if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
@@ -687,13 +711,15 @@ public class ExtendedWebElement {
         WebDriver drv = getDriver();
         wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
-        	element = findElement(EXPLICIT_TIMEOUT);
-            wait.until((Function<WebDriver, Object>) dr -> element.isDisplayed());
+        	setImplicitTimeout(0);
+            wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
             element.sendKeys(decryptedFilePath);
             msg = Messager.FILE_ATTACHED.info(filePath);
         } catch (Exception e) {
             msg = Messager.FILE_NOT_ATTACHED.error(filePath);
             throw new RuntimeException(msg, e);
+        } finally {
+        	setImplicitTimeout();
         }
         Screenshot.capture(drv, msg);
     }
@@ -1027,9 +1053,9 @@ public class ExtendedWebElement {
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         ExtendedWebElement element;
         final WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> {
                 //try to search starting from existing webElement and using driver directly
                 if (!drv.findElements(by).isEmpty()) {
@@ -1044,10 +1070,11 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             element = null;
             //summary.log(Messager.ELEMENT_NOT_FOUND.error(name));
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
             throw new RuntimeException(e);
+        } finally {
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);	
         }
-        setImplicitTimeout(IMPLICIT_TIMEOUT);
+        
         return element;
     }
 
@@ -1061,9 +1088,9 @@ public class ExtendedWebElement {
         List<WebElement> webElements = new ArrayList<WebElement>();
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> {
                 //try to search starting from existing webElement and using driver directly
                 if (!drv.findElements(by).isEmpty()) {
@@ -1080,6 +1107,8 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             //do nothing
+        } finally {
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);
         }
 
         for (WebElement element : webElements) {
@@ -1093,7 +1122,6 @@ public class ExtendedWebElement {
 
             extendedWebElements.add(new ExtendedWebElement(element, name, driver));
         }
-        setImplicitTimeout();
         return extendedWebElements;
     }
 
@@ -1112,10 +1140,10 @@ public class ExtendedWebElement {
         LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
 
         final WebDriver drv = getDriver();
-        setImplicitTimeout(Math.max(1,  Configuration.getLong(Parameter.RETRY_INTERVAL)/1000));
-
+        
         wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
+        	setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> {
                 boolean result = drv.findElements(element.getBy()).size() == 0;
                 if (!result) {
@@ -1129,9 +1157,9 @@ public class ExtendedWebElement {
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             // do nothing
+        } finally {
+        	setImplicitTimeout(IMPLICIT_TIMEOUT);
         }
-
-        setImplicitTimeout();
 
     }
 
@@ -1401,8 +1429,7 @@ public class ExtendedWebElement {
 		CommonUtils.pause(timeout);
 	}
 
-	public void pause(double timeout)
-	{
+	public void pause(double timeout){
 		CommonUtils.pause(timeout);
 	}
 
