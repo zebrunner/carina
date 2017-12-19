@@ -72,6 +72,7 @@ import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -551,25 +552,11 @@ public abstract class AbstractTest // extends DriverHelper
      */
 
     public void pause(long timeout) {
-	LOGGER.info("Will wait for " + timeout + " seconds");
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-	LOGGER.info("Pause is overed. Keep going..");
+	CommonUtils.pause(timeout);
     }
 
     public void pause(Double timeout) {
-	LOGGER.info("Will wait for " + timeout + " seconds");
-        try {
-            timeout = timeout * 1000;
-            long miliSec = timeout.longValue();
-            Thread.sleep(miliSec);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-	LOGGER.info("Pause is overed. Keep going..");
+    CommonUtils.pause(timeout);
     }
 
     protected void putS3Artifact(String key, String path) {
