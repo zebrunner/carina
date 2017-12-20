@@ -130,7 +130,13 @@ public class Jira
 		}
 		if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
 			tickets.clear();
-			tickets.add(result.getMethod().getDescription().split("#")[1].trim()); 
+			String description = null;
+			try {
+				description = result.getMethod().getDescription();
+				tickets.add(description.split("#")[1].trim()); 
+			} catch (Exception e) {
+				LOG.error("Incorrect Jira-ticket format: " + description);
+			}			
 		}
 
 		@SuppressWarnings("unchecked")
