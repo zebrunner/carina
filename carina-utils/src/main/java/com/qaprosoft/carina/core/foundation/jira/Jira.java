@@ -135,7 +135,7 @@ public class Jira
 				description = result.getMethod().getDescription();
 				tickets.add(description.split("#")[1].trim()); 
 			} catch (Exception e) {
-				LOG.error("Incorrect Jira-ticket format: " + description);
+				LOG.error("Incorrect Jira-ticket format: " + description, e);
 			}			
 		}
 
