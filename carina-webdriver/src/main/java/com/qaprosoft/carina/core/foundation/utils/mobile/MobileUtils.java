@@ -287,9 +287,19 @@ public class MobileUtils {
 			oppositeDirection = Direction.RIGHT;
 			bothDirections = true;
 			break;
+		case HORIZONTAL_RIGHT_FIRST:
+			direction = Direction.RIGHT;
+			oppositeDirection = Direction.LEFT;
+			bothDirections = true;
+			break;
 		case VERTICAL:
 			direction = Direction.UP;
 			oppositeDirection = Direction.DOWN;
+			bothDirections = true;
+			break;
+		case VERTICAL_DOWN_FIRST:
+			direction = Direction.DOWN;
+			oppositeDirection = Direction.UP;
 			bothDirections = true;
 			break;
 		default:
