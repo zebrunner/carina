@@ -24,6 +24,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExec
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Platform;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.ProcessBuilderExecutor;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
@@ -133,7 +134,7 @@ public class Device extends RemoteDevice
 		LOGGER.info("adb connect " + getRemoteURL());
 		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
 		executor.execute(cmd);
-		pause(1);
+		CommonUtils.pause(1);
 		
 		String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
 		executor.execute(cmd2);
@@ -302,7 +303,7 @@ public class Device extends RemoteDevice
 					"keyevent", "26");
             executor.execute(cmd);
 
-            pause(5);
+            CommonUtils.pause(5);
 
             screenState = getScreenState();
             if (screenState) {
@@ -338,7 +339,7 @@ public class Device extends RemoteDevice
                     "input", "keyevent", "26");
             executor.execute(cmd);
 
-            pause(5);
+            CommonUtils.pause(5);
             // verify that screen is Off now
             screenState = getScreenState();
             if (!screenState) {
@@ -362,13 +363,7 @@ public class Device extends RemoteDevice
 	}
     
     public void pause(long timeout) {
-	LOGGER.info("Will wait for " + timeout + " seconds");
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-	LOGGER.info("Pause is overed. Keep going..");
+    	CommonUtils.pause(timeout);
     }
     
     public void clearAppData() {
