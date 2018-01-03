@@ -83,7 +83,7 @@ public class Device extends RemoteDevice
 	
 	public Device(Capabilities capabilities)
 	{
-		setName(capabilities.getCapability("deviceName").toString());
+		setName(capabilities.getCapability("deviceName").toString()); //deviceModel is returned from capabilities with name of device
 		setType(capabilities.getCapability("deviceType").toString());
 		setOs(capabilities.getCapability("platformName").toString());
 		setOsVersion(capabilities.getCapability("platformVersion").toString());

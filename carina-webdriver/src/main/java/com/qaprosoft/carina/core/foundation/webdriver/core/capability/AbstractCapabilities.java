@@ -75,8 +75,6 @@ public abstract class AbstractCapabilities {
     
 	protected DesiredCapabilities initCapabilities(DesiredCapabilities capabilities) {
 		// read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
-
-		// read all properties from config.properties and use "capabilities.*" to redefine capability
 		final String prefix = SpecialKeywords.CAPABILITIES + ".";
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());

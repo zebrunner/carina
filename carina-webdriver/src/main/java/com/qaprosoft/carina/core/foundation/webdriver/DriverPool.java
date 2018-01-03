@@ -304,8 +304,8 @@ public final class DriverPool {
 				// DevicePool.ignoreDevice();
 				DevicePool.deregisterDevice();
 				LOGGER.error(
-						String.format("Driver initialization '%s' FAILED for selenium: %s! Retry %d of %d time - %s",
-								name, seleniumHost, count, maxCount, thr.getMessage()), thr);
+						String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s",
+								name, count, maxCount, thr.getMessage()), thr);
 				init_throwable = thr;
 				CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
 			}
@@ -524,16 +524,6 @@ public final class DriverPool {
 			n = group.enumerate(threads);
 		} while (n == nAlloc);
 		return java.util.Arrays.copyOf(threads, n);
-	}
-
-	/**
-	 * Pause for specified timeout.
-	 * 
-	 * @param timeout
-	 *            in seconds.
-	 */
-	private static void pause(long timeout) {
-		CommonUtils.pause(timeout);
 	}
 
 }

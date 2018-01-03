@@ -23,6 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openqa.selenium.WebDriver;
@@ -141,6 +142,9 @@ public class MobileFactory extends AbstractFactory {
 	        ObjectMapper mapper = new ObjectMapper();
 	        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	        device =  mapper.readValue(response.getEntity().getContent(), RemoteDevice.class);
+		}
+		catch (JsonParseException e) {
+			//do nothing as it is direct call to the Appium without selenium 
 		}
 		catch (Exception e) 
 		{
