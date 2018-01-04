@@ -159,13 +159,13 @@ All project configuration properties are located in **_config.properties** file.
 		<td>url</td>
 		<td>Base application URL</td>
 		<td>{must_override}</td>
-		<td>http://carina.com/</td>
+		<td>http://carina-core.io/</td>
 	</tr>
 	<tr>
 		<td>browser</td>
 		<td>Browser for testing</td>
 		<td>chrome</td>
-		<td>chrome / firefox / iexplore</td>
+		<td>chrome / firefox / safari / iexplore</td>
 	</tr>
 	<tr>
 		<td>selenium_host</td>
@@ -175,15 +175,21 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>app_version</td>
-		<td>Application version for reporting</td>
+		<td>Application version/build number for reporting</td>
 		<td>n/a</td>
 		<td>Carina Release 1.2.5</td>
 	</tr>
 	<tr>
 		<td>locale</td>
-		<td>Locale for testing</td>
-		<td>US</td>
-		<td>GB,DE,FR</td>
+		<td>Locale for using L10N feature. Enabled when enable_l10n=true</td>
+		<td>en_US</td>
+		<td>en_GB,de_DE,fr_FR</td>
+	</tr>
+	<tr>
+		<td>language</td>
+		<td>Language for i18n defature. Enabled when enable_i18n=true</td>
+		<td>en_US</td>
+		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
 		<td>implicit_timeout</td>
@@ -192,34 +198,28 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Integer</td>
 	</tr>
 	<tr>
-		<td>retry_timeout</td>
-		<td>Timeout between calling HTML DOM for the element</td>
+		<td>retry_internal</td>
+		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in milliseconds!</td>
 		<td>2</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_screenshot</td>
-		<td>Global switch for taking screenshots</td>
+		<td>Global switch for taking screenshots. When disabled only failures will be captured</td>
 		<td>true</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
-		<td>take_only_fail_screenshot</td>
-		<td>Take only one screenshot of failed step</td>
-		<td>false</td>
-		<td>Boolean</td>
-	</tr>
-	<tr>
 		<td>keep_all_screenshots</td>
-		<td>Keep screenshots even for passed tests</td>
+		<td>Keep screenshots artifacts even for passed tests.</td>
 		<td>false</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>report_url</td>
-		<td>Direct HTTP link to Jenkins workspace report folder</td>
+		<td>Direct HTTP link to Jenkins workspace report folder. Automatically specified by CI</td>
 		<td>n/a</td>
-		<td>http://localhost:8888/job/my project/ws/reports/screenshots</td>
+		<td>http://localhost:8888/job/my_project/1/eTAF_Report</td>
 	</tr>
 	<tr>
 		<td>max_screen_history</td>
@@ -241,27 +241,15 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>sender_email</td>
-		<td>Gmail account for reports sending</td>
+		<td>Email account for reports sending. <br><b>Note:</b> Gmail smtp settings are used by default. Update _email.properties to use your own SMTP server</td>
 		<td>{must_override}</td>
-		<td>carina.qareport</td>
+		<td>carina.qareport@qaprosoft.com</td>
 	</tr>
 	<tr>
 		<td>sender_pswd</td>
-		<td>Gmail password for reports sending</td>
+		<td>Email password for reports sending</td>
 		<td>{must_override}</td>
 		<td>pwd123</td>
-	</tr>
-	<tr>
-		<td>jenkins_url</td>
-		<td>Jenkins URL for job reference in report</td>
-		<td>NULL</td>
-		<td>http://localhost:8080</td>
-	</tr>
-	<tr>
-		<td>jenkins_job</td>
-		<td>Name of Jenkins job for the reference in report</td>
-		<td>NULL</td>
-		<td>carina-demo</td>
 	</tr>
 </table>
 
