@@ -89,9 +89,6 @@ public class DesktopFactory extends AbstractFactory
 			} else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
 				return new IECapabilities().getCapability(name);
-			} else if (BrowserType.HTMLUNIT.equalsIgnoreCase(browser))
-			{
-				return new HTMLUnitCapabilities().getCapability(name);
 			} else if (BrowserType.SAFARI.equalsIgnoreCase(browser))
 			{
 				return new SafariCapabilities().getCapability(name);
