@@ -107,6 +107,11 @@ public class Device extends RemoteDevice
 
 	public Type getDeviceType()
 	{
+		if (isNull()) {
+			//if no device initialized it means that desktop UI automation is used
+			return Type.DESKTOP;
+		}
+		
 		if (getOs().equalsIgnoreCase(SpecialKeywords.ANDROID))
 		{
 			if (isTablet())
