@@ -312,7 +312,7 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
         <tr>
 		<td>capabilities.deviceName</td>
 		<td>Device name for report</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>Sumsung_Galaxy_J5</td>
 	</tr>
         <tr>
@@ -324,37 +324,37 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
         <tr>
 		<td>capabilities.platformName</td>
 		<td>Name of mobile platform</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>Android/iOS/AndroidTV/tvOS</td>
 	</tr>
         <tr>
 		<td>capabilities.platformVersion</td>
 		<td>Version of mobile platform</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>6.0.1</td>
 	</tr>
         <tr>
 		<td>capabilities.automationName</td>
 		<td>Name of programm using for automation</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>Appium/uiautomator2/XCUITest</td>
 	</tr>
         <tr>
 		<td>capabilities.app</td>
 		<td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading...</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>D:/application.apk</td>
 	</tr>
         <tr>
 		<td>capabilities.newCommandTimeout</td>
 		<td>New implicit timeout in seconds to wait for element for mobile automation</td>
-                <td>120</td>
+                <td>n/a</td>
 		<td>180</td>
 	</tr>
         <tr>
 		<td>capabilities.udid</td>
 		<td>Unique Device ID</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>759b543c</td>
 	</tr>
 </table>
