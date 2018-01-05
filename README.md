@@ -300,7 +300,7 @@ TODO
 TODO
 
 ## Mobile automation
-We could provide any Appium capabilty in **_config.properties** file using <i>capabilities.<name>=<value></i> format. In the table below we are providing description for the most popular mobile capabilities:
+We could provide any Appium capabilty in **_config.properties** file using <i>capabilities.< name >=< value ></i> format. In the table below we are providing description for the most popular mobile capabilities:
 
 <table> 
 	<tr>
