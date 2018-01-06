@@ -437,8 +437,7 @@ public final class DriverPool {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		if (currentDrivers.containsKey(name)) {
-			WebDriver drv = currentDrivers.get(name);
-			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
+			LOGGER.debug("########## DEREGISTER threadId: " + threadId);
 			currentDrivers.remove(name);
 
 			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
