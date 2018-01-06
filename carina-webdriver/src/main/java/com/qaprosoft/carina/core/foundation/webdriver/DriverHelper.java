@@ -1403,16 +1403,22 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
-		if (driver != null && !driver.toString().contains("null")) {
-			return driver;
+		try {
+			if (driver != null && !driver.toString().contains("null")) {
+				return driver;
+			}
+		} catch (Exception e) {
+			if (!e.getMessage().contains("Session ID is null.")) {
+				throw e;
+			}
+			// otherwise do nothing
 		}
+		
 		LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
 		
-		long currentThreadId = Thread.currentThread().getId();
-		if (driver == null || driver.toString().contains("null")) {
-			driver = DriverPool.getDriver();
-		}
+		driver = DriverPool.getDriver();
 		if (driver == null) {
+			long currentThreadId = Thread.currentThread().getId();
 			LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
 			throw new RuntimeException("Driver isn't initialized.");
 		}
