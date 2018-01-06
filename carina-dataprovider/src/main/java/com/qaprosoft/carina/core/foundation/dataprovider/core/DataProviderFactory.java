@@ -114,6 +114,7 @@ public class DataProviderFactory {
 
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
 		context.setAttribute(SpecialKeywords.CANONICAL_TEST_NAME_ARGS_MAP, canonicalTestNameArgsMap);
+		//TODO: analyze usage and remove TEST_METHOD_NAME_ARGS_MAP feature as soon as possible
         context.setAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP, testMethodNameArgsMap);
         context.setAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP, testMethodOwnerArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
