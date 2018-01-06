@@ -391,7 +391,7 @@ public final class DriverPool {
 		currentDrivers.put(name, driver);
 		Assert.assertTrue(drivers.get(threadId).containsKey(name),
 				"Driver '" + name + "' was not registered in map for thread: " + threadId);
-		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
+		LOGGER.debug("##########   REGISTER driver for threadId: " + threadId);
 	}
 
 	/**
@@ -437,7 +437,7 @@ public final class DriverPool {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
 		if (currentDrivers.containsKey(name)) {
-			LOGGER.debug("########## DEREGISTER threadId: " + threadId);
+			LOGGER.debug("########## DEREGISTER driver for threadId: " + threadId);
 			currentDrivers.remove(name);
 
 			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
