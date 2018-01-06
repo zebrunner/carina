@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
@@ -426,6 +427,8 @@ public final class DriverPool {
 			if (drv != null && !drv.toString().contains("null")) {
 				valid = true;
 			}
+		} catch (NoSuchSessionException e) {
+			//do nothing
 		} catch (Exception e) {
 			//TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
 			if (!e.getMessage().contains("Session ID is null.")) {
