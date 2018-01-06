@@ -1403,15 +1403,8 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
-		try {
-			if (driver != null && !driver.toString().contains("null")) {
-				return driver;
-			}
-		} catch (Exception e) {
-			if (!e.getMessage().contains("Session ID is null.")) {
-				throw e;
-			}
-			// otherwise do nothing
+		if (DriverPool.isValid(driver)) {
+			return driver;
 		}
 		
 		LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");

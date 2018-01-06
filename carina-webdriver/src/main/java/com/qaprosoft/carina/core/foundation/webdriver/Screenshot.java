@@ -251,11 +251,12 @@ public class Screenshot
 				LOGGER.warn("Unable to capture screenshot as driver is null.");
 				return null;
 			}
-			if (driver.toString().contains("null")) {
+			
+			if (!DriverPool.isValid(driver)) {
 				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 				return null;
 			}
-
+			
 			try {
 				screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
 
@@ -306,7 +307,8 @@ public class Screenshot
 				LOGGER.warn("Unable to capture screenshot as driver is null.");
 				return null;
 			}
-			if (driver.toString().contains("null")) {
+			
+			if (!DriverPool.isValid(driver)) {
 				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 				return null;
 			}
