@@ -195,11 +195,11 @@ public final class DriverPool
 				DevicePool.deregisterDevice();
 			}
 
-			if (drv != null && !drv.toString().contains("null"))
+			if (isValid(drv))
 			{
-				// no sense to quit if it is already gone
 				drv.quit();
-			}
+			}		
+			
 			LOGGER.debug("Driver exited during restart...");
 		}
 		catch (UnreachableBrowserException e)
@@ -253,11 +253,12 @@ public final class DriverPool
 			LOGGER.debug("Driver exiting..." + name);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
-			if (drv != null && !drv.toString().contains("null"))
+			
+			if (isValid(drv))
 			{
-				// no sense to quit if it is already gone
 				drv.quit();
 			}
+			
 			LOGGER.debug("Driver exited..." + name);
 		}
 		catch (UnreachableBrowserException e)
@@ -470,6 +471,35 @@ public final class DriverPool
 			return false;
 		}
 		return currentDrivers.containsKey(name);
+	}
+	
+	/**
+	 * Check if driver is still valid
+	 * 
+	 * @param drv
+	 *            WebDriver
+	 * @return boolean
+	 */
+	public static boolean isValid(WebDriver drv)
+	{
+		boolean valid = false;
+		try
+		{
+			if (drv != null && !drv.toString().contains("null"))
+			{
+				valid = true;
+			}
+		}
+		catch (Exception e)
+		{
+			// TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+			if (!e.getMessage().contains("Session ID is null."))
+			{
+				throw e;
+			}
+			// otherwise do nothing
+		}
+		return valid;
 	}
 
 	/**
