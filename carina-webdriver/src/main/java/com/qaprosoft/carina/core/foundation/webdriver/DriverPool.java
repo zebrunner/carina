@@ -23,7 +23,6 @@ import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -168,6 +167,7 @@ public final class DriverPool {
 			device = DevicePool.getDevice();
 		}
 		
+		
 		try {
 			LOGGER.debug("Driver restarting...");
 			deregisterDriver(DEFAULT);
@@ -175,20 +175,24 @@ public final class DriverPool {
 				DevicePool.deregisterDevice();
 			}
 
-			if (isValid(drv)) {
-				drv.quit();
-			}
+			drv.quit();
 
 			LOGGER.debug("Driver exited during restart...");
-		} catch (UnreachableBrowserException e) {
-			//do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found!");
+		} catch (WebDriverException e) {
+			LOGGER.debug("Error message detected during driver restart: " + e.getMessage(), e);
+			// do nothing
 		} catch (Exception e) {
-			LOGGER.warn("Error discovered during driver restart: ", e);
+			LOGGER.debug("Error discovered during driver restart: " + e.getMessage(), e);
+
+			// TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+			if (!e.getMessage().contains("Session ID is null.")) {
+				throw e;
+			}
+			
 		} finally {
 			NDC.pop();
 		}
-
+		
 		//start default driver. Device can be nullDevice...
 		return createDriver(DEFAULT, null, null, device);
 
@@ -223,23 +227,26 @@ public final class DriverPool {
 			LOGGER.debug("Driver exiting..." + name);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
-			
-			//TODO: remove isValid verification
-			if (isValid(drv)) {
-				drv.quit();
+
+			drv.quit();
+
+			LOGGER.debug("Driver exited..." + name);
+		} catch (WebDriverException e) {
+			LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
+			// do nothing
+		} catch (Exception e) {
+			LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
+
+			// TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+			if (!e.getMessage().contains("Session ID is null.")) {
+				throw e;
 			}
 			
-			LOGGER.debug("Driver exited..." + name);
-		} catch (UnreachableBrowserException e) {
-			//do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found! " + name);
-		} catch (Exception e) {
-			LOGGER.warn("Error discovered during driver quit: " + e.getMessage(), e);
 		} finally {
 			// TODO analyze how to forcibly kill session on device
 			NDC.pop();
 		}
-	}
+	}		
 
 	/**
 	 * Quit all drivers registered for current thread/test
