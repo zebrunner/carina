@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
@@ -224,6 +224,7 @@ public final class DriverPool {
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
 			
+			//TODO: remove isValid verification
 			if (isValid(drv)) {
 				drv.quit();
 			}
@@ -424,10 +425,13 @@ public final class DriverPool {
 	public static boolean isValid(WebDriver drv) {
 		boolean valid = false;
 		try {
+			LOGGER.debug("Starting driver isValid verification...");
 			if (drv != null && !drv.toString().contains("null")) {
 				valid = true;
+				LOGGER.debug("Driver verified successfully...");
 			}
-		} catch (NoSuchSessionException e) {
+		} catch (WebDriverException e) {
+			LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
 			//do nothing
 		} catch (Exception e) {
 			//TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
