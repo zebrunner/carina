@@ -103,6 +103,8 @@ public class Configuration
 		
 		DRIVER_MODE("driver_mode"),
 		
+		DRIVER_EVENT_LISTENERS("driver_event_listeners"),
+		
 		MAX_DRIVER_COUNT("max_driver_count"),
 		
 		CUSTOM_CAPABILITIES("custom_capabilities"),

@@ -113,7 +113,11 @@
 			<artifactId>jira-client</artifactId>
 			<version>${jira-client.version}</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.imgscalr</groupId>
+			<artifactId>imgscalr-lib</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

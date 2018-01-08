@@ -15,72 +15,109 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.IConfigurableEventListener;
 
 /**
- * DriverFactory produces driver instance with desired capabilities according to
- * configuration.
+ * DriverFactory produces driver instance with desired capabilities according to configuration.
  *
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
-
-public class DriverFactory {
-    public static final String HTML_UNIT = "htmlunit";
-
-    protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
-
-    private static final Device nullDevice = new Device();
-
-    /**
-     * Creates driver instance for specified test.
-     *
-     * @param testName in which driver will be used
-     * @return RemoteWebDriver instance
-     */
-    public static WebDriver create(String testName) {
-        return create(testName, nullDevice, null, null);
-    }
-
-    public static WebDriver create(String testName, DesiredCapabilities capabilities, String selenium_host) {
-    	return create(testName, nullDevice, capabilities, selenium_host);
-    }
-    
-	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String selenium_host) {
+public class DriverFactory
+{
+	protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
+	
+	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String seleniumHost)
+	{
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
-		String driverType = Configuration.getDriverType();
-		if (driverType.equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
-			factory = new DesktopFactory();
-		} else if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-			factory = new MobileFactory();
-		} else {
-			throw new RuntimeException("Unsupported driver_type: " + driverType + "!");
+		
+		switch (Configuration.getDriverType())
+		{
+			case SpecialKeywords.DESKTOP:
+				factory = new DesktopFactory();
+				break;
+				
+			case SpecialKeywords.MOBILE:
+				factory = new MobileFactory();
+				break;	
+				
+			default:
+				throw new RuntimeException("Unsupported driver_type: " + Configuration.getDriverType());
 		}
-		WebDriver drv = factory.create(testName, device, capabilities, selenium_host);
+		
+		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost), getEventListeners());
 		LOGGER.debug("DriverFactory finish...");
-		return drv;
+		return driver;
 	}
 
+	public static String getBrowserName(WebDriver driver)
+	{
+		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
+		return cap.getBrowserName().toString();
+	}
 
-    public static String getBrowserName(WebDriver driver) {
-        Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
-        return cap.getBrowserName().toString();
-    }
-
-    public static String getBrowserVersion(WebDriver driver) {
-        Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
-        return cap.getVersion().toString();
-    }
-
+	/**
+	 * Returns browser version from webdriver instance.
+	 * 
+	 * @param driver - webdriver instance
+	 * @return browser version
+	 */
+	public static String getBrowserVersion(WebDriver driver)
+	{
+		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
+		return cap.getVersion().toString();
+	}
+	
+	/**
+	 * Reads 'driver_event_listeners' configuration property and initializes appropriate array of driver event listeners.
+	 * 
+	 * @return array of driver listeners
+	 */
+	private static WebDriverEventListener [] getEventListeners()
+	{
+		List<WebDriverEventListener> listeners = new ArrayList<>();
+		try
+		{
+			String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);
+			if(!StringUtils.isEmpty(listenerClasses))
+			{
+				for(String listenerClass : listenerClasses.split(","))
+				{
+					Class<?> clazz = Class.forName(listenerClass);
+					if(IConfigurableEventListener.class.isAssignableFrom(clazz))
+					{
+						IConfigurableEventListener listener = (IConfigurableEventListener) clazz.newInstance();
+						if(listener.enabled())
+						{
+							listeners.add(listener);
+							LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
+						}
+					}
+				}
+			}
+		}
+		catch (Exception e) 
+		{
+			LOGGER.error("Unable to register webdriver event listeners: " + e.getMessage());
+		}
+		return listeners.toArray(new WebDriverEventListener[listeners.size()]);
+	}
 }

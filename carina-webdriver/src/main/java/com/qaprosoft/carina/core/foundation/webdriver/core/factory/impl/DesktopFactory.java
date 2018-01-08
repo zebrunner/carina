@@ -45,13 +45,16 @@ public class DesktopFactory extends AbstractFactory
 	public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost)
 	{
 		RemoteWebDriver driver = null;
-		if (seleniumHost == null) {
+		if (seleniumHost == null)
+		{
 			seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
 		}
-		
-		if (capabilities == null) {
+
+		if (isCapabilitiesEmpty(capabilities))
+		{
 			capabilities = getCapabilities(name);
 		}
+		
 		if (staticCapabilities != null)
 		{
 			LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
@@ -61,15 +64,19 @@ public class DesktopFactory extends AbstractFactory
 		try
 		{
 			driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
-		} catch (UnreachableBrowserException e) {
+		}
+		catch (UnreachableBrowserException e)
+		{
 			// try to restart selenium hub
 			restartAll(PREFIX_WIN, RESTART_ALL_BAT_PATH);
 			restartAll(PREFIX_NIX, RESTART_ALL_SH_PATH);
-			throw  e;
-		} catch (MalformedURLException e) {
+			throw e;
+		}
+		catch (MalformedURLException e)
+		{
 			throw new RuntimeException("Unable to create desktop driver");
 		}
-		
+
 		return driver;
 	}
 
@@ -79,23 +86,28 @@ public class DesktopFactory extends AbstractFactory
 		if (!customCapabilities.isEmpty())
 		{
 			return new CapabilitiesLoder().loadCapabilities(customCapabilities);
-		} else
+		}
+		else
 		{
 			String browser = Configuration.get(Parameter.BROWSER);
 
 			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 			{
 				return new FirefoxCapabilities().getCapability(name);
-			} else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
+			}
+			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
 			{
 				return new IECapabilities().getCapability(name);
-			} else if (BrowserType.SAFARI.equalsIgnoreCase(browser))
+			}
+			else if (BrowserType.SAFARI.equalsIgnoreCase(browser))
 			{
 				return new SafariCapabilities().getCapability(name);
-			} else if (BrowserType.CHROME.equalsIgnoreCase(browser))
+			}
+			else if (BrowserType.CHROME.equalsIgnoreCase(browser))
 			{
 				return new ChromeCapabilities().getCapability(name);
-			} else
+			}
+			else
 			{
 				throw new RuntimeException("Unsupported browser: " + browser);
 			}
@@ -111,12 +123,17 @@ public class DesktopFactory extends AbstractFactory
 		staticCapabilities.setCapability(name, value);
 	}
 
-	private void restartAll(String cmdPrefix, String filePath) {
-		if (new File(filePath).exists()) {
+	private void restartAll(String cmdPrefix, String filePath)
+	{
+		if (new File(filePath).exists())
+		{
 			LOGGER.info("Following command will be executed: " + cmdPrefix + filePath);
-			try {
+			try
+			{
 				Runtime.getRuntime().exec(cmdPrefix + filePath);
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				throw new RuntimeException("Cannot restart selenium server");
 			}
 		}

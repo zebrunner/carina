@@ -66,6 +66,7 @@
     <monte-repack.version>1.0</monte-repack.version>
     <json-simple.version>1.1</json-simple.version>
     <rest-assured.version>2.9.0</rest-assured.version>
+    <imgscalr-lib.version>4.2</imgscalr-lib.version>
 </properties>
 <modules>
     <module>carina-commons</module>
@@ -366,7 +367,11 @@
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
         </dependency>
-    </dependencies>
+        <dependency>
+     			  <groupId>org.imgscalr</groupId>
+    			  <artifactId>imgscalr-lib</artifactId>
+     			  <version>${imgscalr-lib.version}</version>
+        </dependencies>
 </dependencyManagement>
 <distributionManagement>
     <repository>
