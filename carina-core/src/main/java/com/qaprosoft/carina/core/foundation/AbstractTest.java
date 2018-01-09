@@ -192,7 +192,7 @@ public abstract class AbstractTest // extends DriverHelper
 
         updateAppPath();
         
-        // moved from UITest->executeBeforeTestSuite
+/*        // moved from UITest->executeBeforeTestSuite
         //TODO: investigate later howto incorporate browserStack device registration better
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
@@ -200,6 +200,7 @@ public abstract class AbstractTest // extends DriverHelper
         	Map<String, String> properties = Configuration.loadCoreProperties(customCapabilities);
             DevicePool.registerDevice(properties);
         }
+*/
     }
     
     @BeforeClass(alwaysRun = true)

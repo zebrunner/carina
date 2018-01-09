@@ -61,6 +61,7 @@ public class MobileFactory extends AbstractFactory
 		{
 			seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
 		}
+		//TODO: it seems like a mistake because it always use platform from config and can't generate based on capabilities only
 		String driverType = Configuration.getDriverType();
 		String mobilePlatformName = Configuration.getPlatform();
 

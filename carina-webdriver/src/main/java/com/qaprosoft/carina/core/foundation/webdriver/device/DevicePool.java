@@ -15,11 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class DevicePool
 {
@@ -39,7 +35,7 @@ public class DevicePool
 		return device;
 	}
 	
-	public static void registerDevice(Map<String, String> propertiesMap) {
+/*	public static void registerDevice(Map<String, String> propertiesMap) {
 		//TODO: refactor capability names 
         if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
         	//add device from custom capabilities to the devicePool
@@ -54,7 +50,7 @@ public class DevicePool
         	setDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, ""));
         }
 	}
-	
+*/	
 	
 	public static void deregisterDevice()
 	{
