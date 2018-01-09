@@ -57,87 +57,72 @@ public class Screenshot
 	private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
 	private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
-
+	
 	// Collects screenshot comments. Screenshot comments are associated using screenshot file name.
 	private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
-
+	
 	/**
 	 * Adds screenshot rule
-	 * 
-	 * @param rule
-	 *            IScreenshotRule
+	 * @param rule IScreenshotRule
 	 * @return list of existing rules
 	 */
-	public static List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule)
-	{
-		LOGGER.debug("Following rule will be added: ".concat(rule.getClass().getName()));
-		rules.add(rule);
-		LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
-		return rules;
+	public static List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
+	    LOGGER.debug("Following rule will be added: ".concat(rule.getClass().getName()));
+	    rules.add(rule);
+	    LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
+	    return rules;
 	}
-
+	
 	/**
 	 * Adds screenshot rules
-	 * 
-	 * @param rulesList
-	 *            - list of new rules
+	 * @param rulesList - list of new rules
 	 * @return list of existing rules
 	 */
-	public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList)
-	{
-		for (IScreenshotRule iScreenshotRule : rulesList)
-		{
-			LOGGER.debug("Following rule will be added: ".concat(iScreenshotRule.getClass().getName()));
-		}
-		rules.addAll(rulesList);
-		LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
-		return rules;
-	}
-
+	public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
+	    for (IScreenshotRule iScreenshotRule : rulesList) {
+	        LOGGER.debug("Following rule will be added: ".concat(iScreenshotRule.getClass().getName()));
+        }
+        rules.addAll(rulesList);
+        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
+        return rules;
+    }
+	
 	/**
 	 * Deletes rule
-	 * 
-	 * @param rule
-	 *            IScreenshotRule
+	 * @param rule IScreenshotRule
 	 * @return list of existing rules
 	 */
-	public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule)
-	{
-		LOGGER.debug("Following rule will be removed if it exists: ".concat(rule.getClass().getName()));
-		rules.remove(rule);
-		LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
-		return rules;
-	}
-
-	public static List<IScreenshotRule> clearRules()
-	{
-		LOGGER.debug("All rules will be deleted.");
-		rules.clear();
-		return rules;
-	}
-
+	public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
+        LOGGER.debug("Following rule will be removed if it exists: ".concat(rule.getClass().getName()));
+        rules.remove(rule);
+        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
+        return rules;
+    }
+	
+	public static List<IScreenshotRule> clearRules() {
+	    LOGGER.debug("All rules will be deleted.");
+	    rules.clear();
+        return rules;
+    }
+	
 	public static String captureByRule(WebDriver driver, String comment)
-	{
-		boolean isTakeScreenshotRules = false;
-		for (IScreenshotRule iScreenshotRule : rules)
-		{
-			isTakeScreenshotRules = iScreenshotRule.isTakeScreenshot();
-			if (isTakeScreenshotRules)
-			{
-				break;
-			}
-		}
-		return capture(driver, isTakeScreenshotRules, comment, false);
-	}
-
+    {
+	    boolean isTakeScreenshotRules = false;
+	    for (IScreenshotRule iScreenshotRule : rules) {
+	        isTakeScreenshotRules = iScreenshotRule.isTakeScreenshot();
+	        if (isTakeScreenshotRules) {
+	            break;
+	        }
+	    }
+	    return capture(driver, isTakeScreenshotRules, comment, false);
+    }
+	
 	/**
 	 * Stores comment for screenshot.
 	 *
-	 * @param screenId
-	 *            screenId id
-	 * @param msg
-	 *            message
-	 * 
+     * @param screenId screenId id
+     * @param msg message
+	 *            
 	 */
 	private static void addScreenshotComment(String screenId, String msg)
 	{
@@ -150,9 +135,8 @@ public class Screenshot
 	/**
 	 * Return comment for screenshot.
 	 * 
-	 * @param screenId
-	 *            Screen Id
-	 * 
+	 * @param screenId Screen Id
+	 *            
 	 * @return screenshot comment
 	 */
 	public static String getScreenshotComment(String screenId)
@@ -162,10 +146,9 @@ public class Screenshot
 			comment = screenSteps.get(screenId);
 		return comment;
 	}
-
+	
 	/**
-	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to
-	 * specified screenshots location.
+	 * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
@@ -178,43 +161,37 @@ public class Screenshot
 	}
 
 	/**
-	 * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both
-	 * images to specified screenshots location.
+	 * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
-	 * @param comment
-	 *            String
+	 * @param comment String
 	 * @return screenshot name.
 	 */
 	public static String captureFailure(WebDriver driver, String comment)
 	{
 		return capture(driver, true, comment, true);
 	}
-
+	
 	/**
-	 * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images
-	 * to specified screenshots location.
+	 * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
-	 * @param comment
-	 *            String
+	 * @param comment String
 	 * @return screenshot name.
 	 */
 	public static String captureFullSize(WebDriver driver, String comment)
 	{
-		return capture(driver, true /* explicitly make full size screenshot */, comment, true);
+		return capture(driver, true /*explicitly make full size screenshot*/, comment, true);
 	}
-
+	
 	/**
-	 * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both
-	 * images to specified screenshots location.
+	 * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
-	 * @param comment
-	 *            String
+	 * @param comment String
 	 * @return screenshot name.
 	 */
 	public static String capture(WebDriver driver, String comment)
@@ -237,7 +214,7 @@ public class Screenshot
 		return capture(driver, isTakeScreenshot, "", false);
 
 	}
-
+	
 	/**
 	 * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
@@ -254,61 +231,52 @@ public class Screenshot
 	{
 		return capture(driver, isTakeScreenshot, comment, false);
 	}
-
+	
+	
 	/**
 	 * Captures driver screenshot for Alice-AI metadata and put it to appropriate metadata location
 	 * 
 	 * @param driver
 	 *            instance used for capturing.
 	 * @param screenName
-	 *            String
+	 * 			  String
 	 * @return screenshot name.
 	 */
+	
+	public static String captureMetadata(WebDriver driver, String screenName) {
 
-	public static String captureMetadata(WebDriver driver, String screenName)
-	{
 		String screenPath = "";
-		if (driver == null)
-		{
-			LOGGER.warn("Unable to capture screenshot as driver is null.");
-			return null;
-		}
-		if (!DriverPool.isValid(driver))
-		{
+			
+		if (!DriverPool.isValid(driver)) {
 			LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 			return null;
 		}
-
-		try
-		{
+		
+		try {
 			screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
 
 			WebDriver augmentedDriver = driver;
-			if (!driver.toString().contains("AppiumNativeDriver"))
-			{
+			if (!driver.toString().contains("AppiumNativeDriver")) {
 				// do not augment for Appium 1.x anymore
 				augmentedDriver = new DriverAugmenter().augment(driver);
 			}
-
+			
 			BufferedImage screen;
 
-			// Create screenshot
+			//Create screenshot
 			screen = takeVisibleScreenshot(driver, augmentedDriver);
 
 			ImageIO.write(screen, "PNG", new File(screenPath));
 
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOGGER.error("Unable to capture screenshot!", e);
 		}
+
 		return screenPath;
 	}
-
+	
 	/**
 	 * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
 	 * 
@@ -317,67 +285,53 @@ public class Screenshot
 	 * @param isTakeScreenshot
 	 *            perform actual capture or not
 	 * @param comment
-	 *            String
+	 * 			  String
 	 * @param fullSize
-	 *            Boolean
+	 * 			  Boolean
 	 * @return screenshot name.
 	 */
-
-	private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize)
-	{
+	
+	private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
 		String screenName = "";
-
+		
 		// TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
 		// For the rest of cases returned previous implementation
 
-		if (isTakeScreenshot)
-		{
-			if (driver == null)
-			{
-				LOGGER.warn("Unable to capture screenshot as driver is null.");
-				return null;
-			}
-			if (!DriverPool.isValid(driver))
-			{
+		if (isTakeScreenshot) {
+			if (!DriverPool.isValid(driver)) {
 				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 				return null;
 			}
 
-			try
-			{
+			try {
 				// Define test screenshot root
 				File testScreenRootDir = ReportContext.getTestDir();
 
 				// Capture full page screenshot and resize
-				// TODO: implement naming strategy for screenshots wihtout test names
-				// String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+				//TODO: implement naming strategy for screenshots wihtout test names
+				//String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
 				screenName = System.currentTimeMillis() + ".png";
 				String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
 				WebDriver augmentedDriver = driver;
-				if (!driver.toString().contains("AppiumNativeDriver"))
-				{
+				if (!driver.toString().contains("AppiumNativeDriver")) {
 					// do not augment for Appium 1.x anymore
 					augmentedDriver = new DriverAugmenter().augment(driver);
 				}
-
+				
 				BufferedImage screen;
 
-				// Create screenshot
-				if (fullSize)
-				{
+				//Create screenshot
+				if (fullSize) {
 					screen = takeFullScreenshot(driver, augmentedDriver);
-				}
-				else
-				{
+				} else {
 					screen = takeVisibleScreenshot(driver, augmentedDriver);
 				}
 
 				BufferedImage thumbScreen = screen;
 
 				if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
-						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1)
-				{
+						&& Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
 					resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
 							Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
 				}
@@ -389,18 +343,15 @@ public class Screenshot
 				ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
 				resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
 						Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
+				
 				// Uploading screenshot to Amazon S3
-
+				
 				// TODO: Move upload to S3 into the async calls closer to the end of test to upload whole bundle
 				// Also investigate possibility to remove rederence onto the test name
 				String test = "";
-				if (TestNamingUtil.isTestNameRegistered())
-				{
+				if (TestNamingUtil.isTestNameRegistered()) {
 					test = TestNamingUtil.getTestNameByThread();
-				}
-				else
-				{
+				} else {
 					test = "undefined";
 				}
 				uploadToAmazonS3(test, screenPath, screenName, comment);
@@ -408,13 +359,9 @@ public class Screenshot
 				// add screenshot comment to collector
 				addScreenshotComment(screenName, comment);
 
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				LOGGER.error("Unable to capture screenshot!", e);
 			}
 		}
@@ -430,7 +377,7 @@ public class Screenshot
 		}
 		// TODO: not good solution...
 		Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
-
+		
 		String testName = test.replaceAll("[^a-zA-Z0-9.-]", "_");
 		String key = runId + "/" + testName + "/" + screenName;
 		if (runId == -1)
@@ -462,26 +409,22 @@ public class Screenshot
 	 * @param path
 	 *            - path to screenshot file.
 	 */
-	private static void resizeImg(BufferedImage bufImage, int width, int height, String path)
-	{
-		try
-		{
+	private static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
+		try {
 			bufImage = Scalr.resize(bufImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
 					Scalr.OP_ANTIALIAS);
-			if (bufImage.getHeight() > height)
-			{
+			if (bufImage.getHeight() > height) {
 				bufImage = Scalr.crop(bufImage, bufImage.getWidth(), height);
 			}
 			ImageIO.write(bufImage, "png", new File(path));
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOGGER.error("Image scaling problem!");
 		}
 	}
-
+	
 	/**
-	 * Makes fullsize screenshot using javascript (May not work properly with popups and active js-elements on the page)
+	 * Makes fullsize screenshot using javascript (May not work properly with
+	 * popups and active js-elements on the page)
 	 * 
 	 * @param driver
 	 *            - webDriver.
@@ -491,17 +434,13 @@ public class Screenshot
 	 * 
 	 * @return screenshot image
 	 */
-	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException
-	{
+	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot;
-		if (driver.getClass().toString().contains("java_client") ||
-				Configuration.getDriverType().equals(SpecialKeywords.MOBILE))
-		{
+		if (driver.getClass().toString().contains("java_client") || 
+				Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
 			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
 			screenShot = ImageIO.read(screenshot);
-		}
-		else
-		{
+		} else {
 			ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
 					.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
 			screenShot = screenshot.getImage();
@@ -521,8 +460,7 @@ public class Screenshot
 	 * 
 	 * @return screenshot image
 	 */
-	private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException
-	{
+	private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
 		return screenShot;
 	}

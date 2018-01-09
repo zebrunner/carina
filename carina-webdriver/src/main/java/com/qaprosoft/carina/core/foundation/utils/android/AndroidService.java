@@ -1374,12 +1374,4 @@ public class AndroidService {
 
     // End of TimeZone private section
 
-    /**
-     * Pause
-     *
-     * @param timeout long
-     */
-    private void pause(long timeout) {
-	CommonUtils.pause(timeout);
-    }
 }

@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -36,8 +36,7 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
-public final class DriverPool
-{
+public final class DriverPool {
 	private static final Logger LOGGER = Logger.getLogger(DriverPool.class);
 	private static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
@@ -47,14 +46,13 @@ public final class DriverPool
 	private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 
 	protected static ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
-
+	
 	/**
 	 * Get global suite driver. For driver_mode=suite_mode only.
 	 * 
 	 * @return Suite mode WebDriver
 	 */
-	public static WebDriver getSingleDriver()
-	{
+	public static WebDriver getSingleDriver() {
 		return single_driver;
 	}
 
@@ -63,46 +61,43 @@ public final class DriverPool
 	 * 
 	 * @return default WebDriver
 	 */
-	public static WebDriver getDriver()
-	{
+	public static WebDriver getDriver() {
 		return getDriver(DEFAULT);
 	}
-
+	
 	/**
 	 * Get first registered driver from Pool.
 	 * 
 	 * @return default WebDriver
 	 */
-	public static WebDriver getExistingDriver()
-	{
+	public static WebDriver getExistingDriver() {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-		if (currentDrivers.size() == 0)
-		{
+		if (currentDrivers.size() == 0) {
 			throw new RuntimeException("Unable to find exiting river in DriverPool!");
 		}
-
-		if (currentDrivers.size() > 0)
-		{
-			return currentDrivers.entrySet().iterator().next().getValue();
+		
+		if (currentDrivers.size() > 0) {
+			return currentDrivers.get(0);
 		}
-
+		
 		return getDriver(DEFAULT);
 	}
 
 	/**
-	 * Get driver by name. If no driver discovered it will be created using default capabilities.
+	 * Get driver by name. If no driver discovered it will be created using
+	 * default capabilities.
 	 * 
 	 * @param name
 	 *            String driver name
 	 * @return WebDriver by name
 	 */
-	public static WebDriver getDriver(String name)
-	{
-		return getDriver(name, new DesiredCapabilities(), Configuration.get(Parameter.SELENIUM_HOST));
+	public static WebDriver getDriver(String name) {
+		return getDriver(name, null, null);
 	}
 
 	/**
-	 * Get driver by name. If no driver discovered it will be created using custom capabilities and selenium server.
+	 * Get driver by name. If no driver discovered it will be created using
+	 * custom capabilities and selenium server.
 	 * 
 	 * @param name
 	 *            String driver name
@@ -112,38 +107,29 @@ public final class DriverPool
 	 *            String
 	 * @return WebDriver by name
 	 */
-	public static WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)
-	{
+	public static WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
 		WebDriver drv = null;
 		DriverMode driverMode = Configuration.getDriverMode();
 		Long threadId = Thread.currentThread().getId();
 
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
-		if (currentDrivers.containsKey(name))
-		{
+		if (currentDrivers.containsKey(name)) {
 			drv = currentDrivers.get(name);
-		}
-		else if (driverMode == DriverMode.SUITE_MODE && DEFAULT.equals(name))
-		{
+		} else if (driverMode == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 			LOGGER.debug("########## Unable to find suite driver by threadId: " + threadId);
 			// init our single driver variable
 			drv = single_driver;
-		}
-		else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
+		} else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
 				&& Configuration.getInt(Parameter.THREAD_COUNT) == 1
-				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1)
-		{
+				&& Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
 			Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
 			LOGGER.debug(
 					"Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
-			for (int i = 0; i < threads.length; i++)
-			{
+			for (int i = 0; i < threads.length; i++) {
 				currentDrivers = drivers.get(threads[i].getId());
-				if (currentDrivers != null)
-				{
-					if (currentDrivers.containsKey(name))
-					{
+				if (currentDrivers != null) {
+					if (currentDrivers.containsKey(name)) {
 						drv = currentDrivers.get(name);
 						LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
 						break;
@@ -152,8 +138,7 @@ public final class DriverPool
 			}
 		}
 
-		if (drv == null)
-		{
+		if (drv == null) {
 			LOGGER.debug("Starting new driver as nothing was found in the pool");
 			drv = createDriver(name, capabilities, seleniumHost, DevicePool.getNullDevice());
 		}
@@ -162,11 +147,9 @@ public final class DriverPool
 
 	/**
 	 * Restart default driver
-	 * 
 	 * @return WebDriver
 	 */
-	public static WebDriver restartDriver()
-	{
+	public static WebDriver restartDriver() {
 		return restartDriver(false);
 	}
 
@@ -177,54 +160,48 @@ public final class DriverPool
 	 *            boolean restart driver on the same device or not
 	 * @return WebDriver
 	 */
-	public static WebDriver restartDriver(boolean isSameDevice)
-	{
+	public static WebDriver restartDriver(boolean isSameDevice) {
 		WebDriver drv = getDriver(DEFAULT);
 		Device device = DevicePool.getNullDevice();
-		if (isSameDevice)
-		{
+		if (isSameDevice) {
 			device = DevicePool.getDevice();
 		}
-
-		try
-		{
+		
+		
+		try {
 			LOGGER.debug("Driver restarting...");
 			deregisterDriver(DEFAULT);
-			if (!isSameDevice)
-			{
+			if (!isSameDevice) {
 				DevicePool.deregisterDevice();
 			}
 
-			if (isValid(drv))
-			{
-				drv.quit();
-			}		
-			
+			drv.quit();
+
 			LOGGER.debug("Driver exited during restart...");
-		}
-		catch (UnreachableBrowserException e)
-		{
-			// do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found!");
-		}
-		catch (Exception e)
-		{
-			LOGGER.warn("Error discovered during driver restart: ", e);
-		}
-		finally
-		{
+		} catch (WebDriverException e) {
+			LOGGER.debug("Error message detected during driver restart: " + e.getMessage(), e);
+			// do nothing
+		} catch (Exception e) {
+			LOGGER.debug("Error discovered during driver restart: " + e.getMessage(), e);
+
+			// TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+			if (!e.getMessage().contains("Session ID is null.")) {
+				throw e;
+			}
+			
+		} finally {
 			NDC.pop();
 		}
+		
+		//start default driver. Device can be nullDevice...
+		return createDriver(DEFAULT, null, null, device);
 
-		// start default driver. Device can be nullDevice...
-		return createDriver(DEFAULT, new DesiredCapabilities(), Configuration.get(Parameter.SELENIUM_HOST), device);
 	}
-
+	
 	/**
 	 * Quit default driver
 	 */
-	public static void quitDriver()
-	{
+	public static void quitDriver() {
 		quitDriver(DEFAULT);
 	}
 
@@ -234,64 +211,56 @@ public final class DriverPool
 	 * @param name
 	 *            String driver name
 	 */
-	public static void quitDriver(String name)
-	{
+	public static void quitDriver(String name) {
 		WebDriver drv = getDriver(name);
 
-		// TODO: try to understand valid place for recorded video file to support method/class and suite mode
-		// 1. create for each driver their own video file.
+		//TODO: try to understand valid place for recorded video file to support method/class and suite mode
+		// 1. create for each driver their own video file. 
 		// 2. save it using unique driver/test/thread name - maybe time in ms
 		// 3. register link onto the video as test artifact
 		Device device = DevicePool.getDevice();
-		if (!device.isNull())
-		{
+		if (!device.isNull()) {
 			device.screenOff();
 		}
 
-		try
-		{
+		try {
 			LOGGER.debug("Driver exiting..." + name);
 			deregisterDriver(name);
 			DevicePool.deregisterDevice();
-			
-			if (isValid(drv))
-			{
-				drv.quit();
+
+			drv.quit();
+
+			LOGGER.debug("Driver exited..." + name);
+		} catch (WebDriverException e) {
+			LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
+			// do nothing
+		} catch (Exception e) {
+			LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
+
+			// TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+			if (!e.getMessage().contains("Session ID is null.")) {
+				throw e;
 			}
 			
-			LOGGER.debug("Driver exited..." + name);
-		}
-		catch (UnreachableBrowserException e)
-		{
-			// do not remove this handler as AppiumDriver still has it
-			LOGGER.debug("unable to quit as sesion was not found! " + name);
-		}
-		catch (Exception e)
-		{
-			LOGGER.warn("Error discovered during driver quit: " + e.getMessage(), e);
-		}
-		finally
-		{
+		} finally {
 			// TODO analyze how to forcibly kill session on device
 			NDC.pop();
 		}
-	}
+	}		
 
 	/**
 	 * Quit all drivers registered for current thread/test
 	 */
-	public static void quitDrivers()
-	{
-
+	public static void quitDrivers() {
+		
 		stopRecording();
-
+		
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
-		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet())
-		{
+		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			quitDriver(entry.getKey());
 		}
-
+		
 		// stopProxy();
 	}
 
@@ -308,22 +277,20 @@ public final class DriverPool
 	 *            Device where we want to start driver
 	 * @return WebDriver
 	 */
-	private static WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost, Device device)
-	{
+	private static WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost, Device device) {
 		boolean init = false;
 		int count = 0;
 		WebDriver drv = null;
 		Throwable init_throwable = null;
-
+		
+		
 		// 1 - is default run without retry
 		int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
-		while (!init && count++ < maxCount)
-		{
-			try
-			{
+		while (!init && count++ < maxCount) {
+			try {
 				LOGGER.debug("initDriver start...");
-
-				// TODO: move browsermob startup to this location
+				
+				//TODO: move browsermob startup to this location
 				ProxyPool.startProxy();
 
 				drv = DriverFactory.create(name, device, capabilities, seleniumHost);
@@ -331,76 +298,64 @@ public final class DriverPool
 
 				init = true;
 
-				if (device.isNull())
-				{
-					// During driver creation we choose device and assign it to the test thread
+				if (device.isNull()) {
+					//During driver creation we choose device and assign it to the test thread 
 					device = DevicePool.getDevice();
 				}
-				// push custom device name for log4j default messages
-				if (!device.isNull())
-				{
+				// push custom device name  for log4j default messages				
+				if (!device.isNull()) {
 					NDC.push(" [" + device.getName() + "] ");
 				}
 
 				LOGGER.debug("initDriver finish...");
-
-			}
-			catch (Throwable thr)
-			{
+				
+				
+			} catch (Throwable thr) {
 				// DevicePool.ignoreDevice();
 				DevicePool.deregisterDevice();
 				LOGGER.error(
 						String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s",
-								name, count, maxCount, thr.getMessage()),
-						thr);
+								name, count, maxCount, thr.getMessage()), thr);
 				init_throwable = thr;
 				CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
 			}
 		}
 
-		if (!init)
-		{
+		if (!init) {
 			throw new RuntimeException(init_throwable);
 		}
-
+		
 		startRecording();
 		return drv;
 	}
-
-	private static void startRecording()
-	{
-		if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING))
-		{
+	
+	private static void startRecording() {
+		if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
 			return;
 		}
-
+		
 		Integer pid = adbVideoRecorderPid.get();
-		if (pid == null)
-		{
+		if (pid == null) {
 			// video recording is not started yet for current thread
 			pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
 			adbVideoRecorderPid.set(pid);
-		}
-		else
-		{
+		} else {
 			LOGGER.warn("Video recording is already started for current thread.");
 		}
 
 	}
-
-	private static void stopRecording()
-	{
-		if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING))
-		{
+	
+	private static void stopRecording() {
+		if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
 			return;
 		}
-
+		
+		
 		Device device = DevicePool.getDevice();
-		if (!device.isNull())
-		{
+		if (!device.isNull()) {
 			device.stopRecording(adbVideoRecorderPid.get());
 			CommonUtils.pause(3); // very often video from device is black. waiting
-			// before pulling the file
+						// before pulling the file
 
 			String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
 			String uniqueFileName = "VIDEO-" + System.currentTimeMillis() + ".mp4";
@@ -424,10 +379,8 @@ public final class DriverPool
 	 *            String driver name
 	 * 
 	 */
-	protected static void registerDriver(WebDriver driver, String name)
-	{
-		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name))
-		{
+	protected static void registerDriver(WebDriver driver, String name) {
+		if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 			// replace single_driver only for default one!
 			// init our single driver variable
 			single_driver = driver;
@@ -435,22 +388,20 @@ public final class DriverPool
 
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-		if (currentDrivers.size() == MAX_DRIVER_COUNT)
-		{
+		if (currentDrivers.size() == MAX_DRIVER_COUNT) {
 			// TODO: after moving driver creation to DriverPoolEx need to add
 			// such verification before driver start
 			Assert.fail(
 					"Unable to register driver as you reached max number of drivers per thread: " + MAX_DRIVER_COUNT);
 		}
-		if (currentDrivers.containsKey(name))
-		{
+		if (currentDrivers.containsKey(name)) {
 			Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
 		}
 
 		currentDrivers.put(name, driver);
 		Assert.assertTrue(drivers.get(threadId).containsKey(name),
 				"Driver '" + name + "' was not registered in map for thread: " + threadId);
-		LOGGER.debug("##########   REGISTER threadId: " + threadId + "; driver: " + driver);
+		LOGGER.debug("##########   REGISTER driver for threadId: " + threadId);
 	}
 
 	/**
@@ -461,13 +412,11 @@ public final class DriverPool
 	 *
 	 * @return boolean
 	 */
-	protected static boolean isDriverRegistered(String name)
-	{
+	protected static boolean isDriverRegistered(String name) {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 
-		if (currentDrivers == null)
-		{
+		if (currentDrivers == null) {
 			return false;
 		}
 		return currentDrivers.containsKey(name);
@@ -480,21 +429,20 @@ public final class DriverPool
 	 *            WebDriver
 	 * @return boolean
 	 */
-	public static boolean isValid(WebDriver drv)
-	{
+	public static boolean isValid(WebDriver drv) {
 		boolean valid = false;
-		try
-		{
-			if (drv != null && !drv.toString().contains("null"))
-			{
+		try {
+			LOGGER.debug("Starting driver isValid verification...");
+			if (drv != null && !drv.toString().contains("null")) {
 				valid = true;
+				LOGGER.debug("Driver verified successfully...");
 			}
-		}
-		catch (Exception e)
-		{
-			// TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
-			if (!e.getMessage().contains("Session ID is null."))
-			{
+		} catch (WebDriverException e) {
+			LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
+			//do nothing
+		} catch (Exception e) {
+			//TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+			if (!e.getMessage().contains("Session ID is null.")) {
 				throw e;
 			}
 			// otherwise do nothing
@@ -507,8 +455,7 @@ public final class DriverPool
 	 * 
 	 * @return int
 	 */
-	protected static int size()
-	{
+	protected static int size() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
 		int size = currentDrivers.size();
@@ -523,27 +470,21 @@ public final class DriverPool
 	 *            String driver name
 	 * 
 	 */
-	protected static void deregisterDriver(String name)
-	{
+	protected static void deregisterDriver(String name) {
 		long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
-		if (currentDrivers.containsKey(name))
-		{
-			WebDriver drv = currentDrivers.get(name);
-			LOGGER.debug("########## DEREGISTER threadId: " + threadId + "; driver: " + drv);
+		if (currentDrivers.containsKey(name)) {
+			LOGGER.debug("########## DEREGISTER driver for threadId: " + threadId);
 			currentDrivers.remove(name);
 
-			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name))
-			{
+			if (Configuration.getDriverMode() == DriverMode.SUITE_MODE && DEFAULT.equals(name)) {
 				single_driver = null;
 			}
 
 			Assert.assertFalse(drivers.get(threadId).containsKey(name),
 					"Driver '" + name + "' was not deregistered from map for thread: " + threadId);
-		}
-		else
-		{
+		} else {
 			LOGGER.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);
 		}
 	}
@@ -552,12 +493,10 @@ public final class DriverPool
 	 * Deregister all drivers from the DriverPool for current thread
 	 * 
 	 */
-	protected static void deregisterDrivers()
-	{
+	protected static void deregisterDrivers() {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
-		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet())
-		{
+		for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
 			deregisterDriver(entry.getKey());
 		}
 	}
@@ -569,8 +508,7 @@ public final class DriverPool
 	 *            WebDriver
 	 * 
 	 */
-	public static void replaceDriver(WebDriver driver)
-	{
+	public static void replaceDriver(WebDriver driver) {
 		replaceDriver(driver, DEFAULT);
 	}
 
@@ -584,11 +522,12 @@ public final class DriverPool
 	 *            String driver name
 	 * 
 	 */
-	public static void replaceDriver(WebDriver driver, String name)
-	{
+	public static void replaceDriver(WebDriver driver, String name) {
 		deregisterDriver(name);
 		registerDriver(driver, name);
 	}
+	
+	
 
 	/**
 	 * Return all drivers registered in the DriverPool for this thread
@@ -596,12 +535,10 @@ public final class DriverPool
 	 * @return ConcurrentHashMap of driver names and WebDrivers
 	 * 
 	 */
-	public static ConcurrentHashMap<String, WebDriver> getDrivers()
-	{
+	public static ConcurrentHashMap<String, WebDriver> getDrivers() {
 		Long threadId = Thread.currentThread().getId();
 
-		if (drivers.get(threadId) == null)
-		{
+		if (drivers.get(threadId) == null) {
 			ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
 			drivers.put(threadId, currentDrivers);
 		}
@@ -614,20 +551,17 @@ public final class DriverPool
 	 * @return Thread[]
 	 * 
 	 */
-	private static Thread[] getGroupThreads(final ThreadGroup group)
-	{
+	private static Thread[] getGroupThreads(final ThreadGroup group) {
 		if (group == null)
 			throw new NullPointerException("Null thread group");
 		int nAlloc = group.activeCount();
 		int n = 0;
 		Thread[] threads;
-		do
-		{
+		do {
 			nAlloc *= 2;
 			threads = new Thread[nAlloc];
 			n = group.enumerate(threads);
-		}
-		while (n == nAlloc);
+		} while (n == nAlloc);
 		return java.util.Arrays.copyOf(threads, n);
 	}
 
