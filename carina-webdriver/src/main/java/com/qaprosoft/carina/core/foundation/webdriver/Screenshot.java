@@ -246,35 +246,34 @@ public class Screenshot
 	public static String captureMetadata(WebDriver driver, String screenName) {
 
 		String screenPath = "";
-		if (!DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
 			
-			if (!DriverPool.isValid(driver)) {
-				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
-				return null;
-			}
-			
-			try {
-				screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
-
-				WebDriver augmentedDriver = driver;
-				if (!driver.toString().contains("AppiumNativeDriver")) {
-					// do not augment for Appium 1.x anymore
-					augmentedDriver = new DriverAugmenter().augment(driver);
-				}
-				
-				BufferedImage screen;
-
-				//Create screenshot
-				screen = takeVisibleScreenshot(driver, augmentedDriver);
-
-				ImageIO.write(screen, "PNG", new File(screenPath));
-
-			} catch (IOException e) {
-				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-			} catch (Exception e) {
-				LOGGER.error("Unable to capture screenshot!", e);
-			}
+		if (!DriverPool.isValid(driver)) {
+			LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
+			return null;
 		}
+		
+		try {
+			screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
+
+			WebDriver augmentedDriver = driver;
+			if (!driver.toString().contains("AppiumNativeDriver")) {
+				// do not augment for Appium 1.x anymore
+				augmentedDriver = new DriverAugmenter().augment(driver);
+			}
+			
+			BufferedImage screen;
+
+			//Create screenshot
+			screen = takeVisibleScreenshot(driver, augmentedDriver);
+
+			ImageIO.write(screen, "PNG", new File(screenPath));
+
+		} catch (IOException e) {
+			LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+		} catch (Exception e) {
+			LOGGER.error("Unable to capture screenshot!", e);
+		}
+
 		return screenPath;
 	}
 	
@@ -298,7 +297,7 @@ public class Screenshot
 		// TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
 		// For the rest of cases returned previous implementation
 
-		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
+		if (isTakeScreenshot) {
 			if (!DriverPool.isValid(driver)) {
 				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 				return null;
