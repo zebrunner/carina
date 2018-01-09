@@ -15,11 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.grid.integration;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.grid.Platform;
@@ -31,7 +34,7 @@ import com.qaprosoft.zafira.models.stf.STFDevice;
 /**
  * Singleton for STF client.
  * 
- * @author akhursevich
+ * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class STF
 {
@@ -39,9 +42,11 @@ public class STF
 
 	private static final Long STF_TIMEOUT = 3600L;
 
-	private STFClient client;
-
 	private static boolean running = false;
+	
+	private static Map<String, Date> deviceBookJournal = new ConcurrentHashMap<>();
+	
+	private STFClient client;
 
 	public final static STF INSTANCE = new STF();
 
@@ -73,7 +78,35 @@ public class STF
 	{
 		return running;
 	}
+	
+	/**
+	 * Verifies device availability both in booking journal and STF.
+	 * @param udid - device UDID
+	 * @param timoutMS - booking timeout
+	 * @return if device available
+	 */
+	public static synchronized boolean bookDeviceIfAvailable(String udid, int timoutMS) 
+	{
+		Date bookedUntil = deviceBookJournal.get(udid);
+		if(bookedUntil != null && new Date().getTime() < bookedUntil.getTime())
+		{
+			return false;
+		}
+		
+		boolean available = isDeviceAvailable(udid);
+		if(available)
+		{
+			deviceBookJournal.put(udid, DateUtils.addMilliseconds(new Date(), timoutMS));
+		}
 
+		return available;
+	}
+
+	/**
+	 * Checks availability status in STF.
+	 * @param udid - device UDID 
+	 * @return returns availability status
+	 */
 	public static boolean isDeviceAvailable(String udid)
 	{
 		boolean available = false;
@@ -105,6 +138,11 @@ public class STF
 		return available;
 	}
 
+	/**
+	 * Gets STF device info.
+	 * @param udid - device UDID 
+	 * @return STF device
+	 */
 	public static STFDevice getDevice(String udid)
 	{
 		STFDevice device = null;
@@ -125,7 +163,11 @@ public class STF
 		return device;
 	}
 
-	// TODO: why do we have boolean as return value here and below
+	/**
+	 * Connects to remote device.  
+	 * @param udid - device UDID
+	 * @return status of connected device
+	 */
 	public static boolean reserveDevice(String udid)
 	{
 		boolean status = INSTANCE.client.reserveDevice(udid, TimeUnit.SECONDS.toMillis(STF_TIMEOUT));
@@ -136,12 +178,23 @@ public class STF
 		return status;
 	}
 
+	/**
+	 * Disconnects STF device.
+	 * @param udid - device UDID
+	 * @return status of returned device
+	 */
 	public static boolean returnDevice(String udid)
 	{
 		// it seems like return and remote disconnect guarantee that device becomes free asap
 		return INSTANCE.client.remoteDisconnectDevice(udid) && INSTANCE.client.returnDevice(udid);
 	}
 	
+	/**
+	 * Checks STF required status according to capabilities.
+	 * @param nodeCapability - Selenium node capability
+	 * @param requestedCapability - requested capabilities
+	 * @return if STF required
+	 */
 	public static boolean isSTFRequired(Map<String, Object> nodeCapability, Map<String, Object> requestedCapability)
 	{
 		boolean status = true;

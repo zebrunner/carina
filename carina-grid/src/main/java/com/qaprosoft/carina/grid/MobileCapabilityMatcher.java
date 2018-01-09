@@ -54,6 +54,12 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 		}
 	}
 
+	/**
+	 * Verifies matching between requested and actual node capabilities.
+	 * @param nodeCapability - Selenium node capabilities
+	 * @param requestedCapability - capabilities requested by Selenium client
+	 * @return match results
+	 */
 	private boolean extensionCapabilityCheck(Map<String, Object> nodeCapability, Map<String, Object> requestedCapability)
 	{
 		for(String key : requestedCapability.keySet())
@@ -150,7 +156,7 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher
 		// STF integration that checks device status
 		if(STF.isSTFRequired(nodeCapability, requestedCapability))
 		{
-			return STF.isDeviceAvailable(String.valueOf(nodeCapability.get("udid")));
+			return STF.bookDeviceIfAvailable(String.valueOf(nodeCapability.get("udid")), 5000);
 		}
 		
 		return true;
