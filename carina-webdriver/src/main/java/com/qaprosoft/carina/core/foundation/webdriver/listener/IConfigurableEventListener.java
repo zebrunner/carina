@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
+package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-public interface IScreenshotRule
+import org.openqa.selenium.support.events.WebDriverEventListener;
+
+/**
+ * Extends {@link WebDriverEventListener} and adds configurable functionality.
+ * 
+ * @author Alex Khursevich (alex@qaprosoft.com)
+ */
+public interface IConfigurableEventListener extends WebDriverEventListener
 {
-
-	public abstract boolean isTakeScreenshot();
-
+	/**
+	 * Check global configuration to turn on/off the listener.
+	 * 
+	 * @return listener enabled status
+	 */
+	boolean enabled();
 }
