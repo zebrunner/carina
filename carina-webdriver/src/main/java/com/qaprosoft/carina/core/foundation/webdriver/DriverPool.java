@@ -33,6 +33,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -70,6 +71,7 @@ public final class DriverPool {
 	 * 
 	 * @return default WebDriver
 	 */
+	@Deprecated
 	public static WebDriver getExistingDriver() {
 		ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 		if (currentDrivers.size() == 0) {
@@ -77,7 +79,7 @@ public final class DriverPool {
 		}
 		
 		if (currentDrivers.size() > 0) {
-			return currentDrivers.get(0);
+			return currentDrivers.entrySet().iterator().next().getValue();	
 		}
 		
 		return getDriver(DEFAULT);

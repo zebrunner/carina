@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver;
+package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -68,24 +65,6 @@ public class DriverFactory
 		return driver;
 	}
 
-	public static String getBrowserName(WebDriver driver)
-	{
-		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
-		return cap.getBrowserName().toString();
-	}
-
-	/**
-	 * Returns browser version from webdriver instance.
-	 * 
-	 * @param driver - webdriver instance
-	 * @return browser version
-	 */
-	public static String getBrowserVersion(WebDriver driver)
-	{
-		Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
-		return cap.getVersion().toString();
-	}
-	
 	/**
 	 * Reads 'driver_event_listeners' configuration property and initializes appropriate array of driver event listeners.
 	 * 

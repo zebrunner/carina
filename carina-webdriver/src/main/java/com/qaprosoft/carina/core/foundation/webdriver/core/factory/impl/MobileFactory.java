@@ -46,9 +46,13 @@ import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
 
+/**
+ * MobileFactory creates instance {@link WebDriver} for mobile testing.
+ * 
+ * @author Alex Khursevich (alex@qaprosoft.com)
+ */
 public class MobileFactory extends AbstractFactory
 {
-
 	@Override
 	public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost)
 	{
@@ -127,7 +131,7 @@ public class MobileFactory extends AbstractFactory
 		return driver;
 	}
 
-	public DesiredCapabilities getCapabilities(String name, Device device)
+	private DesiredCapabilities getCapabilities(String name, Device device)
 	{
 		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
 		DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -144,15 +148,19 @@ public class MobileFactory extends AbstractFactory
 		{
 			capabilities.setCapability("udid", device.getUdid());
 			// disable Selenium Hum <-> STF verification as device already
-			// connected by this test (restart driver on the same device is
-			// invoked)
+			// connected by this test (restart driver on the same device is invoked)
 			capabilities.setCapability("STF_ENABLED", "false");
-
 		}
 
 		return capabilities;
 	}
 
+	/**
+	 * Returns device information from Grid Hub using STF service.
+	 * @param seleniumHost - Selenium Grid host
+	 * @param sessionId - Selenium session id
+	 * @return remote device information
+	 */
 	private RemoteDevice getDeviceInfo(String seleniumHost, String sessionId)
 	{
 		RemoteDevice device = null;
