@@ -35,6 +35,7 @@ public class CapabilitiesLoder {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public DesiredCapabilities loadCapabilities(String fileName) {
+    	//TODO: investigate howto allow access to this static method only from internal carina packages
 
         LOGGER.info("Loading capabilities:");
         Properties props = new Properties();
@@ -55,13 +56,15 @@ public class CapabilitiesLoder {
 
 		Map<String, String> capabilitiesMap = new HashMap(props);
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-			String valueFromEnv = null;
-			valueFromEnv = System.getProperty(entry.getKey());
-
-			// add each property directly into CONFIG
-			String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
+			//TODO: investigate effects of removing env args monitoring for extra capabilities declaration
+			//String valueFromEnv = null;
+			//valueFromEnv = System.getProperty(entry.getKey());
+			//String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
+			
+			String value = entry.getValue();
 			String key = entry.getKey();
 			LOGGER.info("Set custom property: " + key + "; value: " + value);
+			// add each property directly into CONFIG
 			R.CONFIG.put(key, value);
 		}
 
