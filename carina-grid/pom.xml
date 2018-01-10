@@ -21,7 +21,6 @@
 	    <source.version>1.8</source.version>
 	    <target.version>1.8</target.version>
 	    <apache-http.version>4.5.3</apache-http.version>
-			<selenium-server.version>3.6.0</selenium-server.version>
 	</properties>
 
 	<dependencies>
@@ -32,7 +31,6 @@
 	    <dependency>
 	        <groupId>org.seleniumhq.selenium</groupId>
 	        <artifactId>selenium-server</artifactId>
-					<version>${selenium-server.version}</version>
 	    </dependency>
 	    <!-- Zafira -->
 	    <dependency>
@@ -70,6 +68,7 @@
 	                <descriptorRefs>
 	                    <descriptorRef>jar-with-dependencies</descriptorRef>
 	                </descriptorRefs>
+					<finalName>carina-grid</finalName>
 	            </configuration>
 	        </plugin>
 	        <plugin>
