@@ -1,4 +1,4 @@
-FROM selenium/base:latest
+FROM selenium/base:3.6.0
 LABEL authors=Qaprosoft
 
 USER seluser
