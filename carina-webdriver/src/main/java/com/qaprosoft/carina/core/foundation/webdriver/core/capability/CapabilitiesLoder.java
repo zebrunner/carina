@@ -56,13 +56,9 @@ public class CapabilitiesLoder {
 		Map<String, String> capabilitiesMap = new HashMap(props);
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
 			String valueFromEnv = null;
+			valueFromEnv = System.getProperty(entry.getKey());
 
 			// add each property directly into CONFIG
-			if (!entry.getKey().equalsIgnoreCase("os")) {
-				valueFromEnv = System.getenv(entry.getKey());
-			} else {
-				LOGGER.warn("'os' property can't be loaded from environment as it is default system variable!");
-			}
 			String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
 			String key = entry.getKey();
 			LOGGER.info("Set custom property: " + key + "; value: " + value);
