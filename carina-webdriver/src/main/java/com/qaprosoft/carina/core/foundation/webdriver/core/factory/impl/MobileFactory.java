@@ -87,36 +87,29 @@ public class MobileFactory extends AbstractFactory
 					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
 				}
 
-				if (device.isNull())
-				{
-					// TODO: double check that local run with direct appium works fine
-					RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
-					if (remoteDevice != null)
-					{
-						device = new Device(remoteDevice);
-					}
-					else
-					{
-						device = new Device(driver.getCapabilities());
-					}
-
-					boolean stfEnabled = R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-					if (stfEnabled)
-					{
-						device.connectRemote();
-					}
-					DevicePool.registerDevice(device);
-				}
 				// will be performed just in case uninstall_related_apps flag marked as true
 				device.uninstallRelatedApps();
 			}
-			else if (driverType.equalsIgnoreCase(SpecialKeywords.CUSTOM))
-			{
+			else {
+				// that's a case for custom mobile capabilities like browserstack or saucelabs 
 				driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
 			}
-			else
-			{
-				throw new RuntimeException("Unsupported browser");
+			
+			if (device.isNull()) {
+				// TODO: double check that local run with direct appium works fine
+				RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+				if (remoteDevice != null) {
+					device = new Device(remoteDevice);
+				} else {
+					device = new Device(driver.getCapabilities());
+				}
+
+				boolean stfEnabled = R.CONFIG
+						.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+				if (stfEnabled) {
+					device.connectRemote();
+				}
+				DevicePool.registerDevice(device);
 			}
 		}
 		catch (MalformedURLException e)
