@@ -15,13 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -420,45 +417,6 @@ public class Configuration
 		return get(param).isEmpty(); 
 	}
 	
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static Map<String, String> loadCoreProperties(String fileName) {
-
-        LOGGER.info("Loading capabilities:");
-        Properties props = new Properties();
-        URL baseResource = ClassLoader.getSystemResource(fileName);
-		try {
-			if(baseResource != null)
-			{
-				props.load(baseResource.openStream());
-				LOGGER.info("Custom capabilities properties loaded: " + fileName);
-			} else {
-				throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");	
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
-		}
-
-        Map<String, String> propertiesMap = new HashMap(props);
-        for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
-            if (entry.getKey().startsWith(SpecialKeywords.CORE)) {
-            	
-                String valueFromEnv = null;
-                if (!entry.getKey().equalsIgnoreCase("os")) {
-                	valueFromEnv = System.getenv(entry.getKey());
-                } else {
-                	LOGGER.warn("'os' property can't be loaded from environment as it is default system variable!");
-                }
-                String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
-                
-            	String key = entry.getKey().replaceAll(SpecialKeywords.CORE + ".", "");
-            	LOGGER.info("Set custom core property: " + key + "; value: " + value);
-            	R.CONFIG.put(key, value);
-            }
-        }
-        
-        return propertiesMap;
-    }
-    
     public static String getPlatform() {
     	// default "platform=value" should be used to determine current platform 
     	String platform = Configuration.get(Parameter.PLATFORM);

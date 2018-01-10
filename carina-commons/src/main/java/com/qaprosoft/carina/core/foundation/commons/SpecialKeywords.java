@@ -105,8 +105,6 @@ public class SpecialKeywords
 	public static final String PHONE = "phone";
 	public static final String TV = "tv";
 	
-	public static final String CORE = "core";
-	
 	public static final String PASSED = "PASSED";
 	public static final String FAILED = "FAILED";
 	public static final String SKIPPED = "SKIPPED";

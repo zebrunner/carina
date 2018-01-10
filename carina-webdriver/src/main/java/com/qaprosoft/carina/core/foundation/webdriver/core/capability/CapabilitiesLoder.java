@@ -24,7 +24,6 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
@@ -52,22 +51,24 @@ public class CapabilitiesLoder {
 			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
 		}
 		
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+		DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        Map<String, String> capabilitiesMap = new HashMap(props);
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            if (!entry.getKey().startsWith(SpecialKeywords.CORE)) {
-                String valueFromEnv = null;
-                valueFromEnv = System.getProperty(entry.getKey());
-                String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
+		Map<String, String> capabilitiesMap = new HashMap(props);
+		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+			String valueFromEnv = null;
 
-            	LOGGER.info("Set custom driver capability: " + entry.getKey() + "; value: " + value);
-            	capabilities.setCapability(entry.getKey(), value);
-            	//add each custom capability to properties generating new key-value pair to be able to change some env specific data later
-            	R.CONFIG.put(entry.getKey(), value);
-            }
-        }
+			// add each property directly into CONFIG
+			if (!entry.getKey().equalsIgnoreCase("os")) {
+				valueFromEnv = System.getenv(entry.getKey());
+			} else {
+				LOGGER.warn("'os' property can't be loaded from environment as it is default system variable!");
+			}
+			String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
+			String key = entry.getKey();
+			LOGGER.info("Set custom property: " + key + "; value: " + value);
+			R.CONFIG.put(key, value);
+		}
 
-        return capabilities;
+		return capabilities;
     }
 }

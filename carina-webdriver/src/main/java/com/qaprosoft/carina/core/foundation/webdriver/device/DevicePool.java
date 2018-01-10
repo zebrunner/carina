@@ -35,23 +35,6 @@ public class DevicePool
 		return device;
 	}
 	
-/*	public static void registerDevice(Map<String, String> propertiesMap) {
-		//TODO: refactor capability names 
-        if (propertiesMap.get("core.driver_type").equals(SpecialKeywords.MOBILE)) {
-        	//add device from custom capabilities to the devicePool
-        	String deviceName = propertiesMap.get("core.deviceName");
-        	String deviceType = propertiesMap.get("core.deviceType");
-        	String devicePlatform = propertiesMap.get("core.platformName");
-        	String devicePlatformVersion = propertiesMap.get("core.platformVersion");
-        	String deviceUdid = propertiesMap.get("core.udid");
-        	if (deviceUdid == null) {
-        		deviceUdid = "";
-        	}
-        	setDevice(new Device(deviceName, deviceType, devicePlatform, devicePlatformVersion, deviceUdid, ""));
-        }
-	}
-*/	
-	
 	public static void deregisterDevice()
 	{
 		currentDevice.remove();
