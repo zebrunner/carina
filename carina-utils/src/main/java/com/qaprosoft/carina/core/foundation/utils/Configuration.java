@@ -436,12 +436,17 @@ public class Configuration
     
     
 	public static String getDriverType() {
-		String platform = getPlatform();
-		String mobileType = SpecialKeywords.DESKTOP;
-		if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
-			mobileType = SpecialKeywords.MOBILE;
+		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+		if (!customCapabilities.isEmpty()) {
+			return SpecialKeywords.CUSTOM;
 		}
-		return mobileType;
+
+		String platform = getPlatform();
+		if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
+			return SpecialKeywords.MOBILE;
+		}
+		
+		return SpecialKeywords.DESKTOP;
 	}
     
     
