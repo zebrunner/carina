@@ -36,7 +36,7 @@ import com.qaprosoft.zafira.models.stf.STFDevice;
 /**
  * Servlet that retrieves information about STF device.
  * 
- * @author akhursevich
+ * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DeviceInfo extends RegistryBasedServlet
 {
