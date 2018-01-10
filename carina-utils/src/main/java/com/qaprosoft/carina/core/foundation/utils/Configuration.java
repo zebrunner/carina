@@ -436,10 +436,6 @@ public class Configuration
     
     
 	public static String getDriverType() {
-		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-		if (!customCapabilities.isEmpty()) {
-			return SpecialKeywords.CUSTOM;
-		}
 
 		String platform = getPlatform();
 		if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {

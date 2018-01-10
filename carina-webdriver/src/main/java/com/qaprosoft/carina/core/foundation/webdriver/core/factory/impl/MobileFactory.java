@@ -61,9 +61,17 @@ public class MobileFactory extends AbstractFactory
 		{
 			seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
 		}
-		//TODO: it seems like a mistake because it always use platform from config and can't generate based on capabilities only
+
 		String driverType = Configuration.getDriverType();
 		String mobilePlatformName = Configuration.getPlatform();
+		
+		//TODO: refactor code to be able to remove SpecialKeywords.CUSTOM property completely
+		
+		// use comparison for custom_capabilities here to localize as possible usage of CUSTOM attribute
+		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+		if (!customCapabilities.isEmpty()) {
+			mobilePlatformName = SpecialKeywords.CUSTOM;
+		}
 
 		LOGGER.debug("selenium: " + seleniumHost);
 
@@ -77,22 +85,18 @@ public class MobileFactory extends AbstractFactory
 		{
 			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE))
 			{
-				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID))
-				{
+				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
-
 				}
-				else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS))
-				{
+				else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
+				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
+					// that's a case for custom mobile capabilities like browserstack or saucelabs 
+					driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+				} else {
+					throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
 				}
 
-				// will be performed just in case uninstall_related_apps flag marked as true
-				device.uninstallRelatedApps();
-			}
-			else {
-				// that's a case for custom mobile capabilities like browserstack or saucelabs 
-				driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
 			}
 			
 			if (device.isNull()) {
@@ -111,6 +115,8 @@ public class MobileFactory extends AbstractFactory
 				}
 				DevicePool.registerDevice(device);
 			}
+			// will be performed just in case uninstall_related_apps flag marked as true
+			device.uninstallRelatedApps();
 		}
 		catch (MalformedURLException e)
 		{
