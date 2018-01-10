@@ -36,7 +36,7 @@ ENV STF_TOKEN ""
 COPY generate_config \
     entry_point.sh \
     /opt/bin/
-COPY target/carina-grid.jar \
+COPY target/carina-grid-jar-with-dependencies.jar \
     /opt/selenium
 # Running this command as sudo just to avoid the message:
 # To run a command as administrator (user "root"), use "sudo <command>". See "man sudo_root" for details.
