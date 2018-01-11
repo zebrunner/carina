@@ -113,9 +113,14 @@ public class Device extends RemoteDevice
 		setOs(Configuration.getPlatform());
 		
 		String platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION);
+		if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
+			platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION);
+		}
 		if (capabilities.getCapability("platformVersion") != null) {
 			platformVersion = capabilities.getCapability("platformVersion").toString();
 		}
+
+		
 		setOsVersion(platformVersion);
 		
 
