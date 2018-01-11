@@ -27,14 +27,6 @@ public class MobileCapabilies extends AbstractCapabilities {
 
 		// add capabilities based on dynamic _config.properties variables
 		capabilities = initCapabilities(capabilities);
-
-		// handle variant with extra capabilities from external property file
-		DesiredCapabilities extraCapabilities = getExtraCapabilities();
-
-		if (extraCapabilities != null) {
-			capabilities.merge(extraCapabilities);
-		}
-
 		return capabilities;
 	}
 

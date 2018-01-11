@@ -133,6 +133,7 @@ public class SpecialKeywords
 	public static final String CAPABILITIES = "capabilities";
 	public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
 	public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
+	public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
 	public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
 	public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
 	public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";

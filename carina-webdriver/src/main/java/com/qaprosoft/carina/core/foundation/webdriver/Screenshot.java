@@ -436,11 +436,15 @@ public class Screenshot
 	 */
 	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot;
-		if (driver.getClass().toString().contains("java_client") || 
-				Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+		if (driver.getClass().toString().contains("java_client")) {
+			//Mobile Native app
 			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
 			screenShot = ImageIO.read(screenshot);
+		} else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+			//Mobile web
+			screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
 		} else {
+			//regular web
 			ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
 					.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
 			screenShot = screenshot.getImage();

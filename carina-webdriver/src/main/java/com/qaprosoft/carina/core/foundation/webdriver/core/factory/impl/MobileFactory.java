@@ -35,7 +35,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -102,7 +101,8 @@ public class MobileFactory extends AbstractFactory
 			if (device.isNull()) {
 				// TODO: double check that local run with direct appium works fine
 				RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
-				if (remoteDevice != null) {
+				// 3rd party solutions like browserstack or saucelabs return not null remoteDevice object. But inside nothing useful
+				if (remoteDevice != null && remoteDevice.getName() != null) {
 					device = new Device(remoteDevice);
 				} else {
 					device = new Device(driver.getCapabilities());
@@ -133,17 +133,9 @@ public class MobileFactory extends AbstractFactory
 
 	private DesiredCapabilities getCapabilities(String name, Device device)
 	{
-		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		if (!customCapabilities.isEmpty())
-		{
-			capabilities = new CapabilitiesLoder().loadCapabilities(customCapabilities);
-		}
-		else
-		{
-			capabilities = new MobileCapabilies().getCapability(name);
-		}
-
+		capabilities = new MobileCapabilies().getCapability(name);
+		
 		if (!device.isNull())
 		{
 			capabilities.setCapability("udid", device.getUdid());

@@ -47,7 +47,7 @@ public class MobileUtils {
     protected static final int MINIMUM_TIMEOUT = 2;
 
     private static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
-    private static final int DEFAULT_MAX_SWIPE_COUNT = 5;
+    private static final int DEFAULT_MAX_SWIPE_COUNT = 50;
     
     
     

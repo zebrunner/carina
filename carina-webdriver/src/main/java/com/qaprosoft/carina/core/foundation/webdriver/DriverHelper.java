@@ -33,6 +33,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
@@ -721,6 +722,8 @@ public class DriverHelper {
 		// stability issues
 		try {
 			drv.manage().window().maximize();
+		} catch (WebDriverException e) {
+			LOGGER.debug(e.getMessage(), e);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		}

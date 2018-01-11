@@ -15,22 +15,25 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.*;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.IECapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public class DesktopFactory extends AbstractFactory
 {
@@ -82,35 +85,27 @@ public class DesktopFactory extends AbstractFactory
 
 	public DesiredCapabilities getCapabilities(String name)
 	{
-		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-		if (!customCapabilities.isEmpty())
+		String browser = Configuration.get(Parameter.BROWSER);
+
+		if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
 		{
-			return new CapabilitiesLoder().loadCapabilities(customCapabilities);
+			return new FirefoxCapabilities().getCapability(name);
+		}
+		else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
+		{
+			return new IECapabilities().getCapability(name);
+		}
+		else if (BrowserType.SAFARI.equalsIgnoreCase(browser))
+		{
+			return new SafariCapabilities().getCapability(name);
+		}
+		else if (BrowserType.CHROME.equalsIgnoreCase(browser))
+		{
+			return new ChromeCapabilities().getCapability(name);
 		}
 		else
 		{
-			String browser = Configuration.get(Parameter.BROWSER);
-
-			if (BrowserType.FIREFOX.equalsIgnoreCase(browser))
-			{
-				return new FirefoxCapabilities().getCapability(name);
-			}
-			else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie"))
-			{
-				return new IECapabilities().getCapability(name);
-			}
-			else if (BrowserType.SAFARI.equalsIgnoreCase(browser))
-			{
-				return new SafariCapabilities().getCapability(name);
-			}
-			else if (BrowserType.CHROME.equalsIgnoreCase(browser))
-			{
-				return new ChromeCapabilities().getCapability(name);
-			}
-			else
-			{
-				throw new RuntimeException("Unsupported browser: " + browser);
-			}
+			throw new RuntimeException("Unsupported browser: " + browser);
 		}
 	}
 

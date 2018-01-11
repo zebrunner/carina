@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 
@@ -34,7 +33,7 @@ public class CapabilitiesLoder {
     private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoder.class);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public DesiredCapabilities loadCapabilities(String fileName) {
+    public void loadCapabilities(String fileName) {
     	//TODO: investigate howto allow access to this static method only from internal carina packages
 
         LOGGER.info("Loading capabilities:");
@@ -52,8 +51,6 @@ public class CapabilitiesLoder {
 			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
 		}
 		
-		DesiredCapabilities capabilities = new DesiredCapabilities();
-
 		Map<String, String> capabilitiesMap = new HashMap(props);
 		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
 			//TODO: investigate effects of removing env args monitoring for extra capabilities declaration
@@ -68,6 +65,5 @@ public class CapabilitiesLoder {
 			R.CONFIG.put(key, value);
 		}
 
-		return capabilities;
     }
 }

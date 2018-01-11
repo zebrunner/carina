@@ -84,6 +84,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
@@ -182,6 +183,19 @@ public abstract class AbstractTest // extends DriverHelper
             L10Nparser.init();
         } catch (Exception e) {
             LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
+        }
+        
+        // TODO: move out from AbstractTest->executeBeforeTestSuite
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            //redefine core CONFIG properties using custom capabilities file
+        	new CapabilitiesLoder().loadCapabilities(customCapabilities);
+        }
+        
+        String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
+        if (!extraCapabilities.isEmpty()) {
+            //redefine core CONFIG properties using extra capabilities file
+        	new CapabilitiesLoder().loadCapabilities(extraCapabilities);
         }
 
         try {
@@ -375,7 +389,7 @@ public abstract class AbstractTest // extends DriverHelper
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+        if (!DevicePool.getDevice().isNull()) {
             //Samsung - Android 4.4.2; iPhone - iOS 7
         	Device device = DevicePool.getDevice();
             String deviceTemplate = "%s - %s %s";
