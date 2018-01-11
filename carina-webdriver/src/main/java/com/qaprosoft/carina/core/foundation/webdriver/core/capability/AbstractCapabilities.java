@@ -63,13 +63,6 @@ public abstract class AbstractCapabilities {
 		// add capabilities based on dynamic _config.properties variables
 		capabilities = initCapabilities(capabilities);
 		
-		//handle variant with extra capabilities from external property file
-    	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
-    			
-    	if (extraCapabilities != null) {
-    		capabilities.merge(extraCapabilities);
-    	}
-    	
         return capabilities;
     }
     
@@ -92,18 +85,6 @@ public abstract class AbstractCapabilities {
 	}
 	
 
-    protected DesiredCapabilities getExtraCapabilities() {
-		//handle variant with extra capabilities from external property file
-    	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
-    	DesiredCapabilities extraCapabilities = null;
-    	if (!extraCapabilitiesFile.isEmpty()) {
-    		LOGGER.info("Append extra Capabilities from '" + extraCapabilitiesFile + "' to desired capabilities");
-    		extraCapabilities = new CapabilitiesLoder().loadCapabilities(extraCapabilitiesFile);
-    	}
-    	
-    	return extraCapabilities;
-    }
-    
     protected Proxy setupProxy() {
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);

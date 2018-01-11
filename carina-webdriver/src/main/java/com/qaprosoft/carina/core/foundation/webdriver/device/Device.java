@@ -83,12 +83,51 @@ public class Device extends RemoteDevice
 	
 	public Device(Capabilities capabilities)
 	{
-		setName(capabilities.getCapability("deviceName").toString()); //deviceModel is returned from capabilities with name of device
-		setType(capabilities.getCapability("deviceType").toString());
-		setOs(capabilities.getCapability("platformName").toString());
-		setOsVersion(capabilities.getCapability("platformVersion").toString());
-		setUdid(capabilities.getCapability("udid").toString());
+		// 1. read from CONFIG and specify if any: capabilities.deviceName, capabilities.device (browserstack notation)
+		// 2. read from capabilities object and set if if it is not null
+		String deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
+		if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_NAME).isEmpty()) {
+			deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_NAME);
+		}
+		if (capabilities.getCapability("deviceName") != null) {
+			deviceName = capabilities.getCapability("deviceName").toString();
+		}
+		if (capabilities.getCapability("deviceModel") != null) {
+			//deviceModel is returned from capabilities with name of device for local appium runs
+			deviceName = capabilities.getCapability("deviceModel").toString();
+		}
+		setName(deviceName);
+		
+		
+		// TODO: should we register default device type as phone?
+		String deviceType = SpecialKeywords.PHONE;
+		if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE).isEmpty()) {
+			deviceType = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE);
+		}
+		if (capabilities.getCapability("deviceType") != null) {
+			deviceType = capabilities.getCapability("deviceType").toString();
+		}
+		setType(deviceType);
+		
+		
+		setOs(Configuration.getPlatform());
+		
+		String platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION);
+		if (capabilities.getCapability("platformVersion") != null) {
+			platformVersion = capabilities.getCapability("platformVersion").toString();
+		}
+		setOsVersion(platformVersion);
+		
+
+		String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
+		if (capabilities.getCapability("udid") != null) {
+			deviceUdid = capabilities.getCapability("udid").toString();
+		}
+
+		setUdid(deviceUdid);
 	}
+	
+	
 	
 	public boolean isPhone()
 	{
