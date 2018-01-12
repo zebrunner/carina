@@ -511,4 +511,49 @@ public class MobileUtils {
         LOGGER.info("Swipe down will be executed.");
         swipeInDevice(null, Direction.DOWN, duration);
     }
+
+    /**
+     * Swipe left several times
+     * 
+     * @param times int
+     * @param duration int
+     */
+    public static void swipeLeft(final int times, final int duration) {
+        for (int i = 0; i < times; i++) {
+            swipeLeft(duration);
+        }
+    }
+
+    /**
+     * Swipe left
+     * 
+     * @param duration int
+     */
+    public static void swipeLeft(final int duration) {
+        LOGGER.info("Swipe left will be executed.");
+        swipeInDevice(null, Direction.LEFT, duration);
+    }
+    
+
+    /**
+     * Swipe right several times
+     * 
+     * @param times int
+     * @param duration int
+     */
+    public static void swipeRight(final int times, final int duration) {
+        for (int i = 0; i < times; i++) {
+            swipeRight(duration);
+        }
+    }
+
+    /**
+     * Swipe right
+     * 
+     * @param duration int
+     */
+    public static void swipeRight(final int duration) {
+        LOGGER.info("Swipe right will be executed.");
+        swipeInDevice(null, Direction.RIGHT, duration);
+    }
 }
