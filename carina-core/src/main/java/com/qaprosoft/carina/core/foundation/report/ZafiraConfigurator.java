@@ -15,6 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
@@ -33,14 +41,6 @@ import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -50,7 +50,6 @@ import java.util.Set;
 public class ZafiraConfigurator implements IConfigurator
 {
 	protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
-    private List<String> uniqueKeys = Arrays.asList(R.CONFIG.get("unique_testrun_fields").split(","));
     
     @Override
     public ConfigurationType getConfiguration()
@@ -62,6 +61,7 @@ public class ZafiraConfigurator implements IConfigurator
         }
 
         if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
+        	//TODO: review and fix for 5.2.2.xx implementation
             // add custom arguments from browserStack
             conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
@@ -93,7 +93,6 @@ public class ZafiraConfigurator implements IConfigurator
         arg.setKey(key);
         //populate valid null values for all arguments
         arg.setValue("NULL".equalsIgnoreCase(value) ? null : value);
-        arg.setUnique(uniqueKeys.contains(key));
         return arg;
     }
 
