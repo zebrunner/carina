@@ -279,11 +279,10 @@ public class AndroidUtils extends MobileUtils {
      *
      * @param container  ExtendedWebElement     - works only with resourceId
      * @param scrollToElement String has to be id, className, text, contentDesc, etc
-     * @param selectorType  SelectorType can be TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
      * @return ExtendedWebElement
      * <p>
      * example of usage:
-     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab , AndroidUtils.SelectorType.TEXT);
+     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab);
      **/
     public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
     	return scroll(scrollToElement, container, SelectorType.TEXT);
