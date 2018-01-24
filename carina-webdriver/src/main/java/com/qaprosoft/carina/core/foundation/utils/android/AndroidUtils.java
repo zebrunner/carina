@@ -22,15 +22,19 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.PressesKeyCode;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
@@ -265,5 +269,98 @@ public class AndroidUtils extends MobileUtils {
 		return element.isElementPresent(5)
 				&& (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }
-    
+
+    public enum SelectorType {
+        TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
+    }
+
+    /**
+     * Scrolls into view in specified container by text only and return ExtendedWebElement
+     *
+     * @param container  ExtendedWebElement     - works only with resourceId
+     * @param scrollToElement String has to be id, className, text, contentDesc, etc
+     * @return ExtendedWebElement
+     * <p>
+     * example of usage:
+     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab);
+     **/
+    public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
+    	return scroll(scrollToElement, container, SelectorType.TEXT);
+    }
+    /**
+     * Scrolls into view in specified container and return ExtendedWebElement
+     *
+     * @param container  ExtendedWebElement     - works only with resourceId
+     * @param scrollToElement String has to be id, className, text, contentDesc, etc
+     * @param selectorType  SelectorType can be TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
+     * @return ExtendedWebElement
+     * <p>
+     * example of usage:
+     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab , AndroidUtils.SelectorType.TEXT);
+     **/
+    public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container, SelectorType selectorType) {
+
+        LOGGER.debug(container.getBy().toString());
+        ExtendedWebElement el;
+
+        String scrollableContainer = container.getBy().toString().replace("By.id:", "").trim();
+        if (!scrollableContainer.contains("id/")) {
+        	Assert.fail("scrollable container should be pointed By.id!");
+        	//TODO: investigate possibility to read package of currently focues app 
+            //scrollableContainer = getCurrentFocusedApkPackageName() + ":id/" + scrollableContainer;
+        }
+
+        String scrollViewContainer_finder = "new UiSelector().resourceId(\"" + scrollableContainer + "\")";
+        String neededElement_finder = "";
+
+        switch (selectorType) {
+            case TEXT:
+                neededElement_finder = "new UiSelector().text(\"" + scrollToElement + "\")";
+                break;
+            case TEXT_CONTAINS:
+                neededElement_finder = "new UiSelector().textContains(\"" + scrollToElement + "\")";
+                break;
+            case TEXT_STARTS_WITH:
+                neededElement_finder = "new UiSelector().textStartsWith(\"" + scrollToElement + "\")";
+                break;
+            case ID:
+                neededElement_finder = "new UiSelector().resourceId(\"" + scrollToElement + "\")";
+                break;
+            case DESCRIPTION:
+                neededElement_finder = "new UiSelector().description(\"" + scrollToElement + "\")";
+                break;
+            case DESCRIPTION_CONTAINS:
+                neededElement_finder = "new UiSelector().descriptionContains(\"" + scrollToElement + "\")";
+                break;
+            case CLASS_NAME:
+                neededElement_finder = "new UiSelector().className(\"" + scrollToElement + "\")";
+                break;
+            default:
+                LOGGER.info("Please provide valid selectorType for element to be found...");
+                break;
+        }
+
+        try {
+            By by = MobileBy.AndroidUIAutomator("new UiScrollable(" + scrollViewContainer_finder + ").scrollIntoView(" + neededElement_finder + ")");
+            LOGGER.debug(by.toString());
+
+            WebElement ele = DriverPool.getDriver().findElement(by);
+
+            if (ele.isDisplayed()) {
+                LOGGER.info(String.format("Element %s:%s was found.", selectorType.toString(), scrollToElement));
+                el = new ExtendedWebElement(ele, scrollToElement, by, DriverPool.getDriver());
+            } else {
+                LOGGER.error(String.format("Element %s:%s was NOT found.", selectorType.toString(), scrollToElement));
+                throw new NoSuchElementException("Element was not found after scroll using " + by.toString());
+            }
+        } catch (NoSuchElementException noSuchElement) {
+            throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", selectorType.toString(), scrollToElement), noSuchElement);
+        } catch (Exception e) {
+            LOGGER.error("Error happen.", e);
+            throw e;
+        }
+
+        return el;
+    }
+
 }
