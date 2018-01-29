@@ -116,7 +116,7 @@ public class SpecialKeywords
 	
 	public static final String COMMENT = "comment";
 	
-	
+	public static final String DEFAULT = "default";	
 	
 	// ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
 	public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
