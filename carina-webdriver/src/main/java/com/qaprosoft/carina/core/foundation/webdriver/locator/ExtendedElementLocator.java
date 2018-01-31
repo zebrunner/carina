@@ -123,7 +123,7 @@ public class ExtendedElementLocator implements ElementLocator
 				catch (NoSuchElementException e) 
 				{
 					exception = e;
-					LOGGER.error("Unable to find element: " + e.getMessage());
+					LOGGER.debug("Unable to find element: " + e.getMessage());
 				}
 			}
 			
