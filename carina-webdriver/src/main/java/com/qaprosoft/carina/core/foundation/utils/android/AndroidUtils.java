@@ -48,6 +48,7 @@ import io.appium.java_client.android.AndroidKeyCode;
 public class AndroidUtils extends MobileUtils {
 
     protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
+    private static final int SCROLL_MAX_SEARCH_SWIPES = 55;
 
     /**
      * execute Key Event
@@ -284,7 +285,7 @@ public class AndroidUtils extends MobileUtils {
      * example of usage:
      * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer);
      **/
-    public ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
+    public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
         return scroll(scrollToElement, container, SelectorType.ID, SelectorType.TEXT);
     }
 
@@ -303,16 +304,15 @@ public class AndroidUtils extends MobileUtils {
      **/
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType) {
-        int maxSearchSwipes = 55; //this value can be changed if necessary
         ExtendedWebElement el = null;
 
-        for (int i = 0; i < maxSearchSwipes; i++) {
+        for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
                 WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) +
                         ".instance(" + containerInstance + "))"+
-                        ".setMaxSearchSwipes(" + maxSearchSwipes + ")" + ".scrollIntoView(" +
+                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
@@ -354,16 +354,15 @@ public class AndroidUtils extends MobileUtils {
      **/
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType, int eleSelectorInstance) {
-        int maxSearchSwipes = 55; //this value can be changed if necessary
         ExtendedWebElement el = null;
 
-        for (int i = 0; i < maxSearchSwipes; i++) {
+        for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
                 WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) +
                         ".instance(" + containerInstance + "))" +
-                        ".setMaxSearchSwipes(" + maxSearchSwipes + ")" + ".scrollIntoView(" +
+                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance(" + eleSelectorInstance + "))"));
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
@@ -403,15 +402,14 @@ public class AndroidUtils extends MobileUtils {
      **/
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           SelectorType eleSelectorType){
-        int maxSearchSwipes = 55; //this value can be changed if necessary
         ExtendedWebElement el = null;
 
-        for (int i = 0; i < maxSearchSwipes; i++) {
+        for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
                 WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) + ")" +
-                        ".setMaxSearchSwipes(" + maxSearchSwipes + ")" + ".scrollIntoView(" +
+                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
