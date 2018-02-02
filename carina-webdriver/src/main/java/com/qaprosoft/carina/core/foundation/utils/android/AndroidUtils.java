@@ -35,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.MobileDriver;
 import io.appium.java_client.PressesKeyCode;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
@@ -165,7 +166,7 @@ public class AndroidUtils extends MobileUtils {
      */
     public static void hideKeyboard() {
         try {
-            ((AndroidDriver<?>) DriverPool.getDriver()).hideKeyboard();
+        	((MobileDriver<?>) DriverPool.getDriver()).hideKeyboard();
         } catch (Exception e) {
             LOGGER.info("Keyboard was already hided or error occurs: " + e);
         }
