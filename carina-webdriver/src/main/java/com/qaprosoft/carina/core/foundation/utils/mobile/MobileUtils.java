@@ -364,14 +364,16 @@ public class MobileUtils {
     	Dimension scrSize = drv.manage().window().getSize();
     	LOGGER.debug("Finished driver dimension size...");
     	//explicitly limit range of coordinates
-    	if (endx > startx) {
-    		endx = Math.max(endx, scrSize.width - 1);
+    	if (endx > scrSize.width) {
+    		LOGGER.warn("endx coordinate is bigger then device width! It will be limited!");
+    		endx = scrSize.width - 1;
     	} else {
     		endx = Math.max(1, endx);
     	}
     	
-    	if (endy > starty) {
-    		endy = Math.max(endy, scrSize.height - 1);
+    	if (endy > scrSize.height) {
+    		LOGGER.warn("endy coordinate is bigger then device height! It will be limited!");
+    		endy = scrSize.height;
     	} else {
     		endy = Math.max(1, endy);
     	}
