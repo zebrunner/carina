@@ -28,7 +28,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -49,6 +48,8 @@ public class AndroidUtils extends MobileUtils {
 
     protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
     private static final int SCROLL_MAX_SEARCH_SWIPES = 55;
+    private static final long SCROLL_TIMEOUT = 300;
+
 
     /**
      * execute Key Event
@@ -305,6 +306,7 @@ public class AndroidUtils extends MobileUtils {
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType) {
         ExtendedWebElement el = null;
+        long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
@@ -327,6 +329,7 @@ public class AndroidUtils extends MobileUtils {
             }
 
             for (int j = 0; j < i; j++) {
+                checkTimeout(startTime);
                 MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType)
                         + ".instance("+ containerInstance + ")).scrollForward()");
@@ -355,6 +358,7 @@ public class AndroidUtils extends MobileUtils {
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType, int eleSelectorInstance) {
         ExtendedWebElement el = null;
+        long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
@@ -377,6 +381,7 @@ public class AndroidUtils extends MobileUtils {
             }
 
             for (int j = 0; j < i; j++) {
+                checkTimeout(startTime);
                 MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType)
                         + ".instance("+ containerInstance + ")).scrollForward()");
@@ -403,6 +408,7 @@ public class AndroidUtils extends MobileUtils {
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           SelectorType eleSelectorType){
         ExtendedWebElement el = null;
+        long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
@@ -424,6 +430,7 @@ public class AndroidUtils extends MobileUtils {
             }
 
             for (int j = 0; j < i; j++) {
+                checkTimeout(startTime);
                 MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) + ").scrollForward()");
                 LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
@@ -529,6 +536,19 @@ public class AndroidUtils extends MobileUtils {
         }
 
         return neededElementFinder;
+    }
+
+    /** Scroll > Timeout check
+     * @param startTime - Long > initial time for timeout count down
+     * @return void
+     * <p>
+     **/
+    public static void checkTimeout(long startTime){
+        long elapsed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())-startTime;
+
+        if (elapsed > SCROLL_TIMEOUT) {
+            throw new RuntimeException("Scroll timeout has been reached..");
+        }
     }
 
 }
