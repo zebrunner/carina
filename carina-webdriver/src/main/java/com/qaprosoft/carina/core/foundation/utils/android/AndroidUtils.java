@@ -324,10 +324,7 @@ public class AndroidUtils extends MobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
-            } catch (Exception e) {
-                LOGGER.error("Element NOT found!!!");
-                throw e;
+                LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
             }
 
             for (int j = 0; j < i; j++) {
@@ -376,10 +373,7 @@ public class AndroidUtils extends MobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
-            } catch (Exception e) {
-                LOGGER.error("Element NOT found!!!");
-                throw e;
+                LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
             }
 
             for (int j = 0; j < i; j++) {
@@ -425,10 +419,7 @@ public class AndroidUtils extends MobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
-            } catch (Exception e) {
-                LOGGER.error("Element NOT found!!!");
-                throw e;
+                LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
             }
 
             for (int j = 0; j < i; j++) {
