@@ -295,6 +295,7 @@ public class AndroidUtils extends MobileUtils {
      * @param scrollableContainer - ExtendedWebElement type
      * @param containerSelectorType - has to be id, text, textContains, textStartsWith, Description, DescriptionContains
      *                             or className
+     * @param containerInstance - has to an instance number of desired container
      * @param eleSelectorType -  has to be id, text, textContains, textStartsWith, Description, DescriptionContains
      *                             or className
      * @return ExtendedWebElement
@@ -538,16 +539,16 @@ public class AndroidUtils extends MobileUtils {
         return neededElementFinder;
     }
 
-    /** Scroll > Timeout check
-     * @param startTime - Long > initial time for timeout count down
-     * @return void
+    /** Scroll Timeout check
+     * @param startTime - Long initial time for timeout count down
+     * @return
      * <p>
      **/
     public static void checkTimeout(long startTime){
         long elapsed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())-startTime;
 
         if (elapsed > SCROLL_TIMEOUT) {
-            throw new RuntimeException("Scroll timeout has been reached..");
+            throw new NoSuchElementException("Scroll timeout has been reached..");
         }
     }
 
