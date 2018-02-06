@@ -541,7 +541,6 @@ public class AndroidUtils extends MobileUtils {
 
     /** Scroll Timeout check
      * @param startTime - Long initial time for timeout count down
-     * <p>
      **/
     public static void checkTimeout(long startTime){
         long elapsed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())-startTime;
