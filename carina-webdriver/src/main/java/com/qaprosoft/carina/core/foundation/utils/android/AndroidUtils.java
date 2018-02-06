@@ -28,7 +28,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -49,6 +48,9 @@ import io.appium.java_client.android.AndroidKeyCode;
 public class AndroidUtils extends MobileUtils {
 
     protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
+    private static final int SCROLL_MAX_SEARCH_SWIPES = 55;
+    private static final long SCROLL_TIMEOUT = 300;
+
 
     /**
      * execute Key Event
@@ -276,92 +278,278 @@ public class AndroidUtils extends MobileUtils {
     }
 
     /**
-     * Scrolls into view in specified container by text only and return ExtendedWebElement
+     * Scrolls into view in specified container by text only and return boolean
      *
-     * @param container  ExtendedWebElement     - works only with resourceId
-     * @param scrollToElement String has to be id, className, text, contentDesc, etc
+     * @param container  ExtendedWebElement - defaults to id Selector Type
+     * @param scrollToElement String defaults to text Selector Type
      * @return ExtendedWebElement
      * <p>
      * example of usage:
-     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab);
+     * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer);
      **/
     public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
-    	return scroll(scrollToElement, container, SelectorType.TEXT);
+        return scroll(scrollToElement, container, SelectorType.ID, SelectorType.TEXT);
     }
-    /**
-     * Scrolls into view in specified container and return ExtendedWebElement
-     *
-     * @param container  ExtendedWebElement     - works only with resourceId
-     * @param scrollToElement String has to be id, className, text, contentDesc, etc
-     * @param selectorType  SelectorType can be TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
+
+    /** Scrolls into view in a container specified by it's instance (index)
+     * @param scrollToEle - has to be id, text, contentDesc or className
+     * @param scrollableContainer - ExtendedWebElement type
+     * @param containerSelectorType - has to be id, text, textContains, textStartsWith, Description, DescriptionContains
+     *                             or className
+     * @param eleSelectorType -  has to be id, text, textContains, textStartsWith, Description, DescriptionContains
+     *                             or className
      * @return ExtendedWebElement
      * <p>
      * example of usage:
-     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab , AndroidUtils.SelectorType.TEXT);
+     * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME, 1,
+     *                          AndroidUtils.SelectorType.TEXT);
      **/
-    public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container, SelectorType selectorType) {
+    public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+                          int containerInstance, SelectorType eleSelectorType) {
+        ExtendedWebElement el = null;
+        long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 
-        LOGGER.debug(container.getBy().toString());
-        ExtendedWebElement el;
+        for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
-        String scrollableContainer = container.getBy().toString().replace("By.id:", "").trim();
-        if (!scrollableContainer.contains("id/")) {
-        	Assert.fail("scrollable container should be pointed By.id!");
-        	//TODO: investigate possibility to read package of currently focues app 
-            //scrollableContainer = getCurrentFocusedApkPackageName() + ":id/" + scrollableContainer;
+            try {
+                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                        getScrollContainerSelector(scrollableContainer, containerSelectorType) +
+                        ".instance(" + containerInstance + "))"+
+                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
+                        getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
+                if (ele.isDisplayed()) {
+                    LOGGER.info("Element found!!!");
+                    el = new ExtendedWebElement(ele, scrollToEle, DriverPool.getDriver());
+                    break;
+                }
+            } catch (NoSuchElementException noSuchElement) {
+                throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
+            } catch (Exception e) {
+                LOGGER.error("Element NOT found!!!");
+                throw e;
+            }
+
+            for (int j = 0; j < i; j++) {
+                checkTimeout(startTime);
+                MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                        getScrollContainerSelector(scrollableContainer, containerSelectorType)
+                        + ".instance("+ containerInstance + ")).scrollForward()");
+                LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
+            }
         }
 
-        String scrollViewContainer_finder = "new UiSelector().resourceId(\"" + scrollableContainer + "\")";
-        String neededElement_finder = "";
+        return el;
+    }
 
-        switch (selectorType) {
+    /** Scrolls into view in specified container
+     * @param scrollToEle - has to be id, text, contentDesc or className
+     * @param scrollableContainer - ExtendedWebElement type
+     * @param containerSelectorType - has to be id, text, textContains, textStartsWith, Description, DescriptionContains
+     *                             or className
+     * @param containerInstance - has to an instance number of desired container
+     * @param eleSelectorType -  has to be id, text, textContains, textStartsWith, Description, DescriptionContains
+     *                             or className
+     * @param eleSelectorInstance - has to an instance number of desired container
+     * @return ExtendedWebElement
+     * <p>
+     * example of usage:
+     * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME, 1,
+     *                          AndroidUtils.SelectorType.TEXT, 2);
+     **/
+    public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+                          int containerInstance, SelectorType eleSelectorType, int eleSelectorInstance) {
+        ExtendedWebElement el = null;
+        long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+
+        for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
+
+            try {
+                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                        getScrollContainerSelector(scrollableContainer, containerSelectorType) +
+                        ".instance(" + containerInstance + "))" +
+                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
+                        getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance(" + eleSelectorInstance + "))"));
+                if (ele.isDisplayed()) {
+                    LOGGER.info("Element found!!!");
+                    el = new ExtendedWebElement(ele, scrollToEle, DriverPool.getDriver());
+                    break;
+                }
+            } catch (NoSuchElementException noSuchElement) {
+                throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
+            } catch (Exception e) {
+                LOGGER.error("Element NOT found!!!");
+                throw e;
+            }
+
+            for (int j = 0; j < i; j++) {
+                checkTimeout(startTime);
+                MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                        getScrollContainerSelector(scrollableContainer, containerSelectorType)
+                        + ".instance("+ containerInstance + ")).scrollForward()");
+                LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
+            }
+        }
+
+        return el;
+    }
+
+    /** Scrolls into view in specified container
+     * @param scrollToEle - has to be id, text, contentDesc or className
+     * @param scrollableContainer - ExtendedWebElement type
+     * @param containerSelectorType - container Selector type: has to be id, text, textContains, textStartsWith, Description, DescriptionContains
+     *                             or className
+     * @param eleSelectorType -  scrollToEle Selector type: has to be id, text, textContains, textStartsWith, Description, DescriptionContains
+     *                             or className
+     * @return ExtendedWebElement
+     * <p>
+     * example of usage:
+     * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME,
+     *                          AndroidUtils.SelectorType.TEXT);
+     **/
+    public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+                          SelectorType eleSelectorType){
+        ExtendedWebElement el = null;
+        long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+
+        for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
+
+            try {
+                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                        getScrollContainerSelector(scrollableContainer, containerSelectorType) + ")" +
+                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
+                        getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
+                if (ele.isDisplayed()) {
+                    LOGGER.info("Element found!!!");
+                    el = new ExtendedWebElement(ele, scrollToEle, DriverPool.getDriver());
+                    break;
+                }
+            } catch (NoSuchElementException noSuchElement) {
+                throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle), noSuchElement);
+            } catch (Exception e) {
+                LOGGER.error("Element NOT found!!!");
+                throw e;
+            }
+
+            for (int j = 0; j < i; j++) {
+                checkTimeout(startTime);
+                MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                        getScrollContainerSelector(scrollableContainer, containerSelectorType) + ").scrollForward()");
+                LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
+            }
+        }
+
+        return el;
+    }
+
+    /** Scrolls into view in specified container
+     * @param scrollableContainer - ExtendedWebElement type
+     * @param containerSelectorType - Selector type: has to be id, text, contentDesc or className
+     * @return boolean
+     * <p>
+     **/
+    private static String getScrollContainerSelector(ExtendedWebElement scrollableContainer, SelectorType containerSelectorType){
+        LOGGER.debug(scrollableContainer.getBy().toString());
+        String scrollableContainerBy;
+        String scrollViewContainerFinder = "";
+
+        switch (containerSelectorType){
             case TEXT:
-                neededElement_finder = "new UiSelector().text(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.text:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().text(\"" + scrollableContainerBy + "\")";
                 break;
             case TEXT_CONTAINS:
-                neededElement_finder = "new UiSelector().textContains(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.textContains:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().textContains(\"" + scrollableContainerBy + "\")";
                 break;
             case TEXT_STARTS_WITH:
-                neededElement_finder = "new UiSelector().textStartsWith(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.textStartsWith:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().textStartsWith(\"" + scrollableContainerBy + "\")";
                 break;
             case ID:
-                neededElement_finder = "new UiSelector().resourceId(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.id:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().resourceId(\"" + scrollableContainerBy + "\")";
                 break;
             case DESCRIPTION:
-                neededElement_finder = "new UiSelector().description(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.description:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().description(\"" + scrollableContainerBy + "\")";
                 break;
             case DESCRIPTION_CONTAINS:
-                neededElement_finder = "new UiSelector().descriptionContains(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.descriptionContains:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().descriptionContains(\"" + scrollableContainerBy + "\")";
                 break;
             case CLASS_NAME:
-                neededElement_finder = "new UiSelector().className(\"" + scrollToElement + "\")";
+                scrollableContainerBy = scrollableContainer.getBy().
+                        toString().replace("By.className:", "").trim();
+                scrollViewContainerFinder = "new UiSelector().className(\"" + scrollableContainerBy + "\")";
                 break;
             default:
                 LOGGER.info("Please provide valid selectorType for element to be found...");
                 break;
         }
 
-        try {
-            By by = MobileBy.AndroidUIAutomator("new UiScrollable(" + scrollViewContainer_finder + ").scrollIntoView(" + neededElement_finder + ")");
-            LOGGER.debug(by.toString());
+        return scrollViewContainerFinder;
 
-            WebElement ele = DriverPool.getDriver().findElement(by);
+    }
 
-            if (ele.isDisplayed()) {
-                LOGGER.info(String.format("Element %s:%s was found.", selectorType.toString(), scrollToElement));
-                el = new ExtendedWebElement(ele, scrollToElement, by, DriverPool.getDriver());
-            } else {
-                LOGGER.error(String.format("Element %s:%s was NOT found.", selectorType.toString(), scrollToElement));
-                throw new NoSuchElementException("Element was not found after scroll using " + by.toString());
-            }
-        } catch (NoSuchElementException noSuchElement) {
-            throw new NoSuchElementException(String.format("Element %s:%s was NOT found.", selectorType.toString(), scrollToElement), noSuchElement);
-        } catch (Exception e) {
-            LOGGER.error("Error happen.", e);
-            throw e;
+    /** Scrolls into view in specified container
+     * @param scrollToEle - String type
+     * @param eleSelectorType - Selector type: has to be id, text, contentDesc or className
+     * @return String
+     * <p>
+     **/
+    private static String getScrollToElementSelector(String scrollToEle, SelectorType eleSelectorType){
+        String neededElementFinder = "";
+        String scrollToEleTrimmed;
+
+        switch (eleSelectorType){
+            case TEXT:
+                neededElementFinder= "new UiSelector().text(\"" + scrollToEle + "\")";
+                break;
+            case TEXT_CONTAINS:
+                neededElementFinder = "new UiSelector().textContains(\"" + scrollToEle + "\")";
+                break;
+            case TEXT_STARTS_WITH:
+                neededElementFinder = "new UiSelector().textStartsWith(\"" + scrollToEle + "\")";
+                break;
+            case ID:
+                scrollToEleTrimmed = scrollToEle.replace("By.id:", "").trim();
+                neededElementFinder = "new UiSelector().resourceId(\"" + scrollToEleTrimmed + "\")";
+                break;
+            case DESCRIPTION:
+                neededElementFinder = "new UiSelector().description(\"" + scrollToEle + "\")";
+                break;
+            case DESCRIPTION_CONTAINS:
+                neededElementFinder = "new UiSelector().descriptionContains(\"" + scrollToEle + "\")";
+                break;
+            case CLASS_NAME:
+                scrollToEleTrimmed = scrollToEle.replace("By.className:", "").trim();
+                neededElementFinder = "new UiSelector().className(\"" + scrollToEleTrimmed + "\")";
+                break;
+            default:
+                LOGGER.info("Please provide valid selectorType for element to be found...");
+                break;
         }
 
-        return el;
+        return neededElementFinder;
+    }
+
+    /** Scroll > Timeout check
+     * @param startTime - Long > initial time for timeout count down
+     * @return void
+     * <p>
+     **/
+    public static void checkTimeout(long startTime){
+        long elapsed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())-startTime;
+
+        if (elapsed > SCROLL_TIMEOUT) {
+            throw new RuntimeException("Scroll timeout has been reached..");
+        }
     }
 
 }
