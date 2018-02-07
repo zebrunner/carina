@@ -330,6 +330,9 @@ public final class DriverPool {
                 if (!device.isNull()) {
                     NDC.push(" [" + device.getName() + "] ");
                 }
+                
+                // moved proxy start logic here since device will be initialized here only             
+                ProxyPool.startProxy(Integer.parseInt(device.getProxyPort()));
 
                 LOGGER.debug("initDriver finish...");
 
