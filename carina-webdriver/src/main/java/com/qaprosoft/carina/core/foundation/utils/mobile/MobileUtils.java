@@ -533,9 +533,18 @@ public class MobileUtils {
      */
     public static void swipeLeft(final int duration) {
         LOGGER.info("Swipe left will be executed.");
-        swipeInDevice(null, Direction.LEFT, duration);
+        swipeLeft(null, duration);
+    }  
+
+    /**
+     * Swipe left in container
+     * 
+     * @param duration int
+     */
+    public static void swipeLeft(ExtendedWebElement container, final int duration) {
+        LOGGER.info("Swipe left will be executed.");
+        swipeInDevice(container, Direction.LEFT, duration);
     }
-    
 
     /**
      * Swipe right several times
@@ -556,6 +565,16 @@ public class MobileUtils {
      */
     public static void swipeRight(final int duration) {
         LOGGER.info("Swipe right will be executed.");
-        swipeInDevice(null, Direction.RIGHT, duration);
+        swipeRight(null, duration);
+    }
+
+    /**
+     * Swipe right in container
+     * 
+     * @param duration int
+     */
+    public static void swipeRight(ExtendedWebElement container, final int duration) {
+        LOGGER.info("Swipe right will be executed.");
+        swipeInDevice(container, Direction.RIGHT, duration);
     }
 }
