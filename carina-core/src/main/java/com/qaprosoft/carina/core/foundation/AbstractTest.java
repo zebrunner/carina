@@ -268,14 +268,6 @@ public abstract class AbstractTest // extends DriverHelper
             Jira.updateAfterTest(result);
 
 
-            // Populate TestRail Cases
-
-            if (!R.ZAFIRA.getBoolean("zafira_enabled")){
-                result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
-                TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-                TestRail.clearCases();
-            }
-
             //we shouldn't deregister info here as all retries will not work
             //TestNamingUtil.releaseZafiraTest();
 
