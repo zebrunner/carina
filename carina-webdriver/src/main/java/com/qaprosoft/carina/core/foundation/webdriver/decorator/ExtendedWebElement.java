@@ -69,6 +69,8 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
+import io.appium.java_client.MobileBy;
+
 //TODO: [VD] removed deprecated constructor and DriverPool import
 // Also refactor screenshots capturing using listener approach to be able to remove it as well
 public class ExtendedWebElement {
@@ -1292,8 +1294,13 @@ public class ExtendedWebElement {
         if (locator.startsWith("css: ")) {
             by = By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
         }
+
         if (locator.startsWith("tagName: ")) {
             by = By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
+        }
+
+        if (locator.startsWith("By.xpath: **")) {
+            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: **: "), objects));
         }
 
         return new ExtendedWebElement(null, name, by, driver);
