@@ -1,18 +1,18 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation;
 
 import java.io.File;
@@ -72,6 +72,7 @@ import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -83,6 +84,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
@@ -182,6 +184,19 @@ public abstract class AbstractTest // extends DriverHelper
         } catch (Exception e) {
             LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
         }
+        
+        // TODO: move out from AbstractTest->executeBeforeTestSuite
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            //redefine core CONFIG properties using custom capabilities file
+        	new CapabilitiesLoder().loadCapabilities(customCapabilities);
+        }
+        
+        String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
+        if (!extraCapabilities.isEmpty()) {
+            //redefine core CONFIG properties using extra capabilities file
+        	new CapabilitiesLoder().loadCapabilities(extraCapabilities);
+        }
 
         try {
         	TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
@@ -191,14 +206,6 @@ public abstract class AbstractTest // extends DriverHelper
 
         updateAppPath();
         
-        // moved from UITest->executeBeforeTestSuite
-        //TODO: investigate later howto incorporate browserStack device registration better
-        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty()) {
-            //redefine core properties using custom capabilities file
-        	Map<String, String> properties = Configuration.loadCoreProperties(customCapabilities);
-            DevicePool.registerDevice(properties);
-        }
     }
     
     @BeforeClass(alwaysRun = true)
@@ -260,14 +267,6 @@ public abstract class AbstractTest // extends DriverHelper
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
             Jira.updateAfterTest(result);
 
-
-            // Populate TestRail Cases
-
-            if (!R.ZAFIRA.getBoolean("zafira_enabled")){
-                result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
-                TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-                TestRail.clearCases();
-            }
 
             //we shouldn't deregister info here as all retries will not work
             //TestNamingUtil.releaseZafiraTest();
@@ -382,7 +381,7 @@ public abstract class AbstractTest // extends DriverHelper
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+        if (!DevicePool.getDevice().isNull()) {
             //Samsung - Android 4.4.2; iPhone - iOS 7
         	Device device = DevicePool.getDevice();
             String deviceTemplate = "%s - %s %s";
@@ -551,25 +550,11 @@ public abstract class AbstractTest // extends DriverHelper
      */
 
     public void pause(long timeout) {
-	LOGGER.info("Will wait for " + timeout + " seconds");
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-	LOGGER.info("Pause is overed. Keep going..");
+	CommonUtils.pause(timeout);
     }
 
     public void pause(Double timeout) {
-	LOGGER.info("Will wait for " + timeout + " seconds");
-        try {
-            timeout = timeout * 1000;
-            long miliSec = timeout.longValue();
-            Thread.sleep(miliSec);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-	LOGGER.info("Pause is overed. Keep going..");
+    CommonUtils.pause(timeout);
     }
 
     protected void putS3Artifact(String key, String path) {

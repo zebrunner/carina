@@ -1,27 +1,24 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -102,6 +99,8 @@ public class Configuration
 		SELENIUM_HOST("selenium_host"),
 		
 		DRIVER_MODE("driver_mode"),
+		
+		DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 		
 		MAX_DRIVER_COUNT("max_driver_count"),
 		
@@ -418,45 +417,6 @@ public class Configuration
 		return get(param).isEmpty(); 
 	}
 	
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static Map<String, String> loadCoreProperties(String fileName) {
-
-        LOGGER.info("Loading capabilities:");
-        Properties props = new Properties();
-        URL baseResource = ClassLoader.getSystemResource(fileName);
-		try {
-			if(baseResource != null)
-			{
-				props.load(baseResource.openStream());
-				LOGGER.info("Custom capabilities properties loaded: " + fileName);
-			} else {
-				throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");	
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
-		}
-
-        Map<String, String> propertiesMap = new HashMap(props);
-        for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
-            if (entry.getKey().startsWith(SpecialKeywords.CORE)) {
-            	
-                String valueFromEnv = null;
-                if (!entry.getKey().equalsIgnoreCase("os")) {
-                	valueFromEnv = System.getenv(entry.getKey());
-                } else {
-                	LOGGER.warn("'os' property can't be loaded from environment as it is default system variable!");
-                }
-                String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
-                
-            	String key = entry.getKey().replaceAll(SpecialKeywords.CORE + ".", "");
-            	LOGGER.info("Set custom core property: " + key + "; value: " + value);
-            	R.CONFIG.put(key, value);
-            }
-        }
-        
-        return propertiesMap;
-    }
-    
     public static String getPlatform() {
     	// default "platform=value" should be used to determine current platform 
     	String platform = Configuration.get(Parameter.PLATFORM);
@@ -476,12 +436,13 @@ public class Configuration
     
     
 	public static String getDriverType() {
+
 		String platform = getPlatform();
-		String mobileType = SpecialKeywords.DESKTOP;
 		if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
-			mobileType = SpecialKeywords.MOBILE;
+			return SpecialKeywords.MOBILE;
 		}
-		return mobileType;
+		
+		return SpecialKeywords.DESKTOP;
 	}
     
     

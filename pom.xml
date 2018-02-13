@@ -55,10 +55,10 @@
     <jna.version>3.0.9</jna.version>
     <!-- Selenium -->
     <selenium-java.version>3.8.1</selenium-java.version>
-    <selenium-server.version>3.8.1</selenium-server.version>
+    <selenium-server.version>3.6.0</selenium-server.version>
     <appium.version>5.0.4</appium.version>
     <!-- Qaprosoft integrations -->
-    <zafira-client.version>3.0.34</zafira-client.version>
+    <zafira-client.version>3.0.35</zafira-client.version>
     <alice-client.version>1.1.0</alice-client.version>
     <!-- HTTP and SMPT -->
     <javax-mail.version>1.4</javax-mail.version>
@@ -66,6 +66,7 @@
     <monte-repack.version>1.0</monte-repack.version>
     <json-simple.version>1.1</json-simple.version>
     <rest-assured.version>2.9.0</rest-assured.version>
+    <imgscalr-lib.version>4.2</imgscalr-lib.version>
 </properties>
 <modules>
     <module>carina-commons</module>
@@ -365,6 +366,11 @@
             <groupId>com.jayway.restassured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
+        </dependency>
+        <dependency>
+     			  <groupId>org.imgscalr</groupId>
+    			  <artifactId>imgscalr-lib</artifactId>
+     			  <version>${imgscalr-lib.version}</version>
         </dependency>
     </dependencies>
 </dependencyManagement>

@@ -1,20 +1,22 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.naming;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +27,6 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
  * Common naming utility for unique test method identification.
@@ -36,45 +37,11 @@ public class TestNamingUtil
 {
 	private static final Logger LOGGER = Logger.getLogger(TestNamingUtil.class);
 
-	private static INamingStrategy namingStrategy;
-
-	// private static final ConcurrentHashMap<Long, String> threadId2TestName = new ConcurrentHashMap<Long, String>();
 	private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
 
 	private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
 
 	private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
-
-	static
-	{
-		try
-		{
-			namingStrategy = (INamingStrategy) Class.forName(R.CONFIG.get("naming_strategy")).newInstance();
-		} catch (Exception e)
-		{
-			throw new RuntimeException("Can't create naming strategy: " + R.CONFIG.get("naming_strategy"));
-		}
-	}
-
-	public static String getCanonicalTestName(ITestResult result)
-	{
-		return StringEscapeUtils.escapeHtml4(namingStrategy.getCanonicalTestName(result));
-	}
-
-	public static String getCanonicalTestMethodName(ITestResult result)
-	{
-		return StringEscapeUtils.escapeHtml4(namingStrategy.getCanonicalTestMethodName(result));
-	}
-
-	public static String getPackageName(ITestResult result)
-	{
-		return StringEscapeUtils.escapeHtml4(namingStrategy.getPackageName(result));
-	}
-
-	public static String appendTestMethodName(String testName, ITestNGMethod m)
-	{
-		return StringEscapeUtils.escapeHtml4(namingStrategy.appendTestMethodName(testName, m));
-	}
 
 	public static synchronized String associateTestInfo2Thread(String test, Long threadId)
 	{
@@ -155,7 +122,7 @@ public class TestNamingUtil
 
 		if (stack.size() == 0)
 		{
-			LOGGER.warn("Unable to find registered test name for threadId from stack: " + threadId);
+			LOGGER.warn("Unable to find registered test name for threadId from empty stack: " + threadId);
 			return null;
 		}
 
@@ -175,4 +142,101 @@ public class TestNamingUtil
 		}
 		return testName2Bug.get(testName);
 	}
+	
+	
+	
+	
+	
+	
+	public static String getCanonicalTestName(ITestResult result) {
+		//verify if testName is already registered with thread then return it back
+		if (isTestNameRegistered()) {
+			return getTestNameByThread();
+		}
+		
+		String testName = ""; 
+		
+		@SuppressWarnings("unchecked")
+		Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
+		
+		if (testnameMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
+			if (testnameMap.containsKey(testHash)) {
+				testName = testnameMap.get(testHash);
+			}
+		}
+		
+		if (testName.isEmpty()) {
+			testName = result.getTestContext().getCurrentXmlTest().getName();
+		}
+		
+		
+		//TODO: find the bext way to calculate TUID/hash
+		if (result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) || 
+				result.getTestContext().getCurrentXmlTest().getTestParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
+			//AUTO-274 "Pass"ing status set on emailable report when a test step fails
+			String methodUID = "";
+			for (int i=0; i<result.getParameters().length; i++) {
+				  if (result.getParameters()[i] != null) {
+					  if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
+						  methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+						  break; //first TUID: parameter is used
+					  }
+				  }
+			}
+			if (!methodUID.isEmpty()) {
+				testName = methodUID + " - " + testName;
+			}
+		}
+		
+		return StringEscapeUtils.escapeHtml4(appendTestMethodName(testName, result.getMethod()));
+	}
+	
+	
+	public static String getCanonicalTestMethodName(ITestResult result)
+	{
+		String testMethodName = result.getMethod().getMethodName();
+		
+		//TODO: remove test method name map as soon as possible
+		@SuppressWarnings("unchecked")
+		Map<Object[], String> testMethodNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP);
+		
+		if (testMethodNameMap != null) {
+			String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));			
+			if (testMethodNameMap.containsKey(testHash)) {
+				LOGGER.error("Error message to check how often this feature is used.");
+				testMethodName = testMethodNameMap.get(testHash);
+			}
+		}
+		
+		return StringEscapeUtils.escapeHtml4(testMethodName); 
+	}
+	
+	public static String getPackageName(ITestResult result)
+	{
+		return StringEscapeUtils.escapeHtml4(result.getMethod().getRealClass().getPackage().getName());
+	}
+	
+	public static String appendTestMethodName(String testName, ITestNGMethod m)
+	{
+		int invocationID = -1;
+		if (m.getInvocationCount() > 1)
+		{
+			invocationID = m.getCurrentInvocationCount() + 1;
+		}
+
+		if (invocationID != -1)
+		{
+			// TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
+			testName = testName + " - " + m.getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
+		} else
+		{
+			testName = testName + " - " + m.getMethodName();
+		}
+
+		return StringEscapeUtils.escapeHtml4(testName);
+	}
+
+
 }
+

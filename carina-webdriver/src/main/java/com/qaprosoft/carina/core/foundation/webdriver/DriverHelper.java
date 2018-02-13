@@ -1,18 +1,18 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
@@ -45,6 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
@@ -720,6 +722,8 @@ public class DriverHelper {
 		// stability issues
 		try {
 			drv.manage().window().maximize();
+		} catch (WebDriverException e) {
+			LOGGER.debug(e.getMessage(), e);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		}
@@ -756,25 +760,11 @@ public class DriverHelper {
 	 */
 
 	public void pause(long timeout) {
-	        LOGGER.info("Will wait for " + timeout + " seconds");
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	        LOGGER.info("Pause is overed. Keep going..");
+		CommonUtils.pause(timeout);
 	}
 
 	public void pause(Double timeout) {
-	        LOGGER.info("Will wait for " + timeout + " seconds");
-		try {
-			timeout = timeout * 1000;
-			long miliSec = timeout.longValue();
-			Thread.sleep(miliSec);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		LOGGER.info("Pause is overed. Keep going..");
+		CommonUtils.pause(timeout);
 	}
 
 	/**
@@ -847,7 +837,7 @@ public class DriverHelper {
 	 *            before refresh.
 	 */
 	public void refresh(long timeout) {
-		pause(timeout);
+		CommonUtils.pause(timeout);
 		refresh();
 	}
 
@@ -1416,16 +1406,15 @@ public class DriverHelper {
 	}
 
 	protected WebDriver getDriver() {
-		if (driver != null && !driver.toString().contains("null")) {
+		if (DriverPool.isValid(driver)) {
 			return driver;
 		}
+		
 		LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
 		
-		long currentThreadId = Thread.currentThread().getId();
-		if (driver == null || driver.toString().contains("null")) {
-			driver = DriverPool.getDriver();
-		}
+		driver = DriverPool.getDriver();
 		if (driver == null) {
+			long currentThreadId = Thread.currentThread().getId();
 			LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
 			throw new RuntimeException("Driver isn't initialized.");
 		}

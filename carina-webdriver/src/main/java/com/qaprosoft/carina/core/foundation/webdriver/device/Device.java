@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import java.io.File;
@@ -24,6 +39,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExec
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Platform;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.ProcessBuilderExecutor;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 
@@ -67,12 +83,56 @@ public class Device extends RemoteDevice
 	
 	public Device(Capabilities capabilities)
 	{
-		setName(capabilities.getCapability("deviceName").toString());
-		setType(capabilities.getCapability("deviceType").toString());
-		setOs(capabilities.getCapability("platformName").toString());
-		setOsVersion(capabilities.getCapability("platformVersion").toString());
-		setUdid(capabilities.getCapability("udid").toString());
+		// 1. read from CONFIG and specify if any: capabilities.deviceName, capabilities.device (browserstack notation)
+		// 2. read from capabilities object and set if if it is not null
+		String deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
+		if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_NAME).isEmpty()) {
+			deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_NAME);
+		}
+		if (capabilities.getCapability("deviceName") != null) {
+			deviceName = capabilities.getCapability("deviceName").toString();
+		}
+		if (capabilities.getCapability("deviceModel") != null) {
+			//deviceModel is returned from capabilities with name of device for local appium runs
+			deviceName = capabilities.getCapability("deviceModel").toString();
+		}
+		setName(deviceName);
+		
+		
+		// TODO: should we register default device type as phone?
+		String deviceType = SpecialKeywords.PHONE;
+		if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE).isEmpty()) {
+			deviceType = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_TYPE);
+		}
+		if (capabilities.getCapability("deviceType") != null) {
+			deviceType = capabilities.getCapability("deviceType").toString();
+		}
+		setType(deviceType);
+		
+		
+		setOs(Configuration.getPlatform());
+		
+		String platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION);
+		if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
+			platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION);
+		}
+		if (capabilities.getCapability("platformVersion") != null) {
+			platformVersion = capabilities.getCapability("platformVersion").toString();
+		}
+
+		
+		setOsVersion(platformVersion);
+		
+
+		String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
+		if (capabilities.getCapability("udid") != null) {
+			deviceUdid = capabilities.getCapability("udid").toString();
+		}
+
+		setUdid(deviceUdid);
 	}
+	
+	
 	
 	public boolean isPhone()
 	{
@@ -91,6 +151,11 @@ public class Device extends RemoteDevice
 
 	public Type getDeviceType()
 	{
+		if (isNull()) {
+			//if no device initialized it means that desktop UI automation is used
+			return Type.DESKTOP;
+		}
+		
 		if (getOs().equalsIgnoreCase(SpecialKeywords.ANDROID))
 		{
 			if (isTablet())
@@ -133,7 +198,7 @@ public class Device extends RemoteDevice
 		LOGGER.info("adb connect " + getRemoteURL());
 		String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
 		executor.execute(cmd);
-		pause(1);
+		CommonUtils.pause(1);
 		
 		String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
 		executor.execute(cmd2);
@@ -302,7 +367,7 @@ public class Device extends RemoteDevice
 					"keyevent", "26");
             executor.execute(cmd);
 
-            pause(5);
+            CommonUtils.pause(5);
 
             screenState = getScreenState();
             if (screenState) {
@@ -338,7 +403,7 @@ public class Device extends RemoteDevice
                     "input", "keyevent", "26");
             executor.execute(cmd);
 
-            pause(5);
+            CommonUtils.pause(5);
             // verify that screen is Off now
             screenState = getScreenState();
             if (!screenState) {
@@ -362,13 +427,7 @@ public class Device extends RemoteDevice
 	}
     
     public void pause(long timeout) {
-	LOGGER.info("Will wait for " + timeout + " seconds");
-        try {
-            Thread.sleep(timeout * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-	LOGGER.info("Pause is overed. Keep going..");
+    	CommonUtils.pause(timeout);
     }
     
     public void clearAppData() {

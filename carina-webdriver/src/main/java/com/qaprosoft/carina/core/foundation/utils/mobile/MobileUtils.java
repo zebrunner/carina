@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
 import java.time.Duration;
@@ -32,7 +47,7 @@ public class MobileUtils {
     protected static final int MINIMUM_TIMEOUT = 2;
 
     private static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
-    private static final int DEFAULT_MAX_SWIPE_COUNT = 5;
+    private static final int DEFAULT_MAX_SWIPE_COUNT = 50;
     
     
     
@@ -349,14 +364,16 @@ public class MobileUtils {
     	Dimension scrSize = drv.manage().window().getSize();
     	LOGGER.debug("Finished driver dimension size...");
     	//explicitly limit range of coordinates
-    	if (endx > startx) {
-    		endx = Math.max(endx, scrSize.width - 1);
+    	if (endx > scrSize.width) {
+    		LOGGER.warn("endx coordinate is bigger then device width! It will be limited!");
+    		endx = scrSize.width - 1;
     	} else {
     		endx = Math.max(1, endx);
     	}
     	
-    	if (endy > starty) {
-    		endy = Math.max(endy, scrSize.height - 1);
+    	if (endy > scrSize.height) {
+    		LOGGER.warn("endy coordinate is bigger then device height! It will be limited!");
+    		endy = scrSize.height;
     	} else {
     		endy = Math.max(1, endy);
     	}
@@ -495,5 +512,69 @@ public class MobileUtils {
     public static void swipeDown(final int duration) {
         LOGGER.info("Swipe down will be executed.");
         swipeInDevice(null, Direction.DOWN, duration);
+    }
+
+    /**
+     * Swipe left several times
+     * 
+     * @param times int
+     * @param duration int
+     */
+    public static void swipeLeft(final int times, final int duration) {
+        for (int i = 0; i < times; i++) {
+            swipeLeft(duration);
+        }
+    }
+
+    /**
+     * Swipe left
+     * 
+     * @param duration int
+     */
+    public static void swipeLeft(final int duration) {
+        LOGGER.info("Swipe left will be executed.");
+        swipeLeft(null, duration);
+    }  
+
+    /**
+     * Swipe left in container
+     * 
+     * @param duration int
+     */
+    public static void swipeLeft(ExtendedWebElement container, final int duration) {
+        LOGGER.info("Swipe left will be executed.");
+        swipeInDevice(container, Direction.LEFT, duration);
+    }
+
+    /**
+     * Swipe right several times
+     * 
+     * @param times int
+     * @param duration int
+     */
+    public static void swipeRight(final int times, final int duration) {
+        for (int i = 0; i < times; i++) {
+            swipeRight(duration);
+        }
+    }
+
+    /**
+     * Swipe right
+     * 
+     * @param duration int
+     */
+    public static void swipeRight(final int duration) {
+        LOGGER.info("Swipe right will be executed.");
+        swipeRight(null, duration);
+    }
+
+    /**
+     * Swipe right in container
+     * 
+     * @param duration int
+     */
+    public static void swipeRight(ExtendedWebElement container, final int duration) {
+        LOGGER.info("Swipe right will be executed.");
+        swipeInDevice(container, Direction.RIGHT, duration);
     }
 }

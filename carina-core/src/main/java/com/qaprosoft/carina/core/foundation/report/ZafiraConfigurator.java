@@ -1,4 +1,27 @@
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
@@ -18,14 +41,6 @@ import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -35,7 +50,6 @@ import java.util.Set;
 public class ZafiraConfigurator implements IConfigurator
 {
 	protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
-    private List<String> uniqueKeys = Arrays.asList(R.CONFIG.get("unique_testrun_fields").split(","));
     
     @Override
     public ConfigurationType getConfiguration()
@@ -47,6 +61,7 @@ public class ZafiraConfigurator implements IConfigurator
         }
 
         if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
+        	//TODO: review and fix for 5.2.2.xx implementation
             // add custom arguments from browserStack
             conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
@@ -65,7 +80,7 @@ public class ZafiraConfigurator implements IConfigurator
 			conf.getArg().add(buildArgumentType("platform", deviceOs));
 			conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
 			
-			LOGGER.info("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
+			LOGGER.debug("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
 		} else {
 			LOGGER.debug("Unable to detect current device for threadId: " + threadId);
 		}
@@ -78,7 +93,6 @@ public class ZafiraConfigurator implements IConfigurator
         arg.setKey(key);
         //populate valid null values for all arguments
         arg.setValue("NULL".equalsIgnoreCase(value) ? null : value);
-        arg.setUnique(uniqueKeys.contains(key));
         return arg;
     }
 

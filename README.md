@@ -1,6 +1,8 @@
+![Alt text](./carina_logo.png "Carina Logo")
+
 Carina Automation Framework
 ==================
-Carina is Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB appications, REST services, Databases.
+Carina is Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
 * Carina framework is built on the top of most popular open-source solutions like Selenium, Appium, TestNG which reduces dependability on specific technology stack.
 
@@ -12,7 +14,10 @@ Carina is Java-based test automation framework that unites all testing layers: M
 
 * API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses dynamically changed by incoming arguments. 
 
-[TRY DEMO PROJECT](https://github.com/qaprosoft/carina-demo)
+![Alt text](./carina.svg "Carina Overview")
+
+<B>[TRY DEMO PROJECT NOW](https://github.com/qaprosoft/carina-demo)</B>
+
 
 ## Сontents
 * [Initial setup](#initial-setup)
@@ -34,7 +39,7 @@ Carina is Java-based test automation framework that unites all testing layers: M
 * Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
 
 ### Generating project
-The easiest way to initialize new project is to you Carina archetype, you will get correct project structure along with test sample, use Carina archetype to generate your project:
+The easiest way to initialize new project is to use Carina archetype, you will get correct project structure along with test samples:
 ```
 mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
@@ -146,6 +151,10 @@ R.DATABASE.get("db.url")
 R.EMAIL.get("title")
 R.TESTDATA.get("user.email")
 ```
+Default config properties can be obtained by 
+```
+Configuration.get(Parameter.EXTRA_CAPABILITIES)
+```
 
 All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of parameters:
 <table> 
@@ -159,13 +168,13 @@ All project configuration properties are located in **_config.properties** file.
 		<td>url</td>
 		<td>Base application URL</td>
 		<td>{must_override}</td>
-		<td>http://carina.com/</td>
+		<td>http://qaprosoft.com</td>
 	</tr>
 	<tr>
 		<td>browser</td>
 		<td>Browser for testing</td>
 		<td>chrome</td>
-		<td>chrome / firefox / iexplore</td>
+		<td>chrome / firefox / safari / iexplore</td>
 	</tr>
 	<tr>
 		<td>selenium_host</td>
@@ -175,15 +184,21 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>app_version</td>
-		<td>Application version for reporting</td>
+		<td>Application version/build number for reporting</td>
 		<td>n/a</td>
-		<td>Carina Release 1.2.5</td>
+		<td>1.2.5</td>
 	</tr>
 	<tr>
 		<td>locale</td>
-		<td>Locale for testing</td>
-		<td>US</td>
-		<td>GB,DE,FR</td>
+		<td>Locale for using L10N feature. Enabled when enable_l10n=true</td>
+		<td>en_US</td>
+		<td>en_GB,de_DE,fr_FR</td>
+	</tr>
+	<tr>
+		<td>language</td>
+		<td>Language for i18n defature. Enabled when enable_i18n=true</td>
+		<td>en_US</td>
+		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
 		<td>implicit_timeout</td>
@@ -192,34 +207,28 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Integer</td>
 	</tr>
 	<tr>
-		<td>retry_timeout</td>
-		<td>Timeout between calling HTML DOM for the element</td>
+		<td>retry_internal</td>
+		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify number from 500-1500 range</td>
 		<td>2</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_screenshot</td>
-		<td>Global switch for taking screenshots</td>
+		<td>Global switch for taking screenshots. When disabled only failures will be captured</td>
 		<td>true</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
-		<td>take_only_fail_screenshot</td>
-		<td>Take only one screenshot of failed step</td>
-		<td>false</td>
-		<td>Boolean</td>
-	</tr>
-	<tr>
 		<td>keep_all_screenshots</td>
-		<td>Keep screenshots even for passed tests</td>
+		<td>Keep screenshots artifacts even for passed tests.</td>
 		<td>false</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>report_url</td>
-		<td>Direct HTTP link to Jenkins workspace report folder</td>
+		<td>Direct HTTP link to Jenkins workspace report folder. Automatically specified by CI</td>
 		<td>n/a</td>
-		<td>http://localhost:8888/job/my project/ws/reports/screenshots</td>
+		<td>http://localhost:8888/job/my_project/1/eTAF_Report</td>
 	</tr>
 	<tr>
 		<td>max_screen_history</td>
@@ -241,27 +250,15 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>sender_email</td>
-		<td>Gmail account for reports sending</td>
+		<td>Email account for reports sending. <br><b>Note:</b> Gmail smtp settings are used by default. Update _email.properties to use your own SMTP server</td>
 		<td>{must_override}</td>
-		<td>carina.qareport</td>
+		<td>carina.qareport@qaprosoft.com</td>
 	</tr>
 	<tr>
 		<td>sender_pswd</td>
-		<td>Gmail password for reports sending</td>
+		<td>Email password for reports sending</td>
 		<td>{must_override}</td>
 		<td>pwd123</td>
-	</tr>
-	<tr>
-		<td>jenkins_url</td>
-		<td>Jenkins URL for job reference in report</td>
-		<td>NULL</td>
-		<td>http://localhost:8080</td>
-	</tr>
-	<tr>
-		<td>jenkins_job</td>
-		<td>Name of Jenkins job for the reference in report</td>
-		<td>NULL</td>
-		<td>carina-demo</td>
 	</tr>
 </table>
 
@@ -290,7 +287,7 @@ As a result you switch between environments just changing env argument in _confi
 ### Execution
 There are a few options to execute the test, you may run test suite from Eclipse IDE or initiate test execution from the console using the Maven Surefire plugin built into the Carina framework. Before running tests make sure you downloaded selenium standalone server jar file and started it by the following command:
 ```
-java -jar selenium-server-standalone-2.53.0.jar
+java -jar selenium-server-standalone-3.6.0.jar
 ```
 
 To run the test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
@@ -305,13 +302,39 @@ mvn clean -Dsuite=api test
 ```
 
 ## Web UI automation
-TODO
+In the table below we are providing description for most important WEB parameters:
+<table> 
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+                <th>Default value</th>
+		<th>Example</th>
+	</tr>
+	<tr>
+		<td>browser</td>
+		<td>Browser for testing</td>
+		<td>chrome</td>
+		<td>chrome / firefox / safari / iexplore</td>
+	</tr>
+	<tr>
+		<td>selenium_host</td>
+		<td>Selenium server host</td>
+		<td>{must_override}</td>
+		<td>http://localhost:4444/wd/hub</td>
+	</tr>
+	<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle. </td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+</table>
 
 ## Web services API automation
 TODO
 
 ## Mobile automation
-All project configuration properties are located in **_config.properties** file. In the table below we are providing description for the mobile project parametrs:
+We could provide any Appium capabilty in **_config.properties** file using <i>capabilities.< name >=< value ></i> format. In the table below we are providing description for the most popular mobile capabilities:
 
 <table> 
 	<tr>
@@ -321,63 +344,51 @@ All project configuration properties are located in **_config.properties** file.
 		<th>Example</th>
 	</tr>
         <tr>
-		<td>driver_type</td>
-		<td>Type of driver which is needed for automation</td>
-                <td>{must_override}</td>
-		<td>mobile</td>
-	</tr>
-        <tr>
-		<td>mobile_device_name</td>
+		<td>capabilities.deviceName</td>
 		<td>Device name for report</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>Sumsung_Galaxy_J5</td>
 	</tr>
         <tr>
-		<td>mobile_device_type</td>
-		<td>Type of device</td>
-                <td>{must_override}</td>
-		<td>phone</td>
+		<td>capabilities.deviceType</td>
+		<td>The only custom carina capability to detmine type of device</td>
+                <td>n/a</td>
+		<td>phone/tablet/tv...</td>
 	</tr>
         <tr>
-		<td>mobile_devices</td>
-		<td>Information about using device, divided by ";" for different devices and "|" for different parametrs</td>
-                <td>{must_override}</td>
-		<td>;Sumsung J5|phone|ANDROID|5.1|759b543c|http://localhost:4723/wd/hub</td>
+		<td>capabilities.platformName</td>
+		<td>Name of mobile platform</td>
+                <td>n/a</td>
+		<td>Android/iOS/AndroidTV/tvOS</td>
 	</tr>
         <tr>
-		<td>mobile_platform_name</td>
-		<td>Name of using mobile platform</td>
-                <td>{must_override}</td>
-		<td>Android/iOS</td>
-	</tr>
-        <tr>
-		<td>mobile_platform_version</td>
+		<td>capabilities.platformVersion</td>
 		<td>Version of mobile platform</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>6.0.1</td>
 	</tr>
         <tr>
-		<td>mobile_automation_name</td>
+		<td>capabilities.automationName</td>
 		<td>Name of programm using for automation</td>
-                <td>{must_override}</td>
-		<td>Appium</td>
+                <td>n/a</td>
+		<td>Appium/uiautomator2/XCUITest</td>
 	</tr>
         <tr>
-		<td>mobile_app</td>
-		<td>Path application which is tested, should be the same as in Appium settings</td>
-                <td>{must_override}</td>
+		<td>capabilities.app</td>
+		<td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading...</td>
+                <td>n/a</td>
 		<td>D:/application.apk</td>
 	</tr>
         <tr>
-		<td>mobile_app</td>
+		<td>capabilities.newCommandTimeout</td>
 		<td>New implicit timeout in seconds to wait for element for mobile automation</td>
-                <td>120</td>
+                <td>n/a</td>
 		<td>180</td>
 	</tr>
         <tr>
-		<td>mobile_device_udid</td>
+		<td>capabilities.udid</td>
 		<td>Unique Device ID</td>
-                <td>{must_override}</td>
+                <td>n/a</td>
 		<td>759b543c</td>
 	</tr>
 </table>
@@ -385,30 +396,25 @@ All project configuration properties are located in **_config.properties** file.
 ### For Android:
 ```
 #=============== Android Mobile ======================#
-mobile_devices=;Sumsung Galaxy J5|phone|ANDROID|5.1|192.168.56.101:5555|http://localhost:4723/wd/hub
-mobile_device_type=phone
-mobile_device_name=Sumsung Galaxy J5
-mobile_platform_name=Android
-mobile_platform_version=5.1.1
-mobile_browser_name=NULL
-mobile_automation_name=Appium
-mobile_app=D:/application1.apk
-mobile_new_command_timeout=180
-mobile_device_udid=759b543c
+capabilities.deviceName=Samsung_Galaxy_J5
+capabilities.app=s3://qaprosoft.com/android/myapk.*-release.apk
+capabilities.skipUnlock=true
+capabilities.noSign=true
+capabilities.automationName=uiautomator2
+capabilities.newCommandTimeout=180
+capabilities.platformName=ANDROID
+capabilities.autoGrantPermissions=true
 #=====================================================#
 ```
 
 ### For iOS:
 ```
 #=================== iOS Mobile ======================#
-mobile_devices=;iPhone 6|phone|iOS|9.3||http://0.0.0.0:4723/wd/hub
-mobile_device_name=iPhone 6
-mobile_platform_name=iOS
-mobile_platform_version=9.3
-#mobile_automation_name=Appium
-mobile_app=/Users/administrator/Downloads/Record.app
-mobile_new_command_timeout=180
-mobile_device_udid=4addd1a575612c6036012dc9f83b925aa11e115a
+capabilities.autoAcceptAlerts=true
+capabilities.app=/opt/apk/my-apk.app
+capabilities.automationName=XCUITest
+capabilities.newCommandTimeout=180
+capabilities.platformName=IOS
 #=====================================================#
 ```
 

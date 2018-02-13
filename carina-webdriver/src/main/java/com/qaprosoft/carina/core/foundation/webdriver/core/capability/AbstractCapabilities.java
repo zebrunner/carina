@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
 import java.util.Arrays;
@@ -48,20 +63,11 @@ public abstract class AbstractCapabilities {
 		// add capabilities based on dynamic _config.properties variables
 		capabilities = initCapabilities(capabilities);
 		
-		//handle variant with extra capabilities from external property file
-    	DesiredCapabilities extraCapabilities = getExtraCapabilities(); 	
-    			
-    	if (extraCapabilities != null) {
-    		capabilities.merge(extraCapabilities);
-    	}
-    	
         return capabilities;
     }
     
 	protected DesiredCapabilities initCapabilities(DesiredCapabilities capabilities) {
 		// read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
-
-		// read all properties from config.properties and use "capabilities.*" to redefine capability
 		final String prefix = SpecialKeywords.CAPABILITIES + ".";
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
@@ -79,18 +85,6 @@ public abstract class AbstractCapabilities {
 	}
 	
 
-    protected DesiredCapabilities getExtraCapabilities() {
-		//handle variant with extra capabilities from external property file
-    	String extraCapabilitiesFile = Configuration.get(Parameter.EXTRA_CAPABILITIES);
-    	DesiredCapabilities extraCapabilities = null;
-    	if (!extraCapabilitiesFile.isEmpty()) {
-    		LOGGER.info("Append extra Capabilities from '" + extraCapabilitiesFile + "' to desired capabilities");
-    		extraCapabilities = new CapabilitiesLoder().loadCapabilities(extraCapabilitiesFile);
-    	}
-    	
-    	return extraCapabilities;
-    }
-    
     protected Proxy setupProxy() {
 		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
 		String proxyPort = Configuration.get(Parameter.PROXY_PORT);

@@ -1,18 +1,18 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.jira;
 
 import java.lang.reflect.Method;
@@ -130,7 +130,13 @@ public class Jira
 		}
 		if(result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
 			tickets.clear();
-			tickets.add(result.getMethod().getDescription().split("#")[1].trim()); 
+			String description = null;
+			try {
+				description = result.getMethod().getDescription();
+				tickets.add(description.split("#")[1].trim()); 
+			} catch (Exception e) {
+				LOG.error("Incorrect Jira-ticket format: " + description, e);
+			}			
 		}
 
 		@SuppressWarnings("unchecked")

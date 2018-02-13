@@ -1,18 +1,18 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.awt.image.BufferedImage;
@@ -246,38 +246,34 @@ public class Screenshot
 	public static String captureMetadata(WebDriver driver, String screenName) {
 
 		String screenPath = "";
-		if (!DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
-			if (driver == null) {
-				LOGGER.warn("Unable to capture screenshot as driver is null.");
-				return null;
-			}
-			if (driver.toString().contains("null")) {
-				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
-				return null;
-			}
-
-			try {
-				screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
-
-				WebDriver augmentedDriver = driver;
-				if (!driver.toString().contains("AppiumNativeDriver")) {
-					// do not augment for Appium 1.x anymore
-					augmentedDriver = new DriverAugmenter().augment(driver);
-				}
-				
-				BufferedImage screen;
-
-				//Create screenshot
-				screen = takeVisibleScreenshot(driver, augmentedDriver);
-
-				ImageIO.write(screen, "PNG", new File(screenPath));
-
-			} catch (IOException e) {
-				LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-			} catch (Exception e) {
-				LOGGER.error("Unable to capture screenshot!", e);
-			}
+			
+		if (!DriverPool.isValid(driver)) {
+			LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
+			return null;
 		}
+		
+		try {
+			screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
+
+			WebDriver augmentedDriver = driver;
+			if (!driver.toString().contains("AppiumNativeDriver")) {
+				// do not augment for Appium 1.x anymore
+				augmentedDriver = new DriverAugmenter().augment(driver);
+			}
+			
+			BufferedImage screen;
+
+			//Create screenshot
+			screen = takeVisibleScreenshot(driver, augmentedDriver);
+
+			ImageIO.write(screen, "PNG", new File(screenPath));
+
+		} catch (IOException e) {
+			LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+		} catch (Exception e) {
+			LOGGER.error("Unable to capture screenshot!", e);
+		}
+
 		return screenPath;
 	}
 	
@@ -301,12 +297,8 @@ public class Screenshot
 		// TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
 		// For the rest of cases returned previous implementation
 
-		if (isTakeScreenshot && !DriverFactory.HTML_UNIT.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
-			if (driver == null) {
-				LOGGER.warn("Unable to capture screenshot as driver is null.");
-				return null;
-			}
-			if (driver.toString().contains("null")) {
+		if (isTakeScreenshot) {
+			if (!DriverPool.isValid(driver)) {
 				LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
 				return null;
 			}
@@ -444,11 +436,15 @@ public class Screenshot
 	 */
 	private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
 		BufferedImage screenShot;
-		if (driver.getClass().toString().contains("java_client") || 
-				Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+		if (driver.getClass().toString().contains("java_client")) {
+			//Mobile Native app
 			File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
 			screenShot = ImageIO.read(screenshot);
+		} else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+			//Mobile web
+			screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
 		} else {
+			//regular web
 			ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
 					.shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
 			screenShot = screenshot.getImage();

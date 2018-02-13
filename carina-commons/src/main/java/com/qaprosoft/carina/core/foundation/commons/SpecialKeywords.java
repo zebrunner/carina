@@ -1,18 +1,18 @@
-/*
- * Copyright 2013-2015 QAPROSOFT (http://qaprosoft.com/).
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.commons;
 
 /**
@@ -52,7 +52,7 @@ public class SpecialKeywords
 	public static final String EXCEL_DS_FILE = "{excel_ds_file}";
 	@Deprecated
 	public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
-	@Deprecated
+	
 	public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
 	public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
 	public static final String DS_ARGS = "{ds_args}";
@@ -105,8 +105,6 @@ public class SpecialKeywords
 	public static final String PHONE = "phone";
 	public static final String TV = "tv";
 	
-	public static final String CORE = "core";
-	
 	public static final String PASSED = "PASSED";
 	public static final String FAILED = "FAILED";
 	public static final String SKIPPED = "SKIPPED";
@@ -135,9 +133,11 @@ public class SpecialKeywords
 	public static final String CAPABILITIES = "capabilities";
 	public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
 	public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
+	public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
 	public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
 	public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
 	public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";
+	public static final String MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";
 	public static final String MOBILE_DEVICE_REMOTE_URL = "capabilities.remoteURL";
 	public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
 	public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";

@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.qaprosoft.amazon;
 
 import java.io.File;
@@ -26,6 +41,7 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public class AmazonS3Manager {
 	protected static final Logger LOGGER = Logger
@@ -335,7 +351,7 @@ public class AmazonS3Manager {
 			// You can poll your transfer's status to check its progress
 			while (!appDownload.isDone()) {
 				LOGGER.info("		transferred: " +(int) (appDownload.getProgress().getPercentTransferred() + 0.5) + "%" );
-				pause(pollingInterval);
+				CommonUtils.pause(pollingInterval);
 			}
 			LOGGER.info("	State: " + appDownload.getState());
 			//appDownload.waitForCompletion();
@@ -382,16 +398,4 @@ public class AmazonS3Manager {
 	 * 
 	 * System.out.println("    " + line); } }
 	 */
-
-	
-	private void pause(long timeout) {
-		LOGGER.info("Will wait for " + timeout + " seconds");
-		try {
-			Thread.sleep(timeout * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		LOGGER.info("Pause is overed. Keep going..");
-	}
-
 }
