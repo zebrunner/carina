@@ -1276,21 +1276,26 @@ public class ExtendedWebElement {
     public ExtendedWebElement format(Object... objects) {
         String locator = by.toString();
         By by = null;
+
         if (locator.startsWith("By.id: ")) {
             by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
         }
+
         if (locator.startsWith("By.name: ")) {
             by = By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
         }
+
         if (locator.startsWith("By.xpath: ")) {
             by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
         if (locator.startsWith("linkText: ")) {
             by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
         }
+
         if (locator.startsWith("partialLinkText: ")) {
             by = By.linkText(String.format(StringUtils.remove(locator, "partialLinkText: "), objects));
         }
+
         if (locator.startsWith("css: ")) {
             by = By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
         }
@@ -1300,7 +1305,7 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("By.xpath: **")) {
-            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: **"), objects));
+            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
 
         return new ExtendedWebElement(null, name, by, driver);
