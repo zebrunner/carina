@@ -1300,7 +1300,7 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("By.xpath: **")) {
-            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: **: "), objects));
+            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: **"), objects));
         }
 
         return new ExtendedWebElement(null, name, by, driver);
