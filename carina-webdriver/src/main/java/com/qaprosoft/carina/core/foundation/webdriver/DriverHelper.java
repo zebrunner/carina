@@ -33,7 +33,6 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
@@ -717,15 +716,6 @@ public class DriverHelper {
 			drv.get(decryptedURL);
 		} catch (UnhandledAlertException e) {
 			drv.switchTo().alert().accept();
-		}
-		// AUTO-250 tweak core to start browser in maximized mode - to prevent
-		// stability issues
-		try {
-			drv.manage().window().maximize();
-		} catch (WebDriverException e) {
-			LOGGER.debug(e.getMessage(), e);
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
 		}
 
 		String msg = Messager.OPEN_URL.info(url);
