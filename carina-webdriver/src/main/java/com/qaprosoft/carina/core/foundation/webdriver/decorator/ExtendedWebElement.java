@@ -1304,6 +1304,10 @@ public class ExtendedWebElement {
             by = By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
         }
 
+        /*
+         * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
+         */
+
         if (locator.startsWith("By.xpath: **")) {
             by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
