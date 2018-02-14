@@ -69,6 +69,8 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
+import io.appium.java_client.MobileBy;
+
 //TODO: [VD] removed deprecated constructor and DriverPool import
 // Also refactor screenshots capturing using listener approach to be able to remove it as well
 public class ExtendedWebElement {
@@ -1274,26 +1276,40 @@ public class ExtendedWebElement {
     public ExtendedWebElement format(Object... objects) {
         String locator = by.toString();
         By by = null;
+
         if (locator.startsWith("By.id: ")) {
             by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
         }
+
         if (locator.startsWith("By.name: ")) {
             by = By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
         }
+
         if (locator.startsWith("By.xpath: ")) {
             by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
         if (locator.startsWith("linkText: ")) {
             by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
         }
+
         if (locator.startsWith("partialLinkText: ")) {
             by = By.linkText(String.format(StringUtils.remove(locator, "partialLinkText: "), objects));
         }
+
         if (locator.startsWith("css: ")) {
             by = By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
         }
+
         if (locator.startsWith("tagName: ")) {
             by = By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
+        }
+
+        /*
+         * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
+         */
+
+        if (locator.startsWith("By.xpath: **")) {
+            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
 
         return new ExtendedWebElement(null, name, by, driver);
