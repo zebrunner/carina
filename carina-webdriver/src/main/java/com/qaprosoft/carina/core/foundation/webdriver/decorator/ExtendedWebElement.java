@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -1123,15 +1122,6 @@ public class ExtendedWebElement {
             extendedWebElements.add(new ExtendedWebElement(element, name, driver));
         }
         return extendedWebElements;
-    }
-
-    public void tapWithCoordinates(double x, double y) {
-        HashMap<String, Double> tapObject = new HashMap<String, Double>();
-        tapObject.put("x", x);
-        tapObject.put("y", y);
-        final WebDriver drv = getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) drv;
-        js.executeScript("mobile: tap", tapObject);
     }
 
     public void waitUntilElementNotPresent(final long timeout) {
