@@ -98,7 +98,7 @@ Generate Eclipse workspace using command:
 ```
 mvn clean eclipse:eclipse
 ```
-Now you are ready to import project into eclipse.
+Now you are ready to import project into Eclipse.
 
 ![Eclipse view](https://github.com/qaprosoft/carina-demo/blob/gh-pages/img/001-Initial-setup.png?raw=true)
 
@@ -271,7 +271,7 @@ Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 
 ### Environment specific configuration
-In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need specify the following properties in _config.properties:
+In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
 ```
 env=DEMO
 STAG.url=http://stag-app-server.com
@@ -422,7 +422,7 @@ capabilities.platformName=IOS
 
 ExtendedWebElement is an extended version of selenium WebElement which you can find in org.openqa.selenium package. The best thing in using ExtendedWebElement is that you can use both old methods of WebElement and new more convenient Carina methods.
 
-The easeast way to find ExtendedWebElement is using annotation @FindBy. The @FindBy annotation is used to locate one or more ExtendedWebElements using a single criterion. The list of criteria is standard:
+The easiest way to find ExtendedWebElement is using annotation @FindBy. The @FindBy annotation is used to locate one or more ExtendedWebElements using a single criterion. The list of criteria is standard:
 * className
 * css
 * how...using
