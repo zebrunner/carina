@@ -573,6 +573,14 @@ And then after adding files (`git add` ...) use `git commit` (add description) a
     
 And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "Compare & Pull Request"
 
+## Code formatter
+We propose to use our configured java code formatter for Eclipse. 
+It is available here [https://github.com/qaprosoft/carina/carina_formatter.xml](https://github.com/qaprosoft/carina/carina_formatter.xml)
+
+To use same formatter in IntelliJ IDEA you should install[**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter)
+
+And configure it.
+
 ## License
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 

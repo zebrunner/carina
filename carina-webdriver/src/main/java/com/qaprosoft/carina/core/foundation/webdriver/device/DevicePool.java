@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,54 +17,48 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import org.apache.log4j.Logger;
 
-public class DevicePool
-{
-	private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
+public class DevicePool {
+    private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
 
-	private static final Device nullDevice = new Device();
-	
-	private static ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
+    private static final Device nullDevice = new Device();
 
+    private static ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
 
-	public static Device registerDevice(Device device) {
-		//register current device to be able to transfer it into Zafira at the end of the test
-		setDevice(device);
-		Long threadId = Thread.currentThread().getId();
-		LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
+    public static Device registerDevice(Device device) {
+        // register current device to be able to transfer it into Zafira at the end of the test
+        setDevice(device);
+        Long threadId = Thread.currentThread().getId();
+        LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
-		return device;
-	}
-	
-	public static void deregisterDevice()
-	{
-		currentDevice.remove();
-	}
+        return device;
+    }
 
-	
-	public static Device getDevice()
-	{
-		long threadId = Thread.currentThread().getId();
-		Device device = currentDevice.get();
-		if (device == null) {
-			LOGGER.debug("Current device is null for thread: " + threadId);
-			device = nullDevice;
-		} else if (device.getName().isEmpty()) {
-			LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
-		} else {
-			LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
-		}
-		return device;
-	}
+    public static void deregisterDevice() {
+        currentDevice.remove();
+    }
 
-	public static Device getNullDevice() {
-		return nullDevice;
-	}
+    public static Device getDevice() {
+        long threadId = Thread.currentThread().getId();
+        Device device = currentDevice.get();
+        if (device == null) {
+            LOGGER.debug("Current device is null for thread: " + threadId);
+            device = nullDevice;
+        } else if (device.getName().isEmpty()) {
+            LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
+        } else {
+            LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
+        }
+        return device;
+    }
 
-	private static void setDevice(Device device) {
-		long threadId = Thread.currentThread().getId();
-		LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
-		currentDevice.set(device);
-	}
-	
+    public static Device getNullDevice() {
+        return nullDevice;
+    }
+
+    private static void setDevice(Device device) {
+        long threadId = Thread.currentThread().getId();
+        LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
+        currentDevice.set(device);
+    }
 
 }

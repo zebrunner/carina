@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ public class DisabledSslClientHttpRequestFactory extends SimpleClientHttpRequest
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
-            TrustManager[] trustManagerArray = {new NullX509TrustManager()};
+            TrustManager[] trustManagerArray = { new NullX509TrustManager() };
             try {
                 sslContext.init(null, trustManagerArray, null);
             } catch (KeyManagementException e) {
@@ -52,8 +52,8 @@ public class DisabledSslClientHttpRequestFactory extends SimpleClientHttpRequest
             ((HttpsURLConnection) connection).setHostnameVerifier(new NullHostnameVerifier());
         }
 
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", 8888));
-//        setProxy(proxy);
+        // Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", 8888));
+        // setProxy(proxy);
 
         super.prepareConnection(connection, httpMethod);
     }

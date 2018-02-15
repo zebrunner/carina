@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,13 +19,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
@@ -161,17 +155,18 @@ public class AndroidUtils extends MobileUtils {
             }
         }
     }
+
     /**
      * Hide keyboard if needed
      */
     public static void hideKeyboard() {
         try {
-        	((MobileDriver<?>) DriverPool.getDriver()).hideKeyboard();
+            ((MobileDriver<?>) DriverPool.getDriver()).hideKeyboard();
         } catch (Exception e) {
             LOGGER.info("Keyboard was already hided or error occurs: " + e);
         }
     }
-    
+
     public static void pressBack() {
         ((AndroidDriver<?>) DriverPool.getDriver()).pressKeyCode(AndroidKeyCode.BACK);
     }
@@ -201,9 +196,9 @@ public class AndroidUtils extends MobileUtils {
      * other devices and custom keyboards could be different.
      */
     public static void pressBottomRightKey() {
-    	WebDriver driver = DriverPool.getDriver();
-    	Dimension size = driver.manage().window().getSize();
-        int height =  size.getHeight();
+        WebDriver driver = DriverPool.getDriver();
+        Dimension size = driver.manage().window().getSize();
+        int height = size.getHeight();
         int width = size.getWidth();
 
         new TouchAction((AndroidDriver<?>) driver).tap(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue()).perform();
@@ -265,39 +260,46 @@ public class AndroidUtils extends MobileUtils {
 
         return status;
     }
-    
+
     public static boolean isChecked(final ExtendedWebElement element) {
-		return element.isElementPresent(5)
-				&& (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
+        return element.isElementPresent(5)
+                && (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }
 
     public enum SelectorType {
-        TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
+        TEXT,
+        TEXT_CONTAINS,
+        TEXT_STARTS_WITH,
+        ID,
+        DESCRIPTION,
+        DESCRIPTION_CONTAINS,
+        CLASS_NAME
     }
 
     /**
      * Scrolls into view in specified container by text only and return ExtendedWebElement
      *
-     * @param container  ExtendedWebElement     - works only with resourceId
+     * @param container ExtendedWebElement - works only with resourceId
      * @param scrollToElement String has to be id, className, text, contentDesc, etc
      * @return ExtendedWebElement
-     * <p>
-     * example of usage:
-     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab);
+     *         <p>
+     *         example of usage:
+     *         ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab);
      **/
     public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
-    	return scroll(scrollToElement, container, SelectorType.TEXT);
+        return scroll(scrollToElement, container, SelectorType.TEXT);
     }
+
     /**
      * Scrolls into view in specified container and return ExtendedWebElement
      *
-     * @param container  ExtendedWebElement     - works only with resourceId
+     * @param container ExtendedWebElement - works only with resourceId
      * @param scrollToElement String has to be id, className, text, contentDesc, etc
-     * @param selectorType  SelectorType can be TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
+     * @param selectorType SelectorType can be TEXT, TEXT_CONTAINS, TEXT_STARTS_WITH, ID, DESCRIPTION, DESCRIPTION_CONTAINS, CLASS_NAME
      * @return ExtendedWebElement
-     * <p>
-     * example of usage:
-     * ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab , AndroidUtils.SelectorType.TEXT);
+     *         <p>
+     *         example of usage:
+     *         ExtendedWebElement res = AndroidUtils.scroll("Hindi", genresTab , AndroidUtils.SelectorType.TEXT);
      **/
     public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container, SelectorType selectorType) {
 
@@ -306,39 +308,39 @@ public class AndroidUtils extends MobileUtils {
 
         String scrollableContainer = container.getBy().toString().replace("By.id:", "").trim();
         if (!scrollableContainer.contains("id/")) {
-        	Assert.fail("scrollable container should be pointed By.id!");
-        	//TODO: investigate possibility to read package of currently focues app 
-            //scrollableContainer = getCurrentFocusedApkPackageName() + ":id/" + scrollableContainer;
+            Assert.fail("scrollable container should be pointed By.id!");
+            // TODO: investigate possibility to read package of currently focues app
+            // scrollableContainer = getCurrentFocusedApkPackageName() + ":id/" + scrollableContainer;
         }
 
         String scrollViewContainer_finder = "new UiSelector().resourceId(\"" + scrollableContainer + "\")";
         String neededElement_finder = "";
 
         switch (selectorType) {
-            case TEXT:
-                neededElement_finder = "new UiSelector().text(\"" + scrollToElement + "\")";
-                break;
-            case TEXT_CONTAINS:
-                neededElement_finder = "new UiSelector().textContains(\"" + scrollToElement + "\")";
-                break;
-            case TEXT_STARTS_WITH:
-                neededElement_finder = "new UiSelector().textStartsWith(\"" + scrollToElement + "\")";
-                break;
-            case ID:
-                neededElement_finder = "new UiSelector().resourceId(\"" + scrollToElement + "\")";
-                break;
-            case DESCRIPTION:
-                neededElement_finder = "new UiSelector().description(\"" + scrollToElement + "\")";
-                break;
-            case DESCRIPTION_CONTAINS:
-                neededElement_finder = "new UiSelector().descriptionContains(\"" + scrollToElement + "\")";
-                break;
-            case CLASS_NAME:
-                neededElement_finder = "new UiSelector().className(\"" + scrollToElement + "\")";
-                break;
-            default:
-                LOGGER.info("Please provide valid selectorType for element to be found...");
-                break;
+        case TEXT:
+            neededElement_finder = "new UiSelector().text(\"" + scrollToElement + "\")";
+            break;
+        case TEXT_CONTAINS:
+            neededElement_finder = "new UiSelector().textContains(\"" + scrollToElement + "\")";
+            break;
+        case TEXT_STARTS_WITH:
+            neededElement_finder = "new UiSelector().textStartsWith(\"" + scrollToElement + "\")";
+            break;
+        case ID:
+            neededElement_finder = "new UiSelector().resourceId(\"" + scrollToElement + "\")";
+            break;
+        case DESCRIPTION:
+            neededElement_finder = "new UiSelector().description(\"" + scrollToElement + "\")";
+            break;
+        case DESCRIPTION_CONTAINS:
+            neededElement_finder = "new UiSelector().descriptionContains(\"" + scrollToElement + "\")";
+            break;
+        case CLASS_NAME:
+            neededElement_finder = "new UiSelector().className(\"" + scrollToElement + "\")";
+            break;
+        default:
+            LOGGER.info("Please provide valid selectorType for element to be found...");
+            break;
         }
 
         try {

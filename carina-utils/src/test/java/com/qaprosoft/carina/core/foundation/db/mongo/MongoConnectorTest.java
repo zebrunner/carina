@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,33 +20,25 @@ import java.util.regex.Pattern;
 
 import org.testng.annotations.Test;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 
 /**
  * Tests for {@link MongoConnector}
  */
-public class MongoConnectorTest
-{
-	@Test(expectedExceptions={RuntimeException.class})
-	public void testConfigValidation() throws NumberFormatException, UnknownHostException
-	{
-		MongoConnector.createClient();
-	}
-	
-	@Test(enabled=false)
-	public void testConnect() throws NumberFormatException, UnknownHostException
-	{
-		MongoClient mc = MongoConnector.createClient();
-		DB db = mc.getDB("lcdocs");
-		DBCollection collection = db.getCollection("statements.files");
-		DBCursor cursor = collection.find(new BasicDBObject("filename", Pattern.compile("/.*278174.*/")));
-		while (cursor.hasNext())
-		{
-			collection.remove(cursor.next());
-		}
-	}
+public class MongoConnectorTest {
+    @Test(expectedExceptions = { RuntimeException.class })
+    public void testConfigValidation() throws NumberFormatException, UnknownHostException {
+        MongoConnector.createClient();
+    }
+
+    @Test(enabled = false)
+    public void testConnect() throws NumberFormatException, UnknownHostException {
+        MongoClient mc = MongoConnector.createClient();
+        DB db = mc.getDB("lcdocs");
+        DBCollection collection = db.getCollection("statements.files");
+        DBCursor cursor = collection.find(new BasicDBObject("filename", Pattern.compile("/.*278174.*/")));
+        while (cursor.hasNext()) {
+            collection.remove(cursor.next());
+        }
+    }
 }

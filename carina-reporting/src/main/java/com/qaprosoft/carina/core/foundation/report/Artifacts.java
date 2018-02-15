@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,34 +27,34 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * Link
  */
 final public class Artifacts {
-	protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
-	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
+    protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
+    private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 
-	public static void clearArtifacts() {
-		testArtifacts.remove();
-	}
+    public static void clearArtifacts() {
+        testArtifacts.remove();
+    }
 
-	public synchronized static Set<TestArtifactType> getArtifacts() {
-		return testArtifacts.get();
-	}
+    public synchronized static Set<TestArtifactType> getArtifacts() {
+        return testArtifacts.get();
+    }
 
-	public static void add(String name, String link) {
-		add(name, link, null);
-	}
+    public static void add(String name, String link) {
+        add(name, link, null);
+    }
 
-	public static void add(String name, String link, Date expires_at) {
-		LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expires_at: " + expires_at );
-		if (name == null || name.isEmpty()) {
-			return;
-		}
-		
-		if (link == null || link.isEmpty()) {
-			return;
-		}
-		
-		TestArtifactType testArtifactType = new TestArtifactType(name, link, expires_at);
-			if (!testArtifacts.get().contains(testArtifactType)) {
-				testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
-			}
-	}
+    public static void add(String name, String link, Date expires_at) {
+        LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expires_at: " + expires_at);
+        if (name == null || name.isEmpty()) {
+            return;
+        }
+
+        if (link == null || link.isEmpty()) {
+            return;
+        }
+
+        TestArtifactType testArtifactType = new TestArtifactType(name, link, expires_at);
+        if (!testArtifacts.get().contains(testArtifactType)) {
+            testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
+        }
+    }
 }

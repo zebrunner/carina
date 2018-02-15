@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,21 +23,17 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Created by mk on 6/30/15.
  */
-public class NullX509TrustManager implements X509TrustManager
-{
+public class NullX509TrustManager implements X509TrustManager {
 
-	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException
-	{
-		// do nothing
-	}
+    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        // do nothing
+    }
 
-	public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException
-	{
-		// do nothing
-	}
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        // do nothing
+    }
 
-	public X509Certificate[] getAcceptedIssuers()
-	{
-		return new X509Certificate[0];
-	}
+    public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
+    }
 }

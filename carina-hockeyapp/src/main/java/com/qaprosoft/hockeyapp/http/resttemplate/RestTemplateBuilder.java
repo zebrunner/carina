@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,13 +45,13 @@ import com.qaprosoft.hockeyapp.http.resttemplate.ssl.DisabledSslClientHttpReques
  */
 public class RestTemplateBuilder {
 
-	protected RestTemplate restTemplate = new RestTemplate();
+    protected RestTemplate restTemplate = new RestTemplate();
 
-	protected List<HttpMessageConverter<?>> httpMessageConverters = new ArrayList<HttpMessageConverter<?>>();
+    protected List<HttpMessageConverter<?>> httpMessageConverters = new ArrayList<HttpMessageConverter<?>>();
 
-	protected boolean isDisableSslChecking = false;
+    protected boolean isDisableSslChecking = false;
 
-	protected boolean isUseDefaultJsonMessageConverter = true;
+    protected boolean isUseDefaultJsonMessageConverter = true;
 
     protected boolean isUseBasicAuth = false;
 
@@ -59,52 +59,53 @@ public class RestTemplateBuilder {
 
     protected String basicAuthPassword;
 
-	protected RestTemplateBuilder() {
-	}
+    protected RestTemplateBuilder() {
+    }
 
-	public static RestTemplateBuilder newInstance() {
-		return new RestTemplateBuilder();
-	}
+    public static RestTemplateBuilder newInstance() {
+        return new RestTemplateBuilder();
+    }
 
-	public RestTemplateBuilder withMessageConverter(
-			HttpMessageConverter<?> messageConverter) {
-		this.httpMessageConverters.add(messageConverter);
-		return this;
-	}
+    public RestTemplateBuilder withMessageConverter(
+            HttpMessageConverter<?> messageConverter) {
+        this.httpMessageConverters.add(messageConverter);
+        return this;
+    }
 
-	public RestTemplateBuilder withDisabledSslChecking() {
-		this.isDisableSslChecking = true;
-		return this;
-	}
+    public RestTemplateBuilder withDisabledSslChecking() {
+        this.isDisableSslChecking = true;
+        return this;
+    }
 
-	public RestTemplateBuilder withSpecificJsonMessageConverter() {
-		isUseDefaultJsonMessageConverter = false;
+    public RestTemplateBuilder withSpecificJsonMessageConverter() {
+        isUseDefaultJsonMessageConverter = false;
 
-		AbstractHttpMessageConverter<?> jsonMessageConverter = new MappingJackson2HttpMessageConverter(
-				Jackson2ObjectMapperBuilder
-						.json()
-						.featuresToEnable(
+        AbstractHttpMessageConverter<?> jsonMessageConverter = new MappingJackson2HttpMessageConverter(
+                Jackson2ObjectMapperBuilder
+                        .json()
+                        .featuresToEnable(
                                 DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
                                 DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-						.build());
-		jsonMessageConverter.setSupportedMediaTypes(Lists.newArrayList(
-				MediaType.TEXT_HTML, MediaType.TEXT_PLAIN,
-				MediaType.APPLICATION_JSON));
+                        .build());
+        jsonMessageConverter.setSupportedMediaTypes(Lists.newArrayList(
+                MediaType.TEXT_HTML, MediaType.TEXT_PLAIN,
+                MediaType.APPLICATION_JSON));
 
-		withMessageConverter(jsonMessageConverter);
+        withMessageConverter(jsonMessageConverter);
 
-		return this;
-	}
+        return this;
+    }
 
     /**
      * http://stackoverflow.com/questions/27603782/java-spring-resttemplate-character-encoding
-     * @return RestTemplateBuilder 
+     * 
+     * @return RestTemplateBuilder
      */
-	public RestTemplateBuilder withUtf8EncodingMessageConverter() {
-		withMessageConverter(new StringHttpMessageConverter(Charset.forName("UTF-8")));
-		
-		return this;
-	}
+    public RestTemplateBuilder withUtf8EncodingMessageConverter() {
+        withMessageConverter(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+
+        return this;
+    }
 
     public RestTemplateBuilder withBasicAuthentication(String username, String password) {
         isUseBasicAuth = true;
@@ -114,28 +115,28 @@ public class RestTemplateBuilder {
         return this;
     }
 
-	public RestTemplate build() {
+    public RestTemplate build() {
 
-		if (!isUseDefaultJsonMessageConverter) {
+        if (!isUseDefaultJsonMessageConverter) {
 
-			HttpMessageConverter<?> httpMessageConverter = Iterables.tryFind(
-					restTemplate.getMessageConverters(),
-					new Predicate<HttpMessageConverter<?>>() {
-						@Override
-						public boolean apply(HttpMessageConverter<?> input) {
-							return input instanceof MappingJackson2HttpMessageConverter;
-						}
-					}).orNull();
+            HttpMessageConverter<?> httpMessageConverter = Iterables.tryFind(
+                    restTemplate.getMessageConverters(),
+                    new Predicate<HttpMessageConverter<?>>() {
+                        @Override
+                        public boolean apply(HttpMessageConverter<?> input) {
+                            return input instanceof MappingJackson2HttpMessageConverter;
+                        }
+                    }).orNull();
 
-			restTemplate.getMessageConverters().remove(httpMessageConverter);
-		}
+            restTemplate.getMessageConverters().remove(httpMessageConverter);
+        }
 
-		restTemplate.getMessageConverters().addAll(httpMessageConverters);
+        restTemplate.getMessageConverters().addAll(httpMessageConverters);
 
         if (isDisableSslChecking) {
-			restTemplate
-					.setRequestFactory(new DisabledSslClientHttpRequestFactory());
-		}
+            restTemplate
+                    .setRequestFactory(new DisabledSslClientHttpRequestFactory());
+        }
 
         if (isUseBasicAuth) {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -146,6 +147,6 @@ public class RestTemplateBuilder {
             restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpClient));
         }
 
-		return restTemplate;
-	}
+        return restTemplate;
+    }
 }

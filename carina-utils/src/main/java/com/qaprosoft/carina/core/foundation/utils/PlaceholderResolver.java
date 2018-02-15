@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,69 +30,57 @@ import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverExcepti
  * 
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
-public class PlaceholderResolver
-{
-	protected static final Logger LOGGER = Logger.getLogger(PlaceholderResolver.class);
-	
-	private static final Pattern PATTERN = Pattern.compile(SpecialKeywords.PLACEHOLER);
-	
-	/**
-	 * Resolves value by placeholder recursively.
-	 * @param properties Properties
-	 * @param key Key
-	 * @return resolved value
-	 */
-	public static String resolve(Properties properties, String key)
-	{
-		String value = properties.getProperty(key);
-		if(value != null)
-		{
-			Matcher matcher = PATTERN.matcher(value);
-			while(matcher.find())
-			{
-				String placeholder = matcher.group();
-				String placeholderKey = placeholder.replace("${", "").replace("}", "");
-				String resolvedValue = resolve(properties, placeholderKey);
-				if(resolvedValue != null)
-				{
-					value = value.replace(placeholder, resolvedValue);
-				}
-			}
-		}
-		else
-		{
-			if (!key.startsWith(SpecialKeywords.CAPABILITIES)) {
-				LOGGER.warn("Value not resolved by key: " + key);
-			}
-		}
-		return value;
-	}
-	
-	/**
-	 * Verifies that properties file contains all placeholder definitions and does not have infinit placeholder loops.
-	 * @param properties Properties value
-	 * @return validation results
-	 */
-	public static boolean isValid(Properties properties)
-	{
-		Set<Object> keys = properties.keySet();
-		for(Object key : keys)
-		{
-			try
-			{
-				resolve(properties, (String) key);
-			}
-			catch(StackOverflowError e)
-			{
-				LOGGER.error("Infinit placeholder loop was found for '" + properties.getProperty((String) key) + "'");
-				return false;
-			}
-			catch (PlaceholderResolverException e) 
-			{
-				LOGGER.error(e.getMessage());
-				return false;
-			}
-		}
-		return true;
-	}
+public class PlaceholderResolver {
+    protected static final Logger LOGGER = Logger.getLogger(PlaceholderResolver.class);
+
+    private static final Pattern PATTERN = Pattern.compile(SpecialKeywords.PLACEHOLER);
+
+    /**
+     * Resolves value by placeholder recursively.
+     * 
+     * @param properties Properties
+     * @param key Key
+     * @return resolved value
+     */
+    public static String resolve(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value != null) {
+            Matcher matcher = PATTERN.matcher(value);
+            while (matcher.find()) {
+                String placeholder = matcher.group();
+                String placeholderKey = placeholder.replace("${", "").replace("}", "");
+                String resolvedValue = resolve(properties, placeholderKey);
+                if (resolvedValue != null) {
+                    value = value.replace(placeholder, resolvedValue);
+                }
+            }
+        } else {
+            if (!key.startsWith(SpecialKeywords.CAPABILITIES)) {
+                LOGGER.warn("Value not resolved by key: " + key);
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Verifies that properties file contains all placeholder definitions and does not have infinit placeholder loops.
+     * 
+     * @param properties Properties value
+     * @return validation results
+     */
+    public static boolean isValid(Properties properties) {
+        Set<Object> keys = properties.keySet();
+        for (Object key : keys) {
+            try {
+                resolve(properties, (String) key);
+            } catch (StackOverflowError e) {
+                LOGGER.error("Infinit placeholder loop was found for '" + properties.getProperty((String) key) + "'");
+                return false;
+            } catch (PlaceholderResolverException e) {
+                LOGGER.error(e.getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
 }

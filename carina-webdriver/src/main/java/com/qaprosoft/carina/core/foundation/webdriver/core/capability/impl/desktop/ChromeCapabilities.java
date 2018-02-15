@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,29 +27,26 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class ChromeCapabilities extends AbstractCapabilities
-{
-	public DesiredCapabilities getCapability(String testName)
-	{
-		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = initBaseCapabilities(capabilities, BrowserType.CHROME, testName);
-		capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-ssl-errors"));
-		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-		capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+public class ChromeCapabilities extends AbstractCapabilities {
+    public DesiredCapabilities getCapability(String testName) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities = initBaseCapabilities(capabilities, BrowserType.CHROME, testName);
+        capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-ssl-errors"));
+        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
-		ChromeOptions options = new ChromeOptions();
-		options.addArguments("test-type");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("test-type");
 
-		if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD))
-		{
-			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
-			chromePrefs.put("download.prompt_for_download", false);
-			chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
-			chromePrefs.put("plugins.always_open_pdf_externally", true);
-			options.setExperimentalOption("prefs", chromePrefs);
-		}
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+            HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+            chromePrefs.put("download.prompt_for_download", false);
+            chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
+            chromePrefs.put("plugins.always_open_pdf_externally", true);
+            options.setExperimentalOption("prefs", chromePrefs);
+        }
 
-		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-		return capabilities;
-	}
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+        return capabilities;
+    }
 }
