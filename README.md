@@ -151,6 +151,10 @@ R.DATABASE.get("db.url")
 R.EMAIL.get("title")
 R.TESTDATA.get("user.email")
 ```
+Default config properties can be obtained by 
+```
+Configuration.get(Parameter.EXTRA_CAPABILITIES)
+```
 
 All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of parameters:
 <table> 
@@ -298,7 +302,33 @@ mvn clean -Dsuite=api test
 ```
 
 ## Web UI automation
-TODO
+In the table below we are providing description for most important WEB parameters:
+<table> 
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+                <th>Default value</th>
+		<th>Example</th>
+	</tr>
+	<tr>
+		<td>browser</td>
+		<td>Browser for testing</td>
+		<td>chrome</td>
+		<td>chrome / firefox / safari / iexplore</td>
+	</tr>
+	<tr>
+		<td>selenium_host</td>
+		<td>Selenium server host</td>
+		<td>{must_override}</td>
+		<td>http://localhost:4444/wd/hub</td>
+	</tr>
+	<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle. </td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+</table>
 
 ## Web services API automation
 TODO
