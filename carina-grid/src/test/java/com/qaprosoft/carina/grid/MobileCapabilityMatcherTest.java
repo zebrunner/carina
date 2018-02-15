@@ -18,8 +18,8 @@ package com.qaprosoft.carina.grid;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class MobileCapabilityMatcherTest
 {

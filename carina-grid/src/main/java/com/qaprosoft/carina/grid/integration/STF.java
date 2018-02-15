@@ -165,9 +165,10 @@ public class STF {
 		}
 
 		// User may pass desired capability STF_ENABLED=false for local run
-		if (status && (requestedCapability.containsKey(SpecialKeywords.STF_ENABLED)
-				&& "false".equalsIgnoreCase((String) requestedCapability.get(SpecialKeywords.STF_ENABLED)))) {
-			status = false;
+		if (status && (requestedCapability.containsKey(SpecialKeywords.STF_ENABLED))) {
+			status = (requestedCapability.get(SpecialKeywords.STF_ENABLED) instanceof Boolean) ?
+				  (Boolean) requestedCapability.get(SpecialKeywords.STF_ENABLED) 
+				 : Boolean.valueOf((String) requestedCapability.get(SpecialKeywords.STF_ENABLED));
 		}
 
 		// STF integration is not available for iOS devices for now

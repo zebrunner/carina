@@ -1124,7 +1124,8 @@ public class ExtendedWebElement {
         }
         return extendedWebElements;
     }
-
+    
+    @Deprecated
     public void tapWithCoordinates(double x, double y) {
         HashMap<String, Double> tapObject = new HashMap<String, Double>();
         tapObject.put("x", x);
