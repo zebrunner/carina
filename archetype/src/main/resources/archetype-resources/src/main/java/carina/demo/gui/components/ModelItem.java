@@ -1,4 +1,6 @@
-#set($symbol_pound='#')#set($symbol_dollar='$')#set($symbol_escape='\')
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 /*
  * Copyright 2013-2017 QAPROSOFT (http://qaprosoft.com/).
  *
