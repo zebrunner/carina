@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,13 +21,13 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class MobileCapabilies extends AbstractCapabilities {
 
-	@Override
-	public DesiredCapabilities getCapability(String testName) {
-		DesiredCapabilities capabilities = new DesiredCapabilities();
+    @Override
+    public DesiredCapabilities getCapability(String testName) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
 
-		// add capabilities based on dynamic _config.properties variables
-		capabilities = initCapabilities(capabilities);
-		return capabilities;
-	}
+        // add capabilities based on dynamic _config.properties variables
+        capabilities = initCapabilities(capabilities);
+        return capabilities;
+    }
 
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,11 +18,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
-public class DebugLevelScreenshotRule implements IScreenshotRule
-{
-	@Override
-	public boolean isTakeScreenshot()
-	{
-		return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
-	}
+public class DebugLevelScreenshotRule implements IScreenshotRule {
+    @Override
+    public boolean isTakeScreenshot() {
+        return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
+    }
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,22 +21,22 @@ import java.util.Locale;
 
 public class LocaleReader {
 
-	public static List<Locale> init(String locale) {
+    public static List<Locale> init(String locale) {
 
-		List<Locale> locales = new ArrayList<Locale>();
-		String[] strLocales = locale.split(",");
-		
-		for (int i=0; i<strLocales.length; i++) {
-			String[] localeSetttings = strLocales[i].trim().split("_");
-			String lang, country = "";
-			lang = localeSetttings[0];
-			if (localeSetttings.length > 1) {
-				country = localeSetttings[1];
-			}
-			locales.add(new Locale(lang, country));
-		}
+        List<Locale> locales = new ArrayList<Locale>();
+        String[] strLocales = locale.split(",");
 
-		return locales;
-	}
+        for (int i = 0; i < strLocales.length; i++) {
+            String[] localeSetttings = strLocales[i].trim().split("_");
+            String lang, country = "";
+            lang = localeSetttings[0];
+            if (localeSetttings.length > 1) {
+                country = localeSetttings[1];
+            }
+            locales.add(new Locale(lang, country));
+        }
+
+        return locales;
+    }
 
 }

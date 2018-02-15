@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,14 +19,14 @@ import java.util.Properties;
 
 public class PropertiesUtil {
 
-	public static Properties readProperties(String path) {
-		Properties prop = new Properties();
-		try {
-			prop.load(PropertiesUtil.class.getClassLoader().getResourceAsStream(path));
-		} catch (Exception e) {
-			throw new RuntimeException("Can't read properties from file", e);
-		}
-		return prop;
-	}
+    public static Properties readProperties(String path) {
+        Properties prop = new Properties();
+        try {
+            prop.load(PropertiesUtil.class.getClassLoader().getResourceAsStream(path));
+        } catch (Exception e) {
+            throw new RuntimeException("Can't read properties from file", e);
+        }
+        return prop;
+    }
 
 }

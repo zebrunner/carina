@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,14 +25,12 @@ import com.qaprosoft.carina.core.foundation.utils.PDFUtil;
 /**
  * Tests for {@link PDFUtil}
  */
-public class PDFUtilTest
-{
-	@Test
-	public void testReadTxtFromPDF()
-	{
-		InputStream is = PDFUtilTest.class.getClassLoader().getResourceAsStream("test.pdf");
-		String text = PDFUtil.readTxtFromPDF(is, 1, 1);
-		Assert.assertNotNull(text);
-		Assert.assertTrue(text.contains("This is Carina PDF test!"));
-	}
+public class PDFUtilTest {
+    @Test
+    public void testReadTxtFromPDF() {
+        InputStream is = PDFUtilTest.class.getClassLoader().getResourceAsStream("test.pdf");
+        String text = PDFUtil.readTxtFromPDF(is, 1, 1);
+        Assert.assertNotNull(text);
+        Assert.assertTrue(text.contains("This is Carina PDF test!"));
+    }
 }

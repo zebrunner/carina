@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,12 +22,11 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public interface IConfigurableEventListener extends WebDriverEventListener
-{
-	/**
-	 * Check global configuration to turn on/off the listener.
-	 * 
-	 * @return listener enabled status
-	 */
-	boolean enabled();
+public interface IConfigurableEventListener extends WebDriverEventListener {
+    /**
+     * Check global configuration to turn on/off the listener.
+     * 
+     * @return listener enabled status
+     */
+    boolean enabled();
 }

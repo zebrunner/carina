@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class SafariCapabilities extends AbstractCapabilities {
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
+public class SafariCapabilities extends AbstractCapabilities {
 
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = DesiredCapabilities.safari();

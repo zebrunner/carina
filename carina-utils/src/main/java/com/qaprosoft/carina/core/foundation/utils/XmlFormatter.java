@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,33 +27,29 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 
-public class XmlFormatter
-{
-	private static final Logger LOGGER = Logger.getLogger(XmlFormatter.class);
+public class XmlFormatter {
+    private static final Logger LOGGER = Logger.getLogger(XmlFormatter.class);
 
-	public static String prettyPrint(String xml)
-	{
-		if(StringUtils.isEmpty(xml)) return xml;
-		
-		try
-		{
-			final InputSource src = new InputSource(new StringReader(xml));
-			final Node document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(src).getDocumentElement();
-			final boolean keepDeclaration = xml.startsWith("<?xml");
+    public static String prettyPrint(String xml) {
+        if (StringUtils.isEmpty(xml))
+            return xml;
 
-			final DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
-			final DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("LS");
-			final LSSerializer writer = impl.createLSSerializer();
+        try {
+            final InputSource src = new InputSource(new StringReader(xml));
+            final Node document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(src).getDocumentElement();
+            final boolean keepDeclaration = xml.startsWith("<?xml");
 
-			writer.getDomConfig().setParameter("format-pretty-print", true);
-			writer.getDomConfig().setParameter("xml-declaration", keepDeclaration); 
+            final DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+            final DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("LS");
+            final LSSerializer writer = impl.createLSSerializer();
 
-			return writer.writeToString(document);
-		}
-		catch (Exception e)
-		{
-			LOGGER.error(e.getMessage());
-		}
-		return xml; // Return the same string if error take place
-	}
+            writer.getDomConfig().setParameter("format-pretty-print", true);
+            writer.getDomConfig().setParameter("xml-declaration", keepDeclaration);
+
+            return writer.writeToString(document);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
+        return xml; // Return the same string if error take place
+    }
 }

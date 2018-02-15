@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail.dto;
 
-import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 import org.json.simple.JSONObject;
+
+import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 
 /**
  * Created by Patotsky on 14.01.2015.
  */
 public class Users {
 
-    public static Request getUserByEmail(String userEmail){
-        return new Request(new JSONObject(),"get_user_by_email&email="+userEmail,"GET");
+    public static Request getUserByEmail(String userEmail) {
+        return new Request(new JSONObject(), "get_user_by_email&email=" + userEmail, "GET");
 
     }
 }

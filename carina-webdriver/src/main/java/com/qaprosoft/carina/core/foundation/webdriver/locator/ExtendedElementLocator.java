@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,14 +20,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
@@ -72,7 +65,7 @@ public class ExtendedElementLocator implements ElementLocator {
      * 
      * @param searchContext The context to use when finding the element
      * @param field The field on the Page Object that will hold the located
-     * value
+     *            value
      */
     public ExtendedElementLocator(SearchContext searchContext, Field field) {
         this.searchContext = searchContext;
@@ -127,8 +120,7 @@ public class ExtendedElementLocator implements ElementLocator {
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
             }
-        }
-        else {
+        } else {
             NoSuchElementException exception = null;
             // Finding element using Selenium
             if (by != null) {

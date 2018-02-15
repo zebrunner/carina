@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,18 +21,18 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 
 public class NetworkUtil {
-	
-	protected static final Logger LOGGER = Logger.getLogger(NetworkUtil.class);
 
-	public static String getIpAddress() {
-		String currentIP = "0.0.0.0"; // localhost
-		try {
-			currentIP = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
-		}
+    protected static final Logger LOGGER = Logger.getLogger(NetworkUtil.class);
 
-		return currentIP;
-	}
-	
+    public static String getIpAddress() {
+        String currentIP = "0.0.0.0"; // localhost
+        try {
+            currentIP = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            LOGGER.error("Error during ip extraction: ".concat(e.getMessage()));
+        }
+
+        return currentIP;
+    }
+
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
@@ -36,99 +34,78 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class Screen implements ICapturable
-{
-	private static final Logger LOGGER = Logger.getLogger(Screen.class);
-	
-	private WebDriver driver;
-	
-	private BufferedImage screenshot;
-	
-	private Screen(WebDriver driver)
-	{
-		this.driver = driver;
-	}
-	
-	public static ICapturable getInstance(WebDriver driver)
-	{
-		return new Screen(new DriverAugmenter().augment(driver));
-	}
-	
-	@Override
-	public ICapturable capture(ScreenArea area)
-	{
-		try
-		{
-			switch (area)
-			{
-				case VISIBLE_SCREEN:
-					screenshot = new AShot().takeScreenshot(driver).getImage();
-					break;
-					
-				case FULL_SCREEN:
-					screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(driver).getImage();
-					break;
-			}
-		}
-		catch (Exception e) 
-		{
-			LOGGER.error("Unable to capture screenshot: " + e.getMessage());
-		}
-		return this;
-	}
-	
-	@Override
-	public ICapturable highlight(Point point)
-	{
-		try
-		{
-			Graphics2D g2d = screenshot.createGraphics();
-			g2d.setColor(Color.red);
-			g2d.draw(new Ellipse2D.Double(point.getX(), point.getY(), 100, 100));
-		}
-		catch (Exception e) 
-		{
-			LOGGER.error("Unable to highligh screenshot: " + e.getMessage());
-		}
-		return this;
-	}
+public class Screen implements ICapturable {
+    private static final Logger LOGGER = Logger.getLogger(Screen.class);
 
-	@Override
-	public ICapturable highlight(Rectangle rect)
-	{
-		try
-		{
-			Graphics2D g2d = screenshot.createGraphics();
-			g2d.setColor(Color.red);
-			g2d.drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-		}
-		catch (Exception e) 
-		{
-			LOGGER.error("Unable to highligh screenshot: " + e.getMessage());
-		}
-		return this;
-	}
+    private WebDriver driver;
 
-	@Override
-	public ICapturable comment(String comment)
-	{
-		try
-		{
-			Graphics2D g2d = screenshot.createGraphics();
-			g2d.setColor(Color.red);
-			g2d.setFont(new Font("Arial", Font.PLAIN, 30));
-			g2d.drawString(comment, 20, screenshot.getHeight() - 20);
-		}
-		catch (Exception e) 
-		{
-			LOGGER.error("Unable to comment screenshot: " + e.getMessage());
-		}
-		return this;
-	}
+    private BufferedImage screenshot;
 
-	@Override
-	public BufferedImage getImage()
-	{
-		return screenshot;
-	}
+    private Screen(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public static ICapturable getInstance(WebDriver driver) {
+        return new Screen(new DriverAugmenter().augment(driver));
+    }
+
+    @Override
+    public ICapturable capture(ScreenArea area) {
+        try {
+            switch (area) {
+            case VISIBLE_SCREEN:
+                screenshot = new AShot().takeScreenshot(driver).getImage();
+                break;
+
+            case FULL_SCREEN:
+                screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(driver).getImage();
+                break;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unable to capture screenshot: " + e.getMessage());
+        }
+        return this;
+    }
+
+    @Override
+    public ICapturable highlight(Point point) {
+        try {
+            Graphics2D g2d = screenshot.createGraphics();
+            g2d.setColor(Color.red);
+            g2d.draw(new Ellipse2D.Double(point.getX(), point.getY(), 100, 100));
+        } catch (Exception e) {
+            LOGGER.error("Unable to highligh screenshot: " + e.getMessage());
+        }
+        return this;
+    }
+
+    @Override
+    public ICapturable highlight(Rectangle rect) {
+        try {
+            Graphics2D g2d = screenshot.createGraphics();
+            g2d.setColor(Color.red);
+            g2d.drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+        } catch (Exception e) {
+            LOGGER.error("Unable to highligh screenshot: " + e.getMessage());
+        }
+        return this;
+    }
+
+    @Override
+    public ICapturable comment(String comment) {
+        try {
+            Graphics2D g2d = screenshot.createGraphics();
+            g2d.setColor(Color.red);
+            g2d.setFont(new Font("Arial", Font.PLAIN, 30));
+            g2d.drawString(comment, 20, screenshot.getHeight() - 20);
+        } catch (Exception e) {
+            LOGGER.error("Unable to comment screenshot: " + e.getMessage());
+        }
+        return this;
+    }
+
+    @Override
+    public BufferedImage getImage() {
+        return screenshot;
+    }
 }

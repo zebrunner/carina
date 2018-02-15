@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,16 +17,14 @@ package com.qaprosoft.carina.core.foundation.api.ssl;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
 
-public class PutDocMethod extends AbstractApiMethodV2
-{
+public class PutDocMethod extends AbstractApiMethodV2 {
 
-	public PutDocMethod()
-	{
-		super(null, null);
-		replaceUrlPlaceholder("base_url", "https://demo-default.uw2.document-server-nprd.lendingcloud.us:8003");
-		request.header("Content-Type", "text/plain");
-		request.header("LCDOC_TYPE", "test");
-		request.body("Test Core Client");
-	}
+    public PutDocMethod() {
+        super(null, null);
+        replaceUrlPlaceholder("base_url", "https://demo-default.uw2.document-server-nprd.lendingcloud.us:8003");
+        request.header("Content-Type", "text/plain");
+        request.header("LCDOC_TYPE", "test");
+        request.body("Test Core Client");
+    }
 
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,25 +33,12 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -71,7 +58,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 import io.appium.java_client.MobileBy;
 
-//TODO: [VD] removed deprecated constructor and DriverPool import
+// TODO: [VD] removed deprecated constructor and DriverPool import
 // Also refactor screenshots capturing using listener approach to be able to remove it as well
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
@@ -856,12 +843,12 @@ public class ExtendedWebElement {
      *
      * @param matcher {@link} BaseMatcher
      * @return true if item selected, otherwise false.
-     * <p>
-     * Usage example: BaseMatcher&lt;String&gt; match=new
-     * BaseMatcher&lt;String&gt;() { {@literal @}Override public boolean
-     * matches(Object actual) { return actual.toString().contains(RequiredText);
-     * } {@literal @}Override public void describeTo(Description description) {
-     * } };
+     *         <p>
+     *         Usage example: BaseMatcher&lt;String&gt; match=new
+     *         BaseMatcher&lt;String&gt;() { {@literal @}Override public boolean
+     *         matches(Object actual) { return actual.toString().contains(RequiredText);
+     *         } {@literal @}Override public void describeTo(Description description) {
+     *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
         boolean isSelected = false;
@@ -1124,7 +1111,7 @@ public class ExtendedWebElement {
         }
         return extendedWebElements;
     }
-    
+
     @Deprecated
     public void tapWithCoordinates(double x, double y) {
         HashMap<String, Double> tapObject = new HashMap<String, Double>();
@@ -1168,7 +1155,7 @@ public class ExtendedWebElement {
      *
      * @param timeout in seconds
      * @return boolean - false if element still present after wait - otherwise
-     * true if it disappear
+     *         true if it disappear
      */
     public boolean isElementNotPresentAfterWait(final long timeout) {
         final ExtendedWebElement element = this;

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,58 +15,60 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.webvideorecording;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import static org.monte.media.AudioFormatKeys.*;
+import static org.monte.media.AudioFormatKeys.EncodingKey;
+import static org.monte.media.AudioFormatKeys.FrameRateKey;
+import static org.monte.media.AudioFormatKeys.KeyFrameIntervalKey;
+import static org.monte.media.AudioFormatKeys.MIME_AVI;
+import static org.monte.media.AudioFormatKeys.MediaTypeKey;
+import static org.monte.media.AudioFormatKeys.MimeTypeKey;
+import static org.monte.media.FormatKeys.MediaType;
+import static org.monte.media.VideoFormatKeys.*;
+import static org.monte.media.VideoFormatKeys.MIME_QUICKTIME;
+
+import java.awt.*;
+import java.io.File;
+import java.nio.ByteOrder;
+
 import org.apache.log4j.Logger;
 import org.monte.media.AudioFormatKeys;
 import org.monte.media.Format;
 import org.monte.media.FormatKeys;
 import org.monte.media.math.Rational;
 import org.monte.screenrecorder.ScreenRecorder;
-import org.openqa.selenium.*;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
 
-import java.awt.*;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.io.File;
-import java.nio.ByteOrder;
-
-import static org.monte.media.AudioFormatKeys.EncodingKey;
-import static org.monte.media.AudioFormatKeys.FrameRateKey;
-import static org.monte.media.AudioFormatKeys.KeyFrameIntervalKey;
-import static org.monte.media.AudioFormatKeys.MIME_AVI;
-import static org.monte.media.FormatKeys.MediaType;
-import static org.monte.media.AudioFormatKeys.MediaTypeKey;
-import static org.monte.media.AudioFormatKeys.MimeTypeKey;
-import static org.monte.media.VideoFormatKeys.*;
-import static org.monte.media.AudioFormatKeys.*;
-
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 
 public class DesktopVideoRecorder {
 
-	/**
-	 * This feature record whole desktop with script executing in video file. 
-	 * By default in reports 'artifacts' folder. 
-	 * 
-	 * Usage of Desktop video recorder
-	 * 
-	 * import com.qaprosoft.carina.core.foundation.report.webvideorecording.DesktopVideoRecorder;
-	 * 
-	 * In base test class add global variable 
-	 * DesktopVideoRecorder recorder = new DesktopVideoRecorder();
-	 * 
-	 * in @BeforeClass add one of below functions. For ex. :
-	 * recorder.startVideoDesktopRecording(getDriver()); 
-	 * 
-	 * in @AfterClass(alwaysRun = true) do not forget to close video recording as below:
-	 * recorder.stopVideoDesktopRecording();
-	 */
+    /**
+     * This feature record whole desktop with script executing in video file.
+     * By default in reports 'artifacts' folder.
+     * 
+     * Usage of Desktop video recorder
+     * 
+     * import com.qaprosoft.carina.core.foundation.report.webvideorecording.DesktopVideoRecorder;
+     * 
+     * In base test class add global variable
+     * DesktopVideoRecorder recorder = new DesktopVideoRecorder();
+     * 
+     * in @BeforeClass add one of below functions. For ex. :
+     * recorder.startVideoDesktopRecording(getDriver());
+     * 
+     * in @AfterClass(alwaysRun = true) do not forget to close video recording as below:
+     * recorder.stopVideoDesktopRecording();
+     */
     private ScreenRecorder screenRecorder;
 
     protected static final Logger LOGGER = Logger.getLogger(DesktopVideoRecorder.class);
 
-    public enum VideoFormat {  AVI, MOV  };
-
+    public enum VideoFormat {
+        AVI,
+        MOV
+    };
 
     /**
      * start Desktop Recording for full screen with default parameters
@@ -80,6 +82,7 @@ public class DesktopVideoRecorder {
      * 
      * Folder will be from ReportContext.getArtifactsFolder()
      * fileName will start from 'TestExecuting' and date with time in format: yyyyMMdd_HH_mm_ss
+     * 
      * @throws Exception java.lang.Exception
      */
     public void startDesktopScreenRecording() throws Exception {
@@ -100,13 +103,12 @@ public class DesktopVideoRecorder {
      * fileName will start from 'TestExecuting' and date with time in format: yyyyMMdd_HH_mm_ss
      *
      * @param using_driver WebDriver
-
+     * 
      * @throws Exception java.lang.Exception
      */
     public void startDesktopScreenRecording(WebDriver using_driver) throws Exception {
         startDesktopScreenRecording(using_driver, VideoFormat.AVI, false);
     }
-
 
     /**
      * start Desktop Recording with specified format and with audio for MOV format
@@ -144,14 +146,12 @@ public class DesktopVideoRecorder {
             captureSize = checkBrowserSize(startPoint.x, startPoint.y, width, height);
         }
 
-        startDesktopScreenRecording(fileNameBase, file, captureSize,videoFileFormat,withSound);
+        startDesktopScreenRecording(fileNameBase, file, captureSize, videoFileFormat, withSound);
     }
-
-
 
     /**
      * start Desktop Recording with a lot of parameters.
-     * if you have more than one monitor it will record just first one. 
+     * if you have more than one monitor it will record just first one.
      * 
      * Requirements:
      * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
@@ -162,44 +162,50 @@ public class DesktopVideoRecorder {
      *
      * @param fileNameBase String
      * @param file File
-     * @param captureSize  Rectangle
+     * @param captureSize Rectangle
      * @param videoFileFormat can be VideoFormat.AVI or VideoFormat.MOV
      * @param withSound if true will try to record sound. Works only on MOV and with a lot of noises.
      * @throws Exception java.lang.Exception
      */
-    public void startDesktopScreenRecording(String fileNameBase, File file, Rectangle captureSize, 
-    		VideoFormat videoFileFormat, boolean withSound) throws Exception {
+    public void startDesktopScreenRecording(String fileNameBase, File file, Rectangle captureSize,
+            VideoFormat videoFileFormat, boolean withSound) throws Exception {
 
         GraphicsConfiguration gc = GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice()
                 .getDefaultConfiguration();
-        Format audio=null;
+        Format audio = null;
 
-        //AVI format
+        // AVI format
         if (videoFileFormat.equals(VideoFormat.AVI)) {
             if (withSound) {
 
-                //Not working AVI audio capabilities. Investigate if will be needed. 
-                /*audio = new Format(MediaTypeKey, MediaType.AUDIO,
-                        EncodingKey, ENCODING_AVI_PCM,
-                        ByteOrderKey,ByteOrder.LITTLE_ENDIAN,
-                        SignedKey,true,SampleSizeInBitsKey,24);*/
-               /* audio = new Format(MediaTypeKey,MediaType.AUDIO,EncodingKey,ENCODING_PCM_UNSIGNED,
-                        FrameRateKey, new Rational(48000L, 1L),
-                        SampleSizeInBitsKey, 16,
-                        ChannelsKey, 2,
-                        SignedKey,false); */
-                /*audio = new Format(MediaTypeKey, MediaType.AUDIO,
-                        EncodingKey, ENCODING_PCM_UNSIGNED,
-                        FrameRateKey, new Rational(48000L, 1L),
-                        SampleSizeInBitsKey,8,
-                        ChannelsKey, 2,
-                        SampleRateKey, new Rational(48000L, 1L),
-                        SignedKey, Boolean.valueOf(false)
-                        //,
-                        //AudioFormatKeys.ByteOrderKey, ByteOrder.BIG_ENDIAN
-                ); */
+                // Not working AVI audio capabilities. Investigate if will be needed.
+                /*
+                 * audio = new Format(MediaTypeKey, MediaType.AUDIO,
+                 * EncodingKey, ENCODING_AVI_PCM,
+                 * ByteOrderKey,ByteOrder.LITTLE_ENDIAN,
+                 * SignedKey,true,SampleSizeInBitsKey,24);
+                 */
+                /*
+                 * audio = new Format(MediaTypeKey,MediaType.AUDIO,EncodingKey,ENCODING_PCM_UNSIGNED,
+                 * FrameRateKey, new Rational(48000L, 1L),
+                 * SampleSizeInBitsKey, 16,
+                 * ChannelsKey, 2,
+                 * SignedKey,false);
+                 */
+                /*
+                 * audio = new Format(MediaTypeKey, MediaType.AUDIO,
+                 * EncodingKey, ENCODING_PCM_UNSIGNED,
+                 * FrameRateKey, new Rational(48000L, 1L),
+                 * SampleSizeInBitsKey,8,
+                 * ChannelsKey, 2,
+                 * SampleRateKey, new Rational(48000L, 1L),
+                 * SignedKey, Boolean.valueOf(false)
+                 * //,
+                 * //AudioFormatKeys.ByteOrderKey, ByteOrder.BIG_ENDIAN
+                 * );
+                 */
 
             }
             this.screenRecorder = new SpecializedScreenRecorder(gc, captureSize,
@@ -215,7 +221,7 @@ public class DesktopVideoRecorder {
                     audio, file, fileNameBase);
         }
 
-        //MOV format
+        // MOV format
         if (videoFileFormat.equals(VideoFormat.MOV)) {
 
             if (withSound) {
@@ -243,53 +249,52 @@ public class DesktopVideoRecorder {
 
         LOGGER.info("Start video recording. \nAbsolute path: " + file.getAbsolutePath() + " . \nStarting name is '" + fileNameBase +
                 "'. \nDimensions: " + captureSize.toString());
-        
+
         this.screenRecorder.start();
     }
 
     /**
-	 * start Video Desktop Recording of whole screen with default parameters
-	 * 
-	 * @return boolean true if everything is ok.
-	 */
-	public boolean startVideoDesktopRecording() {
-		return startVideoDesktopRecording(null);
-	}
+     * start Video Desktop Recording of whole screen with default parameters
+     * 
+     * @return boolean true if everything is ok.
+     */
+    public boolean startVideoDesktopRecording() {
+        return startVideoDesktopRecording(null);
+    }
 
-	/**
-	 * start Video Desktop Recording with default parameters only for browser OR
-	 * whole screen if there were problems with getting browser dimensions
-	 * 
-	 * @param using_driver
-	 *            WebDriver from which we should get browser dimensions.
-	 * @return boolean true if everything is ok.
-	 */
-    
+    /**
+     * start Video Desktop Recording with default parameters only for browser OR
+     * whole screen if there were problems with getting browser dimensions
+     * 
+     * @param using_driver
+     *            WebDriver from which we should get browser dimensions.
+     * @return boolean true if everything is ok.
+     */
+
     public boolean startVideoDesktopRecording(WebDriver using_driver) {
         boolean res = false;
         try {
-        	if (null !=  using_driver) {
-        		if (setBrowserWindowOnTop(using_driver)) {
-        			LOGGER.debug("Start Web Video recording with Browser on Top!");
-        			startDesktopScreenRecording(using_driver);
-        			res = true;
-        			} else {
-        				LOGGER.error("Can't set browser focus.");
-        				LOGGER.debug("Start Web Video recording of whole screen!");
-        				startDesktopScreenRecording();
-        				res = true;
-        				}
-        		} else {
-        			LOGGER.debug("Start Web Video recording of whole screen!");
-    				startDesktopScreenRecording();
-    				res = true;
-        		}
+            if (null != using_driver) {
+                if (setBrowserWindowOnTop(using_driver)) {
+                    LOGGER.debug("Start Web Video recording with Browser on Top!");
+                    startDesktopScreenRecording(using_driver);
+                    res = true;
+                } else {
+                    LOGGER.error("Can't set browser focus.");
+                    LOGGER.debug("Start Web Video recording of whole screen!");
+                    startDesktopScreenRecording();
+                    res = true;
+                }
+            } else {
+                LOGGER.debug("Start Web Video recording of whole screen!");
+                startDesktopScreenRecording();
+                res = true;
+            }
         } catch (Exception e) {
             LOGGER.error("Screen Recording wasn't started.");
         }
         return res;
     }
-
 
     /**
      * stop Video Desktop Recording
@@ -331,7 +336,7 @@ public class DesktopVideoRecorder {
             using_driver.switchTo().window(windowHandle);
             JavascriptExecutor js = (JavascriptExecutor) using_driver;
             js.executeScript("window.focus();");
-           res = true;
+            res = true;
         } catch (Exception e) {
             LOGGER.error("Exception during set focus to browser window: " + e);
 
@@ -341,6 +346,7 @@ public class DesktopVideoRecorder {
 
     /**
      * check Browser Size. If it too small capture full screen.
+     * 
      * @param x
      * @param y
      * @param width
@@ -348,19 +354,23 @@ public class DesktopVideoRecorder {
      * @return Rectangle
      */
     private Rectangle checkBrowserSize(int x, int y, int width, int height) {
-        int res_x=0,res_y=0;
+        int res_x = 0, res_y = 0;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int res_width = screenSize.width;
         int res_height = screenSize.height;
-        if (x>=0) res_x=x;
-        if (y>=0) res_y=y;
+        if (x >= 0)
+            res_x = x;
+        if (y >= 0)
+            res_y = y;
 
-        if ((res_width-width)<=width) res_width=width;
-        if ((res_height-height)<=height) res_height=height;
+        if ((res_width - width) <= width)
+            res_width = width;
+        if ((res_height - height) <= height)
+            res_height = height;
 
-        Rectangle ret=new Rectangle(res_x, res_y, res_width, res_height);
-        LOGGER.debug("Got browser parameters:"+x+", "+y+", "+width+", "+height+" \n Capture in rectangle:"+ret.toString());
-		return ret;
+        Rectangle ret = new Rectangle(res_x, res_y, res_width, res_height);
+        LOGGER.debug("Got browser parameters:" + x + ", " + y + ", " + width + ", " + height + " \n Capture in rectangle:" + ret.toString());
+        return ret;
 
-	}
+    }
 }

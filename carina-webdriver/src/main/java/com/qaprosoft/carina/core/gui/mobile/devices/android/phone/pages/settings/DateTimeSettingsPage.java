@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings;
 
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 public class DateTimeSettingsPage extends MobileAbstractPage {
 
@@ -43,7 +44,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     @FindBy(xpath = "//android.widget.ListView")
     protected ExtendedWebElement scrollableContainer;
 
-    //@FindBy(xpath = "//android.widget.ListView[@resource-id='com.bamnetworks.mobile.android.gameday.atbat:id/drawer_list_view']//android.widget.TextView[contains(@text,'%s')]")
+    // @FindBy(xpath =
+    // "//android.widget.ListView[@resource-id='com.bamnetworks.mobile.android.gameday.atbat:id/drawer_list_view']//android.widget.TextView[contains(@text,'%s')]")
     @FindBy(xpath = "//android.widget.TextView[contains(@text,'%s')]")
     protected ExtendedWebElement tzSelectionBase;
 
@@ -51,7 +53,6 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     protected ExtendedWebElement nextButton;
 
     protected static final String TIMEZONE_TEXT_BASE = "//android.widget.TextView[contains(@text,'%s')]";
-
 
     /**
      * openTimeZoneSetting
@@ -69,11 +70,10 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         LOGGER.info("Select Time Zone Menu item was clicked: " + found);
     }
 
-
     /**
      * selectTimeZone
      *
-     * @param tz       String
+     * @param tz String
      * @param timezone String
      * @return boolean
      */
@@ -84,7 +84,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         boolean selected = false;
 
         LOGGER.info("Searching for tz: " + tz);
-        //TODO: Think how to cover GMT+3:00 instead of GMT+03:00 on some devices.
+        // TODO: Think how to cover GMT+3:00 instead of GMT+03:00 on some devices.
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
             boolean scrolled = MobileUtils.swipe(
@@ -181,7 +181,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     /**
      * selectTimezoneByText
      *
-     * @param timezone         String
+     * @param timezone String
      * @param defaultSwipeTime int
      * @return boolean
      */

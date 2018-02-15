@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.image;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import org.apache.log4j.Logger;
-
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -26,13 +22,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.imageio.ImageIO;
+
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+
 /**
  * Class for adding useful utils for Image processing
  */
 public class ImageProcessing {
 
     protected static final Logger LOGGER = Logger.getLogger(ImageProcessing.class);
-
 
     /**
      * Image Resize tool for screenshots
@@ -69,7 +70,7 @@ public class ImageProcessing {
      * byte[] screenshot=((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
      *
      * @param fileData -<code> byte[] </code> - ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-     * @param percent  - <code>int</code> Percent of Scaling from default image. 100 - same size.
+     * @param percent - <code>int</code> Percent of Scaling from default image. 100 - same size.
      * @return <code>byte[]</code> - default file format is PNG
      */
     public static byte[] imageResize(byte[] fileData, int percent) {
@@ -115,9 +116,9 @@ public class ImageProcessing {
      * Example:
      * byte[] screenshot=((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
      *
-     * @param fileData   -<code> byte[] </code> - ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-     * @param width      - <code> int </code> new width (if 0 - will be scaled proportionally to height)
-     * @param height     - <code> int </code> new height (if 0 - will be scaled proportionally to width)
+     * @param fileData -<code> byte[] </code> - ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+     * @param width - <code> int </code> new width (if 0 - will be scaled proportionally to height)
+     * @param height - <code> int </code> new height (if 0 - will be scaled proportionally to width)
      * @param formatName - <code> String </code> file output format can be
      * @return <code>byte[]</code> - return resized image in required format
      */
@@ -138,7 +139,7 @@ public class ImageProcessing {
 
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-            String[] formatVariants = {"png", "jpg", "gif", "bmp"};
+            String[] formatVariants = { "png", "jpg", "gif", "bmp" };
             if ((formatName.isEmpty()) || (!Arrays.asList(formatVariants).contains(formatName.toLowerCase())))
                 formatName = "png";
 
