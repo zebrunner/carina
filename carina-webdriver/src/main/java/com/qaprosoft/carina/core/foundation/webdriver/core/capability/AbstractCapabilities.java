@@ -76,7 +76,13 @@ public abstract class AbstractCapabilities {
 				String value = R.CONFIG.get(entry.getKey());
 				if (!value.isEmpty()) {
 					String cap = entry.getKey().replaceAll(prefix, "");
-					capabilities.setCapability(cap, value);
+					if ("false".equalsIgnoreCase(value)) {
+						capabilities.setCapability(cap, false);
+					} else if ("true".equalsIgnoreCase(value)) {
+						capabilities.setCapability(cap, true);
+					} else {
+						capabilities.setCapability(cap, value);
+					}
 				}
 			}
 		}
