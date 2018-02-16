@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,11 @@
 package com.qaprosoft.carina.core.foundation.utils.android.recorder.utils;
 
 import com.sun.jna.Native;
+
 interface Kernel32 extends W32API {
     Kernel32 INSTANCE = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class, DEFAULT_OPTIONS);
+
     HANDLE GetCurrentProcess();
+
     int GetProcessId(HANDLE Process);
 }

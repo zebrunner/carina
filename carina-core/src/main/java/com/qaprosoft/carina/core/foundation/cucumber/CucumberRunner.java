@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.cucumber;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import cucumber.api.testng.CucumberFeatureWrapper;
-import cucumber.api.testng.TestNGCucumberRunner;
-import net.masterthought.cucumber.ReportBuilder;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -28,10 +27,13 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+
+import cucumber.api.testng.CucumberFeatureWrapper;
+import cucumber.api.testng.TestNGCucumberRunner;
+import net.masterthought.cucumber.ReportBuilder;
 
 public abstract class CucumberRunner extends AbstractTest {
     private TestNGCucumberRunner testNGCucumberRunner;
@@ -48,19 +50,16 @@ public abstract class CucumberRunner extends AbstractTest {
         if (!isCucumberTest()) {
             LOGGER.error("Looks like it is not Cucumber test");
             throw new Exception("Not Cucumber Test. Please check config.properties.");
-            //return;
+            // return;
         }
         this.testNGCucumberRunner = new TestNGCucumberRunner(this.getClass());
 
     }
 
-    @Test(
-            groups = {"cucumber"},
-            description = "Runs Cucumber Feature",
-            dataProvider = "features"
-    )
+    @Test(groups = { "cucumber" }, description = "Runs Cucumber Feature", dataProvider = "features")
     public void feature(CucumberFeatureWrapper cucumberFeature) {
-        if (!isCucumberTest()) return;
+        if (!isCucumberTest())
+            return;
         this.testNGCucumberRunner.runCucumber(cucumberFeature.getCucumberFeature());
     }
 
@@ -71,12 +70,12 @@ public abstract class CucumberRunner extends AbstractTest {
 
     @AfterClass
     public void tearDownClass(ITestContext context) throws Exception {
-        if (!isCucumberTest()) return;
+        if (!isCucumberTest())
+            return;
         LOGGER.info("In  @AfterClass tearDownClass");
         this.testNGCucumberRunner.finish();
         generateCucumberReport(context);
     }
-
 
     /**
      * Generate Cucumber Report based on config parameters cucumber_tests_app_version and cucumber_tests_name
@@ -109,7 +108,8 @@ public abstract class CucumberRunner extends AbstractTest {
             }
         }
 
-        if ((cucumberTestName.isEmpty()) || (cucumberTestName.toLowerCase().contains("app")) || (cucumberTestName.toLowerCase().contains("jenkins"))) {
+        if ((cucumberTestName.isEmpty()) || (cucumberTestName.toLowerCase().contains("app"))
+                || (cucumberTestName.toLowerCase().contains("jenkins"))) {
             cucumberTestName = title;
         }
 
@@ -121,22 +121,22 @@ public abstract class CucumberRunner extends AbstractTest {
         generateCucumberReport(cucumberTestName, app_version);
     }
 
-
     /**
      * Generate Cucumber Report based on json files in target folder
      *
      * @param buildProject String
-     * @param buildNumber  String
+     * @param buildNumber String
      */
     public void generateCucumberReport(String buildProject, String buildNumber) {
-        if (!isCucumberTest()) return;
+        if (!isCucumberTest())
+            return;
 
         try {
-            //String RootDir = System.getProperty("user.dir");
+            // String RootDir = System.getProperty("user.dir");
             File file = ReportContext.getArtifactsFolder();
 
             File reportOutputDirectory = new File(String.format("%s/%s", file, CUCUMBER_REPORT_FOLDER));
-            //File reportOutputDirectory = new File(file, "/CucumberReport");
+            // File reportOutputDirectory = new File(file, "/CucumberReport");
 
             File dir = new File("target/");
 
@@ -153,25 +153,24 @@ public abstract class CucumberRunner extends AbstractTest {
                 list.add("target/" + fl.getName());
             }
 
-            //buildNumber should be parsable Integer
-            buildNumber= buildNumber.replace(".","").replace(",","");
-
+            // buildNumber should be parsable Integer
+            buildNumber = buildNumber.replace(".", "").replace(",", "");
 
             if (list.size() > 0) {
-                //String buildNumber = "1";
-                //String buildProject = "CUCUMBER";
+                // String buildNumber = "1";
+                // String buildProject = "CUCUMBER";
                 boolean skippedFails = true;
                 boolean pendingFails = true;
                 boolean undefinedFails = true;
                 boolean missingFails = true;
 
-                net.masterthought.cucumber.Configuration configuration = new net.masterthought.cucumber.Configuration(reportOutputDirectory, buildProject + " Cucumber Test Results");
+                net.masterthought.cucumber.Configuration configuration = new net.masterthought.cucumber.Configuration(reportOutputDirectory,
+                        buildProject + " Cucumber Test Results");
                 configuration.setStatusFlags(skippedFails, pendingFails, undefinedFails, missingFails);
                 // configuration.setParallelTesting(parallelTesting);
                 // configuration.setJenkinsBasePath(jenkinsBasePath);
                 // configuration.setRunWithJenkins(runWithJenkins);
                 configuration.setBuildNumber(buildNumber);
-
 
                 ReportBuilder reportBuilder = new ReportBuilder(list, configuration);
                 reportBuilder.generateReports();
@@ -198,57 +197,56 @@ public abstract class CucumberRunner extends AbstractTest {
         return ret;
     }
 
-
     /**
      * Check that CucumberReport Folder exists.
+     * 
      * @return boolean
      */
     public static boolean isCucumberReportFolderExists() {
         try {
             File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getArtifactsFolder(), CUCUMBER_REPORT_FOLDER));
             if (reportOutputDirectory.exists() && reportOutputDirectory.isDirectory()) {
-                if(reportOutputDirectory.list().length>0){
+                if (reportOutputDirectory.list().length > 0) {
                     LOGGER.debug("Cucumber Report Folder is not empty!");
                     return true;
-                }else{
+                } else {
                     LOGGER.error("Cucumber Report Folder is empty!");
                     return false;
                 }
             }
         } catch (Exception e) {
-            LOGGER.debug("Error happen during checking that CucumberReport Folder exists or not. Error: "+e.getMessage());
+            LOGGER.debug("Error happen during checking that CucumberReport Folder exists or not. Error: " + e.getMessage());
         }
         return false;
     }
-
 
     /**
      * Returns URL for cucumber report.
      *
      * @return - URL to test log folder.
      */
-    public static String getCucumberReportResultLink()
-    {
+    public static String getCucumberReportResultLink() {
         String link = "";
 
-/*
-        if (!Configuration.get(Configuration.Parameter.REPORT_URL).isEmpty()) {
-            //remove report url and make link relative
-            link = String.format("%s/%s/feature-overview.html", Configuration.get(Configuration.Parameter.REPORT_URL), ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
-        }
-        else {
-            link = String.format("file://%s/feature-overview.html", ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
-        }
-*/
-        //cucumber-html-reports
+        /*
+         * if (!Configuration.get(Configuration.Parameter.REPORT_URL).isEmpty()) {
+         * //remove report url and make link relative
+         * link = String.format("%s/%s/feature-overview.html", Configuration.get(Configuration.Parameter.REPORT_URL),
+         * ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
+         * }
+         * else {
+         * link = String.format("file://%s/feature-overview.html", ReportContext.getArtifact(CUCUMBER_REPORT_FOLDER));
+         * }
+         */
+        // cucumber-html-reports
         String subfolder = "";
         if (!Configuration.isNull(Configuration.Parameter.CUCUMBER_REPORT_SUBFOLDER)) {
             subfolder = Configuration.get(Configuration.Parameter.CUCUMBER_REPORT_SUBFOLDER);
         }
 
-        link=ReportContext.getCucumberReportLink(CUCUMBER_REPORT_FOLDER,subfolder);
+        link = ReportContext.getCucumberReportLink(CUCUMBER_REPORT_FOLDER, subfolder);
 
-        LOGGER.info("Cucumber Report link: "+link);
+        LOGGER.info("Cucumber Report link: " + link);
 
         return link;
     }
@@ -271,6 +269,7 @@ public abstract class CucumberRunner extends AbstractTest {
 
     /**
      * getCucumberTestName
+     * 
      * @return String
      */
     private String getCucumberTestName() {
@@ -291,6 +290,7 @@ public abstract class CucumberRunner extends AbstractTest {
 
     /**
      * useJSinCucumberReport
+     * 
      * @return boolean
      */
     public static boolean useJSinCucumberReport() {

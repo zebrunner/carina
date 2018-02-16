@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import org.apache.log4j.Logger;
-import org.joda.time.DateTimeZone;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
+import org.joda.time.DateTimeZone;
 
 public class DeviceTimeZone {
 
@@ -66,7 +65,6 @@ public class DeviceTimeZone {
         }
     }
 
-
     public DeviceTimeZone() {
         this.auto_time = true;
         this.auto_timezone = true;
@@ -82,16 +80,17 @@ public class DeviceTimeZone {
     /**
      * DeviceTimeZone
      *
-     * @param auto_time         boolean
-     * @param auto_timezone     boolean
-     * @param time_format       AndroidService.TimeFormat
-     * @param timezone          String
-     * @param gmt               String
+     * @param auto_time boolean
+     * @param auto_timezone boolean
+     * @param time_format AndroidService.TimeFormat
+     * @param timezone String
+     * @param gmt String
      * @param setDeviceDateTime String
-     * @param changeDateTime    boolean
+     * @param changeDateTime boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime,
+            boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -110,15 +109,16 @@ public class DeviceTimeZone {
     /**
      * DeviceTimeZone
      *
-     * @param auto_time         boolean
-     * @param auto_timezone     boolean
-     * @param time_format       AndroidService.TimeFormat
-     * @param timezone          String
+     * @param auto_time boolean
+     * @param auto_timezone boolean
+     * @param time_format AndroidService.TimeFormat
+     * @param timezone String
      * @param setDeviceDateTime String
-     * @param changeDateTime    boolean
+     * @param changeDateTime boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String setDeviceDateTime,
+            boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -129,7 +129,6 @@ public class DeviceTimeZone {
         this.refreshDeviceTime = refreshDeviceTime;
         this.daylightTime = isDaylightTime(timezone);
     }
-
 
     public boolean isAutoTime() {
         return auto_time;
@@ -203,7 +202,8 @@ public class DeviceTimeZone {
     }
 
     public String getTZforID() {
-        if (timezone.isEmpty()) return "";
+        if (timezone.isEmpty())
+            return "";
         return getTimezoneOffset(DateTimeZone.forID(timezone).toTimeZone());
     }
 
@@ -234,11 +234,11 @@ public class DeviceTimeZone {
         return offset;
     }
 
-
     public static boolean compareTimezoneOffsets(String timezone1, String timezone2) {
 
         LOGGER.info("Compare Timezone '" + timezone1 + "' and Timezone '" + timezone2 + "'.");
-        if (timezone1.isEmpty() || timezone2.isEmpty()) return false;
+        if (timezone1.isEmpty() || timezone2.isEmpty())
+            return false;
         TimeZone tz1 = getTimezoneFromOffset(timezone1);
         TimeZone tz2 = getTimezoneFromOffset(timezone2);
 

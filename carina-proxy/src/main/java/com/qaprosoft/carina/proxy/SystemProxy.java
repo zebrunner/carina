@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,46 +24,44 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class SystemProxy {
-	
-	protected static final Logger LOGGER = Logger.getLogger(SystemProxy.class);
 
-	public static void setupProxy()
-	{
-		String proxyHost = Configuration.get(Parameter.PROXY_HOST);
-		String proxyPort = Configuration.get(Parameter.PROXY_PORT);
-		
-		List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
-		
-		if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()
-				&& Configuration.getBoolean(Parameter.PROXY_SET_TO_SYSTEM))
-		{
-			if (protocols.contains("http")) {
-				LOGGER.info(String.format("HTTP client will use http: %s:%s", proxyHost, proxyPort));
+    protected static final Logger LOGGER = Logger.getLogger(SystemProxy.class);
 
-				System.setProperty("http.proxyHost", proxyHost);
-				System.setProperty("http.proxyPort", proxyPort);
-			}
+    public static void setupProxy() {
+        String proxyHost = Configuration.get(Parameter.PROXY_HOST);
+        String proxyPort = Configuration.get(Parameter.PROXY_PORT);
 
-			if (protocols.contains("https")) {
-				LOGGER.info(String.format("HTTP client will use https proxies: %s:%s", proxyHost, proxyPort));
+        List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 
-				System.setProperty("https.proxyHost", proxyHost);
-				System.setProperty("https.proxyPort", proxyPort);
-			}
+        if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()
+                && Configuration.getBoolean(Parameter.PROXY_SET_TO_SYSTEM)) {
+            if (protocols.contains("http")) {
+                LOGGER.info(String.format("HTTP client will use http: %s:%s", proxyHost, proxyPort));
 
-			if (protocols.contains("ftp")) {
-				LOGGER.info(String.format("HTTP client will use ftp proxies: %s:%s", proxyHost, proxyPort));
+                System.setProperty("http.proxyHost", proxyHost);
+                System.setProperty("http.proxyPort", proxyPort);
+            }
 
-				System.setProperty("ftp.proxyHost", proxyHost);
-				System.setProperty("ftp.proxyPort", proxyPort);
-			}
+            if (protocols.contains("https")) {
+                LOGGER.info(String.format("HTTP client will use https proxies: %s:%s", proxyHost, proxyPort));
 
-			if (protocols.contains("socks")) {
-				LOGGER.info(String.format("HTTP client will use socks proxies: %s:%s", proxyHost, proxyPort));
-				System.setProperty("socksProxyHost", proxyHost);
-				System.setProperty("socksProxyPort", proxyPort);
-			}
-		}
-	}
-	
+                System.setProperty("https.proxyHost", proxyHost);
+                System.setProperty("https.proxyPort", proxyPort);
+            }
+
+            if (protocols.contains("ftp")) {
+                LOGGER.info(String.format("HTTP client will use ftp proxies: %s:%s", proxyHost, proxyPort));
+
+                System.setProperty("ftp.proxyHost", proxyHost);
+                System.setProperty("ftp.proxyPort", proxyPort);
+            }
+
+            if (protocols.contains("socks")) {
+                LOGGER.info(String.format("HTTP client will use socks proxies: %s:%s", proxyHost, proxyPort));
+                System.setProperty("socksProxyHost", proxyHost);
+                System.setProperty("socksProxyPort", proxyPort);
+            }
+        }
+    }
+
 }

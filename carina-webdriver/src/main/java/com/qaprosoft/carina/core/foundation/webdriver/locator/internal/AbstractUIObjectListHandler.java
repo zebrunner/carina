@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,60 +30,52 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
-public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler
-{
-	private Class<?> clazz;
-	private WebDriver webDriver;
-	private final ElementLocator locator;
-	private String name;
+public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
+    private Class<?> clazz;
+    private WebDriver webDriver;
+    private final ElementLocator locator;
+    private String name;
 
-	private Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
+    private Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
 
-	public AbstractUIObjectListHandler(Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name)
-	{
-		this.clazz = clazz;
-		this.webDriver = webDriver;
-		this.locator = locator;
-		this.name = name;
-	}
+    public AbstractUIObjectListHandler(Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
+        this.clazz = clazz;
+        this.webDriver = webDriver;
+        this.locator = locator;
+        this.name = name;
+    }
 
-	@SuppressWarnings("unchecked")
-	public Object invoke(Object object, Method method, Object[] objects) throws Throwable
-	{
+    @SuppressWarnings("unchecked")
+    public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
 
-		List<WebElement> elements = locator.findElements();
-		List<T> uIObjects = new ArrayList<T>();
-		int index = 0;
-		if (elements != null)
-		{
-			for (WebElement element : elements)
-			{
-				T uiObject;
-				try
-				{
-					uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
-							.newInstance(
-						webDriver, element);
-				} catch (NoSuchMethodException e)
-				{
-					LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
-							+ e.getMessage());
-					throw new RuntimeException(
-							"Implement appropriate AbstractUIObject constructor for auto-initialization: "
-									+ e.getMessage(), e);
-				}
-				uiObject.setName(String.format("%s - %d", name, index++));
-				uiObject.setRootElement(element);
-				uIObjects.add(uiObject);
-			}
-		}
+        List<WebElement> elements = locator.findElements();
+        List<T> uIObjects = new ArrayList<T>();
+        int index = 0;
+        if (elements != null) {
+            for (WebElement element : elements) {
+                T uiObject;
+                try {
+                    uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
+                            .newInstance(
+                                    webDriver, element);
+                } catch (NoSuchMethodException e) {
+                    LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
+                            + e.getMessage());
+                    throw new RuntimeException(
+                            "Implement appropriate AbstractUIObject constructor for auto-initialization: "
+                                    + e.getMessage(),
+                            e);
+                }
+                uiObject.setName(String.format("%s - %d", name, index++));
+                uiObject.setRootElement(element);
+                uIObjects.add(uiObject);
+            }
+        }
 
-		try
-		{
-			return method.invoke(uIObjects, objects);
-		} catch (InvocationTargetException e)
-		{
-			throw e.getCause();
-		}
-	}
+        try {
+            return method.invoke(uIObjects, objects);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
 }

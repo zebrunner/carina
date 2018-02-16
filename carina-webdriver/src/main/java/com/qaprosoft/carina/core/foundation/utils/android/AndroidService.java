@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -127,7 +127,7 @@ public class AndroidService {
             // add remoteURL/udid reference
             command = "-s " + deviceName + " " + command;
         } else {
-        	LOGGER.warn("nullDevice detected fot current thread!");
+            LOGGER.warn("nullDevice detected fot current thread!");
         }
 
         String result = "";
@@ -182,7 +182,7 @@ public class AndroidService {
      * clear Apk Cache
      *
      * @param appPackageName for example:
-     * com.bamnetworks.mobile.android.gameday.atbat
+     *            com.bamnetworks.mobile.android.gameday.atbat
      * @return boolean
      */
     public boolean clearApkCache(String appPackageName) {
@@ -485,7 +485,7 @@ public class AndroidService {
         try {
             ((AndroidDriver) getDriver()).openNotifications();
             CommonUtils.pause(2); // wait while notifications are playing animation to
-                      // appear to avoid missed taps
+            // appear to avoid missed taps
         } catch (Exception e) {
             LOGGER.error(e);
             LOGGER.info("Using adb to expand Status bar. ");
@@ -614,7 +614,7 @@ public class AndroidService {
      *
      * @param language to set. Can be es, en, etc.
      * @param changeConfig boolean if true - update config locale and language
-     * params
+     *            params
      * @param waitTime int wait in seconds before device refresh.
      * @return boolean
      */
@@ -626,7 +626,7 @@ public class AndroidService {
         String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
 
         LOGGER.info("Do not concat language for Android. Keep: " + language);
-        language=language.replace("_","-");
+        language = language.replace("_", "-");
         LOGGER.info("Refactor language to : " + language);
 
         String actualDeviceLanguage = getDeviceLanguage();
@@ -702,7 +702,7 @@ public class AndroidService {
      */
     public String getDeviceLanguage() {
         String locale = executeAdbCommand("shell getprop persist.sys.language");
-        if(locale.isEmpty()) {
+        if (locale.isEmpty()) {
             locale = executeAdbCommand("shell getprop persist.sys.locale");
         }
         return locale;
@@ -855,7 +855,7 @@ public class AndroidService {
      * switchDeviceAutoTimeAndTimeZone
      *
      * @param autoSwitch boolean. If true - auto Time and TimeZone will be set
-     * as On.
+     *            as On.
      */
     public void switchDeviceAutoTimeAndTimeZone(boolean autoSwitch) {
         String value = "0";
@@ -953,7 +953,7 @@ public class AndroidService {
      * set Device TimeZone by using Apk
      *
      * @param timeZone String required timeZone in Android standard format
-     * (Europe/London)
+     *            (Europe/London)
      * @param timeFormat String 12 or 24
      * @return boolean
      */
@@ -1027,15 +1027,15 @@ public class AndroidService {
     }
 
     // End of TimeZone change sections
-    
+
     /**
      * Open camera on device
-     */    
+     */
     public void openCamera() {
         LOGGER.info("Camera will be opened");
         executeAdbCommand("shell am start -a android.media.action.IMAGE_CAPTURE");
     }
-    
+
     /**
      * Android camera should be already opened
      */

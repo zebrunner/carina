@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,18 +25,17 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * Created by YP.
  * Date: 8/19/2014
  * Time: 12:57 AM
  */
 
-//TODO: rename class to CmdExecutor as we added iOS shell commands as well
+// TODO: rename class to CmdExecutor as we added iOS shell commands as well
 public class AdbExecutor {
     private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
 
-    //private static final String REMOTE_ADB_EXECUTION_CMD = "ssh %s@%s %s";
+    // private static final String REMOTE_ADB_EXECUTION_CMD = "ssh %s@%s %s";
 
     private static String[] cmdInit;
 
@@ -46,6 +45,7 @@ public class AdbExecutor {
 
     /**
      * getDefaultCmd from init Cmd
+     * 
      * @return String[]
      */
     public String[] getDefaultCmd() {
@@ -54,28 +54,29 @@ public class AdbExecutor {
 
     private void initDefaultCmd() {
         String tempCmd = "";
-/*        String adbPath = "adb";
-        if (!Configuration.get(Parameter.ADB_PATH).isEmpty()) {
-            adbPath = Configuration.get(Parameter.ADB_PATH);
-        }
-        
-        if (DevicePool.isSystemDistributed()) {
-            // check if device server value equals to IP of the PC where tests were launched.
-            // adb can be executed locally in this case.
-            String currentIP = HttpClient.getIpAddress();
-            LOGGER.debug("Local IP: ".concat(currentIP));
-            String remoteServer = DevicePool.getServer();
-            if (!remoteServer.equals(currentIP)) {
-                String login = Configuration.get(Parameter.SSH_USERNAME);
-                tempCmd = String.format(REMOTE_ADB_EXECUTION_CMD, login, remoteServer, adbPath);
-            }
-        }*/
+        /*
+         * String adbPath = "adb";
+         * if (!Configuration.get(Parameter.ADB_PATH).isEmpty()) {
+         * adbPath = Configuration.get(Parameter.ADB_PATH);
+         * }
+         * 
+         * if (DevicePool.isSystemDistributed()) {
+         * // check if device server value equals to IP of the PC where tests were launched.
+         * // adb can be executed locally in this case.
+         * String currentIP = HttpClient.getIpAddress();
+         * LOGGER.debug("Local IP: ".concat(currentIP));
+         * String remoteServer = DevicePool.getServer();
+         * if (!remoteServer.equals(currentIP)) {
+         * String login = Configuration.get(Parameter.SSH_USERNAME);
+         * tempCmd = String.format(REMOTE_ADB_EXECUTION_CMD, login, remoteServer, adbPath);
+         * }
+         * }
+         */
 
         // TODO: it can be slightly modified
         // when issues with remote adb execution will be resolved: "concat("-H ADB_HOST -P ADB_PORT")"
         cmdInit = tempCmd.concat("adb").split(" ");
     }
-
 
     @Deprecated
     public List<String> getAttachedDevices() {
@@ -108,7 +109,6 @@ public class AdbExecutor {
         }
     }
 
-
     public List<String> execute(String[] cmd) {
         ProcessBuilderExecutor executor = null;
         BufferedReader in = null;
@@ -120,7 +120,6 @@ public class AdbExecutor {
             Process process = executor.start();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = null;
-
 
             while ((line = in.readLine()) != null) {
                 output.add(line);
@@ -135,7 +134,6 @@ public class AdbExecutor {
 
         return output;
     }
-    
 
     private static void closeQuietly(Closeable closeable) {
         try {

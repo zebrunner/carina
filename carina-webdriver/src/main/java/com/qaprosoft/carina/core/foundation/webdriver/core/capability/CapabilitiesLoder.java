@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,38 +32,37 @@ public class CapabilitiesLoder {
 
     private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoder.class);
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void loadCapabilities(String fileName) {
-    	//TODO: investigate howto allow access to this static method only from internal carina packages
+        // TODO: investigate howto allow access to this static method only from internal carina packages
 
         LOGGER.info("Loading capabilities:");
         Properties props = new Properties();
         URL baseResource = ClassLoader.getSystemResource(fileName);
-		try {
-			if(baseResource != null)
-			{
-				props.load(baseResource.openStream());
-				LOGGER.info("Custom capabilities properties loaded: " + fileName);
-			} else {
-				throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");	
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
-		}
-		
-		Map<String, String> capabilitiesMap = new HashMap(props);
-		for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-			//TODO: investigate effects of removing env args monitoring for extra capabilities declaration
-			//String valueFromEnv = null;
-			//valueFromEnv = System.getProperty(entry.getKey());
-			//String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
-			
-			String value = entry.getValue();
-			String key = entry.getKey();
-			LOGGER.info("Set custom property: " + key + "; value: " + value);
-			// add each property directly into CONFIG
-			R.CONFIG.put(key, value);
-		}
+        try {
+            if (baseResource != null) {
+                props.load(baseResource.openStream());
+                LOGGER.info("Custom capabilities properties loaded: " + fileName);
+            } else {
+                throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
+        }
+
+        Map<String, String> capabilitiesMap = new HashMap(props);
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            // TODO: investigate effects of removing env args monitoring for extra capabilities declaration
+            // String valueFromEnv = null;
+            // valueFromEnv = System.getProperty(entry.getKey());
+            // String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
+
+            String value = entry.getValue();
+            String key = entry.getKey();
+            LOGGER.info("Set custom property: " + key + "; value: " + value);
+            // add each property directly into CONFIG
+            R.CONFIG.put(key, value);
+        }
 
     }
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,126 +47,113 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  *
  * @author akhursevich
  */
-public class ZafiraConfigurator implements IConfigurator
-{
-	protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
-    
+public class ZafiraConfigurator implements IConfigurator {
+    protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
+
     @Override
-    public ConfigurationType getConfiguration()
-    {
+    public ConfigurationType getConfiguration() {
         ConfigurationType conf = new ConfigurationType();
-        for (Parameter parameter : Parameter.values())
-        {
+        for (Parameter parameter : Parameter.values()) {
             conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
         }
 
         if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
-        	//TODO: review and fix for 5.2.2.xx implementation
+            // TODO: review and fix for 5.2.2.xx implementation
             // add custom arguments from browserStack
             conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
             conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
         }
 
-		long threadId = Thread.currentThread().getId();
-		
+        long threadId = Thread.currentThread().getId();
+
         // add custom arguments from current mobile device
-		Device device = DevicePool.getDevice();
-		if (!device.getName().isEmpty()) {
-			String deviceName = device.getName();
-			String deviceOs = device.getOs();
-			String deviceOsVersion = device.getOsVersion();
-			
-			conf.getArg().add(buildArgumentType("device", deviceName));
-			conf.getArg().add(buildArgumentType("platform", deviceOs));
-			conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
-			
-			LOGGER.debug("Detected device: '" + deviceName +"'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'"); 
-		} else {
-			LOGGER.debug("Unable to detect current device for threadId: " + threadId);
-		}
+        Device device = DevicePool.getDevice();
+        if (!device.getName().isEmpty()) {
+            String deviceName = device.getName();
+            String deviceOs = device.getOs();
+            String deviceOsVersion = device.getOsVersion();
+
+            conf.getArg().add(buildArgumentType("device", deviceName));
+            conf.getArg().add(buildArgumentType("platform", deviceOs));
+            conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
+
+            LOGGER.debug("Detected device: '" + deviceName + "'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'");
+        } else {
+            LOGGER.debug("Unable to detect current device for threadId: " + threadId);
+        }
         return conf;
     }
 
-    private ArgumentType buildArgumentType(String key, String value)
-    {
+    private ArgumentType buildArgumentType(String key, String value) {
         ArgumentType arg = new ArgumentType();
         arg.setKey(key);
-        //populate valid null values for all arguments
+        // populate valid null values for all arguments
         arg.setValue("NULL".equalsIgnoreCase(value) ? null : value);
         return arg;
     }
 
     @Override
-    public String getOwner(ISuite suite)
-    {
+    public String getOwner(ISuite suite) {
         String owner = suite.getParameter("suiteOwner");
         return owner != null ? owner : "";
     }
 
     @Override
-    public String getPrimaryOwner(ITestResult test)
-    {
+    public String getPrimaryOwner(ITestResult test) {
         // TODO: re-factor that
         return Ownership.getMethodOwner(test, OwnerType.PRIMARY);
     }
-    
-    @Override
-	public String getSecondaryOwner(ITestResult test) 
-    {
-    		// TODO: re-factor that
-        return Ownership.getMethodOwner(test, OwnerType.SECONDARY);
-	}
 
     @Override
-    public String getTestName(ITestResult test)
-    {
+    public String getSecondaryOwner(ITestResult test) {
+        // TODO: re-factor that
+        return Ownership.getMethodOwner(test, OwnerType.SECONDARY);
+    }
+
+    @Override
+    public String getTestName(ITestResult test) {
         // TODO: avoid TestNamingUtil
         return TestNamingUtil.getCanonicalTestName(test);
     }
 
     @Override
-    public String getTestMethodName(ITestResult test)
-    {
+    public String getTestMethodName(ITestResult test) {
         // TODO: avoid TestNamingUtil
         return TestNamingUtil.getCanonicalTestMethodName(test);
     }
 
     @Override
-    public List<String> getTestWorkItems(ITestResult test)
-    {
+    public List<String> getTestWorkItems(ITestResult test) {
         return Jira.getTickets(test);
     }
 
     @Override
-    public int getRunCount(ITestResult test)
-    {
+    public int getRunCount(ITestResult test) {
         return RetryCounter.getRunCount();
     }
 
     @Override
-    public Map<String, Long> getTestMetrics(ITestResult test)
-    {
+    public Map<String, Long> getTestMetrics(ITestResult test) {
         return Timer.readAndClear();
     }
 
     @Override
-    public DriverMode getDriverMode()
-    {
+    public DriverMode getDriverMode() {
         return DriverMode.valueOf(R.CONFIG.get("driver_mode").toUpperCase());
     }
 
-	@Override
-	public Set<TestArtifactType> getArtifacts(ITestResult test) {
+    @Override
+    public Set<TestArtifactType> getArtifacts(ITestResult test) {
         // Generate additional artifacts links on test run
         test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
         TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
         TestRail.clearCases();
         return Artifacts.getArtifacts();
-	}
-	
-	@Override
-	public String getReportEmails() {
-		// This code is invoked only from ZafiraListener i.e. Zafira integration is already enabled!
-		return  Configuration.get(Parameter.EMAIL_LIST);
-	}
+    }
+
+    @Override
+    public String getReportEmails() {
+        // This code is invoked only from ZafiraListener i.e. Zafira integration is already enabled!
+        return Configuration.get(Parameter.EMAIL_LIST);
+    }
 }

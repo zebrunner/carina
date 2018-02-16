@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,36 +26,32 @@ import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
-public class LoginPage extends AbstractPage
-{
-	@FindBy(name = "email")
-	private ExtendedWebElement emailTextField;
+public class LoginPage extends AbstractPage {
+    @FindBy(name = "email")
+    private ExtendedWebElement emailTextField;
 
-	@FindBy(name = "password")
-	private ExtendedWebElement passwordTextField;
+    @FindBy(name = "password")
+    private ExtendedWebElement passwordTextField;
 
-	@FindBy(xpath = "//input[@value='Log in']")
-	private ExtendedWebElement signInButton;
+    @FindBy(xpath = "//input[@value='Log in']")
+    private ExtendedWebElement signInButton;
 
-	@FindByAI(caption = "Google", label = Label.BUTTON)
-	private ExtendedWebElement googleButton;
+    @FindByAI(caption = "Google", label = Label.BUTTON)
+    private ExtendedWebElement googleButton;
 
-	public LoginPage(WebDriver driver)
-	{
-		super(driver);
-		setPageAbsoluteURL("https://stackoverflow.com/users/login");
-	}
+    public LoginPage(WebDriver driver) {
+        super(driver);
+        setPageAbsoluteURL("https://stackoverflow.com/users/login");
+    }
 
-	public void signIn(String email, String password)
-	{
-		emailTextField.type(email);
-		passwordTextField.type(password);
-		signInButton.click();
-	}
+    public void signIn(String email, String password) {
+        emailTextField.type(email);
+        passwordTextField.type(password);
+        signInButton.click();
+    }
 
-	// AI usage
-	public void signInViaGoogle()
-	{
-		googleButton.click();
-	}
+    // AI usage
+    public void signInViaGoogle() {
+        googleButton.click();
+    }
 }

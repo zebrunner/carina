@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,24 +15,24 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.ai;
 
-public enum Label
-{
-	TEXT_FIELD("text_field"), SELECT("select"), BUTTON("button"), CHECKBOX("checkbox"), RADIO("radio");
+public enum Label {
+    TEXT_FIELD("text_field"),
+    SELECT("select"),
+    BUTTON("button"),
+    CHECKBOX("checkbox"),
+    RADIO("radio");
 
-	private String labelName;
+    private String labelName;
 
-	Label(String labelName)
-	{
-		this.setLabelName(labelName);
-	}
+    Label(String labelName) {
+        this.setLabelName(labelName);
+    }
 
-	public String getLabelName()
-	{
-		return labelName;
-	}
+    public String getLabelName() {
+        return labelName;
+    }
 
-	public void setLabelName(String labelName)
-	{
-		this.labelName = labelName;
-	}
+    public void setLabelName(String labelName) {
+        this.labelName = labelName;
+    }
 }

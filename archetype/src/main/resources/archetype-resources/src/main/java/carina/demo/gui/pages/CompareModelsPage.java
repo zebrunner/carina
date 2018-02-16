@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,35 +30,30 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 import ${package}.carina.demo.gui.components.compare.CondidateBlock;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs;
 
-public class CompareModelsPage extends AbstractPage
-{
-	@FindBy(xpath = "//div[contains(@class, 'candidate-search')]")
-	private List<CondidateBlock> condidateBlocks;
+public class CompareModelsPage extends AbstractPage {
+    @FindBy(xpath = "//div[contains(@class, 'candidate-search')]")
+    private List<CondidateBlock> condidateBlocks;
 
-	public CompareModelsPage(WebDriver driver)
-	{
-		super(driver);
-	}
+    public CompareModelsPage(WebDriver driver) {
+        super(driver);
+    }
 
-	public List<ModelSpecs> compareModels(String... models)
-	{
-		CondidateBlock condidateBlock;
-		List<ModelSpecs> modelSpecs = new ArrayList<>();
-		ModelSpecs modelSpec;
-		for (int index = 0; index < models.length; index++)
-		{
-			modelSpec = new ModelSpecs();
-			condidateBlock = condidateBlocks.get(index);
-			condidateBlock.sendKeysToInputField(models[index]);
-			condidateBlock.getFirstPhone();
-			for (ModelSpecs.SpecType type : ModelSpecs.SpecType.values())
-			{
-				ExtendedWebElement spec = findExtendedWebElement(By.xpath(
-						String.format("//tr[.//a[text()='%s']]//td[@class='nfo'][%d]", type.getType(), index + 1)));
-				modelSpec.setToModelSpecsMap(type, spec.getText());
-			}
-			modelSpecs.add(modelSpec);
-		}
-		return modelSpecs;
-	}
+    public List<ModelSpecs> compareModels(String... models) {
+        CondidateBlock condidateBlock;
+        List<ModelSpecs> modelSpecs = new ArrayList<>();
+        ModelSpecs modelSpec;
+        for (int index = 0; index < models.length; index++) {
+            modelSpec = new ModelSpecs();
+            condidateBlock = condidateBlocks.get(index);
+            condidateBlock.sendKeysToInputField(models[index]);
+            condidateBlock.getFirstPhone();
+            for (ModelSpecs.SpecType type : ModelSpecs.SpecType.values()) {
+                ExtendedWebElement spec = findExtendedWebElement(By.xpath(
+                        String.format("//tr[.//a[text()='%s']]//td[@class='nfo'][%d]", type.getType(), index + 1)));
+                modelSpec.setToModelSpecsMap(type, spec.getText());
+            }
+            modelSpecs.add(modelSpec);
+        }
+        return modelSpecs;
+    }
 }

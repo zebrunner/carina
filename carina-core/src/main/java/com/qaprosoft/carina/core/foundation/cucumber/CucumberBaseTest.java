@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,17 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.cucumber;
 
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+
 import com.qaprosoft.carina.core.foundation.utils.image.ImageProcessing;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 
 public class CucumberBaseTest extends CucumberRunner {
-
 
     /**
      * Check is it Cucumber Test or not.
@@ -50,10 +50,10 @@ public class CucumberBaseTest extends CucumberRunner {
         LOGGER.info("In  @After takeScreenshotOfFailure");
         if (scenario.isFailed()) {
             LOGGER.error("Cucumber Scenario FAILED! Creating screenshot.");
-            //TODO: remove reference onto the DriverPool reusing functionality from Screenshot object!
+            // TODO: remove reference onto the DriverPool reusing functionality from Screenshot object!
             byte[] screenshot = ((TakesScreenshot) DriverPool.getDriver()).getScreenshotAs(OutputType.BYTES);
             screenshot = ImageProcessing.imageResize(screenshot);
-            scenario.embed(screenshot, "image/png"); //stick it in the report
+            scenario.embed(screenshot, "image/png"); // stick it in the report
         }
 
     }

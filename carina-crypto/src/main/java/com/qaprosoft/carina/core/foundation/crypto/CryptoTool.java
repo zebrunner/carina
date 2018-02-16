@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,137 +32,137 @@ import org.apache.log4j.Logger;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class CryptoTool {
-	private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);
+    private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);
 
-	private String algorithm;
-	private Cipher cipher;
-	private Key key;
-	
-	public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, Key key) {
-		this.algorithm = cryptoAlgorithm;
+    private String algorithm;
+    private Cipher cipher;
+    private Key key;
 
-		this.key = key;
-		
-		try {
-			this.cipher = Cipher.getInstance(algorithm);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-			LOGGER.error(e.getMessage(), e);
-		}
-	}
-	
-	public CryptoTool() {
-		this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_PATH);
-	}
-	
-	public CryptoTool(String cryptoKeyPath) {
-		this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, cryptoKeyPath);
-	}
-	
-	public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, String cryptoKeyPath) {
-		this.algorithm = cryptoAlgorithm;
+    public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, Key key) {
+        this.algorithm = cryptoAlgorithm;
 
-		try {
-			this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
-		} catch (IOException e) {
-			LOGGER.error(e.getMessage(), e);
-		}
-		try {
-			this.cipher = Cipher.getInstance(algorithm);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-			LOGGER.error(e.getMessage(), e);
-		}
-	}
+        this.key = key;
 
-	// Encrypt/decrypt
-	public String encrypt(String strToEncrypt) {
-		try {
-			cipher.init(Cipher.ENCRYPT_MODE, key);
-			final String encryptedString = new String(Base64.encodeBase64(cipher.doFinal(strToEncrypt.getBytes())));
-			return encryptedString;
-		} catch (Exception e) {
-			throw new RuntimeException("Error while encrypting, check your crypto key! " + e.getMessage(), e);
-		}
-	}
+        try {
+            this.cipher = Cipher.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
-	public String decrypt(String strToDecrypt) {
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, key);
-			final String decryptedString = new String(cipher.doFinal(Base64.decodeBase64(strToDecrypt.getBytes())));
-			return decryptedString;
-		} catch (Exception e) {
-			throw new RuntimeException("Error while decrypting, check your crypto key! " + e.getMessage(), e);
-		}
-	}
+    public CryptoTool() {
+        this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_PATH);
+    }
 
-	public String encryptByPattern(String content, Pattern pattern) {
-		String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-				pattern.pattern().indexOf(":"));
-		if (content != null && content.contains(wildcard)) {
-			Matcher matcher = pattern.matcher(content);
-			while (matcher.find()) {
-				String group = matcher.group();
-				String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
-				content = StringUtils.replace(content, group, encrypt(crypt));
-			}
-		}
-		return content;
-	}
+    public CryptoTool(String cryptoKeyPath) {
+        this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, cryptoKeyPath);
+    }
 
-	public String decryptByPattern(String content, Pattern pattern) {
-		String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-				pattern.pattern().indexOf(":"));
-		if (content != null && content.contains(wildcard)) {
-			Matcher matcher = pattern.matcher(content);
-			while (matcher.find()) {
-				String group = matcher.group();
-				String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
-				content = StringUtils.replace(content, group, decrypt(crypt));
-			}
-		}
-		return content;
-	}
+    public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, String cryptoKeyPath) {
+        this.algorithm = cryptoAlgorithm;
 
-	public String encryptByPatternAndWrap(String content, Pattern pattern, String wrapper) {
-		String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-				pattern.pattern().indexOf(":"));
-		if (content != null && content.contains(wildcard)) {
-			Matcher matcher = pattern.matcher(content);
-			while (matcher.find()) {
-				String group = matcher.group();
-				String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
-				content = StringUtils.replace(content, group, String.format(wrapper, encrypt(crypt)));
-			}
-		}
-		return content;
-	}
+        try {
+            this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        try {
+            this.cipher = Cipher.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
-	public String decryptByPatternAndWrap(String content, Pattern pattern, String wrapper) {
-		String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-				pattern.pattern().indexOf(":"));
-		if (content != null && content.contains(wildcard)) {
-			Matcher matcher = pattern.matcher(content);
-			while (matcher.find()) {
-				String group = matcher.group();
-				String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
-				content = StringUtils.replace(content, group, String.format(wrapper, decrypt(crypt)));
-			}
-		}
-		return content;
-	}
+    // Encrypt/decrypt
+    public String encrypt(String strToEncrypt) {
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            final String encryptedString = new String(Base64.encodeBase64(cipher.doFinal(strToEncrypt.getBytes())));
+            return encryptedString;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while encrypting, check your crypto key! " + e.getMessage(), e);
+        }
+    }
 
-	public String getAlgorithm() {
-		return algorithm;
-	}
+    public String decrypt(String strToDecrypt) {
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            final String decryptedString = new String(cipher.doFinal(Base64.decodeBase64(strToDecrypt.getBytes())));
+            return decryptedString;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while decrypting, check your crypto key! " + e.getMessage(), e);
+        }
+    }
 
-	public void setAlgorithm(String algorithm) {
-		this.algorithm = algorithm;
-	}
+    public String encryptByPattern(String content, Pattern pattern) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                String group = matcher.group();
+                String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
+                content = StringUtils.replace(content, group, encrypt(crypt));
+            }
+        }
+        return content;
+    }
 
-	public Cipher getCipher() {
-		return cipher;
-	}
+    public String decryptByPattern(String content, Pattern pattern) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                String group = matcher.group();
+                String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
+                content = StringUtils.replace(content, group, decrypt(crypt));
+            }
+        }
+        return content;
+    }
 
-	public void setCipher(Cipher cipher) {
-		this.cipher = cipher;
-	}
+    public String encryptByPatternAndWrap(String content, Pattern pattern, String wrapper) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                String group = matcher.group();
+                String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
+                content = StringUtils.replace(content, group, String.format(wrapper, encrypt(crypt)));
+            }
+        }
+        return content;
+    }
+
+    public String decryptByPatternAndWrap(String content, Pattern pattern, String wrapper) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                String group = matcher.group();
+                String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
+                content = StringUtils.replace(content, group, String.format(wrapper, decrypt(crypt)));
+            }
+        }
+        return content;
+    }
+
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public Cipher getCipher() {
+        return cipher;
+    }
+
+    public void setCipher(Cipher cipher) {
+        this.cipher = cipher;
+    }
 }

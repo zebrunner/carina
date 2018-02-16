@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,130 +50,113 @@ import io.appium.java_client.ios.IOSElement;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class MobileFactory extends AbstractFactory
-{
-	@Override
-	public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost)
-	{
+public class MobileFactory extends AbstractFactory {
+    @Override
+    public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
 
-		if (seleniumHost == null)
-		{
-			seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
-		}
+        if (seleniumHost == null) {
+            seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+        }
 
-		String driverType = Configuration.getDriverType();
-		String mobilePlatformName = Configuration.getPlatform();
-		
-		//TODO: refactor code to be able to remove SpecialKeywords.CUSTOM property completely
-		
-		// use comparison for custom_capabilities here to localize as possible usage of CUSTOM attribute
-		String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-		if (!customCapabilities.isEmpty()) {
-			mobilePlatformName = SpecialKeywords.CUSTOM;
-		}
+        String driverType = Configuration.getDriverType();
+        String mobilePlatformName = Configuration.getPlatform();
 
-		LOGGER.debug("selenium: " + seleniumHost);
+        // TODO: refactor code to be able to remove SpecialKeywords.CUSTOM property completely
 
-		RemoteWebDriver driver = null;
-		if (isCapabilitiesEmpty(capabilities))
-		{
-			capabilities = getCapabilities(name, device);
-		}
-		
-		try
-		{
-			if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE))
-			{
-				if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-					driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
-				}
-				else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
-					driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
-				} else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
-					// that's a case for custom mobile capabilities like browserstack or saucelabs 
-					driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
-				} else {
-					throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
-				}
+        // use comparison for custom_capabilities here to localize as possible usage of CUSTOM attribute
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            mobilePlatformName = SpecialKeywords.CUSTOM;
+        }
 
-			}
-			
-			if (device.isNull()) {
-				// TODO: double check that local run with direct appium works fine
-				RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
-				// 3rd party solutions like browserstack or saucelabs return not null remoteDevice object. But inside nothing useful
-				if (remoteDevice != null && remoteDevice.getName() != null) {
-					device = new Device(remoteDevice);
-				} else {
-					device = new Device(driver.getCapabilities());
-				}
+        LOGGER.debug("selenium: " + seleniumHost);
 
-				boolean stfEnabled = R.CONFIG
-						.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-				if (stfEnabled) {
-					device.connectRemote();
-				}
-				DevicePool.registerDevice(device);
-			}
-			// will be performed just in case uninstall_related_apps flag marked as true
-			device.uninstallRelatedApps();
-		}
-		catch (MalformedURLException e)
-		{
-			LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
-		}
+        RemoteWebDriver driver = null;
+        if (isCapabilitiesEmpty(capabilities)) {
+            capabilities = getCapabilities(name, device);
+        }
 
-		if (driver == null)
-		{
-			Assert.fail("Unable to initialize driver: " + name + "!");
-		}
+        try {
+            if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+                if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+                    driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
+                } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
+                    driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
+                } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
+                    // that's a case for custom mobile capabilities like browserstack or saucelabs
+                    driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+                } else {
+                    throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
+                }
 
-		return driver;
-	}
+            }
 
-	private DesiredCapabilities getCapabilities(String name, Device device)
-	{
-		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities = new MobileCapabilies().getCapability(name);
-		
-		if (!device.isNull())
-		{
-			capabilities.setCapability("udid", device.getUdid());
-			// disable Selenium Hum <-> STF verification as device already
-			// connected by this test (restart driver on the same device is invoked)
-			capabilities.setCapability("STF_ENABLED", "false");
-		}
+            if (device.isNull()) {
+                // TODO: double check that local run with direct appium works fine
+                RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+                // 3rd party solutions like browserstack or saucelabs return not null remoteDevice object. But inside nothing useful
+                if (remoteDevice != null && remoteDevice.getName() != null) {
+                    device = new Device(remoteDevice);
+                } else {
+                    device = new Device(driver.getCapabilities());
+                }
 
-		return capabilities;
-	}
+                boolean stfEnabled = R.CONFIG
+                        .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+                if (stfEnabled) {
+                    device.connectRemote();
+                }
+                DevicePool.registerDevice(device);
+            }
+            // will be performed just in case uninstall_related_apps flag marked as true
+            device.uninstallRelatedApps();
+        } catch (MalformedURLException e) {
+            LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
+        }
 
-	/**
-	 * Returns device information from Grid Hub using STF service.
-	 * @param seleniumHost - Selenium Grid host
-	 * @param sessionId - Selenium session id
-	 * @return remote device information
-	 */
-	private RemoteDevice getDeviceInfo(String seleniumHost, String sessionId)
-	{
-		RemoteDevice device = null;
-		try
-		{
-			HttpClient client = HttpClientBuilder.create().build();
-			HttpGet request = new HttpGet(seleniumHost.split("wd")[0] + "grid/admin/DeviceInfo?session=" + sessionId);
-			HttpResponse response = client.execute(request);
+        if (driver == null) {
+            Assert.fail("Unable to initialize driver: " + name + "!");
+        }
 
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			device = mapper.readValue(response.getEntity().getContent(), RemoteDevice.class);
-		}
-		catch (JsonParseException e)
-		{
-			// do nothing as it is direct call to the Appium without selenium
-		}
-		catch (Exception e)
-		{
-			LOGGER.error("Unable to get device info: " + e.getMessage());
-		}
-		return device;
-	}
+        return driver;
+    }
+
+    private DesiredCapabilities getCapabilities(String name, Device device) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities = new MobileCapabilies().getCapability(name);
+
+        if (!device.isNull()) {
+            capabilities.setCapability("udid", device.getUdid());
+            // disable Selenium Hum <-> STF verification as device already
+            // connected by this test (restart driver on the same device is invoked)
+            capabilities.setCapability("STF_ENABLED", "false");
+        }
+
+        return capabilities;
+    }
+
+    /**
+     * Returns device information from Grid Hub using STF service.
+     * 
+     * @param seleniumHost - Selenium Grid host
+     * @param sessionId - Selenium session id
+     * @return remote device information
+     */
+    private RemoteDevice getDeviceInfo(String seleniumHost, String sessionId) {
+        RemoteDevice device = null;
+        try {
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet request = new HttpGet(seleniumHost.split("wd")[0] + "grid/admin/DeviceInfo?session=" + sessionId);
+            HttpResponse response = client.execute(request);
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            device = mapper.readValue(response.getEntity().getContent(), RemoteDevice.class);
+        } catch (JsonParseException e) {
+            // do nothing as it is direct call to the Appium without selenium
+        } catch (Exception e) {
+            LOGGER.error("Unable to get device info: " + e.getMessage());
+        }
+        return device;
+    }
 }
