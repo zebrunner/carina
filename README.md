@@ -2,7 +2,7 @@
 
 Carina Automation Framework
 ==================
-Carina is a Java-based test automation framework that unites all testing levels: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
+Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
 * Carina framework is built on top of most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on specific technology stack.
 
@@ -285,7 +285,7 @@ Configuration.getEnvArg("url")
 As a result you switch between environments just changing env argument in _config.properties file.
 
 ### Execution
-There are a few options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework. Before running tests make sure you have downloaded Selenium standalone server jar file and started it by the following command:
+There are a several options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework. Before running tests make sure you have downloaded Selenium standalone server jar file and started it by the following command:
 ```
 java -jar selenium-server-standalone-3.6.0.jar
 ```
