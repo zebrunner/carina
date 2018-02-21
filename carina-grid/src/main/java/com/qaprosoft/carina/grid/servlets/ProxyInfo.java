@@ -38,8 +38,6 @@ import com.google.gson.Gson;
 public class ProxyInfo extends RegistryBasedServlet {
 	private static final long serialVersionUID = 1224921425278259572L;
 
-	private static final Gson gson = new Gson();
-	
 	public ProxyInfo() {
         this(null);
     }
@@ -65,7 +63,7 @@ public class ProxyInfo extends RegistryBasedServlet {
         while(itr.hasNext())
         {
         		RemoteProxy proxy = itr.next();
-        		data.put(gson.toJson(proxy.getOriginalRegistrationRequest()));
+        		data.put(proxy.getOriginalRegistrationRequest());
         }
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
