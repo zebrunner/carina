@@ -16,20 +16,21 @@
 package com.qaprosoft.carina.grid.servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codehaus.jettison.json.JSONArray;
+import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.RemoteProxy;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
-import com.google.gson.Gson;
-import com.qaprosoft.carina.commons.models.RemoteDevice;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Servlet that retrieves information about connected nodes.
@@ -38,6 +39,8 @@ import com.qaprosoft.carina.commons.models.RemoteDevice;
  */
 public class ProxyInfo extends RegistryBasedServlet {
 	private static final long serialVersionUID = 1224921425278259572L;
+	
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public ProxyInfo() {
         this(null);
@@ -59,25 +62,22 @@ public class ProxyInfo extends RegistryBasedServlet {
     }
 
     protected void process(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONArray data = new JSONArray();
+        List<RegistrationRequest> proxies = new ArrayList<>();
         Iterator<RemoteProxy> itr = this.getRegistry().getAllProxies().iterator();
-        while(itr.hasNext())
-        {
+        while(itr.hasNext()) {
         		RemoteProxy proxy = itr.next();
-        		data.put(proxy.getOriginalRegistrationRequest().toJson());
+        		proxies.add(proxy.getOriginalRegistrationRequest());
         }
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        try
-        {
-        		data.write(response.getWriter());
+        try {
+        		mapper.writeValue(response.getWriter(), proxies);
         		response.setStatus(HttpStatus.SC_OK);
         }
         catch (Exception e) {
         		response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 		}
-        finally 
-        {
+        finally {
         		response.getWriter().close();
 		}
     }
