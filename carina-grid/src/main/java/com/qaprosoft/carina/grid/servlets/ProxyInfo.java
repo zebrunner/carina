@@ -29,6 +29,7 @@ import org.openqa.grid.internal.RemoteProxy;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
 import com.google.gson.Gson;
+import com.qaprosoft.carina.commons.models.RemoteDevice;
 
 /**
  * Servlet that retrieves information about connected nodes.
@@ -63,12 +64,21 @@ public class ProxyInfo extends RegistryBasedServlet {
         while(itr.hasNext())
         {
         		RemoteProxy proxy = itr.next();
-        		data.put(proxy.getOriginalRegistrationRequest());
+        		data.put(proxy.getOriginalRegistrationRequest().toJson());
         }
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpStatus.SC_OK);
-        response.getWriter().print(data);
-	    response.getWriter().close();
+        try
+        {
+        		data.write(response.getWriter());
+        		response.setStatus(HttpStatus.SC_OK);
+        }
+        catch (Exception e) {
+        		response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+		}
+        finally 
+        {
+        		response.getWriter().close();
+		}
     }
 }
