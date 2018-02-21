@@ -28,6 +28,8 @@ import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.RemoteProxy;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
+import com.google.gson.Gson;
+
 /**
  * Servlet that retrieves information about connected nodes.
  * 
@@ -36,6 +38,8 @@ import org.openqa.grid.web.servlet.RegistryBasedServlet;
 public class ProxyInfo extends RegistryBasedServlet {
 	private static final long serialVersionUID = 1224921425278259572L;
 
+	private static final Gson gson = new Gson();
+	
 	public ProxyInfo() {
         this(null);
     }
@@ -61,7 +65,7 @@ public class ProxyInfo extends RegistryBasedServlet {
         while(itr.hasNext())
         {
         		RemoteProxy proxy = itr.next();
-        		data.put(proxy.getOriginalRegistrationRequest().toJson());
+        		data.put(gson.toJson(proxy.getOriginalRegistrationRequest()));
         }
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
