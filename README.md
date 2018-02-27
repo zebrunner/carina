@@ -260,6 +260,54 @@ All project configuration properties are located in **_config.properties** file.
 		<td>{must_override}</td>
 		<td>pwd123</td>
 	</tr>
+	<tr>
+		<td>env</td>
+		<td>Environment specific configuration. More about this [feature](#environment-specific-configuration)</td>
+		<td>n/a</td>
+		<td>STAG, PROD, DEMO</td>
+	</tr>
+	<tr>
+		<td>env_arg_resolver</td>
+		<td>This parametr is optional, if it isn't set default value will be used. In most cases <b>default value is enough</b></td>
+		<td>com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver</td>
+		<td>java class </td>
+	</tr>
+		<tr>
+		<td>platform</td>
+		<td>Platform version for Selenium Grid</td>
+		<td>*</td>
+		<td>ANDROID,IOS,WINDOWS,MAC,LINUX</td>
+	</tr>
+		<tr>
+		<td>browser_version</td>
+		<td>The browser version, or the empty string if unknown for Selenium Grid</td>
+		<td>n/a</td>
+		<td>"8.0", "52.1"</td>
+	</tr>
+		<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle.</td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+		<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle.</td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+		<tr>
+		<td>driver_event_listeners</td>
+		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be instances of WebDriverEventListener</td>
+		<td>n/a</td>
+		<td>com.someCompane.core.EventListener1,com.someCompane.core.EventListener2</td>
+	</tr>
+		<tr>
+		<td>max_driver_count</td>
+		<td>Max number of drivers per thread</td>
+		<td>3</td>
+		<td>Integer</td>
+	</tr>
 </table>
 
 Most of the properties may be read in the following way:
@@ -273,7 +321,7 @@ Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ### Environment specific configuration
 In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
 ```
-env=DEMO
+env=PROD
 STAG.url=http://stag-app-server.com
 PROD.url=http://prod-app-server.com
 ```
