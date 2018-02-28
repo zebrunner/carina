@@ -308,6 +308,60 @@ All project configuration properties are located in **_config.properties** file.
 		<td>3</td>
 		<td>Integer</td>
 	</tr>
+		<tr>
+		<td>custom_capabilities</td>
+		<td>Name of propertie file with custom capabilities(key-value)</td>
+		<td>n/a</td>
+		<td>custom.propertie</td>
+	</tr>
+		<tr>
+		<td>proxy_host</td>
+		<td>The hostname of the server</td>
+		<td>n/a</td>
+		<td>host.example.com</td>
+	</tr>
+		<tr>
+		<td>proxy_port</td>
+		<td>The port number</td>
+		<td>n/a</td>
+		<td>80</td>
+	</tr>
+		<tr>
+		<td>proxy_protocols</td>
+		<td>Comma-separated list of internet protocols used to carry connection information from the source requesting the connection to the destination for which the connection was requested.</td>
+		<td>http,https,ftp</td>
+		<td>http, https, ftp, socks</td>
+	</tr>
+		<tr>
+		<td>browsermob_proxy</td>
+		<td>Boolean parameter which enable or disable set up of mobile proxy</td>
+		<td>false</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>browsermob_port</td>
+		<td>The port number for mobile browser</td>
+		<td>0</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>proxy_set_to_system</td>
+		<td>Boolean parameter which enable or disable set up of proxy</td>
+		<td>true</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>failure_email_list</td>
+		<td>Comma-separated list of emails for failure reports</td>
+		<td>n/a</td>
+		<td>u1@mail.com,u2@mail.com</td>
+	</tr>
+		<tr>
+		<td>track_known_issues</td>
+		<td>Boolean parameter. If it is true and some Jira tickets assosiated with test in case of failure Jira info will be added to report</td>
+		<td>false</td>
+		<td>true,false</td>
+	</tr>
 </table>
 
 Most of the properties may be read in the following way:
