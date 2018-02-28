@@ -207,7 +207,7 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Integer</td>
 	</tr>
 	<tr>
-		<td>retry_internal</td>
+		<td>retry_interval</td>
 		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify number from 500-1500 range</td>
 		<td>2</td>
 		<td>Integer</td>
@@ -361,6 +361,42 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Boolean parameter. If it is true and some Jira tickets assosiated with test in case of failure Jira info will be added to report</td>
 		<td>false</td>
 		<td>true,false</td>
+	</tr>
+	<tr>
+		<td>smart_screenshot</td>
+		<td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
+		<td>false</td>
+		<td>true,false</td>
+	</tr>
+	<tr>
+		<td>smart_screenshot</td>
+		<td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
+		<td>false</td>
+		<td>true,false</td>
+	</tr>
+	<tr>
+		<td>explicit_timeout</td>
+		<td>Timeout in seconds to wait for a certain condition to occur before proceeding further in the code</td>
+		<td>20</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>auto_download</td>
+		<td>Enabled parametr prevent download dialog and download file automatically. Feature currently avaliable for Chrome and FireFox</td>
+		<td>false</td>
+		<td>false, true</td>
+	</tr>
+	<tr>
+		<td>auto_download_apps</td>
+		<td>MIME types / Internet Media Types. Parameter is necessary only for configure auto downloading for FireFox</td>
+		<td>NULL</td>
+		<td>application/pdf, video/x-msvideo, list of [values](https://freeformatter.com/mime-types-list.html)</td>
+	</tr>
+	<tr>
+		<td>project_report_directory</td>
+		<td>Path to folder where reports will be saved</td>
+		<td>../reports/qa</td>
+		<td>./reports/qa</td>
 	</tr>
 </table>
 
