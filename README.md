@@ -398,6 +398,90 @@ All project configuration properties are located in **_config.properties** file.
 		<td>../reports/qa</td>
 		<td>./reports/qa</td>
 	</tr>
+	<tr>
+		<td>big_screen_width</td>
+		<td>Sreenshots will be resized according this width if there own width is bigger</td>
+		<td>-1</td>
+		<td>500, 1200, Integer</td>
+	</tr>
+	<tr>
+		<td>big_screen_height</td>
+		<td>Sreenshots will be resized according this height if there own height is bigger</td>
+		<td>-1</td>
+		<td>500, 1200, Integer</td>
+	</tr>
+		<tr>
+		<td>small_screen_width</td>
+		<td>Thumbnails width</td>
+		<td>90</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>big_screen_height</td>
+		<td>Thumbnails height</td>
+		<td>90</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>big_screen_height</td>
+		<td>Thumbnails height</td>
+		<td>90</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>init_retry_count</td>
+		<td>Number of attempts to create driver.  Default value 0 means that it would be only 1 attempt</td>
+		<td>0</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>init_retry_interval</td>
+		<td>Interval is seconds between attempts to create driver</td>
+		<td>1</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>retry_count</td>
+		<td>Number of test-retrying in case of failure.  Default value 0 means that test would be performed only once</td>
+		<td>0</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>enable_l10n</td>
+		<td>Enable L10N feature</td>
+		<td>true</td>
+		<td>false, true</td>
+	</tr>
+			<tr>
+		<td>l10n_encoding</td>
+		<td>Charset for l10n feature</td>
+		<td>ISO-8859-1</td>
+		<td>ISO-8859-5, ISO-8859-6</td>
+	</tr>
+	<tr>
+		<td>enable_i18n</td>
+		<td>Enable i18n feature</td>
+		<td>true</td>
+		<td>false, true</td>
+	</tr>
+		<tr>
+		<td>thread_count</td>
+		<td>Default number of threads to use when running tests in parallel.</td>
+		<td>1</td>
+		<td>fInteger</td>
+	</tr>
+		<tr>
+		<td>data_provider_thread_count</td>
+		<td>Default number of threads to use for data providers when running tests in parallel.</td>
+		<td>1</td>
+		<td>fInteger</td>
+	</tr>
+		<tr>
+		<td>core_log_level</td>
+		<td>Level for Carina logging.</td>
+		<td>INFO</td>
+		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE </td>
+	</tr>
 </table>
 
 Most of the properties may be read in the following way:
