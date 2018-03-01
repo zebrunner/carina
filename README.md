@@ -584,6 +584,84 @@ All project configuration properties are located in **_config.properties** file.
 		<td>NULL</td>
 		<td>some-milestone</td>
 	</tr>
+		<tr>
+		<td>testrail_assignee</td>
+		<td>User asserneed for the suit</td>
+		<td>NULL</td>
+		<td>asignee_user@yuorcompany.com</td>
+	</tr>
+		<tr>
+		<td>s3_bucket_name</td>
+		<td>Bucket name on S3 Amazon from which you suppose to download artifacts</td>
+		<td>NULL</td>
+		<td>some bucket</td>
+	</tr>
+		<tr>
+		<td>access_key_id</td>
+		<td>Acces key id for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>NULL</td>
+		<td>gkhcvdgvceUYF67897hbjsbdc</td>
+	</tr>
+		<tr>
+		<td>secret_key</td>
+		<td>Secret key for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>NULL</td>
+		<td>gkhcvdgvceUYF67897hbjsbdc</td>
+	</tr>
+		<tr>
+		<td>s3_local_storage</td>
+		<td>Directory for downloading artefacts</td>
+		<td>.</td>
+		<td>./s3</td>
+	</tr>
+		<tr>
+		<td>s3_screenshot_bucket_name</td>
+		<td>Bucket name on S3 Amamzon for saving report screenshots</td>
+		<td>NULL</td>
+		<td>Screenshot bucket name</td>
+	</tr>
+		<tr>
+		<td>s3_save_screenshots</td>
+		<td>If enabled screenshots would be saved on S3 Amamzon</td>
+		<td>false</td>
+		<td>false, true</td>
+	</tr>
+		<tr>
+		<td>hockeyapp_token</td>
+		<td>Token for authentication in Hockey App</td>
+		<td>NULL</td>
+		<td>gkhcvdgvceUYF67897hbjsbdc</td>
+	</tr>
+		<tr>
+		<td>hockeyapp_local_storage</td>
+		<td>Directory for Hockey App artefacts</td>
+		<td>.</td>
+		<td>./hockeyapp</td>
+	</tr>
+		<tr>
+		<td>add_new_localization</td>
+		<td>Should be set to 'true' if you want to create new localization files for required Locale.Otherwise there will be just localization checking</td>
+		<td>false</td>
+		<td>false, true</td>
+	</tr>
+		<tr>
+		<td>add_new_localization_encoding</td>
+		<td>Encoding for new lokalization</td>
+		<td>utf-8</td>
+		<td>utf-16, utf-32</td>
+	</tr>
+		<tr>
+		<td>add_new_localization_path</td>
+		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+		<td>utf-8</td>
+		<td>utf-16, utf-32</td>
+	</tr>
+		<tr>
+		<td>add_new_localization_property_name</td>
+		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+		<td>new_custom_messages_</td>
+		<td>the basic template for property name. There will be locale added at the end of the filename.</td>
+	</tr>
 
 Most of the properties may be read in the following way:
 ```
