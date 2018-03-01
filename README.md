@@ -512,7 +512,54 @@ All project configuration properties are located in **_config.properties** file.
 		<td>NULL</td>
 		<td>Advanced Acceptance</td>
 	</tr>
-</table>
+	<tr>
+		<td>jira_updater</td>
+		<td>Class contains logic to update Jira. <b>Note</b> Custom updater have to implement DefaultJiraUpdater, by default methods do nothing</td>
+		<td>com.qaprosoft.carina.core.foundation.jira.DefaultJiraUpdater</td>
+		<td>Custom class</td>
+	</tr>
+	<tr>
+		<td>jira_url</td>
+		<td>Url to Jira</td>
+		<td>NULL</td>
+		<td>https://yourclass.atlassian.net</td>
+	</tr>
+		<tr>
+		<td>jira_user</td>
+		<td>Jira user email</td>
+		<td>NULL</td>
+		<td>admin@yourcompany.com</td>
+	</tr>
+		<tr>
+		<td>jira_password</td>
+		<td>Jira user password</td>
+		<td>NULL</td>
+		<td>admin123456</td>
+	</tr>
+		<tr>
+		<td>jira_suite_id</td>
+		<td>Jira suit id (if you have one)</td>
+		<td>NULL</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>jira_project</td>
+		<td>Jira project id</td>
+		<td>NULL</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>jira_create_new_ticket</td>
+		<td>If feature is enabled after test failure new jira ticket will be created</td>
+		<td>false</td>
+		<td>true, false</td>
+	</tr>
+	<tr>
+		<td>video_recording</td>
+		<td>If feature is test will be recorded</td>
+		<td>false</td>
+		<td>true, false</td>
+	</tr>
 
 Most of the properties may be read in the following way:
 ```
