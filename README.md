@@ -698,6 +698,18 @@ All project configuration properties are located in **_config.properties** file.
 		<td>src/test/resources/keysecure</td>
 		<td>./tls/keysecure</td>
 	</tr>
+		<tr>
+		<td>health_check_class</td>
+		<td>Class to execute helth checks</td>
+		<td>NULL</td>
+		<td>Custom class</td>
+	</tr>
+		<tr>
+		<td>health_check_methods</td>
+		<td>Comma-separate list of methods of health_check_class to execute preliminary</td>
+		<td>NULL</td>
+		<td>doThis, doThat</td>
+	</tr>
 Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
