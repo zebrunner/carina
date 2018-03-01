@@ -662,7 +662,42 @@ All project configuration properties are located in **_config.properties** file.
 		<td>new_custom_messages_</td>
 		<td>the basic template for property name. There will be locale added at the end of the filename.</td>
 	</tr>
-
+		<tr>
+		<td>cucumber_tests</td>
+		<td>If parametrs contains true Cucumber tests will be started</td>
+		<td></td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests_app_version</td>
+		<td>Version of app using in Cucumber tests</td>
+		<td></td>
+		<td>2.013</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests_name</td>
+		<td>Cucucmber tests name</td>
+		<td></td>
+		<td>cucumber tests</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests_results_image_resize</td>
+		<td>Percent of Scaling from default image. 100 - same size</td>
+		<td>30</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>cucumber_report_subfolder</td>
+		<td>Subfolder on Jenkins (jenkins_url/{someNumbersFr EveryRun}/artifacts/CucumberReport/{cucumber_report_subfolder})</td>
+		<td>cucumber-html-reports</td>
+		<td>cucumber-reports</td>
+	</tr>
+		<tr>
+		<td>tls_keysecure_location</td>
+		<td>Path to directory with tls secure keys</td>
+		<td>src/test/resources/keysecure</td>
+		<td>./tls/keysecure</td>
+	</tr>
 Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
