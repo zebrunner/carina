@@ -474,13 +474,31 @@ All project configuration properties are located in **_config.properties** file.
 		<td>data_provider_thread_count</td>
 		<td>Default number of threads to use for data providers when running tests in parallel.</td>
 		<td>1</td>
-		<td>fInteger</td>
+		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>core_log_level</td>
-		<td>Level for Carina logging.</td>
+		<td>Level for Carina logging</td>
 		<td>INFO</td>
 		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE </td>
+	</tr>
+		<tr>
+		<td>log_all_json</td>
+		<td>API response will be logged in JSON format</td>
+		<td>true</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>date_format</td>
+		<td>Date format for DateUtils.class</td>
+		<td>HH:mm:ss yyyy-MM-dd</td>
+		<td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
+	</tr>
+		<tr>
+		<td>date_format</td>
+		<td>Date format for DateUtils.class</td>
+		<td>HH:mm:ss yyyy-MM-dd</td>
+		<td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
 	</tr>
 </table>
 
