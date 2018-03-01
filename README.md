@@ -495,10 +495,22 @@ All project configuration properties are located in **_config.properties** file.
 		<td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
 	</tr>
 		<tr>
-		<td>date_format</td>
+		<td>time_format</td>
 		<td>Date format for DateUtils.class</td>
-		<td>HH:mm:ss yyyy-MM-dd</td>
-		<td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
+		<td>HH:mm:ss</td>
+		<td>HH:mm:ss.SSS, HH:mm a zzz</td>
+	</tr>
+		<tr>
+		<td>crypto_key_path</td>
+		<td>Path to file with crypto key</td>
+		<td>./src/main/resources/crypto.key</td>
+		<td>./crypto</td>
+	</tr>
+		<tr>
+		<td>suite_name</td>
+		<td>Suite name for report and TestRail. If this parameter is NULL will be get from TestNG xml (parameter suite name) or _email.properties (title)</td>
+		<td>NULL</td>
+		<td>Advanced Acceptance</td>
 	</tr>
 </table>
 
