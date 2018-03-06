@@ -845,6 +845,36 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
                 <td>n/a</td>
 		<td>759b543c</td>
 	</tr>
+        <tr>
+		<td>capabilities.device</td>
+		<td>Specifies a particular mobile device for the test environment on Browserstack</td>
+                <td>n/a</td>
+		<td>Galaxy Note 8, iPhone X</td>
+	</tr>
+	 <tr>
+		<td>capabilities.os_versione</td>
+		<td>Version of OS for Browserstack</td>
+                <td>n/a</td>
+		<td>ios, android</td>
+	</tr>
+	<tr>
+		<td>capabilities.remoteURL</td>
+		<td>Remote URL for using Selenium Grid</td>
+                <td>n/a</td>
+		<td> 'http://localhost:4444/wd/hub'</td>
+	</tr>
+		<tr>
+		<td>capabilities.appActivity</td>
+		<td>App activity, Appium required it sometimes to install app</td>
+                <td>n/a</td>
+		<td>com.amazon.mShop.home.HomeActivity</td>
+	</tr>
+		<tr>
+		<td>capabilities.appPackage</td>
+		<td>App package, Appium required it sometimes to install app</td>
+                <td>n/a</td>
+		<td>in.amazon.mShop.android.shopping</td>
+	</tr>
 </table>
 
 ### For Android:
