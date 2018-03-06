@@ -340,7 +340,7 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>browsermob_port</td>
-		<td>The port number for mobile browser</td>
+		<td>The port number for mobile browser (make sense only for local debugging)</td>
 		<td>0</td>
 		<td>Integer</td>
 	</tr>
@@ -691,6 +691,12 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Subfolder on Jenkins (jenkins_url/{someNumbersFr EveryRun}/artifacts/CucumberReport/{cucumber_report_subfolder})</td>
 		<td>cucumber-html-reports</td>
 		<td>cucumber-reports</td>
+	</tr>
+		<tr>
+		<td>cucumber_user_js_in_report</td>
+		<td>Enabled parameter help to get more beautiful reports</td>
+		<td>true</td>
+		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
