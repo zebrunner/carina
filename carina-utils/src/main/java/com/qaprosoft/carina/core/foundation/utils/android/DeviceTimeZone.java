@@ -65,6 +65,73 @@ public class DeviceTimeZone {
         }
     }
 
+    public enum TimeZoneFormat {
+        BUENOS_AIRES("America/Buenos_Aires", "Buenos Aires", "GMT-03:00", "ART"),
+        ST_JOHN("America/St_Johns", "St. John", "GMT-03:30", "NST"),
+        HALIFAX("America/Halifax", "Halifax", "GMT-03:00", "AST"),
+        BARBADOS("America/Barbados", "Barbados", "GMT-04:00", ""),
+        EASTERN("America/New_York", "Eastern", "GMT-04:00", "EST"),
+        CENTRAL("America/Chicago", "Central", "GMT-05:00", "CST"),
+        BOGOTA("America/Bogota", "Bogota", "GMT-05:00", ""),
+        CHIHUAHUA("America/Chihuahua", "Chihuahua", "GMT-06:00", ""),
+        MOUNTAIN("America/Phoenix", "Phoenix,Mountain", "GMT-07:00", "MST"),
+        PACIFIC("America/Los_Angeles", "Pacific", "GMT-08:00", "PST"),
+        ALASKA("America/Anchorage", "Alaska", "GMT-09:00", "AKST"),
+        HAWAII("Pacific/Honolulu", "Hawaii", "GMT-10:00", ""),
+        SYDNEY("Australia/Sydney", "Sydney", "GMT+10:00", ""),
+        SEOUL("Asia/Seoul", "Seoul", "GMT+09:00", ""),
+        TAIPEI("Asia/Taipei", "Taipei", "GMT+08:00", ""),
+        PERTH("Australia/Perth", "Perth", "GMT+08:00", ""),
+        MINSK("Europe/Minsk", "Minsk", "GMT+03:00", "MSQ"),
+        JERUSALEM("Asia/Jerusalem", "Jerusalem", "GMT+02:00", "IST"),
+        EUROPE("Europe/Amsterdam", "Amsterdam", "GMT+01:00", "CET"),
+        GMT("Europe/London", "London", "GMT+00:00", "GMT");
+        private String timeZone;
+        private String settingsTZ;
+        private String gmtTZ;
+        private String abbr;
+
+        TimeZoneFormat(String timeZone, String settingsTZ, String gmtTZ, String abbr) {
+            this.timeZone = timeZone;
+            this.settingsTZ = settingsTZ;
+            this.gmtTZ = gmtTZ;
+            this.abbr = abbr;
+        }
+
+        public String getTimeZone() {
+            return timeZone;
+        }
+
+        public String getSettingsTZ() {
+            return settingsTZ;
+        }
+
+        public String getGMT() {
+            return gmtTZ;
+        }
+
+        public String getAbbr() {
+            return abbr;
+        }
+
+        public static TimeZoneFormat parse(String text) {
+            if (text != null) {
+                for (TimeZoneFormat type : TimeZoneFormat.values()) {
+                    if (type.getSettingsTZ().equalsIgnoreCase(text) || type.getTimeZone().toLowerCase().contains(text.toLowerCase())
+                            || type.getGMT().equalsIgnoreCase(text) || type.getAbbr().equals(text)) {
+                        return type;
+                    }
+                }
+            }
+            return GMT;
+        }
+
+        public String toString() {
+            return "TimeZoneFormat{" + "timeZone='" + timeZone + '\'' + ", settingsTZ='" + settingsTZ + '\'' + ", gmtTZ='" + gmtTZ + '\'' + ", abbr='"
+                    + abbr + '\'' + '}';
+        }
+    }
+
     public DeviceTimeZone() {
         this.auto_time = true;
         this.auto_timezone = true;

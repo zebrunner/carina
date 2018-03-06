@@ -281,7 +281,14 @@ public class Configuration {
 
         HEALTH_CHECK_METHODS("health_check_methods"),
 
-        UNINSTALL_RELATED_APPS("uninstall_related_apps");
+        UNINSTALL_RELATED_APPS("uninstall_related_apps"),
+
+        // For Device default timezone and language
+        DEFAULT_DEVICE_TIMEZONE("default_device_timezone"),
+
+        DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
+
+        DEFAULT_DEVICE_LANGUAGE("default_device_language");
 
         private final String key;
 

@@ -26,6 +26,8 @@ import org.testng.Assert;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
+import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -573,4 +575,60 @@ public class MobileUtils {
         LOGGER.info("Swipe right will be executed.");
         swipeInDevice(container, Direction.RIGHT, duration);
     }
+
+    /**
+     * Set Android Device Default TimeZone And Language based on config or to GMT and En
+     * Without restoring actual focused apk.
+     */
+    public static void setDeviceDefaultTimeZoneAndLanguage() {
+        setDeviceDefaultTimeZoneAndLanguage(false);
+    }
+
+    /**
+     * set Android Device Default TimeZone And Language based on config or to GMT and En
+     * 
+     * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
+     */
+    public static void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
+        try {
+            String baseApp = "";
+            String os = DevicePool.getDevice().getOs();
+            if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+
+                AndroidService androidService = AndroidService.getInstance();
+
+                if (returnAppFocus) {
+                    baseApp = androidService.getCurrentFocusedApkDetails();
+                }
+
+                String deviceTimezone = Configuration.get(Parameter.DEFAULT_DEVICE_TIMEZONE);
+                String deviceTimeFormat = Configuration.get(Parameter.DEFAULT_DEVICE_TIME_FORMAT);
+                String deviceLanguage = Configuration.get(Parameter.DEFAULT_DEVICE_LANGUAGE);
+
+                DeviceTimeZone.TimeFormat timeFormat = DeviceTimeZone.TimeFormat.parse(deviceTimeFormat);
+                DeviceTimeZone.TimeZoneFormat timeZone = DeviceTimeZone.TimeZoneFormat.parse(deviceTimezone);
+
+                LOGGER.info("Set device timezone to " + timeZone.toString());
+                LOGGER.info("Set device time format to " + timeFormat.toString());
+                LOGGER.info("Set device language to " + deviceLanguage);
+
+                boolean timeZoneChanged = androidService.setDeviceTimeZone(timeZone.getTimeZone(), timeZone.getSettingsTZ(), timeFormat);
+                boolean languageChanged = androidService.setDeviceLanguage(deviceLanguage);
+
+                LOGGER.info(String.format("Device TimeZone was changed to timeZone '%s' : %s. Device Language was changed to language '%s': %s",
+                        deviceTimezone,
+                        timeZoneChanged, deviceLanguage, languageChanged));
+
+                if (returnAppFocus) {
+                    androidService.openApp(baseApp);
+                }
+
+            } else {
+                LOGGER.info(String.format("Current OS is %s. But we can set default TimeZone and Language only for Android.", os));
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+    }
+
 }

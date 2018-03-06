@@ -175,7 +175,14 @@ public class AndroidService {
      * @param app String
      */
     public void openApp(String app) {
-        executeAdbCommand("shell am start -n " + app);
+        String result = executeAdbCommand("shell am start -n " + app);
+        if (result.contains("Exception")) {
+            String appPackage = app.split("/")[0];
+            if (!checkCurrentDeviceFocus(appPackage)) {
+                LOGGER.info("Expected app is not in focus. We will try another solution.");
+                executeAdbCommand("shell monkey -p " + appPackage + " -c android.intent.category.LAUNCHER 1");
+            }
+        }
     }
 
     /**
@@ -228,6 +235,58 @@ public class AndroidService {
     public String getCurrentDeviceFocus() {
         String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
         return result;
+    }
+
+    /**
+     * get Current Focused Apk Package Name
+     *
+     * @return String
+     */
+    public String getCurrentFocusedApkPackageName() {
+        String res = "";
+        String txt = getCurrentDeviceFocus();
+        String regEx1 = ".*?";
+        String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
+        Pattern pattern1 = Pattern.compile(regEx1 + regEx1, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+        Matcher matcher1 = pattern1.matcher(txt);
+        if (matcher1.find()) {
+            res = matcher1.group(1);
+        }
+        LOGGER.info("Found package name for application in focus : " + res);
+        return res;
+    }
+
+    /**
+     * get Current Focused Apk Details (apkPackage/apkActivity)
+     * 
+     * @return apkPackage/apkActivity to use it in openApp method.
+     */
+    public String getCurrentFocusedApkDetails() {
+        try {
+            String packageName = "";
+            String activityName = "";
+            String txt = getCurrentDeviceFocus();
+            String regEx1 = ".*?";
+            String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
+            Pattern pattern1 = Pattern.compile(regEx1 + regEx2, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Matcher matcher1 = pattern1.matcher(txt);
+            if (matcher1.find()) {
+                packageName = matcher1.group(1);
+            }
+            LOGGER.info("Found package name for application in focus : " + packageName);
+
+            String regEx3 = "\\/((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-\\_]+))(?![\\w\\.])";
+            Pattern pattern2 = Pattern.compile(regEx1 + regEx3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Matcher matcher2 = pattern2.matcher(txt);
+            if (matcher2.find()) {
+                activityName = matcher2.group(1);
+            }
+            LOGGER.info("Found activity name for application in focus : " + activityName);
+            return packageName + "/" + activityName;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return "";
+        }
     }
 
     /**
