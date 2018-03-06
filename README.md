@@ -823,15 +823,15 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
 	</tr>
         <tr>
 		<td>capabilities.automationName</td>
-		<td>Name of programm using for automation</td>
+		<td>Name of programm using for automation (for Android 7+ use uiautomator2 instead of Appium)</td>
                 <td>n/a</td>
 		<td>Appium/uiautomator2/XCUITest</td>
 	</tr>
         <tr>
 		<td>capabilities.app</td>
-		<td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading...</td>
+		<td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading</td>
                 <td>n/a</td>
-		<td>D:/application.apk</td>
+		<td>D:/application.apk, s3://qaprosoft.com/android/myapk.*-release.apk</td>
 	</tr>
         <tr>
 		<td>capabilities.newCommandTimeout</td>
