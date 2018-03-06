@@ -1069,3 +1069,16 @@ And configure it.
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Documentation and Site - [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/deed.en_US)
+
+## Base flow of web test implementation
+<b>Important!</b> If you want to create web automation test and run it the first thing to do is start Selenium server. [More information](https://www.seleniumhq.org/docs/05_selenium_rc.jsp) 
+
+For example let's explain simple [test - testCompareModels] (https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/WebSampleTest.java) from Carina-deno step by step. 
+
+1) Annotations. You have to use standart TestNG [annotations] (http://testng.org/doc/documentation-main.html#annotations) like @Test and can use custom Carina annotations like @Owner - annotation used to specify the TestNG methods owners. Each method caan have two owners @Owner(owner = "qpsowner", secondaryOwner="qpsowner2"). This feature is for mobile automation mostly and very convenient when different people implement one method for different platforms (ios and Android). Owner name will be in report.
+
+2) HomePage homePage = new HomePage(getDriver());
+Carina support and stromgly recomended to use [PageObject Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern)
+Each page have to implement AbstractPage from Carina (com.qaprosoft.carina.core.gui). This class provade some basic operations like openUrl, isPageOpened, savePageAsPdf.
+On HomePage 
+
