@@ -17,10 +17,8 @@ package com.qaprosoft.carina.core.foundation.log;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -53,9 +51,7 @@ public class ThreadLogAppender extends AppenderSkeleton {
                 File testLogFile = new File(ReportContext.getTestDir() + "/test.log");
                 if (!testLogFile.exists())
                     testLogFile.createNewFile();
-
-                // open log file in UTF-8 format to support localized messages
-                fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(testLogFile, true), StandardCharsets.UTF_8));
+                fw = new BufferedWriter(new FileWriter(testLogFile, true));
                 testLogBuffer.set(fw);
             }
 
