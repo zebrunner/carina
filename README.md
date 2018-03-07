@@ -1097,5 +1097,9 @@ For example let's explain simple [test - testCompareModels] (https://github.com/
 2) HomePage homePage = new HomePage(getDriver());
 Carina support and stromgly recomended to use [PageObject Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern)
 Each page have to implement AbstractPage from Carina (com.qaprosoft.carina.core.gui). This class provade some basic operations like openUrl, isPageOpened, savePageAsPdf.
-On HomePage 
+On HomePage all necessary [ExtendedWebElements](#ExtendedWebElement) and methods are discribed.
+
+3) Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+Assertions verify that the state of the application is same to what we are expecting. If Home page isn't opened there is no sense to continue the test. So if assertation isn't try test will be stoped. Message "Home page is not opened" will be in logs to better understanding of situation. Also TestNG provide different kinds of Assert like assertFalse and assertEquals. If you just want to know is assertation true or false but DON'T want to stop test you can use SoftAssert. It will show all failed asserts in the end of test. 
+
 
