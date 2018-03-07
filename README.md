@@ -865,15 +865,32 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
 	</tr>
 		<tr>
 		<td>capabilities.appActivity</td>
-		<td>App activity, Appium required it sometimes to install app</td>
+		<td>Activity name for the Android activity you want to launch from your package.</td>
                 <td>n/a</td>
 		<td>com.amazon.mShop.home.HomeActivity</td>
 	</tr>
 		<tr>
 		<td>capabilities.appPackage</td>
-		<td>App package, Appium required it sometimes to install app</td>
+		<td>Java package of the Android app you want to run</td>
                 <td>n/a</td>
 		<td>in.amazon.mShop.android.shopping</td>
+	</tr>
+	<tr>
+		<td>capabilities.noSign</td>
+		<td>Skip checking and signing of app with debug keys, will work only with UiAutomator and not with selendroid, default false</td>
+                <td>n/a</td>
+		<td>true, false</td>
+	</tr>
+	<tr>
+		<td>capabilities.autoGrantPermissions</td>
+		<td>Have Appium automatically determine which permissions your app requires and grant them to the app on install. Defaults to false</td>
+                <td>n/a</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>Skip the device unlock process. Defaults to false</td>
+                <td>n/a</td>
+		<td>true, false</td>
 	</tr>
 </table>
 
