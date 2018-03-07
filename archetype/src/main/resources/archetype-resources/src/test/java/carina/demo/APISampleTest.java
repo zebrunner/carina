@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,48 +34,43 @@ import ${package}.carina.demo.api.PostUserMethod;
  *
  * @author akhursevich
  */
-public class APISampleTest extends AbstractTest
-{
-	@Test(description = "JIRA${symbol_pound}DEMO-0001")
-	@MethodOwner(owner="akhursevich")
-	public void testCreateUser() throws Exception
-	{
-		PostUserMethod api = new PostUserMethod();
-		api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-		api.callAPI();
-		api.validateResponse();
-	}
+public class APISampleTest extends AbstractTest {
+    @Test(description = "JIRA${symbol_pound}DEMO-0001")
+    @MethodOwner(owner = "akhursevich")
+    public void testCreateUser() throws Exception {
+        PostUserMethod api = new PostUserMethod();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+        api.callAPI();
+        api.validateResponse();
+    }
 
-	@Test(description = "JIRA${symbol_pound}DEMO-0002")
-	@MethodOwner(owner="akhursevich")
-	public void testCreateUserMissingSomeFields() throws Exception
-	{
-		PostUserMethod api = new PostUserMethod();
-		api.getProperties().remove("name");
-		api.getProperties().remove("username");
-		api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-		api.callAPI();
-		api.validateResponse();
-	}
+    @Test(description = "JIRA${symbol_pound}DEMO-0002")
+    @MethodOwner(owner = "akhursevich")
+    public void testCreateUserMissingSomeFields() throws Exception {
+        PostUserMethod api = new PostUserMethod();
+        api.getProperties().remove("name");
+        api.getProperties().remove("username");
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+        api.callAPI();
+        api.validateResponse();
+    }
 
-	@Test(description = "JIRA${symbol_pound}DEMO-0003")
-	@MethodOwner(owner="akhursevich")
-	public void testGetUsers()
-	{
-		GetUserMethods getUsersMethods = new GetUserMethods();
-		getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
-		getUsersMethods.callAPI();
-		getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
-		getUsersMethods.validateResponseAgainstJSONSchema("api/users/_get/rs.schema");
-	}
+    @Test(description = "JIRA${symbol_pound}DEMO-0003")
+    @MethodOwner(owner = "akhursevich")
+    public void testGetUsers() {
+        GetUserMethods getUsersMethods = new GetUserMethods();
+        getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
+        getUsersMethods.callAPI();
+        getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
+        getUsersMethods.validateResponseAgainstJSONSchema("api/users/_get/rs.schema");
+    }
 
-	@Test(description = "JIRA${symbol_pound}DEMO-0004")
-	@MethodOwner(owner="akhursevich")
-	public void testDeleteUsers()
-	{
-		DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
-		deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
-		deleteUserMethod.callAPI();
-		deleteUserMethod.validateResponse();
-	}
+    @Test(description = "JIRA${symbol_pound}DEMO-0004")
+    @MethodOwner(owner = "akhursevich")
+    public void testDeleteUsers() {
+        DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
+        deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
+        deleteUserMethod.callAPI();
+        deleteUserMethod.validateResponse();
+    }
 }

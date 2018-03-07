@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,34 +24,41 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface DeviceType {
 
-	enum Type {
+    enum Type {
 
-		DESKTOP("desktop", "desktop"), ANDROID_TABLET("android_tablet", "android"), ANDROID_PHONE("android_phone",
-				"android"), ANDROID_TV("android_tv", "android"), IOS_TABLET("ios_tablet", "ios"), IOS_PHONE("ios_phone",
-						"ios");
+        DESKTOP("desktop", "desktop"),
+        ANDROID_TABLET("android_tablet", "android"),
+        ANDROID_PHONE(
+                "android_phone",
+                "android"),
+        ANDROID_TV("android_tv", "android"),
+        IOS_TABLET("ios_tablet", "ios"),
+        IOS_PHONE(
+                "ios_phone",
+                "ios");
 
-		private String type;
+        private String type;
 
-		private String family;
+        private String family;
 
-		Type(String type, String family) {
-			this.type = type;
-			this.family = family;
-		}
-		
-		public String getType(){
-			return type;
-		}
+        Type(String type, String family) {
+            this.type = type;
+            this.family = family;
+        }
 
-		public String getFamily(){
-			return family;
-		}
-	}
+        public String getType() {
+            return type;
+        }
 
-	Type pageType() default Type.ANDROID_PHONE;
+        public String getFamily() {
+            return family;
+        }
+    }
 
-	Class<?> parentClass();
-	
-	String[] version() default { "1.0" };
+    Type pageType() default Type.ANDROID_PHONE;
+
+    Class<?> parentClass();
+
+    String[] version() default { "1.0" };
 
 }

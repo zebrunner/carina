@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,40 +21,33 @@ package ${package}.carina.demo.gui.components.compare;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModelSpecs
-{
-	public enum SpecType
-	{
-		TECHNOLOGY("Technology"),
-		ANNOUNCED("Announced");
+public class ModelSpecs {
+    public enum SpecType {
+        TECHNOLOGY("Technology"),
+        ANNOUNCED("Announced");
 
-		private String type;
+        private String type;
 
-		SpecType(String type)
-		{
-			this.type = type;
-		}
+        SpecType(String type) {
+            this.type = type;
+        }
 
-		public String getType()
-		{
-			return type;
-		}
-	}
+        public String getType() {
+            return type;
+        }
+    }
 
-	private Map<SpecType, String> modelSpecsMap;
+    private Map<SpecType, String> modelSpecsMap;
 
-	public ModelSpecs()
-	{
-		this.modelSpecsMap = new HashMap<>();
-	}
+    public ModelSpecs() {
+        this.modelSpecsMap = new HashMap<>();
+    }
 
-	public void setToModelSpecsMap(SpecType specType, String spec)
-	{
-		this.modelSpecsMap.put(specType, spec);
-	}
-	
-	public String readSpec(SpecType specType)
-	{
-		return modelSpecsMap.get(specType);
-	}
+    public void setToModelSpecsMap(SpecType specType, String spec) {
+        this.modelSpecsMap.put(specType, spec);
+    }
+
+    public String readSpec(SpecType specType) {
+        return modelSpecsMap.get(specType);
+    }
 }

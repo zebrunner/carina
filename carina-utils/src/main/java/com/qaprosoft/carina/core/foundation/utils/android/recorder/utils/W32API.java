@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,21 +28,22 @@ import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIFunctionMapper;
 import com.sun.jna.win32.W32APITypeMapper;
 
-/** Base type for most W32 API libraries.  Provides standard options
- * for unicode/ASCII mappings.  Set the system property w32.ascii
+/**
+ * Base type for most W32 API libraries. Provides standard options
+ * for unicode/ASCII mappings. Set the system property w32.ascii
  * to true to default to the ASCII mappings.
  */
 
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
-interface W32API extends StdCallLibrary{
+interface W32API extends StdCallLibrary {
 
-    int NO_ERROR               = 0;
+    int NO_ERROR = 0;
     int ERROR_INVALID_FUNCTION = 1;
-    int ERROR_FILE_NOT_FOUND   = 2;
-    int ERROR_PATH_NOT_FOUND   = 3;
+    int ERROR_FILE_NOT_FOUND = 2;
+    int ERROR_PATH_NOT_FOUND = 3;
 
     /** Standard options to use the unicode version of a w32 API. */
-	Map UNICODE_OPTIONS = new HashMap() {
+    Map UNICODE_OPTIONS = new HashMap() {
         {
             put(OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);
             put(OPTION_FUNCTION_MAPPER, W32APIFunctionMapper.UNICODE);
@@ -71,7 +72,10 @@ interface W32API extends StdCallLibrary{
 
     /** Constant value representing an invalid HANDLE. */
     HANDLE INVALID_HANDLE_VALUE = new HANDLE() {
-        { super.setPointer(Pointer.createConstant(-1)); }
+        {
+            super.setPointer(Pointer.createConstant(-1));
+        }
+
         @Override
         public void setPointer(Pointer p) {
             throw new UnsupportedOperationException("Immutable reference");

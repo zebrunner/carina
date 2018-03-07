@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,6 @@ public class NotificationPage extends MobileAbstractPage {
         notificationService = AndroidService.getInstance();
     }
 
-
     private AndroidService notificationService;
 
     protected static final By NOTIFICATION_XPATH = By
@@ -53,7 +52,6 @@ public class NotificationPage extends MobileAbstractPage {
 
     @FindBy(xpath = "//*[@resource-id = 'com.android.systemui:id/notification_stack_scroller' or @resource-id = 'com.android.systemui:id/latestItems']")
     protected ExtendedWebElement title;
-
 
     @FindBy(xpath = "//*[@resource-id = 'com.android.systemui:id/notification_stack_scroller']")
     protected ExtendedWebElement notification_scroller;
@@ -69,26 +67,24 @@ public class NotificationPage extends MobileAbstractPage {
             "or @resource-id='com.android.systemui:id/clear_all_button']")
     protected ExtendedWebElement dismissBtn;
 
-
-    //Found stable solution
+    // Found stable solution
     @FindBy(id = "com.android.systemui:id/notification_panel")
     private List<ExtendedWebElement> notificationPanel;
 
-    //settings data
+    // settings data
     @FindBy(id = "com.android.systemui:id/clear_all_button")
     private List<ExtendedWebElement> clearAllBtn;
 
-    //last items
+    // last items
     @FindBy(id = "com.android.systemui:id/latestItems")
     private List<ExtendedWebElement> lastItemsContainer;
 
-    //events data
+    // events data
     @FindBy(id = "android:id/status_bar_latest_event_content")
     private List<ExtendedWebElement> lastItemsContent;
 
     @FindBy(id = "android:id/title")
     private List<ExtendedWebElement> itemTitle;
-
 
     String itemTitle_Locator_Text = "android:id/title";
 
@@ -102,7 +98,6 @@ public class NotificationPage extends MobileAbstractPage {
     String itemText_Tablet_Locator_Text = "android:id/big_text";
     @FindBy(id = "android:id/time")
     private List<ExtendedWebElement> itemTime;
-
 
     /**
      * isNativeNotificationPage
@@ -134,7 +129,6 @@ public class NotificationPage extends MobileAbstractPage {
     public int getLastItemsContentSize() {
         return lastItemsContent.size();
     }
-
 
     /**
      * getItemTitle
@@ -168,7 +162,7 @@ public class NotificationPage extends MobileAbstractPage {
                         return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).getText();
                     }
                 } catch (Exception err) {
-                    LOGGER.error("Issue for getting notifications on Tablet.",err);
+                    LOGGER.error("Issue for getting notifications on Tablet.", err);
                     return lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).get(2).getText();
                 }
             } else {
@@ -184,15 +178,17 @@ public class NotificationPage extends MobileAbstractPage {
         clearAllBtn.get(0).click();
     }
 
-    /*public MessagesPage tapLastItemsContent(int num) {
-        tapElement(lastItemsContainer.get(num));
-        return new MessagesPage(driver);
-    }
-
-    public MessagesPage tapItemTitle(int num) {
-        tapElement(lastItemsContent.get(num));
-        return new MessagesPage(driver);
-    }*/
+    /*
+     * public MessagesPage tapLastItemsContent(int num) {
+     * tapElement(lastItemsContainer.get(num));
+     * return new MessagesPage(driver);
+     * }
+     * 
+     * public MessagesPage tapItemTitle(int num) {
+     * tapElement(lastItemsContent.get(num));
+     * return new MessagesPage(driver);
+     * }
+     */
 
     /**
      * clearNotifications
@@ -228,14 +224,12 @@ public class NotificationPage extends MobileAbstractPage {
         }
     }
 
-
     /**
      * cleanNotificationByService
      */
     public void cleanNotificationByService() {
         notificationService.clearNotifications();
     }
-
 
     /**
      * getAllAvailableNotifications
@@ -282,6 +276,5 @@ public class NotificationPage extends MobileAbstractPage {
     public boolean isOpened() {
         return isOpened(EXPLICIT_TIMEOUT);
     }
-
 
 }

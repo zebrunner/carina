@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,23 +17,23 @@ package com.qaprosoft.apitools.validation;
 
 public enum JsonCompareKeywords {
 
-	SKIP("skip"),
-	TYPE("type:"),
-	REGEX("regex:"),
-	ARRAY_CONTAINS("validate_array_contains_only:");
+    SKIP("skip"),
+    TYPE("type:"),
+    REGEX("regex:"),
+    ARRAY_CONTAINS("validate_array_contains_only:");
 
-	private String key;
+    private String key;
 
-	private JsonCompareKeywords(String key) {
-		this.key = key;
-	}
+    private JsonCompareKeywords(String key) {
+        this.key = key;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
 }

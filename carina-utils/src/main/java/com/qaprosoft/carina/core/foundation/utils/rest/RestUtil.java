@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.rest;
 
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
-import org.apache.log4j.Logger;
+import static com.jayway.restassured.RestAssured.given;
 
 import java.util.Map;
 
-import static com.jayway.restassured.RestAssured.given;
+import org.apache.log4j.Logger;
 
+import com.jayway.restassured.path.json.JsonPath;
+import com.jayway.restassured.response.Response;
 
 public class RestUtil {
     protected static final Logger LOGGER = Logger.getLogger(RestUtil.class);
@@ -31,47 +31,43 @@ public class RestUtil {
         return sendHttpPost(contentType, payload, httpPostCommand, true);
     }
 
-    public static Response sendHttpPost(String contentType, Map<String,?> parameters, String httpPostCommand, boolean responseLog) {
+    public static Response sendHttpPost(String contentType, Map<String, ?> parameters, String httpPostCommand, boolean responseLog) {
         if (responseLog) {
-            return
-                    given()
-                            .contentType(contentType)
-                            .formParameters(parameters)
-                            .log().all()
-                            .expect()
-                            .log().all()
-                            .when()
-                            .post(httpPostCommand);
+            return given()
+                    .contentType(contentType)
+                    .formParameters(parameters)
+                    .log().all()
+                    .expect()
+                    .log().all()
+                    .when()
+                    .post(httpPostCommand);
         }
-        return
-                given()
-                        .contentType(contentType)
-                        .formParameters(parameters)
-                        // .log().all()
-                        .when()
-                        .post(httpPostCommand);
+        return given()
+                .contentType(contentType)
+                .formParameters(parameters)
+                // .log().all()
+                .when()
+                .post(httpPostCommand);
 
     }
 
     public static Response sendHttpPost(String contentType, String payload, String httpPostCommand, boolean responseLog) {
         if (responseLog) {
-            return
-                    given()
-                            .contentType(contentType)
-                            .body(payload)
-                            .log().all()
-                            .expect()
-                            .log().all()
-                            .when()
-                            .post(httpPostCommand);
+            return given()
+                    .contentType(contentType)
+                    .body(payload)
+                    .log().all()
+                    .expect()
+                    .log().all()
+                    .when()
+                    .post(httpPostCommand);
         }
-        return
-                given()
-                        .contentType(contentType)
-                        .body(payload)
-                       // .log().all()
-                        .when()
-                        .post(httpPostCommand);
+        return given()
+                .contentType(contentType)
+                .body(payload)
+                // .log().all()
+                .when()
+                .post(httpPostCommand);
 
     }
 
@@ -81,21 +77,19 @@ public class RestUtil {
 
     public static Response sendHttpGet(String contentType, String httpGetCommand, boolean responseLog) {
         if (responseLog) {
-            return
-                    given()
-                            .contentType(contentType)
-                            .log().all()
-                            .expect()
-                            .log().all()
-                            .when()
-                            .get(httpGetCommand);
+            return given()
+                    .contentType(contentType)
+                    .log().all()
+                    .expect()
+                    .log().all()
+                    .when()
+                    .get(httpGetCommand);
         }
-        return
-                given()
-                        .contentType(contentType)
-                        .log().all()
-                        .when()
-                        .get(httpGetCommand);
+        return given()
+                .contentType(contentType)
+                .log().all()
+                .when()
+                .get(httpGetCommand);
     }
 
     public static int statusCode(Response response) {

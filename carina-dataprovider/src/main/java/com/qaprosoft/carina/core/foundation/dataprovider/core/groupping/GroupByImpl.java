@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ public class GroupByImpl {
 
         List<Object[]> listOfObjects = sortDefaultObject(objects, fieldNumber);
         @SuppressWarnings("rawtypes")
-		Iterator iterator = listOfObjects.iterator();
+        Iterator iterator = listOfObjects.iterator();
         Object[] temp = (Object[]) iterator.next();
         List<List<Object[]>> ordered = new ArrayList<List<Object[]>>();
         List<Object[]> tempList = new ArrayList<Object[]>();
@@ -41,19 +41,18 @@ public class GroupByImpl {
                 ordered.add(tempList);
                 tempList = new ArrayList<Object[]>();
                 tempList.add(temp);
-                if (!iterator.hasNext()){
+                if (!iterator.hasNext()) {
                     ordered.add(tempList);
                 }
             }
         }
-        if(tempList.size() > 0) {
-        	//add last grouped rows 
-        	ordered.add(tempList);
+        if (tempList.size() > 0) {
+            // add last grouped rows
+            ordered.add(tempList);
         }
 
         int arraySize = listOfObjects.get(0).length;
         Object[][] finalObject = new Object[ordered.size()][arraySize];
-
 
         int i = 0;
         for (List<Object[]> list : ordered) {
@@ -66,7 +65,7 @@ public class GroupByImpl {
     }
 
     @SuppressWarnings("rawtypes")
-	public static Object[][] getGroupedDataProviderMap(Object[][] objects, String fieldName) {
+    public static Object[][] getGroupedDataProviderMap(Object[][] objects, String fieldName) {
 
         List<Object[]> listOfObjects = sortMapObject(objects, fieldName);
         Iterator iterator = listOfObjects.iterator();
@@ -83,19 +82,18 @@ public class GroupByImpl {
                 ordered.add(tempList);
                 tempList = new ArrayList<Object[]>();
                 tempList.add(temp);
-                if (!iterator.hasNext()){
+                if (!iterator.hasNext()) {
                     ordered.add(tempList);
                 }
             }
         }
-        
-        if(tempList.size() > 0) {
-        	//add last grouped rows 
-        	ordered.add(tempList);
+
+        if (tempList.size() > 0) {
+            // add last grouped rows
+            ordered.add(tempList);
         }
 
         int arraySize = listOfObjects.get(0).length;
-
 
         Object[][] finalObject = new Object[ordered.size()][arraySize];
         int i = 0;
@@ -117,7 +115,7 @@ public class GroupByImpl {
     }
 
     @SuppressWarnings("rawtypes")
-	private static List<HashMap> getHashMaps(List<Object[]> list) {
+    private static List<HashMap> getHashMaps(List<Object[]> list) {
         List<HashMap> hashMaps = new ArrayList<HashMap>();
         for (Object[] objects : list) {
             hashMaps.add((HashMap) objects[0]);
@@ -142,7 +140,7 @@ public class GroupByImpl {
         List<Object[]> listOfObjects = Arrays.asList(objects);
         Collections.sort(listOfObjects, new Comparator<Object[]>() {
             @SuppressWarnings("unchecked")
-			@Override
+            @Override
             public int compare(final Object[] object1, final Object[] object2) {
                 String firstField = ((HashMap<String, String>) object1[0]).get(keyName);
                 String secondField = ((HashMap<String, String>) object2[0]).get(keyName);

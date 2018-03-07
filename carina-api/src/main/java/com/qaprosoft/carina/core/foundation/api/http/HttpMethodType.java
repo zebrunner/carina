@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,36 +20,31 @@ package com.qaprosoft.carina.core.foundation.api.http;
  * 
  * @author Alex Khursevich
  */
-public enum HttpMethodType
-{
-	HEAD(1, "HEAD"),
-	GET(2, "GET"),
-	PUT(3, "PUT"),
-	POST(4, "POST"),
-	DELETE(5, "DELETE"),
-	PATCH(6, "PATCH");
+public enum HttpMethodType {
+    HEAD(1, "HEAD"),
+    GET(2, "GET"),
+    PUT(3, "PUT"),
+    POST(4, "POST"),
+    DELETE(5, "DELETE"),
+    PATCH(6, "PATCH");
 
-	private int code;
-	private String name;
+    private int code;
+    private String name;
 
-	HttpMethodType(int code, String name)
-	{
-		this.code = code;
-		this.name = name;
-	}
+    HttpMethodType(int code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 
-	public int getCode()
-	{
-		return code;
-	}
+    public int getCode() {
+        return code;
+    }
 
-	public String getName()
-	{
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public HttpMethodType get(String name)
-	{
-		return valueOf(name);
-	}
+    public HttpMethodType get(String name) {
+        return valueOf(name);
+    }
 }

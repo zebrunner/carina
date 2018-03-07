@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,17 +15,18 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.ownership;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * This defines the 'MethodOwner' annotation used to specify the
  * TestNG methods owners.
  * 
  */
-@Retention(value=java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target(value=java.lang.annotation.ElementType.METHOD)
-public @interface MethodOwner 
-{
-	String owner() default "";
-	String secondaryOwner() default "";
+@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
+@Target(value = java.lang.annotation.ElementType.METHOD)
+public @interface MethodOwner {
+    String owner() default "";
+
+    String secondaryOwner() default "";
 }

@@ -2,17 +2,17 @@
 
 Carina Automation Framework
 ==================
-Carina is Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
+Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
-* Carina framework is built on the top of most popular open-source solutions like Selenium, Appium, TestNG which reduces dependability on specific technology stack.
+* Carina framework is built on top of most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on specific technology stack.
 
-* Carina covers all popular browsers (IE, Safari, Chrome, Firefox) and mobile devices (iOS/Android). Special feature for mobile domain: it reuses test automation code between IOS/Android by 70-80%.
+* Carina supports all popular browsers (IE, Safari, Chrome, Firefox) and mobile devices (iOS/Android). Special feature for mobile domain: it reuses test automation code between IOS/Android up to 70-80%.
 
-* As far as our framework is build in Java, it is cross-platform. Tests may be easily executed both on Unix or Windows machines all you need is JDK 8 installed.
+* As far as our framework is built in Java, it is cross-platform. Tests may be easily executed both on Unix or Windows OS. All you need is JDK 8 installed.
 
 * Framework supports different types of databases - both relational and nonrelational (MySQL, SQL Server, Oracle, PostgreSQL), providing amazing experience of DAO layer implementation using MyBatis ORM framework.
 
-* API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses dynamically changed by incoming arguments. 
+* API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses are dynamically changed by incoming arguments. 
 
 ![Alt text](./carina.svg "Carina Overview")
 
@@ -35,7 +35,7 @@ Carina is Java-based test automation framework that unites all testing layers: M
 ## Initial setup
 * Install and configure JDK 1.8+
 * Install and configure [Apache Maven 3.5.2+](http://maven.apache.org/)
-* Download and start latest [Selenium standalone server](http://www.seleniumhq.org/download/)
+* Download and start the latest [Selenium standalone server](http://www.seleniumhq.org/download/)
 * Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
 
 ### Generating project
@@ -50,7 +50,7 @@ mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -Durl=<your_proj_url> \
                        -Dversion=<your_proj_version>
 ```
-If any attribute contains spaces, it should be set in quoted(e.g.: -Dname="Hello World"). In the Maven command listed above, you have to specify 5 attributes while the first 3 should be left unchanged. Let's go through these attributes:
+If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In above Maven command you have to specify 5 attributes while the first 3 should be left unchanged. Let's go through these attributes:
 <table> 
 	<tr>
 		<th>Attribute</th>
@@ -85,26 +85,26 @@ If any attribute contains spaces, it should be set in quoted(e.g.: -Dname="Hello
 </table>
 
 ### Import to Eclipse
-If generation finishes successfully, you should see a new project folder with a name equal to the artifactId attribute specified during generation, so navigate to that folder (where pom.xml is located) and execute the following Maven task:
+If generation is successfully complete, you would see a new project folder with a name equal to the artifactId attribute specified during generation, so navigate to that folder (where pom.xml is located) and execute the following Maven task:
 ```
 mvn clean eclipse:eclipse
 ```
-Using this command, Maven should resolve all dependencies, downloading required libraries to your local repository and generating Eclipse classpath. Before importing a new project to Eclipse, you must link your IDE with your Maven repository by executing the following task:
+By executing this command, Maven should resolve all dependencies, downloading required libraries to your local repository and generating Eclipse classpath. Before importing new project to Eclipse, you should link your IDE to your Maven repository by executing the following task:
 ```
 mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
 ```
-Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you may import generated projects such as "Existing Java Project" into Eclipse IDE.
-Generate eclipse workspace using command:
+Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
+Generate Eclipse workspace using command:
 ```
 mvn clean eclipse:eclipse
 ```
-Now you are ready to import project into eclipse.
+Now you are ready to import project into Eclipse.
 
 ![Eclipse view](https://github.com/qaprosoft/carina-demo/blob/gh-pages/img/001-Initial-setup.png?raw=true)
 
 
 ## Project structure
-Carina test project is structured as standard Maven project:
+Carina test project is structured as a standard Maven project:
 ```
 carina-demo
 |-- pom.xml
@@ -122,7 +122,7 @@ carina-demo
 
 ![src/test/java](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/002-Project-structure.png)
 
-* **src/test/resources** - contains TestNG xml files, API templates and XLS data-providers
+* **src/test/resources** - contains TestNG xml files, API templates and XLS data providers
 
 ![src/test/resources](https://raw.githubusercontent.com/qaprosoft/carina-demo/gh-pages/img/003-Project-structure.png)
 
@@ -151,8 +151,12 @@ R.DATABASE.get("db.url")
 R.EMAIL.get("title")
 R.TESTDATA.get("user.email")
 ```
+Default config properties can be obtained by 
+```
+Configuration.get(Parameter.EXTRA_CAPABILITIES)
+```
 
-All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of parameters:
+All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of the parameters:
 <table> 
 	<tr>
 		<th>Attribute</th>
@@ -267,21 +271,21 @@ Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 
 ### Environment specific configuration
-In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need specify the following properties in _config.properties:
+In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
 ```
 env=DEMO
 STAG.url=http://stag-app-server.com
 PROD.url=http://prod-app-server.com
 ```
 
-And get env-specific argument in test in the following way:
+And get env-specific argument in test the following way:
 ```
 Configuration.getEnvArg("url")
 ```
 As a result you switch between environments just changing env argument in _config.properties file.
 
 ### Execution
-There are a few options to execute the test, you may run test suite from Eclipse IDE or initiate test execution from the console using the Maven Surefire plugin built into the Carina framework. Before running tests make sure you downloaded selenium standalone server jar file and started it by the following command:
+There are a several options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework. Before running tests make sure you have downloaded Selenium standalone server jar file and started it by the following command:
 ```
 java -jar selenium-server-standalone-3.6.0.jar
 ```
@@ -298,7 +302,33 @@ mvn clean -Dsuite=api test
 ```
 
 ## Web UI automation
-TODO
+In the table below we are providing description for most important WEB parameters:
+<table> 
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+                <th>Default value</th>
+		<th>Example</th>
+	</tr>
+	<tr>
+		<td>browser</td>
+		<td>Browser for testing</td>
+		<td>chrome</td>
+		<td>chrome / firefox / safari / iexplore</td>
+	</tr>
+	<tr>
+		<td>selenium_host</td>
+		<td>Selenium server host</td>
+		<td>{must_override}</td>
+		<td>http://localhost:4444/wd/hub</td>
+	</tr>
+	<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle. </td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+</table>
 
 ## Web services API automation
 TODO
@@ -390,9 +420,9 @@ capabilities.platformName=IOS
 
 ### ExtendedWebElement
 
-ExtendedWebElement is an extended version of selenium WebElement which you can find in org.openqa.selenium package. The best thing in using ExtendedWebElement is that you can use both all old methods of WebElement and new more comfortable Carina methods.
+ExtendedWebElement is an extended version of selenium WebElement which you can find in org.openqa.selenium package. The best thing in using ExtendedWebElement is that you can use both old methods of WebElement and new more convenient Carina methods.
 
-The simpliest way to find ExtendedWebElement is using annotation @FindBy. The @FindBy annotation is used to locate one or more ExtendedWebElements using a single criterion. The list of criterions is standart:
+The easiest way to find ExtendedWebElement is using annotation @FindBy. The @FindBy annotation is used to locate one or more ExtendedWebElements using a single criterion. The list of criteria is standard:
 * className
 * css
 * how...using
@@ -508,7 +538,7 @@ Most usable methods are reperesented in the table bellow:
 </table>
 
 ### How to use WebDriver methods?
-You can simple transform ExtendedWebElement to WebElement using getElement() method. After this it's possible to operate with standart WebElement methods.
+You can simply transform ExtendedWebElement to WebElement using getElement() method. After this it's possible to operate with standard WebElement methods.
 ```   
    Point point = element.getElement().getLocation();
    Dimension dim = element.getElement().getSize();
@@ -517,7 +547,7 @@ You can simple transform ExtendedWebElement to WebElement using getElement() met
 ## Database access setup
 TODO
 
-## Data-providers usage
+## Data providers usage
 TODO
 
 ## Git configuration 
@@ -542,6 +572,14 @@ And then after adding files (`git add` ...) use `git commit` (add description) a
     git push origin work_local_branch:work_remote_branch
     
 And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "Compare & Pull Request"
+
+## Code formatter
+We propose to use our configured java code formatter for Eclipse. 
+It is available here [https://github.com/qaprosoft/carina/carina_formatter.xml](https://github.com/qaprosoft/carina/carina_formatter.xml)
+
+To use same formatter in IntelliJ IDEA you should install[**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter)
+
+And configure it.
 
 ## License
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
