@@ -38,7 +38,14 @@ import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.testrail.core.APIClient;
 import com.qaprosoft.carina.core.foundation.report.testrail.core.TestStatus;
-import com.qaprosoft.carina.core.foundation.report.testrail.dto.*;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Milestones;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Results;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Runs;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCaseInfo;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCaseResult;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCases;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestInfo;
+import com.qaprosoft.carina.core.foundation.report.testrail.dto.Users;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -410,11 +417,11 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
             return false;
         }
 
-        ArrayList<TestCaseInfo> lcs = getSuiteCases(suiteId);
+        ArrayList<TestCaseInfo> sc = getSuiteCases(suiteId);
 
         Integer tc = Integer.parseInt(testCase);
-        for (TestCaseInfo lc : lcs) {
-            if (lc.getId().equals(tc)) {
+        for (TestCaseInfo tci : sc) {
+            if (tci.getId().equals(tc)) {
                 return true;
             }
         }

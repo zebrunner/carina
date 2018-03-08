@@ -46,7 +46,7 @@ public class SSLContextBuilder {
 
     /**
      * Initializes builder with specific path to tls keysecure files
-     * 
+     *
      * @param path
      *            - relative path to keysecure folder
      * @param isClientAuthEnabled
@@ -61,7 +61,7 @@ public class SSLContextBuilder {
     /**
      * Initializes builder using classpath (priority 1) or Parameter.TLS_KEYSECURE_LOCATION value (priority 2) as source
      * for tls keysecure files
-     * 
+     *
      * @param isClientAuthEnabled
      *            - is client auth enabled or not for required SSL context
      */
@@ -105,9 +105,9 @@ public class SSLContextBuilder {
     }
 
     /**
-     * Create an SSLContext for an LC client with mutual TLS authentication enabled; returns null if the
+     * Create an SSLContext with mutual TLS authentication enabled; returns null if the
      * tlsConfigDirectory was not found.
-     * 
+     *
      * @return SSLContext
      */
     public SSLContext createSSLContext() {
@@ -137,7 +137,7 @@ public class SSLContextBuilder {
 
     /**
      * Creates the client's trustStore; returns null if the tlsConfigDirectory was not found.
-     * 
+     *
      * @return KeyStore
      */
     public KeyStore createTrustStore() {
@@ -154,7 +154,7 @@ public class SSLContextBuilder {
 
     /**
      * Creates the client's keyStore with private and public keys; returns null if the tlsConfigDirectory was not found.
-     * 
+     *
      * @return KeyStore
      */
     public KeyStore createPrivateKeyStore() {
