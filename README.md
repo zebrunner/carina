@@ -269,10 +269,7 @@ All project configuration properties are located in **_config.properties** file.
 	<tr>
 		<td>env_arg_resolver</td>
 		<td>This parametr is optional, if it isn't set default value will be used. In most cases <b>default value is enough</b></td>
-		<td>com.qaprosoft.</n>
-		carina.core.</n>
-		foundation.utils.</n>
-		DefaultEnvArgResolver</td>
+		<td width="20%">com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver</td>
 		<td>java class </td>
 	</tr>
 		<tr>
