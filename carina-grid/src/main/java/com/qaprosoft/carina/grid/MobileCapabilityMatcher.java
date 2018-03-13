@@ -31,6 +31,7 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
     private static final String PLATFORM_NAME = "platformName";
     private static final String PLATFORM_VERSION = "platformVersion";
     private static final String DEVICE_NAME = "deviceName";
+    private static final String DEVICE_TYPE = "deviceType";
     private static final String UDID = "udid";
 
     @Override
@@ -117,6 +118,11 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
                     break;
                 case DEVICE_NAME:
                     if (actualValue != null && !Arrays.asList(expectedValue.split(",")).contains(actualValue)) {
+                        return false;
+                    }
+                    break;
+                case DEVICE_TYPE:
+                    if (actualValue != null && !StringUtils.equalsIgnoreCase(actualValue, expectedValue)) {
                         return false;
                     }
                     break;
