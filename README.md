@@ -515,7 +515,9 @@ All project configuration properties are located in **_config.properties** file.
 	<tr>
 		<td>jira_updater</td>
 		<td>Class contains logic to update Jira. <b>Note</b> Custom updater have to implement DefaultJiraUpdater, by default methods do nothing</td>
-		<td>com.qaprosoft.carina.core.foundation.jira.DefaultJiraUpdater</td>
+		<td>com.qaprosoft.
+		carina.core.foundation.
+		jira.DefaultJiraUpdater</td>
 		<td>Custom class</td>
 	</tr>
 	<tr>
@@ -659,25 +661,25 @@ All project configuration properties are located in **_config.properties** file.
 		<tr>
 		<td>add_new_localization_property_name</td>
 		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
-		<td>new_custom_messages_</td>
+		<td>new_custom_messages</td>
 		<td>the basic template for property name. There will be locale added at the end of the filename.</td>
 	</tr>
 		<tr>
 		<td>cucumber_tests</td>
 		<td>If parametrs contains true Cucumber tests will be started</td>
-		<td></td>
+		<td>n/a</td>
 		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>cucumber_tests_app_version</td>
 		<td>Version of app using in Cucumber tests</td>
-		<td></td>
+		<td>n/a</td>
 		<td>2.013</td>
 	</tr>
 		<tr>
 		<td>cucumber_tests_name</td>
 		<td>Cucucmber tests name</td>
-		<td></td>
+		<td>n/a</td>
 		<td>cucumber tests</td>
 	</tr>
 		<tr>
