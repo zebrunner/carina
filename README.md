@@ -158,6 +158,13 @@ Configuration.get(Parameter.EXTRA_CAPABILITIES)
 
 All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of the parameters:
 <table> 
+<colgroup>
+    <col style="width:10%">
+    <col style="width:50%">
+    <col style="width:10%">
+    <col style="width:20%">
+  </colgroup>  
+	<tbody>
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>
@@ -269,7 +276,7 @@ All project configuration properties are located in **_config.properties** file.
 	<tr>
 		<td>env_arg_resolver</td>
 		<td>This parametr is optional, if it isn't set default value will be used. In most cases <b>default value is enough</b></td>
-		<td width="20%">com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver</td>
+		<td>com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver</td>
 		<td>java class </td>
 	</tr>
 		<tr>
@@ -718,6 +725,8 @@ All project configuration properties are located in **_config.properties** file.
 		<td>NULL</td>
 		<td>doThis, doThat</td>
 	</tr>
+		</tbody>
+	</table>
 Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
