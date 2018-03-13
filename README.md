@@ -158,10 +158,10 @@ Configuration.get(Parameter.EXTRA_CAPABILITIES)
 
 All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of the parameters:
 <table> 
-    <col width="50">
-    <col width="50">
-    <col width="50">
-    <col width="50"> 
+    <col width="20">
+    <col width="20">
+    <col width="20">
+    <col width="20"> 
 	<tbody>
 	<tr>
 		<th>Attribute</th>
