@@ -431,8 +431,14 @@ public class Configuration {
     	}
     	
     	// calculate driver type based on capability values
-    	//TODO: verify potential NPE for platform capability value
-    	String platform = capabilities.getCapability("platformName") != null ? capabilities.getCapability("platformName").toString() : capabilities.getCapability("platform").toString();
+    	String platform = "";
+    	if (capabilities.getCapability("platform") != null) {
+    		platform = capabilities.getCapability("platform").toString();
+    	}
+    	
+    	if (capabilities.getCapability("platformName") != null) {
+    		platform = capabilities.getCapability("platformName").toString();
+    	}
     	
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.MOBILE;
