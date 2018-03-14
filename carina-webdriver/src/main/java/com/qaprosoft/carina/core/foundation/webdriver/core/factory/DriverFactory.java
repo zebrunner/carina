@@ -44,7 +44,7 @@ public class DriverFactory {
         LOGGER.debug("DriverFactory start...");
         AbstractFactory factory;
 
-        switch (Configuration.getDriverType()) {
+        switch (Configuration.getDriverType(capabilities)) {
         case SpecialKeywords.DESKTOP:
             factory = new DesktopFactory();
             break;

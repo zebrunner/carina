@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
@@ -422,7 +423,24 @@ public class Configuration {
 
         return SpecialKeywords.DESKTOP;
     }
+    
+    public static String getDriverType(DesiredCapabilities capabilities) {
+    	if (capabilities == null) {
+    		//calculate driver type based on config.properties arguments
+    		return getDriverType();
+    	}
+    	
+    	// calculate driver type based on capability values
+    	//TODO: verify potential NPE for platform capability value
+    	String platform = capabilities.getCapability("platformName") != null ? capabilities.getCapability("platformName").toString() : capabilities.getCapability("platform").toString();
+    	
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MOBILE;
+        }
 
+        return SpecialKeywords.DESKTOP;
+    }
+    
     public static String getMobileApp() {
         // redefine platform if capabilities.app is available
         String mobileApp = "";
