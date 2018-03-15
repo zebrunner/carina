@@ -24,6 +24,7 @@ import org.apache.log4j.NDC;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
@@ -65,13 +66,14 @@ public final class DriverPool {
      * 
      * @return default WebDriver
      */
+    //TODO: review all places where this method is used to fix potential issues with extraDriver
     public static WebDriver getDriver() {
         return getDriver(DEFAULT);
     }
     
     
     /**
-     * Get driver by serachContext.
+     * Get driver by SearchContext.
      * 
      * @return default WebDriver
      */
@@ -88,7 +90,26 @@ public final class DriverPool {
     	}
     	throw new RuntimeException("WebDriver was not found by serachContext->hashCode: " + context);
     }
-
+    
+    /**
+     * Get driver by WebElement.
+     * 
+     * @return default WebDriver
+     */
+    //TODO: investigate howto allow to use from ExtendedElementLocator only
+    public static WebDriver getDriver(WebElement element) {
+    	String context = element.toString();
+    	LOGGER.debug("Detecting WebDriver by searchContext->hashCode");
+    	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+    	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
+    		if (context.contains(((RemoteWebDriver)enrty.getValue()).getSessionId().toString())) {
+    			LOGGER.debug("Detected WebDriver by searchContext->hashCode");
+    			return enrty.getValue();
+    		}
+    	}
+    	throw new RuntimeException("WebDriver was not found by WebElement: " + context);
+    }
+    
     /**
      * Get driver by name. If no driver discovered it will be created using
      * default capabilities.

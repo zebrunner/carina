@@ -62,6 +62,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 import io.appium.java_client.MobileBy;
@@ -90,22 +91,18 @@ public class ExtendedWebElement {
     private String name;
     private By by;
 
-    //TODO: remove all references onto the driver variable
-    private WebDriver driver;
-
-    public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
-        this(element, driver);
+    public ExtendedWebElement(WebElement element, String name) {
+        this(element);
         this.name = name;
     }
 
-    public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver) {
-        this(element, name, driver);
+    public ExtendedWebElement(WebElement element, String name, By by) {
+        this(element, name);
         this.by = by;
     }
 
-    public ExtendedWebElement(WebElement element, WebDriver driver) {
+    public ExtendedWebElement(WebElement element) {
         this.element = element;
-        this.driver = driver;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
     }
 
@@ -682,7 +679,7 @@ public class ExtendedWebElement {
     }
 
     private WebDriver getDriver() {
-        return driver;
+    	return DriverPool.getDriver(element);
     }
 
     /**
@@ -952,7 +949,7 @@ public class ExtendedWebElement {
                 }
                 return false;
             });
-            element = new ExtendedWebElement(this.getElement().findElement(by), name, by, driver);
+            element = new ExtendedWebElement(this.getElement().findElement(by), name, by);
             // summary.log(Messager.ELEMENT_FOUND.info(name));
         } catch (Exception e) {
             element = null;
@@ -1007,7 +1004,7 @@ public class ExtendedWebElement {
                 LOGGER.debug(e.getMessage(), e.getCause());
             }
 
-            extendedWebElements.add(new ExtendedWebElement(element, name, driver));
+            extendedWebElements.add(new ExtendedWebElement(element, name));
         }
         return extendedWebElements;
     }
@@ -1190,7 +1187,7 @@ public class ExtendedWebElement {
             by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
 
-        return new ExtendedWebElement(null, name, by, driver);
+        return new ExtendedWebElement(null, name, by);
     }
 
     private void captureElements() {
@@ -1205,10 +1202,10 @@ public class ExtendedWebElement {
 
         String currentUrl;
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
-            currentUrl = driver.getCurrentUrl();
+            currentUrl = getDriver().getCurrentUrl();
         } else {
             // change for XBox and looks like mobile part
-            currentUrl = driver.getTitle();
+            currentUrl = getDriver().getTitle();
         }
 
         String cache = getUrlWithoutParameters(currentUrl);
@@ -1231,13 +1228,13 @@ public class ExtendedWebElement {
                 screenShootInfo.setHeight(bimg.getHeight());
                 elementsInfo.setScreenshot(screenShootInfo);
 
-                List<WebElement> all = driver.findElements(By.xpath("//*"));
+                List<WebElement> all = getDriver().findElements(By.xpath("//*"));
 
-                List<WebElement> control = driver.findElements(
+                List<WebElement> control = getDriver().findElements(
                         By.xpath("//input[not(contains(@type,'hidden'))] | //button | .//*[contains(@class, 'btn') and not(self::span)] | //select"));
 
                 for (WebElement webElement : control) {
-                    ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement, driver));
+                    ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement));
 
                     int elementPosition = all.indexOf(webElement);
                     for (int i = 1; i < 5; i++) {
@@ -1255,7 +1252,7 @@ public class ExtendedWebElement {
                         if (sti == null || sti.isEmpty() || control.get(0).getText().equals(sti)) {
                             continue;
                         } else {
-                            elementInfo.setTextInfo(getElementInfo(new ExtendedWebElement(all.get(elementPosition - i), driver)));
+                            elementInfo.setTextInfo(getElementInfo(new ExtendedWebElement(all.get(elementPosition - i))));
                             break;
                         }
                     }
@@ -1292,7 +1289,7 @@ public class ExtendedWebElement {
             Dimension size = extendedWebElement.getElement().getSize();
             elementInfo.setRect(new Rect(location.getX(), location.getY(), size.getWidth(), size.getHeight()));
             elementInfo.setElementsAttributes(
-                    (Map<String, String>) ((RemoteWebDriver) driver).executeScript(ATTRIBUTE_JS, extendedWebElement.getElement()));
+                    (Map<String, String>) ((RemoteWebDriver) getDriver()).executeScript(ATTRIBUTE_JS, extendedWebElement.getElement()));
 
             try {
                 elementInfo.setText(extendedWebElement.getText());
