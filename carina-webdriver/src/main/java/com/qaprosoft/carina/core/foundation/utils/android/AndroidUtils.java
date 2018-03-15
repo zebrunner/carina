@@ -106,7 +106,7 @@ public class AndroidUtils extends MobileUtils {
         double directMultY1 = 0.5;
         double directMultY2 = 0.5;
 
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = DriverPool.getDriver(elem.getElement());
 
         if (direction.equals(Direction.RIGHT)) {
             directMultX1 = 0.2;
@@ -313,7 +313,7 @@ public class AndroidUtils extends MobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                WebElement ele = DriverPool.getDriver(scrollableContainer.getElement()).findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) +
                         ".instance(" + containerInstance + "))"+
                         ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
@@ -362,7 +362,8 @@ public class AndroidUtils extends MobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
+            	//get driver from pool using web element to support manipulation for extra drivers in the single test 
+                WebElement ele = DriverPool.getDriver(scrollableContainer.getElement()).findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) +
                         ".instance(" + containerInstance + "))" +
                         ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
@@ -409,7 +410,7 @@ public class AndroidUtils extends MobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
+                WebElement ele = DriverPool.getDriver(scrollableContainer.getElement()).findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
                         getScrollContainerSelector(scrollableContainer, containerSelectorType) + ")" +
                         ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));

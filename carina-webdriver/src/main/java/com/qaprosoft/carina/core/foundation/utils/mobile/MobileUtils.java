@@ -358,6 +358,7 @@ public class MobileUtils {
      */
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
         LOGGER.debug("Starting swipe...");
+        //TODO: investigate possibility to use non-default drivers as well
         WebDriver drv = DriverPool.getDriver();
 
         LOGGER.debug("Getting driver dimension size...");
@@ -405,7 +406,7 @@ public class MobileUtils {
 
         if (container == null) {
             // whole screen/driver is a container!
-            WebDriver driver = DriverPool.getDriver();
+            WebDriver driver = DriverPool.getDriver(container.getElement());
             elementLocation = new Point(0, 0); // initial left corner for that case
             elementDimensions = driver.manage().window().getSize();
         } else {
