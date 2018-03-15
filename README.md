@@ -1083,19 +1083,6 @@ And then after adding files (`git add` ...) use `git commit` (add description) a
     
 And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "Compare & Pull Request"
 
-## Code formatter
-We propose to use our configured java code formatter for Eclipse. 
-It is available here [https://github.com/qaprosoft/carina/carina_formatter.xml](https://github.com/qaprosoft/carina/carina_formatter.xml)
-
-To use same formatter in IntelliJ IDEA you should install[**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter)
-
-And configure it.
-
-## License
-Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
-
-Documentation and Site - [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/deed.en_US)
-
 ## Base flow of web test implementation
 <b>Important!</b> If you want to create web automation test and run it the first thing to do is start Selenium server. [More information](https://www.seleniumhq.org/docs/05_selenium_rc.jsp) 
 
@@ -1110,5 +1097,18 @@ On HomePage all necessary [ExtendedWebElements](#ExtendedWebElement) and methods
 
 3) Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
 Assertions verify that the state of the application is same to what we are expecting. If Home page isn't opened there is no sense to continue the test. So if assertation isn't try test will be stoped. Message "Home page is not opened" will be in logs to better understanding of situation. Also TestNG provide different kinds of Assert like assertFalse and assertEquals. If you just want to know is assertation true or false but DON'T want to stop test you can use SoftAssert. It will show all failed asserts in the end of test. 
+
+## Code formatter
+We propose to use our configured java code formatter for Eclipse. 
+It is available here [https://github.com/qaprosoft/carina/carina_formatter.xml](https://github.com/qaprosoft/carina/carina_formatter.xml)
+
+To use same formatter in IntelliJ IDEA you should install[**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter)
+
+And configure it.
+
+## License
+Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+Documentation and Site - [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/deed.en_US)
 
 
