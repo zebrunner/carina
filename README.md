@@ -158,6 +158,11 @@ Configuration.get(Parameter.EXTRA_CAPABILITIES)
 
 All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of the parameters:
 <table> 
+    <col width="20">
+    <col width="20">
+    <col width="20">
+    <col width="20"> 
+	<tbody>
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>
@@ -207,7 +212,7 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Integer</td>
 	</tr>
 	<tr>
-		<td>retry_internal</td>
+		<td>retry_interval</td>
 		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify number from 500-1500 range</td>
 		<td>2</td>
 		<td>Integer</td>
@@ -260,8 +265,466 @@ All project configuration properties are located in **_config.properties** file.
 		<td>{must_override}</td>
 		<td>pwd123</td>
 	</tr>
-</table>
-
+	<tr>
+		<td>env</td>
+		<td>Environment specific configuration. More about this [feature](#environment-specific-configuration)</td>
+		<td>n/a</td>
+		<td>STAG, PROD, DEMO</td>
+	</tr>
+	<tr>
+		<td>env_arg_resolver</td>
+		<td>This parametr is optional, if it isn't set default value will be used. In most cases <b>default value is enough</b></td>
+		<td>com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver</td>
+		<td>java class </td>
+	</tr>
+		<tr>
+		<td>platform</td>
+		<td>Platform version for Selenium Grid</td>
+		<td>*</td>
+		<td>ANDROID,IOS,WINDOWS,MAC,LINUX</td>
+	</tr>
+		<tr>
+		<td>browser_version</td>
+		<td>The browser version, or the empty string if unknown for Selenium Grid</td>
+		<td>n/a</td>
+		<td>"8.0", "52.1"</td>
+	</tr>
+		<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle.</td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+		<tr>
+		<td>driver_mode</td>
+		<td>Rule for defining WebDriver lifecycle.</td>
+		<td>method_mode</td>
+		<td>method_mode / class_mode / suite_mode</td>
+	</tr>
+		<tr>
+		<td>driver_event_listeners</td>
+		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be instances of WebDriverEventListener</td>
+		<td>n/a</td>
+		<td>com.someCompane.core.EventListener1,com.someCompane.core.EventListener2</td>
+	</tr>
+		<tr>
+		<td>max_driver_count</td>
+		<td>Max number of drivers per thread</td>
+		<td>3</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>custom_capabilities</td>
+		<td>Name of propertie file with custom capabilities(key-value)</td>
+		<td>n/a</td>
+		<td>custom.propertie</td>
+	</tr>
+		<tr>
+		<td>proxy_host</td>
+		<td>The hostname of the server</td>
+		<td>n/a</td>
+		<td>host.example.com</td>
+	</tr>
+		<tr>
+		<td>proxy_port</td>
+		<td>The port number</td>
+		<td>n/a</td>
+		<td>80</td>
+	</tr>
+		<tr>
+		<td>proxy_protocols</td>
+		<td>Comma-separated list of internet protocols used to carry connection information from the source requesting the connection to the destination for which the connection was requested.</td>
+		<td>http,https,ftp</td>
+		<td>http, https, ftp, socks</td>
+	</tr>
+		<tr>
+		<td>browsermob_proxy</td>
+		<td>Boolean parameter which enable or disable set up of mobile proxy</td>
+		<td>false</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>browsermob_port</td>
+		<td>The port number for mobile browser (make sense only for local debugging)</td>
+		<td>0</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>proxy_set_to_system</td>
+		<td>Boolean parameter which enable or disable set up of proxy</td>
+		<td>true</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>failure_email_list</td>
+		<td>Comma-separated list of emails for failure reports</td>
+		<td>n/a</td>
+		<td>u1@mail.com,u2@mail.com</td>
+	</tr>
+		<tr>
+		<td>track_known_issues</td>
+		<td>Boolean parameter. If it is true and some Jira tickets assosiated with test in case of failure Jira info will be added to report</td>
+		<td>false</td>
+		<td>true,false</td>
+	</tr>
+	<tr>
+		<td>smart_screenshot</td>
+		<td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
+		<td>false</td>
+		<td>true,false</td>
+	</tr>
+	<tr>
+		<td>smart_screenshot</td>
+		<td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
+		<td>false</td>
+		<td>true,false</td>
+	</tr>
+	<tr>
+		<td>explicit_timeout</td>
+		<td>Timeout in seconds to wait for a certain condition to occur before proceeding further in the code</td>
+		<td>20</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>auto_download</td>
+		<td>Enabled parametr prevent download dialog and download file automatically. Feature currently avaliable for Chrome and FireFox</td>
+		<td>false</td>
+		<td>false, true</td>
+	</tr>
+	<tr>
+		<td>auto_download_apps</td>
+		<td>MIME types / Internet Media Types. Parameter is necessary only for configure auto downloading for FireFox</td>
+		<td>NULL</td>
+		<td>application/pdf, video/x-msvideo, list of [values](https://freeformatter.com/mime-types-list.html)</td>
+	</tr>
+	<tr>
+		<td>project_report_directory</td>
+		<td>Path to folder where reports will be saved</td>
+		<td>../reports/qa</td>
+		<td>./reports/qa</td>
+	</tr>
+	<tr>
+		<td>big_screen_width</td>
+		<td>Sreenshots will be resized according this width if there own width is bigger</td>
+		<td>-1</td>
+		<td>500, 1200, Integer</td>
+	</tr>
+	<tr>
+		<td>big_screen_height</td>
+		<td>Sreenshots will be resized according this height if there own height is bigger</td>
+		<td>-1</td>
+		<td>500, 1200, Integer</td>
+	</tr>
+		<tr>
+		<td>small_screen_width</td>
+		<td>Thumbnails width</td>
+		<td>90</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>big_screen_height</td>
+		<td>Thumbnails height</td>
+		<td>90</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>big_screen_height</td>
+		<td>Thumbnails height</td>
+		<td>90</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>init_retry_count</td>
+		<td>Number of attempts to create driver.  Default value 0 means that it would be only 1 attempt</td>
+		<td>0</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>init_retry_interval</td>
+		<td>Interval is seconds between attempts to create driver</td>
+		<td>1</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>retry_count</td>
+		<td>Number of test-retrying in case of failure.  Default value 0 means that test would be performed only once</td>
+		<td>0</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>enable_l10n</td>
+		<td>Enable L10N feature</td>
+		<td>true</td>
+		<td>false, true</td>
+	</tr>
+			<tr>
+		<td>l10n_encoding</td>
+		<td>Charset for l10n feature</td>
+		<td>ISO-8859-1</td>
+		<td>ISO-8859-5, ISO-8859-6</td>
+	</tr>
+	<tr>
+		<td>enable_i18n</td>
+		<td>Enable i18n feature</td>
+		<td>true</td>
+		<td>false, true</td>
+	</tr>
+		<tr>
+		<td>thread_count</td>
+		<td>Default number of threads to use when running tests in parallel.</td>
+		<td>1</td>
+		<td>fInteger</td>
+	</tr>
+		<tr>
+		<td>data_provider_thread_count</td>
+		<td>Default number of threads to use for data providers when running tests in parallel.</td>
+		<td>1</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>core_log_level</td>
+		<td>Level for Carina logging</td>
+		<td>INFO</td>
+		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE </td>
+	</tr>
+		<tr>
+		<td>log_all_json</td>
+		<td>API response will be logged in JSON format</td>
+		<td>true</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>date_format</td>
+		<td>Date format for DateUtils.class</td>
+		<td>HH:mm:ss yyyy-MM-dd</td>
+		<td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
+	</tr>
+		<tr>
+		<td>time_format</td>
+		<td>Date format for DateUtils.class</td>
+		<td>HH:mm:ss</td>
+		<td>HH:mm:ss.SSS, HH:mm a zzz</td>
+	</tr>
+		<tr>
+		<td>crypto_key_path</td>
+		<td>Path to file with crypto key</td>
+		<td>./src/main/resources/crypto.key</td>
+		<td>./crypto</td>
+	</tr>
+		<tr>
+		<td>suite_name</td>
+		<td>Suite name for report and TestRail. If this parameter is NULL will be get from TestNG xml (parameter suite name) or _email.properties (title)</td>
+		<td>NULL</td>
+		<td>Advanced Acceptance</td>
+	</tr>
+	<tr>
+		<td>jira_updater</td>
+		<td>Class contains logic to update Jira. <b>Note</b> Custom updater have to implement DefaultJiraUpdater, by default methods do nothing</td>
+		<td>com.qaprosoft.
+		carina.core.foundation.
+		jira.DefaultJiraUpdater</td>
+		<td>Custom class</td>
+	</tr>
+	<tr>
+		<td>jira_url</td>
+		<td>Url to Jira</td>
+		<td>NULL</td>
+		<td>https://yourclass.atlassian.net</td>
+	</tr>
+		<tr>
+		<td>jira_user</td>
+		<td>Jira user email</td>
+		<td>NULL</td>
+		<td>admin@yourcompany.com</td>
+	</tr>
+		<tr>
+		<td>jira_password</td>
+		<td>Jira user password</td>
+		<td>NULL</td>
+		<td>admin123456</td>
+	</tr>
+		<tr>
+		<td>jira_suite_id</td>
+		<td>Jira suit id (if you have one)</td>
+		<td>NULL</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>jira_project</td>
+		<td>Jira project id</td>
+		<td>NULL</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>jira_create_new_ticket</td>
+		<td>If feature is enabled after test failure new jira ticket will be created</td>
+		<td>false</td>
+		<td>true, false</td>
+	</tr>
+	<tr>
+		<td>video_recording</td>
+		<td>If feature is test will be recorded</td>
+		<td>false</td>
+		<td>true, false</td>
+	</tr>	
+	<tr>
+		<td>testrail_url</td>
+		<td>Url to TestRail</td>
+		<td>NULL</td>
+		<td>https:/yourcompany.testrail.net</td>
+	</tr>
+	<tr>
+		<td>testrail_user</td>
+		<td>TestRail user email</td>
+		<td>NULL</td>
+		<td>admin@yourcompany.com</td>
+	</tr>
+		<tr>
+		<td>testrail_updater</td>
+		<td>Class contains logic to update TestRail. <b>Note</b> Custom updater have to implement EmptyTestRailUpdater, by default methods do nothing</td>
+		<td>com.qaprosoft.carina.core.foundation.report.testrail.EmptyTestRailUpdater</td>
+		<td>Custom class</td>
+	</tr>
+		<tr>
+		<td>testrail_milestone</td>
+		<td>Milestone to set on TestRail for run</td>
+		<td>NULL</td>
+		<td>some-milestone</td>
+	</tr>
+		<tr>
+		<td>testrail_assignee</td>
+		<td>User asserneed for the suit</td>
+		<td>NULL</td>
+		<td>asignee_user@yuorcompany.com</td>
+	</tr>
+		<tr>
+		<td>s3_bucket_name</td>
+		<td>Bucket name on S3 Amazon from which you suppose to download artifacts</td>
+		<td>NULL</td>
+		<td>some bucket</td>
+	</tr>
+		<tr>
+		<td>access_key_id</td>
+		<td>Acces key id for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>NULL</td>
+		<td>gkhcvdgvceUYF67897hbjsbdc</td>
+	</tr>
+		<tr>
+		<td>secret_key</td>
+		<td>Secret key for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>NULL</td>
+		<td>gkhcvdgvceUYF67897hbjsbdc</td>
+	</tr>
+		<tr>
+		<td>s3_local_storage</td>
+		<td>Directory for downloading artefacts</td>
+		<td>.</td>
+		<td>./s3</td>
+	</tr>
+		<tr>
+		<td>s3_screenshot_bucket_name</td>
+		<td>Bucket name on S3 Amamzon for saving report screenshots</td>
+		<td>NULL</td>
+		<td>Screenshot bucket name</td>
+	</tr>
+		<tr>
+		<td>s3_save_screenshots</td>
+		<td>If enabled screenshots would be saved on S3 Amamzon</td>
+		<td>false</td>
+		<td>false, true</td>
+	</tr>
+		<tr>
+		<td>hockeyapp_token</td>
+		<td>Token for authentication in Hockey App</td>
+		<td>NULL</td>
+		<td>gkhcvdgvceUYF67897hbjsbdc</td>
+	</tr>
+		<tr>
+		<td>hockeyapp_local_storage</td>
+		<td>Directory for Hockey App artefacts</td>
+		<td>.</td>
+		<td>./hockeyapp</td>
+	</tr>
+		<tr>
+		<td>add_new_localization</td>
+		<td>Should be set to 'true' if you want to create new localization files for required Locale.Otherwise there will be just localization checking</td>
+		<td>false</td>
+		<td>false, true</td>
+	</tr>
+		<tr>
+		<td>add_new_localization_encoding</td>
+		<td>Encoding for new lokalization</td>
+		<td>utf-8</td>
+		<td>utf-16, utf-32</td>
+	</tr>
+		<tr>
+		<td>add_new_localization_path</td>
+		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+		<td>utf-8</td>
+		<td>utf-16, utf-32</td>
+	</tr>
+		<tr>
+		<td>add_new_localization_property_name</td>
+		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+		<td>new_custom_messages</td>
+		<td>the basic template for property name. There will be locale added at the end of the filename.</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests</td>
+		<td>If parametrs contains true Cucumber tests will be started</td>
+		<td>n/a</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests_app_version</td>
+		<td>Version of app using in Cucumber tests</td>
+		<td>n/a</td>
+		<td>2.013</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests_name</td>
+		<td>Cucucmber tests name</td>
+		<td>n/a</td>
+		<td>cucumber tests</td>
+	</tr>
+		<tr>
+		<td>cucumber_tests_results_image_resize</td>
+		<td>Percent of Scaling from default image. 100 - same size</td>
+		<td>30</td>
+		<td>Integer</td>
+	</tr>
+		<tr>
+		<td>cucumber_report_subfolder</td>
+		<td>Subfolder on Jenkins (jenkins_url/{someNumbersFr EveryRun}/artifacts/CucumberReport/{cucumber_report_subfolder})</td>
+		<td>cucumber-html-reports</td>
+		<td>cucumber-reports</td>
+	</tr>
+		<tr>
+		<td>cucumber_user_js_in_report</td>
+		<td>Enabled parameter help to get more beautiful reports</td>
+		<td>true</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>tls_keysecure_location</td>
+		<td>Path to directory with tls secure keys</td>
+		<td>src/test/resources/keysecure</td>
+		<td>./tls/keysecure</td>
+	</tr>
+		<tr>
+		<td>health_check_class</td>
+		<td>Class to execute helth checks</td>
+		<td>NULL</td>
+		<td>Custom class</td>
+	</tr>
+		<tr>
+		<td>health_check_methods</td>
+		<td>Comma-separate list of methods of health_check_class to execute preliminary</td>
+		<td>NULL</td>
+		<td>doThis, doThat</td>
+	</tr>
+		</tbody>
+	</table>
 Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
@@ -273,7 +736,7 @@ Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ### Environment specific configuration
 In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
 ```
-env=DEMO
+env=PROD
 STAG.url=http://stag-app-server.com
 PROD.url=http://prod-app-server.com
 ```
@@ -369,15 +832,15 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
 	</tr>
         <tr>
 		<td>capabilities.automationName</td>
-		<td>Name of programm using for automation</td>
+		<td>Name of programm using for automation (for Android 7+ use uiautomator2 instead of Appium)</td>
                 <td>n/a</td>
 		<td>Appium/uiautomator2/XCUITest</td>
 	</tr>
         <tr>
 		<td>capabilities.app</td>
-		<td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading...</td>
+		<td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading</td>
                 <td>n/a</td>
-		<td>D:/application.apk</td>
+		<td>D:/application.apk, s3://qaprosoft.com/android/myapk.*-release.apk</td>
 	</tr>
         <tr>
 		<td>capabilities.newCommandTimeout</td>
@@ -390,6 +853,53 @@ We could provide any Appium capabilty in **_config.properties** file using <i>ca
 		<td>Unique Device ID</td>
                 <td>n/a</td>
 		<td>759b543c</td>
+	</tr>
+        <tr>
+		<td>capabilities.device</td>
+		<td>Specifies a particular mobile device for the test environment on Browserstack</td>
+                <td>n/a</td>
+		<td>Galaxy Note 8, iPhone X</td>
+	</tr>
+	 <tr>
+		<td>capabilities.os_versione</td>
+		<td>Version of OS for Browserstack</td>
+                <td>n/a</td>
+		<td>ios, android</td>
+	</tr>
+	<tr>
+		<td>capabilities.remoteURL</td>
+		<td>Remote URL for using Selenium Grid</td>
+                <td>n/a</td>
+		<td> 'http://localhost:4444/wd/hub'</td>
+	</tr>
+		<tr>
+		<td>capabilities.appActivity</td>
+		<td>Activity name for the Android activity you want to launch from your package.</td>
+                <td>n/a</td>
+		<td>com.amazon.mShop.home.HomeActivity</td>
+	</tr>
+		<tr>
+		<td>capabilities.appPackage</td>
+		<td>Java package of the Android app you want to run</td>
+                <td>n/a</td>
+		<td>in.amazon.mShop.android.shopping</td>
+	</tr>
+	<tr>
+		<td>capabilities.noSign</td>
+		<td>Skip checking and signing of app with debug keys, will work only with UiAutomator and not with selendroid, default false</td>
+                <td>n/a</td>
+		<td>true, false</td>
+	</tr>
+	<tr>
+		<td>capabilities.autoGrantPermissions</td>
+		<td>Have Appium automatically determine which permissions your app requires and grant them to the app on install. Defaults to false</td>
+                <td>n/a</td>
+		<td>true, false</td>
+	</tr>
+		<tr>
+		<td>Skip the device unlock process. Defaults to false</td>
+                <td>n/a</td>
+		<td>true, false</td>
 	</tr>
 </table>
 
@@ -585,3 +1095,20 @@ And configure it.
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Documentation and Site - [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/deed.en_US)
+
+## Base flow of web test implementation
+<b>Important!</b> If you want to create web automation test and run it the first thing to do is start Selenium server. [More information](https://www.seleniumhq.org/docs/05_selenium_rc.jsp) 
+
+For example let's explain simple [test - testCompareModels] (https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/WebSampleTest.java) from Carina-deno step by step. 
+
+1) Annotations. You have to use standart TestNG [annotations] (http://testng.org/doc/documentation-main.html#annotations) like @Test and can use custom Carina annotations like @Owner - annotation used to specify the TestNG methods owners. Each method caan have two owners @Owner(owner = "qpsowner", secondaryOwner="qpsowner2"). This feature is for mobile automation mostly and very convenient when different people implement one method for different platforms (ios and Android). Owner name will be in report.
+
+2) HomePage homePage = new HomePage(getDriver());
+Carina support and stromgly recomended to use [PageObject Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern)
+Each page have to implement AbstractPage from Carina (com.qaprosoft.carina.core.gui). This class provade some basic operations like openUrl, isPageOpened, savePageAsPdf.
+On HomePage all necessary [ExtendedWebElements](#ExtendedWebElement) and methods are discribed.
+
+3) Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+Assertions verify that the state of the application is same to what we are expecting. If Home page isn't opened there is no sense to continue the test. So if assertation isn't try test will be stoped. Message "Home page is not opened" will be in logs to better understanding of situation. Also TestNG provide different kinds of Assert like assertFalse and assertEquals. If you just want to know is assertation true or false but DON'T want to stop test you can use SoftAssert. It will show all failed asserts in the end of test. 
+
+
