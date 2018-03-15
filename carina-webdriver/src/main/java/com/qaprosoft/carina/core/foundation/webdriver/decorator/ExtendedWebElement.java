@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -38,13 +37,11 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -59,20 +56,17 @@ import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 import io.appium.java_client.MobileBy;
 
-// TODO: [VD] removed deprecated constructor and DriverPool import
-// Also refactor screenshots capturing using listener approach to be able to remove it as well
+// TODO: [VD] Also refactor screenshots capturing using listener approach to be able to remove it as well
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
 
@@ -95,6 +89,8 @@ public class ExtendedWebElement {
     private WebElement element;
     private String name;
     private By by;
+
+    //TODO: remove all references onto the driver variable
     private WebDriver driver;
 
     public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
@@ -111,22 +107,6 @@ public class ExtendedWebElement {
         this.element = element;
         this.driver = driver;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name) {
-        // TODO: remove usage with default river!
-        this(element, name, DriverPool.getDriver());
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, By by) {
-        this(element, name, by, DriverPool.getDriver());
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element) {
-        this(element, DriverPool.getDriver());
     }
 
     public WebElement getElement() {
@@ -170,18 +150,6 @@ public class ExtendedWebElement {
         return element;
     }
 
-    private WebElement findStaleElement() {
-        WebElement staleElement;
-        WebDriver drv = getDriver();
-        if (!drv.findElements(by).isEmpty()) {
-            LOGGER.debug("Element was idenfified using By: " + by.toString());
-            staleElement = drv.findElement(by);
-        } else {
-            throw new RuntimeException("Unable to identify element using By: " + by.toString());
-        }
-        return staleElement;
-    }
-
     public void setElement(WebElement element) {
         this.element = element;
     }
@@ -204,16 +172,7 @@ public class ExtendedWebElement {
      * @return String text
      */
     public String getText() {
-        String text = null;
-        try {
-            text = findElement(EXPLICIT_TIMEOUT).getText();
-        } catch (StaleElementReferenceException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element = findStaleElement();
-            text = element.getText();
-        }
-
-        return text;
+       	return findElement(EXPLICIT_TIMEOUT).getText();
     }
 
     /**
@@ -222,16 +181,7 @@ public class ExtendedWebElement {
      * @return Point location
      */
     public Point getLocation() {
-        Point point = null;
-        try {
-            point = findElement(EXPLICIT_TIMEOUT).getLocation();
-        } catch (StaleElementReferenceException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element = findStaleElement();
-            point = element.getLocation();
-        }
-
-        return point;
+		return findElement(EXPLICIT_TIMEOUT).getLocation();
     }
 
     /**
@@ -240,16 +190,7 @@ public class ExtendedWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-        Dimension dim = null;
-        try {
-            dim = findElement(EXPLICIT_TIMEOUT).getSize();
-        } catch (StaleElementReferenceException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element = findStaleElement();
-            dim = element.getSize();
-        }
-
-        return dim;
+    	return  findElement(EXPLICIT_TIMEOUT).getSize();
     }
 
     /**
@@ -259,16 +200,7 @@ public class ExtendedWebElement {
      * @return String text
      */
     public String getAttribute(String name) {
-        String attribute = null;
-        try {
-            attribute = findElement(EXPLICIT_TIMEOUT).getAttribute(name);
-        } catch (StaleElementReferenceException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element = findStaleElement();
-            attribute = element.getAttribute(name);
-        }
-
-        return attribute;
+		return findElement(EXPLICIT_TIMEOUT).getAttribute(name);
     }
 
     /**
@@ -344,13 +276,9 @@ public class ExtendedWebElement {
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             drv.switchTo().alert().accept();
-        } catch (StaleElementReferenceException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            element = findStaleElement();
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             if (e.getMessage().contains("Element is not clickable")) {
-                scrollTo();
             }
             CommonUtils.pause((double) RETRY_TIME / 1000);
 
@@ -588,15 +516,6 @@ public class ExtendedWebElement {
                 element.clear();
                 element.sendKeys(decryptedText);
                 msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-            } catch (StaleElementReferenceException e) {
-                // TODO: [VD] think about movement
-                // StaleElementReferenceException handler to findElement private
-                // method
-                element = findStaleElement();
-                LOGGER.debug(e.getMessage(), e.getCause());
-                element.clear();
-                element.sendKeys(decryptedText);
-                msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
             } catch (Exception e) {
                 msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
                 throw new RuntimeException(msg, e);
@@ -655,12 +574,8 @@ public class ExtendedWebElement {
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             getDriver().switchTo().alert().accept();
-        } catch (StaleElementReferenceException e) {
-            element = findStaleElement();
-            LOGGER.debug(e.getMessage(), e.getCause());
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
-            scrollTo();
             reason = e;
         }
 
@@ -673,34 +588,6 @@ public class ExtendedWebElement {
                 String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
                 throw new RuntimeException(msg, reason);
             }
-        }
-    }
-
-    /**
-     * Scroll to element (applied only for desktop).
-     */
-    @Deprecated
-    public void scrollTo() {
-        if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-            LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
-            return;
-        }
-        try {
-            Locatable locatableElement = (Locatable) findElement(EXPLICIT_TIMEOUT);
-            // [VD] onScreen should be updated onto onPage as only 2nd one
-            // returns real coordinates without scrolling... read below material
-            // for details
-            // https://groups.google.com/d/msg/selenium-developers/nJR5VnL-3Qs/uqUkXFw4FSwJ
-
-            // [CB] onPage -> inViewPort
-            // https://code.google.com/p/selenium/source/browse/java/client/src/org/openqa/selenium/remote/RemoteWebElement.java?r=abc64b1df10d5f5d72d11fba37fabf5e85644081
-            int y = locatableElement.getCoordinates().inViewPort().getY();
-            int offset = R.CONFIG.getInt("scroll_to_element_y_offset");
-            ((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - offset) + ");");
-        } catch (Exception e) {
-            // TODO: calm error logging as it is too noisy
-            // LOGGER.debug("Scroll to element: " + getName() + " not
-            // performed!" + e.getMessage());
         }
     }
 
@@ -1123,16 +1010,6 @@ public class ExtendedWebElement {
             extendedWebElements.add(new ExtendedWebElement(element, name, driver));
         }
         return extendedWebElements;
-    }
-
-    @Deprecated
-    public void tapWithCoordinates(double x, double y) {
-        HashMap<String, Double> tapObject = new HashMap<String, Double>();
-        tapObject.put("x", x);
-        tapObject.put("y", y);
-        final WebDriver drv = getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) drv;
-        js.executeScript("mobile: tap", tapObject);
     }
 
     public void waitUntilElementNotPresent(final long timeout) {

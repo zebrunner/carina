@@ -16,13 +16,16 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -65,24 +68,25 @@ public final class DriverPool {
     public static WebDriver getDriver() {
         return getDriver(DEFAULT);
     }
-
+    
+    
     /**
-     * Get first registered driver from Pool.
+     * Get driver by serachContext.
      * 
      * @return default WebDriver
      */
-    @Deprecated
-    public static WebDriver getExistingDriver() {
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-        if (currentDrivers.size() == 0) {
-            throw new RuntimeException("Unable to find exiting river in DriverPool!");
-        }
-
-        if (currentDrivers.size() > 0) {
-            return currentDrivers.entrySet().iterator().next().getValue();
-        }
-
-        return getDriver(DEFAULT);
+    //TODO: investigate howto allow to use from ExtendedElementLocator only
+    public static WebDriver getDriver(SearchContext searchContext) {
+    	String context = searchContext.toString();
+    	LOGGER.debug("Detecting WebDriver by searchContext->hashCode");
+    	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+    	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
+    		if (context.contains(((RemoteWebDriver)enrty.getValue()).getSessionId().toString())) {
+    			LOGGER.debug("Detected WebDriver by searchContext->hashCode");
+    			return enrty.getValue();
+    		}
+    	}
+    	throw new RuntimeException("WebDriver was not found by serachContext->hashCode: " + context);
     }
 
     /**
