@@ -582,30 +582,7 @@ public class DriverHelper {
         doubleClick(new ExtendedWebElement(control, controlInfo));
     }
 
-    /**
-     * Mouse Right click to element.
-     * 
-     * @param extendedWebElement to do right click
-     * 
-     * @return boolean true if there is no errors.
-     */
-    public boolean rightClick(final ExtendedWebElement extendedWebElement) {
-        return extendedWebElement.rightClick();
-    }
-
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     * 
-     * @param extendedWebElement to click hidden element
-     * 
-     * @return boolean true if there is no errors.
-     */
-    public boolean clickHiddenElement(final ExtendedWebElement extendedWebElement) {
-        return extendedWebElement.clickHiddenElement();
-    }
-
-    /**
+     /**
      * Sends enter to element.
      * 
      * @param extendedWebElement
@@ -1404,6 +1381,7 @@ public class DriverHelper {
 
         LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
 
+        //TODO: find a way to support extraDrivers manipulation as well if default driver is not valid...
         driver = DriverPool.getDriver();
         if (driver == null) {
             long currentThreadId = Thread.currentThread().getId();

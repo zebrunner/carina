@@ -24,9 +24,9 @@ import org.apache.log4j.NDC;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -79,16 +79,7 @@ public final class DriverPool {
      */
     //TODO: investigate howto allow to use from ExtendedElementLocator only
     public static WebDriver getDriver(SearchContext searchContext) {
-    	String context = searchContext.toString();
-    	LOGGER.debug("Detecting WebDriver by searchContext->hashCode");
-    	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-    	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
-    		if (context.contains(((RemoteWebDriver)enrty.getValue()).getSessionId().toString())) {
-    			LOGGER.debug("Detected WebDriver by searchContext->hashCode");
-    			return enrty.getValue();
-    		}
-    	}
-    	throw new RuntimeException("WebDriver was not found by serachContext->hashCode: " + context);
+    	return getDriver(((RemoteWebDriver)searchContext).getSessionId());
     }
     
     /**
@@ -96,18 +87,22 @@ public final class DriverPool {
      * 
      * @return default WebDriver
      */
-    //TODO: investigate howto allow to use from ExtendedElementLocator only
-    public static WebDriver getDriver(WebElement element) {
-    	String context = element.toString();
-    	LOGGER.debug("Detecting WebDriver by searchContext->hashCode");
+    //TODO: investigate howto allow to use from ExtendedWebElement only
+    public static WebDriver getDriver(SessionId sessionId) {
+    	LOGGER.debug("Detecting WebDriver by sessionId...");
     	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
     	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
-    		if (context.contains(((RemoteWebDriver)enrty.getValue()).getSessionId().toString())) {
-    			LOGGER.debug("Detected WebDriver by searchContext->hashCode");
+    		LOGGER.debug("analyzing driver: " + ((RemoteWebDriver)enrty.getValue()).getSessionId().toString());
+    		if (sessionId.equals(((RemoteWebDriver)enrty.getValue()).getSessionId())) {
+    			LOGGER.debug("Detected WebDriver by sessionId");
     			return enrty.getValue();
     		}
     	}
-    	throw new RuntimeException("WebDriver was not found by WebElement: " + context);
+
+    	LOGGER.warn("Unable to find driver using sessionId artifacts. Returning default one!");
+    	//TODO: take a look into the replaceDriver case and how sessionId are regenerated on page objects
+    	return getDriver();
+    	
     }
     
     /**

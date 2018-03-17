@@ -27,11 +27,15 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +62,9 @@ public class ExtendedElementLocator implements ElementLocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedElementLocator.class);
 
     private SearchContext searchContext;
-    private boolean shouldCache;
-    private By by;
+    private boolean isCached;
+
+	private By by;
     private WebElement cachedElement;
     private List<WebElement> cachedElementList;
 
@@ -81,7 +86,7 @@ public class ExtendedElementLocator implements ElementLocator {
         
         if (field.isAnnotationPresent(FindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
-            this.shouldCache = annotations.isLookupCached();
+            this.isCached = annotations.isLookupCached();
             this.by = annotations.buildBy();
         }
         // Elements to be recognized by Alice
@@ -106,8 +111,16 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     @SuppressWarnings("rawtypes")
     public WebElement findElement() {
-        if (cachedElement != null && shouldCache) {
-            return cachedElement;
+        if (cachedElement != null && isCached) {
+        	//verify that it is not staleness otherwise repeit find procedure based on by annotations
+        	Wait<WebDriver> wait = new WebDriverWait((WebDriver)searchContext, 1, 100);
+            try {
+                wait.until(ExpectedConditions.stalenessOf(cachedElement));
+            } catch (NoSuchElementException | TimeoutException e) {
+            	return cachedElement;
+            } catch (Exception e) {
+                LOGGER.debug(e.getMessage(), e.getCause());
+            }   
         }
 
         WebElement element = null;
@@ -142,6 +155,7 @@ public class ExtendedElementLocator implements ElementLocator {
             		// 1. find valid driver in DriverPool using id value
             		// 2. reinit searchContext
             		// 3. again search using by annotation
+                	LOGGER.error("Obligatory analyze conditions when this happens with findElement");
             		searchContext = (RemoteWebDriver) DriverPool.getDriver(searchContext);
             		element = searchContext.findElement(by);
                 } catch (NoSuchElementException e) {
@@ -162,9 +176,9 @@ public class ExtendedElementLocator implements ElementLocator {
 
     	
         //always cache already discovered element to minimize selenium calls and sppedup tests
-        shouldCache = true;
+        isCached = true;
         
-        if (shouldCache) {
+        if (isCached) {
             cachedElement = element;
         }
         return element;
@@ -175,7 +189,7 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<WebElement> findElements() {
-        if (cachedElementList != null && shouldCache) {
+        if (cachedElementList != null && isCached) {
             return cachedElementList;
         }
 
@@ -210,9 +224,9 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
         //always cache already discovered element to minimize selenium calls and sppedup tests
-        shouldCache = true;
+        isCached = true;
         
-        if (shouldCache) {
+        if (isCached) {
             cachedElementList = elements;
         }
 
