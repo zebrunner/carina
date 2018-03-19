@@ -268,13 +268,14 @@ public class ExtendedWebElement {
         
         try {
             getElement().click();
+        } catch (StaleElementReferenceException | InvalidElementStateException e) {
+        	getDriver().findElement(by).click();
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             getDriver().switchTo().alert().accept();
             getElement().click();
-        } catch (StaleElementReferenceException e) {
-        	getDriver().findElement(by).click();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
@@ -304,6 +305,9 @@ public class ExtendedWebElement {
         element = getElement();
         try {
         	action.moveToElement(element).doubleClick(element).build().perform();
+        } catch (StaleElementReferenceException | InvalidElementStateException e) {
+        	element = getDriver().findElement(by);
+        	action.moveToElement(element).doubleClick(element).build().perform();
         } catch (UnhandledAlertException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             getDriver().switchTo().alert().accept();
@@ -329,21 +333,25 @@ public class ExtendedWebElement {
      */
     public void rightClick(long timeout) {
     	assertElementPresent(timeout);
+
+        WebDriver drv = getDriver();
+        Actions action = new Actions(drv);
         
         String msg = "Right Click";
         try {
-            WebDriver drv = getDriver();
-            Actions action = new Actions(drv);
             element = getElement();
             action.moveToElement(element).contextClick(element).build().perform();
-            msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
+        } catch (StaleElementReferenceException | InvalidElementStateException e) {
+        	element = getDriver().findElement(by);
+            action.moveToElement(element).contextClick(element).build().perform();
         } catch (Exception e) {
             msg = Messager.ELEMENT_NOT_RIGHT_CLICKED.info(getNameWithLocator());
             throw new RuntimeException(msg, e);
         }
 
+        msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
         //TODO: move outside of class
-        Screenshot.capture(getDriver(), msg);
+        Screenshot.capture(drv, msg);
     }
 
     public void clickHiddenElement() {
@@ -357,17 +365,19 @@ public class ExtendedWebElement {
     	assertElementPresent(timeout);
         
         String msg = "Hidden Element Click";
-        try {
-            WebElement elem = getElement();
-            JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-            executor.executeScript("arguments[0].click();", elem);
+        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
 
-            msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
+        try {
+            executor.executeScript("arguments[0].click();", element);
+        } catch (StaleElementReferenceException | InvalidElementStateException e) {
+        	element = getDriver().findElement(by);
+        	executor.executeScript("arguments[0].click();", element);
         } catch (Exception e) {
             msg = Messager.HIDDEN_ELEMENT_NOT_CLICKED.info(getName());
             throw new RuntimeException(msg, e);
         }
-        
+
+        msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
         //TODO: move outside of class
         Screenshot.capture(getDriver(), msg);
     }
@@ -414,7 +424,6 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent() {
     	return isPresent(EXPLICIT_TIMEOUT);
-        //return isElementPresent(EXPLICIT_TIMEOUT);
     }
 
     /**
@@ -425,46 +434,6 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent(long timeout) {
     	return isPresent(timeout);
-    	
-/*        boolean result;
-        if (timeout < 1) {
-            LOGGER.warn("Timeout should be bigger than 0.");
-            timeout = 1;
-        }
-
-        final long finalTimeout = timeout;
-
-        final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-            LOGGER.debug("isElementPresent: starting...");
-            setImplicitTimeout(0);
-            wait.until((Function<WebDriver, Object>) dr -> findElement(finalTimeout).isDisplayed());
-            result = true;
-            LOGGER.debug("isElementPresent: finished true...");
-        } catch (NoSuchElementException | TimeoutException e) {
-            // don't write exception even in debug mode
-            LOGGER.debug("isElementPresent: NoSuchElementException | TimeoutException e...", e);
-            result = false;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            LOGGER.debug("isElementPresent: Exception e...", e);
-            result = false;
-        } finally {
-            LOGGER.debug("isElementPresent: finally");
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
-        }
-
-        // TODO: [VD] try to add error or exception to reraise correctly
-        // exception on selenium level!
-        
-         * if (undefinedException != null && undefinedException.getMessage() !=
-         * null && !undefinedException.getMessage().
-         * startsWith("Unable to find dynamic element using")) {
-         * LOGGER.error(undefinedException.getMessage(), undefinedException); }
-         
-
-        return result;*/
     }
 
     /**
@@ -553,17 +522,16 @@ public class ExtendedWebElement {
 			element = getElement();
 			element.clear();
 			element.sendKeys(decryptedText);
-			msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-		} catch (InvalidElementStateException e) {
+		} catch (InvalidElementStateException | StaleElementReferenceException e) {
 			element = getDriver().findElement(by);
 			element.clear();
 			element.sendKeys(decryptedText);
-			msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());			
 		} catch (Exception e) {
 			msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator());
 			throw new RuntimeException(msg, e);
 		}
 
+		msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
 		//TODO: move outside of class
         WebDriver drv = getDriver();
         Screenshot.capture(drv, msg);
@@ -607,12 +575,16 @@ public class ExtendedWebElement {
         
         
         try {
-            getElement().sendKeys(decryptedFilePath);
-            msg = Messager.FILE_ATTACHED.info(filePath);
-        } catch (Exception e) {
+            element.sendKeys(decryptedFilePath);
+        } catch (InvalidElementStateException | StaleElementReferenceException e) {
+			element = getDriver().findElement(by);
+			element.sendKeys(decryptedFilePath);
+		} catch (Exception e) {
             msg = Messager.FILE_NOT_ATTACHED.error(filePath);
             throw new RuntimeException(msg, e);
         }
+        
+        msg = Messager.FILE_ATTACHED.info(filePath);
         //TODO: move outside of class
         WebDriver drv = getDriver();
         Screenshot.capture(drv, msg);
@@ -715,14 +687,18 @@ public class ExtendedWebElement {
         String msg = null;
 
         try {
-            final Select s = new Select(getElement());
+            final Select s = new Select(element);
             s.selectByVisibleText(decryptedSelectText);
-            msg = Messager.SELECT_BY_TEXT_PERFORMED.info(selectText, getName());
-        } catch (Exception e) {
+        } catch (InvalidElementStateException | StaleElementReferenceException e) {
+			element = getDriver().findElement(by);
+            final Select s = new Select(element);
+            s.selectByVisibleText(decryptedSelectText);
+		} catch (Exception e) {
             msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(selectText, getNameWithLocator());
             throw new RuntimeException(msg, e);
         }
         
+        msg = Messager.SELECT_BY_TEXT_PERFORMED.info(selectText, getName());
         WebDriver drv = getDriver();
         Screenshot.capture(drv, msg);
         return isSelected;
@@ -761,10 +737,10 @@ public class ExtendedWebElement {
     	
         boolean isSelected = false;
         
-        final Select s = new Select(getElement());
         String msg = null;
 
 		try {
+			Select s = new Select(element);
 			String fullTextValue = null;
 			for (WebElement option : s.getOptions()) {
 				if (matcher.matches(option.getText())) {
@@ -774,12 +750,24 @@ public class ExtendedWebElement {
 			}
 			s.selectByVisibleText(fullTextValue);
 			isSelected = true;
-			msg = Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(matcher.toString(), getName());
+		} catch (InvalidElementStateException | StaleElementReferenceException e) {
+			element = getDriver().findElement(by);
+			Select s = new Select(element);
+			String fullTextValue = null;
+			for (WebElement option : s.getOptions()) {
+				if (matcher.matches(option.getText())) {
+					fullTextValue = option.getText();
+					break;
+				}
+			}
+			s.selectByVisibleText(fullTextValue);
+			isSelected = true;
 		} catch (Exception e) {
 			msg = Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), getNameWithLocator());
 			throw new RuntimeException(msg, e);
 		}
 		
+		msg = Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(matcher.toString(), getName());
 		WebDriver drv = getDriver();
         Screenshot.capture(drv, msg);
         return isSelected;
@@ -796,13 +784,11 @@ public class ExtendedWebElement {
     	
         boolean isSelected = false;
 
-        
-
-        final Select s = new Select(getElement());
         String msg = null;
-
+        String fullTextValue = null;
+        
         try {
-            String fullTextValue = null;
+        	Select s = new Select(element);
             for (WebElement option : s.getOptions()) {
                 if (option.getText().contains(partialSelectText)) {
                     fullTextValue = option.getText();
@@ -811,12 +797,24 @@ public class ExtendedWebElement {
             }
             s.selectByVisibleText(fullTextValue);
             isSelected = true;
-            msg = Messager.SELECT_BY_TEXT_PERFORMED.info(partialSelectText, getName());
-        } catch (Exception e) {
+        } catch (InvalidElementStateException | StaleElementReferenceException e) {
+			element = getDriver().findElement(by);
+			Select s = new Select(element);
+			fullTextValue = null;
+            for (WebElement option : s.getOptions()) {
+                if (option.getText().contains(partialSelectText)) {
+                    fullTextValue = option.getText();
+                    break;
+                }
+            }
+            s.selectByVisibleText(fullTextValue);
+            isSelected = true;
+		} catch (Exception e) {
         	msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator());
         	throw new RuntimeException(msg, e);
         }
 
+        msg = Messager.SELECT_BY_TEXT_PERFORMED.info(partialSelectText, getName());
         WebDriver drv = getDriver();
         Screenshot.capture(drv, msg);
 
@@ -834,18 +832,23 @@ public class ExtendedWebElement {
     	
         boolean isSelected = false;
 
-        final Select s = new Select(getElement());
         String msg = null;
 
         try {
+        	Select s = new Select(element);
             s.selectByIndex(index);
             isSelected = true;
-            msg = Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), getName());
-        } catch (Exception e) {
+        } catch (InvalidElementStateException | StaleElementReferenceException e) {
+			element = getDriver().findElement(by);
+        	Select s = new Select(element);
+            s.selectByIndex(index);
+            isSelected = true;
+		} catch (Exception e) {
         	msg = Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), getNameWithLocator());
         	throw new RuntimeException(msg, e);
         }
         
+        msg = Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), getName());
         WebDriver drv = getDriver();
         Screenshot.capture(drv, msg);
 
