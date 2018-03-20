@@ -539,7 +539,8 @@ public class MobileUtils {
     /**
      * Swipe left in container
      * 
-     * @param duration int
+     * @param duration - time period during which swipe action will 
+     * @param container - element in within which swipe will be performed
      */
     public static void swipeLeft(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe left will be executed.");
@@ -549,8 +550,8 @@ public class MobileUtils {
     /**
      * Swipe right several times
      * 
-     * @param times int
-     * @param duration int
+     * @param times - number of swipe repetitions
+     * @param duration - time period during which swipe action will 
      */
     public static void swipeRight(final int times, final int duration) {
         for (int i = 0; i < times; i++) {
@@ -561,7 +562,7 @@ public class MobileUtils {
     /**
      * Swipe right
      * 
-     * @param duration int
+     * @param duration - time period during which swipe action will 
      */
     public static void swipeRight(final int duration) {
         LOGGER.info("Swipe right will be executed.");
@@ -571,7 +572,8 @@ public class MobileUtils {
     /**
      * Swipe right in container
      * 
-     * @param duration int
+     * @param duration - time period during which swipe action will 
+     * @param container - element in within which swipe will be performed
      */
     public static void swipeRight(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe right will be executed.");
@@ -579,7 +581,7 @@ public class MobileUtils {
     }
 
     /**
-     * Set Android Device Default TimeZone And Language based on config or to GMT and En
+     * Set Android Device Default TimeZone And Language based on configuration file or to GMT and En
      * Without restoring actual focused apk.
      */
     public static void setDeviceDefaultTimeZoneAndLanguage() {

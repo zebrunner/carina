@@ -295,6 +295,8 @@ public class ExtendedWebElement {
     
     /**
      * Double Clicks on element.
+     * 
+     * @param timeout - time to wait until element is displayed
      */
     public void doubleClick(long timeout) {
     	assertElementPresent(timeout);
@@ -326,10 +328,12 @@ public class ExtendedWebElement {
     public void rightClick() {
     	rightClick(EXPLICIT_TIMEOUT);
     }
+    
     /**
      * Mouse Right click to element.
+     * 
+     * @param timeout - time to wait until element is displayed
      *
-     * @return boolean true if there is no errors.
      */
     public void rightClick(long timeout) {
     	assertElementPresent(timeout);
@@ -355,14 +359,17 @@ public class ExtendedWebElement {
     }
 
     public void clickHiddenElement() {
-    	clickHiddenElement(EXPLICIT_TIMEOUT);
+    		clickHiddenElement(EXPLICIT_TIMEOUT);
     }
+    
     /**
      * Click Hidden Element. useful when element present in DOM but actually is
      * not visible. And can't be clicked by standard click.
+     * 
+     * @param timeout - time to wait until element is displayed
      */
     public void clickHiddenElement(long timeout) {
-    	assertElementPresent(timeout);
+   		assertElementPresent(timeout);
         
         String msg = "Hidden Element Click";
         JavascriptExecutor executor = (JavascriptExecutor) getDriver();

@@ -75,9 +75,11 @@ public final class DriverPool {
     /**
      * Get driver by SearchContext.
      * 
+     * @param searchContext - context to be used for searching a desired driver
+     * 
      * @return default WebDriver
      */
-    //TODO: investigate howto allow to use from ExtendedElementLocator only
+    //TODO: investigate how to allow to use from ExtendedElementLocator only
     public static WebDriver getDriver(SearchContext searchContext) {
     	return getDriver(((RemoteWebDriver)searchContext).getSessionId());
     }
@@ -85,9 +87,11 @@ public final class DriverPool {
     /**
      * Get driver by WebElement.
      * 
+     * @param sessionId - session id to be used for searching a desired driver
+     * 
      * @return default WebDriver
      */
-    //TODO: investigate howto allow to use from ExtendedWebElement only
+    //TODO: investigate how to allow to use from ExtendedWebElement only
     public static WebDriver getDriver(SessionId sessionId) {
     	LOGGER.debug("Detecting WebDriver by sessionId...");
     	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
