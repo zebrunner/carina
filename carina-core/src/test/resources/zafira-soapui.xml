@@ -61,8 +61,8 @@
     "logURL": "http://localhost:8080/log",
     "workItems": ["JIRA-2342"]
 }]]></con:request><con:originalUri>http://localhost/zafira/tests</con:originalUri><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource><con:resource name="users" path="/users"><con:settings/><con:parameters/><con:method name="createUser" method="POST"><con:settings/><con:parameters/><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="RESPONSE"><con:mediaType>application/json;charset=UTF-8</con:mediaType><con:status>200</con:status><con:params/><con:element xmlns:user="http://localhost/zafira/users">user:Response</con:element></con:representation><con:request name="POST" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#zafira.baseURL}</con:endpoint><con:request>{
-    "userName": "pkebets",
-    "email": "pkebets@lendingclub.com",
-    "firstName": "Paul",
-    "lastName": "Kebets"
+    "userName": "demo",
+    "email": "demo@qaprosoft.com",
+    "firstName": "Demo",
+    "lastName": "User"
 }</con:request><con:originalUri>http://localhost/zafira/users</con:originalUri><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource></con:interface><con:properties><con:property><con:name>zafira.baseURL</con:name><con:value>http://10.253.1.105:8090/zafira</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

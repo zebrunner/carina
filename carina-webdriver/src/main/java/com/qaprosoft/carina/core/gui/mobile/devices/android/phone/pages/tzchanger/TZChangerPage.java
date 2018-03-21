@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger;
 
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 public class TZChangerPage extends MobileAbstractPage {
 
@@ -45,7 +46,6 @@ public class TZChangerPage extends MobileAbstractPage {
 
     protected static final String TIMEZONE_TEXT_BASE = "//android.widget.TextView[contains(@text,'%s')]";
 
-
     /**
      * selectTimeZone
      *
@@ -55,7 +55,7 @@ public class TZChangerPage extends MobileAbstractPage {
     public boolean selectTimeZone(String timezone) {
         int defaultSwipeTime = 30;
 
-        //String baseTimezoneText = timezone;
+        // String baseTimezoneText = timezone;
         boolean selected = false;
         String tz = "";
 
@@ -84,7 +84,6 @@ public class TZChangerPage extends MobileAbstractPage {
                 LOGGER.info("Select timezone folder: " + tz);
                 format(tzSelectionBase, tz).click();
 
-
                 LOGGER.info("Searching for " + timezone);
                 scrolled = MobileUtils.swipe(
                         format(tzSelectionBase, timezone),
@@ -112,11 +111,10 @@ public class TZChangerPage extends MobileAbstractPage {
 
         }
 
-
         return selected;
     }
 
-     /**
+    /**
      * isOpened
      *
      * @param timeout long
@@ -130,6 +128,5 @@ public class TZChangerPage extends MobileAbstractPage {
     public boolean isOpened() {
         return isOpened(EXPLICIT_TIMEOUT);
     }
-
 
 }

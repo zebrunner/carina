@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,29 +24,32 @@ import java.util.List;
  */
 public class CmdLine {
 
-    public static String[] createPlatformDependentCommandLine(String ... command) {
-/*    	if (Platform.IS_MAC_OS_X || Platform.IS_LINUX) {
-			int newArraySize = command.length + 2;
-			
-	        String[] newCommands = new String[newArraySize];
-	        newCommands[0] = "\"";
-	        int i = 1;	        
-	        for (String cmd : command) {
-	            newCommands[i] = cmd;
-	            i++;
-	        }
-	        newCommands[newArraySize - 1] = "\"";
-	        
-	        return mergeCommands(Platform.getCmd(), newCommands);
-		}
-    	//win
-*/        return mergeCommands(Platform.getCmd(), command);
+    public static String[] createPlatformDependentCommandLine(String... command) {
+        /*
+         * if (Platform.IS_MAC_OS_X || Platform.IS_LINUX) {
+         * int newArraySize = command.length + 2;
+         * 
+         * String[] newCommands = new String[newArraySize];
+         * newCommands[0] = "\"";
+         * int i = 1;
+         * for (String cmd : command) {
+         * newCommands[i] = cmd;
+         * i++;
+         * }
+         * newCommands[newArraySize - 1] = "\"";
+         * 
+         * return mergeCommands(Platform.getCmd(), newCommands);
+         * }
+         * //win
+         */ return mergeCommands(Platform.getCmd(), command);
     }
 
- /*   public static String[] createPlatformDependentCommandLine(String[] executable, String[] command) {
-        String[] execCmd = insertCommandsAfter(Platform.getCmd(), executable);
-        return mergeCommands(execCmd, command);
-    }*/
+    /*
+     * public static String[] createPlatformDependentCommandLine(String[] executable, String[] command) {
+     * String[] execCmd = insertCommandsAfter(Platform.getCmd(), executable);
+     * return mergeCommands(execCmd, command);
+     * }
+     */
 
     public static String[] insertCommandsAfter(String[] originalCmd, String... extraCommands) {
         return mergeCommands(originalCmd, extraCommands);

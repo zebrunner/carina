@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,24 +47,24 @@ public class HockeyAppManager {
 
     private String revision;
     private String versionNumber;
-    
-    private static final String hockeyAppUrl = "rink.hockeyapp.net";
-    
-    private static volatile HockeyAppManager instance = null;
-    
-	private HockeyAppManager() {
-	}
 
-	public static HockeyAppManager getInstance() {
-		if (instance == null) {
-			synchronized (HockeyAppManager.class) {
-				if (instance == null) {
-					instance = new HockeyAppManager();
-				}
-			}
-		}
-		return instance;
-	}
+    private static final String hockeyAppUrl = "rink.hockeyapp.net";
+
+    private static volatile HockeyAppManager instance = null;
+
+    private HockeyAppManager() {
+    }
+
+    public static HockeyAppManager getInstance() {
+        if (instance == null) {
+            synchronized (HockeyAppManager.class) {
+                if (instance == null) {
+                    instance = new HockeyAppManager();
+                }
+            }
+        }
+        return instance;
+    }
 
     private void disableRestTemplateSsl() {
         restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
@@ -76,7 +76,8 @@ public class HockeyAppManager {
      * @param appName takes in the HockeyApp Name tЩo look for.
      * @param platformName takes in the platform we wish to download for.
      * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
-     * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that build.
+     * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
+     *            build.
      * @return file to the downloaded build artifact
      */
     public File getBuild(String folder, String appName, String platformName, String buildType, String version) {
@@ -84,23 +85,23 @@ public class HockeyAppManager {
 
         String buildToDownload = scanAppForBuild(getAppId(appName, platformName), buildType, version);
 
-        String fileName = folder + "/" + createFileName(appName, buildType,platformName);
-        
-        //TODO: incorporate file exists and size verification to skip re download the same build artifacts
+        String fileName = folder + "/" + createFileName(appName, buildType, platformName);
+
+        // TODO: incorporate file exists and size verification to skip re download the same build artifacts
 
         try {
             LOGGER.debug("Beginning Transfer of HockeyApp Build");
             URL downloadLink = new URL(buildToDownload);
             ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
             FileOutputStream fos = new FileOutputStream(fileName);
-            fos.getChannel().transferFrom(readableByteChannel, 0 , Long.MAX_VALUE);
+            fos.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fos.close();
             readableByteChannel.close();
             LOGGER.debug(String.format("HockeyApp Build (%s) was retrieved", fileName));
         } catch (Exception ex) {
             LOGGER.error(String.format("Error Thrown When Attempting to Transfer HockeyApp Build (%s)", ex.getMessage()), ex);
         }
-        
+
         return new File(fileName);
 
     }
@@ -116,13 +117,14 @@ public class HockeyAppManager {
         List<String> appList = new ArrayList<String>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
-        		hockeyAppUrl,
+                hockeyAppUrl,
                 "/api/2/apps",
                 HttpMethod.GET);
         JsonNode appResults = restTemplate.exchange(retrieveApps, JsonNode.class).getBody();
 
         for (JsonNode node : appResults.get("apps")) {
-            if (platformName.equalsIgnoreCase(node.get("platform").asText()) && node.get("title").asText().toLowerCase().contains(appName.toLowerCase())) {
+            if (platformName.equalsIgnoreCase(node.get("platform").asText())
+                    && node.get("title").asText().toLowerCase().contains(appName.toLowerCase())) {
                 LOGGER.info(String.format("Found App: %s (%s)", node.get("title"), node.get("public_identifier")));
                 appList.add(node.get("public_identifier").asText());
             }
@@ -139,7 +141,8 @@ public class HockeyAppManager {
      *
      * @param appIds takes in the application Ids
      * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
-     * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that build.
+     * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
+     *            build.
      * @return
      */
     private String scanAppForBuild(List<String> appIds, String buildType, String version) {
@@ -150,11 +153,10 @@ public class HockeyAppManager {
             queryParams.add("include_build_urls", "true");
 
             RequestEntity<String> retrieveBuilds = buildRequestEntity(
-            		hockeyAppUrl,
+                    hockeyAppUrl,
                     "api/2/apps/" + appId + "/app_versions",
                     queryParams,
-                    HttpMethod.GET
-            );
+                    HttpMethod.GET);
 
             JsonNode buildResults = restTemplate.exchange(retrieveBuilds, JsonNode.class).getBody();
 
@@ -185,8 +187,8 @@ public class HockeyAppManager {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	private RequestEntity<String> buildRequestEntity(String hostUrl, String path,
-                                                    HttpMethod httpMethod) {
+    private RequestEntity<String> buildRequestEntity(String hostUrl, String path,
+            HttpMethod httpMethod) {
 
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme("https")
@@ -199,7 +201,7 @@ public class HockeyAppManager {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private RequestEntity<String> buildRequestEntity(String hostUrl, String path,
-                                                    MultiValueMap<String, String> listQueryParams, HttpMethod httpMethod) {
+            MultiValueMap<String, String> listQueryParams, HttpMethod httpMethod) {
 
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme("https")

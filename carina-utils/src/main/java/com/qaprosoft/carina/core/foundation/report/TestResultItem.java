@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,134 +19,112 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestResultItem
-{
-	private String pack = null;
-	private String test = null;
-	private String linkToLog = null;
-	private String linkToScreenshots = null;
-	private String linkToVideo = null;
-	private String failReason = null;
-	private String description = null;
-	private List<String> jiraTickets = new ArrayList<String>(); //empty list
-	private TestResultType result = null;
-	
-	private boolean config = false;
+public class TestResultItem {
+    private String pack = null;
+    private String test = null;
+    private String linkToLog = null;
+    private String linkToScreenshots = null;
+    private String linkToVideo = null;
+    private String failReason = null;
+    private String description = null;
+    private List<String> jiraTickets = new ArrayList<String>(); // empty list
+    private TestResultType result = null;
 
-	public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo, String failReason)
-	{
-		this.pack = group;
-		this.test = test;
-		this.result = result;
-		this.linkToLog = linkToLog;
-		this.linkToScreenshots = linkToScreenshots;
-		this.linkToVideo = linkToVideo;
-		this.failReason = failReason;
-	}
-	public String getPack()
-	{
-		return pack;
-	}
+    private boolean config = false;
 
-	public void setPack(String pack)
-	{
-		this.pack = pack;
-	}
+    public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo,
+            String failReason) {
+        this.pack = group;
+        this.test = test;
+        this.result = result;
+        this.linkToLog = linkToLog;
+        this.linkToScreenshots = linkToScreenshots;
+        this.linkToVideo = linkToVideo;
+        this.failReason = failReason;
+    }
 
-	public String getTest()
-	{
-		return test;
-	}
+    public String getPack() {
+        return pack;
+    }
 
-	public void setTest(String test)
-	{
-		this.test = test;
-	}
+    public void setPack(String pack) {
+        this.pack = pack;
+    }
 
-	public TestResultType getResult()
-	{
-		return result;
-	}
+    public String getTest() {
+        return test;
+    }
 
-	public void setResult(TestResultType result)
-	{
-		this.result = result;
-	}
+    public void setTest(String test) {
+        this.test = test;
+    }
 
-	public String getLinkToLog()
-	{
-		return linkToLog;
-	}
+    public TestResultType getResult() {
+        return result;
+    }
 
-	public void setLinkToLog(String linkToLog)
-	{
-		this.linkToLog = linkToLog;
-	}
+    public void setResult(TestResultType result) {
+        this.result = result;
+    }
 
-	public String getLinkToScreenshots()
-	{
-		return linkToScreenshots;
-	}
+    public String getLinkToLog() {
+        return linkToLog;
+    }
 
-	public void setLinkToVideo(String linkToVideo)
-	{
-		this.linkToVideo = linkToVideo;
-	}
-	
-	public String getLinkToVideo()
-	{
-		return linkToVideo;
-	}
+    public void setLinkToLog(String linkToLog) {
+        this.linkToLog = linkToLog;
+    }
 
-	public void setLinkToScreenshots(String linkToScreenshots)
-	{
-		this.linkToScreenshots = linkToScreenshots;
-	}	
+    public String getLinkToScreenshots() {
+        return linkToScreenshots;
+    }
 
-	public String getFailReason()
-	{
-		if(failReason != null)
-		{
-			return new String(failReason.getBytes(), Charset.forName("UTF-8"));
-		}
-		else
-		{
-			return failReason;
-		}
-		
-	}
+    public void setLinkToVideo(String linkToVideo) {
+        this.linkToVideo = linkToVideo;
+    }
 
-	public void setFailReason(String failReason)
-	{
-		this.failReason = failReason;
-	}
-	
-	public String getDescription()
-	{
-		return description;
-	}
+    public String getLinkToVideo() {
+        return linkToVideo;
+    }
 
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
-	
-	public List<String> getJiraTickets()
-	{
-		return jiraTickets;
-	}
+    public void setLinkToScreenshots(String linkToScreenshots) {
+        this.linkToScreenshots = linkToScreenshots;
+    }
 
-	public void setJiraTickets(List<String> jiraTickets)
-	{
-		this.jiraTickets = jiraTickets;
-	}
+    public String getFailReason() {
+        if (failReason != null) {
+            return new String(failReason.getBytes(), Charset.forName("UTF-8"));
+        } else {
+            return failReason;
+        }
 
-	public String hash()
-	{
-		return String.valueOf(pack.hashCode()) + "-" + String.valueOf(test.hashCode());
-	}
-	
-	public boolean isConfig() {
-		return config;
-	}
+    }
+
+    public void setFailReason(String failReason) {
+        this.failReason = failReason;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getJiraTickets() {
+        return jiraTickets;
+    }
+
+    public void setJiraTickets(List<String> jiraTickets) {
+        this.jiraTickets = jiraTickets;
+    }
+
+    public String hash() {
+        return String.valueOf(pack.hashCode()) + "-" + String.valueOf(test.hashCode());
+    }
+
+    public boolean isConfig() {
+        return config;
+    }
 }

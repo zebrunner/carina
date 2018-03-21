@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -127,7 +127,7 @@ public class AndroidService {
             // add remoteURL/udid reference
             command = "-s " + deviceName + " " + command;
         } else {
-        	LOGGER.warn("nullDevice detected fot current thread!");
+            LOGGER.warn("nullDevice detected fot current thread!");
         }
 
         String result = "";
@@ -175,14 +175,21 @@ public class AndroidService {
      * @param app String
      */
     public void openApp(String app) {
-        executeAdbCommand("shell am start -n " + app);
+        String result = executeAdbCommand("shell am start -n " + app);
+        if (result.contains("Exception")) {
+            String appPackage = app.split("/")[0];
+            if (!checkCurrentDeviceFocus(appPackage)) {
+                LOGGER.info("Expected app is not in focus. We will try another solution.");
+                executeAdbCommand("shell monkey -p " + appPackage + " -c android.intent.category.LAUNCHER 1");
+            }
+        }
     }
 
     /**
      * clear Apk Cache
      *
      * @param appPackageName for example:
-     * com.bamnetworks.mobile.android.gameday.atbat
+     *            com.bamnetworks.mobile.android.gameday.atbat
      * @return boolean
      */
     public boolean clearApkCache(String appPackageName) {
@@ -228,6 +235,58 @@ public class AndroidService {
     public String getCurrentDeviceFocus() {
         String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
         return result;
+    }
+
+    /**
+     * get Current Focused Apk Package Name
+     *
+     * @return String
+     */
+    public String getCurrentFocusedApkPackageName() {
+        String res = "";
+        String txt = getCurrentDeviceFocus();
+        String regEx1 = ".*?";
+        String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
+        Pattern pattern1 = Pattern.compile(regEx1 + regEx1, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+        Matcher matcher1 = pattern1.matcher(txt);
+        if (matcher1.find()) {
+            res = matcher1.group(1);
+        }
+        LOGGER.info("Found package name for application in focus : " + res);
+        return res;
+    }
+
+    /**
+     * get Current Focused Apk Details (apkPackage/apkActivity)
+     * 
+     * @return apkPackage/apkActivity to use it in openApp method.
+     */
+    public String getCurrentFocusedApkDetails() {
+        try {
+            String packageName = "";
+            String activityName = "";
+            String txt = getCurrentDeviceFocus();
+            String regEx1 = ".*?";
+            String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
+            Pattern pattern1 = Pattern.compile(regEx1 + regEx2, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Matcher matcher1 = pattern1.matcher(txt);
+            if (matcher1.find()) {
+                packageName = matcher1.group(1);
+            }
+            LOGGER.info("Found package name for application in focus : " + packageName);
+
+            String regEx3 = "\\/((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-\\_]+))(?![\\w\\.])";
+            Pattern pattern2 = Pattern.compile(regEx1 + regEx3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Matcher matcher2 = pattern2.matcher(txt);
+            if (matcher2.find()) {
+                activityName = matcher2.group(1);
+            }
+            LOGGER.info("Found activity name for application in focus : " + activityName);
+            return packageName + "/" + activityName;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return "";
+        }
     }
 
     /**
@@ -485,7 +544,7 @@ public class AndroidService {
         try {
             ((AndroidDriver) getDriver()).openNotifications();
             CommonUtils.pause(2); // wait while notifications are playing animation to
-                      // appear to avoid missed taps
+            // appear to avoid missed taps
         } catch (Exception e) {
             LOGGER.error(e);
             LOGGER.info("Using adb to expand Status bar. ");
@@ -614,7 +673,7 @@ public class AndroidService {
      *
      * @param language to set. Can be es, en, etc.
      * @param changeConfig boolean if true - update config locale and language
-     * params
+     *            params
      * @param waitTime int wait in seconds before device refresh.
      * @return boolean
      */
@@ -626,7 +685,7 @@ public class AndroidService {
         String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
 
         LOGGER.info("Do not concat language for Android. Keep: " + language);
-        language=language.replace("_","-");
+        language = language.replace("_", "-");
         LOGGER.info("Refactor language to : " + language);
 
         String actualDeviceLanguage = getDeviceLanguage();
@@ -702,7 +761,7 @@ public class AndroidService {
      */
     public String getDeviceLanguage() {
         String locale = executeAdbCommand("shell getprop persist.sys.language");
-        if(locale.isEmpty()) {
+        if (locale.isEmpty()) {
             locale = executeAdbCommand("shell getprop persist.sys.locale");
         }
         return locale;
@@ -855,7 +914,7 @@ public class AndroidService {
      * switchDeviceAutoTimeAndTimeZone
      *
      * @param autoSwitch boolean. If true - auto Time and TimeZone will be set
-     * as On.
+     *            as On.
      */
     public void switchDeviceAutoTimeAndTimeZone(boolean autoSwitch) {
         String value = "0";
@@ -953,7 +1012,7 @@ public class AndroidService {
      * set Device TimeZone by using Apk
      *
      * @param timeZone String required timeZone in Android standard format
-     * (Europe/London)
+     *            (Europe/London)
      * @param timeFormat String 12 or 24
      * @return boolean
      */
@@ -1027,15 +1086,15 @@ public class AndroidService {
     }
 
     // End of TimeZone change sections
-    
+
     /**
      * Open camera on device
-     */    
+     */
     public void openCamera() {
         LOGGER.info("Camera will be opened");
         executeAdbCommand("shell am start -a android.media.action.IMAGE_CAPTURE");
     }
-    
+
     /**
      * Android camera should be already opened
      */

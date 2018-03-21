@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,20 +19,19 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class JenkinsClientTest {
-	
-	
-	@Test
-	public void testJenkinsClientUrl() {
-		String jenkinsUrl = "http://localhost:8080/jenkins";	
-		JenkinsClient client = new JenkinsClient(jenkinsUrl);
-		Assert.assertEquals(client.getJenkinsURL(), jenkinsUrl);
-	}
-	
-	@Test
-	public void testSetJenkinsUrl() {
-		String jenkinsUrl = "http://localhost:8080/jenkins/";	
-		JenkinsClient client = new JenkinsClient(jenkinsUrl);
-		Assert.assertEquals(client.getJenkinsURL(), "http://localhost:8080/jenkins");
-	}
+
+    @Test
+    public void testJenkinsClientUrl() {
+        String jenkinsUrl = "http://localhost:8080/jenkins";
+        JenkinsClient client = new JenkinsClient(jenkinsUrl);
+        Assert.assertEquals(client.getJenkinsURL(), jenkinsUrl);
+    }
+
+    @Test
+    public void testSetJenkinsUrl() {
+        String jenkinsUrl = "http://localhost:8080/jenkins/";
+        JenkinsClient client = new JenkinsClient(jenkinsUrl);
+        Assert.assertEquals(client.getJenkinsURL(), "http://localhost:8080/jenkins");
+    }
 
 }

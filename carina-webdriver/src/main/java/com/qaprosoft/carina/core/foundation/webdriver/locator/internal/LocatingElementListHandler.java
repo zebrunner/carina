@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,42 +28,34 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
-public class LocatingElementListHandler implements InvocationHandler
-{
-	private final ElementLocator locator;
-	private String name;
-	private By by;
-	private WebDriver webDriver; 
+public class LocatingElementListHandler implements InvocationHandler {
+    private final ElementLocator locator;
+    private String name;
+    private By by;
+    private WebDriver webDriver;
 
-	public LocatingElementListHandler(ElementLocator locator, String name, By by, WebDriver driver)
-	{
-		this.locator = locator;
-		this.name = name;
-		this.by = by;
-		this.webDriver = driver;
-	}
+    public LocatingElementListHandler(ElementLocator locator, String name, By by, WebDriver driver) {
+        this.locator = locator;
+        this.name = name;
+        this.by = by;
+        this.webDriver = driver;
+    }
 
-	public Object invoke(Object object, Method method, Object[] objects) throws Throwable
-	{
+    public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
 
-		List<WebElement> elements = locator.findElements();
-		List<ExtendedWebElement> extendedWebElements = null;
-		if (elements != null)
-		{
-			extendedWebElements = new ArrayList<ExtendedWebElement>();
-			for (WebElement element : elements)
-			{
-				extendedWebElements.add(new ExtendedWebElement(element, name, by, webDriver));
-			}
-		}
+        List<WebElement> elements = locator.findElements();
+        List<ExtendedWebElement> extendedWebElements = null;
+        if (elements != null) {
+            extendedWebElements = new ArrayList<ExtendedWebElement>();
+            for (WebElement element : elements) {
+                extendedWebElements.add(new ExtendedWebElement(element, name, by, webDriver));
+            }
+        }
 
-		try
-		{
-			return method.invoke(extendedWebElements, objects);
-		} 
-		catch (InvocationTargetException e)
-		{
-			throw e.getCause();
-		}
-	}
+        try {
+            return method.invoke(extendedWebElements, objects);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
 }

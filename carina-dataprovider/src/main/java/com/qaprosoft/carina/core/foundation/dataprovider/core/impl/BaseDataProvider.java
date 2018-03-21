@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,60 +35,56 @@ public abstract class BaseDataProvider {
 
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
     protected Map<String, String> testMethodNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
-	protected Map<String, String> canonicalTestNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
-    
+    protected Map<String, String> canonicalTestNameArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
     protected Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
     protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
-	protected Map<String, String> bugArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
+    protected Map<String, String> bugArgsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
-	protected List<String> argsList;
+    protected List<String> argsList;
     protected List<String> staticArgsList;
 
-	protected List<String> doNotRunTestNames;
+    protected List<String> doNotRunTestNames;
 
-	public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
+    public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
 
     protected static Object getStaticParam(String name, ITestContext context, DSBean dsBean) {
         return ParameterGenerator.process(dsBean
-                        .getTestParams().get(name));
+                .getTestParams().get(name));
     }
 
     public Map<String, String> getTestNameArgsMap() {
         return testNameArgsMap;
     }
-    
+
     public Map<String, String> getTestMethodNameArgsMap() {
         return testMethodNameArgsMap;
     }
-    
+
     public Map<String, String> getTestMethodOwnerArgsMap() {
         return testMethodOwnerArgsMap;
     }
-
 
     public Map<String, String> getJiraArgsMap() {
         return jiraArgsMap;
     }
 
     public Map<String, String> getTestRailsArgsMap() {
-		return testRailsArgsMap;
-	}
+        return testRailsArgsMap;
+    }
 
-	public Map<String, String> getBugArgsMap()
-	{
-		return bugArgsMap;
-	}
+    public Map<String, String> getBugArgsMap() {
+        return bugArgsMap;
+    }
 
-	public List<String> getDoNotRunRowsIDs()
-	{
-		return doNotRunTestNames;
-	}
+    public List<String> getDoNotRunRowsIDs() {
+        return doNotRunTestNames;
+    }
 
-	public Map<String, String> getCanonicalTestNameArgsMap()
-	{
-		return canonicalTestNameArgsMap;
-	}
+    public Map<String, String> getCanonicalTestNameArgsMap() {
+        return canonicalTestNameArgsMap;
+    }
 
 }

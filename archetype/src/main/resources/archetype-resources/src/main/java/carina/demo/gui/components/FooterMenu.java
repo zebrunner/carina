@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,28 +27,24 @@ import com.qaprosoft.carina.core.gui.AbstractUIObject;
 import ${package}.carina.demo.gui.pages.CompareModelsPage;
 import ${package}.carina.demo.gui.pages.HomePage;
 
-public class FooterMenu extends AbstractUIObject
-{
-	@FindBy(linkText = "Home")
-	private ExtendedWebElement homeLink;
+public class FooterMenu extends AbstractUIObject {
+    @FindBy(linkText = "Home")
+    private ExtendedWebElement homeLink;
 
-	@FindBy(linkText = "Compare")
-	private ExtendedWebElement compareLink;
+    @FindBy(linkText = "Compare")
+    private ExtendedWebElement compareLink;
 
-	public FooterMenu(WebDriver driver, SearchContext searchContext)
-	{
-		super(driver, searchContext);
-	}
+    public FooterMenu(WebDriver driver, SearchContext searchContext) {
+        super(driver, searchContext);
+    }
 
-	public HomePage openHomePage()
-	{
-		homeLink.click();
-		return new HomePage(driver);
-	}
+    public HomePage openHomePage() {
+        homeLink.click();
+        return new HomePage(driver);
+    }
 
-	public CompareModelsPage openComparePage()
-	{
-		compareLink.click();
-		return new CompareModelsPage(driver);
-	}
+    public CompareModelsPage openComparePage() {
+        compareLink.click();
+        return new CompareModelsPage(driver);
+    }
 }

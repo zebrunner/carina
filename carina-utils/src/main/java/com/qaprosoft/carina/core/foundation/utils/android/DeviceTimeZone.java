@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import org.apache.log4j.Logger;
-import org.joda.time.DateTimeZone;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
+import org.joda.time.DateTimeZone;
 
 public class DeviceTimeZone {
 
@@ -66,6 +65,72 @@ public class DeviceTimeZone {
         }
     }
 
+    public enum TimeZoneFormat {
+        BUENOS_AIRES("America/Buenos_Aires", "Buenos Aires", "GMT-03:00", "ART"),
+        ST_JOHN("America/St_Johns", "St. John", "GMT-03:30", "NST"),
+        HALIFAX("America/Halifax", "Halifax", "GMT-03:00", "AST"),
+        BARBADOS("America/Barbados", "Barbados", "GMT-04:00", ""),
+        EASTERN("America/New_York", "Eastern", "GMT-04:00", "EST"),
+        CENTRAL("America/Chicago", "Central", "GMT-05:00", "CST"),
+        BOGOTA("America/Bogota", "Bogota", "GMT-05:00", ""),
+        CHIHUAHUA("America/Chihuahua", "Chihuahua", "GMT-06:00", ""),
+        MOUNTAIN("America/Phoenix", "Phoenix,Mountain", "GMT-07:00", "MST"),
+        PACIFIC("America/Los_Angeles", "Pacific", "GMT-08:00", "PST"),
+        ALASKA("America/Anchorage", "Alaska", "GMT-09:00", "AKST"),
+        HAWAII("Pacific/Honolulu", "Hawaii", "GMT-10:00", ""),
+        SYDNEY("Australia/Sydney", "Sydney", "GMT+10:00", ""),
+        SEOUL("Asia/Seoul", "Seoul", "GMT+09:00", ""),
+        TAIPEI("Asia/Taipei", "Taipei", "GMT+08:00", ""),
+        PERTH("Australia/Perth", "Perth", "GMT+08:00", ""),
+        MINSK("Europe/Minsk", "Minsk", "GMT+03:00", "MSQ"),
+        JERUSALEM("Asia/Jerusalem", "Jerusalem", "GMT+02:00", "IST"),
+        EUROPE("Europe/Amsterdam", "Amsterdam", "GMT+01:00", "CET"),
+        GMT("Europe/London", "London", "GMT+00:00", "GMT");
+        private String timeZone;
+        private String settingsTZ;
+        private String gmtTZ;
+        private String abbr;
+
+        TimeZoneFormat(String timeZone, String settingsTZ, String gmtTZ, String abbr) {
+            this.timeZone = timeZone;
+            this.settingsTZ = settingsTZ;
+            this.gmtTZ = gmtTZ;
+            this.abbr = abbr;
+        }
+
+        public String getTimeZone() {
+            return timeZone;
+        }
+
+        public String getSettingsTZ() {
+            return settingsTZ;
+        }
+
+        public String getGMT() {
+            return gmtTZ;
+        }
+
+        public String getAbbr() {
+            return abbr;
+        }
+
+        public static TimeZoneFormat parse(String text) {
+            if (text != null) {
+                for (TimeZoneFormat type : TimeZoneFormat.values()) {
+                    if (type.getSettingsTZ().equalsIgnoreCase(text) || type.getTimeZone().toLowerCase().contains(text.toLowerCase())
+                            || type.getGMT().equalsIgnoreCase(text) || type.getAbbr().equals(text)) {
+                        return type;
+                    }
+                }
+            }
+            return GMT;
+        }
+
+        public String toString() {
+            return "TimeZoneFormat{" + "timeZone='" + timeZone + '\'' + ", settingsTZ='" + settingsTZ + '\'' + ", gmtTZ='" + gmtTZ + '\'' + ", abbr='"
+                    + abbr + '\'' + '}';
+        }
+    }
 
     public DeviceTimeZone() {
         this.auto_time = true;
@@ -82,16 +147,17 @@ public class DeviceTimeZone {
     /**
      * DeviceTimeZone
      *
-     * @param auto_time         boolean
-     * @param auto_timezone     boolean
-     * @param time_format       AndroidService.TimeFormat
-     * @param timezone          String
-     * @param gmt               String
+     * @param auto_time boolean
+     * @param auto_timezone boolean
+     * @param time_format AndroidService.TimeFormat
+     * @param timezone String
+     * @param gmt String
      * @param setDeviceDateTime String
-     * @param changeDateTime    boolean
+     * @param changeDateTime boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String gmt, String setDeviceDateTime,
+            boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -110,15 +176,16 @@ public class DeviceTimeZone {
     /**
      * DeviceTimeZone
      *
-     * @param auto_time         boolean
-     * @param auto_timezone     boolean
-     * @param time_format       AndroidService.TimeFormat
-     * @param timezone          String
+     * @param auto_time boolean
+     * @param auto_timezone boolean
+     * @param time_format AndroidService.TimeFormat
+     * @param timezone String
      * @param setDeviceDateTime String
-     * @param changeDateTime    boolean
+     * @param changeDateTime boolean
      * @param refreshDeviceTime boolean
      */
-    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String setDeviceDateTime, boolean changeDateTime, boolean refreshDeviceTime) {
+    public DeviceTimeZone(boolean auto_time, boolean auto_timezone, TimeFormat time_format, String timezone, String setDeviceDateTime,
+            boolean changeDateTime, boolean refreshDeviceTime) {
         this.auto_time = auto_time;
         this.auto_timezone = auto_timezone;
         this.time_format = time_format;
@@ -129,7 +196,6 @@ public class DeviceTimeZone {
         this.refreshDeviceTime = refreshDeviceTime;
         this.daylightTime = isDaylightTime(timezone);
     }
-
 
     public boolean isAutoTime() {
         return auto_time;
@@ -203,7 +269,8 @@ public class DeviceTimeZone {
     }
 
     public String getTZforID() {
-        if (timezone.isEmpty()) return "";
+        if (timezone.isEmpty())
+            return "";
         return getTimezoneOffset(DateTimeZone.forID(timezone).toTimeZone());
     }
 
@@ -234,11 +301,11 @@ public class DeviceTimeZone {
         return offset;
     }
 
-
     public static boolean compareTimezoneOffsets(String timezone1, String timezone2) {
 
         LOGGER.info("Compare Timezone '" + timezone1 + "' and Timezone '" + timezone2 + "'.");
-        if (timezone1.isEmpty() || timezone2.isEmpty()) return false;
+        if (timezone1.isEmpty() || timezone2.isEmpty())
+            return false;
         TimeZone tz1 = getTimezoneFromOffset(timezone1);
         TimeZone tz2 = getTimezoneFromOffset(timezone2);
 
