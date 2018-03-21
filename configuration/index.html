@@ -1,0 +1,984 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.0">
+    
+    
+      
+        <title>Configuration - Carina</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.78aab2dc.css">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <a href="#configuration-files" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Carina" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Carina
+              </span>
+              <span class="md-header-nav__topic">
+                Configuration
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </span>
+    Carina
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Overview" class="md-nav__link">
+      Overview
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting_started/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../project_structure/" title="Project structure" class="md-nav__link">
+      Project structure
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Configuration
+      </label>
+    
+    <a href="./" title="Configuration" class="md-nav__link md-nav__link--active">
+      Configuration
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-files" title="Configuration files" class="md-nav__link">
+    Configuration files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-specific-configuration" title="Environment specific configuration" class="md-nav__link">
+    Environment specific configuration
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../execution/" title="Execution" class="md-nav__link">
+      Execution
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Automation
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Automation
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../automation/web/" title="Web automation" class="md-nav__link">
+      Web automation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../automation/mobile/" title="Mobile automation" class="md-nav__link">
+      Mobile automation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../automation/api/" title="API automation" class="md-nav__link">
+      API automation
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../dataproviders/" title="Dataproviders" class="md-nav__link">
+      Dataproviders
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../releases/" title="Release notes" class="md-nav__link">
+      Release notes
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-files" title="Configuration files" class="md-nav__link">
+    Configuration files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-specific-configuration" title="Environment specific configuration" class="md-nav__link">
+    Environment specific configuration
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Configuration</h1>
+                
+                <h3 id="configuration-files">Configuration files</h3>
+<p>There are multiple properties files located in src/main/resources:
+<em> <strong>_api.properties</strong> - API test endpoints reference
+</em> <strong>_config.properties</strong> - global test configuration
+<em> <strong>_database.properties</strong> - database connection properties
+</em> <strong>_email.properties</strong> - emailable reports config
+* <strong>_testdata.properties</strong> - test user credentials</p>
+<p>All properties may be retrieved in test using R class:</p>
+<pre><code>R.API.get(&quot;GetUserMethods&quot;)
+R.CONFIG.get(&quot;browser&quot;)
+R.DATABASE.get(&quot;db.url&quot;)
+R.EMAIL.get(&quot;title&quot;)
+R.TESTDATA.get(&quot;user.email&quot;)
+</code></pre>
+
+<p>Default config properties can be obtained by</p>
+<pre><code>Configuration.get(Parameter.EXTRA_CAPABILITIES)
+</code></pre>
+
+<p>All project configuration properties are located in <strong>_config.properties</strong> file. In the table below we are providing description for most of the parameters:
+<table>
+    <tr>
+        <th>Attribute</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>url</td>
+        <td>Base application URL</td>
+        <td>http://qaprosoft.com</td>
+    </tr>
+    <tr>
+        <td>browser</td>
+        <td>Browser for testing</td>
+        <td>chrome / firefox / safari / iexplore</td>
+    </tr>
+    <tr>
+        <td>selenium_host</td>
+        <td>Selenium server host</td>
+        <td>http://localhost:4444/wd/hub</td>
+    </tr>
+    <tr>
+        <td>app_version</td>
+        <td>Application version/build number for reporting</td>
+        <td>1.2.5</td>
+    </tr>
+    <tr>
+        <td>locale</td>
+        <td>Locale for using L10N feature. Enabled when enable_l10n=true</td>
+        <td>en_GB,de_DE,fr_FR</td>
+    </tr>
+    <tr>
+        <td>language</td>
+        <td>Language for i18n defature. Enabled when enable_i18n=true</td>
+        <td>en_GB,de_DE,fr_FR</td>
+    </tr>
+    <tr>
+        <td>implicit_timeout</td>
+        <td>Implicit timeout in seconds to wait for element</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>retry_interval</td>
+        <td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify number from 500-1500 range</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>auto_screenshot</td>
+        <td>Global switch for taking screenshots. When disabled only failures will be captured</td>
+        <td>Boolean</td>
+    </tr>
+    <tr>
+        <td>keep_all_screenshots</td>
+        <td>Keep screenshots artifacts even for passed tests.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>report_url</td>
+        <td>Direct HTTP link to Jenkins workspace report folder. Automatically specified by CI</td>
+        <td>http://localhost:8888/job /my_project/1/eTAF_Report</td>
+    </tr>
+    <tr>
+        <td>max_screen_history</td>
+        <td>Max number of reports in history</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>jira_url</td>
+        <td>JIRA base URL for direct links with bugs description</td>
+        <td>https://jira.carina.com/browse/</td>
+    </tr>
+    <tr>
+        <td>email_list</td>
+        <td>Comma-separated list of emails for reports</td>
+        <td>u1@gmail.com,u2@gmail.com</td>
+    </tr>
+    <tr>
+        <td>sender_email</td>
+        <td>Email account for reports sending. <br><b>Note:</b> Gmail smtp settings are used by default. Update _email.properties to use your own SMTP server</td>
+        <td>carina.qareport@qaprosoft.com</td>
+    </tr>
+    <tr>
+        <td>sender_pswd</td>
+        <td>Email password for reports sending</td>
+        <td>pwd123</td>
+    </tr>
+    <tr>
+        <td>env</td>
+        <td>Environment specific configuration. More about this <a href="#environment-specific-configuration">feature</a></td>
+        <td>STAG, PROD, DEMO</td>
+    </tr>
+    <tr>
+        <td>env_arg_resolver</td>
+        <td>This parametr is optional, if it isn't set default value will be used. In most cases <b>default value is enough</b></td>
+        <td>java class </td>
+    </tr>
+        <tr>
+        <td>platform</td>
+        <td>Platform version for Selenium Grid</td>
+        <td>ANDROID,IOS,WINDOWS,MAC,LINUX</td>
+    </tr>
+        <tr>
+        <td>browser_version</td>
+        <td>The browser version, or the empty string if unknown for Selenium Grid</td>
+        <td>"8.0", "52.1"</td>
+    </tr>
+        <tr>
+        <td>driver_mode</td>
+        <td>Rule for defining WebDriver lifecycle.</td>
+        <td>method_mode / class_mode / suite_mode</td>
+    </tr>
+        <tr>
+        <td>driver_mode</td>
+        <td>Rule for defining WebDriver lifecycle.</td>
+        <td>method_mode / class_mode / suite_mode</td>
+    </tr>
+        <tr>
+        <td>driver_event_listeners</td>
+        <td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be instances of WebDriverEventListener</td>
+        <td>com.someCompane.core .EventListener</td>
+    </tr>
+        <tr>
+        <td>max_driver_count</td>
+        <td>Max number of drivers per thread</td>
+        <td>Integer</td>
+    </tr>
+        <tr>
+        <td>custom_capabilities</td>
+        <td>Name of propertie file with custom capabilities(key-value)</td>
+        <td>custom.propertie</td>
+    </tr>
+        <tr>
+        <td>proxy_host</td>
+        <td>The hostname of the server</td>
+        <td>host.example.com</td>
+    </tr>
+        <tr>
+        <td>proxy_port</td>
+        <td>The port number</td>
+        <td>80</td>
+    </tr>
+        <tr>
+        <td>proxy_protocols</td>
+        <td>Comma-separated list of internet protocols used to carry connection information from the source requesting the connection to the destination for which the connection was requested.</td>
+        <td>http, https, ftp, socks</td>
+    </tr>
+        <tr>
+        <td>browsermob_proxy</td>
+        <td>Boolean parameter which enable or disable set up of mobile proxy</td>
+        <td>true, false</td>
+    </tr>
+        <tr>
+        <td>browsermob_port</td>
+        <td>The port number for mobile browser (make sense only for local debugging)</td>
+        <td>Integer</td>
+    </tr>
+        <tr>
+        <td>proxy_set_to_system</td>
+        <td>Boolean parameter which enable or disable set up of proxy</td>
+        <td>true, false</td>
+    </tr>
+        <tr>
+        <td>failure_email_list</td>
+        <td>Comma-separated list of emails for failure reports</td>
+        <td>u1@mail.com,u2@mail.com</td>
+    </tr>
+        <tr>
+        <td>track_known_issues</td>
+        <td>Boolean parameter. If it is true and some Jira tickets assosiated with test in case of failure Jira info will be added to report</td>
+        <td>true,false</td>
+    </tr>
+    <tr>
+        <td>smart_screenshot</td>
+        <td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
+        <td>true,false</td>
+    </tr>
+    <tr>
+        <td>smart_screenshot</td>
+        <td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
+        <td>true,false</td>
+    </tr>
+    <tr>
+        <td>explicit_timeout</td>
+        <td>Timeout in seconds to wait for a certain condition to occur before proceeding further in the code</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>auto_download</td>
+        <td>Enabled parametr prevent download dialog and download file automatically. Feature currently avaliable for Chrome and FireFox</td>
+        <td>false, true</td>
+    </tr>
+    <tr>
+        <td>auto_download_apps</td>
+        <td>MIME types / Internet Media Types. Parameter is necessary only for configure auto downloading for FireFox</td>
+        <td>application/pdf, list of <a href="https://freeformatter.com/mime-types-list.html">values</a></td>
+    </tr>
+    <tr>
+        <td>project_report_directory</td>
+        <td>Path to folder where reports will be saved</td>
+        <td>./reports/qa</td>
+    </tr>
+    <tr>
+        <td>big_screen_width</td>
+        <td>Sreenshots will be resized according this width if there own width is bigger</td>
+        <td>500, 1200, Integer</td>
+    </tr>
+    <tr>
+        <td>big_screen_height</td>
+        <td>Sreenshots will be resized according this height if there own height is bigger</td>
+        <td>500, 1200, Integer</td>
+    </tr>
+        <tr>
+        <td>small_screen_width</td>
+        <td>Thumbnails width</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>big_screen_height</td>
+        <td>Thumbnails height</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>big_screen_height</td>
+        <td>Thumbnails height</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>init_retry_count</td>
+        <td>Number of attempts to create driver.  Default value 0 means that it would be only 1 attempt</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>init_retry_interval</td>
+        <td>Interval is seconds between attempts to create driver</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>retry_count</td>
+        <td>Number of test-retrying in case of failure.  Default value 0 means that test would be performed only once</td>
+        <td>Integer</td>
+    </tr>
+        <tr>
+        <td>enable_l10n</td>
+        <td>Enable L10N feature</td>
+        <td>false, true</td>
+    </tr>
+            <tr>
+        <td>l10n_encoding</td>
+        <td>Charset for l10n feature</td>
+        <td>ISO-8859-5, ISO-8859-6</td>
+    </tr>
+    <tr>
+        <td>enable_i18n</td>
+        <td>Enable i18n feature</td>
+        <td>false, true</td>
+    </tr>
+        <tr>
+        <td>thread_count</td>
+        <td>Default number of threads to use when running tests in parallel.</td>
+        <td>fInteger</td>
+    </tr>
+        <tr>
+        <td>data_provider_thread_count</td>
+        <td>Default number of threads to use for data providers when running tests in parallel.</td>
+        <td>Integer</td>
+    </tr>
+        <tr>
+        <td>core_log_level</td>
+        <td>Level for Carina logging</td>
+        <td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE </td>
+    </tr>
+        <tr>
+        <td>log_all_json</td>
+        <td>API response will be logged in JSON format</td>
+        <td>true, false</td>
+    </tr>
+        <tr>
+        <td>date_format</td>
+        <td>Date format for DateUtils.class</td>
+        <td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
+    </tr>
+        <tr>
+        <td>time_format</td>
+        <td>Date format for DateUtils.class</td>
+        <td>HH:mm:ss.SSS, HH:mm a zzz</td>
+    </tr>
+        <tr>
+        <td>crypto_key_path</td>
+        <td>Path to file with crypto key</td>
+        <td>./crypto</td>
+    </tr>
+        <tr>
+        <td>suite_name</td>
+        <td>Suite name for report and TestRail. If this parameter is NULL will be get from TestNG xml (parameter suite name) or _email.properties (title)</td>
+        <td>Advanced Acceptance</td>
+    </tr>
+    <tr>
+        <td>jira_updater</td>
+        <td>Class contains logic to update Jira. <b>Note</b> Custom updater have to implement DefaultJiraUpdater, by default methods do nothing</td>
+        <td>Custom class</td>
+    </tr>
+    <tr>
+        <td>jira_url</td>
+        <td>Url to Jira</td>
+        <td>https://yourclass.atlassian.net</td>
+    </tr>
+        <tr>
+        <td>jira_user</td>
+        <td>Jira user email</td>
+        <td>admin@yourcompany.com</td>
+    </tr>
+        <tr>
+        <td>jira_password</td>
+        <td>Jira user password</td>
+        <td>admin123456</td>
+    </tr>
+        <tr>
+        <td>jira_suite_id</td>
+        <td>Jira suit id (if you have one)</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>jira_project</td>
+        <td>Jira project id</td>
+        <td>Integer</td>
+    </tr>
+        <tr>
+        <td>jira_create_new_ticket</td>
+        <td>If feature is enabled after test failure new jira ticket will be created</td>
+        <td>true, false</td>
+    </tr>
+    <tr>
+        <td>video_recording</td>
+        <td>If feature is test will be recorded</td>
+        <td>true, false</td>
+    </tr>
+    <tr>
+        <td>testrail_url</td>
+        <td>Url to TestRail</td>
+        <td>https:/yourcompany.testrail.net</td>
+    </tr>
+    <tr>
+        <td>testrail_user</td>
+        <td>TestRail user email</td>
+        <td>admin@yourcompany.com</td>
+    </tr>
+        <tr>
+        <td>testrail_updater</td>
+        <td>Class contains logic to update TestRail. <b>Note</b> Custom updater have to implement EmptyTestRailUpdater, by default methods do nothing</td>
+        <td>Custom class</td>
+    </tr>
+        <tr>
+        <td>testrail_milestone</td>
+        <td>Milestone to set on TestRail for run</td>
+        <td>some-milestone</td>
+    </tr>
+        <tr>
+        <td>testrail_assignee</td>
+        <td>User asserneed for the suit</td>
+        <td>asignee_user@yuorcompany.com</td>
+    </tr>
+        <tr>
+        <td>s3_bucket_name</td>
+        <td>Bucket name on S3 Amazon from which you suppose to download artifacts</td>
+        <td>some bucket</td>
+    </tr>
+        <tr>
+        <td>access_key_id</td>
+        <td>Acces key id for Amamzon S3. More info <a href="#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">here</a></td>
+        <td>gkhcvdgvceUYF67897hbjsbdc</td>
+    </tr>
+        <tr>
+        <td>secret_key</td>
+        <td>Secret key for Amamzon S3. More info <a href="#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">here</a></td>
+        <td>gkhcvdgvceUYF67897hbjsbdc</td>
+    </tr>
+        <tr>
+        <td>s3_local_storage</td>
+        <td>Directory for downloading artefacts</td>
+        <td>./s3</td>
+    </tr>
+        <tr>
+        <td>s3_screenshot_bucket_name</td>
+        <td>Bucket name on S3 Amamzon for saving report screenshots</td>
+        <td>Screenshot bucket name</td>
+    </tr>
+        <tr>
+        <td>s3_save_screenshots</td>
+        <td>If enabled screenshots would be saved on S3 Amamzon</td>
+        <td>false, true</td>
+    </tr>
+        <tr>
+        <td>hockeyapp_token</td>
+        <td>Token for authentication in Hockey App</td>
+        <td>gkhcvdgvceUYF67897hbjsbdc</td>
+    </tr>
+        <tr>
+        <td>hockeyapp_local_storage</td>
+        <td>Directory for Hockey App artefacts</td>
+        <td>./hockeyapp</td>
+    </tr>
+        <tr>
+        <td>add_new_localization</td>
+        <td>Should be set to 'true' if you want to create new localization files for required Locale.Otherwise there will be just localization checking</td>
+        <td>false, true</td>
+    </tr>
+        <tr>
+        <td>add_new_localization_encoding</td>
+        <td>Encoding for new lokalization</td>
+        <td>utf-16, utf-32</td>
+    </tr>
+        <tr>
+        <td>add_new_localization_path</td>
+        <td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+        <td>utf-16, utf-32</td>
+    </tr>
+        <tr>
+        <td>add_new_localization_property_name</td>
+        <td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+        <td>Basic template for property name.</td>
+    </tr>
+        <tr>
+        <td>cucumber_tests</td>
+        <td>If parametrs contains true Cucumber tests will be started</td>
+        <td>true, false</td>
+    </tr>
+        <tr>
+        <td>cucumber_tests_app_version</td>
+        <td>Version of app using in Cucumber tests</td>
+        <td>2.013</td>
+    </tr>
+        <tr>
+        <td>cucumber_tests_name</td>
+        <td>Cucucmber tests name</td>
+        <td>cucumber tests</td>
+    </tr>
+        <tr>
+        <td>cucumber_tests_results_image_resize</td>
+        <td>Percent of Scaling from default image. 100 - same size</td>
+        <td>Integer</td>
+    </tr>
+        <tr>
+        <td>cucumber_report_subfolder</td>
+        <td>Subfolder on Jenkins (jenkins_url/{someNumbersFr EveryRun}/ artifacts/CucumberReport/ {cucumber_report_subfolder})</td>
+        <td>cucumber-reports</td>
+    </tr>
+        <tr>
+        <td>cucumber_user_js_in_report</td>
+        <td>Enabled parameter help to get more beautiful reports</td>
+        <td>true, false</td>
+    </tr>
+        <tr>
+        <td>tls_keysecure_location</td>
+        <td>Path to directory with tls secure keys</td>
+        <td>./tls/keysecure</td>
+    </tr>
+        <tr>
+        <td>health_check_class</td>
+        <td>Class to execute helth checks</td>
+        <td>Custom class</td>
+    </tr>
+        <tr>
+        <td>health_check_methods</td>
+        <td>Comma-separate list of methods of health_check_class to execute preliminary</td>
+        <td>doThis, doThat</td>
+    </tr>
+</table>
+Most of the properties may be read in the following way:</p>
+<pre><code>Configuration.get(Parameter.URL) // returns string value
+Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
+Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
+Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
+</code></pre>
+
+<h3 id="environment-specific-configuration">Environment specific configuration</h3>
+<p>In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:</p>
+<pre><code>env=PROD
+STAG.url=http://stag-app-server.com
+PROD.url=http://prod-app-server.com
+</code></pre>
+
+<p>And get env-specific argument in test the following way:</p>
+<pre><code>Configuration.getEnvArg(&quot;url&quot;)
+</code></pre>
+
+<p>As a result you switch between environments just changing env argument in _config.properties file.</p>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../project_structure/" title="Project structure" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Project structure
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../execution/" title="Execution" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Execution
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.8eb9be28.js"></script>
+      
+      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>

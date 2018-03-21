@@ -19,7 +19,7 @@
 
     
     <url>
-     <loc>/releases/</loc>
+     <loc>/project_structure/</loc>
      <lastmod>2018-03-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
@@ -27,7 +27,53 @@
 
     
     <url>
-     <loc>/about/</loc>
+     <loc>/configuration/</loc>
+     <lastmod>2018-03-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/execution/</loc>
+     <lastmod>2018-03-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>/automation/web/</loc>
+     <lastmod>2018-03-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/automation/mobile/</loc>
+     <lastmod>2018-03-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/automation/api/</loc>
+     <lastmod>2018-03-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+    <url>
+     <loc>/dataproviders/</loc>
+     <lastmod>2018-03-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/releases/</loc>
      <lastmod>2018-03-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
