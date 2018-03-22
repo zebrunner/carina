@@ -26,6 +26,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 
@@ -81,7 +82,14 @@ public final class DriverPool {
      */
     //TODO: investigate how to allow to use from ExtendedElementLocator only
     public static WebDriver getDriver(SearchContext searchContext) {
-    	return getDriver(((RemoteWebDriver)searchContext).getSessionId());
+    	if (searchContext instanceof RemoteWebElement) {
+    		RemoteWebDriver drv = (RemoteWebDriver) ((RemoteWebElement) searchContext).getWrappedDriver();
+    		return getDriver(drv.getSessionId());
+    	} else if (searchContext instanceof RemoteWebDriver) {
+    		return getDriver(((RemoteWebDriver)searchContext).getSessionId());
+    	}
+    	
+    	throw new RuntimeException("Unable to find driver in Pool by searchContext!");
     }
     
     /**

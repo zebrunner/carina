@@ -112,8 +112,9 @@ public class ExtendedElementLocator implements ElementLocator {
     @SuppressWarnings("rawtypes")
     public WebElement findElement() {
         if (cachedElement != null && isCached) {
+        	return cachedElement;
         	//verify that it is not staleness otherwise repeit find procedure based on by annotations
-        	Wait<WebDriver> wait = new WebDriverWait((WebDriver)searchContext, 1, 100);
+/*        	Wait<WebDriver> wait = new WebDriverWait((WebDriver)searchContext, 1, 100);
             try {
                 wait.until(ExpectedConditions.stalenessOf(cachedElement));
             } catch (NoSuchElementException | TimeoutException e) {
@@ -121,7 +122,7 @@ public class ExtendedElementLocator implements ElementLocator {
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(), e.getCause());
             }   
-        }
+*/        }
 
         WebElement element = null;
         

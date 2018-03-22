@@ -51,6 +51,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -126,19 +127,47 @@ public class ExtendedWebElement {
         }
         
 		try {
+            
 			Field locatorField, searchContextField = null;
-			InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
-			locatorField = innerProxy.getClass().getDeclaredField("locator");
-			locatorField.setAccessible(true);
+			SearchContext searchContext = null;
 			
-			ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+			if (element instanceof RemoteWebElement) {
+				searchContext = ((RemoteWebElement) element).getWrappedDriver();
+			} else if (element instanceof Proxy) { 
+				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
+				
+				locatorField = innerProxy.getClass().getDeclaredField("locator");
+				locatorField.setAccessible(true);
+				
+				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+				
+				searchContextField = locator.getClass().getDeclaredField("searchContext");
+				searchContextField.setAccessible(true);
+				searchContext = (SearchContext) searchContextField.get(locator);
+				
+				if (searchContext instanceof Proxy) {
+					innerProxy = Proxy.getInvocationHandler(((Proxy) searchContext));
+					
+					locatorField = innerProxy.getClass().getDeclaredField("locator");
+					locatorField.setAccessible(true);
+					
+					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+					
+					searchContextField = locator.getClass().getDeclaredField("searchContext");
+					searchContextField.setAccessible(true);
+					searchContext = (SearchContext) searchContextField.get(locator);
+				}
+			}
 			
-			searchContextField = locator.getClass().getDeclaredField("searchContext");
-			searchContextField.setAccessible(true);
-			SearchContext searchContext = (SearchContext) searchContextField.get(locator);
-			
-			SessionId sessionId = ((RemoteWebDriver)searchContext).getSessionId();
-			driver = DriverPool.getDriver(sessionId);
+			if (searchContext instanceof RemoteWebElement) {
+				searchContext = ((RemoteWebElement) searchContext).getWrappedDriver();
+			}
+			if (searchContext != null && searchContext instanceof RemoteWebDriver) {
+				SessionId sessionId = ((RemoteWebDriver)searchContext).getSessionId();
+				driver = DriverPool.getDriver(sessionId);
+			} else {
+				LOGGER.error(searchContext);
+			}
 			
 		} catch (NoSuchFieldException e) {
 			e.printStackTrace();
@@ -149,10 +178,18 @@ public class ExtendedWebElement {
 											// to Proxy...
 			e.printStackTrace();
 		}
-
+		if (driver == null) {
+			try {
+				throw new RuntimeException("review stacktrace!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+		} else  {
+			LOGGER.info("instance of driver");
+		}
 
     }
-
+    
     public WebElement getElement() {
         if (element == null) {
         	//TODO: why 1 sec?
