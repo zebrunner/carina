@@ -568,8 +568,6 @@ public class DriverHelper {
      * not visible. And can't be clicked by standard click.
      * 
      * @param extendedWebElement to click hidden element
-     * 
-     * @return boolean true if there is no errors.
      */
     @Deprecated
     public void clickHiddenElement(final ExtendedWebElement extendedWebElement) {
