@@ -15,5 +15,5 @@ pages:
     - Release notes: releases.md
 theme:
   name: 'material'
-repo_url: https://github.com/qaprosoft/carina-docs
+repo_url: https://github.com/qaprosoft/carina
 repo_name: Github
