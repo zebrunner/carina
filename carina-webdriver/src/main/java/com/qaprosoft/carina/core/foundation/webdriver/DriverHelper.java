@@ -86,18 +86,12 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Base UI interaction operations
     // --------------------------------------------------------------------------
-
-    @Deprecated
-    public long getImplicitTimeout() {
-        return IMPLICIT_TIMEOUT;
-    }
-
     /**
      * Set implicit timeout.
      * 
      * @param timeout in seconds. Minimal value - 1 second
      */
-
+    @Deprecated
     public void setImplicitTimeout(long timeout) {
         if (timeout < 1) {
             timeout = 1;
@@ -117,6 +111,7 @@ public class DriverHelper {
      * @param waitPeriod long in seconds.
      * @return true if element become clickable
      */
+    @Deprecated
     public boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
         return waitForElementToBeClickable(element, (int) waitPeriod);
     }
@@ -130,6 +125,7 @@ public class DriverHelper {
      * @param waitPeriod int in seconds.
      * @return true if element become clickable
      */
+    @Deprecated
     public boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
         return element.isClickable(waitPeriod);
     }
@@ -141,6 +137,7 @@ public class DriverHelper {
      *            ExtendedWebElement
      * @return element existence status.
      */
+    @Deprecated
     public boolean isElementPresent(final ExtendedWebElement extWebElement) {
         return isElementPresent(extWebElement, EXPLICIT_TIMEOUT);
     }
@@ -154,16 +151,19 @@ public class DriverHelper {
      *            - timeout.
      * @return element existence status.
      */
+    @Deprecated
     public boolean isElementPresent(final ExtendedWebElement extWebElement, long timeout) {
         if (extWebElement == null)
             return false;
         return extWebElement.isElementPresent(timeout);
     }
 
+    @Deprecated
     public boolean isElementPresent(String controlInfo, final WebElement element) {
         return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent();
     }
 
+    @Deprecated
     public boolean isElementPresent(String controlInfo, final WebElement element, long timeout) {
         return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent(timeout);
     }
@@ -199,7 +199,7 @@ public class DriverHelper {
             timeout = 1;
         while (present && index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = isElementPresent(elements[i], timeout);
+                present = elements[i].isElementPresent(timeout);
                 if (!present) {
                     LOGGER.error(elements[i].getNameWithLocator() + " is not present.");
                     ret = false;
@@ -244,7 +244,7 @@ public class DriverHelper {
             int index = 0;
             while (!present && index++ < counts) {
                 try {
-                    present = isElementPresent(elements[i].get(0), timeout);
+                    present = elements[i].get(0).isElementPresent(timeout);
                 } catch (Exception e) {
                     present = false;
                 }
@@ -286,7 +286,7 @@ public class DriverHelper {
             timeout = 1;
         while (!present && index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = isElementPresent(elements[i], timeout);
+                present = elements[i].isElementPresent(timeout);
                 if (present) {
                     LOGGER.debug(elements[i].getNameWithLocator() + " is present");
                     return true;
@@ -328,7 +328,7 @@ public class DriverHelper {
             timeout = 1;
         while (!present && index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = isElementPresent(elements[i], timeout);
+                present = elements[i].isElementPresent(timeout);
                 if (present) {
                     LOGGER.debug(elements[i].getNameWithLocator() + " is present");
                     return elements[i];
@@ -340,30 +340,6 @@ public class DriverHelper {
             throw new RuntimeException("Unable to find any element from array: " + elements.toString());
         }
         return new ExtendedWebElement(null, null, null, null);
-    }
-
-    @Deprecated
-    public boolean isElementPresent(String elementName, final By by, long timeout) {
-        boolean result;
-
-        final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-            setImplicitTimeout(0);
-            wait.until((Function<WebDriver, Object>) dr -> !dr.findElements(by).isEmpty() && dr.findElement(by).isDisplayed());
-            result = true;
-        } catch (Exception e) {
-            result = false;
-        } finally {
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
-        }
-
-        return result;
-    }
-
-    @Deprecated
-    public boolean isElementPresent(String elementName, final By by) {
-        return isElementPresent(elementName, by, EXPLICIT_TIMEOUT);
     }
 
     /**
@@ -435,6 +411,7 @@ public class DriverHelper {
      * @param text
      *            to type.
      */
+    @Deprecated
     public void type(final ExtendedWebElement extWebElement, String text) {
         extWebElement.type(text);
     }
@@ -447,7 +424,7 @@ public class DriverHelper {
      * @param text to type
      * 
      */
-
+    @Deprecated
     public void type(String controlInfo, WebElement control, String text) {
         type(new ExtendedWebElement(control, controlInfo, getDriver()), text);
     }
@@ -458,6 +435,7 @@ public class DriverHelper {
      * @param extendedWebElement to click on
      *
      */
+    @Deprecated
     public void click(final ExtendedWebElement extendedWebElement) {
         click(extendedWebElement, EXPLICIT_TIMEOUT);
     }
@@ -469,7 +447,7 @@ public class DriverHelper {
      * @param timeout to wait
      *
      */
-
+    @Deprecated
     public void click(final ExtendedWebElement extendedWebElement, long timeout) {
         extendedWebElement.click(timeout);
     }
@@ -481,7 +459,7 @@ public class DriverHelper {
      * @param controlInfo String
      *
      */
-
+    @Deprecated
     public void click(String controlInfo, WebElement control) {
         click(new ExtendedWebElement(control, controlInfo, getDriver()));
     }
@@ -513,7 +491,7 @@ public class DriverHelper {
         int counts = 10;
         while (!clicked && index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                clicked = clickIfPresent(elements[i], timeout / counts);
+                clicked = elements[i].clickIfPresent(timeout / counts);
                 if (clicked) {
                     break;
                 }
@@ -532,7 +510,7 @@ public class DriverHelper {
      * @return boolean
      *
      */
-
+    @Deprecated
     public boolean clickIfPresent(final ExtendedWebElement extWebElement) {
         return clickIfPresent(extWebElement, EXPLICIT_TIMEOUT);
     }
@@ -546,7 +524,7 @@ public class DriverHelper {
      * @return boolean
      *
      */
-
+    @Deprecated
     public boolean clickIfPresent(final ExtendedWebElement extWebElement, long timeout) {
         return extWebElement.clickIfPresent(timeout);
     }
@@ -557,7 +535,7 @@ public class DriverHelper {
      * @param extendedWebElement to do dowble click
      *
      */
-
+    @Deprecated
     public void doubleClick(final ExtendedWebElement extendedWebElement) {
         extendedWebElement.doubleClick();
     }
@@ -569,7 +547,7 @@ public class DriverHelper {
      * @param control WebElement
      *
      */
-
+    @Deprecated
     public void doubleClick(String controlInfo, WebElement control) {
         doubleClick(new ExtendedWebElement(control, controlInfo, getDriver()));
     }
@@ -579,10 +557,10 @@ public class DriverHelper {
      * 
      * @param extendedWebElement to do right click
      * 
-     * @return boolean true if there is no errors.
      */
-    public boolean rightClick(final ExtendedWebElement extendedWebElement) {
-        return extendedWebElement.rightClick();
+    @Deprecated
+    public void rightClick(final ExtendedWebElement extendedWebElement) {
+        extendedWebElement.rightClick();
     }
 
     /**
@@ -593,63 +571,9 @@ public class DriverHelper {
      * 
      * @return boolean true if there is no errors.
      */
-    public boolean clickHiddenElement(final ExtendedWebElement extendedWebElement) {
-        return extendedWebElement.clickHiddenElement();
-    }
-
-    /**
-     * Sends enter to element.
-     * 
-     * @param extendedWebElement
-     *            to send enter.
-     */
-    public void pressEnter(final ExtendedWebElement extendedWebElement) {
-        isElementPresent(extendedWebElement);
-        pressEnterSafe(extendedWebElement, true);
-        String msg = Messager.ELEMENT_CLICKED.info(extendedWebElement.getName());
-        Screenshot.capture(getDriver(), msg);
-    }
-
-    /**
-     * Safe enter sending to specified element.
-     * 
-     * @param controlInfo
-     *            controlInfo
-     * @param control
-     *            control
-     */
     @Deprecated
-    public void pressEnter(String controlInfo, WebElement control) {
-        pressEnter(new ExtendedWebElement(control, controlInfo, getDriver()));
-    }
-
-    @Deprecated
-    private void pressEnterSafe(ExtendedWebElement extendedWebElement, boolean startTimer) {
-
-        if (startTimer) {
-            timer = System.currentTimeMillis();
-        }
-        try {
-            Thread.sleep(RETRY_TIME);
-            if (extendedWebElement.getElement() == null) {
-                extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
-            }
-            extendedWebElement.getElement().sendKeys(Keys.ENTER);
-        } catch (UnhandledAlertException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            getDriver().switchTo().alert().accept();
-        } catch (StaleElementReferenceException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            extendedWebElement = findExtendedWebElement(extendedWebElement.getBy());
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            if (System.currentTimeMillis() - timer < EXPLICIT_TIMEOUT * 1000) {
-                pressEnterSafe(extendedWebElement, false);
-            } else {
-                String msg = Messager.ELEMENT_NOT_CLICKED.error(extendedWebElement.getNameWithLocator());
-                throw new RuntimeException(msg, e);
-            }
-        }
+    public void clickHiddenElement(final ExtendedWebElement extendedWebElement) {
+        extendedWebElement.clickHiddenElement();
     }
 
     /**
@@ -658,6 +582,7 @@ public class DriverHelper {
      * @param checkbox
      *            Element
      */
+    @Deprecated
     public void check(ExtendedWebElement checkbox) {
         checkbox.check();
     }
@@ -668,6 +593,7 @@ public class DriverHelper {
      * @param checkbox
      *            Element
      */
+    @Deprecated
     public void uncheck(ExtendedWebElement checkbox) {
         checkbox.uncheck();
     }
@@ -679,6 +605,7 @@ public class DriverHelper {
      *            - checkbox to test
      * @return - current state
      */
+    @Deprecated
     public boolean isChecked(final ExtendedWebElement checkbox) {
         return checkbox.isChecked();
     }
@@ -691,6 +618,7 @@ public class DriverHelper {
      * @param filePath
      *            path
      */
+    @Deprecated
     public void attachFile(final ExtendedWebElement extendedWebElement, String filePath) {
         extendedWebElement.attachFile(filePath);
     }
@@ -835,6 +763,7 @@ public class DriverHelper {
      *            select text
      * @return true if item selected, otherwise false.
      */
+    @Deprecated
     public boolean select(final ExtendedWebElement extendedWebElement, final String selectText) {
         return extendedWebElement.select(selectText);
     }
@@ -847,10 +776,12 @@ public class DriverHelper {
      * 
      * @return boolean
      */
+    @Deprecated
     public boolean select(final ExtendedWebElement extendedWebElement, final String[] values) {
         return extendedWebElement.select(values);
     }
 
+    @Deprecated
     public void select(String controlInfo, WebElement control, String selectText) {
         select(new ExtendedWebElement(control, controlInfo, getDriver()), selectText);
     }
@@ -864,6 +795,7 @@ public class DriverHelper {
      *            {@link} BaseMatcher
      * @return true if item selected, otherwise false.
      */
+    @Deprecated
     public boolean selectByMatcher(final ExtendedWebElement extendedWebElement, final BaseMatcher<String> matcher) {
         return extendedWebElement.selectByMatcher(matcher);
     }
@@ -877,6 +809,7 @@ public class DriverHelper {
      *            select by partial text
      * @return true if item selected, otherwise false.
      */
+    @Deprecated
     public boolean selectByPartialText(final ExtendedWebElement extendedWebElement, final String partialSelectText) {
         return extendedWebElement.selectByPartialText(partialSelectText);
     }
@@ -889,44 +822,17 @@ public class DriverHelper {
      * 
      * @return true if item selected, otherwise false.
      */
+    @Deprecated
     public boolean select(final ExtendedWebElement extendedWebElement, final int index) {
         return extendedWebElement.select(index);
     }
 
+    @Deprecated
     public void select(String controlInfo, WebElement control, int index) {
         select(new ExtendedWebElement(control, controlInfo, getDriver()), index);
     }
 
     // TODO: review why hover from ExtendedWelement doesn't work
-
-    /*	*//**
-           * Hovers over element.
-           *
-           */
-    /*
-     * public void hover(final ExtendedWebElement extendedWebElement) {
-     * hover(extendedWebElement, null, null); } public void hover(final
-     * ExtendedWebElement extendedWebElement, Integer xOffset, Integer yOffset)
-     * { extendedWebElement.hover(xOffset, yOffset); }
-     * 
-     * @Deprecated public void hover(String controlInfo, WebElement control) {
-     * hover(new ExtendedWebElement(control, controlInfo)); }
-     *//**
-        * Hovers over element.
-        * 
-        * @param xpathLocator
-        *            xpathLocator
-        * @param elementName
-        *            element name
-        */
-    /*
-     * @Deprecated public void hover(String elementName, String xpathLocator) {
-     * WebDriver drv = getDriver(); Actions action = new Actions(drv);
-     * action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
-     * String msg = Messager.HOVER_IMG.info(elementName); summary.log(msg);
-     * Screenshot.capture(drv, msg); }
-     */
-
     /**
      * Hovers over element.
      * 
@@ -934,10 +840,12 @@ public class DriverHelper {
      *            final ExtendedWebElement
      *
      */
+    @Deprecated
     public void hover(final ExtendedWebElement extendedWebElement) {
         hover(extendedWebElement, null, null);
     }
 
+    @Deprecated
     public void hover(final ExtendedWebElement extendedWebElement, Integer xOffset, Integer yOffset) {
         WebDriver drv = getDriver();
         if (isElementPresent(extendedWebElement)) {
@@ -978,6 +886,7 @@ public class DriverHelper {
         }
     }
 
+    @Deprecated
     public void hover(String controlInfo, WebElement control) {
         hover(new ExtendedWebElement(control, controlInfo, getDriver()));
     }
@@ -1014,6 +923,7 @@ public class DriverHelper {
     /**
      * Close alert modal by JS.
      */
+    @Deprecated
     public void silentAlert() {
         WebDriver drv = getDriver();
 
@@ -1089,6 +999,7 @@ public class DriverHelper {
      *            Element
      * @return selected value
      */
+    @Deprecated
     public String getSelectedValue(ExtendedWebElement select) {
         return select.getSelectedValue();
     }
@@ -1100,6 +1011,7 @@ public class DriverHelper {
      *            Element
      * @return selected value
      */
+    @Deprecated
     public List<String> getSelectedValues(ExtendedWebElement select) {
         return select.getSelectedValues();
     }
@@ -1151,30 +1063,6 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Methods from v1.0
     // --------------------------------------------------------------------------
-
-    @Deprecated
-    public void setElementText(String controlInfo, String frame, String id, String text) {
-        final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-        WebDriver drv = getDriver();
-        ((JavascriptExecutor) drv).executeScript(String.format(
-                "document.getElementById('%s').contentWindow.document.getElementById('%s').innerHTML='%s'", frame, id,
-                decryptedText));
-        String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
-        Screenshot.capture(drv, msg);
-    }
-
-    @Deprecated
-    public void setElementText(String controlInfo, String text) {
-        final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-        WebDriver drv = getDriver();
-        ((JavascriptExecutor) drv)
-                .executeScript(String
-                        .format("document.contentWindow.getElementsByTagName('ol')[0].getElementsByTagName('li')[1].getElementsByClassName('CodeMirror-lines')[0].getElementsByTagName('div')[0].getElementsByTagName('div')[2].innerHTML=<pre><span class='cm-plsql-word'>'%s'</span></pre>",
-                                decryptedText));
-        String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, controlInfo);
-        Screenshot.capture(drv, msg);
-    }
-
     public boolean isPageOpened(final AbstractPage page) {
         return isPageOpened(page, EXPLICIT_TIMEOUT);
     }
@@ -1406,11 +1294,6 @@ public class DriverHelper {
     }
 
     public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
-        return element.format(objects);
-    }
-
-    @Deprecated
-    public ExtendedWebElement format(long timeout, ExtendedWebElement element, Object... objects) {
         return element.format(objects);
     }
 

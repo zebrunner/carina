@@ -20,14 +20,23 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.InvalidElementStateException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.alice.models.dto.RecognitionMetaType;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
@@ -101,22 +110,21 @@ public class ExtendedElementLocator implements ElementLocator {
             return cachedElement;
         }
 
-        WebDriver driver = DriverPool.getDriver();
         WebElement element = null;
 
         if (isPredicate) {
-            if (driver instanceof IOSDriver) {
-                element = driver.findElement(MobileBy.iOSNsPredicateString(getLocator(by)));
-            } else if (driver instanceof AndroidDriver) {
-                element = ((AndroidDriver) driver).findElementByAndroidUIAutomator(getLocator(by));
+            if (searchContext instanceof IOSDriver) {
+                element = searchContext.findElement(MobileBy.iOSNsPredicateString(getLocator(by)));
+            } else if (searchContext instanceof AndroidDriver) {
+                element = ((AndroidDriver) searchContext).findElementByAndroidUIAutomator(getLocator(by));
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
             }
         } else if (isClassChain) {
-            if (driver instanceof IOSDriver) {
-                element = driver.findElement(MobileBy.iOSClassChain(getLocator(by)));
-            } else if (driver instanceof AndroidDriver) {
-                element = ((AndroidDriver) driver).findElementByAndroidUIAutomator(getLocator(by));
+            if (searchContext instanceof IOSDriver) {
+                element = searchContext.findElement(MobileBy.iOSClassChain(getLocator(by)));
+            } else if (searchContext instanceof AndroidDriver) {
+                element = ((AndroidDriver) searchContext).findElementByAndroidUIAutomator(getLocator(by));
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
             }
@@ -126,15 +134,17 @@ public class ExtendedElementLocator implements ElementLocator {
             if (by != null) {
                 try {
                     element = searchContext.findElement(by);
+                } catch (StaleElementReferenceException | InvalidElementStateException e) {
+                	element = ((RemoteWebElement) searchContext).getWrappedDriver().findElement(by);
                 } catch (NoSuchElementException e) {
                     exception = e;
                     LOGGER.debug("Unable to find element: " + e.getMessage());
                 }
             }
-
+            
             // Finding element using AI tool
             if (element == null && AliceRecognition.INSTANCE.isEnabled()) {
-                element = findElementByAI(driver, aiLabel, aiCaption);
+                element = findElementByAI((WebDriver) searchContext, aiLabel, aiCaption);
             }
             // If no luck throw general NoSuchElementException
             if (element == null) {
@@ -142,6 +152,8 @@ public class ExtendedElementLocator implements ElementLocator {
             }
         }
 
+		// enable cache for successfully discovered element to minimize selenium calls
+		shouldCache = true;
         if (shouldCache) {
             cachedElement = element;
         }
@@ -159,27 +171,43 @@ public class ExtendedElementLocator implements ElementLocator {
 
         List<WebElement> elements = null;
         if (isPredicate) {
-            WebDriver drv = DriverPool.getDriver();
-            if (drv instanceof IOSDriver) {
-                elements = drv.findElements(MobileBy.iOSNsPredicateString(getLocator(by)));
-            } else if (drv instanceof AndroidDriver) {
-                elements = ((AndroidDriver) drv).findElementsByAndroidUIAutomator(getLocator(by));
+            if (searchContext instanceof IOSDriver) {
+                elements = searchContext.findElements(MobileBy.iOSNsPredicateString(getLocator(by)));
+            } else if (searchContext instanceof AndroidDriver) {
+                elements = ((AndroidDriver) searchContext).findElementsByAndroidUIAutomator(getLocator(by));
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
             }
         } else if (isClassChain) {
-            WebDriver drv = DriverPool.getDriver();
-            if (drv instanceof IOSDriver) {
-                elements = drv.findElements(MobileBy.iOSClassChain(getLocator(by)));
-            } else if (drv instanceof AndroidDriver) {
-                elements = ((AndroidDriver) drv).findElementsByAndroidUIAutomator(getLocator(by));
+            if (searchContext instanceof IOSDriver) {
+                elements = searchContext.findElements(MobileBy.iOSClassChain(getLocator(by)));
+            } else if (searchContext instanceof AndroidDriver) {
+                elements = ((AndroidDriver) searchContext).findElementsByAndroidUIAutomator(getLocator(by));
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
             }
         } else {
-            elements = searchContext.findElements(by);
+        	NoSuchElementException exception = null;
+        	try {
+        		elements = searchContext.findElements(by);
+            } catch (StaleElementReferenceException | InvalidElementStateException e) {
+            	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
+            } catch (NoSuchElementException e) {
+                exception = e;
+                LOGGER.debug("Unable to find elements: " + e.getMessage());
+            }
+        	
+        	//TODO: incorporate find by AI???
+        	
+            // If no luck throw general NoSuchElementException
+            if (elements == null) {
+                throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
+            }
+
         }
 
+		// enable cache for successfully discovered element to minimize selenium calls
+		shouldCache = true;
         if (shouldCache) {
             cachedElementList = elements;
         }
