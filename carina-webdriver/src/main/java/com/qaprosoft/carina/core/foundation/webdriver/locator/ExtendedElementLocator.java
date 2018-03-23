@@ -138,7 +138,7 @@ public class ExtendedElementLocator implements ElementLocator {
                 	element = ((RemoteWebElement) searchContext).getWrappedDriver().findElement(by);
                 } catch (NoSuchElementException e) {
                     exception = e;
-                    LOGGER.debug("Unable to find element: " + e.getMessage());
+                    LOGGER.info("Unable to find element: " + e.getMessage());
                 }
             }
             
@@ -194,7 +194,7 @@ public class ExtendedElementLocator implements ElementLocator {
             	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
             } catch (NoSuchElementException e) {
                 exception = e;
-                LOGGER.debug("Unable to find elements: " + e.getMessage());
+                LOGGER.info("Unable to find elements: " + e.getMessage());
             }
         	
         	//TODO: incorporate find by AI???
