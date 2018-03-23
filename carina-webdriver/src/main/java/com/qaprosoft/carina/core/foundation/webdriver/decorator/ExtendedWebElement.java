@@ -176,6 +176,17 @@ public class ExtendedWebElement {
 
         return element;
     }
+    
+    private WebElement findStaleElement(By by, long timeout) {
+        //explicitly find element using by annotation
+        if (isPresent(by, timeout)) {
+        	element = getDriver().findElement(by);
+        } else {
+        	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
+        }
+
+        return element;
+    }
 
     public void setElement(WebElement element) {
         this.element = element;
@@ -199,7 +210,18 @@ public class ExtendedWebElement {
      * @return String text
      */
     public String getText() {
-    	return findElement(EXPLICIT_TIMEOUT).getText();
+    	String text = "";
+    	try {
+    		text = findElement(EXPLICIT_TIMEOUT).getText();
+    	} catch (Exception e) {
+        	if (e != null && e.getMessage().contains("StaleObjectException")) {
+        		element = findStaleElement(getBy(), 1);
+        		text = element.getText();
+        		//reset exception info and everything is fine after refind
+        	}
+
+    	}
+    	return text;
     }
 
     /**
@@ -264,17 +286,30 @@ public class ExtendedWebElement {
     	assertElementPresent(timeout);
     	captureElements();
     	
+    	
         try {
             getElement().click();
         } catch (UnhandledAlertException e) {
+        	//TODO: think about removal for this alert as not very popular anymore
             LOGGER.debug(e.getMessage(), e.getCause());
             getDriver().switchTo().alert().accept();
             getElement().click();
         } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
+        	// analyze if it StaleObjectException and try to find again using driver
+        	boolean isThrow = true;
+        	if (e != null && e.getMessage().contains("StaleObjectException")) {
+        		element = findStaleElement(getBy(), 1);
+        		element.click();
+        		//reset exception info and everything is fine after refind
+        		isThrow = false;
+        	}
+        	
+        	if (isThrow = true) {
+	            LOGGER.debug(e.getMessage(), e.getCause());
+	            String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
+	            Screenshot.capture(getDriver(), msg);
+	            throw e;
+        	}
         }
         
         String msg = Messager.ELEMENT_CLICKED.info(getName());
