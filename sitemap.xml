@@ -81,6 +81,14 @@
 
     
     <url>
+     <loc>/contribution/</loc>
+     <lastmod>2018-03-23</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
      <loc>/releases/</loc>
      <lastmod>2018-03-23</lastmod>
      <changefreq>daily</changefreq>

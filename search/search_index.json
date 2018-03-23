@@ -101,6 +101,11 @@
             "title": "Secured data usage"
         }, 
         {
+            "location": "/contribution/", 
+            "text": "1) \nFork repository\n \nhttps://github.com/qaprosoft/carina\n to your own user.\n\n\n2) \nClone your fork to your local machine\n:\n\n\ngit clone git@github.com:your_fork_url/carina.git\n\n\n3) \ngit remote add origin \nyour_fork_url\n (can be already added)\n\n\n4) \ngit fetch origin\n\n\n5) \ngit remote add upstream git@github.com:qaprosoft/carina.git\n\n\n6) \ngit fetch upstream\n\n\n7) \ngit checkout -b work_local_branch upstream/master\n\n\nAnd then after adding files (\ngit add\n ...) use \ngit commit\n (add description) and then\npush\n:\n\n\ngit push origin work_local_branch:work_remote_branch\n\n\n\nAnd on \nhttps://github.com/qaprosoft/carina\n you will see possibility to \"Compare \n Pull Request\"", 
+            "title": "Contribution"
+        }, 
+        {
             "location": "/releases/", 
             "text": "Release notes", 
             "title": "Release notes"
