@@ -44,7 +44,7 @@ public class DriverFactory {
         LOGGER.debug("DriverFactory start...");
         AbstractFactory factory;
 
-        switch (Configuration.getDriverType()) {
+        switch (Configuration.getDriverType(capabilities)) {
         case SpecialKeywords.DESKTOP:
             factory = new DesktopFactory();
             break;
@@ -54,7 +54,7 @@ public class DriverFactory {
             break;
 
         default:
-            throw new RuntimeException("Unsupported driver_type: " + Configuration.getDriverType());
+            throw new RuntimeException("Unsupported driver_type: " + Configuration.getDriverType(capabilities));
         }
 
         WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost), getEventListeners());

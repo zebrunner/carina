@@ -25,7 +25,15 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
@@ -161,11 +169,11 @@ public class DriverHelper {
     }
 
     public boolean isElementPresent(String controlInfo, final WebElement element) {
-        return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent();
+        return new ExtendedWebElement(element, controlInfo).isElementPresent();
     }
 
     public boolean isElementPresent(String controlInfo, final WebElement element, long timeout) {
-        return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent(timeout);
+        return new ExtendedWebElement(element, controlInfo).isElementPresent(timeout);
     }
 
     /**
@@ -339,7 +347,7 @@ public class DriverHelper {
             LOGGER.error("All elements are not present");
             throw new RuntimeException("Unable to find any element from array: " + elements.toString());
         }
-        return new ExtendedWebElement(null, null, null, null);
+        return new ExtendedWebElement(null, null, null);
     }
 
     @Deprecated
@@ -425,7 +433,7 @@ public class DriverHelper {
      */
 
     public boolean isElementNotPresent(String controlInfo, final WebElement element) {
-        return isElementNotPresent(new ExtendedWebElement(element, controlInfo, getDriver()));
+        return isElementNotPresent(new ExtendedWebElement(element, controlInfo));
     }
 
     /**
@@ -449,7 +457,7 @@ public class DriverHelper {
      */
 
     public void type(String controlInfo, WebElement control, String text) {
-        type(new ExtendedWebElement(control, controlInfo, getDriver()), text);
+        type(new ExtendedWebElement(control, controlInfo), text);
     }
 
     /**
@@ -483,7 +491,7 @@ public class DriverHelper {
      */
 
     public void click(String controlInfo, WebElement control) {
-        click(new ExtendedWebElement(control, controlInfo, getDriver()));
+        click(new ExtendedWebElement(control, controlInfo));
     }
 
     /**
@@ -571,33 +579,10 @@ public class DriverHelper {
      */
 
     public void doubleClick(String controlInfo, WebElement control) {
-        doubleClick(new ExtendedWebElement(control, controlInfo, getDriver()));
+        doubleClick(new ExtendedWebElement(control, controlInfo));
     }
 
-    /**
-     * Mouse Right click to element.
-     * 
-     * @param extendedWebElement to do right click
-     * 
-     * @return boolean true if there is no errors.
-     */
-    public boolean rightClick(final ExtendedWebElement extendedWebElement) {
-        return extendedWebElement.rightClick();
-    }
-
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     * 
-     * @param extendedWebElement to click hidden element
-     * 
-     * @return boolean true if there is no errors.
-     */
-    public boolean clickHiddenElement(final ExtendedWebElement extendedWebElement) {
-        return extendedWebElement.clickHiddenElement();
-    }
-
-    /**
+     /**
      * Sends enter to element.
      * 
      * @param extendedWebElement
@@ -620,7 +605,7 @@ public class DriverHelper {
      */
     @Deprecated
     public void pressEnter(String controlInfo, WebElement control) {
-        pressEnter(new ExtendedWebElement(control, controlInfo, getDriver()));
+        pressEnter(new ExtendedWebElement(control, controlInfo));
     }
 
     @Deprecated
@@ -852,7 +837,7 @@ public class DriverHelper {
     }
 
     public void select(String controlInfo, WebElement control, String selectText) {
-        select(new ExtendedWebElement(control, controlInfo, getDriver()), selectText);
+        select(new ExtendedWebElement(control, controlInfo), selectText);
     }
 
     /**
@@ -894,7 +879,7 @@ public class DriverHelper {
     }
 
     public void select(String controlInfo, WebElement control, int index) {
-        select(new ExtendedWebElement(control, controlInfo, getDriver()), index);
+        select(new ExtendedWebElement(control, controlInfo), index);
     }
 
     // TODO: review why hover from ExtendedWelement doesn't work
@@ -979,7 +964,7 @@ public class DriverHelper {
     }
 
     public void hover(String controlInfo, WebElement control) {
-        hover(new ExtendedWebElement(control, controlInfo, getDriver()));
+        hover(new ExtendedWebElement(control, controlInfo));
     }
 
     /**
@@ -1336,7 +1321,7 @@ public class DriverHelper {
         try {
             setImplicitTimeout(0);
             wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
-            element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
+            element = new ExtendedWebElement(driver.findElement(by), name, by);
             Messager.ELEMENT_FOUND.info(name);
         } catch (Exception e) {
             element = null;
@@ -1380,7 +1365,7 @@ public class DriverHelper {
             } catch (Exception e) {/* do nothing */
             }
 
-            extendedWebElements.add(new ExtendedWebElement(element, name, drv));
+            extendedWebElements.add(new ExtendedWebElement(element, name));
         }
         return extendedWebElements;
     }
@@ -1396,6 +1381,7 @@ public class DriverHelper {
 
         LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
 
+        //TODO: find a way to support extraDrivers manipulation as well if default driver is not valid...
         driver = DriverPool.getDriver();
         if (driver == null) {
             long currentThreadId = Thread.currentThread().getId();

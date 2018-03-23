@@ -16,13 +16,18 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -62,29 +67,56 @@ public final class DriverPool {
      * 
      * @return default WebDriver
      */
+    //TODO: review all places where this method is used to fix potential issues with extraDriver
     public static WebDriver getDriver() {
         return getDriver(DEFAULT);
     }
-
+    
+    
     /**
-     * Get first registered driver from Pool.
+     * Get driver by SearchContext.
+     * 
+     * @param searchContext - context to be used for searching a desired driver
      * 
      * @return default WebDriver
      */
-    @Deprecated
-    public static WebDriver getExistingDriver() {
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-        if (currentDrivers.size() == 0) {
-            throw new RuntimeException("Unable to find exiting river in DriverPool!");
-        }
-
-        if (currentDrivers.size() > 0) {
-            return currentDrivers.entrySet().iterator().next().getValue();
-        }
-
-        return getDriver(DEFAULT);
+    //TODO: investigate how to allow to use from ExtendedElementLocator only
+    public static WebDriver getDriver(SearchContext searchContext) {
+    	if (searchContext instanceof RemoteWebElement) {
+    		RemoteWebDriver drv = (RemoteWebDriver) ((RemoteWebElement) searchContext).getWrappedDriver();
+    		return getDriver(drv.getSessionId());
+    	} else if (searchContext instanceof RemoteWebDriver) {
+    		return getDriver(((RemoteWebDriver)searchContext).getSessionId());
+    	}
+    	
+    	throw new RuntimeException("Unable to find driver in Pool by searchContext!");
     }
+    
+    /**
+     * Get driver by WebElement.
+     * 
+     * @param sessionId - session id to be used for searching a desired driver
+     * 
+     * @return default WebDriver
+     */
+    //TODO: investigate how to allow to use from ExtendedWebElement only
+    public static WebDriver getDriver(SessionId sessionId) {
+    	LOGGER.debug("Detecting WebDriver by sessionId...");
+    	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+    	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
+    		LOGGER.debug("analyzing driver: " + ((RemoteWebDriver)enrty.getValue()).getSessionId().toString());
+    		if (sessionId.equals(((RemoteWebDriver)enrty.getValue()).getSessionId())) {
+    			LOGGER.debug("Detected WebDriver by sessionId");
+    			return enrty.getValue();
+    		}
+    	}
 
+    	LOGGER.warn("Unable to find driver using sessionId artifacts. Returning default one!");
+    	//TODO: take a look into the replaceDriver case and how sessionId are regenerated on page objects
+    	return getDriver();
+    	
+    }
+    
     /**
      * Get driver by name. If no driver discovered it will be created using
      * default capabilities.

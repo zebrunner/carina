@@ -75,11 +75,11 @@ public abstract class AbstractElementExtractor {
         return driver.findElements(By.xpath("//*[count(./*)=0]"));
     }
 
-    public ExtendedWebElement generateExtenedElement(List<WebElement> elements, WebDriver driver, String name) {
+    public ExtendedWebElement generateExtenedElement(List<WebElement> elements, String name) {
         if (elements.size() != 1) {
             throw new RuntimeException("Zero or more than 1 element was found using coordinates.");
         }
-        return new ExtendedWebElement(elements.get(0), name, driver);
+        return new ExtendedWebElement(elements.get(0), name);
     }
 
 }

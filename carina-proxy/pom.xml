@@ -4,7 +4,6 @@
 	xmlns="http://maven.apache.org/POM/4.0.0">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qaprosoft</groupId>
 	<artifactId>carina-proxy</artifactId>
 	<packaging>jar</packaging>
 
