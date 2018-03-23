@@ -11,6 +11,7 @@ pages:
       - API automation: automation/api.md
     - Dataproviders: dataproviders.md
     - Security: security.md
+    - Contribution: contribution.md
     - Release notes: releases.md
 theme:
   name: 'material'
