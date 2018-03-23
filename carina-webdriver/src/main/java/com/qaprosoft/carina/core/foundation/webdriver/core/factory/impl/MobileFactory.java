@@ -58,7 +58,7 @@ public class MobileFactory extends AbstractFactory {
             seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
         }
 
-        String driverType = Configuration.getDriverType();
+        String driverType = Configuration.getDriverType(capabilities);
         String mobilePlatformName = Configuration.getPlatform();
 
         // TODO: refactor code to be able to remove SpecialKeywords.CUSTOM property completely
