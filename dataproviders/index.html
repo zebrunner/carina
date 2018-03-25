@@ -420,7 +420,8 @@ After that you can specify data providers tests as follows:</p>
 <p>1. For XLS/ XLSX/ CSV spreadsheets look at the following code snippet:</p>
 <pre><code class="java">@Test(dataProvider = &quot;DataProvider&quot;, description = &quot;your_description&quot;)
 @MethodOwner(owner=&quot;your_name&quot;)
-@XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
+@XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, 
+sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
 public void testSumOperation(String a, String b, String c)
 {
     int actual = Integer.valueOf(a) + Integer.valueOf(b);
