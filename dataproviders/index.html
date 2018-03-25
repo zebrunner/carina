@@ -89,10 +89,6 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <a href="#todo" tabindex="1" class="md-skip">
-        Skip to content
-      </a>
-    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -358,36 +354,9 @@
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
     
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Dataproviders
-      </label>
-    
     <a href="./" title="Dataproviders" class="md-nav__link md-nav__link--active">
       Dataproviders
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#todo" title="TODO" class="md-nav__link">
-    TODO
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
     
   </li>
 
@@ -435,35 +404,6 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#todo" title="TODO" class="md-nav__link">
-    TODO
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
@@ -474,7 +414,77 @@
                 
                   <h1>Dataproviders</h1>
                 
-                <h2 id="todo">TODO</h2>
+                <p>Carina test framework provides possibility to write all tests with data providers in one place include parametrization using external XLS/ XLSX/ CSV spreadsheets, TestNG <code>@DataProvider</code> and <code>@Parameters</code> annotations.</p>
+<p>First of all you need to declare test class that extends <code>AbstractTest.java</code> and define test suite in xml document for it.
+After that you can specify data providers tests as follows:</p>
+<p>1. For XLS/ XLSX/ CSV spreadsheets look at the following code snippet:</p>
+<pre><code class="java">@Test(dataProvider = &quot;DataProvider&quot;, description = &quot;your_description&quot;)
+@MethodOwner(owner=&quot;your_name&quot;)
+@XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
+public void testSumOperation(String a, String b, String c)
+{
+    int actual = Integer.valueOf(a) + Integer.valueOf(b);
+    int expected = Integer.valueOf(c);
+    Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
+}
+</code></pre>
+
+<p>This test uses XLS/ XLSX/ CSV files as data sourse. Every row in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code> . Carina test framework initially defines several data providers methods in <code>AbstractTest.java</code>, which you've extended earlier:</p>
+<ul>
+<li>
+<p>createData method (data provider name = "DataProvider") for common usecases</p>
+</li>
+<li>
+<p>createDataSingeThread method (data provider name = "SingleDataProvider") for single-thread execution.</p>
+</li>
+</ul>
+<p>To specify XLS/ XLSX/ CSV spreadsheets for test you should declare <code>@XlsDataSourceParameters</code> annotaion and define its parameters:</p>
+<ul>
+<li>path - file path located in src/test/resources</li>
+<li>sheet - sheet name</li>
+<li>dsUid - data-source unique identifier</li>
+<li>dsArgs - column names from sheet</li>
+</ul>
+<p>2. Next lets take a look at widely used TestNG Data Provider parametrization. In this case there are common rules for writing this kind of tests: </p>
+<ul>
+<li>create data-provider method that returns <code>Object[][]</code> and set DataProvider annotation.</li>
+<li>specify data-provider name in <code>@Test</code> annotation</li>
+</ul>
+<p>Example:</p>
+<pre><code class="java">@Test(dataProvider = &quot;DP1&quot;, description = &quot;your_description&quot;)
+@MethodOwner(owner=&quot;your_name&quot;)
+public void testMuliplyOperation(int a, int b, int c)
+{
+    int actual = a * b;
+    int expected = c;
+    Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
+}
+
+@DataProvider(parallel = false, name = &quot;DP1&quot;)
+public static Object[][] dataprovider()
+{
+    return new Object[][]
+    {
+        { 2, 3, 6 },
+        { 6, 6, 36 },
+        { 5, 8, 40 } 
+    };
+}
+</code></pre>
+
+<p>3. Besides you can use TestNG annotation <code>@Parameters</code> for listig all parameter names as in the following code snippet:</p>
+<pre><code class="java">@Test(description = &quot;your_description&quot;)
+@MethodOwner(owner=&quot;your_name&quot;)
+@Parameters({ &quot;a&quot;, &quot;b&quot;, &quot;c&quot; })
+public void testSubstractOperation(int a, int b, int c)
+{
+    int actual = Integer.valueOf(a) - Integer.valueOf(b);
+    int expected = Integer.valueOf(c);
+    Assert.assertEquals(actual, expected, &quot;Invalid substract result!&quot;);
+}
+</code></pre>
+
+<p>All of these tests can be consolidated under single java class as it's shown in our <a href="https://github.com/qaprosoft/carina-demo">demo</a> of Carina test framework, where you can find <code>DataprovidersSampleTest.java</code></p>
                 
                   
                 
