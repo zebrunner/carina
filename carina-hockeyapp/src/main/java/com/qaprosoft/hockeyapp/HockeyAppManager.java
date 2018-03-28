@@ -161,12 +161,18 @@ public class HockeyAppManager {
             JsonNode buildResults = restTemplate.exchange(retrieveBuilds, JsonNode.class).getBody();
 
             for (JsonNode node : buildResults.get("app_versions")) {
-                if (checkNotesForCorrectBuild(buildType.toLowerCase(), node) && checkBuild(version, node)) {
+                if (checkBuild(version, node) && checkTitleForCorrectPattern(buildType.toLowerCase(), node) || checkNotesForCorrectBuild(buildType.toLowerCase(), node)) {
                     LOGGER.info("Downloading Version: " + node);
                     versionNumber = node.get("shortversion").asText();
                     revision = node.get("version").asText();
 
-                    return node.get("build_url").asText();
+                    if (node.has("build_url")) {
+                        LOGGER.info("Downloading Build From: build_url");
+                        return node.get("build_url").asText();
+                    }
+
+                    LOGGER.info("Downloading Build From: download_url");
+                    return node.get("download_url").asText();
                 }
             }
         }
@@ -188,7 +194,7 @@ public class HockeyAppManager {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private RequestEntity<String> buildRequestEntity(String hostUrl, String path,
-            HttpMethod httpMethod) {
+                                                     HttpMethod httpMethod) {
 
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme("https")
@@ -201,7 +207,7 @@ public class HockeyAppManager {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private RequestEntity<String> buildRequestEntity(String hostUrl, String path,
-            MultiValueMap<String, String> listQueryParams, HttpMethod httpMethod) {
+                                                     MultiValueMap<String, String> listQueryParams, HttpMethod httpMethod) {
 
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme("https")
@@ -234,15 +240,25 @@ public class HockeyAppManager {
 
     private boolean checkNotesForCorrectBuild(String pattern, JsonNode node) {
 
-        String noteField = node.get("notes").asText().toLowerCase();
+        return checkForPattern("notes", pattern, node);
+    }
 
-        if (noteField.contains(pattern)) {
+    private boolean checkTitleForCorrectPattern(String pattern, JsonNode node) {
+
+        return checkForPattern("title", pattern, node);
+    }
+
+    private boolean checkForPattern(String nodeName, String pattern, JsonNode node) {
+
+        String nodeField = node.get(nodeName).asText().toLowerCase();
+
+        if (nodeField.contains(pattern)) {
             return true;
         }
 
         String[] patternList = pattern.split("[^\\w']+");
 
-        if (patternList.length > 1 && noteField.contains(patternList[0]) && noteField.contains(patternList[1])) {
+        if (patternList.length > 1 && nodeField.matches(".*" + patternList[0] + ".*") && nodeField.matches(".*" + patternList[1] + ".*")) {
             return true;
         }
 
