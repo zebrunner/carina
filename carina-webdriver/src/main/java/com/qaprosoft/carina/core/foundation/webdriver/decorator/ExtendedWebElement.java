@@ -85,8 +85,6 @@ public class ExtendedWebElement {
 
     private static Wait<WebDriver> wait;
 
-    private long timer;
-
     private CryptoTool cryptoTool;
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
@@ -294,7 +292,7 @@ public class ExtendedWebElement {
             LOGGER.debug(e.getMessage(), e.getCause());
             getDriver().switchTo().alert().accept();
             getElement().click();
-        } catch (Exception e) {
+        } catch (Throwable e) {
         	// analyze if it StaleObjectException and try to find again using driver
         	boolean isThrow = true;
         	if (e != null && e.getMessage().contains("StaleObjectException")) {
@@ -533,7 +531,7 @@ public class ExtendedWebElement {
             getDriver().switchTo().alert().accept();
             getElement().clear();
             getElement().sendKeys(decryptedText);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
