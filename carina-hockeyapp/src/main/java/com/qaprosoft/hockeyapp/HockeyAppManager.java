@@ -22,6 +22,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpHeaders;
@@ -166,13 +168,15 @@ public class HockeyAppManager {
                     versionNumber = node.get("shortversion").asText();
                     revision = node.get("version").asText();
 
-                    if (node.has("build_url")) {
-                        LOGGER.info("Downloading Build From: build_url");
-                        return node.get("build_url").asText();
-                    }
+                    List<String> packageUrls = new ArrayList<>();
+                    packageUrls.add("build_url");
+                    packageUrls.add("download_url");
 
-                    LOGGER.info("Downloading Build From: download_url");
-                    return node.get("download_url").asText();
+                    for (String packageUrl : packageUrls) {
+                        if (node.has(packageUrl)) {
+                            return node.get(packageUrl).asText();
+                        }
+                    }
                 }
             }
         }
@@ -258,10 +262,26 @@ public class HockeyAppManager {
 
         String[] patternList = pattern.split("[^\\w']+");
 
-        if (patternList.length > 1 && nodeField.matches(".*" + patternList[0] + ".*") && nodeField.matches(".*" + patternList[1] + ".*")) {
+        if (patternList.length <= 1) {
+            throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
+        }
+
+        String patternToReplace = ".*[ -]%s[ -].*";
+        String patternToMatch = String.format(patternToReplace, patternList[0]);
+        String patternToMatchTwo = String.format(patternToReplace, patternList[1]);
+
+        if (patternList.length > 1 && searchFieldsForString(patternToMatch, nodeField)
+                && searchFieldsForString(patternToMatchTwo, nodeField)) {
             return true;
         }
 
         return false;
+    }
+
+    private boolean searchFieldsForString(String pattern, String stringToSearch) {
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(stringToSearch);
+
+        return m.find();
     }
 }
