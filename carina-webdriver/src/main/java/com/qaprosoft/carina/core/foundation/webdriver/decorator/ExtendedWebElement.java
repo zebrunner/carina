@@ -38,6 +38,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -292,22 +293,16 @@ public class ExtendedWebElement {
             LOGGER.debug(e.getMessage(), e.getCause());
             getDriver().switchTo().alert().accept();
             getElement().click();
-        } catch (Throwable e) {
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.info("catched StaleElementReferenceException: ", e);
         	// analyze if it StaleObjectException and try to find again using driver
-        	boolean isThrow = true;
-        	if (e != null && e.getMessage().contains("StaleObjectException")) {
-        		element = findStaleElement(getBy(), 1);
-        		element.click();
-        		//reset exception info and everything is fine after refind
-        		isThrow = false;
-        	}
-        	
-        	if (isThrow = true) {
-	            LOGGER.debug(e.getMessage(), e.getCause());
-	            String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
-	            Screenshot.capture(getDriver(), msg);
-	            throw e;
-        	}
+        	element = findStaleElement(getBy(), 1);
+    		element.click();
+        } catch (Throwable e) {
+            LOGGER.debug(e.getMessage(), e.getCause());
+            String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
+            Screenshot.capture(getDriver(), msg);
+            throw e;
         }
         
         String msg = Messager.ELEMENT_CLICKED.info(getName());
@@ -531,6 +526,12 @@ public class ExtendedWebElement {
             getDriver().switchTo().alert().accept();
             getElement().clear();
             getElement().sendKeys(decryptedText);
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.info("catched StaleElementReferenceException: ", e);
+        	// analyze if it StaleObjectException and try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+        	element.clear();
+        	element.sendKeys(decryptedText);
         } catch (Throwable e) {
             LOGGER.debug(e.getMessage(), e.getCause());
             msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(getNameWithLocator());
