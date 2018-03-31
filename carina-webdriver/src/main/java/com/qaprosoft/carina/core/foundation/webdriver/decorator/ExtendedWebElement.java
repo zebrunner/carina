@@ -47,6 +47,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
@@ -140,24 +141,27 @@ public class ExtendedWebElement {
     }
     
 	private boolean isPresent(By by, long timeout) {
+		return waitUntil(ExpectedConditions.presenceOfElementLocated(getBy()), by, timeout);
+	}
+	
+	
+	private boolean waitUntil(ExpectedCondition<WebElement> condition,  By by, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			LOGGER.info("isPresent: starting..." + getNameWithLocator());
-			wait.until(ExpectedConditions.presenceOfElementLocated(getBy()));
+			LOGGER.debug("waitUntil: starting..." + getNameWithLocator() + "; condition: " + condition.toString());
+			wait.until(condition);
 			result = true;
-			LOGGER.info("isPresent: finished true..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
 		} catch (NoSuchElementException | TimeoutException e) {
 			// don't write exception even in debug mode
-			LOGGER.info("isPresent: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
 			result = false;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e.getCause());
-			LOGGER.error("isPresent: Exception e..." + getNameWithLocator(), e);
+			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
-		} finally {
-			LOGGER.debug("isPresent: finally..." + getNameWithLocator());
 		}
 		return result;
 	}
@@ -178,7 +182,8 @@ public class ExtendedWebElement {
     
     private WebElement findStaleElement(By by, long timeout) {
         LOGGER.info("explicitly find element using by annotation: " + by);
-        if (isPresent(by, timeout)) {
+        //TODO: implement privte isClickable using explicit by locator
+        if (isClickable(timeout)) {
         	element = getDriver().findElement(by);
         } else {
         	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
@@ -212,13 +217,11 @@ public class ExtendedWebElement {
     	String text = "";
     	try {
     		text = findElement(EXPLICIT_TIMEOUT).getText();
-    	} catch (Exception e) {
-        	if (e != null && e.getMessage().contains("StaleObjectException")) {
-        		element = findStaleElement(getBy(), 1);
-        		text = element.getText();
-        		//reset exception info and everything is fine after refind
-        	}
-
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
+        	// analyze if it StaleObjectException and try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+    		text = element.getText();
     	}
     	return text;
     }
@@ -229,7 +232,17 @@ public class ExtendedWebElement {
      * @return Point location
      */
     public Point getLocation() {
-    	return findElement(EXPLICIT_TIMEOUT).getLocation();
+    	Point point;
+    	try {
+    		point = findElement(EXPLICIT_TIMEOUT).getLocation();
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
+        	// analyze if it StaleObjectException and try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+    		point = element.getLocation();
+    	}
+    	
+    	return point;
     }
 
     /**
@@ -238,7 +251,16 @@ public class ExtendedWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-    	return findElement(EXPLICIT_TIMEOUT).getSize();
+    	Dimension dim;
+    	try {
+    		dim = findElement(EXPLICIT_TIMEOUT).getSize();
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
+        	// analyze if it StaleObjectException and try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+    		dim = element.getSize();
+    	}
+    	return dim;
     }
 
     /**
@@ -248,7 +270,16 @@ public class ExtendedWebElement {
      * @return String text
      */
     public String getAttribute(String name) {
-    	return findElement(EXPLICIT_TIMEOUT).getAttribute(name);
+    	String attribute;
+    	try {
+    		attribute = findElement(EXPLICIT_TIMEOUT).getAttribute(name);
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
+        	// analyze if it StaleObjectException and try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+    		attribute = element.getAttribute(name);
+    	}
+    	return attribute;
     }
 
     /**
@@ -294,7 +325,7 @@ public class ExtendedWebElement {
             getDriver().switchTo().alert().accept();
             getElement().click();
         } catch (StaleElementReferenceException e) {
-        	LOGGER.info("catched StaleElementReferenceException: ", e);
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
         	// analyze if it StaleObjectException and try to find again using driver
         	element = findStaleElement(getBy(), 1);
     		element.click();
@@ -1043,29 +1074,7 @@ public class ExtendedWebElement {
      * @return element clickability status.
      */
     public boolean isClickable(long timeout) {
-        final WebDriver drv = getDriver();
-        By locator = getBy();
-        boolean res = true;
-        String msg = "";
-        try {
-            ExpectedConditions.elementToBeClickable(locator);
-            (new WebDriverWait(drv, timeout)).until(ExpectedConditions.elementToBeClickable(locator));
-            msg = Messager.ELEMENT_BECOME_CLICKABLE.info(getName());
-        } catch (TimeoutException ex) {
-            msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
-            LOGGER.error(ex);
-            res = false;
-        } catch (Exception e) {
-            msg = Messager.ELEMENT_NOT_BECOME_CLICKABLE.info(getName());
-            LOGGER.error(e);
-            res = false;
-        }
-        try {
-            Screenshot.capture(getDriver(), msg);
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-        }
-        return res;
+    	return waitUntil(ExpectedConditions.elementToBeClickable(getBy()), getBy(), timeout);
     }
 
     /**
@@ -1084,29 +1093,7 @@ public class ExtendedWebElement {
      * @return element visibility status.
      */
     public boolean isVisible(long timeout) {
-        final WebDriver drv = getDriver();
-        By locator = getBy();
-        boolean res = true;
-        String msg = "";
-        try {
-            ExpectedConditions.elementToBeClickable(locator);
-            (new WebDriverWait(drv, timeout)).until(ExpectedConditions.visibilityOfElementLocated(locator));
-            msg = Messager.ELEMENT_BECOME_VISIBLE.info(getName());
-        } catch (TimeoutException ex) {
-            msg = Messager.ELEMENT_NOT_BECOME_VISIBLE.info(getName());
-            LOGGER.error(ex);
-            res = false;
-        } catch (Exception e) {
-            msg = Messager.ELEMENT_NOT_BECOME_VISIBLE.info(getName());
-            LOGGER.error(e);
-            res = false;
-        }
-        try {
-            Screenshot.capture(getDriver(), msg);
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-        }
-        return res;
+    	return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), getBy(), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {

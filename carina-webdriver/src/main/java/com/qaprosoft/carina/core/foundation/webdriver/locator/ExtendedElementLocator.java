@@ -167,6 +167,7 @@ public class ExtendedElementLocator implements ElementLocator {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<WebElement> findElements() {
         if (cachedElementList != null && shouldCache) {
+        	LOGGER.info("returning element from cache: " + by);
             return cachedElementList;
         }
 
