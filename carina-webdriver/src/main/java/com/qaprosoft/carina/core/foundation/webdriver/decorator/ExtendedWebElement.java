@@ -177,7 +177,7 @@ public class ExtendedWebElement {
     }
     
     private WebElement findStaleElement(By by, long timeout) {
-        //explicitly find element using by annotation
+        LOGGER.info("explicitly find element using by annotation: " + by);
         if (isPresent(by, timeout)) {
         	element = getDriver().findElement(by);
         } else {
