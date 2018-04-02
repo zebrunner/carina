@@ -6,6 +6,7 @@ There are multiple properties files located in src/main/resources:
 *  **database.properties** - database connection properties
 *  **email.properties** - emailable reports config
 *  **testdata.properties** - test user credentials
+*  **zafira.properties** - [Zafira](https://github.com/qaprosoft/zafira) QA repoting center 
 
 All properties may be retrieved in test using R class:
 ```
@@ -490,6 +491,24 @@ Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
 Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
 Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
+
+**zafira.properties** is used for integrating Zafira QA reporting into the project.
+
+Here you should specify some values for proper integration:
+
+```
+zafira_enabled=
+zafira_service_url=http://localhost:8080/zafira-ws
+zafira_access_token=
+zafira_project=
+zafira_rerun_failures=false
+zafira_report_emails=
+zafira_configurator=com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator
+```
+
+First of all you should define **_zafira_enabled_** as true for running report center. 
+In **_zafira_access_token_** you must put token value. More information about how to do that you can find in [Zafira QA tool](https://github.com/qaprosoft/zafira) page.
+**_zafira_project_** defines name of the project. 
 
 ### Environment specific configuration
 In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
