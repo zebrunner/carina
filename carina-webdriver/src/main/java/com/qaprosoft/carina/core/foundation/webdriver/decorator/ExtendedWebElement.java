@@ -330,7 +330,7 @@ public class ExtendedWebElement {
         	element = findStaleElement(getBy(), 1);
     		element.click();
         } catch (Throwable e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;
@@ -370,7 +370,7 @@ public class ExtendedWebElement {
         	element = getElement();
             action.moveToElement(element).doubleClick(element).build().perform();
         } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -403,8 +403,8 @@ public class ExtendedWebElement {
         try {
         	element = getElement();
         	action.moveToElement(element).contextClick(element).build().perform();
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.ELEMENT_NOT_RIGHT_CLICKED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -438,8 +438,8 @@ public class ExtendedWebElement {
         	element = getElement();
         	JavascriptExecutor executor = (JavascriptExecutor) getDriver();
             executor.executeScript("arguments[0].click();", element);
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.HIDDEN_ELEMENT_NOT_CLICKED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -564,7 +564,7 @@ public class ExtendedWebElement {
         	element.clear();
         	element.sendKeys(decryptedText);
         } catch (Throwable e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e);
             msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -641,8 +641,8 @@ public class ExtendedWebElement {
     	
         try {
         	getElement().sendKeys(decryptedFilePath);
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.FILE_NOT_ATTACHED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -748,8 +748,8 @@ public class ExtendedWebElement {
         	final Select s = new Select(element);
         	s.selectByVisibleText(decryptedSelectText);
         	isSelected = true;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -806,8 +806,8 @@ public class ExtendedWebElement {
             }
             s.selectByVisibleText(fullTextValue);
         	isSelected = true;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -842,8 +842,8 @@ public class ExtendedWebElement {
             }
             s.selectByVisibleText(fullTextValue);
         	isSelected = true;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
@@ -871,8 +871,8 @@ public class ExtendedWebElement {
         	final Select s = new Select(element);
         	s.selectByIndex(index);
         	isSelected = true;
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             String msg = Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(getNameWithLocator());
             Screenshot.capture(getDriver(), msg);
             throw e;  
