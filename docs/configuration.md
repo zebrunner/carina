@@ -7,8 +7,7 @@ There are multiple properties files located in src/main/resources:
 *  **config.properties** - global test configuration
 *  **database.properties** - database connection properties
 *  **email.properties** - emailable reports config
-*  **testdata.properties** - test user credentials
-*  **zafira.properties** - [Zafira](https://github.com/qaprosoft/zafira) QA repoting center 
+*  **testdata.properties** - test user credentials 
 
 All properties may be retrieved in test using R class:
 ```
@@ -494,24 +493,6 @@ Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
 Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 
-**zafira.properties** is used for integrating Zafira QA reporting into the project.
-
-Here you should specify some values for proper integration:
-
-```
-zafira_enabled=
-zafira_service_url=http://localhost:8080/zafira-ws
-zafira_access_token=
-zafira_project=
-zafira_rerun_failures=false
-zafira_report_emails=
-zafira_configurator=com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator
-```
-
-First of all you should define **_zafira_enabled_** as true for running report center. 
-In **_zafira_access_token_** you must put token value. More information about how to do that you can find in [Zafira QA tool](https://github.com/qaprosoft/zafira) page.
-**_zafira_project_** defines name of the project. 
-
 ### Environment specific configuration
 In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
 ```
@@ -525,3 +506,45 @@ And get env-specific argument in test the following way:
 Configuration.getEnvArg("url")
 ```
 As a result you switch between environments just changing env argument in _config.properties file.
+
+### [Zafira](https://github.com/qaprosoft/zafira) configuration
+**zafira.properties** is used for Zafira QA reporting integration.
+
+Here you should specify some values for proper integration:
+<table>
+	<tr>
+		<th>Attribute</th>
+		<th>Meaning</th>
+		<th>Example</th>
+	</tr>
+	<tr>
+		<td>zafira_enabled</td>
+		<td>Root switch</td>
+		<td>true/false</td>
+	</tr>
+	<tr>
+		<td>zafira_service_url</td>
+		<td>Webservice URL</td>
+		<td>http://localhost:8080/zafira-ws</td>
+	</tr>
+	<tr>
+		<td>zafira_project</td>
+		<td>Project name (created in Zafira)</td>
+		<td>empty or any created</td>
+	</tr>
+	<tr>
+		<td>zafira_rerun_failures</td>
+		<td>Rerun only failures</td>
+		<td>true/false</td>
+	</tr>
+	<tr>
+		<td>zafira_report_emails</td>
+		<td>List of emails for report</td>
+		<td>user1@qps.com,user2@qps.com</td>
+	</tr>
+	<tr>
+		<td>zafira_configurator</td>
+		<td>Configurator class (use default)</td>
+		<td>com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator</td>
+	</tr>	
+</table>
