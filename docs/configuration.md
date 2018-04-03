@@ -508,7 +508,7 @@ Configuration.getEnvArg("url")
 As a result you switch between environments just changing env argument in _config.properties file.
 
 ### [Zafira](https://github.com/qaprosoft/zafira) configuration
-**zafira.properties** is used for Zafira QA reporting integration.
+[**zafira.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/zafira.properties) is used for Zafira QA reporting integration.
 
 Here you should specify some values for proper integration:
 <table>
