@@ -1,3 +1,5 @@
+[![Carina - Configuration](http://img.youtube.com/vi/MMviWxCS9x4/0.jpg)](https://youtu.be/MMviWxCS9x4)
+
 ### Configuration files
 There are multiple properties files located in src/main/resources:
 
