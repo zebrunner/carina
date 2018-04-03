@@ -63,10 +63,5 @@ By executing this command, Maven should resolve all dependencies, downloading re
 mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
 ```
 Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
-Generate Eclipse workspace using command:
-```
-mvn clean eclipse:eclipse
-```
-Now you are ready to import project into Eclipse.
 
 ![Eclipse view](img/001-Initial-setup.png)
