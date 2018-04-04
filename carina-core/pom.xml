@@ -34,10 +34,10 @@
 
 	<dependencies>
 		<!-- Carina Core sub-modules -->
-		<dependency>
+		<!--<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-proxy</artifactId>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-dataprovider</artifactId>
@@ -50,10 +50,10 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-webdriver</artifactId>
