@@ -41,10 +41,10 @@
 		</dependency>
 
 		<!-- Test utilities -->
-		<dependency>
+		<!--<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- needed for spring RestTemplate stuff -->
 		<dependency>
