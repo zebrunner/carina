@@ -147,7 +147,7 @@ All project configuration properties are located in **_config.properties** file.
 		<tr>
 		<td>custom_capabilities</td>
 		<td>Name of propertie file with custom capabilities(key-value)</td>
-		<td>custom.propertie</td>
+		<td>custom.properties</td>
 	</tr>
 		<tr>
 		<td>proxy_host</td>
@@ -187,16 +187,6 @@ All project configuration properties are located in **_config.properties** file.
 		<tr>
 		<td>track_known_issues</td>
 		<td>Boolean parameter. If it is true and some Jira tickets assosiated with test in case of failure Jira info will be added to report</td>
-		<td>true,false</td>
-	</tr>
-	<tr>
-		<td>smart_screenshot</td>
-		<td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
-		<td>true,false</td>
-	</tr>
-	<tr>
-		<td>smart_screenshot</td>
-		<td>This parameter currently avaliable only for Chrome browser. Enable taking screenshots with metadata</td>
 		<td>true,false</td>
 	</tr>
 	<tr>
@@ -307,7 +297,7 @@ All project configuration properties are located in **_config.properties** file.
 		<tr>
 		<td>crypto_key_path</td>
 		<td>Path to file with crypto key</td>
-		<td>./crypto</td>
+		<td>./src/main/resources/crypto.key</td>
 	</tr>
 		<tr>
 		<td>suite_name</td>
