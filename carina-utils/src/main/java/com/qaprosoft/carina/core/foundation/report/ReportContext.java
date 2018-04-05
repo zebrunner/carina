@@ -135,9 +135,16 @@ public class ReportContext {
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
             }
-            boolean isCreated = artifactsDirectory.mkdir();
+            
+            boolean isCreated = artifactsDirectory.exists() && artifactsDirectory.isDirectory();
             if (!isCreated) {
-                throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
+            		isCreated = artifactsDirectory.mkdir();
+            } else {
+            	LOGGER.info("Artifacts folder already exists: "  + artifactsDirectory.getAbsolutePath());
+            }
+            
+            if (!isCreated) {
+                throw new RuntimeException("Artifacts folder not created: " + artifactsDirectory.getAbsolutePath());
             }
         }
         return artifactsDirectory;
