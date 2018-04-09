@@ -2,7 +2,7 @@
 
 [![Carina - Start Selenium](http://img.youtube.com/vi/YGXsVoEY74M/0.jpg)](https://youtu.be/YGXsVoEY74M)
 
-Before running any web test you have to start Selenium server locally or use remote Selenium server. You may download latest version of Selenium standalone server on [offictial website](https://www.seleniumhq.org/download) along with browser binary for Chrome, Firefox, IE etc. For running test with Chrome browser you will need to download chromedriver and place along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by current Selenium version):
+Before running any web test you have to start Selenium server locally or use remote Selenium server. You may download latest version of Selenium standalone server on [official website](https://www.seleniumhq.org/download) along with browser binary for Chrome, Firefox, IE etc. For running test with Chrome browser you will need to download chromedriver and place along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by current Selenium version):
 ```
 java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-X.jar
 ```
