@@ -1,6 +1,6 @@
 ### Selenium server
 
-[![Carina - Start Selenium](http://img.youtube.com/vi/QGHCezE-d-I/0.jpg)](https://youtu.be/QGHCezE-d-I)
+[![Carina - Start Selenium](http://img.youtube.com/vi/YGXsVoEY74M/0.jpg)](https://youtu.be/YGXsVoEY74M)
 
 Before running any web test you have to start Selenium server locally or use remote Selenium server. You may download latest version of Selenium standalone server on [offictial website](https://www.seleniumhq.org/download) along with browser binary for Chrome, Firefox, IE etc. For running test with Chrome browser you will need to download chromedriver and place along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by current Selenium version):
 ```
@@ -42,7 +42,7 @@ docker-compose up
 
 ### Running tests
 
-[![Carina - Running tests](http://img.youtube.com/vi/YGXsVoEY74M/0.jpg)](https://youtu.be/YGXsVoEY74M)
+[![Carina - Running tests](http://img.youtube.com/vi/QGHCezE-d-I/0.jpg)](https://youtu.be/QGHCezE-d-I)
 
 There are a several options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
 
