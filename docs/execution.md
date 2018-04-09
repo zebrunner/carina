@@ -1,9 +1,48 @@
+### Start Selenium server
+
 [![Carina - Start Selenium](http://img.youtube.com/vi/YGXsVoEY74M/0.jpg)](https://youtu.be/YGXsVoEY74M)
 
-There are a several options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework. Before running tests make sure you have downloaded Selenium standalone server jar file and started it by the following command:
+Before running any web test you have to start Selenium server locally or use remote Selenium server. You may download latest version of Selenium standalone server on [offictial website](https://www.seleniumhq.org/download) along with browser binary for Chrome, Firefox, IE etc. For running test with Chrome browser you will need to download chromedriver and place along with selenium-standalone-server-xxx.jar and execute:
 ```
-java -jar selenium-server-standalone-3.6.0.jar
+java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-xxx.jar
 ```
+You have another option for running [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way to create docker-compose.yml:
+```
+# To execute this docker-compose yml file use docker-compose -f <file_name> up
+# Add the "-d" flag at the end for deattached execution
+version: '2'
+services:
+  firefox:
+    image: selenium/node-firefox:3.11.0-californium
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - hub
+    environment:
+      HUB_HOST: hub
+
+  chrome:
+    image: selenium/node-chrome:3.11.0-californium
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - hub
+    environment:
+      HUB_HOST: hub
+
+  hub:
+    image: selenium/hub:3.11.0-californium
+    ports:
+      - "4444:4444"
+```
+Now you may start Selenium running the following command in terminal:
+```
+docker-compose up
+```
+
+### Running tests
+
+There are a several options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
 
 To run the test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
 
