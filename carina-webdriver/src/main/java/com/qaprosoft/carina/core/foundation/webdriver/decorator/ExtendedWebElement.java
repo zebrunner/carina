@@ -558,7 +558,7 @@ public class ExtendedWebElement {
             getElement().clear();
             getElement().sendKeys(decryptedText);
         } catch (StaleElementReferenceException e) {
-        	LOGGER.info("catched StaleElementReferenceException: ", e);
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
         	// analyze if it StaleObjectException and try to find again using driver
         	element = findStaleElement(getBy(), 1);
         	element.clear();
