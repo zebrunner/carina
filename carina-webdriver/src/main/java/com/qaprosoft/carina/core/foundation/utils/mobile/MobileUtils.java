@@ -534,11 +534,14 @@ public class MobileUtils {
         swipeLeft(null, duration);
     }
 
-    /**
-     * Swipe left in container
-     * 
-     * @param duration int
-     */
+	/**
+	 * Swipe left in container
+	 * 
+	 * @param container
+	 *            ExtendedWebElement
+	 * @param duration
+	 *            int
+	 */
     public static void swipeLeft(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe left will be executed.");
         swipeInDevice(container, Direction.LEFT, duration);
@@ -566,11 +569,14 @@ public class MobileUtils {
         swipeRight(null, duration);
     }
 
-    /**
-     * Swipe right in container
-     * 
-     * @param duration int
-     */
+	/**
+	 * Swipe right in container
+	 * 
+	 * @param container
+	 *            ExtendedWebElement
+	 * @param duration
+	 *            int
+	 */
     public static void swipeRight(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe right will be executed.");
         swipeInDevice(container, Direction.RIGHT, duration);
