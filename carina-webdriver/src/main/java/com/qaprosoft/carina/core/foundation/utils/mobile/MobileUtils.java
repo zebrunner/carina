@@ -275,12 +275,13 @@ public class MobileUtils {
     public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
             int count, int duration) {
 
-        LOGGER.debug("Verify if element present before swipe: " + element.getNameWithLocator().toString());
         boolean isPresent = element.isElementPresent(1);
         if (isPresent) {
             // no sense to continue;
-            LOGGER.debug("element already present before swipe: " + element.getNameWithLocator().toString());
+            LOGGER.info("element already present before swipe: " + element.getNameWithLocator().toString());
             return true;
+        } else {
+        	LOGGER.info("swiping to element: " + element.getNameWithLocator().toString());
         }
 
         Direction oppositeDirection = Direction.DOWN;
