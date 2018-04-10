@@ -136,16 +136,37 @@ public class ExtendedWebElement {
         return element;
     }
 
-    private boolean isPresent(long timeout) {
+    /**
+     * Check that element present within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @return element existence status.
+     */
+    public boolean isPresent(long timeout) {
     	return isPresent(getBy(), timeout);
     }
     
-	private boolean isPresent(By by, long timeout) {
+    /**
+     * Check that element with By present within specified timeout.
+     *
+     * @param by - By.
+     * @param timeout - timeout.
+     * @return element existence status.
+     */
+    public boolean isPresent(By by, long timeout) {
 		return waitUntil(ExpectedConditions.presenceOfElementLocated(getBy()), by, timeout);
 	}
 	
 	
-	private boolean waitUntil(ExpectedCondition<WebElement> condition,  By by, long timeout) {
+    /**
+     * Wait until any condition happens.
+     *
+     * @param condition - ExpectedCondition.
+     * @param by - By.
+     * @param timeout - timeout.
+     * @return true if condition happen.
+     */
+	public boolean waitUntil(ExpectedCondition<WebElement> condition,  By by, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
