@@ -57,6 +57,8 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.performance.CoreOperation.CORE_OPERATIONS;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -169,6 +171,7 @@ public class ExtendedWebElement {
 	public boolean waitUntil(ExpectedCondition<WebElement> condition,  By by, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
+		Timer.start(CORE_OPERATIONS.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator() + "; condition: " + condition.toString());
@@ -184,6 +187,7 @@ public class ExtendedWebElement {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
 		}
+		Timer.stop(CORE_OPERATIONS.WAIT);
 		return result;
 	}
 	
@@ -338,6 +342,7 @@ public class ExtendedWebElement {
     	captureElements();
     	
     	
+    	Timer.start(CORE_OPERATIONS.CLICK);
         try {
             getElement().click();
         } catch (UnhandledAlertException e) {
@@ -356,6 +361,7 @@ public class ExtendedWebElement {
             Screenshot.capture(getDriver(), msg);
             throw e;
         }
+        Timer.stop(CORE_OPERATIONS.CLICK);
         
         String msg = Messager.ELEMENT_CLICKED.info(getName());
         //TODO: move screenshoting outside of class
@@ -570,6 +576,7 @@ public class ExtendedWebElement {
         String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
         final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
         
+        Timer.start(CORE_OPERATIONS.TYPE);
         try {
             getElement().clear();
             getElement().sendKeys(decryptedText);
@@ -590,6 +597,7 @@ public class ExtendedWebElement {
             Screenshot.capture(getDriver(), msg);
             throw e;  
         }
+        Timer.stop(CORE_OPERATIONS.TYPE);
         
         //TODO: move screenshoting outside of class
         Screenshot.capture(getDriver(), msg);
