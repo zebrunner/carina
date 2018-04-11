@@ -275,12 +275,13 @@ public class MobileUtils {
     public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
             int count, int duration) {
 
-        LOGGER.debug("Verify if element present before swipe: " + element.getNameWithLocator().toString());
         boolean isPresent = element.isElementPresent(1);
         if (isPresent) {
             // no sense to continue;
-            LOGGER.debug("element already present before swipe: " + element.getNameWithLocator().toString());
+            LOGGER.info("element already present before swipe: " + element.getNameWithLocator().toString());
             return true;
+        } else {
+        	LOGGER.info("swiping to element: " + element.getNameWithLocator().toString());
         }
 
         Direction oppositeDirection = Direction.DOWN;
@@ -534,11 +535,14 @@ public class MobileUtils {
         swipeLeft(null, duration);
     }
 
-    /**
-     * Swipe left in container
-     * 
-     * @param duration int
-     */
+	/**
+	 * Swipe left in container
+	 * 
+	 * @param container
+	 *            ExtendedWebElement
+	 * @param duration
+	 *            int
+	 */
     public static void swipeLeft(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe left will be executed.");
         swipeInDevice(container, Direction.LEFT, duration);
@@ -566,11 +570,14 @@ public class MobileUtils {
         swipeRight(null, duration);
     }
 
-    /**
-     * Swipe right in container
-     * 
-     * @param duration int
-     */
+	/**
+	 * Swipe right in container
+	 * 
+	 * @param container
+	 *            ExtendedWebElement
+	 * @param duration
+	 *            int
+	 */
     public static void swipeRight(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe right will be executed.");
         swipeInDevice(container, Direction.RIGHT, duration);

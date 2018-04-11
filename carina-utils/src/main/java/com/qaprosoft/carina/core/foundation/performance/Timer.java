@@ -18,52 +18,72 @@ package com.qaprosoft.carina.core.foundation.performance;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
 public class Timer {
     private static final Logger LOGGER = Logger.getLogger(Timer.class);
 
+    //data structure to collect summarized/combined datetime  
     private static ThreadLocal<ConcurrentHashMap<String, Long>> metrics = new ThreadLocal<ConcurrentHashMap<String, Long>>();
+    
+    //data structure for current timer only
+    private static ThreadLocal<ConcurrentHashMap<String, Long>> timer = new ThreadLocal<ConcurrentHashMap<String, Long>>();
 
     public static synchronized void start(IPerformanceOperation operation) {
-        Map<String, Long> testMertrics = getTestMetrics();
-        if (testMertrics.containsKey(operation.getKey())) {
+        Map<String, Long> testTimer = getTimer();
+        if (testTimer.containsKey(operation.getKey())) {
             throw new RuntimeException("Operation already started: " + operation.getKey());
         }
-        testMertrics.put(operation.getKey(), Calendar.getInstance().getTimeInMillis());
+        testTimer.put(operation.getKey(), Calendar.getInstance().getTimeInMillis());
     }
 
     public static synchronized void stop(IPerformanceOperation operation) {
-        Map<String, Long> testMertrics = getTestMetrics();
-        if (!testMertrics.containsKey(operation.getKey())) {
+        Map<String, Long> testTimer = getTimer();
+        if (!testTimer.containsKey(operation.getKey())) {
             throw new RuntimeException("Operation not started: " + operation.getKey());
         }
-        testMertrics.put(operation.getKey(), Calendar.getInstance().getTimeInMillis() - testMertrics.get(operation.getKey()));
+        
+        Map<String, Long> testMertrics = getMetrics();
+        long capturedTime = 0;
+        if (testMertrics.get(operation.getKey()) != null) {
+        	//summarize operation time
+        	capturedTime = testMertrics.get(operation.getKey());
+        }
+        testMertrics.put(operation.getKey(), capturedTime + Calendar.getInstance().getTimeInMillis() - testTimer.get(operation.getKey()));
+        //remove stopped timer data 
+        testTimer.remove(operation.getKey());
     }
 
     public static synchronized Map<String, Long> readAndClear() {
-        Map<String, Long> testMertrics = getTestMetrics();
-        for (String key : testMertrics.keySet()) {
+        Map<String, Long> testTimer = getTimer();
+        for (String key : testTimer.keySet()) {
             // timer not stopped
-            if (TimeUnit.MILLISECONDS.toMinutes(testMertrics.get(key)) > 60) {
-                testMertrics.remove(key);
-                LOGGER.error("Timer not stopped for operation: " + key);
-            }
+            LOGGER.error("Timer not stopped for operation: " + key);
         }
 
+        Map<String, Long> testMertrics = getMetrics();
         Map<String, Long> returnMetrics = new ConcurrentHashMap<>(testMertrics);
         // clear
+        testTimer.clear();
         testMertrics.clear();
         return returnMetrics;
     }
 
+    private static Map<String, Long> getTimer() {
+        ConcurrentHashMap<String, Long> testTimer = timer.get();
+        if (testTimer == null) {
+        	testTimer = new ConcurrentHashMap<>();
+            timer.set(testTimer);
+        }
+        return testTimer;
+    }
+    
     public static synchronized void clear() {
-        getTestMetrics().clear();
+        getMetrics().clear();
     }
 
-    private static Map<String, Long> getTestMetrics() {
+    private static Map<String, Long> getMetrics() {
         ConcurrentHashMap<String, Long> testMetrics = metrics.get();
         if (testMetrics == null) {
             testMetrics = new ConcurrentHashMap<>();

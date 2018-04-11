@@ -32,6 +32,8 @@ import org.openqa.selenium.WebDriver;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.performance.CoreOperation.CORE_OPERATIONS;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -294,6 +296,7 @@ public class Screenshot {
             }
 
             try {
+            	Timer.start(CORE_OPERATIONS.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
@@ -348,7 +351,7 @@ public class Screenshot {
 
                 // add screenshot comment to collector
                 addScreenshotComment(screenName, comment);
-
+                Timer.stop(CORE_OPERATIONS.CAPTURE_SCREENSHOT);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (Exception e) {
