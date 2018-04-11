@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
@@ -200,12 +201,21 @@ public class TestNamingUtil {
 
         if (invocationID != -1) {
             // TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
-            testName = testName + " - " + m.getMethodName() + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
+            testName = testName + " - " + figureOutTestName(m) + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
         } else {
-            testName = testName + " - " + m.getMethodName();
+            testName = testName + " - " + figureOutTestName(m);
         }
 
         return StringEscapeUtils.escapeHtml4(testName);
+    }
+
+    private static String figureOutTestName(ITestNGMethod m) {
+
+        if ("descriptive".equalsIgnoreCase(R.CONFIG.get("test_naming_option")) && m.getDescription() != null) {
+            return m.getDescription();
+        }
+        return m.getMethodName();
+
     }
 
 }
