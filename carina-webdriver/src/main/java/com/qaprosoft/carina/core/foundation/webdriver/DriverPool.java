@@ -255,8 +255,6 @@ public final class DriverPool {
      */
     public static void quitDrivers() {
 
-        stopRecording();
-
         ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
         for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
@@ -326,47 +324,7 @@ public final class DriverPool {
             throw new RuntimeException(init_throwable);
         }
 
-        startRecording();
         return drv;
-    }
-
-    private static void startRecording() {
-        if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-            return;
-        }
-
-        Integer pid = adbVideoRecorderPid.get();
-        if (pid == null) {
-            // video recording is not started yet for current thread
-            pid = DevicePool.getDevice().startRecording(SpecialKeywords.VIDEO_FILE_NAME);
-            adbVideoRecorderPid.set(pid);
-        } else {
-            LOGGER.warn("Video recording is already started for current thread.");
-        }
-
-    }
-
-    private static void stopRecording() {
-        if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-            return;
-        }
-
-        Device device = DevicePool.getDevice();
-        if (!device.isNull()) {
-            device.stopRecording(adbVideoRecorderPid.get());
-            CommonUtils.pause(3); // very often video from device is black. waiting
-            // before pulling the file
-
-            String videoDir = ReportContext.getArtifactsFolder().getAbsolutePath();
-            String uniqueFileName = "VIDEO-" + System.currentTimeMillis() + ".mp4";
-            device.pullFile(SpecialKeywords.VIDEO_FILE_NAME, videoDir + "/" + uniqueFileName);
-
-            String artifactsLink = ReportContext.getTestArtifactsLink();
-
-            // TODO: use expiration date as current_date + 30
-            Artifacts.add("VIDEO", artifactsLink + "/" + uniqueFileName);
-        }
-
     }
 
     /**

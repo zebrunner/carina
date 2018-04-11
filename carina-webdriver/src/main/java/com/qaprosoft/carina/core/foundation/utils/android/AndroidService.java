@@ -246,7 +246,7 @@ public class AndroidService {
         String res = "";
         String txt = getCurrentDeviceFocus();
         String regEx1 = ".*?";
-        String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
+//        String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
         Pattern pattern1 = Pattern.compile(regEx1 + regEx1, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
         Matcher matcher1 = pattern1.matcher(txt);
         if (matcher1.find()) {

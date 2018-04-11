@@ -341,14 +341,14 @@ public class ReportContext {
             File parentFolder = ReportContext.getTestDir();
             File fList[] = parentFolder.listFiles();
             for (int i = 0; i < fList.length; i++) {
-                if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".mp4") || fList[i].getName().endsWith(".html")) {
+                if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".html")) {
                     fList[i].delete();
                 }
             }
             File thumbnailsFolder = new File(parentFolder.getAbsoluteFile() + "/thumbnails");
             FileUtils.deleteDirectory(thumbnailsFolder);
         } catch (Exception e) {
-            LOGGER.error("Exception discovered during screenshots/video removing! " + e);
+            LOGGER.error("Exception discovered during screenshots removing! " + e);
         }
     }
 
@@ -459,27 +459,6 @@ public class ReportContext {
         } else {
             // TODO: it seems like defect
             link = String.format("file://%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-        }
-
-        return link;
-    }
-
-    /**
-     * Returns URL for test video record.
-     * 
-     * @param test
-     *            test name
-     * @return - URL to test log folder.
-     */
-    // TODO: refactor removing "test" argument
-    public static String getTestVideoLink(String test) {
-        String link = "";
-        if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
-            // remove report url and make link relative
-            // link = String.format("./%d/%s/video.mp4", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-            link = String.format("%s/%d/%s/video.mp4", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-        } else {
-            link = String.format("file://%s/%s/video.mp4", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
         }
 
         return link;

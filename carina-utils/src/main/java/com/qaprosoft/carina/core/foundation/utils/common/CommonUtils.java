@@ -17,6 +17,9 @@ package com.qaprosoft.carina.core.foundation.utils.common;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.performance.CoreOperation.CORE_OPERATIONS;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
+
 public class CommonUtils {
 
     private static final Logger LOGGER = Logger.getLogger(CommonUtils.class);
@@ -27,6 +30,7 @@ public class CommonUtils {
      * @param timeout Number
      */
     public static void pause(Number timeout) {
+    	Timer.start(CORE_OPERATIONS.PAUSE);
         LOGGER.info(String.format("Will wait for %s seconds", timeout));
         try {
             Float timeoutFloat = timeout.floatValue() * 1000;
@@ -36,5 +40,6 @@ public class CommonUtils {
             e.printStackTrace();
         }
         LOGGER.info("Pause is overed. Keep going..");
+        Timer.stop(CORE_OPERATIONS.PAUSE);
     }
 }

@@ -24,7 +24,6 @@ public class TestResultItem {
     private String test = null;
     private String linkToLog = null;
     private String linkToScreenshots = null;
-    private String linkToVideo = null;
     private String failReason = null;
     private String description = null;
     private List<String> jiraTickets = new ArrayList<String>(); // empty list
@@ -32,14 +31,12 @@ public class TestResultItem {
 
     private boolean config = false;
 
-    public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String linkToVideo,
-            String failReason) {
+    public TestResultItem(String group, String test, TestResultType result, String linkToScreenshots, String linkToLog, String failReason) {
         this.pack = group;
         this.test = test;
         this.result = result;
         this.linkToLog = linkToLog;
         this.linkToScreenshots = linkToScreenshots;
-        this.linkToVideo = linkToVideo;
         this.failReason = failReason;
     }
 
@@ -77,14 +74,6 @@ public class TestResultItem {
 
     public String getLinkToScreenshots() {
         return linkToScreenshots;
-    }
-
-    public void setLinkToVideo(String linkToVideo) {
-        this.linkToVideo = linkToVideo;
-    }
-
-    public String getLinkToVideo() {
-        return linkToVideo;
     }
 
     public void setLinkToScreenshots(String linkToScreenshots) {

@@ -494,7 +494,6 @@ public class AbstractTestListener extends TestArgsListener {
         String group = TestNamingUtil.getPackageName(result);
         String test = TestNamingUtil.getCanonicalTestName(result);
         String linkToLog = ReportContext.getTestLogLink(test);
-        String linkToVideo = ReportContext.getTestVideoLink(test);
         // String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
         String linkToScreenshots = null;
 
@@ -518,8 +517,7 @@ public class AbstractTestListener extends TestArgsListener {
                 linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
             }
         }
-        TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog,
-                linkToVideo, failReason);
+        TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
         // jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
