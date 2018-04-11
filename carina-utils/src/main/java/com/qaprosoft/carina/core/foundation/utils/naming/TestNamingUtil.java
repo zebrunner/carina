@@ -211,11 +211,19 @@ public class TestNamingUtil {
 
     private static String figureOutTestName(ITestNGMethod m) {
 
-        if ("descriptive".equalsIgnoreCase(R.CONFIG.get("test_naming_option")) && m.getDescription() != null) {
-            return m.getDescription();
+        switch(R.CONFIG.get("test_naming_option")) {
+            case "descriptive":
+                if (m.getDescription() != null) {
+                    return m.getDescription();
+                }
+                return m.getMethodName();
+            case "full":
+                if (m.getDescription() != null) {
+                    return m.getMethodName() + " - " + m.getDescription();
+                }
+                return m.getMethodName();
+            default:
+                return m.getMethodName();
         }
-        return m.getMethodName();
-
     }
-
 }
