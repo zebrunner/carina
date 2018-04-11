@@ -36,6 +36,7 @@ import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -57,8 +58,8 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.performance.CoreOperation.CORE_OPERATIONS;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -473,6 +474,40 @@ public class ExtendedWebElement {
         }
         
         String msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
+        //TODO: move screenshoting outside of class
+        Screenshot.capture(getDriver(), msg);
+    }
+    
+    /**
+     * Sends keys to element.
+     */
+    public void sendKeys(Keys keys) {
+    	sendKeys(keys, EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Sends enter to element.
+     *
+     * @param timeout to wait
+     */
+    public void sendKeys(Keys keys, long timeout) {
+    	assertElementPresent(timeout);
+    	
+        try {
+            getElement().sendKeys(keys);
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
+        	// analyze if it StaleObjectException and try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+    		element.sendKeys(keys);
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            String msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(keys.toString(), getNameWithLocator());
+            Screenshot.capture(getDriver(), msg);
+            throw e;
+        }
+        
+        String msg = Messager.KEYS_SEND_TO_ELEMENT.info(keys.toString(), getName());
         //TODO: move screenshoting outside of class
         Screenshot.capture(getDriver(), msg);
     }

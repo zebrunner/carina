@@ -1167,6 +1167,17 @@ public class DriverHelper {
     // Helpers
     // --------------------------------------------------------------------------
 
+	/**
+	 * Sends enter to element.
+	 * 
+	 * @param extendedWebElement
+	 *            to send enter.
+	 */
+    @Deprecated
+	public void pressEnter(final ExtendedWebElement extendedWebElement) {
+		extendedWebElement.sendKeys(Keys.ENTER);
+	}
+    
     /**
      * Find Extended Web Element on page using By.
      * 
