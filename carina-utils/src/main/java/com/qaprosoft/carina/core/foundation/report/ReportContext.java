@@ -127,13 +127,24 @@ public class ReportContext {
     public static synchronized File getArtifactsFolder() {
         if (artifactsDirectory == null) {
             try {
-                artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(getBaseDir().getAbsolutePath(), "utf-8"), ARTIFACTS_FOLDER));
+            	if (Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
+            		artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(getBaseDir().getAbsolutePath(), "utf-8"), ARTIFACTS_FOLDER));
+            	} else {
+            		artifactsDirectory = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER));
+            	}
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
             }
-            boolean isCreated = artifactsDirectory.mkdir();
+            
+            boolean isCreated = artifactsDirectory.exists() && artifactsDirectory.isDirectory();
             if (!isCreated) {
-                throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
+            		isCreated = artifactsDirectory.mkdir();
+            } else {
+            	LOGGER.info("Artifacts folder already exists: "  + artifactsDirectory.getAbsolutePath());
+            }
+            
+            if (!isCreated) {
+                throw new RuntimeException("Artifacts folder not created: " + artifactsDirectory.getAbsolutePath());
             }
         }
         return artifactsDirectory;

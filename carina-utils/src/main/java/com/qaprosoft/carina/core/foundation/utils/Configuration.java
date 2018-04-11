@@ -136,6 +136,8 @@ public class Configuration {
         AUTO_DOWNLOAD("auto_download"),
 
         AUTO_DOWNLOAD_APPS("auto_download_apps"),
+        
+    	CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder"),
 
         RETRY_INTERVAL("retry_interval"),
 

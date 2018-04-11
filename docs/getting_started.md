@@ -1,3 +1,6 @@
+
+[![Carina - Getting started](http://img.youtube.com/vi/UtY-KLFnmI8/0.jpg)](https://youtu.be/UtY-KLFnmI8)
+
 * Install and configure JDK 1.8+
 * Install and configure [Apache Maven 3.5.2+](http://maven.apache.org/)
 * Download and start the latest [Selenium standalone server](http://www.seleniumhq.org/download/)
@@ -60,10 +63,5 @@ By executing this command, Maven should resolve all dependencies, downloading re
 mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
 ```
 Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
-Generate Eclipse workspace using command:
-```
-mvn clean eclipse:eclipse
-```
-Now you are ready to import project into Eclipse.
 
 ![Eclipse view](img/001-Initial-setup.png)
