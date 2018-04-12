@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -201,29 +202,27 @@ public class TestNamingUtil {
 
         if (invocationID != -1) {
             // TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
-            testName = testName + " - " + figureOutTestName(m) + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
+            testName = testName + " - " + adjustTestName(m) + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
         } else {
-            testName = testName + " - " + figureOutTestName(m);
+            testName = testName + " - " + adjustTestName(m);
         }
 
         return StringEscapeUtils.escapeHtml4(testName);
     }
 
-    private static String figureOutTestName(ITestNGMethod m) {
+    private static String adjustTestName(ITestNGMethod m) {
+        String testName = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
+        testName.replace(SpecialKeywords.METHOD_NAME, m.getMethodName());
+        testName.replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(m.getPriority()));
+        testName.replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(m.getThreadPoolSize()));
 
-        switch(R.CONFIG.get("test_naming_option")) {
-            case "descriptive":
-                if (m.getDescription() != null) {
-                    return m.getDescription();
-                }
-                return m.getMethodName();
-            case "full":
-                if (m.getDescription() != null) {
-                    return m.getMethodName() + " - " + m.getDescription();
-                }
-                return m.getMethodName();
-            default:
-                return m.getMethodName();
+        if (m.getDescription() != null) {
+            testName.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getDescription());
+        } else {
+            testName.replace(SpecialKeywords.METHOD_DESCRIPTION, "");
         }
+
+        return testName;
     }
+
 }
