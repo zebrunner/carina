@@ -214,6 +214,8 @@ public class Configuration {
 
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
 
+        TEST_NAMING_PATTERN("test_naming_pattern"),
+
         // Appium 1.1.x mobile capabilities: iOS and Android
         MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
 
