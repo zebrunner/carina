@@ -98,6 +98,8 @@ public enum Messager {
     ELEMENT_PRESENT("PASS: element '%s' presents."),
 
     ELEMENT_NOT_PRESENT("FAIL: element '%s' does not present!"),
+    
+    ELEMENT_NOT_VERIFIED("FAIL: element '%s' was not verified!"),
 
     ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' does not present"),
 
@@ -120,6 +122,10 @@ public enum Messager {
     ELEMENT_FOUND("PASS: element '%s' is found."),
 
     ELEMENT_NOT_FOUND("FAIL: element '%s' is not found!"),
+    
+    ELEMENT_ATTRIBUTE_FOUND("PASS: attribute '%s' for element '%s' is found."),
+
+    ELEMENT_ATTRIBUTE_NOT_FOUND("FAIL: attribute '%s' for element '%s' is not found!"),
 
     ELEMENT_DOUBLE_CLICKED("PASS: element '%s' is double clicked."),
 

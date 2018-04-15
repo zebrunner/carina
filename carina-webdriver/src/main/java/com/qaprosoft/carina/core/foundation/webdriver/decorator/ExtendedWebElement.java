@@ -41,7 +41,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -58,7 +57,7 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.performance.CoreOperation.CORE_OPERATIONS;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -172,7 +171,7 @@ public class ExtendedWebElement {
 	public boolean waitUntil(ExpectedCondition<WebElement> condition,  By by, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
-		Timer.start(CORE_OPERATIONS.WAIT);
+		Timer.start(ACTION_NAME.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator() + "; condition: " + condition.toString());
@@ -188,7 +187,7 @@ public class ExtendedWebElement {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
 		}
-		Timer.stop(CORE_OPERATIONS.WAIT);
+		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
 	
@@ -233,81 +232,7 @@ public class ExtendedWebElement {
     public void setName(String name) {
         this.name = name;
     }
-
-    /**
-     * Get element text.
-     *
-     * @return String text
-     */
-    public String getText() {
-    	String text = "";
-    	try {
-    		text = findElement(EXPLICIT_TIMEOUT).getText();
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-    		text = element.getText();
-    	}
-    	return text;
-    }
-
-    /**
-     * Get element location.
-     *
-     * @return Point location
-     */
-    public Point getLocation() {
-    	Point point;
-    	try {
-    		point = findElement(EXPLICIT_TIMEOUT).getLocation();
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-    		point = element.getLocation();
-    	}
-    	
-    	return point;
-    }
-
-    /**
-     * Get element size.
-     *
-     * @return Dimension size
-     */
-    public Dimension getSize() {
-    	Dimension dim;
-    	try {
-    		dim = findElement(EXPLICIT_TIMEOUT).getSize();
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-    		dim = element.getSize();
-    	}
-    	return dim;
-    }
-
-    /**
-     * Get element attribute.
-     *
-     * @param name of attribute
-     * @return String text
-     */
-    public String getAttribute(String name) {
-    	String attribute;
-    	try {
-    		attribute = findElement(EXPLICIT_TIMEOUT).getAttribute(name);
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-    		attribute = element.getAttribute(name);
-    	}
-    	return attribute;
-    }
-
+    
     /**
      * Get element By.
      *
@@ -326,11 +251,49 @@ public class ExtendedWebElement {
         return name;
     }
 
+
+    /**
+     * Get element text.
+     *
+     * @return String text
+     */
+    public String getText() {
+    	return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    }
+
+    /**
+     * Get element location.
+     *
+     * @return Point location
+     */
+    public Point getLocation() {
+    	return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    }
+
+    /**
+     * Get element size.
+     *
+     * @return Dimension size
+     */
+    public Dimension getSize() {
+    	return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    }
+
+    /**
+     * Get element attribute.
+     *
+     * @param name of attribute
+     * @return String attribute value
+     */
+    public String getAttribute(String name) {
+    	return (String) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), name);
+    }
+
     /**
      * Click on element.
      */
     public void click() {
-        click(EXPLICIT_TIMEOUT);
+        click(EXPLICIT_TIMEOUT, ExpectedConditions.elementToBeClickable(getBy()));
     }
 
     /**
@@ -339,34 +302,18 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-    	assertElementPresent(timeout);
-    	captureElements();
-    	
-    	
-    	Timer.start(CORE_OPERATIONS.CLICK);
-        try {
-            getElement().click();
-        } catch (UnhandledAlertException e) {
-        	//TODO: think about removal for this alert as not very popular anymore
-            LOGGER.debug(e.getMessage(), e.getCause());
-            getDriver().switchTo().alert().accept();
-            getElement().click();
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-    		element.click();
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;
-        }
-        Timer.stop(CORE_OPERATIONS.CLICK);
-        
-        String msg = Messager.ELEMENT_CLICKED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
+    	click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    }
+    
+	/**
+	 * Click on element.
+	 *
+	 * @param timeout
+	 * @param waitCondition
+	 *            to check element conditions before action
+	 */
+    public void click(long timeout, ExpectedCondition<WebElement> waitCondition) {
+    	doAction(ACTION_NAME.CLICK, timeout, waitCondition);
     }
 
     /**
@@ -382,67 +329,46 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-    	assertElementPresent(timeout);
-    	captureElements();
-
-    	WebDriver drv = getDriver();
-        Actions action = new Actions(drv);
-
-        try {
-        	element = getElement();
-            action.moveToElement(element).doubleClick(element).build().perform();
-        } catch (UnhandledAlertException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            getDriver().switchTo().alert().accept();
-            
-        	element = getElement();
-            action.moveToElement(element).doubleClick(element).build().perform();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.ELEMENT_DOUBLE_CLICKED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
+    	doubleClick(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    }
+    /**
+     * Double Click on element.
+     *
+     * @param timeout to wait
+	 * @param waitCondition
+	 *            to check element conditions before action
+     */
+    public void doubleClick(long timeout, ExpectedCondition<WebElement> waitCondition) {
+    	doAction(ACTION_NAME.DOUBLE_CLICK, timeout, waitCondition);
     }
 
+    
     /**
-     * Mouse Right click on element.
+     * Mouse RightClick on element.
      */
     public void rightClick() {
     	rightClick(EXPLICIT_TIMEOUT);
     }
     
     /**
-     * Mouse Right click on element.
+     * Mouse RightClick on element.
      *
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-    	assertElementPresent(timeout);
-    	captureElements();
-
-    	WebDriver drv = getDriver();
-        Actions action = new Actions(drv);
-
-        try {
-        	element = getElement();
-        	action.moveToElement(element).contextClick(element).build().perform();
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.ELEMENT_NOT_RIGHT_CLICKED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.ELEMENT_RIGHT_CLICKED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
+    	rightClick(timeout, ExpectedConditions.elementToBeClickable(getBy()));
     }
     
+    /**
+     * Mouse RightClick on element.
+     *
+     * @param timeout to wait
+	 * @param waitCondition
+	 *            to check element conditions before action
+     */
+    public void rightClick(long timeout, ExpectedCondition<WebElement> waitCondition) {
+    	doAction(ACTION_NAME.RIGHT_CLICK, timeout, waitCondition);
+    }
     
     /**
      * Click Hidden Element. useful when element present in DOM but actually is
@@ -474,40 +400,6 @@ public class ExtendedWebElement {
         }
         
         String msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
-    }
-    
-    /**
-     * Sends keys to element.
-     */
-    public void sendKeys(Keys keys) {
-    	sendKeys(keys, EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Sends enter to element.
-     *
-     * @param timeout to wait
-     */
-    public void sendKeys(Keys keys, long timeout) {
-    	assertElementPresent(timeout);
-    	
-        try {
-            getElement().sendKeys(keys);
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-    		element.sendKeys(keys);
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(keys.toString(), getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;
-        }
-        
-        String msg = Messager.KEYS_SEND_TO_ELEMENT.info(keys.toString(), getName());
         //TODO: move screenshoting outside of class
         Screenshot.capture(getDriver(), msg);
     }
@@ -589,56 +481,62 @@ public class ExtendedWebElement {
         return present;
     }
 
+    
     /**
-     * Types text to specified element.
+     * Send Keys to element.
+     */
+    public void sendKeys(Keys keys) {
+    	sendKeys(keys, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    }
+
+    /**
+     * Send Keys to element.
      *
-     * @param text to type.
+     * @param timeout to wait
+     */
+    public void sendKeys(Keys keys, long timeout) {
+    	sendKeys(keys, timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
+    }
+    
+	/**
+	 * Send Keys to element.
+	 *
+	 * @param timeout
+	 * @param waitCondition
+	 *            to check element conditions before action
+	 */
+    public void sendKeys(Keys keys, long timeout, ExpectedCondition<WebElement> waitCondition) {
+    	doAction(ACTION_NAME.SEND_KEYS, timeout, waitCondition, keys);
+    }
+    
+    
+    /**
+     * Type text to element.
      */
     public void type(String text) {
-        type(text, EXPLICIT_TIMEOUT);
+    	type(text, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
 
     /**
-     * Types text to specified element.
+     * Type text to element.
      *
-     * @param text to type.
-     * @param timeout long
+     * @param timeout to wait
      */
     public void type(String text, long timeout) {
-    	assertElementPresent(timeout);
-    	
-        captureElements();
-        String msg = Messager.KEYS_SEND_TO_ELEMENT.info(text, getName());
-        final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-        
-        Timer.start(CORE_OPERATIONS.TYPE);
-        try {
-            getElement().clear();
-            getElement().sendKeys(decryptedText);
-        } catch (UnhandledAlertException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            getDriver().switchTo().alert().accept();
-            getElement().clear();
-            getElement().sendKeys(decryptedText);
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// analyze if it StaleObjectException and try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-        	element.clear();
-        	element.sendKeys(decryptedText);
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            msg = Messager.KEYS_NOT_SEND_TO_ELEMENT.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        Timer.stop(CORE_OPERATIONS.TYPE);
-        
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
-  
+    	type(text, timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
-
+    
+	/**
+	 * Type text to element.
+	 *
+	 * @param timeout
+	 * @param waitCondition
+	 *            to check element conditions before action
+	 */
+    public void type(String text, long timeout, ExpectedCondition<WebElement> waitCondition) {
+    	doAction(ACTION_NAME.TYPE, timeout, waitCondition, text);
+    }
+    
     /**
      * Set implicit timeout to default IMPLICIT_TIMEOUT value.
      */
@@ -652,10 +550,6 @@ public class ExtendedWebElement {
      * @param timeout in seconds. Minimal value - 1 second
      */
     public void setImplicitTimeout(long timeout) {
-        if (timeout < 1) {
-            timeout = 1;
-        }
-
         try {
             LOGGER.info("setImplicitTimeout: starting... value: " + timeout);
             getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
@@ -699,22 +593,7 @@ public class ExtendedWebElement {
      * @param filePath path
      */
     public void attachFile(String filePath) {
-    	assertElementPresent(EXPLICIT_TIMEOUT);
-    	
-    	final String decryptedFilePath = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
-    	
-        try {
-        	getElement().sendKeys(decryptedFilePath);
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.FILE_NOT_ATTACHED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.FILE_ATTACHED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
+    	doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), filePath);
     }
 
     /**
@@ -723,13 +602,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void check() {
-    	assertElementPresent();
-    	
-    	if (!getElement().isSelected()) {
-            click();
-            String msg = Messager.CHECKBOX_CHECKED.info(getName());
-            Screenshot.capture(getDriver(), msg);
-        }
+    	doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
 
     /**
@@ -738,13 +611,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-    	assertElementPresent();
-    	
-    	if (getElement().isSelected()) {
-            click();
-            String msg = Messager.CHECKBOX_UNCHECKED.info(getName());
-            Screenshot.capture(getDriver(), msg);
-        }
+    	doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
 
     /**
@@ -803,27 +670,7 @@ public class ExtendedWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-    	assertElementPresent(EXPLICIT_TIMEOUT);
-    	
-        boolean isSelected = false;
-        final String decryptedSelectText = cryptoTool.decryptByPattern(selectText, CRYPTO_PATTERN);
-        
-        try {
-        	final Select s = new Select(element);
-        	s.selectByVisibleText(decryptedSelectText);
-        	isSelected = true;
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.SELECT_BY_TEXT_PERFORMED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
-        
-        return isSelected;
+    	return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), selectText);
     }
 
     /**
@@ -833,13 +680,7 @@ public class ExtendedWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-        boolean result = true;
-        for (String value : values) {
-            if (!select(value)) {
-                result = false;
-            }
-        }
-        return result;
+    	return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), values);
     }
 
     /**
@@ -855,33 +696,7 @@ public class ExtendedWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-    	assertElementPresent(EXPLICIT_TIMEOUT);
-    	
-        boolean isSelected = false;
-        
-        try {
-        	final Select s = new Select(element);
-            String fullTextValue = null;
-            for (WebElement option : s.getOptions()) {
-                if (matcher.matches(option.getText())) {
-                    fullTextValue = option.getText();
-                    break;
-                }
-            }
-            s.selectByVisibleText(fullTextValue);
-        	isSelected = true;
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
-        
-        return isSelected;
+    	return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), matcher);
     }
 
     /**
@@ -891,33 +706,7 @@ public class ExtendedWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-    	assertElementPresent(EXPLICIT_TIMEOUT);
-    	
-        boolean isSelected = false;
-        
-        try {
-        	final Select s = new Select(element);
-            String fullTextValue = null;
-            for (WebElement option : s.getOptions()) {
-                if (option.getText().contains(partialSelectText)) {
-                    fullTextValue = option.getText();
-                    break;
-                }
-            }
-            s.selectByVisibleText(fullTextValue);
-        	isSelected = true;
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.SELECT_BY_TEXT_PERFORMED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
-        
-        return isSelected;
+    	return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), partialSelectText);
     }
 
     /**
@@ -927,26 +716,7 @@ public class ExtendedWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-    	assertElementPresent(EXPLICIT_TIMEOUT);
-    	
-        boolean isSelected = false;
-        
-        try {
-        	final Select s = new Select(element);
-        	s.selectByIndex(index);
-        	isSelected = true;
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.SELECT_BY_INDEX_PERFORMED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
-        
-        return isSelected;
+    	return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), index);
     }
 
     // --------------------------------------------------------------------------
@@ -1330,4 +1100,385 @@ public class ExtendedWebElement {
         CommonUtils.pause(timeout);
     }
 
+    
+    public interface ActionSteps {
+        void doClick();
+        void doDoubleClick();
+        void doRightClick();
+        void doType(String text);
+        void doSendKeys(Keys keys);
+        void doAttachFile(String filePath);
+        void doCheck();
+        void doUncheck();
+        String doGetText();
+        Point doGetLocation();
+        Dimension doGetSize();
+        String doGetAttribute(String name);
+        boolean doSelect(String text);
+        boolean doSelectValues(final String[] values);
+        boolean doSelectByMatcher(final BaseMatcher<String> matcher);
+        boolean doSelectByPartialText(final String partialSelectText);
+        boolean doSelectByIndex(final int index);
+    }
+
+    
+	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object inputArg) {
+    	Object result = null;
+    	switch (actionName) {
+    	case CLICK:
+    		actionSteps.doClick();
+    		break;
+    	case DOUBLE_CLICK:
+    		actionSteps.doDoubleClick();
+    		break;
+    	case RIGHT_CLICK:
+    		actionSteps.doRightClick();
+    		break;
+		case GET_TEXT:
+			result = actionSteps.doGetText();
+			break;
+		case GET_LOCATION:
+			result = actionSteps.doGetLocation();
+			break;
+		case GET_SIZE:
+			result = actionSteps.doGetSize();
+			break;
+		case GET_ATTRIBUTE:
+			result = actionSteps.doGetAttribute((String) inputArg);
+			break;
+		case SEND_KEYS:
+			actionSteps.doSendKeys((Keys) inputArg);
+			break;
+		case TYPE:
+			actionSteps.doType((String) inputArg);
+			break;
+		case ATTACH_FILE:
+			actionSteps.doAttachFile((String) inputArg);
+			break;
+		case CHECK:
+			actionSteps.doCheck();
+			break;
+		case UNCHECK:
+			actionSteps.doUncheck();
+			break;
+		case SELECT:
+			result = actionSteps.doSelect((String) inputArg);
+			break;
+		case SELECT_VALUES:
+			result = actionSteps.doSelectValues((String[]) inputArg);
+			break;
+		case SELECT_BY_MATCHER:
+			result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArg);
+			break;
+		case SELECT_BY_PARTIAL_TEXT:
+			result = actionSteps.doSelectByPartialText((String) inputArg);
+			break;
+		case SELECT_BY_INDEX:
+			result = actionSteps.doSelectByIndex((int) inputArg);
+			break;
+		default:
+			Assert.fail("Unsupported UI action name" + actionName.toString());
+			break;    		
+    	}
+    	return result;
+    }
+    
+    
+	/**
+	 * doAction on element.
+	 *
+	 * @param timeout
+	 * @param waitCondition
+	 *            to check element conditions before action
+	 */
+	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition) {
+		return doAction(actionName, timeout, waitCondition, null);
+	}
+	
+    private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition, Object inputArg) {
+        if (waitCondition != null & !waitUntil(waitCondition, getBy(), timeout)) {
+        	Assert.fail(Messager.ELEMENT_NOT_VERIFIED.getMessage(getNameWithLocator()));
+        }
+        
+        Object output = null;
+    	//captureElements();
+    	
+    	Timer.start(actionName);
+        try {
+        	element = getElement();
+        	output = overrideAction(actionName, inputArg);
+        } catch (StaleElementReferenceException e) {
+        	LOGGER.debug("catched StaleElementReferenceException: ", e);
+        	// try to find again using driver
+        	element = findStaleElement(getBy(), 1);
+        	
+        	output = overrideAction(actionName, inputArg);
+        	
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            //print error messages according to the action type
+            output = overrideActionException(actionName, inputArg);
+            throw e;
+        } finally {
+        	Timer.stop(actionName);
+        }
+     
+        return output;
+    }
+
+    //single place for all supported UI actions in carina core
+	private Object overrideAction(ACTION_NAME actionName, Object inputArg) {
+		Object output = executeAction(actionName, new ActionSteps() {
+			@Override
+			public void doClick() {
+				element.click();
+				Screenshot.capture(getDriver(), Messager.ELEMENT_CLICKED.info(getName()));
+			}
+
+			@Override
+			public void doDoubleClick() {
+				WebDriver drv = getDriver();
+				Actions action = new Actions(drv);
+				action.moveToElement(element).doubleClick(element).build().perform();
+				Screenshot.capture(getDriver(), Messager.ELEMENT_DOUBLE_CLICKED.info(getName()));
+			}
+
+			@Override
+			public void doSendKeys(Keys keys) {
+				element.sendKeys(keys);
+				Screenshot.capture(getDriver(), Messager.KEYS_SEND_TO_ELEMENT.info(keys.toString(), getName()));
+			}
+			
+			@Override
+			public void doType(String text) {
+				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				element.clear();
+				element.sendKeys(decryptedText);
+				Screenshot.capture(getDriver(), Messager.KEYS_SEND_TO_ELEMENT.info(text, getName()));
+			}
+			
+			@Override
+			public void doAttachFile(String filePath) {
+				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				element.sendKeys(decryptedText);
+				Screenshot.capture(getDriver(), Messager.FILE_ATTACHED.info(filePath, getName()));
+			}
+
+			@Override
+			public String doGetText() {
+				String text = element.getText(); 
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Text", getName());
+				return text;
+			}
+			
+			@Override
+			public Point doGetLocation() {
+				Point point = element.getLocation();
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Location", getName());
+				return point;
+			}
+
+			@Override
+			public Dimension doGetSize() {
+				Dimension dim = element.getSize();
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Size", getName());
+				return dim;
+			}
+
+			@Override
+			public String doGetAttribute(String name) {
+				String attribute = element.getAttribute(name);
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info(name, getName());
+				return attribute;
+			}
+
+			@Override
+			public void doRightClick() {
+				WebDriver drv = getDriver();
+		        Actions action = new Actions(drv);
+				action.moveToElement(element).contextClick(element).build().perform();
+				Screenshot.capture(getDriver(), Messager.ELEMENT_RIGHT_CLICKED.info(getName()));
+			}
+
+			@Override
+			public void doCheck() {
+		    	if (!element.isSelected()) {
+		            click();
+		            Screenshot.capture(getDriver(), Messager.CHECKBOX_CHECKED.info(getName()));
+		        }
+			}
+
+			@Override
+			public void doUncheck() {
+		    	if (element.isSelected()) {
+		            click();
+		            Screenshot.capture(getDriver(), Messager.CHECKBOX_UNCHECKED.info(getName()));
+		        }
+			}
+
+			@Override
+			public boolean doSelect(String text) {
+		        final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+	        	final Select s = new Select(element);
+	        	s.selectByVisibleText(decryptedSelectText);
+	        	Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
+				return true;
+			}
+
+			@Override
+			public boolean doSelectValues(String[] values) {
+		       boolean result = true;
+		        for (String value : values) {
+		            if (!select(value)) {
+		                result = false;
+		            }
+		        }
+				return result;
+			}
+
+			@Override
+			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
+	        	final Select s = new Select(element);
+	            String fullTextValue = null;
+	            for (WebElement option : s.getOptions()) {
+	                if (matcher.matches(option.getText())) {
+	                    fullTextValue = option.getText();
+	                    break;
+	                }
+	            }
+	            s.selectByVisibleText(fullTextValue);
+	            Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(getName()));
+				return true;
+			}
+
+			@Override
+			public boolean doSelectByPartialText(String partialSelectText) {
+	        	final Select s = new Select(element);
+	            String fullTextValue = null;
+	            for (WebElement option : s.getOptions()) {
+	                if (option.getText().contains(partialSelectText)) {
+	                    fullTextValue = option.getText();
+	                    break;
+	                }
+	            }
+	            s.selectByVisibleText(fullTextValue);
+	            Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
+				return true;
+			}
+
+			@Override
+			public boolean doSelectByIndex(int index) {
+				// TODO Auto-generated method stub
+	        	final Select s = new Select(element);
+	        	s.selectByIndex(index);
+	        	Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(getName()));
+				return true;
+			}
+		}, inputArg);
+		return output;
+	}
+	
+	
+	private Object overrideActionException(ACTION_NAME actionName, Object inputArg) {
+		
+        Object output = executeAction(actionName, new ActionSteps() {
+            @Override
+            public void doClick() {
+            	Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator()));
+            }
+
+            @Override
+            public void doDoubleClick() {
+            	Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator()));
+            }
+            
+			@Override
+			public void doRightClick() {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_RIGHT_CLICKED.error(getNameWithLocator()));
+			}
+
+			@Override
+			public void doSendKeys(Keys keys) {
+				Screenshot.capture(getDriver(), Messager.KEYS_NOT_SEND_TO_ELEMENT.error(keys.toString(), getNameWithLocator()));
+			}
+			
+			@Override
+			public void doType(String text) {
+				Screenshot.capture(getDriver(), Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator()));
+			}
+			
+			@Override
+			public void doAttachFile(String filePath) {
+				Screenshot.capture(getDriver(), Messager.FILE_NOT_ATTACHED.error(filePath, getNameWithLocator()));
+			}
+
+			@Override
+			public String doGetText() {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Text", getNameWithLocator()));
+				return "";
+			}
+
+			@Override
+			public Point doGetLocation() {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Location", getNameWithLocator()));
+				return null;
+			}
+
+			@Override
+			public Dimension doGetSize() {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Size", getNameWithLocator()));
+				return null;
+			}
+
+			@Override
+			public String doGetAttribute(String name) {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error(name, getNameWithLocator()));
+				return null;
+			}
+
+			@Override
+			public void doCheck() {
+				// do nothing for now
+			}
+
+			@Override
+			public void doUncheck() {
+				// do nothing for now
+			}
+
+			@Override
+			public boolean doSelect(String text) {
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(name, getNameWithLocator()));
+				return false;
+			}
+
+			@Override
+			public boolean doSelectValues(String[] values) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), getNameWithLocator()));
+				return false;
+			}
+
+			@Override
+			public boolean doSelectByPartialText(String partialSelectText) {
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator()));
+				return false;
+			}
+
+			@Override
+			public boolean doSelectByIndex(int index) {
+				// TODO Auto-generated method stub
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), getNameWithLocator()));
+				return false;
+			}
+
+        }, inputArg);
+        
+		return output;
+	}
 }
