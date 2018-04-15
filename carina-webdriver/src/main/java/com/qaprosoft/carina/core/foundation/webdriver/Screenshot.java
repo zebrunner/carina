@@ -18,7 +18,11 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -32,8 +36,8 @@ import org.openqa.selenium.WebDriver;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
-import com.qaprosoft.carina.core.foundation.performance.CoreOperation.CORE_OPERATIONS;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -296,7 +300,7 @@ public class Screenshot {
             }
 
             try {
-            	Timer.start(CORE_OPERATIONS.CAPTURE_SCREENSHOT);
+            	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
@@ -351,7 +355,7 @@ public class Screenshot {
 
                 // add screenshot comment to collector
                 addScreenshotComment(screenName, comment);
-                Timer.stop(CORE_OPERATIONS.CAPTURE_SCREENSHOT);
+                Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (Exception e) {
