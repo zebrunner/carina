@@ -286,7 +286,7 @@ public class ExtendedWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-    	return (String) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), name);
+    	return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), name);
     }
 
     /**
