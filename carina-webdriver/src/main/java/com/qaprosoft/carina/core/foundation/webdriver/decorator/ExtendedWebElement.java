@@ -1101,39 +1101,54 @@ public class ExtendedWebElement {
     }
 
     
-    public interface ActionSteps {
-        void doClick();
-        void doDoubleClick();
-        void doRightClick();
-        void doType(String text);
-        void doSendKeys(Keys keys);
-        void doAttachFile(String filePath);
-        void doCheck();
-        void doUncheck();
-        String doGetText();
-        Point doGetLocation();
-        Dimension doGetSize();
-        String doGetAttribute(String name);
-        boolean doSelect(String text);
-        boolean doSelectValues(final String[] values);
-        boolean doSelectByMatcher(final BaseMatcher<String> matcher);
-        boolean doSelectByPartialText(final String partialSelectText);
-        boolean doSelectByIndex(final int index);
-    }
+	public interface ActionSteps {
+		void doClick();
 
-    
+		void doDoubleClick();
+
+		void doRightClick();
+
+		void doType(String text);
+
+		void doSendKeys(Keys keys);
+
+		void doAttachFile(String filePath);
+
+		void doCheck();
+
+		void doUncheck();
+
+		String doGetText();
+
+		Point doGetLocation();
+
+		Dimension doGetSize();
+
+		String doGetAttribute(String name);
+
+		boolean doSelect(String text);
+
+		boolean doSelectValues(final String[] values);
+
+		boolean doSelectByMatcher(final BaseMatcher<String> matcher);
+
+		boolean doSelectByPartialText(final String partialSelectText);
+
+		boolean doSelectByIndex(final int index);
+	}
+
 	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object inputArg) {
-    	Object result = null;
-    	switch (actionName) {
-    	case CLICK:
-    		actionSteps.doClick();
-    		break;
-    	case DOUBLE_CLICK:
-    		actionSteps.doDoubleClick();
-    		break;
-    	case RIGHT_CLICK:
-    		actionSteps.doRightClick();
-    		break;
+		Object result = null;
+		switch (actionName) {
+		case CLICK:
+			actionSteps.doClick();
+			break;
+		case DOUBLE_CLICK:
+			actionSteps.doDoubleClick();
+			break;
+		case RIGHT_CLICK:
+			actionSteps.doRightClick();
+			break;
 		case GET_TEXT:
 			result = actionSteps.doGetText();
 			break;
@@ -1178,12 +1193,11 @@ public class ExtendedWebElement {
 			break;
 		default:
 			Assert.fail("Unsupported UI action name" + actionName.toString());
-			break;    		
-    	}
-    	return result;
-    }
-    
-    
+			break;
+		}
+		return result;
+	}
+
 	/**
 	 * doAction on element.
 	 *
@@ -1194,39 +1208,40 @@ public class ExtendedWebElement {
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition) {
 		return doAction(actionName, timeout, waitCondition, null);
 	}
-	
-    private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition, Object inputArg) {
-        if (waitCondition != null & !waitUntil(waitCondition, getBy(), timeout)) {
-        	Assert.fail(Messager.ELEMENT_NOT_VERIFIED.getMessage(getNameWithLocator()));
-        }
-        
-        Object output = null;
-    	//captureElements();
-    	
-    	Timer.start(actionName);
-        try {
-        	element = getElement();
-        	output = overrideAction(actionName, inputArg);
-        } catch (StaleElementReferenceException e) {
-        	LOGGER.debug("catched StaleElementReferenceException: ", e);
-        	// try to find again using driver
-        	element = findStaleElement(getBy(), 1);
-        	
-        	output = overrideAction(actionName, inputArg);
-        	
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            //print error messages according to the action type
-            output = overrideActionException(actionName, inputArg);
-            throw e;
-        } finally {
-        	Timer.stop(actionName);
-        }
-     
-        return output;
-    }
 
-    //single place for all supported UI actions in carina core
+	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
+			Object inputArg) {
+		if (waitCondition != null & !waitUntil(waitCondition, getBy(), timeout)) {
+			Assert.fail(Messager.ELEMENT_NOT_VERIFIED.getMessage(getNameWithLocator()));
+		}
+
+		Object output = null;
+		// captureElements();
+
+		Timer.start(actionName);
+		try {
+			element = getElement();
+			output = overrideAction(actionName, inputArg);
+		} catch (StaleElementReferenceException e) {
+			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			// try to find again using driver
+			element = findStaleElement(getBy(), 1);
+
+			output = overrideAction(actionName, inputArg);
+
+		} catch (Throwable e) {
+			LOGGER.error(e.getMessage(), e);
+			// print error messages according to the action type
+			output = overrideActionException(actionName, inputArg);
+			throw e;
+		} finally {
+			Timer.stop(actionName);
+		}
+
+		return output;
+	}
+
+	// single place for all supported UI actions in carina core
 	private Object overrideAction(ACTION_NAME actionName, Object inputArg) {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
@@ -1248,7 +1263,7 @@ public class ExtendedWebElement {
 				element.sendKeys(keys);
 				Screenshot.capture(getDriver(), Messager.KEYS_SEND_TO_ELEMENT.info(keys.toString(), getName()));
 			}
-			
+
 			@Override
 			public void doType(String text) {
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
@@ -1256,7 +1271,7 @@ public class ExtendedWebElement {
 				element.sendKeys(decryptedText);
 				Screenshot.capture(getDriver(), Messager.KEYS_SEND_TO_ELEMENT.info(text, getName()));
 			}
-			
+
 			@Override
 			public void doAttachFile(String filePath) {
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
@@ -1266,11 +1281,11 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetText() {
-				String text = element.getText(); 
+				String text = element.getText();
 				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Text", getName());
 				return text;
 			}
-			
+
 			@Override
 			public Point doGetLocation() {
 				Point point = element.getLocation();
@@ -1295,103 +1310,102 @@ public class ExtendedWebElement {
 			@Override
 			public void doRightClick() {
 				WebDriver drv = getDriver();
-		        Actions action = new Actions(drv);
+				Actions action = new Actions(drv);
 				action.moveToElement(element).contextClick(element).build().perform();
 				Screenshot.capture(getDriver(), Messager.ELEMENT_RIGHT_CLICKED.info(getName()));
 			}
 
 			@Override
 			public void doCheck() {
-		    	if (!element.isSelected()) {
-		            click();
-		            Screenshot.capture(getDriver(), Messager.CHECKBOX_CHECKED.info(getName()));
-		        }
+				if (!element.isSelected()) {
+					click();
+					Screenshot.capture(getDriver(), Messager.CHECKBOX_CHECKED.info(getName()));
+				}
 			}
 
 			@Override
 			public void doUncheck() {
-		    	if (element.isSelected()) {
-		            click();
-		            Screenshot.capture(getDriver(), Messager.CHECKBOX_UNCHECKED.info(getName()));
-		        }
+				if (element.isSelected()) {
+					click();
+					Screenshot.capture(getDriver(), Messager.CHECKBOX_UNCHECKED.info(getName()));
+				}
 			}
 
 			@Override
 			public boolean doSelect(String text) {
-		        final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-	        	final Select s = new Select(element);
-	        	s.selectByVisibleText(decryptedSelectText);
-	        	Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
+				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				final Select s = new Select(element);
+				s.selectByVisibleText(decryptedSelectText);
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
 				return true;
 			}
 
 			@Override
 			public boolean doSelectValues(String[] values) {
-		       boolean result = true;
-		        for (String value : values) {
-		            if (!select(value)) {
-		                result = false;
-		            }
-		        }
+				boolean result = true;
+				for (String value : values) {
+					if (!select(value)) {
+						result = false;
+					}
+				}
 				return result;
 			}
 
 			@Override
 			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
-	        	final Select s = new Select(element);
-	            String fullTextValue = null;
-	            for (WebElement option : s.getOptions()) {
-	                if (matcher.matches(option.getText())) {
-	                    fullTextValue = option.getText();
-	                    break;
-	                }
-	            }
-	            s.selectByVisibleText(fullTextValue);
-	            Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(getName()));
+				final Select s = new Select(element);
+				String fullTextValue = null;
+				for (WebElement option : s.getOptions()) {
+					if (matcher.matches(option.getText())) {
+						fullTextValue = option.getText();
+						break;
+					}
+				}
+				s.selectByVisibleText(fullTextValue);
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(getName()));
 				return true;
 			}
 
 			@Override
 			public boolean doSelectByPartialText(String partialSelectText) {
-	        	final Select s = new Select(element);
-	            String fullTextValue = null;
-	            for (WebElement option : s.getOptions()) {
-	                if (option.getText().contains(partialSelectText)) {
-	                    fullTextValue = option.getText();
-	                    break;
-	                }
-	            }
-	            s.selectByVisibleText(fullTextValue);
-	            Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
+				final Select s = new Select(element);
+				String fullTextValue = null;
+				for (WebElement option : s.getOptions()) {
+					if (option.getText().contains(partialSelectText)) {
+						fullTextValue = option.getText();
+						break;
+					}
+				}
+				s.selectByVisibleText(fullTextValue);
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
 				return true;
 			}
 
 			@Override
 			public boolean doSelectByIndex(int index) {
 				// TODO Auto-generated method stub
-	        	final Select s = new Select(element);
-	        	s.selectByIndex(index);
-	        	Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(getName()));
+				final Select s = new Select(element);
+				s.selectByIndex(index);
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(getName()));
 				return true;
 			}
 		}, inputArg);
 		return output;
 	}
-	
-	
-	private Object overrideActionException(ACTION_NAME actionName, Object inputArg) {
-		
-        Object output = executeAction(actionName, new ActionSteps() {
-            @Override
-            public void doClick() {
-            	Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator()));
-            }
 
-            @Override
-            public void doDoubleClick() {
-            	Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator()));
-            }
-            
+	private Object overrideActionException(ACTION_NAME actionName, Object inputArg) {
+
+		Object output = executeAction(actionName, new ActionSteps() {
+			@Override
+			public void doClick() {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator()));
+			}
+
+			@Override
+			public void doDoubleClick() {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator()));
+			}
+
 			@Override
 			public void doRightClick() {
 				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_RIGHT_CLICKED.error(getNameWithLocator()));
@@ -1399,14 +1413,15 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doSendKeys(Keys keys) {
-				Screenshot.capture(getDriver(), Messager.KEYS_NOT_SEND_TO_ELEMENT.error(keys.toString(), getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.KEYS_NOT_SEND_TO_ELEMENT.error(keys.toString(), getNameWithLocator()));
 			}
-			
+
 			@Override
 			public void doType(String text) {
 				Screenshot.capture(getDriver(), Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator()));
 			}
-			
+
 			@Override
 			public void doAttachFile(String filePath) {
 				Screenshot.capture(getDriver(), Messager.FILE_NOT_ATTACHED.error(filePath, getNameWithLocator()));
@@ -1414,19 +1429,22 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetText() {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Text", getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Text", getNameWithLocator()));
 				return "";
 			}
 
 			@Override
 			public Point doGetLocation() {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Location", getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Location", getNameWithLocator()));
 				return null;
 			}
 
 			@Override
 			public Dimension doGetSize() {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Size", getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Size", getNameWithLocator()));
 				return null;
 			}
 
@@ -1448,7 +1466,8 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelect(String text) {
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(name, getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(name, getNameWithLocator()));
 				return false;
 			}
 
@@ -1460,25 +1479,28 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), getNameWithLocator()));
 				return false;
 			}
 
 			@Override
 			public boolean doSelectByPartialText(String partialSelectText) {
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator()));
 				return false;
 			}
 
 			@Override
 			public boolean doSelectByIndex(int index) {
 				// TODO Auto-generated method stub
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), getNameWithLocator()));
+				Screenshot.capture(getDriver(),
+						Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), getNameWithLocator()));
 				return false;
 			}
 
-        }, inputArg);
-        
+		}, inputArg);
+
 		return output;
 	}
 }
