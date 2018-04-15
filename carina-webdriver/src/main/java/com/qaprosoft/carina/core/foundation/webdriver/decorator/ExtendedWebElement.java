@@ -46,6 +46,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1275,6 +1276,7 @@ public class ExtendedWebElement {
 			@Override
 			public void doAttachFile(String filePath) {
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
 				Screenshot.capture(getDriver(), Messager.FILE_ATTACHED.info(filePath, getName()));
 			}
