@@ -184,7 +184,6 @@ public class ExtendedWebElement {
 			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
 			result = false;
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e.getCause());
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
 		}
@@ -1338,7 +1337,7 @@ public class ExtendedWebElement {
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 				final Select s = new Select(element);
 				s.selectByVisibleText(decryptedSelectText);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(text, getName()));
 				return true;
 			}
 
@@ -1364,7 +1363,7 @@ public class ExtendedWebElement {
 					}
 				}
 				s.selectByVisibleText(fullTextValue);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(getName()));
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(matcher.toString(), getName()));
 				return true;
 			}
 
@@ -1379,7 +1378,7 @@ public class ExtendedWebElement {
 					}
 				}
 				s.selectByVisibleText(fullTextValue);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(getName()));
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(partialSelectText, getName()));
 				return true;
 			}
 
@@ -1388,7 +1387,7 @@ public class ExtendedWebElement {
 				// TODO Auto-generated method stub
 				final Select s = new Select(element);
 				s.selectByIndex(index);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(getName()));
+				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), getName()));
 				return true;
 			}
 		}, inputArg);
@@ -1469,7 +1468,7 @@ public class ExtendedWebElement {
 			@Override
 			public boolean doSelect(String text) {
 				Screenshot.capture(getDriver(),
-						Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(name, getNameWithLocator()));
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(text, getNameWithLocator()));
 				return false;
 			}
 
