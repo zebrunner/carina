@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
@@ -29,6 +27,7 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 /**
  * Common naming utility for unique test method identification.
@@ -212,14 +211,14 @@ public class TestNamingUtil {
 
     private static String adjustTestName(ITestNGMethod m) {
         String testName = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
-        testName.replace(SpecialKeywords.METHOD_NAME, m.getMethodName());
-        testName.replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(m.getPriority()));
-        testName.replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(m.getThreadPoolSize()));
+        testName = testName.replace(SpecialKeywords.METHOD_NAME, m.getMethodName());
+        testName = testName.replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(m.getPriority()));
+        testName = testName.replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(m.getThreadPoolSize()));
 
         if (m.getDescription() != null) {
-            testName.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getDescription());
+        	testName = testName.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getDescription());
         } else {
-            testName.replace(SpecialKeywords.METHOD_DESCRIPTION, "");
+        	testName = testName.replace(SpecialKeywords.METHOD_DESCRIPTION, "");
         }
 
         return testName;
