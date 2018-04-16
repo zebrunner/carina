@@ -69,7 +69,7 @@ public class DriverFactory {
 		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost), getEventListeners());
 		LOGGER.debug("DriverFactory finish...");
 
-		if (driver instanceof RemoteWebDriver && Boolean.TRUE.equals(Configuration.getCapability("enableVNC"))) {
+		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
 			streamVNC((RemoteWebDriver) driver);
 		}
 
