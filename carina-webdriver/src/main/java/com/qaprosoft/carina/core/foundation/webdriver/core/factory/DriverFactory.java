@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.Reporter;
@@ -65,12 +66,11 @@ public class DriverFactory {
 			throw new RuntimeException("Unsupported driver_type: " + driverType);
 		}
 
-		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost),
-				getEventListeners());
+		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost), getEventListeners());
 		LOGGER.debug("DriverFactory finish...");
 
-		if (driver instanceof RemoteWebDriver && ((RemoteWebDriver) driver).getCapabilities().is("enableVNC")) {
-			streamVNC((RemoteWebDriver) driver, seleniumHost);
+		if (driver instanceof RemoteWebDriver && Boolean.TRUE.equals(Configuration.getCapability("enableVNC"))) {
+			streamVNC((RemoteWebDriver) driver);
 		}
 
 		return driver;
@@ -112,7 +112,7 @@ public class DriverFactory {
 	 * @param seleniumHost
 	 *            - Selenium server host
 	 */
-	private static void streamVNC(RemoteWebDriver driver, String seleniumHost) {
+	private static void streamVNC(RemoteWebDriver driver) {
 		try {
 			if (Reporter.getCurrentTestResult().getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
 
@@ -122,11 +122,12 @@ public class DriverFactory {
 
 				// User STF or Selenoid websocket
 				if (driver.getCapabilities().getCapability("vnc") != null) {
-					artifact.setLink(
-							String.format("ws://%s/websockify", driver.getCapabilities().getCapability("vnc")));
+					artifact.setLink(String.format("ws://%s/websockify", driver.getCapabilities().getCapability("vnc")));
 				} else {
 					// TODO: resolve negative case when VNC is not supported
-					artifact.setLink(String.format("%s/vnc/%s", seleniumHost, driver.getSessionId().toString()));
+					final String  host = ((HttpCommandExecutor) driver.getCommandExecutor()).getAddressOfRemoteServer().getHost();
+					final Integer port = ((HttpCommandExecutor) driver.getCommandExecutor()).getAddressOfRemoteServer().getPort();
+					artifact.setLink(String.format("ws://%s:%d/vnc/%s", host, port, driver.getSessionId().toString()));
 				}
 
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);

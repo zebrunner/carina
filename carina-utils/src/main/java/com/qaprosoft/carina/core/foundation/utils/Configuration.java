@@ -464,5 +464,8 @@ public class Configuration {
         R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".app", mobileApp);
         LOGGER.info("Updated mobile app: " + mobileApp);
     }
-
+    
+    public static Object getCapability(String name) {
+    		return R.CONFIG.get("capabilities." + name);
+    }
 }
