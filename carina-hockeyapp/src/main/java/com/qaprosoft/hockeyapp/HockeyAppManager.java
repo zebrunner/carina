@@ -87,6 +87,11 @@ public class HockeyAppManager {
 
         String buildToDownload = scanAppForBuild(getAppId(appName, platformName), buildType, version);
 
+        if (!buildToDownload.contains("api")) {
+            buildToDownload = new StringBuilder(buildToDownload).insert(buildToDownload.indexOf("/apps"), "/api/2").toString()
+                    + "?format=" + returnProperPlatformExtension(platformName);
+        }
+
         String fileName = folder + "/" + createFileName(appName, buildType, platformName);
 
         // TODO: incorporate file exists and size verification to skip re download the same build artifacts
@@ -236,10 +241,15 @@ public class HockeyAppManager {
         String fileName = String.format("%s.%s.%s.%s", appName, buildType, versionNumber, revision)
                 .replace(" ", "");
 
+        return fileName + "." + returnProperPlatformExtension(platformName);
+    }
+
+    private String returnProperPlatformExtension(String platformName) {
+
         if (platformName.toLowerCase().contains("ios")) {
-            return fileName + ".ipa";
+            return "ipa";
         }
-        return fileName + ".apk";
+        return "apk";
     }
 
     private boolean checkNotesForCorrectBuild(String pattern, JsonNode node) {
