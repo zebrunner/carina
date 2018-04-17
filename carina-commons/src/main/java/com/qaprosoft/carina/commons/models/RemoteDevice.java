@@ -27,6 +27,8 @@ public class RemoteDevice {
     private String osVersion;
     private String udid;
     private String remoteURL;
+    private String vnc;
+    private Integer proxyPort;
 
     public String getName() {
         return name;
@@ -75,4 +77,20 @@ public class RemoteDevice {
     public String getType() {
         return type;
     }
+
+	public String getVnc() {
+		return vnc;
+	}
+
+	public void setVnc(String vnc) {
+		this.vnc = vnc;
+	}
+
+	public Integer getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
+	}
 }

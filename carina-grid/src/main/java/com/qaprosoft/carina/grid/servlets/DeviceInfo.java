@@ -77,6 +77,12 @@ public class DeviceInfo extends RegistryBasedServlet {
                     device.setOsVersion((String) cap.get("platformVersion"));
                     device.setType((String) cap.get("deviceType"));
                     device.setUdid((String) cap.get("udid"));
+                    if(cap.containsKey("vnc")) {
+                    		device.setVnc((String) cap.get("vnc"));
+                    }
+                    if(cap.containsKey("proxy_port")) {
+                    		device.setProxyPort((Integer) cap.get("proxy_port"));
+                    }
 
                     STFDevice stfDevice = STF.getDevice(device.getUdid());
                     if (stfDevice != null) {

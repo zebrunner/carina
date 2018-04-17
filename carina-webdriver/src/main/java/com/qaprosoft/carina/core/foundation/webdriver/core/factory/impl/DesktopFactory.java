@@ -23,6 +23,7 @@ import java.net.URL;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
@@ -106,4 +107,17 @@ public class DesktopFactory extends AbstractFactory {
             }
         }
     }
+
+	@Override
+	public String getVncURL(WebDriver driver) {
+		String vncURL = null;
+		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
+			// TODO: resolve negative case when VNC is not supported
+			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
+			final String  host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
+			final Integer port = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort();
+			vncURL = String.format("ws://%s:%d/vnc/%s", host, port, rwd.getSessionId().toString());
+		}
+		return vncURL;
+	}
 }

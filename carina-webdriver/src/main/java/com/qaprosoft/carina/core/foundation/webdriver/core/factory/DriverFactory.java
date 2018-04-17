@@ -22,8 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.Reporter;
 
@@ -66,12 +64,11 @@ public class DriverFactory {
 			throw new RuntimeException("Unsupported driver_type: " + driverType);
 		}
 
-		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost), getEventListeners());
+		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost),
+				getEventListeners());
 		LOGGER.debug("DriverFactory finish...");
 
-		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
-			streamVNC((RemoteWebDriver) driver);
-		}
+		streamVNC(factory.getVncURL(driver));
 
 		return driver;
 	}
@@ -107,29 +104,16 @@ public class DriverFactory {
 	/**
 	 * Creates Zafira artifact that contains link to VNC websocket
 	 * 
-	 * @param driver
-	 *            - {@link RemoteWebDriver} instance
-	 * @param seleniumHost
-	 *            - Selenium server host
+	 * @param vncURL - websocket URL
 	 */
-	private static void streamVNC(RemoteWebDriver driver) {
+	private static void streamVNC(String vncURL) {
 		try {
-			if (Reporter.getCurrentTestResult().getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
-
+			if (!StringUtils.isEmpty(vncURL) && Reporter.getCurrentTestResult().getAttribute("ztid") != null
+					&& ZafiraSingleton.INSTANCE.isRunning()) {
 				TestArtifactType artifact = new TestArtifactType();
 				artifact.setName("Live demo");
 				artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
-
-				// User STF or Selenoid websocket
-				if (driver.getCapabilities().getCapability("vnc") != null) {
-					artifact.setLink(String.format("ws://%s/websockify", driver.getCapabilities().getCapability("vnc")));
-				} else {
-					// TODO: resolve negative case when VNC is not supported
-					final String  host = ((HttpCommandExecutor) driver.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-					final Integer port = ((HttpCommandExecutor) driver.getCommandExecutor()).getAddressOfRemoteServer().getPort();
-					artifact.setLink(String.format("ws://%s:%d/vnc/%s", host, port, driver.getSessionId().toString()));
-				}
-
+				artifact.setLink(vncURL);
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
 			}
 		} catch (Exception e) {

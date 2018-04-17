@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -27,6 +28,7 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 
@@ -159,4 +161,18 @@ public class MobileFactory extends AbstractFactory {
         }
         return device;
     }
+
+	@Override
+	public String getVncURL(WebDriver driver) {
+		String vncURL = null;
+		if (driver instanceof RemoteWebDriver) {
+			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
+			RemoteDevice rd = getDeviceInfo(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().toString(), 
+					rwd.getSessionId().toString());
+			if(rd != null && !StringUtils.isEmpty(rd.getVnc())) {
+				vncURL = rd.getVnc();
+			}
+		}
+		return vncURL;
+	}
 }

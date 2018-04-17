@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
@@ -71,4 +72,12 @@ public abstract class AbstractFactory {
     protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
     }
+    
+    /**
+     * Retrieves VNC URL if available.
+     * 
+     * @param driver - {@link RemoteWebDriver} instance
+     * @return VNC URL
+     */
+    abstract public String getVncURL(WebDriver driver);
 }
