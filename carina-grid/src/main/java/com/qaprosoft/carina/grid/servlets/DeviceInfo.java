@@ -78,7 +78,7 @@ public class DeviceInfo extends RegistryBasedServlet {
                     device.setType((String) cap.get("deviceType"));
                     device.setUdid((String) cap.get("udid"));
                     if(cap.containsKey("vnc")) {
-                    		device.setVncURL((String) cap.get("vnc"));
+                    		device.setVnc((String) cap.get("vnc"));
                     }
                     if(cap.containsKey("proxy_port")) {
                     		device.setProxyPort((String) cap.get("proxy_port"));

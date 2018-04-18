@@ -29,6 +29,7 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.IECapabilities;
@@ -116,7 +117,7 @@ public class DesktopFactory extends AbstractFactory {
 			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 			final String  host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
 			final Integer port = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort();
-			vncURL = String.format("ws://%s:%d/vnc/%s", host, port, rwd.getSessionId().toString());
+			vncURL = String.format(R.CONFIG.get("desktop_vnc"), host, port, rwd.getSessionId().toString());
 		}
 		return vncURL;
 	}
