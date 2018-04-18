@@ -46,10 +46,10 @@
 			<artifactId>carina-proxy</artifactId>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
@@ -78,11 +78,11 @@
 
 
 		<!-- Guava -->
-		<dependency>
+		<!--<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- Appium -->
 		<dependency>
@@ -109,23 +109,23 @@
 			<version>${ashot.version}</version>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
 			<version>${commons-httpclient.version}</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- HTTP utilities -->
-		<dependency>
+		<!--<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${apache-http.version}</version>
-		</dependency>
-		<dependency>
+		</dependency>-->
+		<!--<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
 			<version>${apache-http.version}</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
@@ -144,10 +144,10 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>alice-client</artifactId>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 		  <groupId>org.apache.commons</groupId>
 		  <artifactId>commons-configuration2</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- Reflections -->
 		<dependency>
