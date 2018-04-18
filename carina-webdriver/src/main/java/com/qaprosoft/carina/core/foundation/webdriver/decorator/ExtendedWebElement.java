@@ -42,6 +42,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
@@ -1246,7 +1247,17 @@ public class ExtendedWebElement {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
-				element.click();
+				try {
+					element.click();
+				} catch (WebDriverException e) {
+					if (e != null && e.getMessage().contains("Other element would receive the click:")) {
+						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
+						Actions actions = new Actions(getDriver());
+						actions.moveToElement(element).click().perform();
+					} else {
+						throw e;
+					}
+				}
 				Screenshot.capture(getDriver(), Messager.ELEMENT_CLICKED.info(getName()));
 			}
 
