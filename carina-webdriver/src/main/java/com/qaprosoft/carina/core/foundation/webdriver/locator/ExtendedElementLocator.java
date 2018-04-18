@@ -93,11 +93,19 @@ public class ExtendedElementLocator implements ElementLocator {
         this.isPredicate = false;
         if (field.isAnnotationPresent(Predicate.class)) {
             this.isPredicate = field.getAnnotation(Predicate.class).enabled();
+            //replace generate by annotation using MobileBy... method
+            if (searchContext instanceof IOSDriver) {
+            	this.by = MobileBy.iOSNsPredicateString(getLocator(by));
+            }
         }
 
         this.isClassChain = false;
         if (field.isAnnotationPresent(ClassChain.class)) {
             this.isClassChain = field.getAnnotation(ClassChain.class).enabled();
+            //replace generate by annotation using MobileBy... method
+            if (searchContext instanceof IOSDriver) {
+            	this.by = MobileBy.iOSClassChain(getLocator(by));
+            }
         }
     }
 
@@ -114,17 +122,8 @@ public class ExtendedElementLocator implements ElementLocator {
         WebElement element = null;
 
         if (isPredicate) {
-            if (searchContext instanceof IOSDriver) {
-                element = searchContext.findElement(MobileBy.iOSNsPredicateString(getLocator(by)));
-            } else if (searchContext instanceof AndroidDriver) {
-                element = ((AndroidDriver) searchContext).findElementByAndroidUIAutomator(getLocator(by));
-            } else {
-                throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
-            }
-        } else if (isClassChain) {
-            if (searchContext instanceof IOSDriver) {
-                element = searchContext.findElement(MobileBy.iOSClassChain(getLocator(by)));
-            } else if (searchContext instanceof AndroidDriver) {
+        	//TODO: remove findElement when we set valid by to the element
+            if (searchContext instanceof AndroidDriver) {
                 element = ((AndroidDriver) searchContext).findElementByAndroidUIAutomator(getLocator(by));
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
@@ -173,17 +172,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
         List<WebElement> elements = null;
         if (isPredicate) {
-            if (searchContext instanceof IOSDriver) {
-                elements = searchContext.findElements(MobileBy.iOSNsPredicateString(getLocator(by)));
-            } else if (searchContext instanceof AndroidDriver) {
-                elements = ((AndroidDriver) searchContext).findElementsByAndroidUIAutomator(getLocator(by));
-            } else {
-                throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
-            }
-        } else if (isClassChain) {
-            if (searchContext instanceof IOSDriver) {
-                elements = searchContext.findElements(MobileBy.iOSClassChain(getLocator(by)));
-            } else if (searchContext instanceof AndroidDriver) {
+            if (searchContext instanceof AndroidDriver) {
                 elements = ((AndroidDriver) searchContext).findElementsByAndroidUIAutomator(getLocator(by));
             } else {
                 throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());

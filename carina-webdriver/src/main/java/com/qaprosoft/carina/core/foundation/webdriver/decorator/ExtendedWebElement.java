@@ -158,7 +158,7 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isPresent(By by, long timeout) {
-		return waitUntil(ExpectedConditions.presenceOfElementLocated(getBy()), by, timeout);
+		return waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout);
 	}
 	
 	
@@ -166,11 +166,10 @@ public class ExtendedWebElement {
      * Wait until any condition happens.
      *
      * @param condition - ExpectedCondition.
-     * @param by - By.
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	public boolean waitUntil(ExpectedCondition<WebElement> condition,  By by, long timeout) {
+	public boolean waitUntil(ExpectedCondition<WebElement> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
@@ -309,7 +308,7 @@ public class ExtendedWebElement {
 	/**
 	 * Click on element.
 	 *
-	 * @param timeout
+	 * @param timeout to wait
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
@@ -485,6 +484,8 @@ public class ExtendedWebElement {
     
     /**
      * Send Keys to element.
+     * 
+	 * @param keys Keys
      */
     public void sendKeys(Keys keys) {
     	sendKeys(keys, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
@@ -493,6 +494,7 @@ public class ExtendedWebElement {
     /**
      * Send Keys to element.
      *
+	 * @param keys Keys
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
@@ -502,7 +504,8 @@ public class ExtendedWebElement {
 	/**
 	 * Send Keys to element.
 	 *
-	 * @param timeout
+	 * @param keys Keys
+	 * @param timeout to wait
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
@@ -513,6 +516,8 @@ public class ExtendedWebElement {
     
     /**
      * Type text to element.
+     * 
+	 * @param text String
      */
     public void type(String text) {
     	type(text, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
@@ -521,6 +526,7 @@ public class ExtendedWebElement {
     /**
      * Type text to element.
      *
+	 * @param text String
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
@@ -530,7 +536,8 @@ public class ExtendedWebElement {
 	/**
 	 * Type text to element.
 	 *
-	 * @param timeout
+	 * @param text String
+	 * @param timeout to wait
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
@@ -548,7 +555,7 @@ public class ExtendedWebElement {
     /**
      * Set implicit timeout.
      *
-     * @param timeout in seconds. Minimal value - 1 second
+     * @param timeout in seconds.
      */
     public void setImplicitTimeout(long timeout) {
         try {
@@ -909,7 +916,7 @@ public class ExtendedWebElement {
      * @return element clickability status.
      */
     public boolean isClickable(long timeout) {
-    	return waitUntil(ExpectedConditions.elementToBeClickable(getBy()), getBy(), timeout);
+    	return waitUntil(ExpectedConditions.elementToBeClickable(getBy()), timeout);
     }
 
     /**
@@ -928,7 +935,7 @@ public class ExtendedWebElement {
      * @return element visibility status.
      */
     public boolean isVisible(long timeout) {
-    	return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), getBy(), timeout);
+    	return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
@@ -1212,7 +1219,7 @@ public class ExtendedWebElement {
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
 			Object inputArg) {
-		if (waitCondition != null & !waitUntil(waitCondition, getBy(), timeout)) {
+		if (waitCondition != null & !waitUntil(waitCondition, timeout)) {
 			Assert.fail(Messager.ELEMENT_NOT_VERIFIED.getMessage(getNameWithLocator()));
 		}
 
