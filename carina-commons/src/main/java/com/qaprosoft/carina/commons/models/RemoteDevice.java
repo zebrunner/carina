@@ -21,76 +21,76 @@ package com.qaprosoft.carina.commons.models;
  * @author akhursevich
  */
 public class RemoteDevice {
-    private String name;
-    private String type;
-    private String os;
-    private String osVersion;
-    private String udid;
-    private String remoteURL;
-    private String vnc;
-    private Integer proxyPort;
+	private String name;
+	private String type;
+	private String os;
+	private String osVersion;
+	private String udid;
+	private String remoteURL;
+	private String vncURL;
+	private String proxyPort;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getOs() {
-        return os;
-    }
-
-    public void setOs(String os) {
-        this.os = os;
-    }
-
-    public String getOsVersion() {
-        return osVersion;
-    }
-
-    public void setOsVersion(String osVersion) {
-        this.osVersion = osVersion;
-    }
-
-    public String getUdid() {
-        return udid;
-    }
-
-    public void setUdid(String udid) {
-        this.udid = udid;
-    }
-
-    public String getRemoteURL() {
-        return remoteURL;
-    }
-
-    public void setRemoteURL(String remoteURL) {
-        this.remoteURL = remoteURL;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-	public String getVnc() {
-		return vnc;
+	public String getName() {
+		return name;
 	}
 
-	public void setVnc(String vnc) {
-		this.vnc = vnc;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public Integer getProxyPort() {
+	public String getOs() {
+		return os;
+	}
+
+	public void setOs(String os) {
+		this.os = os;
+	}
+
+	public String getOsVersion() {
+		return osVersion;
+	}
+
+	public void setOsVersion(String osVersion) {
+		this.osVersion = osVersion;
+	}
+
+	public String getUdid() {
+		return udid;
+	}
+
+	public void setUdid(String udid) {
+		this.udid = udid;
+	}
+
+	public String getRemoteURL() {
+		return remoteURL;
+	}
+
+	public void setRemoteURL(String remoteURL) {
+		this.remoteURL = remoteURL;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public String getVncURL() {
+		return vncURL;
+	}
+
+	public void setVncURL(String vncURL) {
+		this.vncURL = vncURL;
+	}
+
+	public String getProxyPort() {
 		return proxyPort;
 	}
 
-	public void setProxyPort(Integer proxyPort) {
+	public void setProxyPort(String proxyPort) {
 		this.proxyPort = proxyPort;
 	}
 }

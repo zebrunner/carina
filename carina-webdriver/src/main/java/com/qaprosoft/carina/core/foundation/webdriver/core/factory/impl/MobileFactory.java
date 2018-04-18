@@ -169,8 +169,8 @@ public class MobileFactory extends AbstractFactory {
 			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 			RemoteDevice rd = getDeviceInfo(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().toString(), 
 					rwd.getSessionId().toString());
-			if(rd != null && !StringUtils.isEmpty(rd.getVnc())) {
-				vncURL = rd.getVnc();
+			if(rd != null && !StringUtils.isEmpty(rd.getVncURL())) {
+				vncURL = rd.getVncURL();
 			}
 		}
 		return vncURL;
