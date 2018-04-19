@@ -96,6 +96,8 @@ public class ExtendedElementLocator implements ElementLocator {
             //replace generate by annotation using MobileBy... method
             if (searchContext instanceof IOSDriver) {
             	this.by = MobileBy.iOSNsPredicateString(getLocator(by));
+            } else if (searchContext instanceof AndroidDriver) {
+            	this.by = MobileBy.AndroidUIAutomator(getLocator(by));
             }
         }
 
@@ -112,7 +114,6 @@ public class ExtendedElementLocator implements ElementLocator {
     /**
      * Find the element.
      */
-    @SuppressWarnings("rawtypes")
     public WebElement findElement() {
         if (cachedElement != null && shouldCache) {
         	LOGGER.info("returning element from cache: " + by);
@@ -120,36 +121,26 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
         WebElement element = null;
-
-        if (isPredicate) {
-        	//TODO: remove findElement when we set valid by to the element
-            if (searchContext instanceof AndroidDriver) {
-                element = ((AndroidDriver) searchContext).findElementByAndroidUIAutomator(getLocator(by));
-            } else {
-                throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
+        NoSuchElementException exception = null;
+        // Finding element using Selenium
+        if (by != null) {
+            try {
+                element = searchContext.findElement(by);
+            } catch (StaleElementReferenceException | InvalidElementStateException e) {
+            	element = ((RemoteWebElement) searchContext).getWrappedDriver().findElement(by);
+            } catch (NoSuchElementException e) {
+                exception = e;
+                LOGGER.info("Unable to find element: " + e.getMessage());
             }
-        } else {
-            NoSuchElementException exception = null;
-            // Finding element using Selenium
-            if (by != null) {
-                try {
-                    element = searchContext.findElement(by);
-                } catch (StaleElementReferenceException | InvalidElementStateException e) {
-                	element = ((RemoteWebElement) searchContext).getWrappedDriver().findElement(by);
-                } catch (NoSuchElementException e) {
-                    exception = e;
-                    LOGGER.info("Unable to find element: " + e.getMessage());
-                }
-            }
-            
-            // Finding element using AI tool
-            if (element == null && AliceRecognition.INSTANCE.isEnabled()) {
-                element = findElementByAI((WebDriver) searchContext, aiLabel, aiCaption);
-            }
-            // If no luck throw general NoSuchElementException
-            if (element == null) {
-                throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
-            }
+        }
+        
+        // Finding element using AI tool
+        if (element == null && AliceRecognition.INSTANCE.isEnabled()) {
+            element = findElementByAI((WebDriver) searchContext, aiLabel, aiCaption);
+        }
+        // If no luck throw general NoSuchElementException
+        if (element == null) {
+            throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
         }
 
 		// enable cache for successfully discovered element to minimize selenium calls
@@ -163,7 +154,6 @@ public class ExtendedElementLocator implements ElementLocator {
     /**
      * Find the element list.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<WebElement> findElements() {
         if (cachedElementList != null && shouldCache) {
         	LOGGER.info("returning element from cache: " + by);
@@ -171,30 +161,21 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
         List<WebElement> elements = null;
-        if (isPredicate) {
-            if (searchContext instanceof AndroidDriver) {
-                elements = ((AndroidDriver) searchContext).findElementsByAndroidUIAutomator(getLocator(by));
-            } else {
-                throw new RuntimeException("Unable to to detect valid driver for searching " + by.toString());
-            }
-        } else {
-        	NoSuchElementException exception = null;
-        	try {
-        		elements = searchContext.findElements(by);
-            } catch (StaleElementReferenceException | InvalidElementStateException e) {
-            	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
-            } catch (NoSuchElementException e) {
-                exception = e;
-                LOGGER.info("Unable to find elements: " + e.getMessage());
-            }
-        	
-        	//TODO: incorporate find by AI???
-        	
-            // If no luck throw general NoSuchElementException
-            if (elements == null) {
-                throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
-            }
-
+    	NoSuchElementException exception = null;
+    	try {
+    		elements = searchContext.findElements(by);
+        } catch (StaleElementReferenceException | InvalidElementStateException e) {
+        	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
+        } catch (NoSuchElementException e) {
+            exception = e;
+            LOGGER.info("Unable to find elements: " + e.getMessage());
+        }
+    	
+    	//TODO: incorporate find by AI???
+    	
+        // If no luck throw general NoSuchElementException
+        if (elements == null) {
+            throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
         }
 
 		// enable cache for successfully discovered element to minimize selenium calls
