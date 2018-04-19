@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -23,6 +24,8 @@ import org.apache.log4j.NDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -144,6 +147,31 @@ public final class DriverPool {
         return drv;
     }
 
+    /**
+     * Get driver by WebElement.
+     * 
+     * @param sessionId - session id to be used for searching a desired driver
+     * 
+     * @return default WebDriver
+     */
+    //TODO: investigate how to allow to use from ExtendedWebElement only
+    public static WebDriver getDriver(SessionId sessionId) {
+    	LOGGER.debug("Detecting WebDriver by sessionId...");
+    	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+    	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
+    		LOGGER.debug("analyzing driver: " + ((RemoteWebDriver)enrty.getValue()).getSessionId().toString());
+    		if (sessionId.equals(((RemoteWebDriver)enrty.getValue()).getSessionId())) {
+    			LOGGER.debug("Detected WebDriver by sessionId");
+    			return enrty.getValue();
+    		}
+    	}
+
+    	LOGGER.warn("Unable to find driver using sessionId artifacts. Returning default one!");
+    	//TODO: take a look into the replaceDriver case and how sessionId are regenerated on page objects
+    	return getDriver();
+    	
+    }
+    
     /**
      * Restart default driver
      * 

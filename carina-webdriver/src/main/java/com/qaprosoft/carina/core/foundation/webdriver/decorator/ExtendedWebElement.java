@@ -128,14 +128,18 @@ public class ExtendedWebElement {
         //read searchContext from not null element
         if (element == null) {
         	try {
-        		throw new RuntimeException("to see stacktrace!");
+        		throw new RuntimeException("to see stacktrace! TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element");
         	} catch (Throwable thr) {
         		thr.printStackTrace();
         	}
         	//TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element
         	return;
         }
-        
+
+        //TODO: start collecting tempBy and tempDriver to compare on real examples with those which are provided to constructor;
+		By tempBy = null;
+		WebDriver tempDriver = null;
+		
 		try {
             
 			Field locatorField, searchContextField, byContextField = null;
@@ -157,7 +161,7 @@ public class ExtendedWebElement {
 				
 				byContextField = locator.getClass().getDeclaredField("by");
 				byContextField.setAccessible(true);
-				by = (By) byContextField.get(locator);
+				tempBy = (By) byContextField.get(locator);
 				
 
 				
@@ -180,8 +184,7 @@ public class ExtendedWebElement {
 			}
 			if (searchContext != null && searchContext instanceof RemoteWebDriver) {
 				SessionId sessionId = ((RemoteWebDriver)searchContext).getSessionId();
-				//TODO: move getDriver by SessionId as well
-				//driver = DriverPool.getDriver(sessionId);
+				tempDriver = DriverPool.getDriver(sessionId);
 			} else {
 				LOGGER.error(searchContext);
 			}
@@ -195,13 +198,29 @@ public class ExtendedWebElement {
 											// to Proxy...
 			e.printStackTrace();
 		}
-		if (driver == null) {
+		if (tempDriver == null) {
 			try {
-				throw new RuntimeException("review stacktrace to analyze why driver is not populated correctly via reflection!");
+				throw new RuntimeException("review stacktrace to analyze why tempDriver is not populated correctly via reflection!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+		} else if (!tempDriver.equals(driver)) {
+			try {
+				throw new RuntimeException("review stacktrace to analyze why 'driver' from reflection and from decorator differs!");
 			} catch (Throwable thr) {
 				thr.printStackTrace();
 			}
 		}
+
+		
+		if (!by.equals(tempBy)) {
+			try {
+				throw new RuntimeException("review stacktrace to analyze why 'by' locator from reflection and from decorator differs!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+		}
+		
     }
 
     @Deprecated
@@ -223,7 +242,7 @@ public class ExtendedWebElement {
     public WebElement getElement() {
     	//TODO: for public calls make a call to driver and re-create element.
     	//TODO: think about legacy selenium call support as a feature
-    	element = findStaleElement(getBy(), 1);
+    	element = refindElement(getBy(), 1);
 /*        if (element == null) {
         	//TODO: why 1 sec?
             element = findElement(1);
@@ -305,10 +324,10 @@ public class ExtendedWebElement {
         return element;
     }
     
-    private WebElement findStaleElement(By by, long timeout) {
+    private WebElement refindElement(By by, long timeout) {
         LOGGER.info("explicitly find element using by annotation: " + by);
-        //TODO: implement privte isClickable using explicit by locator
-        if (isClickable(timeout)) {
+        //TODO: implement private isClickable using explicit by locator
+        if (isPresent(timeout)) {
         	element = getDriver().findElement(by);
         } else {
         	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
@@ -491,60 +510,6 @@ public class ExtendedWebElement {
     public void clickHiddenElement(long timeout) {
     	click(timeout);
     }
-    
-    /**
-     * Check that element present.
-     *
-     * @return element existence status.
-     */
-    public boolean isElementPresent() {
-    	return isPresent(EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Check that element present within specified timeout.
-     *
-     * @param timeout - timeout.
-     * @return element existence status.
-     */
-    public boolean isElementPresent(long timeout) {
-    	return isPresent(timeout);
-    }
-
-    /**
-     * Check that element not present within specified timeout.
-     *
-     * @param timeout - timeout.
-     * @return element existence status.
-     */
-    public boolean isElementNotPresent(long timeout) {
-        return !isElementPresent(timeout);
-    }
-
-    /**
-     * Check that element with text present.
-     *
-     * @param text of element to check.
-     * @return element with text existence status.
-     */
-    public boolean isElementWithTextPresent(final String text) {
-        return isElementWithTextPresent(text, EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Check that element with text present.
-     *
-     * @param text of element to check.
-     * @param timeout - timeout.
-     * @return element with text existence status.
-     */
-    public boolean isElementWithTextPresent(final String text, long timeout) {
-    	assertElementPresent(timeout);
-    	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-    	//TODO: SZ migrate to FluentWaits using separate UI doAction
-    	//temporary used direct call to selenium to regenerate element explicitly
-    	return getElement().getText().contains(decryptedText);
-    }
 
     /**
      * Click onto element if it present.
@@ -718,14 +683,7 @@ public class ExtendedWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-    	//TODO: SZ migrate to FluentWaits
-        assertElementPresent();
-        element = getElement();
-        boolean res = element.isSelected();
-        if (element.getAttribute("checked") != null) {
-            res |= element.getAttribute("checked").equalsIgnoreCase("true");
-        }
-        return res;
+    	return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
 
     /**
@@ -823,6 +781,60 @@ public class ExtendedWebElement {
     // --------------------------------------------------------------------------
     // Base UI validations
     // --------------------------------------------------------------------------
+    /**
+     * Check that element present.
+     *
+     * @return element existence status.
+     */
+    public boolean isElementPresent() {
+    	return isPresent(EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Check that element present within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @return element existence status.
+     */
+    public boolean isElementPresent(long timeout) {
+    	return isPresent(timeout);
+    }
+
+    /**
+     * Check that element not present within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @return element existence status.
+     */
+    public boolean isElementNotPresent(long timeout) {
+        return !isElementPresent(timeout);
+    }
+
+    /**
+     * Check that element with text present.
+     *
+     * @param text of element to check.
+     * @return element with text existence status.
+     */
+    public boolean isElementWithTextPresent(final String text) {
+        return isElementWithTextPresent(text, EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Check that element with text present.
+     *
+     * @param text of element to check.
+     * @param timeout - timeout.
+     * @return element with text existence status.
+     */
+    public boolean isElementWithTextPresent(final String text, long timeout) {
+    	assertElementPresent(timeout);
+    	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+    	//TODO: SZ migrate to FluentWaits using separate UI doAction
+    	//temporary used direct call to selenium to regenerate element explicitly
+    	return getElement().getText().contains(decryptedText);
+    }
+    
     public void assertElementPresent() {
         assertElementPresent(EXPLICIT_TIMEOUT);
     }
@@ -1222,7 +1234,9 @@ public class ExtendedWebElement {
 		void doCheck();
 
 		void doUncheck();
-
+		
+		boolean doIsChecked();
+		
 		String doGetText();
 
 		Point doGetLocation();
@@ -1281,6 +1295,9 @@ public class ExtendedWebElement {
 		case UNCHECK:
 			actionSteps.doUncheck();
 			break;
+		case IS_CHECKED:
+			actionSteps.doIsChecked();
+			break;
 		case SELECT:
 			result = actionSteps.doSelect((String) inputArg);
 			break;
@@ -1332,7 +1349,7 @@ public class ExtendedWebElement {
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException | InvalidElementStateException: ", e);
 			// try to find again using driver
-			element = findStaleElement(getBy(), 1);
+			element = refindElement(getBy(), 1);
 
 			output = overrideAction(actionName, inputArg);
 		} catch (Throwable e) {
@@ -1357,7 +1374,7 @@ public class ExtendedWebElement {
 				try {
 					element.click();
 				} catch (WebDriverException e) {
-					if (e != null && e.getMessage().contains("Other element would receive the click:")) {
+					if (e != null && (e.getMessage().contains("Other element would receive the click:") || e.getMessage().contains("is not visible on the screen and thus is not interactable"))) {
 						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
 						Actions actions = new Actions(getDriver());
 						actions.moveToElement(element).click().perform();
@@ -1453,7 +1470,18 @@ public class ExtendedWebElement {
 					Screenshot.capture(getDriver(), Messager.CHECKBOX_UNCHECKED.info(getName()));
 				}
 			}
-
+			
+			@Override
+			public boolean doIsChecked() {
+				
+		        boolean res = element.isSelected();
+		        if (element.getAttribute("checked") != null) {
+		            res |= element.getAttribute("checked").equalsIgnoreCase("true");
+		        }
+		        
+		        return res;
+			}
+			
 			@Override
 			public boolean doSelect(String text) {
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
@@ -1512,6 +1540,7 @@ public class ExtendedWebElement {
 				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), getName()));
 				return true;
 			}
+			
 		}, inputArg);
 		return output;
 	}
@@ -1585,6 +1614,12 @@ public class ExtendedWebElement {
 			@Override
 			public void doUncheck() {
 				// do nothing for now
+			}
+			
+			@Override
+			public boolean doIsChecked() {
+				// do nothing for now
+				return false;
 			}
 
 			@Override

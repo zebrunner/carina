@@ -17,6 +17,7 @@ public enum ACTION_NAME implements IPerformanceOperation {
     WAIT("wait"),
     CHECK("check"),
     UNCHECK("uncheck"),
+    IS_CHECKED("is_checked"),
     SELECT("select"),
     SELECT_VALUES("select_values"),
     SELECT_BY_MATCHER("select_by_matcher"),
