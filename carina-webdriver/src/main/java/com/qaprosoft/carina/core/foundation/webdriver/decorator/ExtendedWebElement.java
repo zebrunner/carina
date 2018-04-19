@@ -1325,25 +1325,12 @@ public class ExtendedWebElement {
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArg);
-		} catch (StaleElementReferenceException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
+		} catch (StaleElementReferenceException | InvalidElementStateException e) {
+			LOGGER.debug("catched StaleElementReferenceException | InvalidElementStateException: ", e);
 			// try to find again using driver
 			element = findStaleElement(getBy(), 1);
 
 			output = overrideAction(actionName, inputArg);
-		} catch (InvalidElementStateException e) {
-			LOGGER.debug("catched InvalidElementStateException: ", e);
-			// try to find again using driver
-			element = findStaleElement(getBy(), 1);
-
-			output = overrideAction(actionName, inputArg);
-		} catch (NoSuchElementException  e) {
-			LOGGER.debug("catched NoSuchElementException: ", e);
-			// try to find again using driver
-			element = findStaleElement(getBy(), 1);
-
-			output = overrideAction(actionName, inputArg);
-			
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
 			// print error messages according to the action type
