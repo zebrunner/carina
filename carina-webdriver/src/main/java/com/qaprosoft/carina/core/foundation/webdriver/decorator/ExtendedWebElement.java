@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -133,6 +134,18 @@ public class ExtendedWebElement {
     }
 
     public WebElement getElement() {
+    	//TODO: for public calls make a call to driver and re-create element.
+    	//TODO: think about legacy selenium call support as a feature
+    	element = findStaleElement(getBy(), 1);
+/*        if (element == null) {
+        	//TODO: why 1 sec?
+            element = findElement(1);
+        }
+*/
+    	return element;
+    }
+    
+    private WebElement getCachedElement() {
         if (element == null) {
         	//TODO: why 1 sec?
             element = findElement(1);
@@ -293,7 +306,7 @@ public class ExtendedWebElement {
      * Click on element.
      */
     public void click() {
-        click(EXPLICIT_TIMEOUT, ExpectedConditions.elementToBeClickable(getBy()));
+        click(EXPLICIT_TIMEOUT);
     }
 
     /**
@@ -302,7 +315,9 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-    	click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    	//TODO: temporary use presence due to the issues with iOS clickable detection
+        //click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    	click(timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
     
 	/**
@@ -374,6 +389,7 @@ public class ExtendedWebElement {
      * Click Hidden Element. useful when element present in DOM but actually is
      * not visible. And can't be clicked by standard click.
      */
+    @Deprecated
     public void clickHiddenElement() {
     	clickHiddenElement(EXPLICIT_TIMEOUT);
     }
@@ -384,24 +400,9 @@ public class ExtendedWebElement {
      *
      * @param timeout to wait
      */
+    @Deprecated
     public void clickHiddenElement(long timeout) {
-    	assertElementPresent(timeout);
-    	captureElements();
-
-        try {
-        	element = getElement();
-        	JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-            executor.executeScript("arguments[0].click();", element);
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-            String msg = Messager.HIDDEN_ELEMENT_NOT_CLICKED.error(getNameWithLocator());
-            Screenshot.capture(getDriver(), msg);
-            throw e;  
-        }
-        
-        String msg = Messager.HIDDEN_ELEMENT_CLICKED.info(getName());
-        //TODO: move screenshoting outside of class
-        Screenshot.capture(getDriver(), msg);
+    	click(timeout);
     }
     
     /**
@@ -453,7 +454,9 @@ public class ExtendedWebElement {
     public boolean isElementWithTextPresent(final String text, long timeout) {
     	assertElementPresent(timeout);
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-    	return element.getText().contains(decryptedText);
+    	//TODO: SZ migrate to FluentWaits using separate UI doAction
+    	//temporary used direct call to selenium to regenerate element explicitly
+    	return getElement().getText().contains(decryptedText);
     }
 
     /**
@@ -488,7 +491,7 @@ public class ExtendedWebElement {
 	 * @param keys Keys
      */
     public void sendKeys(Keys keys) {
-    	sendKeys(keys, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	sendKeys(keys, EXPLICIT_TIMEOUT);
     }
 
     /**
@@ -520,7 +523,7 @@ public class ExtendedWebElement {
 	 * @param text String
      */
     public void type(String text) {
-    	type(text, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	type(text, EXPLICIT_TIMEOUT);
     }
 
     /**
@@ -628,6 +631,7 @@ public class ExtendedWebElement {
      * @return - current state
      */
     public boolean isChecked() {
+    	//TODO: SZ migrate to FluentWaits
         assertElementPresent();
         element = getElement();
         boolean res = element.isSelected();
@@ -643,6 +647,7 @@ public class ExtendedWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
+    	//TODO: SZ migrate to FluentWaits
         assertElementPresent();
         return new Select(getElement()).getAllSelectedOptions().get(0).getText();
     }
@@ -653,6 +658,7 @@ public class ExtendedWebElement {
      * @return selected values
      */
     public List<String> getSelectedValues() {
+    	//TODO: SZ migrate to FluentWaits
         assertElementPresent();
         Select s = new Select(getElement());
         List<String> values = new ArrayList<String>();
@@ -843,6 +849,7 @@ public class ExtendedWebElement {
     }
 
     //TODO: refactor to fluent waits
+    @Deprecated
     public void waitUntilElementNotPresent(final long timeout) {
         final ExtendedWebElement element = this;
 
@@ -974,6 +981,7 @@ public class ExtendedWebElement {
          */
 
         if (locator.startsWith("By.xpath: **")) {
+        	//TODO: why do we need this code at all?
             by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
 
@@ -1220,15 +1228,17 @@ public class ExtendedWebElement {
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
 			Object inputArg) {
 		if (waitCondition != null & !waitUntil(waitCondition, timeout)) {
-			Assert.fail(Messager.ELEMENT_NOT_VERIFIED.getMessage(getNameWithLocator()));
+			LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(getNameWithLocator()));
 		}
 
 		Object output = null;
 		// captureElements();
 
+		//TODO: SZ migrate to FluentWaits
+		//handle invalid element state: Element is not currently interactable and may not be manipulated
 		Timer.start(actionName);
 		try {
-			element = getElement();
+			element = getCachedElement();
 			output = overrideAction(actionName, inputArg);
 		} catch (StaleElementReferenceException e) {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
@@ -1236,7 +1246,13 @@ public class ExtendedWebElement {
 			element = findStaleElement(getBy(), 1);
 
 			output = overrideAction(actionName, inputArg);
+		} catch (InvalidElementStateException e) {
+			LOGGER.debug("catched InvalidElementStateException: ", e);
+			// try to find again using driver
+			element = findStaleElement(getBy(), 1);
 
+			output = overrideAction(actionName, inputArg);
+			
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
 			// print error messages according to the action type
@@ -1249,6 +1265,8 @@ public class ExtendedWebElement {
 		return output;
 	}
 
+	//TODO: SZ: add isSelected
+	
 	// single place for all supported UI actions in carina core
 	private Object overrideAction(ACTION_NAME actionName, Object inputArg) {
 		Object output = executeAction(actionName, new ActionSteps() {
@@ -1261,6 +1279,10 @@ public class ExtendedWebElement {
 						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
 						Actions actions = new Actions(getDriver());
 						actions.moveToElement(element).click().perform();
+						
+						//TODO: analyze if we should try to click using js as well
+						//JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+			            //executor.executeScript("arguments[0].click();", element);
 					} else {
 						throw e;
 					}

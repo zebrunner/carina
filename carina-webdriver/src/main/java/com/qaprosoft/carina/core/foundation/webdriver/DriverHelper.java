@@ -978,6 +978,7 @@ public class DriverHelper {
      *            move y
      */
     public void slide(ExtendedWebElement slider, int moveX, int moveY) {
+    	//TODO: SZ migrate to FluentWaits
         if (isElementPresent(slider)) {
             WebDriver drv = getDriver();
             (new Actions(drv)).moveToElement(slider.getElement()).dragAndDropBy(slider.getElement(), moveX, moveY)

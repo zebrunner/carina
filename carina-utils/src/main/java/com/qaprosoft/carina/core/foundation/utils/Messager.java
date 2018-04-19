@@ -99,7 +99,7 @@ public enum Messager {
 
     ELEMENT_NOT_PRESENT("FAIL: element '%s' does not present!"),
     
-    ELEMENT_NOT_VERIFIED("FAIL: element '%s' was not verified!"),
+    ELEMENT_CONDITION_NOT_VERIFIED("FAIL: waitCondition for element '%s' does not present!!"),
 
     ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' does not present"),
 
@@ -111,9 +111,9 @@ public enum Messager {
 
     ELEMENT_WITH_TEXT_NOT_PRESENT("FAIL: element '%s' with text: '%s' does not present!"),
 
-    UNEXPECTED_ELEMENT_PRESENT("FAIL: unexpected element '%s' presents!"),
+    UNEXPECTED_ELEMENT_PRESENT("FAIL: unexpected element '%s' present!"),
 
-    UNEXPECTED_ELEMENT_WITH_TEXT_PRESENT("FAIL: unexpected element '%s' with text '%s' presents!"),
+    UNEXPECTED_ELEMENT_WITH_TEXT_PRESENT("FAIL: unexpected element '%s' with text '%s' present!"),
 
     ELEMENT_CLICKED("PASS: element '%s' is clicked."),
 
@@ -134,10 +134,6 @@ public enum Messager {
     ELEMENT_RIGHT_CLICKED("PASS: element '%s' is right clicked."),
 
     ELEMENT_NOT_RIGHT_CLICKED("FAIL: element '%s' is not right clicked!"),
-
-    HIDDEN_ELEMENT_CLICKED("PASS: hidden element '%s' is clicked."),
-
-    HIDDEN_ELEMENT_NOT_CLICKED("FAIL: hidden element '%s' is not clicked!"),
 
     ELEMENT_HOVERED("PASS: element '%s' is hovered."),
 
