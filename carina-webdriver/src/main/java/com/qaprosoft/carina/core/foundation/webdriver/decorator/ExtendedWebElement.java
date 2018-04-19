@@ -115,6 +115,89 @@ public class ExtendedWebElement {
         this.element = element;
         this.driver = driver;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+        
+
+/*
+        //read searchContext from not null element
+        if (element == null) {
+        	try {
+        		throw new RuntimeException("to see stacktrace!");
+        	} catch (Throwable thr) {
+        		thr.printStackTrace();
+        	}
+        	//TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element
+        	return;
+        }
+        
+		try {
+            
+			Field locatorField, searchContextField, byContextField = null;
+			SearchContext searchContext = null;
+			
+			if (element instanceof RemoteWebElement) {
+				searchContext = ((RemoteWebElement) element).getWrappedDriver();
+			} else if (element instanceof Proxy) { 
+				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
+				
+				locatorField = innerProxy.getClass().getDeclaredField("locator");
+				locatorField.setAccessible(true);
+				
+				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+				
+				searchContextField = locator.getClass().getDeclaredField("searchContext");
+				searchContextField.setAccessible(true);
+				searchContext = (SearchContext) searchContextField.get(locator);
+				
+				byContextField = locator.getClass().getDeclaredField("by");
+				byContextField.setAccessible(true);
+				by = (By) byContextField.get(locator);
+				
+
+				
+				if (searchContext instanceof Proxy) {
+					innerProxy = Proxy.getInvocationHandler(((Proxy) searchContext));
+					
+					locatorField = innerProxy.getClass().getDeclaredField("locator");
+					locatorField.setAccessible(true);
+					
+					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+					
+					searchContextField = locator.getClass().getDeclaredField("searchContext");
+					searchContextField.setAccessible(true);
+					searchContext = (SearchContext) searchContextField.get(locator);
+				}
+			}
+			
+			if (searchContext instanceof RemoteWebElement) {
+				searchContext = ((RemoteWebElement) searchContext).getWrappedDriver();
+			}
+			if (searchContext != null && searchContext instanceof RemoteWebDriver) {
+				SessionId sessionId = ((RemoteWebDriver)searchContext).getSessionId();
+				//TODO: move getDriver by SessionId as well
+				//driver = DriverPool.getDriver(sessionId);
+			} else {
+				LOGGER.error(searchContext);
+			}
+			
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassCastException e) { // TODO: refactor: why? somehow
+											// HtmlElement objects can't be cast
+											// to Proxy...
+			e.printStackTrace();
+		}
+		if (driver == null) {
+			try {
+				throw new RuntimeException("review stacktrace!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+		} else  {
+			LOGGER.info("instance of driver");
+		}
+*/
     }
 
     @Deprecated
@@ -979,10 +1062,12 @@ public class ExtendedWebElement {
         /*
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
-
-        if (locator.startsWith("By.xpath: **")) {
-        	//TODO: why do we need this code at all?
-            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
+        if (locator.startsWith("By.IosClassChain: **")) {
+            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
+        }
+        
+        if (locator.startsWith("By.IosNsPredicate: **")) {
+            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
         return new ExtendedWebElement(null, name, by, driver);
@@ -1248,6 +1333,12 @@ public class ExtendedWebElement {
 			output = overrideAction(actionName, inputArg);
 		} catch (InvalidElementStateException e) {
 			LOGGER.debug("catched InvalidElementStateException: ", e);
+			// try to find again using driver
+			element = findStaleElement(getBy(), 1);
+
+			output = overrideAction(actionName, inputArg);
+		} catch (NoSuchElementException  e) {
+			LOGGER.debug("catched NoSuchElementException: ", e);
 			// try to find again using driver
 			element = findStaleElement(getBy(), 1);
 

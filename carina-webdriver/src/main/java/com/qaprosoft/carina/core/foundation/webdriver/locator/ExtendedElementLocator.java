@@ -19,7 +19,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -40,12 +39,6 @@ import com.qaprosoft.alice.models.dto.RecognitionMetaType;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
-
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -62,9 +55,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private By by;
     private WebElement cachedElement;
     private List<WebElement> cachedElementList;
-
-    private Boolean isPredicate;
-    private Boolean isClassChain;
 
     private String aiCaption;
     private Label aiLabel;
@@ -90,25 +80,6 @@ public class ExtendedElementLocator implements ElementLocator {
             this.aiLabel = field.getAnnotation(FindByAI.class).label();
         }
 
-        this.isPredicate = false;
-        if (field.isAnnotationPresent(Predicate.class)) {
-            this.isPredicate = field.getAnnotation(Predicate.class).enabled();
-            //replace generate by annotation using MobileBy... method
-            if (searchContext instanceof IOSDriver) {
-            	this.by = MobileBy.iOSNsPredicateString(getLocator(by));
-            } else if (searchContext instanceof AndroidDriver) {
-            	this.by = MobileBy.AndroidUIAutomator(getLocator(by));
-            }
-        }
-
-        this.isClassChain = false;
-        if (field.isAnnotationPresent(ClassChain.class)) {
-            this.isClassChain = field.getAnnotation(ClassChain.class).enabled();
-            //replace generate by annotation using MobileBy... method
-            if (searchContext instanceof IOSDriver) {
-            	this.by = MobileBy.iOSClassChain(getLocator(by));
-            }
-        }
     }
 
     /**
@@ -121,15 +92,23 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
         WebElement element = null;
+        List<WebElement> elements = null;
         NoSuchElementException exception = null;
         // Finding element using Selenium
         if (by != null) {
             try {
-                element = searchContext.findElement(by);
+            	element = searchContext.findElement(by);
             } catch (StaleElementReferenceException | InvalidElementStateException e) {
             	element = ((RemoteWebElement) searchContext).getWrappedDriver().findElement(by);
             } catch (NoSuchElementException e) {
                 exception = e;
+            	//TODO: on iOS findElement return nothing but findElements return valid single item
+            	// maybe migrate to the latest appium java driver
+            	elements = searchContext.findElements(by);
+            	if (!elements.isEmpty()) {
+            		exception = null;
+            		element = searchContext.findElements(by).get(0);
+            	}
                 LOGGER.info("Unable to find element: " + e.getMessage());
             }
         }
@@ -201,47 +180,4 @@ public class ExtendedElementLocator implements ElementLocator {
         return element;
     }
 
-    private String getLocator(By by) {
-        String locator = by.toString();
-
-        if (locator.startsWith("id=")) {
-            return StringUtils.remove(locator, "id=");
-        } else if (locator.startsWith("name=")) {
-            return StringUtils.remove(locator, "name=");
-        } else if (locator.startsWith("xpath=")) {
-            return StringUtils.remove(locator, "xpath=");
-        } else if (locator.startsWith("linkText=")) {
-            return StringUtils.remove(locator, "linkText=");
-        } else if (locator.startsWith("partialLinkText=")) {
-            return StringUtils.remove(locator, "partialLinkText=");
-        } else if (locator.startsWith("cssSelector=")) {
-            return StringUtils.remove(locator, "cssSelector=");
-        } else if (locator.startsWith("css=")) {
-            return StringUtils.remove(locator, "css=");
-        } else if (locator.startsWith("tagName=")) {
-            return StringUtils.remove(locator, "tagName=");
-        } else if (locator.startsWith("className=")) {
-            return StringUtils.remove(locator, "className=");
-        } else if (locator.startsWith("By.id: ")) {
-            return StringUtils.remove(locator, "By.id: ");
-        } else if (locator.startsWith("By.name: ")) {
-            return StringUtils.remove(locator, "By.name: ");
-        } else if (locator.startsWith("By.xpath: ")) {
-            return StringUtils.remove(locator, "By.xpath: ");
-        } else if (locator.startsWith("By.linkText: ")) {
-            return StringUtils.remove(locator, "By.linkText: ");
-        } else if (locator.startsWith("By.partialLinkText: ")) {
-            return StringUtils.remove(locator, "By.partialLinkText: ");
-        } else if (locator.startsWith("By.css: ")) {
-            return StringUtils.remove(locator, "By.css: ");
-        } else if (locator.startsWith("By.cssSelector: ")) {
-            return StringUtils.remove(locator, "By.cssSelector: ");
-        } else if (locator.startsWith("By.className: ")) {
-            return StringUtils.remove(locator, "By.className: ");
-        } else if (locator.startsWith("By.tagName: ")) {
-            return StringUtils.remove(locator, "By.tagName: ");
-        }
-
-        throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
-    }
 }
