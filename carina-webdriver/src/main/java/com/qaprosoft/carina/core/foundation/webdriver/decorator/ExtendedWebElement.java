@@ -197,7 +197,11 @@ public class ExtendedWebElement {
 											// HtmlElement objects can't be cast
 											// to Proxy...
 			e.printStackTrace();
+		} catch (Throwable thr) {
+			thr.printStackTrace();
+			LOGGER.error("Unable to get driver and/or by for " + getNameWithLocator(), thr);
 		}
+		
 		if (tempDriver == null) {
 			try {
 				throw new RuntimeException("review stacktrace to analyze why tempDriver is not populated correctly via reflection!");
