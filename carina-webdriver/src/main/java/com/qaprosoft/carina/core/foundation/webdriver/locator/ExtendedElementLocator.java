@@ -123,8 +123,7 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
 		// 1. enable cache for successfully discovered element to minimize selenium calls
-        // 2. disable default caching to test iOS click issue 
-		//shouldCache = true;
+		shouldCache = true;
         if (shouldCache) {
             cachedElement = element;
         }
