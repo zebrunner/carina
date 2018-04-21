@@ -1293,7 +1293,7 @@ public class ExtendedWebElement {
 			actionSteps.doUncheck();
 			break;
 		case IS_CHECKED:
-			actionSteps.doIsChecked();
+			result = actionSteps.doIsChecked();
 			break;
 		case SELECT:
 			result = actionSteps.doSelect((String) inputArg);
