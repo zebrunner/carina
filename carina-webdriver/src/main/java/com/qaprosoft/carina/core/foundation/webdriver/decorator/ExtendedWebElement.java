@@ -1080,7 +1080,7 @@ public class ExtendedWebElement {
         }
         
         if (locator.startsWith("By.IosNsPredicate: **")) {
-            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
+            by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
         return new ExtendedWebElement(null, name, by, driver);
@@ -1371,7 +1371,7 @@ public class ExtendedWebElement {
 				try {
 					element.click();
 				} catch (WebDriverException e) {
-					if (e != null && (e.getMessage().contains("Other element would receive the click:") || e.getMessage().contains("is not visible on the screen and thus is not interactable"))) {
+					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
 						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
 						Actions actions = new Actions(getDriver());
 						actions.moveToElement(element).click().perform();
