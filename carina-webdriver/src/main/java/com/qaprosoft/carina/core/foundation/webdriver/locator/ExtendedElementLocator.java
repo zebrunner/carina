@@ -157,8 +157,8 @@ public class ExtendedElementLocator implements ElementLocator {
             throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
         }
 
-		// enable cache for successfully discovered element to minimize selenium calls
-		shouldCache = true;
+        // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
+        // As result for all dynamic lists we have too often out of bound index exceptions
         if (shouldCache) {
             cachedElementList = elements;
         }
