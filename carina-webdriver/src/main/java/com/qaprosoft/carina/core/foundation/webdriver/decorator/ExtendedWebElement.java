@@ -285,7 +285,7 @@ public class ExtendedWebElement {
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	public boolean waitUntil(ExpectedCondition<WebElement> condition, long timeout) {
+	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
@@ -689,9 +689,7 @@ public class ExtendedWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-    	//TODO: SZ migrate to FluentWaits
-        assertElementPresent();
-        return new Select(getElement()).getAllSelectedOptions().get(0).getText();
+    	return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
 
     /**
@@ -699,24 +697,9 @@ public class ExtendedWebElement {
      *
      * @return selected values
      */
-    public List<String> getSelectedValues() {
-    	//TODO: SZ migrate to FluentWaits
-        assertElementPresent();
-        Select s = new Select(getElement());
-        List<String> values = new ArrayList<String>();
-        for (WebElement we : s.getAllSelectedOptions()) {
-            values.add(we.getText());
-        }
-        return values;
-    }
-
-    private WebDriver getDriver() {
-		if (driver != null) {
-			return driver;
-		} else {
-			LOGGER.error("Unable to detect driver by sessionId! Looking for default one from pool.");
-			return DriverPool.getDriver();
-		}
+    @SuppressWarnings("unchecked")
+	public List<String> getSelectedValues() {
+    	return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
 
     /**
@@ -825,11 +808,24 @@ public class ExtendedWebElement {
      * @return element with text existence status.
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
-    	assertElementPresent(timeout);
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-    	//TODO: SZ migrate to FluentWaits using separate UI doAction
-    	//temporary used direct call to selenium to regenerate element explicitly
-    	return getElement().getText().contains(decryptedText);
+    	
+    	//TODO: test how effective it is to combine presence and textToBe
+    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfAllElementsLocatedBy(getBy()),
+				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
+    }
+    
+    public void assertElementWithTextPresent(final String text) {
+        assertElementWithTextPresent(text, EXPLICIT_TIMEOUT);
+    }
+
+    public void assertElementWithTextPresent(final String text, long timeout) {
+        if (isElementWithTextPresent(text, timeout)) {
+        	//TODO: move screenshot outside of the class
+            Screenshot.capture(getDriver(), Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(getName(), text));
+        } else {
+            Assert.fail(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(getNameWithLocator(), text));
+        }
     }
     
     public void assertElementPresent() {
@@ -842,17 +838,7 @@ public class ExtendedWebElement {
 		}
     }
 
-    public void assertElementWithTextPresent(final String text) {
-        assertElementWithTextPresent(text, EXPLICIT_TIMEOUT);
-    }
 
-    public void assertElementWithTextPresent(final String text, long timeout) {
-        if (isElementWithTextPresent(text, timeout)) {
-            Screenshot.capture(getDriver(), Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(getName(), text));
-        } else {
-            Assert.fail(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(getNameWithLocator(), text));
-        }
-    }
 
     /**
      * Find Extended Web Element on page using By starting search from this
@@ -1251,6 +1237,10 @@ public class ExtendedWebElement {
 		boolean doSelectByPartialText(final String partialSelectText);
 
 		boolean doSelectByIndex(final int index);
+		
+		String doGetSelectedValue();
+		
+		List<String> doGetSelectedValues();
 	}
 
 	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object inputArg) {
@@ -1310,6 +1300,12 @@ public class ExtendedWebElement {
 		case SELECT_BY_INDEX:
 			result = actionSteps.doSelectByIndex((int) inputArg);
 			break;
+		case GET_SELECTED_VALUE:
+			result = actionSteps.doGetSelectedValue();
+			break;
+		case GET_SELECTED_VALUES:
+			result = actionSteps.doGetSelectedValues();
+			break;
 		default:
 			Assert.fail("Unsupported UI action name" + actionName.toString());
 			break;
@@ -1337,7 +1333,6 @@ public class ExtendedWebElement {
 		Object output = null;
 		// captureElements();
 
-		//TODO: SZ migrate to FluentWaits
 		//handle invalid element state: Element is not currently interactable and may not be manipulated
 		Timer.start(actionName);
 		try {
@@ -1361,8 +1356,6 @@ public class ExtendedWebElement {
 		return output;
 	}
 
-	//TODO: SZ: add isSelected
-	
 	// single place for all supported UI actions in carina core
 	private Object overrideAction(ACTION_NAME actionName, Object inputArg) {
 		Object output = executeAction(actionName, new ActionSteps() {
@@ -1531,11 +1524,26 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByIndex(int index) {
-				// TODO Auto-generated method stub
 				final Select s = new Select(element);
 				s.selectByIndex(index);
 				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), getName()));
 				return true;
+			}
+
+			@Override
+			public String doGetSelectedValue() {
+				final Select s = new Select(element);
+				return s.getAllSelectedOptions().get(0).getText();
+			}
+
+			@Override
+			public List<String> doGetSelectedValues() {
+		        final Select s = new Select(getElement());
+		        List<String> values = new ArrayList<String>();
+		        for (WebElement we : s.getAllSelectedOptions()) {
+		            values.add(we.getText());
+		        }
+		        return values;
 			}
 			
 		}, inputArg);
@@ -1654,8 +1662,28 @@ public class ExtendedWebElement {
 				return false;
 			}
 
+			@Override
+			public String doGetSelectedValue() {
+				return "";
+			}
+
+			@Override
+			public List<String> doGetSelectedValues() {
+				//return empty list 
+				return new ArrayList<String>();
+			}
+
 		}, inputArg);
 
 		return output;
 	}
+	
+    private WebDriver getDriver() {
+		if (driver != null) {
+			return driver;
+		} else {
+			LOGGER.error("Unable to detect driver by sessionId! Looking for default one from pool.");
+			return DriverPool.getDriver();
+		}
+    }
 }
