@@ -76,6 +76,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.PerformsTouchActions;
+import io.appium.java_client.TouchAction;
 
 // TODO: [VD] removed deprecated constructor and DriverPool import
 // Also refactor screenshots capturing using listener approach to be able to remove it as well
@@ -1372,6 +1374,10 @@ public class ExtendedWebElement {
 						//TODO: analyze if we should try to click using js as well
 						//JavascriptExecutor executor = (JavascriptExecutor) getDriver();
 			            //executor.executeScript("arguments[0].click();", element);
+					} else if (e != null && (e.getMessage().contains("is not visible on the screen and thus is not interactable"))) {
+						// https://github.com/facebook/WebDriverAgent/issues/602
+						LOGGER.warn("Trying to do click by TouchActions due to the: " + e.getMessage());
+						new TouchAction((PerformsTouchActions) getDriver()).tap(element).perform();
 					} else {
 						throw e;
 					}
