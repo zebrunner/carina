@@ -361,6 +361,8 @@ public class Configuration {
             }
         }
 
+        //write into the log extra information about selenium_host together with capabilities
+        asString.append(String.format("%s=%s\n", "selenium_host", R.CONFIG.get("selenium_host")));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";

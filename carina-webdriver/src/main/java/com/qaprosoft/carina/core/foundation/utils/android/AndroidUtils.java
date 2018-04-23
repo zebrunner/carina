@@ -269,6 +269,7 @@ public class AndroidUtils extends MobileUtils {
     }
     
     public static boolean isChecked(final ExtendedWebElement element) {
+    	//TODO: SZ migrate to FluentWaits
 		return element.isElementPresent(5)
 				&& (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }

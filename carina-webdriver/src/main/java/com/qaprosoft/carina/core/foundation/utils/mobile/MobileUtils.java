@@ -105,6 +105,7 @@ public class MobileUtils {
      * @return boolean
      */
     public static boolean longPress(ExtendedWebElement element) {
+    	//TODO: SZ migrate to FluentWaits
         try {
             WebDriver driver = DriverPool.getDriver();
             TouchAction action = new TouchAction((MobileDriver<?>) driver);

@@ -15,16 +15,25 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.AbstractFindByBuilder;
+import org.openqa.selenium.support.PageFactoryFinder;
 import org.openqa.selenium.support.pagefactory.Annotations;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
+
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 public class LocalizedAnnotations extends Annotations {
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
@@ -35,8 +44,10 @@ public class LocalizedAnnotations extends Annotations {
 
     @Override
     public By buildBy() {
+
         By by = super.buildBy();
         String param = by.toString();
+        
         // replace by using localization pattern
         Matcher matcher = L10N_PATTERN.matcher(param);
         while (matcher.find()) {
@@ -51,7 +62,18 @@ public class LocalizedAnnotations extends Annotations {
             }
 
         }
-        by = createBy(param);
+        
+		if (getField().isAnnotationPresent(Predicate.class)) {
+			// TODO: analyze howto determine iOS or Android predicate
+			param = StringUtils.remove(param, "By.xpath: ");
+			by = MobileBy.iOSNsPredicateString(param);
+			// by = MobileBy.AndroidUIAutomator(param);
+		} else if (getField().isAnnotationPresent(ClassChain.class)) {
+			param = StringUtils.remove(param, "By.xpath: ");
+			by = MobileBy.iOSClassChain(param);
+		} else {
+			by = createBy(param);
+		}
         return by;
     }
 
@@ -92,7 +114,7 @@ public class LocalizedAnnotations extends Annotations {
             return By.className(StringUtils.remove(locator, "By.className: "));
         } else if (locator.startsWith("By.tagName: ")) {
             return By.tagName(StringUtils.remove(locator, "By.tagName: "));
-        }
+        }       
 
         throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
     }
