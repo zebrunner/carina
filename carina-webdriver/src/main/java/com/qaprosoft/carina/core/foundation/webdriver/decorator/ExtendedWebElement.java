@@ -763,7 +763,7 @@ public class ExtendedWebElement {
     // Base UI validations
     // --------------------------------------------------------------------------
     /**
-     * Check that element present.
+     * Check that element present and visible.
      *
      * @return element existence status.
      */
@@ -772,7 +772,7 @@ public class ExtendedWebElement {
     }
 
     /**
-     * Check that element present within specified timeout.
+     * Check that element present and visible within specified timeout.
      *
      * @param timeout - timeout.
      * @return element existence status.
@@ -783,7 +783,7 @@ public class ExtendedWebElement {
     }
 
     /**
-     * Check that element not present within specified timeout.
+     * Check that element not present and not visible within specified timeout.
      *
      * @param timeout - timeout.
      * @return element existence status.
@@ -813,7 +813,7 @@ public class ExtendedWebElement {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
     	
     	//TODO: test how effective it is to combine presence and textToBe
-    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfAllElementsLocatedBy(getBy()),
+    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
     }
     
@@ -969,6 +969,7 @@ public class ExtendedWebElement {
      * @return boolean - false if element still present after wait - otherwise
      *         true if it disappear
      */
+    @Deprecated
     public boolean isElementNotPresentAfterWait(final long timeout) {
         final ExtendedWebElement element = this;
 
