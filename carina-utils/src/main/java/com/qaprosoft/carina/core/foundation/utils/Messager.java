@@ -123,7 +123,7 @@ public enum Messager {
 
     ELEMENT_NOT_FOUND("FAIL: element '%s' is not found!"),
     
-    ELEMENT_ATTRIBUTE_FOUND("PASS: attribute '%s' for element '%s' is found."),
+    ELEMENT_ATTRIBUTE_FOUND("PASS: attribute/value '%s'/'%s' for element '%s' is found."),
 
     ELEMENT_ATTRIBUTE_NOT_FOUND("FAIL: attribute '%s' for element '%s' is not found!"),
 

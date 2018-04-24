@@ -1412,28 +1412,28 @@ public class ExtendedWebElement {
 			@Override
 			public String doGetText() {
 				String text = element.getText();
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Text", getName());
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Text", text, getName());
 				return text;
 			}
 
 			@Override
 			public Point doGetLocation() {
 				Point point = element.getLocation();
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Location", getName());
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Location", point.toString(), getName());
 				return point;
 			}
 
 			@Override
 			public Dimension doGetSize() {
 				Dimension dim = element.getSize();
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Size", getName());
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Size", dim.toString(), getName());
 				return dim;
 			}
 
 			@Override
 			public String doGetAttribute(String name) {
 				String attribute = element.getAttribute(name);
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info(name, getName());
+				Messager.ELEMENT_ATTRIBUTE_FOUND.info(name, attribute, getName());
 				return attribute;
 			}
 
