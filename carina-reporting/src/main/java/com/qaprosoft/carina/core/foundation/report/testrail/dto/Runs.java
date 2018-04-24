@@ -36,6 +36,10 @@ public class Runs {
         obj.put("include_all", insludeAllCases);
         return new Request(obj, "add_run/" + projectID, "POST");
     }
+    
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID) {
+		return addRun(suite_id, name, assignedto_id, projectID, Boolean.TRUE);
+	}
 
     @SuppressWarnings("unchecked")
     public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, boolean insludeAllCases) {
@@ -47,6 +51,10 @@ public class Runs {
         obj.put("milestone_id", milestoneId);
         return new Request(obj, "add_run/" + projectID, "POST");
     }
+    
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId) {
+		return addRun(suite_id, name, assignedto_id, projectID, milestoneId, Boolean.TRUE);
+	}
 
     @SuppressWarnings("unchecked")
     public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, String desc) {
