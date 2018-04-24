@@ -72,6 +72,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -1372,6 +1373,12 @@ public class ExtendedWebElement {
 						//TODO: analyze if we should try to click using js as well
 						//JavascriptExecutor executor = (JavascriptExecutor) getDriver();
 			            //executor.executeScript("arguments[0].click();", element);
+					} else if (e != null && (e.getMessage().contains("is not visible on the screen and thus is not interactable"))) {
+						// https://github.com/facebook/WebDriverAgent/issues/602
+						LOGGER.warn("Trying to do tap by coordinates temporary due to the: " + e.getMessage());
+						Point point = getLocation();
+						Dimension dim = getSize();
+						MobileUtils.tap(point.getX() + dim.getWidth() / 2, point.getY() + dim.getHeight() / 2);
 					} else {
 						throw e;
 					}
