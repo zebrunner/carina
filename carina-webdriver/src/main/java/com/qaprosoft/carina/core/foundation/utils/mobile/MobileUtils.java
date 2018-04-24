@@ -276,8 +276,8 @@ public class MobileUtils {
     public static boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
             int count, int duration) {
 
-        boolean isPresent = element.isElementPresent(1);
-        if (isPresent) {
+        boolean isVisible = element.isVisible(1);
+        if (isVisible) {
             // no sense to continue;
             LOGGER.info("element already present before swipe: " + element.getNameWithLocator().toString());
             return true;
@@ -327,26 +327,26 @@ public class MobileUtils {
 
         int currentCount = count;
 
-        while (!isPresent && currentCount-- > 0) {
+        while (!isVisible && currentCount-- > 0) {
             LOGGER.debug("Element not present! Swipe " + direction + " will be executed to element: " + element.getNameWithLocator().toString());
             swipeInDevice(container, direction, duration);
 
             LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
-            isPresent = element.isElementPresent(1);
-            LOGGER.info("Result: " + isPresent);
+            isVisible = element.isVisible(1);
+            LOGGER.info("Result: " + isVisible);
         }
 
         currentCount = count;
-        while (bothDirections && !isPresent && currentCount-- > 0) {
+        while (bothDirections && !isVisible && currentCount-- > 0) {
             LOGGER.debug(
                     "Element not present! Swipe " + oppositeDirection + " will be executed to element: " + element.getNameWithLocator().toString());
             swipeInDevice(container, oppositeDirection, duration);
             LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
-            isPresent = element.isElementPresent(1);
-            LOGGER.info("Result: " + isPresent);
+            isVisible = element.isVisible(1);
+            LOGGER.info("Result: " + isVisible);
         }
 
-        return isPresent;
+        return isVisible;
     }
 
     /**
