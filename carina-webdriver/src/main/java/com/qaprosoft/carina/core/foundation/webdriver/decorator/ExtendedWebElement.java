@@ -72,12 +72,11 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.PerformsTouchActions;
-import io.appium.java_client.TouchAction;
 
 // TODO: [VD] removed deprecated constructor and DriverPool import
 // Also refactor screenshots capturing using listener approach to be able to remove it as well
@@ -1376,8 +1375,10 @@ public class ExtendedWebElement {
 			            //executor.executeScript("arguments[0].click();", element);
 					} else if (e != null && (e.getMessage().contains("is not visible on the screen and thus is not interactable"))) {
 						// https://github.com/facebook/WebDriverAgent/issues/602
-						LOGGER.warn("Trying to do click by TouchActions due to the: " + e.getMessage());
-						new TouchAction((PerformsTouchActions) getDriver()).tap(element).perform();
+						LOGGER.warn("Trying to do tap by coordinates temporary due to the: " + e.getMessage());
+						Point point = getLocation();
+						Dimension dim = getSize();
+						MobileUtils.tap(point.getX() + dim.getWidth() / 2, point.getY() + dim.getHeight() / 2);
 					} else {
 						throw e;
 					}
