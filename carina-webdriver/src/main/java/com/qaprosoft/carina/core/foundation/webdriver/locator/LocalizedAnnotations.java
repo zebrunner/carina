@@ -15,15 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.AbstractFindByBuilder;
-import org.openqa.selenium.support.PageFactoryFinder;
 import org.openqa.selenium.support.pagefactory.Annotations;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -32,8 +29,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Clas
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 
 public class LocalizedAnnotations extends Annotations {
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
