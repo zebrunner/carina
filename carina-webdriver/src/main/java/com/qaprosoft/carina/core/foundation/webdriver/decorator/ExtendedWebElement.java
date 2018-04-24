@@ -117,6 +117,7 @@ public class ExtendedWebElement {
         this.driver = driver;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
         
+        //TODO: we must implement below functionality safety to restore AbstractUIObject(s)
 
 /*
         //read searchContext from not null element
@@ -779,7 +780,7 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent(long timeout) {
     	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-    			ExpectedConditions.presenceOfElementLocated(getBy())), timeout);
+    			ExpectedConditions.visibilityOfElementLocated(getBy())), timeout);
     }
 
     /**

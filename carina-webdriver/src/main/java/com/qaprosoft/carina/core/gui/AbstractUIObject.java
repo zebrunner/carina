@@ -15,12 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -72,11 +81,11 @@ public abstract class AbstractUIObject extends DriverHelper {
      *         false - otherwise
      */
     public boolean isUIObjectPresent(int timeout) {
-        return isElementPresent(name, rootElement, timeout);
+    	return waitUntil(ExpectedConditions.visibilityOf(rootElement), timeout);
     }
 
     public boolean isUIObjectPresent() {
-        return isElementPresent(name, rootElement);
+    	return isUIObjectPresent(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
     }
 
     public String getName() {
@@ -94,4 +103,36 @@ public abstract class AbstractUIObject extends DriverHelper {
     public void setRootElement(WebElement rootElement) {
         this.rootElement = rootElement;
     }
+    
+    
+    /**
+     * Wait until any condition happens.
+     *
+     * @param condition - ExpectedCondition.
+     * @param timeout - timeout.
+     * @return true if condition happen.
+     */
+    //TODO: replace with extendedWebElement as only deliver functionality for getting driver and by from WebElement object only
+	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
+		boolean result;
+		final WebDriver drv = getDriver();
+		Timer.start(ACTION_NAME.WAIT);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try {
+			LOGGER.debug("waitUntil: starting..." + getName() + "; condition: " + condition.toString());
+			wait.until(condition);
+			result = true;
+			LOGGER.debug("waitUntil: finished true..." + getName());
+		} catch (NoSuchElementException | TimeoutException e) {
+			// don't write exception even in debug mode
+			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getName());
+			result = false;
+		} catch (Exception e) {
+			LOGGER.error("waitUntil: " + getName(), e);
+			result = false;
+		}
+		Timer.stop(ACTION_NAME.WAIT);
+		return result;
+	}
+	
 }
