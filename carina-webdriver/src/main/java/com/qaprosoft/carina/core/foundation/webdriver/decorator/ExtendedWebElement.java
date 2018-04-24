@@ -768,7 +768,7 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent() {
-    	return isPresent(EXPLICIT_TIMEOUT);
+    	return isElementPresent(EXPLICIT_TIMEOUT);
     }
 
     /**
@@ -778,7 +778,8 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-    	return isPresent(timeout);
+    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+    			ExpectedConditions.presenceOfElementLocated(getBy())), timeout);
     }
 
     /**
