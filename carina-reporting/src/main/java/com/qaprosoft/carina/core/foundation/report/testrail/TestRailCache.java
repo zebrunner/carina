@@ -27,6 +27,6 @@ import com.qaprosoft.carina.core.foundation.report.testrail.dto.TestCaseInfo;
  */
 public class TestRailCache {
 
-    static Map<Integer, ArrayList<TestCaseInfo>> suiteCases = Collections.synchronizedMap(new HashMap<Integer, ArrayList<TestCaseInfo>>());
+   public static Map<Integer, ArrayList<TestCaseInfo>> suiteCases = Collections.synchronizedMap(new HashMap<Integer, ArrayList<TestCaseInfo>>());
 
 }
