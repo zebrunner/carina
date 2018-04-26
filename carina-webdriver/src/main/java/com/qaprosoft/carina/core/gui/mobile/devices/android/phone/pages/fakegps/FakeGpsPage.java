@@ -163,7 +163,7 @@ public class FakeGpsPage extends MobileAbstractPage {
     }
 
     public boolean isOpened(long timeout) {
-        return isElementPresent(setLocationStart, timeout) || isElementPresent(setLocationButton, timeout) || isOpenSettingButtonPresent();
+        return setLocationStart.isElementPresent(timeout) || setLocationButton.isElementPresent(timeout) || isOpenSettingButtonPresent();
     }
 
     @Override

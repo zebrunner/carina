@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
@@ -32,13 +31,11 @@ public class LocatingElementListHandler implements InvocationHandler {
     private final ElementLocator locator;
     private String name;
     private By by;
-    private WebDriver webDriver;
 
-    public LocatingElementListHandler(ElementLocator locator, String name, By by, WebDriver driver) {
+    public LocatingElementListHandler(ElementLocator locator, String name, By by) {
         this.locator = locator;
         this.name = name;
         this.by = by;
-        this.webDriver = driver;
     }
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
@@ -48,7 +45,7 @@ public class LocatingElementListHandler implements InvocationHandler {
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
             for (WebElement element : elements) {
-                extendedWebElements.add(new ExtendedWebElement(element, name, by, webDriver));
+                extendedWebElements.add(new ExtendedWebElement(element, name, by));
             }
         }
 

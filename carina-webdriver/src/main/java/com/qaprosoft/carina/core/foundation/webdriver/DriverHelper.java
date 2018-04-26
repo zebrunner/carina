@@ -25,14 +25,27 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
@@ -335,11 +348,9 @@ public class DriverHelper {
                 }
             }
         }
-        if (!present) {
-            LOGGER.error("All elements are not present");
-            throw new RuntimeException("Unable to find any element from array: " + elements.toString());
-        }
-        return new ExtendedWebElement(null, null, null, null);
+        //throw exception anyway if nothing was returned inside for cycle
+        LOGGER.error("All elements are not present");
+        throw new RuntimeException("Unable to find any element from array: " + elements.toString());
     }
 
     /**
@@ -401,7 +412,7 @@ public class DriverHelper {
      */
 
     public boolean isElementNotPresent(String controlInfo, final WebElement element) {
-        return isElementNotPresent(new ExtendedWebElement(element, controlInfo, getDriver()));
+        return isElementNotPresent(new ExtendedWebElement(element, controlInfo));
     }
 
     /**
@@ -1227,58 +1238,53 @@ public class DriverHelper {
      * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-        ExtendedWebElement element;
-        final WebDriver drv = getDriver();
-
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-            setImplicitTimeout(0);
-            wait.until((Function<WebDriver, Object>) dr -> !drv.findElements(by).isEmpty());
-            element = new ExtendedWebElement(driver.findElement(by), name, by, driver);
-            Messager.ELEMENT_FOUND.info(name);
-        } catch (Exception e) {
-            element = null;
-            Messager.ELEMENT_NOT_FOUND.error(name);
-            throw new RuntimeException(e);
-        } finally {
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
-        }
-
-        return element;
+    	if (!waitUntil(name, ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+    		LOGGER.error(Messager.ELEMENT_NOT_FOUND.error(name));
+    		return null;
+    	}
+    	Messager.ELEMENT_FOUND.info(name);
+    	return new ExtendedWebElement(by, name);
     }
 
+    /**
+     * Find List of Extended Web Elements on page using By and explicit timeout.
+     * 
+     * @param by
+     *            Selenium By locator
+     * @return List of ExtendedWebElement.
+     */
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Find List of Extended Web Elements on page using By.
+     * 
+     * @param by
+     *            Selenium By locator
+     * @param timeout
+     *            Timeout to find
+     * @return List of ExtendedWebElement.
+     */
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
         List<WebElement> webElements = new ArrayList<WebElement>();
 
-        final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-            setImplicitTimeout(0);
-            wait.until(new Function<WebDriver, Object>() {
-                public Boolean apply(WebDriver dr) {
-                    return !drv.findElements(by).isEmpty();
-                }
-            });
-            webElements = driver.findElements(by);
-        } catch (Exception e) {
-            // do nothing
-        } finally {
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
-        }
-
+        String name = "undefined";
+    	if (!waitUntil(name, ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+    		LOGGER.info(Messager.ELEMENT_NOT_FOUND.info(name));
+    		return extendedWebElements;
+    	}
+    	
+    	webElements = getDriver().findElements(by);
         for (WebElement element : webElements) {
-            String name = "undefined";
             try {
                 name = element.getText();
-            } catch (Exception e) {/* do nothing */
+            } catch (Exception e) {
+            	/* do nothing */
             }
 
-            extendedWebElements.add(new ExtendedWebElement(element, name, drv));
+            extendedWebElements.add(new ExtendedWebElement(element, name));
         }
         return extendedWebElements;
     }
@@ -1303,8 +1309,38 @@ public class DriverHelper {
         return driver;
     }
 
+    @Deprecated
     public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
         return element.format(objects);
     }
 
+    
+    /**
+     * Wait until any condition happens.
+     *
+     * @param condition - ExpectedCondition.
+     * @param timeout - timeout.
+     * @return true if condition happen.
+     */
+	private boolean waitUntil(String name, ExpectedCondition<?> condition, long timeout) {
+		boolean result;
+		final WebDriver drv = getDriver();
+		Timer.start(ACTION_NAME.WAIT);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		try {
+			LOGGER.debug("waitUntil: starting..." + name + "; condition: " + condition.toString());
+			wait.until(condition);
+			result = true;
+			LOGGER.debug("waitUntil: finished true..." + name);
+		} catch (NoSuchElementException | TimeoutException e) {
+			// don't write exception even in debug mode
+			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + name);
+			result = false;
+		} catch (Exception e) {
+			LOGGER.error("waitUntil: " + name, e);
+			result = false;
+		}
+		Timer.stop(ACTION_NAME.WAIT);
+		return result;
+	}
 }

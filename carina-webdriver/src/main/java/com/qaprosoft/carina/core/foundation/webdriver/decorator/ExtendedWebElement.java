@@ -50,7 +50,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -125,9 +125,9 @@ public class ExtendedWebElement {
     	this(element);
     }
     
-    @Deprecated
     public ExtendedWebElement(WebElement element, String name, By by) {
-        this(element, name, by, DriverPool.getDriver());
+        this(element, name);
+        this.by = by;
     }
 
     public ExtendedWebElement(By by, String name) {
@@ -1097,7 +1097,7 @@ public class ExtendedWebElement {
             by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
-        return new ExtendedWebElement(null, name, by, driver);
+        return new ExtendedWebElement(by, name);
     }
 
     private void captureElements() {
