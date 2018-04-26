@@ -109,32 +109,56 @@ public class ExtendedWebElement {
     private By by;
     private WebDriver driver;
 
+    @Deprecated
     public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
-        this(element, driver);
-        this.name = name;
+        this(element, name);
     }
 
+    @Deprecated
     public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver) {
-        this(element, name, driver);
+        this(element, name);
         this.by = by;
     }
 
+    @Deprecated
     public ExtendedWebElement(WebElement element, WebDriver driver) {
+    	this(element);
+    }
+    
+    @Deprecated
+    public ExtendedWebElement(WebElement element, String name, By by) {
+        this(element, name, by, DriverPool.getDriver());
+    }
+
+    public ExtendedWebElement(By by, String name) {
+    	this.by = by;
+    	this.name = name;
+    	this.element = null;
+    }
+    
+    public ExtendedWebElement(WebElement element, String name) {
+    	this(element);
+    	this.name = name;
+    }
+    
+    public ExtendedWebElement(WebElement element) {
         this.element = element;
-        this.driver = driver;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
         
         //TODO: we must implement below functionality safety to restore AbstractUIObject(s)
 
 
-        //read searchContext from not null element
+        //read searchContext from not null elements only
         if (element == null) {
-        	try {
-        		throw new RuntimeException("to see stacktrace! TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element");
-        	} catch (Throwable thr) {
-        		thr.printStackTrace();
+        	// it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
+        	if (getBy() == null) {
+				try {
+					throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+				} catch (Throwable thr) {
+					thr.printStackTrace();
+				}
         	}
-        	//TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element
+
         	return;
         }
 
@@ -218,7 +242,8 @@ public class ExtendedWebElement {
 			}
 		}
 
-		LOGGER.info("by: " + by);
+		this.driver = tempDriver;
+		
 		LOGGER.info("tempBy: " + tempBy);
 
 /*		if (tempBy == null) {
@@ -235,22 +260,6 @@ public class ExtendedWebElement {
 			}
 		}*/
 		
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name) {
-        // TODO: remove usage with default river!
-        this(element, name, DriverPool.getDriver());
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, By by) {
-        this(element, name, by, DriverPool.getDriver());
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element) {
-        this(element, DriverPool.getDriver());
     }
 
     public WebElement getElement() {
