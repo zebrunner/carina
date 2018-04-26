@@ -45,7 +45,7 @@ public class ScreenElementExtractor extends AbstractElementExtractor {
                 result.add(webElement);
             }
         }
-        return generateExtenedElement(result, driver, elementName);
+        return generateExtenedElement(result, elementName);
     }
 
 }
