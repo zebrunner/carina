@@ -25,7 +25,14 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
@@ -830,7 +837,6 @@ public class DriverHelper {
         select(new ExtendedWebElement(control, controlInfo, getDriver()), index);
     }
 
-    // TODO: review why hover from ExtendedWelement doesn't work
     /**
      * Hovers over element.
      * 
@@ -845,65 +851,12 @@ public class DriverHelper {
 
     @Deprecated
     public void hover(final ExtendedWebElement extendedWebElement, Integer xOffset, Integer yOffset) {
-        WebDriver drv = getDriver();
-        if (isElementPresent(extendedWebElement)) {
-
-            if (!drv.toString().contains("safari")) {
-                Actions action = new Actions(drv);
-                if (xOffset != null && yOffset != null) {
-                    action.moveToElement(extendedWebElement.getElement(), xOffset, yOffset);
-                } else {
-                    action.moveToElement(extendedWebElement.getElement());
-                }
-
-                action.perform();
-            } else {
-                // https://code.google.com/p/selenium/issues/detail?id=4136
-                JavascriptExecutor js = (JavascriptExecutor) drv;
-                String locatorType = extendedWebElement.getBy().toString().substring(3);
-                String elem = "var elem = document;";
-                if (locatorType.startsWith("id")) {
-                    elem = "var elem = document.getElementById(\"" + locatorType.substring(4) + "\");";
-                } else if (locatorType.startsWith("xpath")) {
-                    String snippet = "document.getElementByXPath = function(sValue) { var a = this.evaluate(sValue, this, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null); if (a.snapshotLength > 0) { return a.snapshotItem(0); } }; ";
-                    js.executeScript(snippet);
-                    elem = "var elem = document.getElementByXPath(\"" + locatorType.substring(7) + "\");";
-                } else if (locatorType.startsWith("className")) {
-                    elem = "var elem = document.getElementsByClassName(\"" + locatorType.substring(14) + "\")[0];";
-                }
-                String mouseOverScript = elem
-                        + " if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false);"
-                        + " elem.dispatchEvent(evObj);} else if(document.createEventObject) { elem.fireEvent('onmouseover');}";
-                js.executeScript(mouseOverScript);
-            }
-
-            String msg = Messager.HOVER_IMG.info(extendedWebElement.getName());
-            Screenshot.capture(drv, msg);
-        } else {
-            Messager.ELEMENT_NOT_HOVERED.error(extendedWebElement.getNameWithLocator());
-        }
+    	extendedWebElement.hover(xOffset, yOffset);
     }
 
     @Deprecated
     public void hover(String controlInfo, WebElement control) {
         hover(new ExtendedWebElement(control, controlInfo, getDriver()));
-    }
-
-    /**
-     * Hovers over element.
-     * 
-     * @param xpathLocator
-     *            xpathLocator
-     * @param elementName
-     *            element name
-     */
-    @Deprecated
-    public void hover(String elementName, String xpathLocator) {
-        WebDriver drv = getDriver();
-        Actions action = new Actions(drv);
-        action.moveToElement(drv.findElement(By.xpath(xpathLocator))).perform();
-        String msg = Messager.HOVER_IMG.info(elementName);
-        Screenshot.capture(drv, msg);
     }
 
     public void pressTab() {

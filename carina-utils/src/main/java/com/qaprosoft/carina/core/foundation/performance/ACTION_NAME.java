@@ -6,6 +6,7 @@ public enum ACTION_NAME implements IPerformanceOperation {
     CLICK("click"),
     DOUBLE_CLICK("double_click"),
     RIGHT_CLICK("right_click"),
+    HOVER("hover"),
     SEND_KEYS("send_kyes"),
     TYPE("type"),
     ATTACH_FILE("attach_file"),

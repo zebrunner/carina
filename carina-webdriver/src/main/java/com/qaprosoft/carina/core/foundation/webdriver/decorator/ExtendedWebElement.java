@@ -420,9 +420,9 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-    	//TODO: temporary use presence due to the issues with iOS clickable detection
-        //click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
-    	click(timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	//TODO: reverted back to verify clickable. test on iOS where we had issue with it's detection on iOS 11.3
+        click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    	//click(timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
     
 	/**
@@ -488,6 +488,23 @@ public class ExtendedWebElement {
      */
     public void rightClick(long timeout, ExpectedCondition<WebElement> waitCondition) {
     	doAction(ACTION_NAME.RIGHT_CLICK, timeout, waitCondition);
+    }
+    
+
+    /**
+     * MouseOver (Hover) an element.
+     */
+    public void hover() {
+        hover(null, null);
+    }
+
+    /**
+     * MouseOver (Hover) an element.
+	 * @param xOffset x offset for moving
+	 * @param yOffset y offset for moving
+     */
+    public void hover(Integer xOffset, Integer yOffset) {
+    	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), xOffset, yOffset);
     }
     
     /**
@@ -1211,6 +1228,8 @@ public class ExtendedWebElement {
 		void doDoubleClick();
 
 		void doRightClick();
+		
+		void doHover(Integer xOffset, Integer yOffset);
 
 		void doType(String text);
 
@@ -1247,7 +1266,7 @@ public class ExtendedWebElement {
 		List<String> doGetSelectedValues();
 	}
 
-	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object inputArg) {
+	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object...inputArgs) {
 		Object result = null;
 		switch (actionName) {
 		case CLICK:
@@ -1255,6 +1274,9 @@ public class ExtendedWebElement {
 			break;
 		case DOUBLE_CLICK:
 			actionSteps.doDoubleClick();
+			break;
+		case HOVER:
+			actionSteps.doHover((Integer) inputArgs[0], (Integer) inputArgs[1]);
 			break;
 		case RIGHT_CLICK:
 			actionSteps.doRightClick();
@@ -1269,16 +1291,16 @@ public class ExtendedWebElement {
 			result = actionSteps.doGetSize();
 			break;
 		case GET_ATTRIBUTE:
-			result = actionSteps.doGetAttribute((String) inputArg);
+			result = actionSteps.doGetAttribute((String) inputArgs[0]);
 			break;
 		case SEND_KEYS:
-			actionSteps.doSendKeys((Keys) inputArg);
+			actionSteps.doSendKeys((Keys) inputArgs[0]);
 			break;
 		case TYPE:
-			actionSteps.doType((String) inputArg);
+			actionSteps.doType((String) inputArgs[0]);
 			break;
 		case ATTACH_FILE:
-			actionSteps.doAttachFile((String) inputArg);
+			actionSteps.doAttachFile((String) inputArgs[0]);
 			break;
 		case CHECK:
 			actionSteps.doCheck();
@@ -1290,19 +1312,19 @@ public class ExtendedWebElement {
 			result = actionSteps.doIsChecked();
 			break;
 		case SELECT:
-			result = actionSteps.doSelect((String) inputArg);
+			result = actionSteps.doSelect((String) inputArgs[0]);
 			break;
 		case SELECT_VALUES:
-			result = actionSteps.doSelectValues((String[]) inputArg);
+			result = actionSteps.doSelectValues((String[]) inputArgs);
 			break;
 		case SELECT_BY_MATCHER:
-			result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArg);
+			result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArgs[0]);
 			break;
 		case SELECT_BY_PARTIAL_TEXT:
-			result = actionSteps.doSelectByPartialText((String) inputArg);
+			result = actionSteps.doSelectByPartialText((String) inputArgs[0]);
 			break;
 		case SELECT_BY_INDEX:
-			result = actionSteps.doSelectByIndex((int) inputArg);
+			result = actionSteps.doSelectByIndex((int) inputArgs[0]);
 			break;
 		case GET_SELECTED_VALUE:
 			result = actionSteps.doGetSelectedValue();
@@ -1325,11 +1347,11 @@ public class ExtendedWebElement {
 	 *            to check element conditions before action
 	 */
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition) {
-		return doAction(actionName, timeout, waitCondition, null);
+		return doAction(actionName, timeout, waitCondition);
 	}
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
-			Object inputArg) {
+			Object...inputArgs) {
 		if (waitCondition != null & !waitUntil(waitCondition, timeout)) {
 			LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(getNameWithLocator()));
 		}
@@ -1341,17 +1363,17 @@ public class ExtendedWebElement {
 		Timer.start(actionName);
 		try {
 			element = getCachedElement();
-			output = overrideAction(actionName, inputArg);
+			output = overrideAction(actionName, inputArgs);
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException | InvalidElementStateException: ", e);
 			// try to find again using driver
 			element = refindElement(getBy(), 1);
 
-			output = overrideAction(actionName, inputArg);
+			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
 			// print error messages according to the action type
-			output = overrideActionException(actionName, inputArg);
+			output = overrideActionException(actionName, inputArgs);
 			throw e;
 		} finally {
 			Timer.stop(actionName);
@@ -1361,7 +1383,7 @@ public class ExtendedWebElement {
 	}
 
 	// single place for all supported UI actions in carina core
-	private Object overrideAction(ACTION_NAME actionName, Object inputArg) {
+	private Object overrideAction(ACTION_NAME actionName, Object...inputArgs) {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
@@ -1396,7 +1418,19 @@ public class ExtendedWebElement {
 				action.moveToElement(element).doubleClick(element).build().perform();
 				Screenshot.capture(getDriver(), Messager.ELEMENT_DOUBLE_CLICKED.info(getName()));
 			}
-
+			
+			@Override
+			public void doHover(Integer xOffset, Integer yOffset) {
+				WebDriver drv = getDriver();
+				Actions action = new Actions(drv);
+				if (xOffset != null && yOffset!= null) {
+					action.moveToElement(element, xOffset, yOffset).build().perform();
+				} else {
+					action.moveToElement(element).build().perform();
+				}
+				Screenshot.capture(getDriver(), Messager.ELEMENT_HOVERED.info(getName()));				
+			}
+			
 			@Override
 			public void doSendKeys(Keys keys) {
 				element.sendKeys(keys);
@@ -1556,7 +1590,7 @@ public class ExtendedWebElement {
 		        return values;
 			}
 			
-		}, inputArg);
+		}, inputArgs);
 		return output;
 	}
 
@@ -1578,6 +1612,11 @@ public class ExtendedWebElement {
 				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_RIGHT_CLICKED.error(getNameWithLocator()));
 			}
 
+			@Override
+			public void doHover(Integer xOffset, Integer yOffset) {
+				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_HOVERED.error(getNameWithLocator()));
+			}
+			
 			@Override
 			public void doSendKeys(Keys keys) {
 				Screenshot.capture(getDriver(),
