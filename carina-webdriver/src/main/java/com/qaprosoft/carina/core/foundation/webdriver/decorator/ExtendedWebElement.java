@@ -1347,7 +1347,9 @@ public class ExtendedWebElement {
 	 *            to check element conditions before action
 	 */
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition) {
-		return doAction(actionName, timeout, waitCondition);
+		// [VD] do not remove null args otherwise all actions without arguments will be broken!
+		Object nullArgs = null;
+		return doAction(actionName, timeout, waitCondition, nullArgs);
 	}
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
