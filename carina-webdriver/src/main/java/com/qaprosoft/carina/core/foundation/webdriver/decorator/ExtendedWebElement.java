@@ -18,6 +18,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -50,6 +54,8 @@ import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -75,6 +81,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
 import io.appium.java_client.MobileBy;
 
@@ -119,7 +126,7 @@ public class ExtendedWebElement {
         
         //TODO: we must implement below functionality safety to restore AbstractUIObject(s)
 
-/*
+
         //read searchContext from not null element
         if (element == null) {
         	try {
@@ -203,7 +210,7 @@ public class ExtendedWebElement {
 			} catch (Throwable thr) {
 				thr.printStackTrace();
 			}
-		} else if (!tempDriver.equals(driver)) {
+		} else if (driver!= null && !tempDriver.equals(driver)) {
 			try {
 				throw new RuntimeException("review stacktrace to analyze why 'driver' from reflection and from decorator differs!");
 			} catch (Throwable thr) {
@@ -211,8 +218,16 @@ public class ExtendedWebElement {
 			}
 		}
 
-		
-		if (!by.equals(tempBy)) {
+		LOGGER.info("by: " + by);
+		LOGGER.info("tempBy: " + tempBy);
+
+/*		if (tempBy == null) {
+			try {
+				throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+		} else if (by != null && !tempBy.equals(by)) {
 			try {
 				throw new RuntimeException("review stacktrace to analyze why 'by' locator from reflection and from decorator differs!");
 			} catch (Throwable thr) {
@@ -1414,6 +1429,7 @@ public class ExtendedWebElement {
 			@Override
 			public void doAttachFile(String filePath) {
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
 				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
 				Screenshot.capture(getDriver(), Messager.FILE_ATTACHED.info(filePath, getName()));
