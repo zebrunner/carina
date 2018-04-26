@@ -200,11 +200,9 @@ public class AbstractTestListener extends TestArgsListener {
 
         // Populate TestRail Cases
 
-        if (!R.ZAFIRA.getBoolean("zafira_enabled")) {
-            result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
-            TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-            TestRail.clearCases();
-        }
+        result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
+        TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
+        TestRail.clearCases();
 
         TestNamingUtil.releaseTestInfoByThread();
     }
