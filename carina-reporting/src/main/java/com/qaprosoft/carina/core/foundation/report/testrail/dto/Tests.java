@@ -20,11 +20,11 @@ import org.json.simple.JSONObject;
 import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 
 /**
- * Created by yauheni_patotski on 5/13/15.
+ * Created by anazarenko on 4/24/18.
  */
-public class TestCases {
+public class Tests {
 
-    public static Request getSuiteTestCases(int projectId, int suiteID) {
-        return new Request(new JSONObject(), "get_cases/" + projectId + "&suite_id=" + suiteID, "GET");
+    public static Request getTests(int runId) {
+        return new Request(new JSONObject(), "get_tests/" + runId, "GET");
     }
 }

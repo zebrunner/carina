@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.simple.JSONObject;
 
 import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
@@ -25,25 +28,33 @@ import com.qaprosoft.carina.core.foundation.report.testrail.core.Request;
 public class Runs {
 
     @SuppressWarnings("unchecked")
-    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID) {
+    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, boolean insludeAllCases) {
         JSONObject obj = new JSONObject();
         obj.put("suite_id", suite_id);
         obj.put("name", name);
         obj.put("assignedto_id", assignedto_id);
-        obj.put("include_all", true);
+        obj.put("include_all", insludeAllCases);
         return new Request(obj, "add_run/" + projectID, "POST");
     }
+    
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID) {
+		return addRun(suite_id, name, assignedto_id, projectID, Boolean.TRUE);
+	}
 
     @SuppressWarnings("unchecked")
-    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId) {
+    public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, boolean insludeAllCases) {
         JSONObject obj = new JSONObject();
         obj.put("suite_id", suite_id);
         obj.put("name", name);
         obj.put("assignedto_id", assignedto_id);
-        obj.put("include_all", true);
+        obj.put("include_all", insludeAllCases);
         obj.put("milestone_id", milestoneId);
         return new Request(obj, "add_run/" + projectID, "POST");
     }
+    
+	public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId) {
+		return addRun(suite_id, name, assignedto_id, projectID, milestoneId, Boolean.TRUE);
+	}
 
     @SuppressWarnings("unchecked")
     public static Request addRun(int suite_id, String name, int assignedto_id, int projectID, int milestoneId, String desc) {
@@ -56,13 +67,22 @@ public class Runs {
         obj.put("description", desc);
         return new Request(obj, "add_run/" + projectID, "POST");
     }
+    
+    @SuppressWarnings("unchecked")
+    public static Request updateRun(int runId, List<String> caseIds) {
+    		List<Integer> ids = new ArrayList<Integer>();
+    		caseIds.stream().forEach(id -> ids.add(Integer.valueOf(id)));
+        JSONObject obj = new JSONObject();
+        obj.put("case_ids", ids);
+        return new Request(obj, "update_run/" + runId, "POST");
+    }
 
     public static Request getRun(int run_id) {
         return new Request(new JSONObject(), "get_run/" + run_id, "GET");
 
     }
 
-    public static Request getRuns(int projectId) {
+	public static Request getRuns(int projectId) {
         return new Request(new JSONObject(), "get_runs/" + projectId, "GET");
 
     }

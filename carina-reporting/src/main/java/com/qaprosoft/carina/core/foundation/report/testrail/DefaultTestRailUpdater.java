@@ -158,9 +158,9 @@ public class DefaultTestRailUpdater implements ITestRailUpdater {
         }
         // TODO: combine both variants of Runs.addRun into the single method which can register with and w/o milestones
         if (milestoneId > 0) {
-            return apiClient.sendRequest(Runs.addRun(suiteID, title, userId, projectID, milestoneId));
+            return apiClient.sendRequest(Runs.addRun(suiteID, title, userId, projectID, milestoneId, Boolean.TRUE));
         } else {
-            return apiClient.sendRequest(Runs.addRun(suiteID, title, userId, projectID));
+            return apiClient.sendRequest(Runs.addRun(suiteID, title, userId, projectID, Boolean.TRUE));
         }
 
     }
