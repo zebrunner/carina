@@ -120,6 +120,13 @@ public class Device extends RemoteDevice {
         }
 
         setUdid(deviceUdid);
+        
+        String proxyPort = R.CONFIG.get(SpecialKeywords.MOBILE_PROXY_PORT);
+        if (capabilities.getCapability("proxy_port") != null) {
+            deviceUdid = capabilities.getCapability("proxy_port").toString();
+        }
+
+        setProxyPort(proxyPort);
     }
 
     public boolean isPhone() {

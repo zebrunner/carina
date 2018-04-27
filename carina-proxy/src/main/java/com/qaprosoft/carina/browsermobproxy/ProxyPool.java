@@ -15,11 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -30,7 +26,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.NetworkUtil;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.ProcessBuilderExecutor;
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -252,31 +247,14 @@ public final class ProxyPool {
         proxies.put(threadId, proxy);
     }
     
+    /**
+     * Method to kill process by port. It is used before start of new proxy instance
+     * 
+     * @param port
+     */
     private static void killProcessByPort(int port) {
         LOGGER.info(String.format("Process on port %d will be closed.", port));
-        ProcessBuilderExecutor executor = null;
-        BufferedReader in = null;
-        List<String> output = new ArrayList<String>();
-
-        try {
-            executor = new ProcessBuilderExecutor(String.format("kill $(lsof -t -i:%d)", port));
-
-            Process process = executor.start();
-            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = null;
-
-
-            while ((line = in.readLine()) != null) {
-                output.add(line);
-                LOGGER.debug(line);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            AdbExecutor.closeQuietly(in);
-            ProcessBuilderExecutor.gcNullSafe(executor);
-        }
-
+        LOGGER.info(new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" ")));
     }
     
 }
