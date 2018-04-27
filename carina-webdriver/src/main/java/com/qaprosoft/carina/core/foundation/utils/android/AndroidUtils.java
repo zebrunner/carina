@@ -321,7 +321,7 @@ public class AndroidUtils extends MobileUtils {
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
-                    el = new ExtendedWebElement(ele, scrollToEle, DriverPool.getDriver());
+                    el = new ExtendedWebElement(ele, scrollToEle);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -370,7 +370,7 @@ public class AndroidUtils extends MobileUtils {
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance(" + eleSelectorInstance + "))"));
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
-                    el = new ExtendedWebElement(ele, scrollToEle, DriverPool.getDriver());
+                    el = new ExtendedWebElement(ele, scrollToEle);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -416,7 +416,7 @@ public class AndroidUtils extends MobileUtils {
                         getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
-                    el = new ExtendedWebElement(ele, scrollToEle, DriverPool.getDriver());
+                    el = new ExtendedWebElement(ele, scrollToEle);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {

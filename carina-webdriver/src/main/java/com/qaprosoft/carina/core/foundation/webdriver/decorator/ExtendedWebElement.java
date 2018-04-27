@@ -18,6 +18,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -40,16 +43,19 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -75,6 +81,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
 import io.appium.java_client.MobileBy;
 
@@ -102,32 +109,56 @@ public class ExtendedWebElement {
     private By by;
     private WebDriver driver;
 
+    @Deprecated
     public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
-        this(element, driver);
-        this.name = name;
+        this(element, name);
     }
 
+    @Deprecated
     public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver) {
-        this(element, name, driver);
+        this(element, name);
         this.by = by;
     }
 
+    @Deprecated
     public ExtendedWebElement(WebElement element, WebDriver driver) {
+    	this(element);
+    }
+    
+    public ExtendedWebElement(WebElement element, String name, By by) {
+        this(element, name);
+        this.by = by;
+    }
+
+    public ExtendedWebElement(By by, String name) {
+    	this.by = by;
+    	this.name = name;
+    	this.element = null;
+    }
+    
+    public ExtendedWebElement(WebElement element, String name) {
+    	this(element);
+    	this.name = name;
+    }
+    
+    public ExtendedWebElement(WebElement element) {
         this.element = element;
-        this.driver = driver;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
         
         //TODO: we must implement below functionality safety to restore AbstractUIObject(s)
 
-/*
-        //read searchContext from not null element
+
+        //read searchContext from not null elements only
         if (element == null) {
-        	try {
-        		throw new RuntimeException("to see stacktrace! TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element");
-        	} catch (Throwable thr) {
-        		thr.printStackTrace();
+        	// it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
+        	if (getBy() == null) {
+				try {
+					throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+				} catch (Throwable thr) {
+					thr.printStackTrace();
+				}
         	}
-        	//TODO: we should refactor and remove possibility to declare ExtendedWebElement with null element
+
         	return;
         }
 
@@ -203,7 +234,7 @@ public class ExtendedWebElement {
 			} catch (Throwable thr) {
 				thr.printStackTrace();
 			}
-		} else if (!tempDriver.equals(driver)) {
+		} else if (driver!= null && !tempDriver.equals(driver)) {
 			try {
 				throw new RuntimeException("review stacktrace to analyze why 'driver' from reflection and from decorator differs!");
 			} catch (Throwable thr) {
@@ -211,8 +242,17 @@ public class ExtendedWebElement {
 			}
 		}
 
+		this.driver = tempDriver;
 		
-		if (!by.equals(tempBy)) {
+		LOGGER.info("tempBy: " + tempBy);
+
+/*		if (tempBy == null) {
+			try {
+				throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+		} else if (by != null && !tempBy.equals(by)) {
 			try {
 				throw new RuntimeException("review stacktrace to analyze why 'by' locator from reflection and from decorator differs!");
 			} catch (Throwable thr) {
@@ -220,22 +260,6 @@ public class ExtendedWebElement {
 			}
 		}*/
 		
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name) {
-        // TODO: remove usage with default river!
-        this(element, name, DriverPool.getDriver());
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, By by) {
-        this(element, name, by, DriverPool.getDriver());
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element) {
-        this(element, DriverPool.getDriver());
     }
 
     public WebElement getElement() {
@@ -1090,7 +1114,7 @@ public class ExtendedWebElement {
             by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
-        return new ExtendedWebElement(null, name, by, driver);
+        return new ExtendedWebElement(by, name);
     }
 
     private void captureElements() {
@@ -1450,6 +1474,7 @@ public class ExtendedWebElement {
 			@Override
 			public void doAttachFile(String filePath) {
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
 				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
 				Screenshot.capture(getDriver(), Messager.FILE_ATTACHED.info(filePath, getName()));

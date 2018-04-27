@@ -58,10 +58,10 @@ public class DivisionElementExtractor extends AbstractElementExtractor {
         LOGGER.debug("Index: " + index);
 
         if (elements.size() == 1) {
-            return generateExtenedElement(elements, driver, elementName);
+            return generateExtenedElement(elements, elementName);
         }
 
-        return generateExtenedElement(checkBoundaryElements(elements, x, y, index), driver, elementName);
+        return generateExtenedElement(checkBoundaryElements(elements, x, y, index), elementName);
     }
 
     /**
