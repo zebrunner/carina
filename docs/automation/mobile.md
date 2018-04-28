@@ -62,7 +62,7 @@ We could provide any Appium capabilty in **config.properties** file using capabi
 		<td>Galaxy Note 8, iPhone X</td>
 	</tr>
 	 <tr>
-		<td>capabilities.os_versione</td>
+		<td>capabilities.os_version</td>
 		<td>Version of OS for Browserstack</td>
                 <td>n/a</td>
 		<td>ios, android</td>
@@ -97,7 +97,8 @@ We could provide any Appium capabilty in **config.properties** file using capabi
                 <td>n/a</td>
 		<td>true, false</td>
 	</tr>
-		<tr>
+	<tr>
+		<td>capabilities.skipUnlock</td>
 		<td>Skip the device unlock process. Defaults to false</td>
                 <td>n/a</td>
 		<td>true, false</td>
