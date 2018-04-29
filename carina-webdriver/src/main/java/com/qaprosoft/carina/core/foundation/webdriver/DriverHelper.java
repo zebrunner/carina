@@ -181,6 +181,10 @@ public class DriverHelper {
         return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent(timeout);
     }
 
+    @Deprecated
+    public boolean isElementPresent(String controlInfo, final By by) {
+        return new ExtendedWebElement(by, controlInfo).isElementPresent();
+    }
     /**
      * Method which quickly looks for all element and check that they present
      * during EXPLICIT_TIMEOUT
