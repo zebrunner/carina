@@ -141,6 +141,8 @@ public class SpecialKeywords {
     public static final String MOBILE_DEVICE_REMOTE_URL = "capabilities.remoteURL";
     public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
+    public static final String MOBILE_PROXY_PORT = "capabilities.proxyPort";
+
 
     // ------------- STF PROPERTIES ---------------------------------
     public static final String STF_ENABLED = "STF_ENABLED";

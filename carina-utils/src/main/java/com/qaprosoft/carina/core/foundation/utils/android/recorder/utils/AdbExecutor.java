@@ -135,7 +135,7 @@ public class AdbExecutor {
         return output;
     }
 
-    private static void closeQuietly(Closeable closeable) {
+    public static void closeQuietly(Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();
