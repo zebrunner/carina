@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
@@ -167,7 +168,14 @@ public class TestNamingUtil {
             }
         }
 
-        return StringEscapeUtils.escapeHtml4(appendTestMethodName(testName, result.getMethod()));
+        testName = StringEscapeUtils.escapeHtml4(appendTestMethodName(testName, result.getMethod()));
+
+        String customCapability = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapability.isEmpty() && customCapability.toLowerCase().contains("browserstack")) {
+            R.CONFIG.put("capabilities.name", testName);
+        }
+
+        return testName;
     }
 
     public static String getCanonicalTestMethodName(ITestResult result) {
@@ -218,7 +226,11 @@ public class TestNamingUtil {
         if (m.getDescription() != null) {
         	testName = testName.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getDescription());
         } else {
-        	testName = testName.replace(SpecialKeywords.METHOD_DESCRIPTION, "");
+            if (testName.contains(SpecialKeywords.METHOD_NAME)) {
+                testName = testName.replace(SpecialKeywords.METHOD_DESCRIPTION, "");
+            } else {
+                testName = testName.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getMethodName());
+            }
         }
 
         return testName;
