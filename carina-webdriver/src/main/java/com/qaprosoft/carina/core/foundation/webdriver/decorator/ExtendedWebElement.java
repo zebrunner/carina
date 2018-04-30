@@ -244,22 +244,6 @@ public class ExtendedWebElement {
 
 		this.driver = tempDriver;
 		
-		LOGGER.info("tempBy: " + tempBy);
-
-/*		if (tempBy == null) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-				thr.printStackTrace();
-			}
-		} else if (by != null && !tempBy.equals(by)) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why 'by' locator from reflection and from decorator differs!");
-			} catch (Throwable thr) {
-				thr.printStackTrace();
-			}
-		}*/
-		
     }
 
     public WebElement getElement() {

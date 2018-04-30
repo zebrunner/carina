@@ -583,12 +583,14 @@ public class DriverHelper {
      * not visible. And can't be clicked by standard click.
      * 
      * @param extendedWebElement to click hidden element
+     * 
+     * @return boolean
      */
     @Deprecated
-    public void clickHiddenElement(final ExtendedWebElement extendedWebElement) {
+    public boolean clickHiddenElement(final ExtendedWebElement extendedWebElement) {
         extendedWebElement.clickHiddenElement();
+        return true;
     }
-
     /**
      * Check checkbox
      * 
