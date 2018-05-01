@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,18 +23,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.IConfigurableEventListener;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
+
+import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
+import io.appium.java_client.android.AndroidStopScreenRecordingOptions;
+import io.appium.java_client.screenrecording.CanRecordScreen;
+import io.appium.java_client.screenrecording.ScreenRecordingUploadOptions;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -69,7 +77,7 @@ public class DriverFactory {
 		LOGGER.debug("DriverFactory finish...");
 
 		streamVNC(factory.getVncURL(driver));
-
+		
 		return driver;
 	}
 
@@ -118,6 +126,51 @@ public class DriverFactory {
 			}
 		} catch (Exception e) {
 			LOGGER.error("Unable to stream VNC: " + e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * Starts new screen recording.
+	 * @param driver {@link RemoteWebDriver}
+	 */
+	public static void startScreenRecording(WebDriver driver) {
+		try {
+			if(driver instanceof CanRecordScreen && R.CONFIG.getBoolean("capabilities.enableVideo")) {
+				((CanRecordScreen) driver).startRecordingScreen(
+						new AndroidStartScreenRecordingOptions()
+				 				.withVideoSize(R.CONFIG.get("screen_record_size"))
+				 				.withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
+				 				.withBitRate(R.CONFIG.getInt("screen_record_bitrate")));
+			}
+		} catch (Exception e) {
+			LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * Stops screen recording and saves to specified location.
+	 * @param driver {@link RemoteWebDriver}
+	 */
+	public static void stopScreenRecording(WebDriver driver) {
+		try {
+			if(driver instanceof CanRecordScreen && R.CONFIG.getBoolean("capabilities.enableVideo")) {
+				final String videoURL = String.format("%s/%s.mp4", R.CONFIG.get("screen_record_host"), ((RemoteWebDriver)driver).getSessionId().toString());
+				((CanRecordScreen) driver).stopRecordingScreen(
+						new AndroidStopScreenRecordingOptions()
+							.withUploadOptions(new ScreenRecordingUploadOptions()
+							.withRemotePath(videoURL)
+							.withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"))));
+			
+				if(Reporter.getCurrentTestResult().getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
+					TestArtifactType artifact = new TestArtifactType();
+					artifact.setName("Video");
+					artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
+					artifact.setLink(videoURL);
+					ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
 		}
 	}
 }
