@@ -39,11 +39,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>${apache-http.version}</version>
-    </dependency>
+    </dependency>-->
   </dependencies>
   <build>
     <plugins>
