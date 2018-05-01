@@ -254,7 +254,12 @@ public final class ProxyPool {
      */
     private static void killProcessByPort(int port) {
         LOGGER.info(String.format("Process on port %d will be closed.", port));
-        LOGGER.info(new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" ")));
+        //TODO: make OS independent
+        try {
+        	LOGGER.info(new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" ")));
+        } catch (Exception e) {
+        	//do nothing
+        }
     }
     
 }
