@@ -45,10 +45,10 @@
 			<artifactId>aws-java-sdk</artifactId>
 			<version>${aws-java-sdk.version}</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-		</dependency>
+		</dependency>-->
 
 
 		<!-- Test utilities -->

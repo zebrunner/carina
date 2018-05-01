@@ -36,10 +36,10 @@
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
-		<dependency>
+		<!--<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-commons</artifactId>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>

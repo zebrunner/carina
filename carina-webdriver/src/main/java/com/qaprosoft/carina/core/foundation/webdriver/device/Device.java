@@ -74,6 +74,7 @@ public class Device extends RemoteDevice {
         setOsVersion(remoteDevice.getOsVersion());
         setUdid(remoteDevice.getUdid());
         setRemoteURL(remoteDevice.getRemoteURL());
+        setProxyPort(remoteDevice.getProxyPort());
     }
 
     public Device(Capabilities capabilities) {
