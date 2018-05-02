@@ -202,8 +202,6 @@ public final class DriverPool {
                 DevicePool.deregisterDevice();
             }
             
-            DriverFactory.stopScreenRecording(drv);
-            
             drv.quit();
 
             LOGGER.debug("Driver exited during restart...");
@@ -257,8 +255,6 @@ public final class DriverPool {
             deregisterDriver(name);
             DevicePool.deregisterDevice();
 
-            DriverFactory.stopScreenRecording(drv);
-            
             drv.quit();
 
             LOGGER.debug("Driver exited..." + name);
@@ -319,8 +315,6 @@ public final class DriverPool {
                 LOGGER.debug("initDriver start...");
 
                 drv = DriverFactory.create(name, device, capabilities, seleniumHost);
-                
-                DriverFactory.startScreenRecording(drv);
                 
                 registerDriver(drv, name);
 

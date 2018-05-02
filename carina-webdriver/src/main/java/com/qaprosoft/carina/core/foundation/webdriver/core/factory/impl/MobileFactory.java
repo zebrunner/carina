@@ -92,9 +92,11 @@ public class MobileFactory extends AbstractFactory {
 
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+                
+                EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
+                
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
-                    EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
                                 .withVideoSize(R.CONFIG.get("screen_record_size"))
@@ -106,14 +108,12 @@ public class MobileFactory extends AbstractFactory {
                                 .withRemotePath(R.CONFIG.get("screen_record_host"))
                                 .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
                         
-                        ce.getListeners().add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(o1, o2));
+                        ce.getListeners().add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
                         
                     }
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
                     
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
-                    
-                    EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     
                     if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
@@ -126,7 +126,7 @@ public class MobileFactory extends AbstractFactory {
                                 .withRemotePath(R.CONFIG.get("screen_record_host"))
                                 .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
                         
-                        ce.getListeners().add(new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(o1, o2));
+                        ce.getListeners().add(new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2));
                         
                     }
                     

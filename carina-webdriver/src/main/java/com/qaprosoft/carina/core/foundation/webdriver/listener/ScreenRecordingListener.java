@@ -15,30 +15,76 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.CommandExecutor;
+import org.openqa.selenium.remote.DriverCommand;
+import org.testng.Reporter;
+
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.models.dto.TestArtifactType;
+
+import io.appium.java_client.MobileCommand;
+import io.appium.java_client.screenrecording.BaseScreenRecordingOptions;
 
 /**
- * VideoRecordingListener - starts/stops video recording for Android and IOS drivers.
+ * ScreenRecordingListener - starts/stops video recording for Android and IOS drivers.
  * 
  * @author akhursevich
  */
-public class ScreenRecordingListener<O1, O2> implements IDriverCommandListener {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class ScreenRecordingListener<O1 extends BaseScreenRecordingOptions, O2 extends BaseScreenRecordingOptions> implements IDriverCommandListener {
+
+    protected static final Logger LOGGER = Logger.getLogger(ScreenRecordingListener.class);
+
+    private CommandExecutor commandExecutor;
 
     private O1 startRecordingOpt;
+
     private O2 stopRecordingOpt;
-    
-	public ScreenRecordingListener(O1 startRecordingOpt, O2 stopRecordingOpt) {
+
+    public ScreenRecordingListener(CommandExecutor ce, O1 startRecordingOpt, O2 stopRecordingOpt) {
         this.startRecordingOpt = startRecordingOpt;
         this.stopRecordingOpt = stopRecordingOpt;
+        this.commandExecutor = ce;
     }
 
     @Override
-	public void beforeEvent(Command command) {
-		System.out.println(command.getName());
-	}
+    public void beforeEvent(Command command) {
+        if (DriverCommand.QUIT.equals(command.getName())) {
+            try {
+                Map<String, Object> opt = stopRecordingOpt.build();
+                if (opt.containsKey("remotePath")) {
+                    String path = String.format((String) opt.get("remotePath"), command.getSessionId());
+                    opt.put("remotePath", path);
+                }
+                
+                commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN, stopRecordingOpt.build()));
 
-	@Override
-	public void afterEvent(Command command) {
-		System.out.println();
-	}
+                if (Reporter.getCurrentTestResult().getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
+                    TestArtifactType artifact = new TestArtifactType();
+                    artifact.setName("Video");
+                    artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
+                    artifact.setLink((String) opt.get("remotePath"));
+                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+                }
+
+            } catch (Exception e) {
+                LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
+    public void afterEvent(Command command) {
+        if (DriverCommand.NEW_SESSION.equals(command.getName())) {
+            try {
+                commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN, startRecordingOpt.build()));
+            } catch (Exception e) {
+                LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
+            }
+        }
+    }
 }
