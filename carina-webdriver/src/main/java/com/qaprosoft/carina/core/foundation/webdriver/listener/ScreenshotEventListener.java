@@ -172,4 +172,16 @@ public class ScreenshotEventListener implements IConfigurableEventListener {
         }
         return s;
     }
+
+    @Override
+    public void afterSwitchToWindow(String arg0, WebDriver arg1) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void beforeSwitchToWindow(String arg0, WebDriver arg1) {
+        // TODO Auto-generated method stub
+        
+    }
 }
