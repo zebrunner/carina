@@ -15,7 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +46,8 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 public class DriverFactory {
 
 	protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
+	
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 
 	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities,
 			String seleniumHost) {
@@ -111,7 +115,7 @@ public class DriverFactory {
 			if (!StringUtils.isEmpty(vncURL) && Reporter.getCurrentTestResult().getAttribute("ztid") != null
 					&& ZafiraSingleton.INSTANCE.isRunning()) {
 				TestArtifactType artifact = new TestArtifactType();
-				artifact.setName("Live demo");
+				artifact.setName("Live demo " + SDF.format(new Date()));
 				artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
 				artifact.setLink(vncURL);
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);

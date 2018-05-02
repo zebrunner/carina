@@ -93,45 +93,46 @@ public class MobileFactory extends AbstractFactory {
 
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
-                
+
                 EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-                
+
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
-                    if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
+                    if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
                                 .withVideoSize(R.CONFIG.get("screen_record_size"))
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
-                                .withBitRate(R.CONFIG.getInt("screen_record_bitrate"));
-                                
+                                .withBitRate(getBitrate(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality"))));
+
                         AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions()
                                 .withUploadOptions(new ScreenRecordingUploadOptions()
-                                .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
-                                .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
-                        
-                        ce.getListeners().add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
+                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
+                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
+
+                        ce.getListeners()
+                                .add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
-                    
+
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
-                    
-                    if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
+
+                    if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
-                                .withVideoQuality(VideoQuality.MEDIUM)
+                                .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality")))
                                 .withVideoType(VideoType.MP4)
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
-                                
+
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions()
                                 .withUploadOptions(new ScreenRecordingUploadOptions()
-                                .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
-                                .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
-                        
+                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
+                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
+
                         ce.getListeners().add(new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2));
                     }
 
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
-                    
+
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                     // that's a case for custom mobile capabilities like browserstack or saucelabs
                     driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
@@ -233,5 +234,23 @@ public class MobileFactory extends AbstractFactory {
             }
         }
         return vncURL;
+    }
+
+    /**
+     * Returns bitrate by {@link VideoQuality}
+     * @param quality - video quality for recording
+     * @return appropriate bitrate
+     */
+    private int getBitrate(VideoQuality quality) {
+        switch (quality) {
+        case LOW:
+            return 250000;
+        case MEDIUM:
+            return 500000;
+        case HIGH:
+            return 1000000;
+        default:
+            return 1;
+        }
     }
 }

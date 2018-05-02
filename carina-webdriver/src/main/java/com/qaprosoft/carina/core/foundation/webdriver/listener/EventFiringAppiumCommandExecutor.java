@@ -44,10 +44,12 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 
 import io.appium.java_client.MobileCommand;
+import io.appium.java_client.remote.AppiumCommandExecutor;
 import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 
 /**
  * EventFiringCommandExecutor triggers event listener before/after execution of the command.
+ * Please track {@link AppiumCommandExecutor} for latest changes.
  * 
  * @author akhursevich
  */
