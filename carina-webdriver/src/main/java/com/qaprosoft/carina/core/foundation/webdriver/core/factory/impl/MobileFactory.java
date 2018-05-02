@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -97,43 +98,39 @@ public class MobileFactory extends AbstractFactory {
                 
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
-                    ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions> srl = new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce);
-                    
-                    srl.setStartRecordingOpt(new AndroidStartScreenRecordingOptions()
-                            .withVideoSize(R.CONFIG.get("screen_record_size"))
-                            .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
-                            .withBitRate(R.CONFIG.getInt("screen_record_bitrate")));
-                    
                     if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
-                        ce.getListeners().add(srl);
+                        AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
+                                .withVideoSize(R.CONFIG.get("screen_record_size"))
+                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
+                                .withBitRate(R.CONFIG.getInt("screen_record_bitrate"));
+                                
+                        AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions()
+                                .withUploadOptions(new ScreenRecordingUploadOptions()
+                                .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
+                                .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
+                        
+                        ce.getListeners().add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
                     }
-                    
+
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
-                    
-                    srl.setStopRecordingOpt(new AndroidStopScreenRecordingOptions()
-                            .withUploadOptions(new ScreenRecordingUploadOptions()
-                            .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), driver.getSessionId().toString()))
-                            .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"))));
                     
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
                     
-                    ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions> srl = new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce);
-                    
-                    srl.setStartRecordingOpt(new IOSStartScreenRecordingOptions()
-                            .withVideoQuality(VideoQuality.MEDIUM)
-                            .withVideoType(VideoType.MP4)
-                            .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration"))));
-                    
                     if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
-                        ce.getListeners().add(srl);
+                        IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
+                                .withVideoQuality(VideoQuality.MEDIUM)
+                                .withVideoType(VideoType.MP4)
+                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
+                                
+                        IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions()
+                                .withUploadOptions(new ScreenRecordingUploadOptions()
+                                .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
+                                .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
+                        
+                        ce.getListeners().add(new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2));
                     }
-                    
+
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
-                    
-                    srl.setStopRecordingOpt(new IOSStopScreenRecordingOptions()
-                            .withUploadOptions(new ScreenRecordingUploadOptions()
-                            .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), driver.getSessionId().toString()))
-                            .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"))));
                     
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                     // that's a case for custom mobile capabilities like browserstack or saucelabs

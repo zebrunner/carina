@@ -42,20 +42,18 @@ public class ScreenRecordingListener<O1 extends BaseScreenRecordingOptions, O2 e
     private O1 startRecordingOpt;
 
     private O2 stopRecordingOpt;
+    
+    private boolean recording = false;
 
-    public ScreenRecordingListener(CommandExecutor commandExecutor) {
+    public ScreenRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt) {
         this.commandExecutor = commandExecutor;
-    }
-
-    public ScreenRecordingListener(CommandExecutor ce, O1 startRecordingOpt, O2 stopRecordingOpt) {
-        this(ce);
         this.startRecordingOpt = startRecordingOpt;
         this.stopRecordingOpt = stopRecordingOpt;
     }
 
     @Override
     public void beforeEvent(Command command) {
-        if (DriverCommand.QUIT.equals(command.getName())) {
+        if (recording && DriverCommand.QUIT.equals(command.getName())) {
             try {
                 commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN, stopRecordingOpt.build()));
 
@@ -74,28 +72,13 @@ public class ScreenRecordingListener<O1 extends BaseScreenRecordingOptions, O2 e
 
     @Override
     public void afterEvent(Command command) {
-        if (DriverCommand.NEW_SESSION.equals(command.getName())) {
+        if (!recording && command.getSessionId() != null) {
             try {
+                recording = true;
                 commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN, startRecordingOpt.build()));
             } catch (Exception e) {
                 LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
             }
         }
-    }
-
-    public O1 getStartRecordingOpt() {
-        return startRecordingOpt;
-    }
-
-    public void setStartRecordingOpt(O1 startRecordingOpt) {
-        this.startRecordingOpt = startRecordingOpt;
-    }
-
-    public O2 getStopRecordingOpt() {
-        return stopRecordingOpt;
-    }
-
-    public void setStopRecordingOpt(O2 stopRecordingOpt) {
-        this.stopRecordingOpt = stopRecordingOpt;
     }
 }
