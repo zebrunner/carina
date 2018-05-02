@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -45,32 +43,29 @@ public class ScreenRecordingListener<O1 extends BaseScreenRecordingOptions, O2 e
 
     private O2 stopRecordingOpt;
 
+    public ScreenRecordingListener(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+    }
+
     public ScreenRecordingListener(CommandExecutor ce, O1 startRecordingOpt, O2 stopRecordingOpt) {
+        this(ce);
         this.startRecordingOpt = startRecordingOpt;
         this.stopRecordingOpt = stopRecordingOpt;
-        this.commandExecutor = ce;
     }
 
     @Override
     public void beforeEvent(Command command) {
         if (DriverCommand.QUIT.equals(command.getName())) {
             try {
-                Map<String, Object> opt = stopRecordingOpt.build();
-                if (opt.containsKey("remotePath")) {
-                    String path = String.format((String) opt.get("remotePath"), command.getSessionId());
-                    opt.put("remotePath", path);
-                }
-                
                 commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN, stopRecordingOpt.build()));
 
                 if (Reporter.getCurrentTestResult().getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
                     TestArtifactType artifact = new TestArtifactType();
                     artifact.setName("Video");
                     artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
-                    artifact.setLink((String) opt.get("remotePath"));
+                    artifact.setLink((String) stopRecordingOpt.build().get("remotePath"));
                     ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
                 }
-
             } catch (Exception e) {
                 LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
             }
@@ -86,5 +81,21 @@ public class ScreenRecordingListener<O1 extends BaseScreenRecordingOptions, O2 e
                 LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
             }
         }
+    }
+
+    public O1 getStartRecordingOpt() {
+        return startRecordingOpt;
+    }
+
+    public void setStartRecordingOpt(O1 startRecordingOpt) {
+        this.startRecordingOpt = startRecordingOpt;
+    }
+
+    public O2 getStopRecordingOpt() {
+        return stopRecordingOpt;
+    }
+
+    public void setStopRecordingOpt(O2 stopRecordingOpt) {
+        this.stopRecordingOpt = stopRecordingOpt;
     }
 }

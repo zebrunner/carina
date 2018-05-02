@@ -97,47 +97,49 @@ public class MobileFactory extends AbstractFactory {
                 
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
+                    ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions> srl = new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce);
+                    
+                    srl.setStartRecordingOpt(new AndroidStartScreenRecordingOptions()
+                            .withVideoSize(R.CONFIG.get("screen_record_size"))
+                            .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
+                            .withBitRate(R.CONFIG.getInt("screen_record_bitrate")));
+                    
                     if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
-                        AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
-                                .withVideoSize(R.CONFIG.get("screen_record_size"))
-                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
-                                .withBitRate(R.CONFIG.getInt("screen_record_bitrate"));
-                                
-                        AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions()
-                                .withUploadOptions(new ScreenRecordingUploadOptions()
-                                .withRemotePath(R.CONFIG.get("screen_record_host"))
-                                .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
-                        
-                        ce.getListeners().add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
-                        
+                        ce.getListeners().add(srl);
                     }
+                    
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
+                    
+                    srl.setStopRecordingOpt(new AndroidStopScreenRecordingOptions()
+                            .withUploadOptions(new ScreenRecordingUploadOptions()
+                            .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), driver.getSessionId().toString()))
+                            .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"))));
                     
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
                     
+                    ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions> srl = new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce);
+                    
+                    srl.setStartRecordingOpt(new IOSStartScreenRecordingOptions()
+                            .withVideoQuality(VideoQuality.MEDIUM)
+                            .withVideoType(VideoType.MP4)
+                            .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration"))));
+                    
                     if(R.CONFIG.getBoolean("capabilities.enableVideo")) {
-                        IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
-                                .withVideoQuality(VideoQuality.MEDIUM)
-                                .withVideoType(VideoType.MP4)
-                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
-                                
-                        IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions()
-                                .withUploadOptions(new ScreenRecordingUploadOptions()
-                                .withRemotePath(R.CONFIG.get("screen_record_host"))
-                                .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));    
-                        
-                        ce.getListeners().add(new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2));
-                        
+                        ce.getListeners().add(srl);
                     }
                     
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
+                    
+                    srl.setStopRecordingOpt(new IOSStopScreenRecordingOptions()
+                            .withUploadOptions(new ScreenRecordingUploadOptions()
+                            .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), driver.getSessionId().toString()))
+                            .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"))));
                     
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                     // that's a case for custom mobile capabilities like browserstack or saucelabs
                     driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
                 } else {
-                    throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: "
-                            + mobilePlatformName);
+                    throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
                 }
             }
 
