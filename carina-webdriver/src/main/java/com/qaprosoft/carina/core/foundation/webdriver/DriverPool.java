@@ -201,7 +201,7 @@ public final class DriverPool {
             if (!isSameDevice) {
                 DevicePool.deregisterDevice();
             }
-
+            
             drv.quit();
 
             LOGGER.debug("Driver exited during restart...");
@@ -315,6 +315,7 @@ public final class DriverPool {
                 LOGGER.debug("initDriver start...");
 
                 drv = DriverFactory.create(name, device, capabilities, seleniumHost);
+                
                 registerDriver(drv, name);
 
                 init = true;
