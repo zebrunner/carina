@@ -223,7 +223,7 @@ public enum Messager {
         LOGGER.info(message);
         return message;
     }
-
+    
     /**
      * Logs error message and adds message to TestNG report.
      * 
@@ -235,19 +235,6 @@ public enum Messager {
         String message = create(args);
         Reporter.log(message);
         LOGGER.error(message);
-        return message;
-    }
-
-    /**
-     * Logs info message and adds message to TestNG report.
-     * 
-     * @param args
-     *            for insert into patterns
-     * @return generated message
-     */
-    public String report(String... args) {
-        String message = create(args);
-        Reporter.log(message);
         return message;
     }
 

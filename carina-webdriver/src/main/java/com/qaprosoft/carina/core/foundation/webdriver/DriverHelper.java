@@ -53,6 +53,7 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 /**
@@ -656,8 +657,7 @@ public class DriverHelper {
             drv.switchTo().alert().accept();
         }
 
-        String msg = Messager.OPEN_URL.info(url);
-        Screenshot.capture(driver, msg);
+		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), null);
     }
 
     /**
@@ -1190,12 +1190,15 @@ public class DriverHelper {
      * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
+		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
+				Messager.ELEMENT_NOT_FOUND.getMessage(name));
+    	
     	if (!waitUntil(name, ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		LOGGER.error(Messager.ELEMENT_NOT_FOUND.error(name));
+    		Messager.ELEMENT_NOT_FOUND.error(name);
     		return null;
     	}
-    	Messager.ELEMENT_FOUND.info(name);
-    	return new ExtendedWebElement(by, name);
+
+    	return new ExtendedWebElement(by, name, getDriver());
     }
 
     /**
@@ -1224,7 +1227,7 @@ public class DriverHelper {
 
         String name = "undefined";
     	if (!waitUntil(name, ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		LOGGER.info(Messager.ELEMENT_NOT_FOUND.info(name));
+    		Messager.ELEMENT_NOT_FOUND.info(name);
     		return extendedWebElements;
     	}
     	

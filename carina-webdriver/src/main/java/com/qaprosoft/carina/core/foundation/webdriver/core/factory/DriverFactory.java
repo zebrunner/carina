@@ -48,6 +48,8 @@ public class DriverFactory {
 	protected static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
 	
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
+	
+	private static final String defaultCarinaEventListener = "com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener";
 
 	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities,
 			String seleniumHost) {
@@ -86,10 +88,24 @@ public class DriverFactory {
 	private static WebDriverEventListener[] getEventListeners() {
 		List<WebDriverEventListener> listeners = new ArrayList<>();
 		try {
+			//explicitely add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.ScreenshotEventListener
+			Class<?> clazz = Class.forName(defaultCarinaEventListener);
+			if (IConfigurableEventListener.class.isAssignableFrom(clazz)) {
+				IConfigurableEventListener listener = (IConfigurableEventListener) clazz.newInstance();
+				if (listener.enabled()) {
+					listeners.add(listener);
+					LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
+				}
+			}
+
 			String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);
 			if (!StringUtils.isEmpty(listenerClasses)) {
 				for (String listenerClass : listenerClasses.split(",")) {
-					Class<?> clazz = Class.forName(listenerClass);
+					if (defaultCarinaEventListener.equals(listenerClass)) {
+						//do not register default carina listener twice
+						continue;
+					}
+					clazz = Class.forName(listenerClass);
 					if (IConfigurableEventListener.class.isAssignableFrom(clazz)) {
 						IConfigurableEventListener listener = (IConfigurableEventListener) clazz.newInstance();
 						if (listener.enabled()) {
@@ -99,8 +115,9 @@ public class DriverFactory {
 					}
 				}
 			}
+			
 		} catch (Exception e) {
-			LOGGER.error("Unable to register webdriver event listeners: " + e.getMessage());
+			LOGGER.error("Unable to register webdriver event listeners: " + e.getMessage(), e);
 		}
 		return listeners.toArray(new WebDriverEventListener[listeners.size()]);
 	}

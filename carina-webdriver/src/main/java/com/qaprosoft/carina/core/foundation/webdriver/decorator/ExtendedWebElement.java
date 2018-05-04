@@ -15,23 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -51,14 +41,13 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.internal.Locatable;
-import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -73,33 +62,25 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementInfo;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.Rect;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ScreenShootInfo;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
 import io.appium.java_client.MobileBy;
 
 // TODO: [VD] removed deprecated constructor and DriverPool import
-// Also refactor screenshots capturing using listener approach to be able to remove it as well
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
-
-    private static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
 
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 
-    private static final String ATTRIBUTE_JS = "var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;";
-
     private static Wait<WebDriver> wait;
-
+    
+    private WebDriver driver;
+    
     private CryptoTool cryptoTool;
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
@@ -107,7 +88,6 @@ public class ExtendedWebElement {
     private WebElement element;
     private String name;
     private By by;
-    private WebDriver driver;
 
     @Deprecated
     public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
@@ -136,6 +116,12 @@ public class ExtendedWebElement {
     	this.element = null;
     }
     
+    public ExtendedWebElement(By by, String name, WebDriver driver) {
+    	this.by = by;
+    	this.name = name;
+    	this.driver = driver;
+    }
+    
     public ExtendedWebElement(WebElement element, String name) {
     	this(element);
     	this.name = name;
@@ -145,9 +131,6 @@ public class ExtendedWebElement {
         this.element = element;
         cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
         
-        //TODO: we must implement below functionality safety to restore AbstractUIObject(s)
-
-
         //read searchContext from not null elements only
         if (element == null) {
         	// it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
@@ -158,103 +141,89 @@ public class ExtendedWebElement {
 					thr.printStackTrace();
 				}
         	}
-
         	return;
         }
 
-        //TODO: start collecting tempBy and tempDriver to compare on real examples with those which are provided to constructor;
-		By tempBy = null;
-		WebDriver tempDriver = null;
-		
 		try {
-            
 			Field locatorField, searchContextField, byContextField = null;
 			SearchContext searchContext = null;
-			
+
+			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+				// reuse reflection to get internal fields
+				locatorField = element.getClass().getDeclaredField("underlyingElement");
+				locatorField.setAccessible(true);
+				element = (RemoteWebElement) locatorField.get(element);
+			}
+
 			if (element instanceof RemoteWebElement) {
 				searchContext = ((RemoteWebElement) element).getWrappedDriver();
-			} else if (element instanceof Proxy) { 
+			} else if (element instanceof Proxy) {
 				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
-				
+
 				locatorField = innerProxy.getClass().getDeclaredField("locator");
 				locatorField.setAccessible(true);
-				
+
 				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-				
+
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
 				searchContext = (SearchContext) searchContextField.get(locator);
-				
+
 				byContextField = locator.getClass().getDeclaredField("by");
 				byContextField.setAccessible(true);
-				tempBy = (By) byContextField.get(locator);
-				
+				this.by = (By) byContextField.get(locator);
 
-				
 				if (searchContext instanceof Proxy) {
 					innerProxy = Proxy.getInvocationHandler(((Proxy) searchContext));
-					
+
 					locatorField = innerProxy.getClass().getDeclaredField("locator");
 					locatorField.setAccessible(true);
-					
+
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-					
+
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
 					searchContext = (SearchContext) searchContextField.get(locator);
 				}
 			}
-			
+
+			if (searchContext instanceof EventFiringWebDriver) {
+				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) searchContext;
+				this.driver = eventFirDriver.getWrappedDriver();
+				return;
+			}
+
+			if (searchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+				// reuse reflection to get internal fields
+				locatorField = searchContext.getClass().getDeclaredField("underlyingElement");
+				locatorField.setAccessible(true);
+				searchContext = (RemoteWebElement) locatorField.get(searchContext);
+			}
+
 			if (searchContext instanceof RemoteWebElement) {
 				searchContext = ((RemoteWebElement) searchContext).getWrappedDriver();
 			}
 			if (searchContext != null && searchContext instanceof RemoteWebDriver) {
-				SessionId sessionId = ((RemoteWebDriver)searchContext).getSessionId();
-				tempDriver = DriverPool.getDriver(sessionId);
+				SessionId sessionId = ((RemoteWebDriver) searchContext).getSessionId();
+				this.driver = DriverPool.getDriver(sessionId);
 			} else {
 				LOGGER.error(searchContext);
 			}
-			
 		} catch (NoSuchFieldException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-		} catch (ClassCastException e) { // TODO: refactor: why? somehow
-											// HtmlElement objects can't be cast
-											// to Proxy...
+		} catch (ClassCastException e) {
 			e.printStackTrace();
 		} catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.error("Unable to get driver and/or by for " + getNameWithLocator(), thr);
 		}
-		
-		if (tempDriver == null) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why tempDriver is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-				thr.printStackTrace();
-			}
-		} else if (driver!= null && !tempDriver.equals(driver)) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why 'driver' from reflection and from decorator differs!");
-			} catch (Throwable thr) {
-				thr.printStackTrace();
-			}
-		}
-
-		this.driver = tempDriver;
-		
     }
 
     public WebElement getElement() {
-    	//TODO: for public calls make a call to driver and re-create element.
     	//TODO: think about legacy selenium call support as a feature
     	element = refindElement(getBy(), 1);
-/*        if (element == null) {
-        	//TODO: why 1 sec?
-            element = findElement(1);
-        }
-*/
     	return element;
     }
     
@@ -316,7 +285,7 @@ public class ExtendedWebElement {
 		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
-	
+
     private WebElement findElement(long timeout) {
         if (element != null) {
             return element;
@@ -333,7 +302,6 @@ public class ExtendedWebElement {
     
     private WebElement refindElement(By by, long timeout) {
         LOGGER.info("explicitly find element using by annotation: " + by);
-        //TODO: implement private isClickable using explicit by locator
         if (isPresent(timeout)) {
         	element = getDriver().findElement(by);
         } else {
@@ -428,9 +396,7 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-    	//TODO: reverted back to verify clickable. test on iOS where we had issue with it's detection on iOS 11.3
         click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
-    	//click(timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
     }
     
 	/**
@@ -625,27 +591,6 @@ public class ExtendedWebElement {
     }
     
     /**
-     * Set implicit timeout to default IMPLICIT_TIMEOUT value.
-     */
-    public void setImplicitTimeout() {
-        setImplicitTimeout(IMPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Set implicit timeout.
-     *
-     * @param timeout in seconds.
-     */
-    public void setImplicitTimeout(long timeout) {
-        try {
-            LOGGER.info("setImplicitTimeout: starting... value: " + timeout);
-            getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
-            LOGGER.info("setImplicitTimeout: finished. " + timeout);
-        } catch (Exception e) {
-            LOGGER.error("Unable to set implicit timeout to " + timeout, e);
-        }
-    }
-
     /**
      * Scroll to element (applied only for desktop).
      */
@@ -668,14 +613,11 @@ public class ExtendedWebElement {
             int offset = R.CONFIG.getInt("scroll_to_element_y_offset");
             ((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0," + (y - offset) + ");");
         } catch (Exception e) {
-            // TODO: calm error logging as it is too noisy
-            // LOGGER.debug("Scroll to element: " + getName() + " not
-            // performed!" + e.getMessage());
+        	//do nothing
         }
     }
-
-    /**
-     * Inputs file path to specified element.
+     
+    /* Inputs file path to specified element.
      *
      * @param filePath path
      */
@@ -837,8 +779,6 @@ public class ExtendedWebElement {
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-    	
-    	//TODO: test how effective it is to combine presence and textToBe
     	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
     }
@@ -848,10 +788,7 @@ public class ExtendedWebElement {
     }
 
     public void assertElementWithTextPresent(final String text, long timeout) {
-        if (isElementWithTextPresent(text, timeout)) {
-        	//TODO: move screenshot outside of the class
-            Screenshot.capture(getDriver(), Messager.ELEMENT_WITH_TEXT_PRESENT.getMessage(getName(), text));
-        } else {
+        if (!isElementWithTextPresent(text, timeout)) {
             Assert.fail(Messager.ELEMENT_WITH_TEXT_NOT_PRESENT.getMessage(getNameWithLocator(), text));
         }
     }
@@ -914,7 +851,7 @@ public class ExtendedWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-        	return new ExtendedWebElement(getElement().findElement(by), name, by, driver);
+        	return new ExtendedWebElement(getElement().findElement(by), name);
         } else {
         	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
         }
@@ -943,7 +880,7 @@ public class ExtendedWebElement {
                 LOGGER.debug(e.getMessage(), e.getCause());
             }
 
-            extendedWebElements.add(new ExtendedWebElement(element, name, driver));
+            extendedWebElements.add(new ExtendedWebElement(element, name));
         }
         return extendedWebElements;
     }
@@ -958,34 +895,13 @@ public class ExtendedWebElement {
         js.executeScript("mobile: tap", tapObject);
     }
 
-    //TODO: refactor to fluent waits
     @Deprecated
     public void waitUntilElementNotPresent(final long timeout) {
-        final ExtendedWebElement element = this;
-
-        LOGGER.info(String.format("Wait until element %s disappear", element.getName()));
-
-        final WebDriver drv = getDriver();
-
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-        try {
-            setImplicitTimeout(0);
-            wait.until((Function<WebDriver, Object>) dr -> {
-                boolean result = drv.findElements(element.getBy()).size() == 0;
-                if (!result) {
-                    LOGGER.debug(drv.getPageSource());
-                    LOGGER.info(String.format("Element %s is still present. Wait until it disappear.", element.getName()));
-                }
-                return result;
-
-            });
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
-            // do nothing
-        } finally {
-            setImplicitTimeout(IMPLICIT_TIMEOUT);
-        }
-
+    	waitUntilElementDissappear(timeout);
+    }
+    
+    public boolean waitUntilElementDissappear(final long timeout) {
+		return waitUntil(ExpectedConditions.stalenessOf(element) , timeout);
     }
 
     /**
@@ -997,27 +913,8 @@ public class ExtendedWebElement {
      */
     @Deprecated
     public boolean isElementNotPresentAfterWait(final long timeout) {
-        final ExtendedWebElement element = this;
-
-        LOGGER.info(String.format("Check element %s not presence after wait.", element.getName()));
-
-        Wait<WebDriver> wait = new FluentWait<WebDriver>(getDriver()).withTimeout(timeout, TimeUnit.SECONDS).pollingEvery(1, TimeUnit.SECONDS)
-                .ignoring(NoSuchElementException.class);
-        try {
-            return wait.until(driver -> {
-                boolean result = driver.findElements(element.getBy()).isEmpty();
-                if (!result) {
-                    LOGGER.info(String.format("Element '%s' is still present. Wait until it disappear.", element.getNameWithLocator()));
-                }
-                return result;
-            });
-        } catch (Exception e) {
-            LOGGER.error("Error happened: " + e.getMessage(), e.getCause());
-            LOGGER.warn("Return standard element not presence method");
-            return !element.isElementPresent();
-        }
+    	return waitUntilElementDissappear(timeout);
     }
-
     /**
      * Checks that element clickable.
      *
@@ -1102,8 +999,10 @@ public class ExtendedWebElement {
     }
 
     private void captureElements() {
+    	//TODO: take a look again when we need this functionality again
+    	return;
 
-        if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
+/*        if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
             return;
         }
 
@@ -1178,10 +1077,10 @@ public class ExtendedWebElement {
             } catch (Throwable thr) {
                 LOGGER.error("Unable to capture elements metadata!", thr);
             }
-        }
+        }*/
     }
 
-    private String getUrlWithoutParameters(String url) {
+    /*    private String getUrlWithoutParameters(String url) {
 
         try {
             URI uri = new URI(url);
@@ -1214,7 +1113,7 @@ public class ExtendedWebElement {
         }
 
     }
-
+*/
     /**
      * Pause for specified timeout.
      * 
@@ -1383,7 +1282,6 @@ public class ExtendedWebElement {
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
 			// print error messages according to the action type
-			output = overrideActionException(actionName, inputArgs);
 			throw e;
 		} finally {
 			Timer.stop(actionName);
@@ -1398,6 +1296,8 @@ public class ExtendedWebElement {
 			@Override
 			public void doClick() {
 				try {
+					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 					element.click();
 				} catch (WebDriverException e) {
 					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
@@ -1418,19 +1318,23 @@ public class ExtendedWebElement {
 						throw e;
 					}
 				}
-				Screenshot.capture(getDriver(), Messager.ELEMENT_CLICKED.info(getName()));
 			}
 
 			@Override
 			public void doDoubleClick() {
+				DriverListener.setMessages(Messager.ELEMENT_DOUBLE_CLICKED.getMessage(getName()),
+						Messager.ELEMENT_NOT_DOUBLE_CLICKED.getMessage(getNameWithLocator()));
+				
 				WebDriver drv = getDriver();
 				Actions action = new Actions(drv);
 				action.moveToElement(element).doubleClick(element).build().perform();
-				Screenshot.capture(getDriver(), Messager.ELEMENT_DOUBLE_CLICKED.info(getName()));
 			}
 			
 			@Override
 			public void doHover(Integer xOffset, Integer yOffset) {
+				DriverListener.setMessages(Messager.ELEMENT_HOVERED.getMessage(getName()),
+						Messager.ELEMENT_NOT_HOVERED.getMessage(getNameWithLocator()));
+				
 				WebDriver drv = getDriver();
 				Actions action = new Actions(drv);
 				if (xOffset != null && yOffset!= null) {
@@ -1438,81 +1342,89 @@ public class ExtendedWebElement {
 				} else {
 					action.moveToElement(element).build().perform();
 				}
-				Screenshot.capture(getDriver(), Messager.ELEMENT_HOVERED.info(getName()));				
 			}
 			
 			@Override
 			public void doSendKeys(Keys keys) {
+				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(keys.toString(), getName()),
+						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(keys.toString(), getNameWithLocator()));
 				element.sendKeys(keys);
-				Screenshot.capture(getDriver(), Messager.KEYS_SEND_TO_ELEMENT.info(keys.toString(), getName()));
 			}
 
 			@Override
 			public void doType(String text) {
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-				element.clear();
+				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(decryptedText, getName()),
+						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
+
+				//element.clear();
 				element.sendKeys(decryptedText);
-				Screenshot.capture(getDriver(), Messager.KEYS_SEND_TO_ELEMENT.info(text, getName()));
 			}
 
 			@Override
 			public void doAttachFile(String filePath) {
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				
+				DriverListener.setMessages(Messager.FILE_ATTACHED.getMessage(decryptedText, getName()),
+						Messager.FILE_NOT_ATTACHED.getMessage(decryptedText, getNameWithLocator()));
+
 				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
 				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
-				Screenshot.capture(getDriver(), Messager.FILE_ATTACHED.info(filePath, getName()));
 			}
 
 			@Override
 			public String doGetText() {
 				String text = element.getText();
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Text", text, getName());
+				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Text", text, getName()));
 				return text;
 			}
 
 			@Override
 			public Point doGetLocation() {
 				Point point = element.getLocation();
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Location", point.toString(), getName());
+				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Location", point.toString(), getName()));
 				return point;
 			}
 
 			@Override
 			public Dimension doGetSize() {
 				Dimension dim = element.getSize();
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info("Size", dim.toString(), getName());
+				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Size", dim.toString(), getName()));
 				return dim;
 			}
 
 			@Override
 			public String doGetAttribute(String name) {
 				String attribute = element.getAttribute(name);
-				Messager.ELEMENT_ATTRIBUTE_FOUND.info(name, attribute, getName());
+				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage(name, attribute, getName()));
 				return attribute;
 			}
 
 			@Override
 			public void doRightClick() {
+				DriverListener.setMessages(Messager.ELEMENT_RIGHT_CLICKED.getMessage(getName()),
+						Messager.ELEMENT_NOT_RIGHT_CLICKED.getMessage(getNameWithLocator()));
+				
 				WebDriver drv = getDriver();
 				Actions action = new Actions(drv);
 				action.moveToElement(element).contextClick(element).build().perform();
-				Screenshot.capture(getDriver(), Messager.ELEMENT_RIGHT_CLICKED.info(getName()));
 			}
 
 			@Override
 			public void doCheck() {
+				DriverListener.setMessages(Messager.CHECKBOX_CHECKED.getMessage(getName()), null);
+				
 				if (!element.isSelected()) {
 					click();
-					Screenshot.capture(getDriver(), Messager.CHECKBOX_CHECKED.info(getName()));
 				}
 			}
 
 			@Override
 			public void doUncheck() {
+				DriverListener.setMessages(Messager.CHECKBOX_UNCHECKED.getMessage(getName()), null);
 				if (element.isSelected()) {
 					click();
-					Screenshot.capture(getDriver(), Messager.CHECKBOX_UNCHECKED.info(getName()));
 				}
 			}
 			
@@ -1530,9 +1442,13 @@ public class ExtendedWebElement {
 			@Override
 			public boolean doSelect(String text) {
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				
+				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(decryptedSelectText, getName()),
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(decryptedSelectText, getNameWithLocator()));
+
+				
 				final Select s = new Select(element);
 				s.selectByVisibleText(decryptedSelectText);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(text, getName()));
 				return true;
 			}
 
@@ -1549,6 +1465,11 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
+				
+				DriverListener.setMessages(Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.getMessage(matcher.toString(), getName()),
+						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.getMessage(matcher.toString(), getNameWithLocator()));
+
+				
 				final Select s = new Select(element);
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
@@ -1558,12 +1479,16 @@ public class ExtendedWebElement {
 					}
 				}
 				s.selectByVisibleText(fullTextValue);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.info(matcher.toString(), getName()));
 				return true;
 			}
 
 			@Override
 			public boolean doSelectByPartialText(String partialSelectText) {
+				
+				DriverListener.setMessages(
+						Messager.SELECT_BY_TEXT_PERFORMED.getMessage(partialSelectText, getName()),
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(partialSelectText, getNameWithLocator()));
+				
 				final Select s = new Select(element);
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
@@ -1573,15 +1498,18 @@ public class ExtendedWebElement {
 					}
 				}
 				s.selectByVisibleText(fullTextValue);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_TEXT_PERFORMED.info(partialSelectText, getName()));
 				return true;
 			}
 
 			@Override
 			public boolean doSelectByIndex(int index) {
+				DriverListener.setMessages(
+						Messager.SELECT_BY_INDEX_PERFORMED.getMessage(String.valueOf(index), getName()),
+						Messager.SELECT_BY_INDEX_NOT_PERFORMED.getMessage(String.valueOf(index), getNameWithLocator()));
+				
+				
 				final Select s = new Select(element);
 				s.selectByIndex(index);
-				Screenshot.capture(getDriver(), Messager.SELECT_BY_INDEX_PERFORMED.info(String.valueOf(index), getName()));
 				return true;
 			}
 
@@ -1605,144 +1533,17 @@ public class ExtendedWebElement {
 		return output;
 	}
 
-	private Object overrideActionException(ACTION_NAME actionName, Object inputArg) {
-
-		Object output = executeAction(actionName, new ActionSteps() {
-			@Override
-			public void doClick() {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_CLICKED.error(getNameWithLocator()));
-			}
-
-			@Override
-			public void doDoubleClick() {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_DOUBLE_CLICKED.error(getNameWithLocator()));
-			}
-
-			@Override
-			public void doRightClick() {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_RIGHT_CLICKED.error(getNameWithLocator()));
-			}
-
-			@Override
-			public void doHover(Integer xOffset, Integer yOffset) {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_NOT_HOVERED.error(getNameWithLocator()));
-			}
-			
-			@Override
-			public void doSendKeys(Keys keys) {
-				Screenshot.capture(getDriver(),
-						Messager.KEYS_NOT_SEND_TO_ELEMENT.error(keys.toString(), getNameWithLocator()));
-			}
-
-			@Override
-			public void doType(String text) {
-				Screenshot.capture(getDriver(), Messager.KEYS_NOT_SEND_TO_ELEMENT.error(text, getNameWithLocator()));
-			}
-
-			@Override
-			public void doAttachFile(String filePath) {
-				Screenshot.capture(getDriver(), Messager.FILE_NOT_ATTACHED.error(filePath, getNameWithLocator()));
-			}
-
-			@Override
-			public String doGetText() {
-				Screenshot.capture(getDriver(),
-						Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Text", getNameWithLocator()));
-				return "";
-			}
-
-			@Override
-			public Point doGetLocation() {
-				Screenshot.capture(getDriver(),
-						Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Location", getNameWithLocator()));
-				return null;
-			}
-
-			@Override
-			public Dimension doGetSize() {
-				Screenshot.capture(getDriver(),
-						Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error("Size", getNameWithLocator()));
-				return null;
-			}
-
-			@Override
-			public String doGetAttribute(String name) {
-				Screenshot.capture(getDriver(), Messager.ELEMENT_ATTRIBUTE_NOT_FOUND.error(name, getNameWithLocator()));
-				return null;
-			}
-
-			@Override
-			public void doCheck() {
-				// do nothing for now
-			}
-
-			@Override
-			public void doUncheck() {
-				// do nothing for now
-			}
-			
-			@Override
-			public boolean doIsChecked() {
-				// do nothing for now
-				return false;
-			}
-
-			@Override
-			public boolean doSelect(String text) {
-				Screenshot.capture(getDriver(),
-						Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(text, getNameWithLocator()));
-				return false;
-			}
-
-			@Override
-			public boolean doSelectValues(String[] values) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
-				Screenshot.capture(getDriver(),
-						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.error(matcher.toString(), getNameWithLocator()));
-				return false;
-			}
-
-			@Override
-			public boolean doSelectByPartialText(String partialSelectText) {
-				Screenshot.capture(getDriver(),
-						Messager.SELECT_BY_TEXT_NOT_PERFORMED.error(partialSelectText, getNameWithLocator()));
-				return false;
-			}
-
-			@Override
-			public boolean doSelectByIndex(int index) {
-				// TODO Auto-generated method stub
-				Screenshot.capture(getDriver(),
-						Messager.SELECT_BY_INDEX_NOT_PERFORMED.error(String.valueOf(index), getNameWithLocator()));
-				return false;
-			}
-
-			@Override
-			public String doGetSelectedValue() {
-				return "";
-			}
-
-			@Override
-			public List<String> doGetSelectedValues() {
-				//return empty list 
-				return new ArrayList<String>();
-			}
-
-		}, inputArg);
-
-		return output;
-	}
-	
     private WebDriver getDriver() {
 		if (driver != null) {
 			return driver;
 		} else {
-			LOGGER.error("Unable to detect driver by sessionId! Looking for default one from pool.");
+			try {
+				throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+			
+			LOGGER.error("Unable to detect driver! Looking for default one from pool.");
 			return DriverPool.getDriver();
 		}
     }

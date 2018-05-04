@@ -26,6 +26,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -158,11 +159,19 @@ public final class DriverPool {
     public static WebDriver getDriver(SessionId sessionId) {
     	LOGGER.debug("Detecting WebDriver by sessionId...");
     	ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-    	for (Entry<String, WebDriver> enrty : currentDrivers.entrySet()) {
-    		LOGGER.debug("analyzing driver: " + ((RemoteWebDriver)enrty.getValue()).getSessionId().toString());
-    		if (sessionId.equals(((RemoteWebDriver)enrty.getValue()).getSessionId())) {
+    	for (Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+    		WebDriver drv = entry.getValue();
+    		if (drv instanceof EventFiringWebDriver) {
+    			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
+    			drv = eventFirDriver.getWrappedDriver();
+    		}
+    		
+    		SessionId drvSessionId = ((RemoteWebDriver)drv).getSessionId();
+    		
+    		LOGGER.debug("analyzing driver: " + drvSessionId.toString());
+    		if (sessionId.equals(drvSessionId)) {
     			LOGGER.debug("Detected WebDriver by sessionId");
-    			return enrty.getValue();
+    			return drv;
     		}
     	}
 
@@ -171,7 +180,7 @@ public final class DriverPool {
     	return getDriver();
     	
     }
-    
+
     /**
      * Restart default driver
      * 

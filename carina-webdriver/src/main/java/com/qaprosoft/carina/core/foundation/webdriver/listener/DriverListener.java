@@ -22,46 +22,48 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.screenshot.ICapturable.ScreenArea;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.Screen;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.ICapturable.ScreenArea;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class ScreenshotEventListener implements IConfigurableEventListener {
-    private static final Logger LOGGER = Logger.getLogger(ScreenshotEventListener.class);
-
+public class DriverListener implements IConfigurableEventListener {
+	
+    private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
+    
+    private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
+    private final static ThreadLocal<String> currentNegativeMessage = new ThreadLocal<String>();
+    
     @Override
     public boolean enabled() {
-        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT);
+    	//custom listener should be enabled forever as UI actions logging moved to this class
+    	return true;
     }
 
     @Override
     public void afterAlertAccept(WebDriver driver) {
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).comment("Alert accepted").getImage()));
+    	captureScreenshot("Alert accepted", driver);
     }
 
     @Override
     public void afterAlertDismiss(WebDriver driver) {
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).comment("Alert dismissed").getImage()));
+    	captureScreenshot("Alert dismissed", driver);
     }
 
     @Override
     public void afterChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
         String comment = String.format("Text '%s' typed", charArrayToString(value));
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).highlight(element.getLocation()).comment(comment).getImage()));
+    	captureScreenshot(comment, driver, element, false);
     }
 
     @Override
     public void afterClickOn(WebElement element, WebDriver driver) {
-        // Do nothing
+        String comment = "Element clicked";
+    	captureScreenshot(comment, driver, element, false);
     }
 
     @Override
@@ -71,27 +73,23 @@ public class ScreenshotEventListener implements IConfigurableEventListener {
 
     @Override
     public void afterNavigateBack(WebDriver driver) {
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).comment("Navigated back").getImage()));
+    	captureScreenshot("Navigated back", driver);
     }
 
     @Override
     public void afterNavigateForward(WebDriver driver) {
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).comment("Navigated forward").getImage()));
+    	captureScreenshot("Navigated forward", driver);
     }
 
     @Override
     public void afterNavigateRefresh(WebDriver driver) {
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).comment("Page refreshed").getImage()));
+    	captureScreenshot("Page refreshed", driver);
     }
 
     @Override
     public void afterNavigateTo(String url, WebDriver driver) {
         String comment = String.format("URL '%s' opened", url);
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).comment(comment).getImage()));
+        captureScreenshot(comment, driver);
     }
 
     @Override
@@ -116,8 +114,7 @@ public class ScreenshotEventListener implements IConfigurableEventListener {
 
     @Override
     public void beforeClickOn(WebElement element, WebDriver driver) {
-        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-                .capture(ScreenArea.VISIBLE_SCREEN).highlight(element.getLocation()).comment("Element clicked").getImage()));
+    	// Do nothing
     }
 
     @Override
@@ -153,6 +150,7 @@ public class ScreenshotEventListener implements IConfigurableEventListener {
     @Override
     public void onException(Throwable t, WebDriver driver) {
         // Do nothing
+    	captureScreenshot(t.getMessage(), driver, null, true);
     }
 
     /**
@@ -184,4 +182,59 @@ public class ScreenshotEventListener implements IConfigurableEventListener {
         // TODO Auto-generated method stub
         
     }
+    
+    
+    private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
+    	if (getMessage() != null) {
+    		comment = getMessage();
+    	}
+    	
+    	if (errorMessage) {
+    		LOGGER.error(comment);
+    	} else {
+    		LOGGER.info(comment);
+    	}
+    	Screenshot.capture(driver, comment);
+/*    	if (element != null) {
+    		ReportContext.saveScreenshot(Screen.getInstance(driver)
+                    .capture(ScreenArea.VISIBLE_SCREEN).highlight(element.getLocation()).comment(comment).getImage());
+    	} else {
+    		ReportContext.saveScreenshot(Screen.getInstance(driver)
+                    .capture(ScreenArea.VISIBLE_SCREEN).comment(comment).getImage());
+    	}*/
+    	resetMessages();
+    	
+    	//examples of new screenshooting approaches 
+/*        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
+                .capture(ScreenArea.VISIBLE_SCREEN).highlight(element.getLocation()).comment(comment).getImage()));
+
+        LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
+                .capture(ScreenArea.VISIBLE_SCREEN).comment("Alert accepted").getImage()));
+
+		ReportContext.saveScreenshot(Screen.getInstance(driver).capture(ScreenArea.VISIBLE_SCREEN)
+				.highlight(element.getLocation()).comment(comment).getImage());
+				
+
+*/
+    }
+
+    private void captureScreenshot(String comment, WebDriver driver) {
+    	captureScreenshot(comment, driver, null, false);
+    }
+    
+
+    public static String getMessage() {
+    	return currentPositiveMessage.get();
+    }
+    
+    public static void setMessages(String positiveMessage, String negativeMessage) {
+    	currentPositiveMessage.set(positiveMessage);
+    	currentNegativeMessage.set(negativeMessage);
+    }
+    
+    private void resetMessages() {
+    	currentPositiveMessage.remove();
+    	currentNegativeMessage.remove();
+    }
+
 }

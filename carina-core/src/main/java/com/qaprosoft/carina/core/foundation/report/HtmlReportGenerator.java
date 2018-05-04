@@ -74,9 +74,9 @@ public class HtmlReportGenerator {
 
                 image = image.replace("${image}", imgNames.get(i));
                 image = image.replace("${thumbnail}", imgNames.get(i));
-                if (i == imgNames.size() - 1) {
-                    image = image.replace("onload=\"\"", "onload=\"this.click()\"");
-                }
+//                if (i == imgNames.size() - 1) {
+//                    image = image.replace("onload=\"\"", "onload=\"this.click()\"");
+//                }
 
                 String title = Screenshot.getScreenshotComment(imgNames.get(i));
                 if (title == null) {
