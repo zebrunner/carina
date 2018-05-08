@@ -21,10 +21,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.screenshot.Screen;
-import com.qaprosoft.carina.core.foundation.webdriver.screenshot.ICapturable.ScreenArea;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
