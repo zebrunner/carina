@@ -23,7 +23,7 @@
 
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
-		<aws-java-sdk.version>1.10.30</aws-java-sdk.version>
+		<aws-java-sdk.version>1.11.324</aws-java-sdk.version>
 
 	</properties>
 
@@ -44,13 +44,6 @@
 			<artifactId>aws-java-sdk</artifactId>
 			<version>${aws-java-sdk.version}</version>
 		</dependency>
-		<dependency>
-			<!-- explicitly downgrade apache http client for aws s3 otherwise aws s3 ibraries do not operate correctly-->
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.1</version>
-		</dependency>
-
 		<!--<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
