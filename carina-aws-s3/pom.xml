@@ -44,6 +44,13 @@
 			<artifactId>aws-java-sdk</artifactId>
 			<version>${aws-java-sdk.version}</version>
 		</dependency>
+		<dependency>
+			<!-- explicitly downgrade apache http client for aws s3 otherwise aws s3 ibraries do not operate correctly-->
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.1</version>
+		</dependency>
+
 		<!--<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
