@@ -70,12 +70,14 @@ public class DriverFactory {
 			throw new RuntimeException("Unsupported driver_type: " + driverType);
 		}
 
-		WebDriver driver = factory.registerListeners(factory.create(testName, device, capabilities, seleniumHost),
-				getEventListeners());
-		LOGGER.debug("DriverFactory finish...");
-
+		WebDriver driver = factory.create(testName, device, capabilities, seleniumHost);
+		
 		streamVNC(factory.getVncURL(driver));
 		
+		factory.registerListeners(driver, getEventListeners());   
+		
+		LOGGER.debug("DriverFactory finish...");
+
 		return driver;
 	}
 
