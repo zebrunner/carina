@@ -145,7 +145,12 @@ public final class DriverPool {
             LOGGER.debug("Starting new driver as nothing was found in the pool");
             drv = createDriver(name, capabilities, seleniumHost, DevicePool.getNullDevice());
         }
-        return drv;
+
+        if (drv instanceof EventFiringWebDriver) {
+        	return ((EventFiringWebDriver) drv).getWrappedDriver();
+        } else {
+        	return drv;
+        }
     }
 
     /**
