@@ -264,7 +264,7 @@ public class ExtendedWebElement {
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
+	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
