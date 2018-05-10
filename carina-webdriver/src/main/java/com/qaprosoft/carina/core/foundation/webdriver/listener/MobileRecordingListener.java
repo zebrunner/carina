@@ -15,14 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DriverCommand;
-import org.testng.Reporter;
 
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -37,12 +33,10 @@ import io.appium.java_client.screenrecording.BaseStopScreenRecordingOptions;
  * @author akhursevich
  */
 @SuppressWarnings({ "rawtypes"})
-public class ScreenRecordingListener<O1 extends BaseStartScreenRecordingOptions, O2 extends BaseStopScreenRecordingOptions> implements IDriverCommandListener {
+public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions, O2 extends BaseStopScreenRecordingOptions> implements IDriverCommandListener {
 
-    protected static final Logger LOGGER = Logger.getLogger(ScreenRecordingListener.class);
+    protected static final Logger LOGGER = Logger.getLogger(MobileRecordingListener.class);
     
-    private final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
-
     private CommandExecutor commandExecutor;
 
     private O1 startRecordingOpt;
@@ -51,10 +45,13 @@ public class ScreenRecordingListener<O1 extends BaseStartScreenRecordingOptions,
     
     private boolean recording = false;
     
-    public ScreenRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt) {
+    private TestArtifactType artifact;
+    
+    public MobileRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt, TestArtifactType artifact) {
         this.commandExecutor = commandExecutor;
         this.startRecordingOpt = startRecordingOpt;
         this.stopRecordingOpt = stopRecordingOpt;
+        this.artifact = artifact;
     }
 
     @Override
@@ -65,11 +62,7 @@ public class ScreenRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                         MobileCommand.STOP_RECORDING_SCREEN, 
                         MobileCommand.stopRecordingScreenCommand((BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()));
 
-                if (Reporter.getCurrentTestResult().getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
-                    TestArtifactType artifact = new TestArtifactType();
-                    artifact.setName("Video " + SDF.format(new Date()));
-                    artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
-                    artifact.setLink((String) stopRecordingOpt.build().get("remotePath"));
+                if (ZafiraSingleton.INSTANCE.isRunning()) {
                     ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
                 }
             } catch (Exception e) {

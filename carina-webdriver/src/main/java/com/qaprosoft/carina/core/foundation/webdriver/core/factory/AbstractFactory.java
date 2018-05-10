@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
@@ -24,8 +27,13 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.testng.Reporter;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.zafira.models.dto.TestArtifactType;
+
+import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 /**
  * Base implementation of WebDriver factory.
@@ -33,7 +41,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
+    
     protected static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
+    
+    protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
@@ -80,4 +91,24 @@ public abstract class AbstractFactory {
      * @return VNC URL
      */
     abstract public String getVncURL(WebDriver driver);
+    
+    /**
+     * Returns bitrate by {@link VideoQuality}
+     * @param quality - video quality for recording
+     * @return appropriate bitrate
+     */
+    abstract protected int getBitrate(VideoQuality quality);
+    
+    /**
+     * Generate test artifact for zafira upload.
+     * @param videoName 
+     * @return test artifact with video details
+     */
+    protected TestArtifactType initVideoArtifact(String videoName) {
+        TestArtifactType artifact = new TestArtifactType();
+        artifact.setName("Video " + SDF.format(new Date()));
+        artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
+        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
+        return artifact;
+    }
 }

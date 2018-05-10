@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.UUID;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
@@ -36,6 +37,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
+
+import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 public class DesktopFactory extends AbstractFactory {
 
@@ -62,7 +67,17 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         try {
-            driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+            
+            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
+            
+            if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
+                final String videoName = UUID.randomUUID().toString();
+                capabilities.setCapability("videoName", videoName + ".mp4");
+                capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality"))));
+                ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+            }
+            
+            driver = new RemoteWebDriver(ce, capabilities);
         } catch (UnreachableBrowserException e) {
             // try to restart selenium hub
             restartAll(PREFIX_WIN, RESTART_ALL_BAT_PATH);
@@ -126,4 +141,18 @@ public class DesktopFactory extends AbstractFactory {
 		}
 		return vncURL;
 	}
+	
+	@Override
+    protected int getBitrate(VideoQuality quality) {
+        switch (quality) {
+        case LOW:
+            return 6;
+        case MEDIUM:
+            return 12;
+        case HIGH:
+            return 24;
+        default:
+            return 1;
+        }
+    }
 }
