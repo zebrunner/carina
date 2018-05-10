@@ -1357,7 +1357,7 @@ public class ExtendedWebElement {
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(decryptedText, getName()),
 						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
 
-				//element.clear();
+				element.clear();
 				element.sendKeys(decryptedText);
 			}
 
