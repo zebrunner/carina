@@ -96,7 +96,12 @@ public class DesktopFactory extends AbstractFactory {
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
-            return new IECapabilities().getCapability(name);
+        	DesiredCapabilities caps = new IECapabilities().getCapability(name);
+        	if (browser.equalsIgnoreCase("ie")) {
+        		//hotfix for the browserstack integration where browser should be declared as "IE"  
+        		caps.setBrowserName("IE");
+        	}
+            return caps;
         } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
