@@ -44,7 +44,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ScreenRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -64,6 +64,7 @@ import io.appium.java_client.screenrecording.ScreenRecordingUploadOptions;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
+    
     @Override
     public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
 
@@ -99,6 +100,9 @@ public class MobileFactory extends AbstractFactory {
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
                     if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
+                        
+                        final String videoName = UUID.randomUUID().toString();
+                        
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
                                 .withVideoSize(R.CONFIG.get("screen_record_size"))
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
@@ -106,11 +110,11 @@ public class MobileFactory extends AbstractFactory {
 
                         AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions()
                                 .withUploadOptions(new ScreenRecordingUploadOptions()
-                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
+                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                                         .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         ce.getListeners()
-                                .add(new ScreenRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
+                                .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
@@ -118,6 +122,9 @@ public class MobileFactory extends AbstractFactory {
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 
                     if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
+                        
+                        final String videoName = UUID.randomUUID().toString();
+                        
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
                                 .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality")))
                                 .withVideoType(VideoType.MP4)
@@ -125,10 +132,10 @@ public class MobileFactory extends AbstractFactory {
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions()
                                 .withUploadOptions(new ScreenRecordingUploadOptions()
-                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_host"), UUID.randomUUID().toString()))
+                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                                         .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        ce.getListeners().add(new ScreenRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2));
+                        ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
                     }
 
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
@@ -235,13 +242,9 @@ public class MobileFactory extends AbstractFactory {
         }
         return vncURL;
     }
-
-    /**
-     * Returns bitrate by {@link VideoQuality}
-     * @param quality - video quality for recording
-     * @return appropriate bitrate
-     */
-    private int getBitrate(VideoQuality quality) {
+    
+    @Override
+    protected int getBitrate(VideoQuality quality) {
         switch (quality) {
         case LOW:
             return 250000;

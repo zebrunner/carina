@@ -48,7 +48,7 @@ import io.appium.java_client.remote.AppiumCommandExecutor;
 import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 
 /**
- * EventFiringCommandExecutor triggers event listener before/after execution of the command.
+ * EventFiringAppiumCommandExecutor triggers event listener before/after execution of the command.
  * Please track {@link AppiumCommandExecutor} for latest changes.
  * 
  * @author akhursevich
