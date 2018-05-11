@@ -24,7 +24,7 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<opencsv.version>1.7</opencsv.version>		
+		<opencsv.version>1.7</opencsv.version>
 	</properties>
 
 	<dependencies>
@@ -48,7 +48,7 @@
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>			
+			<artifactId>poi</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -66,11 +66,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-		
+
 		<dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>            
-        </dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
 
 	</dependencies>
 
