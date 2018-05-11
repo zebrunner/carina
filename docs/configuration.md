@@ -60,11 +60,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
-		<td>implicit_timeout</td>
-		<td>Implicit timeout in seconds to wait for element</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
 		<td>retry_interval</td>
 		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify number from 500-1500 range</td>
 		<td>Integer</td>
