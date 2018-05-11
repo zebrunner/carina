@@ -193,7 +193,7 @@ public class AbstractTestListener extends TestArgsListener {
         // register configuration step as test artifact
         String test = TestNamingUtil.getCanonicalTestName(result);
 
-        Artifacts.add("Log", ReportContext.getTestLogLink(test));
+        Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
 
         ReportContext.renameTestDir(test);
