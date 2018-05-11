@@ -105,34 +105,4 @@ public abstract class AbstractUIObject extends DriverHelper {
     }
     
     
-    /**
-     * Wait until any condition happens.
-     *
-     * @param condition - ExpectedCondition.
-     * @param timeout - timeout.
-     * @return true if condition happen.
-     */
-    //TODO: replace with extendedWebElement as only deliver functionality for getting driver and by from WebElement object only
-	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-		boolean result;
-		final WebDriver drv = getDriver();
-		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
-		try {
-			LOGGER.debug("waitUntil: starting..." + getName() + "; condition: " + condition.toString());
-			wait.until(condition);
-			result = true;
-			LOGGER.debug("waitUntil: finished true..." + getName());
-		} catch (NoSuchElementException | TimeoutException e) {
-			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getName());
-			result = false;
-		} catch (Exception e) {
-			LOGGER.error("waitUntil: " + getName(), e);
-			result = false;
-		}
-		Timer.stop(ACTION_NAME.WAIT);
-		return result;
-	}
-	
 }

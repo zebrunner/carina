@@ -1193,7 +1193,7 @@ public class DriverHelper {
 		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
 				Messager.ELEMENT_NOT_FOUND.getMessage(name));
     	
-    	if (!waitUntil(name, ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
     		Messager.ELEMENT_NOT_FOUND.error(name);
     		return null;
     	}
@@ -1226,7 +1226,7 @@ public class DriverHelper {
         List<WebElement> webElements = new ArrayList<WebElement>();
 
         String name = "undefined";
-    	if (!waitUntil(name, ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
     		Messager.ELEMENT_NOT_FOUND.info(name);
     		return extendedWebElements;
     	}
@@ -1277,22 +1277,22 @@ public class DriverHelper {
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	private boolean waitUntil(String name, ExpectedCondition<?> condition, long timeout) {
+	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			LOGGER.debug("waitUntil: starting..." + name + "; condition: " + condition.toString());
+			LOGGER.debug("waitUntil: condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
-			LOGGER.debug("waitUntil: finished true..." + name);
+			LOGGER.debug("waitUntil: finished true...");
 		} catch (NoSuchElementException | TimeoutException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + name);
+			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + condition.toString());
 			result = false;
 		} catch (Exception e) {
-			LOGGER.error("waitUntil: " + name, e);
+			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
 		}
 		Timer.stop(ACTION_NAME.WAIT);

@@ -73,7 +73,7 @@ public class AliceRecognition implements IRecognition {
                 this.enabled = this.client.isAvailable();
             }
         } catch (Exception e) {
-            LOGGER.error("Unable to initialize Alice: " + e.getMessage());
+            LOGGER.error("Unable to initialize Alice: " + e.getMessage(), e);
         }
     };
 

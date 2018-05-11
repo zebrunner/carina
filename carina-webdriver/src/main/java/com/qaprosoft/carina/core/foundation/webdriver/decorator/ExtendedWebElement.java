@@ -995,7 +995,7 @@ public class ExtendedWebElement {
             by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
-        return new ExtendedWebElement(by, name);
+        return new ExtendedWebElement(by, name, getDriver());
     }
 
     private void captureElements() {
@@ -1261,8 +1261,11 @@ public class ExtendedWebElement {
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
 			Object...inputArgs) {
-		if (waitCondition != null & !waitUntil(waitCondition, timeout)) {
-			LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(getNameWithLocator()));
+		if (waitCondition != null) {
+			//do verification only if waitCondition is fine
+			if (!waitUntil(waitCondition, timeout)) {
+				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(getNameWithLocator()));
+			}
 		}
 
 		Object output = null;
