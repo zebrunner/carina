@@ -134,7 +134,7 @@ public class DriverFactory {
 			if (!StringUtils.isEmpty(vncURL) && Reporter.getCurrentTestResult().getAttribute("ztid") != null
 					&& ZafiraSingleton.INSTANCE.isRunning()) {
 				TestArtifactType artifact = new TestArtifactType();
-				artifact.setName("Live demo " + SDF.format(new Date()));
+				artifact.setName(String.format("Live video %s", SDF.format(new Date())));
 				artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
 				artifact.setLink(vncURL);
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
