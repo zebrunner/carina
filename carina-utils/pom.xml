@@ -25,7 +25,6 @@
 		<target.version>1.8</target.version>
 
 		<pdfbox.version>1.8.7</pdfbox.version>
-		<jackson-databind.version>2.8.9</jackson-databind.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
 
@@ -35,10 +34,8 @@
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-commons</artifactId>
-		</dependency>-->
+		<!--<dependency> <groupId>com.qaprosoft</groupId> <artifactId>carina-commons</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
@@ -71,8 +68,18 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.jayway.restassured</groupId>
-		    <artifactId>rest-assured</artifactId>
+			<groupId>com.jayway.restassured</groupId>
+			<artifactId>rest-assured</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
 		</dependency>
 
 		<!-- Test utilities -->
@@ -89,10 +96,12 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>${jackson-databind.version}</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
+
+		<!--<dependency> <groupId>com.jayway.jsonpath</groupId> <artifactId>json-path</artifactId> 
+			<version>2.9.0</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.mongodb</groupId>
@@ -101,9 +110,9 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>joda-time</groupId>
-		    <artifactId>joda-time</artifactId>
-		    <version>${joda-time.version}</version>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${joda-time.version}</version>
 		</dependency>
 
 		<!-- Jira -->
@@ -112,7 +121,7 @@
 			<artifactId>jira-client</artifactId>
 			<version>${jira-client.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>

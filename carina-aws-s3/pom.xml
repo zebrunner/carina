@@ -23,8 +23,6 @@
 
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
-		<aws-java-sdk.version>1.11.324</aws-java-sdk.version>
-
 	</properties>
 
 	<dependencies>
@@ -42,12 +40,9 @@
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk</artifactId>
-			<version>${aws-java-sdk.version}</version>
 		</dependency>
-		<!--<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>-->
+		<!--<dependency> <groupId>junit</groupId> <artifactId>junit</artifactId> 
+			</dependency> -->
 
 
 		<!-- Test utilities -->

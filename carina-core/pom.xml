@@ -34,10 +34,8 @@
 
 	<dependencies>
 		<!-- Carina Core sub-modules -->
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-proxy</artifactId>
-		</dependency>-->
+		<!--<dependency> <groupId>com.qaprosoft</groupId> <artifactId>carina-proxy</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-dataprovider</artifactId>
@@ -48,12 +46,22 @@
 		</dependency>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-aws-s3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-crypto</artifactId>
-		</dependency>-->
+		<dependency>
+			<groupId>io.appium</groupId>
+			<artifactId>java-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+		</dependency>
+		<!--<dependency> <groupId>com.qaprosoft</groupId> <artifactId>carina-crypto</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-webdriver</artifactId>
@@ -69,6 +77,30 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.restassured</groupId>
+			<artifactId>rest-assured</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 		<!-- Cucumber -->
 		<dependency>
