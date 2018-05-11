@@ -24,7 +24,6 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<guava.version>21.0</guava.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
@@ -99,8 +98,11 @@
 
 
 		<!-- Guava -->
-		<!--<dependency> <groupId>com.google.guava</groupId> <artifactId>guava</artifactId> 
-			<version>${guava.version}</version> </dependency> -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>23.0-android</version>
+		</dependency>
 
 		<!-- Appium -->
 		<dependency>
