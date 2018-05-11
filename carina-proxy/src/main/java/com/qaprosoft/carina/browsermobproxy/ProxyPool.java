@@ -45,6 +45,10 @@ public final class ProxyPool {
         BrowserMobProxyServer proxy = new BrowserMobProxyServer();
         proxy.setTrustAllServers(true);
         //System.setProperty("jsse.enableSNIExtension", "false");
+        
+        // disable MITM in case we do not need it
+        proxy.setMitmDisabled(Configuration.getBoolean(Parameter.BROWSERMOB_MITM));
+        
         return proxy;
     }
     
