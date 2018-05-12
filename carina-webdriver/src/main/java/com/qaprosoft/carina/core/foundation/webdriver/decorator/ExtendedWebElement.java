@@ -81,7 +81,7 @@ public class ExtendedWebElement {
     
     private WebDriver driver;
     
-    private CryptoTool cryptoTool;
+    private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
@@ -89,6 +89,8 @@ public class ExtendedWebElement {
     private String name;
     private By by;
 
+    
+    //TODO: remove deprecated constructors and combined rest of functionality without code duplicates
     @Deprecated
     public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
         this(element, name);
@@ -114,12 +116,14 @@ public class ExtendedWebElement {
     	this.by = by;
     	this.name = name;
     	this.element = null;
+    	
     }
     
     public ExtendedWebElement(By by, String name, WebDriver driver) {
     	this.by = by;
     	this.name = name;
     	this.driver = driver;
+    	
     }
     
     public ExtendedWebElement(WebElement element, String name) {
@@ -129,7 +133,6 @@ public class ExtendedWebElement {
     
     public ExtendedWebElement(WebElement element) {
         this.element = element;
-        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
         
         //read searchContext from not null elements only
         if (element == null) {
