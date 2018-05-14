@@ -24,7 +24,6 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<guava.version>21.0</guava.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
@@ -45,10 +44,8 @@
 			<artifactId>carina-proxy</artifactId>
 		</dependency>
 
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-crypto</artifactId>
-		</dependency>-->
+		<!--<dependency> <groupId>com.qaprosoft</groupId> <artifactId>carina-crypto</artifactId> 
+			</dependency> -->
 
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
@@ -75,13 +72,36 @@
 			<artifactId>selenium-java</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+		</dependency>
+
 
 		<!-- Guava -->
-		<!--<dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
-		</dependency>-->
+			<artifactId>guava</artifactId>			
+		</dependency>
 
 		<!-- Appium -->
 		<dependency>
@@ -108,23 +128,16 @@
 			<version>${ashot.version}</version>
 		</dependency>
 
-		<!--<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>${commons-httpclient.version}</version>
-		</dependency>-->
+		<!--<dependency> <groupId>commons-httpclient</groupId> <artifactId>commons-httpclient</artifactId> 
+			<version>${commons-httpclient.version}</version> </dependency> -->
 
 		<!-- HTTP utilities -->
-		<!--<dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>${apache-http.version}</version>
-		</dependency>-->
-		<!--<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>${apache-http.version}</version>
-		</dependency>-->
+		</dependency>
+		<!--<dependency> <groupId>org.apache.httpcomponents</groupId> <artifactId>httpcore</artifactId> 
+			<version>${apache-http.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
@@ -143,15 +156,13 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>alice-client</artifactId>
 		</dependency>
-		<!--<dependency>
-		  <groupId>org.apache.commons</groupId>
-		  <artifactId>commons-configuration2</artifactId>
-		</dependency>-->
+		<!--<dependency> <groupId>org.apache.commons</groupId> <artifactId>commons-configuration2</artifactId> 
+			</dependency> -->
 
 		<!-- Reflections -->
 		<dependency>
-		    <groupId>org.reflections</groupId>
-		    <artifactId>reflections</artifactId>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
 			<version>${reflections.version}</version>
 			<exclusions>
 				<exclusion>

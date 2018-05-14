@@ -25,7 +25,6 @@
 		<target.version>1.8</target.version>
 
 		<opencsv.version>1.7</opencsv.version>
-		<apache-poi.version>3.11-beta3</apache-poi.version>
 	</properties>
 
 	<dependencies>
@@ -47,11 +46,10 @@
 			<version>${opencsv.version}</version>
 		</dependency>
 
-		<!--<dependency>
+		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>${apache-poi.version}</version>
-		</dependency>-->
+		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -59,14 +57,19 @@
 		</dependency>
 
 
-		<!--dependency>
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-		</dependency-->
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
 		</dependency>
 
 	</dependencies>
