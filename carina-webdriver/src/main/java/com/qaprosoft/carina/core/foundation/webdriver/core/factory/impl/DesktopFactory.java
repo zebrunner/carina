@@ -107,7 +107,7 @@ public class DesktopFactory extends AbstractFactory {
             return new SafariCapabilities().getCapability(name);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.equalsIgnoreCase(browser)) {
+        } else if (BrowserType.EDGE.toLowerCase().contains(browser)) {
             return new EdgeCapabilities().getCapability(name);
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
