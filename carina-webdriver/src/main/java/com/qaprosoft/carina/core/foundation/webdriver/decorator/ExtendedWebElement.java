@@ -520,7 +520,7 @@ public class ExtendedWebElement {
      * @return boolean return true if clicked
      */
     public boolean clickIfPresent(long timeout) {
-        boolean present = isPresent(timeout);
+        boolean present = isElementPresent(timeout);
         if (present) {
             captureElements();
             click();
