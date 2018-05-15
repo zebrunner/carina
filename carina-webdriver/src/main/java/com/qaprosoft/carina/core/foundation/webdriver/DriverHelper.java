@@ -1239,7 +1239,7 @@ public class DriverHelper {
             	/* do nothing */
             }
 
-            extendedWebElements.add(new ExtendedWebElement(element, name));
+            extendedWebElements.add(new ExtendedWebElement(by, name, getDriver()));
         }
         return extendedWebElements;
     }

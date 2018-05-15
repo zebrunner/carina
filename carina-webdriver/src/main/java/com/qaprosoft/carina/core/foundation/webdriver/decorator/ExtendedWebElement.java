@@ -883,7 +883,7 @@ public class ExtendedWebElement {
                 LOGGER.debug(e.getMessage(), e.getCause());
             }
 
-            extendedWebElements.add(new ExtendedWebElement(element, name));
+            extendedWebElements.add(new ExtendedWebElement(by, name, getDriver()));
         }
         return extendedWebElements;
     }
@@ -904,7 +904,20 @@ public class ExtendedWebElement {
     }
     
     public boolean waitUntilElementDissappear(final long timeout) {
-		return waitUntil(ExpectedConditions.stalenessOf(element) , timeout);
+    	//TODO: test the case when getCachedElement is null and we again do driver search.
+/*    	Such kind of exception can be generated here for above scenario:
+    	Returned value cannot be converted to WebElement: {stacktrace=NoSuchElementError: An element could not be located on the page using the given search parameters.
+    			at XCUITestDriver.callee$0$0$ (/usr/local/lib/node_modules/appium/node_modules/appium-xcuitest-driver/lib/commands/find.js:130:13)
+    			at tryCatch (/usr/local/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:67:40)
+    			at GeneratorFunctionPrototype.invoke [as _invoke] (/usr/local/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:315:22)
+    			at GeneratorFunctionPrototype.prototype.(anonymous function) [as throw] (/usr/local/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:100:21)
+    			at GeneratorFunctionPrototype.invoke (/usr/local/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:136:37)
+    			at , error=no such element, message=An element could not be located on the page using the given search parameters.}
+    			Build info: version: '3.11.0', revision: 'e59cfb3', time: '2018-03-11T20:26:55.152Z'
+    			System info: host: '*', ip: '*', os.name: 'Mac OS X', os.arch: 'x86_64', os.version: '10.13.4', java.version: '1.8.0_73'
+    			Driver info: driver.version: IOSDriver*/
+		return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(getCachedElement()),
+				ExpectedConditions.invisibilityOf(getCachedElement())), timeout);
     }
 
     /**
