@@ -28,9 +28,9 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 /**
  * Created by yauhenipatotski on 10/26/15.
  */
-public class CapabilitiesLoder {
+public class CapabilitiesLoader {
 
-    private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoder.class);
+    private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoader.class);
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void loadCapabilities(String fileName) {

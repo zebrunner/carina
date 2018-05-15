@@ -62,7 +62,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoder;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
@@ -168,13 +168,13 @@ public abstract class AbstractTest // extends DriverHelper
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
             // redefine core CONFIG properties using custom capabilities file
-            new CapabilitiesLoder().loadCapabilities(customCapabilities);
+            new CapabilitiesLoader().loadCapabilities(customCapabilities);
         }
 
         String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
         if (!extraCapabilities.isEmpty()) {
             // redefine core CONFIG properties using extra capabilities file
-            new CapabilitiesLoder().loadCapabilities(extraCapabilities);
+            new CapabilitiesLoader().loadCapabilities(extraCapabilities);
         }
 
         try {
