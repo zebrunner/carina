@@ -871,6 +871,7 @@ public class ExtendedWebElement {
         	throw new RuntimeException("Unable to find dynamic elements using By: " + by.toString());
         }
 
+        int i = 1;
         for (WebElement element : webElements) {
             String name = "undefined";
             try {
@@ -881,7 +882,8 @@ public class ExtendedWebElement {
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(element, name));
+            extendedWebElements.add(new ExtendedWebElement(element, name, generateByForList(by, i)));
+            i++;
         }
         return extendedWebElements;
     }
@@ -908,7 +910,12 @@ public class ExtendedWebElement {
     	} catch (NoSuchElementException e) {
     		//element not present so means disappear
     		return true;
+    	} catch (Exception e) {
+    		//element not present so means disappear
+    		LOGGER.error("Investigate use-case with disappeared element later!", e);
+    		return true;
     	}
+
     	
     	return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
 				ExpectedConditions.invisibilityOf(element)), timeout);
@@ -983,7 +990,7 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("partialLinkText: ")) {
-            by = By.linkText(String.format(StringUtils.remove(locator, "partialLinkText: "), objects));
+            by = By.partialLinkText(String.format(StringUtils.remove(locator, "partialLinkText: "), objects));
         }
 
         if (locator.startsWith("css: ")) {
@@ -1555,4 +1562,52 @@ public class ExtendedWebElement {
 			return DriverPool.getDriver();
 		}
     }
+    
+    
+	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
+    public By generateByForList(By by, int index) {
+        String locator = by.toString();
+        By resBy = null;
+
+        if (locator.startsWith("By.id: ")) {
+            resBy = By.id(StringUtils.remove(locator, "By.id: ") + "[" + index + "]");
+        }
+
+        if (locator.startsWith("By.name: ")) {
+        	resBy = By.name(StringUtils.remove(locator, "By.name: ") + "[" + index + "]");
+        }
+
+        if (locator.startsWith("By.xpath: ")) {
+        	resBy = By.xpath(StringUtils.remove(locator, "By.xpath: ") + "[" + index + "]");
+        }
+        if (locator.startsWith("linkText: ")) {
+        	resBy = By.linkText(StringUtils.remove(locator, "linkText: ") + "[" + index + "]");
+        }
+
+        if (locator.startsWith("partialLinkText: ")) {
+        	resBy = By.partialLinkText(StringUtils.remove(locator, "partialLinkText: ") + "[" + index + "]");
+        }
+
+        if (locator.startsWith("css: ")) {
+        	resBy = By.cssSelector(StringUtils.remove(locator, "css: ") + "[" + index + "]");
+        }
+
+        if (locator.startsWith("tagName: ")) {
+        	resBy = By.tagName(StringUtils.remove(locator, "tagName: ") + "[" + index + "]");
+        }
+
+        /*
+         * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
+         */
+        if (locator.startsWith("By.IosClassChain: **")) {
+        	resBy = MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
+        }
+        
+        if (locator.startsWith("By.IosNsPredicate: **")) {
+        	resBy = MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
+        }
+
+        return resBy;
+    }
+
 }

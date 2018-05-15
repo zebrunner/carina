@@ -1232,6 +1232,7 @@ public class DriverHelper {
     	}
     	
     	webElements = getDriver().findElements(by);
+    	int i = 1;
         for (WebElement element : webElements) {
             try {
                 name = element.getText();
@@ -1240,7 +1241,8 @@ public class DriverHelper {
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(element, name));
+            extendedWebElements.add(new ExtendedWebElement(element, name, extendedWebElements.get(0).generateByForList(by, i)));          
+            i++;
         }
         return extendedWebElements;
     }
@@ -1298,4 +1300,5 @@ public class DriverHelper {
 		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
+
 }
