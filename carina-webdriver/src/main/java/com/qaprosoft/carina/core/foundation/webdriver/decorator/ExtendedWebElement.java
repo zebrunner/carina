@@ -883,7 +883,8 @@ public class ExtendedWebElement {
                 LOGGER.debug(e.getMessage(), e.getCause());
             }
 
-            extendedWebElements.add(new ExtendedWebElement(by, name, getDriver()));
+            // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
+            extendedWebElements.add(new ExtendedWebElement(element, name));
         }
         return extendedWebElements;
     }
