@@ -47,6 +47,7 @@ import io.appium.java_client.android.AndroidKeyCode;
  */
 public class AndroidUtils extends MobileUtils {
 
+	//TODO: review carefully and remove duplicates and migrate completely to fluent waits
     protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
     private static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     private static final long SCROLL_TIMEOUT = 300;
@@ -218,10 +219,10 @@ public class AndroidUtils extends MobileUtils {
      * @param timeout long
      * @param pollingTime long
      */
+    @Deprecated
     public static void waitUntilElementNotPresent(final By locator, final long timeout, final long pollingTime) {
         LOGGER.info(String.format("Wait until element %s disappear", locator.toString()));
         WebDriver driver = DriverPool.getDriver();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         try {
             if (new WebDriverWait(driver, timeout, pollingTime).until(ExpectedConditions.invisibilityOfElementLocated(locator))) {
                 LOGGER.info(String.format("Element located by: %s not present.", locator.toString()));
@@ -232,9 +233,8 @@ public class AndroidUtils extends MobileUtils {
             LOGGER.debug(e.getMessage());
             LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
         }
-        driver.manage().timeouts().implicitlyWait(IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
     }
-
+    
     /**
      * change Android Device Language
      * <p>
@@ -308,20 +308,23 @@ public class AndroidUtils extends MobileUtils {
      **/
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType) {
-        ExtendedWebElement el = null;
+        ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+		// TODO: support multi threaded WebDriver's removing DriverPool usage
+		WebDriver drv = DriverPool.getDriver();
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
-                        getScrollContainerSelector(scrollableContainer, containerSelectorType) +
-                        ".instance(" + containerInstance + "))"+
-                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
-                        getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
+				By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+						+ getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
+						+ containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
+						+ ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
+                
+				WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
-                    el = new ExtendedWebElement(ele, scrollToEle);
+                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -337,7 +340,7 @@ public class AndroidUtils extends MobileUtils {
             }
         }
 
-        return el;
+        return extendedWebElement;
     }
 
     /** Scrolls into view in specified container
@@ -357,20 +360,25 @@ public class AndroidUtils extends MobileUtils {
      **/
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType, int eleSelectorInstance) {
-        ExtendedWebElement el = null;
+        ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+		// TODO: support multi threaded WebDriver's removing DriverPool usage
+		WebDriver drv = DriverPool.getDriver();
+
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
-                        getScrollContainerSelector(scrollableContainer, containerSelectorType) +
-                        ".instance(" + containerInstance + "))" +
-                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
-                        getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance(" + eleSelectorInstance + "))"));
+				By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+						+ getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
+						+ containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
+						+ ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance("
+						+ eleSelectorInstance + "))");
+				
+                WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
-                    el = new ExtendedWebElement(ele, scrollToEle);
+                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -386,7 +394,7 @@ public class AndroidUtils extends MobileUtils {
             }
         }
 
-        return el;
+        return extendedWebElement;
     }
 
     /** Scrolls into view in specified container
@@ -404,19 +412,23 @@ public class AndroidUtils extends MobileUtils {
      **/
     public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           SelectorType eleSelectorType){
-        ExtendedWebElement el = null;
+        ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+		// TODO: support multi threaded WebDriver's removing DriverPool usage
+		WebDriver drv = DriverPool.getDriver();
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                WebElement ele = DriverPool.getDriver().findElement(MobileBy.AndroidUIAutomator("new UiScrollable(" +
-                        getScrollContainerSelector(scrollableContainer, containerSelectorType) + ")" +
-                        ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView(" +
-                        getScrollToElementSelector(scrollToEle, eleSelectorType) + ")"));
+				By scrollBy = MobileBy.AndroidUIAutomator(
+						"new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
+								+ ")" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView("
+								+ getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
+				
+                WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
-                    el = new ExtendedWebElement(ele, scrollToEle);
+                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -431,7 +443,7 @@ public class AndroidUtils extends MobileUtils {
             }
         }
 
-        return el;
+        return extendedWebElement;
     }
 
     /** Scrolls into view in specified container
