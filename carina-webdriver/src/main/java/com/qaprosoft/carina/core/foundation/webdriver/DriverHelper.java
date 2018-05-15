@@ -1284,7 +1284,6 @@ public class DriverHelper {
 		Timer.start(ACTION_NAME.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			LOGGER.debug("waitUntil: condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true...");
