@@ -28,13 +28,11 @@ import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -272,7 +270,7 @@ public class ExtendedWebElement {
 		Timer.start(ACTION_NAME.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
 		try {
-			LOGGER.debug("waitUntil: starting..." + getNameWithLocator() + "; condition: " + condition.toString());
+			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
@@ -900,25 +898,20 @@ public class ExtendedWebElement {
 
     @Deprecated
     public void waitUntilElementNotPresent(final long timeout) {
-    	waitUntilElementDissappear(timeout);
+    	waitUntilElementDisappear(timeout);
     }
     
-    public boolean waitUntilElementDissappear(final long timeout) {
-    	boolean res = false;
+    public boolean waitUntilElementDisappear(final long timeout) {
+    	try {
+    		//do direct selenium/appium search without any extra validations 
+    		element = getDriver().findElement(by);
+    	} catch (NoSuchElementException e) {
+    		//element not present so means disappear
+    		return true;
+    	}
     	
-		try {
-			res = waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(getCachedElement()),
-					ExpectedConditions.invisibilityOf(getCachedElement())), timeout);
-		} catch (WebDriverException e) {
-			if (e.getMessage() != null && e.getMessage().contains("Returned value cannot be converted to WebElement")) {
-				// everything is fine as element really does not exist anymore
-				res = true;
-			} else {
-				throw e;
-			}
-		}
-		
-		return res;
+    	return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
+				ExpectedConditions.invisibilityOf(element)), timeout);
     }
 
     /**
@@ -930,7 +923,7 @@ public class ExtendedWebElement {
      */
     @Deprecated
     public boolean isElementNotPresentAfterWait(final long timeout) {
-    	return waitUntilElementDissappear(timeout);
+    	return waitUntilElementDisappear(timeout);
     }
     /**
      * Checks that element clickable.
