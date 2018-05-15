@@ -105,6 +105,7 @@ public class HockeyAppManager {
             boolean retry = true;
             while (retry && retryCount <= 5) {
                 retry = downloadBuild(fileName, downloadLink);
+                retryCount = retryCount + 1;
             }
             LOGGER.debug(String.format("HockeyApp Build (%s) was retrieved", fileName));
         } catch (Exception ex) {
