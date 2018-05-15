@@ -62,7 +62,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
@@ -1294,8 +1293,9 @@ public class ExtendedWebElement {
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException | InvalidElementStateException: ", e);
+		//} catch (StaleElementReferenceException | InvalidElementStateException e) {
+		} catch (WebDriverException e) {
+			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
 			element = refindElement(getBy(), 1);
 
@@ -1329,12 +1329,6 @@ public class ExtendedWebElement {
 						//TODO: analyze if we should try to click using js as well
 						//JavascriptExecutor executor = (JavascriptExecutor) getDriver();
 			            //executor.executeScript("arguments[0].click();", element);
-					} else if (e != null && (e.getMessage().contains("is not visible on the screen and thus is not interactable"))) {
-						// https://github.com/facebook/WebDriverAgent/issues/602
-						LOGGER.warn("Trying to do tap by coordinates temporary due to the: " + e.getMessage());
-						Point point = getLocation();
-						Dimension dim = getSize();
-						MobileUtils.tap(point.getX() + dim.getWidth() / 2, point.getY() + dim.getHeight() / 2);
 					} else {
 						throw e;
 					}
