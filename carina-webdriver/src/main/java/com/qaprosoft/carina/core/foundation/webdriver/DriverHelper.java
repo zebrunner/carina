@@ -1237,11 +1237,12 @@ public class DriverHelper {
             try {
                 name = element.getText();
             } catch (Exception e) {
-            	/* do nothing */
+            	/* do nothing and keep 'undefined' for control name */
             }
 
-            // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(element, name, extendedWebElements.get(0).generateByForList(by, i)));          
+            ExtendedWebElement tempElement = new ExtendedWebElement(element, name);
+            tempElement.setBy(tempElement.generateByForList(by, i));
+            extendedWebElements.add(tempElement);          
             i++;
         }
         return extendedWebElements;
