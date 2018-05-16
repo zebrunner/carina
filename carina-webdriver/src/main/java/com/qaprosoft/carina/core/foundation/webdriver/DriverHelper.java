@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -646,6 +647,16 @@ public class DriverHelper {
             drv.switchTo().alert().accept();
         }
         
+        try {
+    		if ("chrome".equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
+    			driver.manage().window().setSize(new Dimension(1920, 1080));
+    		} else {
+    			driver.manage().window().maximize();
+    		}
+        } catch (Exception e) {
+        	LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
+        }
+
 		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), null);
     }
 
