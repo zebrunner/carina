@@ -89,6 +89,10 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
+      <a href="#implementation-of-page-objects" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -315,9 +319,64 @@
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Web automation
+      </label>
+    
     <a href="./" title="Web automation" class="md-nav__link md-nav__link--active">
       Web automation
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-page-objects" title="Implementation of Page Objects" class="md-nav__link">
+    Implementation of Page Objects
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-ui-components" title="Implementation of UI Components" class="md-nav__link">
+    Implementation of UI Components
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-tests" title="Implementation of tests" class="md-nav__link">
+    Implementation of tests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-configuration" title="Test configuration" class="md-nav__link">
+    Test configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testng-xml" title="TestNG xml" class="md-nav__link">
+    TestNG xml
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -406,6 +465,63 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-page-objects" title="Implementation of Page Objects" class="md-nav__link">
+    Implementation of Page Objects
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-ui-components" title="Implementation of UI Components" class="md-nav__link">
+    Implementation of UI Components
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-tests" title="Implementation of tests" class="md-nav__link">
+    Implementation of tests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-configuration" title="Test configuration" class="md-nav__link">
+    Test configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testng-xml" title="TestNG xml" class="md-nav__link">
+    TestNG xml
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
@@ -416,51 +532,188 @@
                 
                   <h1>Web automation</h1>
                 
-                <p>Developing tests with Carina is very straightforward. If you are going to create Web UI tests, you need to go through the following steps:</p>
-<ul>
-<li>
-<p><strong>Implement page models with element locators</strong>
-In page models, you list all the elements along with Selenium @FindBy annotation, specifying the locator of the HTML element. In constructor, you have to identify the absolute or relative page URL. Also, the page model may contain business logic methods that encapsulate complex user behavior.
-<img alt="Page object" src="../../img/ti-page-object.png" /></p>
-</li>
-<li>
-<p><strong>Implement test case that operates with page objects and performs validations</strong>
-Test cases themselves represent composition of page models, so all UI actions are essentially performed via page objects. Test scripts should contain some assertions and UI validation logic.
-<img alt="Test" src="../../img/ti-test.png" /></p>
-</li>
-<li>
-<p><strong>Create TestNG suite configuration that includes tests with appropriate test parameters</strong>
-TestNG xml suite descriptors contain test configurations, but also contain test grouping tools that allow creation of different suites: sanity, regression, etc.
-<img alt="Test" src="../../img/ti-config.png" /></p>
-</li>
-</ul>
-<p>In the table below we are providing description for most important WEB parameters:
-<table>
-    <tr>
-        <th>Attribute</th>
-        <th>Meaning</th>
-                <th>Default value</th>
-        <th>Example</th>
-    </tr>
-    <tr>
-        <td>browser</td>
-        <td>Browser for testing</td>
-        <td>chrome</td>
-        <td>chrome / firefox / safari / iexplore</td>
-    </tr>
-    <tr>
-        <td>selenium_host</td>
-        <td>Selenium server host</td>
-        <td>{must_override}</td>
-        <td>http://localhost:4444/wd/hub</td>
-    </tr>
-    <tr>
-        <td>driver_mode</td>
-        <td>Rule for defining WebDriver lifecycle. </td>
-        <td>method_mode</td>
-        <td>method_mode / class_mode / suite_mode</td>
-    </tr>
-</table></p>
+                <p>Carina framework follows Selenium best practices for web tests automation. If you are familiar with Selenium WebDriver and hve already implemented few tests with Page Object pattern the following guide will be pretty much easy for understanding. We have choosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demontration pursposes, all the the test source code is locted in <a href="https://github.com/qaprosoft/carina-demo">carina-demo</a> Github repo.</p>
+<h3 id="implementation-of-page-objects">Implementation of Page Objects</h3>
+<p>When you are writing functional tests using Selenium a major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements you will verify some state of the element through various assertions and move on to fetching the next element. You may find WebElements directry in your tests:</p>
+<pre><code>List&lt;WebElement&gt; zipCodes = driver.findElements(By.id(&quot;zipCodes&quot;));
+for (WebElement zipCode : zipCodes) {
+    if (zipCode.getText().equals(&quot;12345&quot;)){
+        zipCode.click();
+        break;
+    }
+}
+WebElement city = driver.findElement(By.id(&quot;city&quot;));
+assertEquals(&quot;MyCityName&quot;, city.getText());
+</code></pre>
+
+<p>So some of the typical problems for this type of Selenium test are:
+<em> Test cases are difficult to read
+</em> Changes in the UI breaks multiple tests often in several places
+* Duplication of selectors both inside and across tests - no reuse</p>
+<p>So instead of having each test fetch elements directly and being fragile towards UI changes, the Page Object Pattern introduces what is basically a decoupling layer. </p>
+<p>You create an object that represents the UI you want to test, which could be a whole page or a significant part of it. The responsibility of this object is to wrap HTML elements and encapsulate interactions with the UI, meaning that this is where all calls to WebDriver will go. This is where most WebElements are. And this is the only place you need to modify when the UI changes.</p>
+<p><img alt="Page Object Pattern" src="../../img/page-objects.png" /></p>
+<p>In general Page Object contains locators of the elements located on the page and some business logic that may be reused by different tests:</p>
+<pre><code>public class ModelInfoPage extends AbstractPage {
+    @FindBy(css = &quot;.help-display strong&quot;)
+    private ExtendedWebElement displayInfoLabel;
+
+    @FindBy(css = &quot;.help-camera strong&quot;)
+    private ExtendedWebElement cameraInfoLabel;
+
+    @FindBy(css = &quot;.help-expansion strong&quot;)
+    private ExtendedWebElement displayRamLabel;
+
+    @FindBy(css = &quot;.help-battery strong&quot;)
+    private ExtendedWebElement batteryInfoLabel;
+
+    public ModelInfoPage(WebDriver driver) {
+        super(driver);
+    }
+
+    public String readDisplay() {
+        assertElementPresent(displayInfoLabel);
+        return displayInfoLabel.getText();
+    }
+
+    public String readCamera() {
+        assertElementPresent(cameraInfoLabel);
+        return cameraInfoLabel.getText();
+    }
+
+    public String readRam() {
+        assertElementPresent(displayRamLabel);
+        return displayRamLabel.getText();
+    }
+
+    public String readBattery() {
+        assertElementPresent(displayInfoLabel);
+        return batteryInfoLabel.getText();
+    }
+}
+
+</code></pre>
+
+<p><strong>Important:</strong>
+<em> Page should extend <strong>com.qaprosoft.carina.core.gui.AbstractPage</strong>
+</em> Use <strong>com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement</strong> instead of Selenium WebElement
+* Locate Page Object classes in src/main/java</p>
+<h3 id="implementation-of-ui-components">Implementation of UI Components</h3>
+<p>In some cases it is usefull to implement UI Objects that may be reused between multiple Page Objects, for instance top menu or footer may be shared between multiple pages:</p>
+<pre><code>public class FooterMenu extends AbstractUIObject {
+    @FindBy(linkText = &quot;Home&quot;)
+    private ExtendedWebElement homeLink;
+
+    @FindBy(linkText = &quot;Compare&quot;)
+    private ExtendedWebElement compareLink;
+
+    public FooterMenu(WebDriver driver, SearchContext searchContext) {
+        super(driver, searchContext);
+    }
+
+    public HomePage openHomePage() {
+        homeLink.click();
+        return new HomePage(driver);
+    }
+
+    public CompareModelsPage openComparePage() {
+        compareLink.click();
+        return new CompareModelsPage(driver);
+    }
+}
+</code></pre>
+
+<p>And then you can use that in Page Object:</p>
+<pre><code>public class HomePage extends AbstractPage {
+    @FindBy(id = &quot;footmenu&quot;)
+    private FooterMenu footerMenu;
+
+    @FindBy(xpath = &quot;//div[contains(@class, 'brandmenu-v2')]//a&quot;)
+    private List&lt;ExtendedWebElement&gt; brandLinks;
+
+    public HomePage(WebDriver driver) {
+        super(driver);
+    }
+
+    public FooterMenu getFooterMenu() {
+        return footerMenu;
+    }
+
+    public BrandModelsPage selectBrand(String brand) {
+        LOGGER.info(&quot;selecting '&quot; + brand + &quot;' brand...&quot;);
+        for (ExtendedWebElement brandLink : brandLinks) {
+            String currentBrand = brandLink.getText();
+            LOGGER.info(&quot;currentBrand: &quot; + currentBrand);
+            if (brand.equalsIgnoreCase(currentBrand)) {
+                brandLink.click();
+                return new BrandModelsPage(driver);
+            }
+        }
+        throw new RuntimeException(&quot;Unable to open brand: &quot; + brand);
+    }
+}
+</code></pre>
+
+<p><strong>Important:</strong>
+<em> UI Object should extend <strong>com.qaprosoft.carina.core.gui.AbstractUIObject</strong>
+</em> You should call super constructor <strong>super(driver, searchContext)</strong> where searchContext is instance of <strong>org.openqa.selenium.SearchContext</strong>
+* Locate UI Object classes in src/main/java source folder</p>
+<h3 id="implementation-of-tests">Implementation of tests</h3>
+<p>Carina framework uses TestNG for test organization. In general test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
+<pre><code>public class WebSampleTest extends AbstractTest {
+    @Test(description = &quot;JIRA#AUTO-0009&quot;)
+    @MethodOwner(owner = &quot;qpsdemo&quot;)
+    public void testCompareModels() {
+        // Open GSM Arena home page and verify page is opened
+        HomePage homePage = new HomePage(getDriver());
+        homePage.open();
+        Assert.assertTrue(homePage.isPageOpened(), &quot;Home page is not opened&quot;);
+        // Open model compare page
+        FooterMenu footerMenu = homePage.getFooterMenu();
+        Assert.assertTrue(footerMenu.isUIObjectPresent(2), &quot;Footer menu wasn't found!&quot;);
+        CompareModelsPage comparePage = footerMenu.openComparePage();
+        // Compare 3 models
+        List&lt;ModelSpecs&gt; specs = comparePage.compareModels(&quot;Samsung Galaxy J3&quot;, &quot;Samsung Galaxy J5&quot;, &quot;Samsung Galaxy J7 Pro&quot;);
+        // Verify model announced dates
+        Assert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), &quot;2015, November&quot;);
+        Assert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), &quot;2016, September&quot;);
+        Assert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), &quot;2017, June&quot;);
+    }
+}
+
+</code></pre>
+
+<p>It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in test, do not mix that logic.</p>
+<p><strong>Important:</strong>
+<em> Test class should extend <strong>com.qaprosoft.carina.core.foundation.AbstractTest</strong>
+</em> Test method should start with <strong>org.testng.annotations.Test</strong> annotation
+<em> Use <strong>getDriver()</strong> method to get driver instance in test
+</em> Locate tests in src/test/java source folder</p>
+<h3 id="test-configuration">Test configuration</h3>
+<p>There are few critical properties in config.properties file that are required for web tests exexcution:
+<em> url=http://www.gsmarena.com
+</em> platform=<em>
+</em> browser=chrome
+<em> browser_version=</em></p>
+<h3 id="testng-xml">TestNG xml</h3>
+<p>Implemented tests cases should be placed in TestNG xml file according to test group the test belongs to. More details about TestNG configuration you may find in <a href="http://testng.org/doc/documentation-main.html">official documentation</a>.</p>
+<pre><code>&lt;!DOCTYPE suite SYSTEM &quot;http://testng.org/testng-1.0.dtd&quot;&gt;
+
+&lt;suite verbose=&quot;1&quot; name=&quot;Carina Demo Tests - Web tests&quot; skipfailedinvocationcounts=&quot;false&quot; junit=&quot;false&quot; parallel=&quot;tests&quot; data-provider-thread-count=&quot;50&quot; annotations=&quot;JDK&quot;&gt;
+
+    &lt;listeners&gt;
+        &lt;listener class-name=&quot;com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer&quot;/&gt;
+        &lt;listener class-name=&quot;com.qaprosoft.zafira.listener.ZafiraListener&quot;/&gt;
+    &lt;/listeners&gt;
+
+    &lt;test name=&quot;GSM arena web tests&quot;&gt;
+        &lt;classes&gt;
+            &lt;class name=&quot;com.qaprosoft.carina.demo.WebSampleTest&quot; /&gt;
+        &lt;/classes&gt;
+    &lt;/test&gt;
+
+&lt;/suite&gt;
+</code></pre>
                 
                   
                 
