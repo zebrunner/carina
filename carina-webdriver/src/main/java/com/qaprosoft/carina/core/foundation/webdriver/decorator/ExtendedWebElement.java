@@ -851,8 +851,9 @@ public class ExtendedWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-        	return new ExtendedWebElement(getElement().findElement(by), name);
+        	return new ExtendedWebElement(getElement().findElement(by), name, by);
         } else {
+        	//TODO: reuse no_such_element_exception
         	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
         }
     }
