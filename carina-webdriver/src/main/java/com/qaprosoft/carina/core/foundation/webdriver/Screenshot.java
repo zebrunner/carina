@@ -344,7 +344,7 @@ public class Screenshot {
                 // Uploading screenshot to Amazon S3
 
                 // TODO: Move upload to S3 into the async calls closer to the end of test to upload whole bundle
-                // Also investigate possibility to remove rederence onto the test name
+                // Also investigate possibility to remove reference onto the test name
                 String test = "";
                 if (TestNamingUtil.isTestNameRegistered()) {
                     test = TestNamingUtil.getTestNameByThread();
@@ -355,11 +355,12 @@ public class Screenshot {
 
                 // add screenshot comment to collector
                 addScreenshotComment(screenName, comment);
-                Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot!", e);
+            } finally {
+            	Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
         }
         return screenName;
