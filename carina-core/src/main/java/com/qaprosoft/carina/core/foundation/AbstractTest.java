@@ -79,7 +79,6 @@ public abstract class AbstractTest // extends DriverHelper
 
     protected APIMethodBuilder apiMethodBuilder;
 
-    protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";

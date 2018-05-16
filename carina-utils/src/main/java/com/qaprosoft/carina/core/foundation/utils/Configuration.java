@@ -132,8 +132,6 @@ public class Configuration {
 
         SMART_SCREENSHOT("smart_screenshot"),
 
-        IMPLICIT_TIMEOUT("implicit_timeout"),
-
         EXPLICIT_TIMEOUT("explicit_timeout"),
 
         AUTO_DOWNLOAD("auto_download"),

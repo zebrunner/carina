@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,9 +64,9 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 public class DriverHelper {
     protected static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
 
-    protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
-
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+    
+    protected static final long SHORT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 3;
 
     protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 
@@ -93,8 +92,6 @@ public class DriverHelper {
             throw new RuntimeException("[" + DevicePool.getDevice().getName() + "] WebDriver not initialized, check log files for details!");
         }
 
-        setImplicitTimeout(IMPLICIT_TIMEOUT);
-
     }
 
     // --------------------------------------------------------------------------
@@ -107,16 +104,7 @@ public class DriverHelper {
      */
     @Deprecated
     public void setImplicitTimeout(long timeout) {
-        if (timeout < 1) {
-            timeout = 1;
-        }
-
-        try {
-            getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            LOGGER.error("Unable to set implicit timeout to " + timeout, e);
-            // getDriver().manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
-        }
+    	LOGGER.error("DO NOTHING AS IMPLICIT_TIMEOUT IS NOT REQUIRED ANYMORE!");
     }
 
     /**
@@ -229,7 +217,7 @@ public class DriverHelper {
 
     /**
      * Method which quickly looks for all element lists and check that they
-     * contain at least one element during IMPLICIT_TIMEOUT
+     * contain at least one element during SHORT_TIMEOUT
      *
      * @param elements
      *            List&lt;ExtendedWebElement&gt;...
@@ -237,7 +225,7 @@ public class DriverHelper {
      */
     @SuppressWarnings("unchecked")
     public boolean allElementListsAreNotEmpty(List<ExtendedWebElement>... elements) {
-        return allElementListsAreNotEmpty(IMPLICIT_TIMEOUT, elements);
+        return allElementListsAreNotEmpty(SHORT_TIMEOUT, elements);
     }
 
     /**
@@ -278,13 +266,13 @@ public class DriverHelper {
 
     /**
      * Method which quickly looks for any element presence during
-     * IMPLICIT_TIMEOUT
+     * SHORT_TIMEOUT
      *
      * @param elements ExtendedWebElement...
      * @return true if any of elements was found.
      */
     public boolean isAnyElementPresent(ExtendedWebElement... elements) {
-        return isAnyElementPresent(IMPLICIT_TIMEOUT, elements);
+        return isAnyElementPresent(SHORT_TIMEOUT, elements);
     }
 
     /**
@@ -320,13 +308,13 @@ public class DriverHelper {
 
     /**
      * return Any Present Element from the list which present during
-     * IMPLICIT_TIMEOUT
+     * SHORT_TIMEOUT
      *
      * @param elements ExtendedWebElement...
      * @return ExtendedWebElement
      */
     public ExtendedWebElement returnAnyPresentElement(ExtendedWebElement... elements) {
-        return returnAnyPresentElement(IMPLICIT_TIMEOUT, elements);
+        return returnAnyPresentElement(SHORT_TIMEOUT, elements);
     }
 
     /**
@@ -651,12 +639,13 @@ public class DriverHelper {
                 : Configuration
                         .get(Parameter.URL) + decryptedURL;
         WebDriver drv = getDriver();
+        
         try {
             drv.get(decryptedURL);
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
         }
-
+        
 		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), null);
     }
 

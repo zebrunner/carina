@@ -49,8 +49,6 @@ public class MobileUtils {
         HORIZONTAL_RIGHT_FIRST
     }
 
-    protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.IMPLICIT_TIMEOUT);
-
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     protected static final int MINIMUM_TIMEOUT = 2;
