@@ -363,13 +363,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#testng-xml" title="TestNG xml" class="md-nav__link">
-    TestNG xml
-  </a>
-  
-</li>
-      
       
       
       
@@ -504,13 +497,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#testng-xml" title="TestNG xml" class="md-nav__link">
-    TestNG xml
-  </a>
-  
-</li>
-      
       
       
       
@@ -546,10 +532,12 @@ WebElement city = driver.findElement(By.id(&quot;city&quot;));
 assertEquals(&quot;MyCityName&quot;, city.getText());
 </code></pre>
 
-<p>So some of the typical problems for this type of Selenium test are:
-<em> Test cases are difficult to read
-</em> Changes in the UI breaks multiple tests often in several places
-* Duplication of selectors both inside and across tests - no reuse</p>
+<p>So some of the typical problems for this type of Selenium test are:</p>
+<ul>
+<li>Test cases are difficult to read</li>
+<li>Changes in the UI breaks multiple tests often in several places</li>
+<li>Duplication of selectors both inside and across tests - no reuse</li>
+</ul>
 <p>So instead of having each test fetch elements directly and being fragile towards UI changes, the Page Object Pattern introduces what is basically a decoupling layer. </p>
 <p>You create an object that represents the UI you want to test, which could be a whole page or a significant part of it. The responsibility of this object is to wrap HTML elements and encapsulate interactions with the UI, meaning that this is where all calls to WebDriver will go. This is where most WebElements are. And this is the only place you need to modify when the UI changes.</p>
 <p><img alt="Page Object Pattern" src="../../img/page-objects.png" /></p>
@@ -594,10 +582,12 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 
 </code></pre>
 
-<p><strong>Important:</strong>
-<em> Page should extend <strong>com.qaprosoft.carina.core.gui.AbstractPage</strong>
-</em> Use <strong>com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement</strong> instead of Selenium WebElement
-* Locate Page Object classes in src/main/java</p>
+<p><strong>Important:</strong></p>
+<ul>
+<li>Page should extend <strong>com.qaprosoft.carina.core.gui.AbstractPage</strong></li>
+<li>Use <strong>com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement</strong> instead of Selenium WebElement</li>
+<li>Locate Page Object classes in src/main/java</li>
+</ul>
 <h3 id="implementation-of-ui-components">Implementation of UI Components</h3>
 <p>In some cases it is usefull to implement UI Objects that may be reused between multiple Page Objects, for instance top menu or footer may be shared between multiple pages:</p>
 <pre><code>public class FooterMenu extends AbstractUIObject {
@@ -654,10 +644,12 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 }
 </code></pre>
 
-<p><strong>Important:</strong>
-<em> UI Object should extend <strong>com.qaprosoft.carina.core.gui.AbstractUIObject</strong>
-</em> You should call super constructor <strong>super(driver, searchContext)</strong> where searchContext is instance of <strong>org.openqa.selenium.SearchContext</strong>
-* Locate UI Object classes in src/main/java source folder</p>
+<p><strong>Important:</strong></p>
+<ul>
+<li>UI Object should extend <strong>com.qaprosoft.carina.core.gui.AbstractUIObject</strong></li>
+<li>You should call super constructor <strong>super(driver, searchContext)</strong> where searchContext is instance of <strong>org.openqa.selenium.SearchContext</strong></li>
+<li>Locate UI Object classes in src/main/java source folder</li>
+</ul>
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
 <pre><code>public class WebSampleTest extends AbstractTest {
@@ -684,18 +676,21 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 </code></pre>
 
 <p>It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in test, do not mix that logic.</p>
-<p><strong>Important:</strong>
-<em> Test class should extend <strong>com.qaprosoft.carina.core.foundation.AbstractTest</strong>
-</em> Test method should start with <strong>org.testng.annotations.Test</strong> annotation
-<em> Use <strong>getDriver()</strong> method to get driver instance in test
-</em> Locate tests in src/test/java source folder</p>
+<p><strong>Important:</strong></p>
+<ul>
+<li>Test class should extend <strong>com.qaprosoft.carina.core.foundation.AbstractTest</strong></li>
+<li>Test method should start with <strong>org.testng.annotations.Test</strong> annotation</li>
+<li>Use <strong>getDriver()</strong> method to get driver instance in test</li>
+<li>Locate tests in src/test/java source folder</li>
+</ul>
 <h3 id="test-configuration">Test configuration</h3>
-<p>There are few critical properties in config.properties file that are required for web tests exexcution:
-<em> url=http://www.gsmarena.com
-</em> platform=<em>
-</em> browser=chrome
-<em> browser_version=</em></p>
-<h3 id="testng-xml">TestNG xml</h3>
+<p>There are few critical properties in config.properties file that are required for web tests exexcution:</p>
+<ul>
+<li>url=http://www.gsmarena.com</li>
+<li>platform=*</li>
+<li>browser=chrome</li>
+<li>browser_version=*</li>
+</ul>
 <p>Implemented tests cases should be placed in TestNG xml file according to test group the test belongs to. More details about TestNG configuration you may find in <a href="http://testng.org/doc/documentation-main.html">official documentation</a>.</p>
 <pre><code>&lt;!DOCTYPE suite SYSTEM &quot;http://testng.org/testng-1.0.dtd&quot;&gt;
 
