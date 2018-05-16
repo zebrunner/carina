@@ -17,8 +17,10 @@ package com.qaprosoft.hockeyapp;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,7 @@ public class HockeyAppManager {
     private String revision;
     private String versionNumber;
 
-    private static final String hockeyAppUrl = "rink.hockeyapp.net";
+    private static final String HOCKEY_APP_URL = "rink.hockeyapp.net";
 
     private static volatile HockeyAppManager instance = null;
 
@@ -99,11 +101,12 @@ public class HockeyAppManager {
         try {
             LOGGER.debug("Beginning Transfer of HockeyApp Build");
             URL downloadLink = new URL(buildToDownload);
-            ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
-            FileOutputStream fos = new FileOutputStream(fileName);
-            fos.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-            fos.close();
-            readableByteChannel.close();
+            int retryCount = 0;
+            boolean retry = true;
+            while (retry && retryCount <= 5) {
+                retry = downloadBuild(fileName, downloadLink);
+                retryCount = retryCount + 1;
+            }
             LOGGER.debug(String.format("HockeyApp Build (%s) was retrieved", fileName));
         } catch (Exception ex) {
             LOGGER.error(String.format("Error Thrown When Attempting to Transfer HockeyApp Build (%s)", ex.getMessage()), ex);
@@ -111,6 +114,40 @@ public class HockeyAppManager {
 
         return new File(fileName);
 
+    }
+
+    /**
+     *
+     * @param fileName will be the name of the downloaded file.
+     * @param downloadLink will be the URL to retrieve the build from.
+     * @return brings back a true/false on whether or not the build was successfully downloaded.
+     * @throws IOException throws a non Interruption Exception up.
+     */
+    private boolean downloadBuild(String fileName, URL downloadLink) throws IOException {
+        ReadableByteChannel readableByteChannel = null;
+        FileOutputStream fos = null;
+        try {
+            if (Thread.currentThread().isInterrupted()) {
+                LOGGER.debug(String.format("Current Thread (%s) is interrupted, clearing interruption.", Thread.currentThread().getId()));
+                Thread.interrupted();
+            }
+            readableByteChannel = Channels.newChannel(downloadLink.openStream());
+            fos = new FileOutputStream(fileName);
+            fos.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            LOGGER.info("Successfully Transferred...");
+            return false;
+        } catch (ClosedByInterruptException ie1) {
+            LOGGER.info("Retrying....");
+            LOGGER.error("Getting Error: " + ie1.getMessage(), ie1);
+            return true;
+        } finally {
+            if (fos != null) {
+                fos.close();
+            }
+            if (readableByteChannel != null) {
+                readableByteChannel.close();
+            }
+        }
     }
 
     /**
@@ -124,7 +161,7 @@ public class HockeyAppManager {
         List<String> appList = new ArrayList<String>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
-                hockeyAppUrl,
+                HOCKEY_APP_URL,
                 "/api/2/apps",
                 HttpMethod.GET);
         JsonNode appResults = restTemplate.exchange(retrieveApps, JsonNode.class).getBody();
@@ -160,7 +197,7 @@ public class HockeyAppManager {
             queryParams.add("include_build_urls", "true");
 
             RequestEntity<String> retrieveBuilds = buildRequestEntity(
-                    hockeyAppUrl,
+                    HOCKEY_APP_URL,
                     "api/2/apps/" + appId + "/app_versions",
                     queryParams,
                     HttpMethod.GET);
