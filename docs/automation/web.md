@@ -15,6 +15,7 @@ WebElement city = driver.findElement(By.id("city"));
 assertEquals("MyCityName", city.getText());
 ```
 So some of the typical problems for this type of Selenium test are:
+
 * Test cases are difficult to read
 * Changes in the UI breaks multiple tests often in several places
 * Duplication of selectors both inside and across tests - no reuse
@@ -67,6 +68,7 @@ public class ModelInfoPage extends AbstractPage {
 
 ```
 **Important:**
+
 * Page should extend **com.qaprosoft.carina.core.gui.AbstractPage**
 * Use **com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement** instead of Selenium WebElement
 * Locate Page Object classes in src/main/java
@@ -129,6 +131,7 @@ public class HomePage extends AbstractPage {
 }
 ```
 **Important:**
+
 * UI Object should extend **com.qaprosoft.carina.core.gui.AbstractUIObject**
 * You should call super constructor **super(driver, searchContext)** where searchContext is instance of **org.openqa.selenium.SearchContext**
 * Locate UI Object classes in src/main/java source folder
@@ -161,6 +164,7 @@ public class WebSampleTest extends AbstractTest {
 It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in test, do not mix that logic.
 
 **Important:**
+
 * Test class should extend **com.qaprosoft.carina.core.foundation.AbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
 * Use **getDriver()** method to get driver instance in test
@@ -168,12 +172,12 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 ### Test configuration
 There are few critical properties in config.properties file that are required for web tests exexcution:
+
 * url=http://www.gsmarena.com
 * platform=*
 * browser=chrome
 * browser_version=*
 
-### TestNG xml
 Implemented tests cases should be placed in TestNG xml file according to test group the test belongs to. More details about TestNG configuration you may find in [official documentation](http://testng.org/doc/documentation-main.html).
 ```
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
