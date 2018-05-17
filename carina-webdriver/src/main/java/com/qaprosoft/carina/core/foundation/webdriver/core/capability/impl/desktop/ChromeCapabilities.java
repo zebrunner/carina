@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
@@ -46,6 +47,15 @@ public class ChromeCapabilities extends AbstractCapabilities {
             options.setExperimentalOption("prefs", chromePrefs);
         }
 
+        Proxy proxy = setupProxy();
+        if (proxy != null) {
+        	// explicitely add proxy as chrome option
+        	// https://github.com/SeleniumHQ/selenium/issues/5299
+        	options.setProxy(proxy);
+            LOGGER.debug("specific http proxy for chrome: " + proxy.getHttpProxy());
+            LOGGER.debug("https proxy: " + proxy.getSslProxy());
+        }
+        
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         return capabilities;
     }
