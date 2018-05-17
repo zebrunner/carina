@@ -379,7 +379,7 @@ public class MobileUtils {
             endy = Math.max(1, endy);
         }
 
-        LOGGER.info("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy + "; duration: " + duration);
+        LOGGER.debug("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy + "; duration: " + duration);
         new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
                 .moveTo(endx, endy).release().perform();
 
