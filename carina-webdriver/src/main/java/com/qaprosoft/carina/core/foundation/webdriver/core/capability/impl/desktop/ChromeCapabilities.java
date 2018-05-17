@@ -52,8 +52,6 @@ public class ChromeCapabilities extends AbstractCapabilities {
         	// explicitely add proxy as chrome option
         	// https://github.com/SeleniumHQ/selenium/issues/5299
         	options.setProxy(proxy);
-            LOGGER.debug("specific http proxy for chrome: " + proxy.getHttpProxy());
-            LOGGER.debug("https proxy: " + proxy.getSslProxy());
         }
         
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
