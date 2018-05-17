@@ -343,10 +343,14 @@ public final class DriverPool {
                     NDC.push(" [" + device.getName() + "] ");
                 }
                 
-                // moved proxy start logic here since device will be initialized here only      
-                if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
-                    ProxyPool.startProxy(Integer.parseInt(device.getProxyPort()));
-                }
+				// moved proxy start logic here since device will be initialized here only
+				if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+					int proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
+					if (!device.isNull()) {
+						proxyPort = Integer.parseInt(device.getProxyPort());
+					}
+					ProxyPool.startProxy(proxyPort);
+				}
 
                 LOGGER.debug("initDriver finish...");
 
