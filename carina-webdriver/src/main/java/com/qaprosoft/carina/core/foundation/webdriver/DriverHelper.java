@@ -649,14 +649,13 @@ public class DriverHelper {
         
         try {
     		if ("chrome".equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
-    			driver.manage().window().setSize(new Dimension(1920, 1080));
+    			driver.manage().window().setSize(new Dimension(1920, 1040));
     		} else {
     			driver.manage().window().maximize();
     		}
         } catch (Exception e) {
         	LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
         }
-
 		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), null);
     }
 

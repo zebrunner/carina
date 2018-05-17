@@ -74,7 +74,7 @@ public class DriverFactory {
 		
 		streamVNC(factory.getVncURL(driver));
 		
-		factory.registerListeners(driver, getEventListeners());   
+		driver = factory.registerListeners(driver, getEventListeners());   
 		
 		LOGGER.debug("DriverFactory finish...");
 

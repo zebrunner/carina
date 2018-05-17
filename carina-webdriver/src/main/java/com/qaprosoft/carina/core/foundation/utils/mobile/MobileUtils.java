@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -636,5 +637,14 @@ public class MobileUtils {
             LOGGER.error(e);
         }
     }
+    
+	public static WebDriver getDriver() {
+		WebDriver drv = DriverPool.getDriver();
+		if (drv instanceof EventFiringWebDriver) {
+			return ((EventFiringWebDriver) drv).getWrappedDriver();
+		} else {
+			return drv;
+		}
+	}
 
 }

@@ -146,11 +146,9 @@ public final class DriverPool {
             drv = createDriver(name, capabilities, seleniumHost, DevicePool.getNullDevice());
         }
 
-        if (drv instanceof EventFiringWebDriver) {
-        	return ((EventFiringWebDriver) drv).getWrappedDriver();
-        } else {
-        	return drv;
-        }
+        // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener and all logging will be lost!
+        return drv;
+        
     }
 
     /**

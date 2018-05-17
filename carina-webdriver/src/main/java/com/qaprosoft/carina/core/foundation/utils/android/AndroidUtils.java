@@ -30,7 +30,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileBy;
@@ -59,7 +58,7 @@ public class AndroidUtils extends MobileUtils {
      * @param keyCode int
      */
     public static void executeKeyEvent(int keyCode) {
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
         LOGGER.info("Execute key event: " + keyCode);
         HashMap<String, Integer> keyCodeMap = new HashMap<String, Integer>();
         keyCodeMap.put("keycode", keyCode);
@@ -76,7 +75,7 @@ public class AndroidUtils extends MobileUtils {
     public static boolean pressKeyCode(int keyCode) {
         try {
             LOGGER.info("Press key code: " + keyCode);
-            ((PressesKeyCode) DriverPool.getDriver()).pressKeyCode(keyCode);
+            ((PressesKeyCode) getDriver()).pressKeyCode(keyCode);
             return true;
         } catch (Exception e) {
             LOGGER.error("Exception during pressKeyCode:", e);
@@ -107,7 +106,7 @@ public class AndroidUtils extends MobileUtils {
         double directMultY1 = 0.5;
         double directMultY2 = 0.5;
 
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
 
         if (direction.equals(Direction.RIGHT)) {
             directMultX1 = 0.2;
@@ -169,14 +168,14 @@ public class AndroidUtils extends MobileUtils {
      */
     public static void hideKeyboard() {
         try {
-        	((MobileDriver<?>) DriverPool.getDriver()).hideKeyboard();
+        	((MobileDriver<?>) getDriver()).hideKeyboard();
         } catch (Exception e) {
             LOGGER.info("Keyboard was already hided or error occurs: " + e);
         }
     }
     
     public static void pressBack() {
-        ((AndroidDriver<?>) DriverPool.getDriver()).pressKeyCode(AndroidKeyCode.BACK);
+        ((AndroidDriver<?>) getDriver()).pressKeyCode(AndroidKeyCode.BACK);
     }
 
     /**
@@ -204,7 +203,7 @@ public class AndroidUtils extends MobileUtils {
      * other devices and custom keyboards could be different.
      */
     public static void pressBottomRightKey() {
-    	WebDriver driver = DriverPool.getDriver();
+    	WebDriver driver = getDriver();
     	Dimension size = driver.manage().window().getSize();
         int height =  size.getHeight();
         int width = size.getWidth();
@@ -222,7 +221,7 @@ public class AndroidUtils extends MobileUtils {
     @Deprecated
     public static void waitUntilElementNotPresent(final By locator, final long timeout, final long pollingTime) {
         LOGGER.info(String.format("Wait until element %s disappear", locator.toString()));
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
         try {
             if (new WebDriverWait(driver, timeout, pollingTime).until(ExpectedConditions.invisibilityOfElementLocated(locator))) {
                 LOGGER.info(String.format("Element located by: %s not present.", locator.toString()));
@@ -311,7 +310,7 @@ public class AndroidUtils extends MobileUtils {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 		// TODO: support multi threaded WebDriver's removing DriverPool usage
-		WebDriver drv = DriverPool.getDriver();
+		WebDriver drv = getDriver();
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
@@ -363,7 +362,7 @@ public class AndroidUtils extends MobileUtils {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 		// TODO: support multi threaded WebDriver's removing DriverPool usage
-		WebDriver drv = DriverPool.getDriver();
+		WebDriver drv = getDriver();
 
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
@@ -415,7 +414,7 @@ public class AndroidUtils extends MobileUtils {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 		// TODO: support multi threaded WebDriver's removing DriverPool usage
-		WebDriver drv = DriverPool.getDriver();
+		WebDriver drv = getDriver();
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 

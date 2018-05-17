@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import static com.qaprosoft.carina.core.foundation.webdriver.DriverPool.getDriver;
+import static com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.getDriver;
 
 import java.io.File;
 import java.io.IOException;
