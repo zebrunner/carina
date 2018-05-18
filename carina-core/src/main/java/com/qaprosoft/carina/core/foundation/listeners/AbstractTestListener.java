@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -578,8 +579,15 @@ public class AbstractTestListener extends TestArgsListener {
 
         for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
             String driverName = entry.getKey();
+            WebDriver drv = entry.getValue();
+
+            if (drv instanceof EventFiringWebDriver) {
+                drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+            }
+            
             screenId = Screenshot.captureFullSize(entry.getValue(), driverName + ": " + msg); // in case of failure
         }
         return screenId;
     }
+    
 }

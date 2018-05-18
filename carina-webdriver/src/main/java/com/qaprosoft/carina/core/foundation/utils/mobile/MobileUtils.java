@@ -106,8 +106,8 @@ public class MobileUtils {
     public static boolean longPress(ExtendedWebElement element) {
     	//TODO: SZ migrate to FluentWaits
         try {
-            WebDriver driver = DriverPool.getDriver();
-            TouchAction action = new TouchAction((MobileDriver<?>) driver);
+            WebDriver driver = getDriver();
+            TouchAction<?> action = new TouchAction((MobileDriver<?>) driver);
             action.longPress(element.getElement()).release().perform();
             return true;
         } catch (Exception e) {
@@ -124,7 +124,7 @@ public class MobileUtils {
      * @param duration int
      */
     public static void tap(int startx, int starty, int duration) {
-        TouchAction touchAction = new TouchAction((MobileDriver<?>) DriverPool.getDriver());
+        TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) getDriver());
         touchAction.press(startx, starty).waitAction(Duration.ofMillis(duration)).release().perform();
     }
 
@@ -359,7 +359,7 @@ public class MobileUtils {
      */
     public static void swipe(int startx, int starty, int endx, int endy, int duration) {
         LOGGER.debug("Starting swipe...");
-        WebDriver drv = DriverPool.getDriver();
+        WebDriver drv = getDriver();
 
         LOGGER.debug("Getting driver dimension size...");
         Dimension scrSize = drv.manage().window().getSize();
@@ -406,7 +406,7 @@ public class MobileUtils {
 
         if (container == null) {
             // whole screen/driver is a container!
-            WebDriver driver = DriverPool.getDriver();
+            WebDriver driver = getDriver();
             elementLocation = new Point(0, 0); // initial left corner for that case
             elementDimensions = driver.manage().window().getSize();
         } else {
