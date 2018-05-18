@@ -224,6 +224,14 @@ public class ExtendedWebElement {
 			thr.printStackTrace();
 			LOGGER.error("Unable to get Driver, serachContext and By via reflection!", thr);
 		}
+		
+    	if (this.searchContext == null) {
+			try {
+				throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+    	}
     }
 
     public WebElement getElement() {
@@ -309,7 +317,12 @@ public class ExtendedWebElement {
     
     private WebElement refindElement() {
         //do not return without element initialization!
-        element = searchContext.findElement(by);
+    	//TODO: if is added as part of a hotifx. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
+    	if (searchContext != null) {
+    		element = searchContext.findElement(by);
+    	} else {
+    		element = getDriver().findElement(by);
+    	}
         return element;
     }
 
