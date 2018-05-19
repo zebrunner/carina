@@ -33,6 +33,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -1315,11 +1316,15 @@ public class ExtendedWebElement {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
 		//} catch (StaleElementReferenceException | InvalidElementStateException e) {
+		} catch (StaleElementReferenceException e) {
+			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			// try to find again using driver
+			element = refindElement();
+			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
 			element = refindElement();
-
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
