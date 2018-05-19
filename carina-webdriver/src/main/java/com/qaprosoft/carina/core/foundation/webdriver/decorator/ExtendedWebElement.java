@@ -1397,7 +1397,7 @@ public class ExtendedWebElement {
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 
 				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
-						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(getNameWithLocator()));
+						Messager.KEYS_NOT_CLEARED_IN_ELEMENT.getMessage(getNameWithLocator()));
 				element.clear();
 
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(decryptedText, getName()),
