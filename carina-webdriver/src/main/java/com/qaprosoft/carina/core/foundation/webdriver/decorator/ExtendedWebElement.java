@@ -42,6 +42,7 @@ import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -75,6 +76,9 @@ public class ExtendedWebElement {
 
     private static Wait<WebDriver> wait;
     
+    // we should keep both properties: drivre and searchContext obligatory
+    // driver is used for actions, javascripts execution etc
+    // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
     
@@ -207,10 +211,10 @@ public class ExtendedWebElement {
 				tempSearchContext = ((RemoteWebElement) tempSearchContext).getWrappedDriver();
 			}
 			if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
-				//SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
+				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
 				this.searchContext = tempSearchContext;
-				this.driver = (WebDriver) tempSearchContext;
-				//this.driver = DriverPool.getDriver(sessionId);
+				//this.driver = (WebDriver) tempSearchContext;
+				this.driver = DriverPool.getDriver(sessionId);
 			} else {
 				LOGGER.error(tempSearchContext);
 			}
@@ -1576,7 +1580,6 @@ public class ExtendedWebElement {
 			}
 			
 			LOGGER.error("Unable to detect driver! Looking for default one from pool.");
-			//TODO: reuse searchContext and remove private getDriver method at all
 			return DriverPool.getDriver();
 		}
     }
