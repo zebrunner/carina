@@ -146,7 +146,7 @@ public class DriverListener implements IConfigurableEventListener {
 
     @Override
     public void onException(Throwable t, WebDriver driver) {
-        // Do nothing
+    	LOGGER.error(t.getMessage(), t);
         captureScreenshot(t.getMessage(), driver, null, true);
     }
 
