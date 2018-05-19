@@ -181,16 +181,18 @@ public class DriverListener implements IConfigurableEventListener {
     }
 
     private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
-        if (getMessage() != null) {
-            comment = getMessage();
+        if (getMessage(errorMessage) != null) {
+            comment = getMessage(errorMessage);
         }
 
         if (errorMessage) {
             LOGGER.error(comment);
+            Screenshot.captureFailure(driver, comment); // in case of failure
         } else {
             LOGGER.info(comment);
+            Screenshot.capture(driver, comment);
         }
-        Screenshot.capture(driver, comment);
+        
         /*
          * if (element != null) {
          * ReportContext.saveScreenshot(Screen.getInstance(driver)
@@ -221,8 +223,12 @@ public class DriverListener implements IConfigurableEventListener {
         captureScreenshot(comment, driver, null, false);
     }
 
-    public static String getMessage() {
-        return currentPositiveMessage.get();
+    public static String getMessage(boolean errorMessage) {
+    	if (errorMessage) {
+    		return currentNegativeMessage.get();
+    	} else {
+    		return currentPositiveMessage.get();
+    	}
     }
 
     public static void setMessages(String positiveMessage, String negativeMessage) {
