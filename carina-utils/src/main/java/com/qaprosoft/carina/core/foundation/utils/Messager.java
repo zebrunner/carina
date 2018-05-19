@@ -143,6 +143,10 @@ public enum Messager {
 
     ELEMENTS_NOT_DRAGGED_AND_DROPPED("FAIL: element '%s' is not dragged and dropped to '%s'!"),
 
+    KEYS_CLEARED_IN_ELEMENT("PASS: keys cleared in element '%s'."),
+    
+    KEYS_NOT_CLEARED_IN_ELEMENT("FAIL: keys not cleared in element '%s'."),
+    
     KEYS_SEND_TO_ELEMENT("PASS: keys '%s' are sent to element '%s'."),
 
     KEYS_NOT_SEND_TO_ELEMENT("FAIL: keys '%s' are not sent to element '%s'!"),
