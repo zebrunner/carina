@@ -28,11 +28,13 @@ import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -76,7 +78,11 @@ public class ExtendedWebElement {
 
     private static Wait<WebDriver> wait;
     
+    // we should keep both properties: drivre and searchContext obligatory
+    // driver is used for actions, javascripts execution etc
+    // searchContext is used for searching element by default
     private WebDriver driver;
+    private SearchContext searchContext;
     
     private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 
@@ -146,7 +152,7 @@ public class ExtendedWebElement {
 
 		try {
 			Field locatorField, searchContextField, byContextField = null;
-			SearchContext searchContext = null;
+			SearchContext tempSearchContext = null;
 
 			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
@@ -156,7 +162,7 @@ public class ExtendedWebElement {
 			}
 
 			if (element instanceof RemoteWebElement) {
-				searchContext = ((RemoteWebElement) element).getWrappedDriver();
+				tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
 			} else if (element instanceof Proxy) {
 				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
 
@@ -167,14 +173,14 @@ public class ExtendedWebElement {
 
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
-				searchContext = (SearchContext) searchContextField.get(locator);
+				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
 
 				byContextField = locator.getClass().getDeclaredField("by");
 				byContextField.setAccessible(true);
 				this.by = (By) byContextField.get(locator);
 
-				if (searchContext instanceof Proxy) {
-					innerProxy = Proxy.getInvocationHandler(((Proxy) searchContext));
+				if (tempSearchContext instanceof Proxy) {
+					innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
 
 					locatorField = innerProxy.getClass().getDeclaredField("locator");
 					locatorField.setAccessible(true);
@@ -183,31 +189,36 @@ public class ExtendedWebElement {
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
-					searchContext = (SearchContext) searchContextField.get(locator);
+					tempSearchContext = (SearchContext) searchContextField.get(locator);
 				}
 			}
 
-			if (searchContext instanceof EventFiringWebDriver) {
-				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) searchContext;
+			if (tempSearchContext instanceof EventFiringWebDriver) {
+				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) tempSearchContext;
+				//this.searchContext = tempSearchContext;
 				this.driver = eventFirDriver.getWrappedDriver();
+				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
 				return;
 			}
 
-			if (searchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+			if (tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
-				locatorField = searchContext.getClass().getDeclaredField("underlyingElement");
+				locatorField = tempSearchContext.getClass().getDeclaredField("underlyingElement");
 				locatorField.setAccessible(true);
-				searchContext = (RemoteWebElement) locatorField.get(searchContext);
+				this.searchContext = tempSearchContext = (RemoteWebElement) locatorField.get(tempSearchContext);
 			}
 
-			if (searchContext instanceof RemoteWebElement) {
-				searchContext = ((RemoteWebElement) searchContext).getWrappedDriver();
+			if (tempSearchContext instanceof RemoteWebElement) {
+//				this.driver = ((RemoteWebElement) searchContext).getWrappedDriver();
+				tempSearchContext = ((RemoteWebElement) tempSearchContext).getWrappedDriver();
 			}
-			if (searchContext != null && searchContext instanceof RemoteWebDriver) {
-				SessionId sessionId = ((RemoteWebDriver) searchContext).getSessionId();
+			if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
+				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
+				this.searchContext = tempSearchContext;
+				//this.driver = (WebDriver) tempSearchContext;
 				this.driver = DriverPool.getDriver(sessionId);
 			} else {
-				LOGGER.error(searchContext);
+				LOGGER.error(tempSearchContext);
 			}
 		} catch (NoSuchFieldException e) {
 			e.printStackTrace();
@@ -217,13 +228,21 @@ public class ExtendedWebElement {
 			e.printStackTrace();
 		} catch (Throwable thr) {
 			thr.printStackTrace();
-			LOGGER.error("Unable to get driver and/or by for " + getNameWithLocator(), thr);
+			LOGGER.error("Unable to get Driver, serachContext and By via reflection!", thr);
 		}
+		
+    	if (this.searchContext == null) {
+			try {
+				throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
+			} catch (Throwable thr) {
+				thr.printStackTrace();
+			}
+    	}
     }
 
     public WebElement getElement() {
     	//TODO: think about legacy selenium call support as a feature
-    	element = refindElement(getBy(), 1);
+    	element = refindElement();
     	return element;
     }
     
@@ -253,6 +272,7 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isPresent(By by, long timeout) {
+    	//ExpectedConditions.visibilityOf(element)
 		return waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout);
 	}
 	
@@ -292,6 +312,7 @@ public class ExtendedWebElement {
         }
         
         if (isPresent(timeout)) {
+        	//TODO: investigate maybe searchContext better to use here!
         	element = getDriver().findElement(by);
         } else {
         	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
@@ -300,14 +321,14 @@ public class ExtendedWebElement {
         return element;
     }
     
-    private WebElement refindElement(By by, long timeout) {
-        LOGGER.info("explicitly find element using by annotation: " + by);
-        if (isPresent(timeout)) {
-        	element = getDriver().findElement(by);
-        } else {
-        	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
-        }
-
+    private WebElement refindElement() {
+        //do not return without element initialization!
+    	//TODO: if is added as part of a hotifx. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
+    	if (searchContext != null) {
+    		element = searchContext.findElement(by);
+    	} else {
+    		element = getDriver().findElement(by);
+    	}
         return element;
     }
 
@@ -906,7 +927,8 @@ public class ExtendedWebElement {
     
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
-    		//do direct selenium/appium search without any extra validations 
+        	//TODO: investigate maybe searchContext better to use here!
+    		//do direct selenium/appium search without any extra validations
     		element = getDriver().findElement(by);
     	} catch (NoSuchElementException e) {
     		//element not present so means disappear
@@ -1294,12 +1316,15 @@ public class ExtendedWebElement {
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
-		//} catch (StaleElementReferenceException | InvalidElementStateException e) {
+		} catch (StaleElementReferenceException | InvalidElementStateException e) {
+			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			// try to find again using driver
+			element = refindElement();
+			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
-			element = refindElement(getBy(), 1);
-
+			element = refindElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);
@@ -1370,10 +1395,13 @@ public class ExtendedWebElement {
 			@Override
 			public void doType(String text) {
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+
+				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
+						Messager.KEYS_NOT_CLEARED_IN_ELEMENT.getMessage(getNameWithLocator()));
+				element.clear();
+
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(decryptedText, getName()),
 						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
-
-				element.clear();
 				element.sendKeys(decryptedText);
 			}
 
@@ -1554,7 +1582,7 @@ public class ExtendedWebElement {
 			return driver;
 		} else {
 			try {
-				throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+				throw new RuntimeException("review stacktrace to analyze why driver is not populated correctly via reflection!");
 			} catch (Throwable thr) {
 				thr.printStackTrace();
 			}
