@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -1315,8 +1316,7 @@ public class ExtendedWebElement {
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
-		//} catch (StaleElementReferenceException | InvalidElementStateException e) {
-		} catch (StaleElementReferenceException e) {
+		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
 			element = refindElement();
