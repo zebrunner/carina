@@ -1395,10 +1395,13 @@ public class ExtendedWebElement {
 			@Override
 			public void doType(String text) {
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+
+				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
+						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(getNameWithLocator()));
+				element.clear();
+
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(decryptedText, getName()),
 						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
-
-				element.clear();
 				element.sendKeys(decryptedText);
 			}
 

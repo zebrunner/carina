@@ -144,11 +144,18 @@ public class DriverListener implements IConfigurableEventListener {
         // Do nothing
     }
 
-    @Override
-    public void onException(Throwable t, WebDriver driver) {
-    	LOGGER.error(t.getMessage(), t);
-        captureScreenshot(t.getMessage(), driver, null, true);
-    }
+	@Override
+	public void onException(Throwable thr, WebDriver driver) {
+		if (thr.getMessage() != null) {
+			if (!thr.getMessage().contains("StaleObjectException")
+					&& !thr.getMessage().contains("InvalidElementStateException")) {
+				LOGGER.error("onException: " + thr.getMessage(), thr);
+				captureScreenshot(thr.getMessage(), driver, null, true);
+			}
+		}
+		// TODO: do not generate for error message for
+		// "StaleElementReferenceException | InvalidElementStateException"
+	}
 
     /**
      * Converts char sequence to string.
