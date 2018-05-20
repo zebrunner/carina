@@ -147,10 +147,13 @@ public class DriverListener implements IConfigurableEventListener {
 	@Override
 	public void onException(Throwable thr, WebDriver driver) {
 		if (thr.getMessage() != null) {
+			// handle cases which should't be captured
+			// TODO: analyze maybe we can easier specify list of issues for
+			// capturng here
 			if (!thr.getMessage().contains("StaleObjectException")
 					&& !thr.getMessage().contains("InvalidElementStateException")
 					&& !thr.getMessage().contains("stale element reference")
-					&& !thr.getMessage().contains("no such element")
+					&& !thr.getMessage().contains("no such element") && !thr.getMessage().contains("timeout")
 					&& !thr.getMessage().contains("Session timed out or not found")) {
 				captureScreenshot(thr.getMessage(), driver, null, true);
 			}
