@@ -585,7 +585,7 @@ public class AbstractTestListener extends TestArgsListener {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
             }
             
-            screenId = Screenshot.captureFullSize(entry.getValue(), driverName + ": " + msg); // in case of failure
+            screenId = Screenshot.captureFailure(drv, driverName + ": " + msg); // in case of failure
         }
         return screenId;
     }
