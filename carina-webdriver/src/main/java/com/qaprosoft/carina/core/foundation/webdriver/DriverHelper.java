@@ -1256,13 +1256,6 @@ public class DriverHelper {
     }
 
     protected WebDriver getDriver() {
-        if (DriverPool.isValid(driver)) {
-            return driver;
-        }
-
-        LOGGER.info("Unable to find driver in DriverHelper without DriverPool!");
-
-        driver = DriverPool.getDriver();
         if (driver == null) {
             long currentThreadId = Thread.currentThread().getId();
             LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);

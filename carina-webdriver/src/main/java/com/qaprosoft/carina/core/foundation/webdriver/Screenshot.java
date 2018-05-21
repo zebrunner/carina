@@ -243,11 +243,6 @@ public class Screenshot {
 
         String screenPath = "";
 
-        if (!DriverPool.isValid(driver)) {
-            LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
-            return null;
-        }
-
         try {
             screenPath = ReportContext.getMetadataFolder().getAbsolutePath() + "/" + screenName.replaceAll("\\W+", "_") + ".png";
 
@@ -294,11 +289,6 @@ public class Screenshot {
         // For the rest of cases returned previous implementation
 
         if (isTakeScreenshot) {
-            if (!DriverPool.isValid(driver)) {
-                LOGGER.warn("Unable to capture screenshot as driver is not valid anymore.");
-                return null;
-            }
-
             try {
             	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root

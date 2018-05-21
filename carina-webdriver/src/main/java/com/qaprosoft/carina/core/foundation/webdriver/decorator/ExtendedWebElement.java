@@ -216,6 +216,7 @@ public class ExtendedWebElement {
 				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
 				this.searchContext = tempSearchContext;
 				//this.driver = (WebDriver) tempSearchContext;
+				// that's the only place to use DriverPool to get driver.
 				this.driver = DriverPool.getDriver(sessionId);
 			} else {
 				LOGGER.error(tempSearchContext);
@@ -1578,18 +1579,12 @@ public class ExtendedWebElement {
 	}
 
     private WebDriver getDriver() {
-		if (driver != null) {
-			return driver;
-		} else {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why driver is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-				thr.printStackTrace();
-			}
-			
-			LOGGER.error("Unable to detect driver! Looking for default one from pool.");
-			return DriverPool.getDriver();
+		if (driver == null) {
+			LOGGER.error("There is no any initialized driver for ExtendedWebElement: " + getNameWithLocator());
+			throw new RuntimeException(
+					"Driver isn't initialized. Review stacktrace to analyze why driver is not populated correctly via reflection!");
 		}
+		return driver;
     }
     
     
