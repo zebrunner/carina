@@ -41,6 +41,8 @@ public class Timer {
     public static synchronized void stop(IPerformanceOperation operation) {
         Map<String, Long> testTimer = getTimer();
         if (!testTimer.containsKey(operation.getKey())) {
+			// TODO: current exception could stop tests execution which is
+			// inappropriate. Think about erroring only!
             throw new RuntimeException("Operation not started: " + operation.getKey());
         }
         
