@@ -32,6 +32,7 @@ import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -216,6 +217,7 @@ public class ExtendedWebElement {
 				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
 				this.searchContext = tempSearchContext;
 				//this.driver = (WebDriver) tempSearchContext;
+				// that's the only place to use DriverPool to get driver.
 				this.driver = DriverPool.getDriver(sessionId);
 			} else {
 				LOGGER.error(tempSearchContext);
@@ -288,7 +290,8 @@ public class ExtendedWebElement {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
+				.ignoring(NoSuchSessionException.class);
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
 			wait.until(condition);
@@ -1578,18 +1581,12 @@ public class ExtendedWebElement {
 	}
 
     private WebDriver getDriver() {
-		if (driver != null) {
-			return driver;
-		} else {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why driver is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-				thr.printStackTrace();
-			}
-			
-			LOGGER.error("Unable to detect driver! Looking for default one from pool.");
-			return DriverPool.getDriver();
+		if (driver == null) {
+			LOGGER.error("There is no any initialized driver for ExtendedWebElement: " + getNameWithLocator());
+			throw new RuntimeException(
+					"Driver isn't initialized. Review stacktrace to analyze why driver is not populated correctly via reflection!");
 		}
+		return driver;
     }
     
     

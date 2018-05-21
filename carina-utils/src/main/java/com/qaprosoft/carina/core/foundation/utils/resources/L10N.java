@@ -60,9 +60,12 @@ public class L10N {
 
         for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
             public @Override boolean accept(URL u) {
-                LOGGER.debug("L10N: file URL: " + u);
-                String s = u.getPath();
-                return s.contains(SpecialKeywords.L10N);
+				String s = u.getPath();
+				boolean contains = s.contains(SpecialKeywords.L10N);
+				if (contains) {
+					LOGGER.debug("L10N: file URL: " + u);
+				}
+				return contains;
             }
         })) {
             LOGGER.debug(String.format(

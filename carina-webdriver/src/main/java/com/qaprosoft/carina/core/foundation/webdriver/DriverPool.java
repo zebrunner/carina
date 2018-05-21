@@ -425,34 +425,6 @@ public final class DriverPool {
     }
 
     /**
-     * Check if driver is still valid
-     * 
-     * @param drv
-     *            WebDriver
-     * @return boolean
-     */
-    public static boolean isValid(WebDriver drv) {
-        boolean valid = false;
-        try {
-            LOGGER.debug("Starting driver isValid verification...");
-            if (drv != null && !drv.toString().contains("null")) {
-                valid = true;
-                LOGGER.debug("Driver verified successfully...");
-            }
-        } catch (WebDriverException e) {
-            LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
-            // do nothing
-        } catch (Exception e) {
-            // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
-            if (!e.getMessage().contains("Session ID is null.")) {
-                throw e;
-            }
-            // otherwise do nothing
-        }
-        return valid;
-    }
-
-    /**
      * Return number of registered driver per thread
      * 
      * @return int

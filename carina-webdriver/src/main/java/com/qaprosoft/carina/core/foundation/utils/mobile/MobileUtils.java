@@ -332,7 +332,6 @@ public class MobileUtils {
 
             LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
             isVisible = element.isVisible(1);
-            LOGGER.info("Result: " + isVisible);
         }
 
         currentCount = count;
@@ -342,9 +341,9 @@ public class MobileUtils {
             swipeInDevice(container, oppositeDirection, duration);
             LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
             isVisible = element.isVisible(1);
-            LOGGER.info("Result: " + isVisible);
         }
 
+        LOGGER.info("Result: " + isVisible);
         return isVisible;
     }
 
