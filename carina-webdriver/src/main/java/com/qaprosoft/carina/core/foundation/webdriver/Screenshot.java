@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -347,6 +348,8 @@ public class Screenshot {
                 addScreenshotComment(screenName, comment);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+            } catch (NoSuchSessionException e) {
+            	//do nothing as no way to make screenshot using invalid driver 
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot!", e);
             } finally {
