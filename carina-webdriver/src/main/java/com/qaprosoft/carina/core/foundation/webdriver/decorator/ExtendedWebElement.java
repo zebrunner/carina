@@ -289,7 +289,7 @@ public class ExtendedWebElement {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class);
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
 			wait.until(condition);

@@ -34,6 +34,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
@@ -1281,7 +1282,7 @@ public class DriverHelper {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class);
 		try {
 			wait.until(condition);
 			result = true;
