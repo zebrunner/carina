@@ -1331,7 +1331,12 @@ public class ExtendedWebElement {
 		} catch (WebDriverException e) {
 			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
-			element = refindElement();
+			try {
+				element = refindElement();
+			} catch (NoSuchElementException ex) {
+				//no sense to repeite action if refind element didn't help
+				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
+			}
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(), e);

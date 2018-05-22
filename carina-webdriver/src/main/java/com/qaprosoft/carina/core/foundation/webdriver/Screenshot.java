@@ -18,6 +18,9 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
@@ -44,6 +48,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
@@ -302,6 +307,24 @@ public class Screenshot {
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
                 WebDriver augmentedDriver = driver;
+                
+                
+                //hotfix to converting proxy into the valid driver
+                if (driver instanceof Proxy) {
+    				try {
+        				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) driver));
+        				// "arg$2" is by default RemoteWebDriver;
+        				// "arg$1" is EventFiringWebDriver
+        				// wrap into try/catch to make sure we don't affect test execution
+        				Field locatorField = innerProxy.getClass().getDeclaredField("arg$2");
+        				locatorField.setAccessible(true);
+        				
+        				augmentedDriver = driver = (WebDriver) locatorField.get(innerProxy); 
+    				} catch (Exception e) {
+    					//do nothing and recieve augmenting warning in the logs
+    				}
+                }
+    				
                 if (!driver.toString().contains("AppiumNativeDriver")) {
                     // do not augment for Appium 1.x anymore
                     augmentedDriver = new DriverAugmenter().augment(driver);
