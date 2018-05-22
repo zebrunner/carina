@@ -215,7 +215,7 @@ public class ExtendedWebElement {
 			}
 			if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
 				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
-				this.searchContext = tempSearchContext;
+				//this.searchContext = tempSearchContext; //do not uncomment as it corrupt AbstractUiObjects and searchContext for them
 				//this.driver = (WebDriver) tempSearchContext;
 				// that's the only place to use DriverPool to get driver.
 				this.driver = DriverPool.getDriver(sessionId);
