@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.*;
 import org.testng.annotations.*;
 import org.testng.xml.XmlTest;
@@ -680,7 +681,9 @@ public abstract class AbstractTest // extends DriverHelper
         if (drv == null) {
             Assert.fail("Unable to find driver by name: " + name);
         }
-        return drv;
+        
+        
+        return castDriver(drv);
     }
 
     protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -688,9 +691,17 @@ public abstract class AbstractTest // extends DriverHelper
         if (drv == null) {
             Assert.fail("Unable to find driver by name: " + name);
         }
-        return drv;
+        return castDriver(drv);
     }
 
+    private WebDriver castDriver(WebDriver drv) {
+        if (drv instanceof EventFiringWebDriver) {
+            return ((EventFiringWebDriver) drv).getWrappedDriver();
+        } else {
+            return drv;
+        }
+    }
+    
     protected static void quitDrivers() {
         DriverPool.quitDrivers();
     }
