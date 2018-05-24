@@ -231,9 +231,10 @@ public class MobileFactory extends AbstractFactory {
             if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
                 if (rd.getVnc().matches("\\w+:\\d+")) {
                     // host:port format
+                    final String protocol = R.CONFIG.get("vnc_protocol");
                     final String host = rd.getVnc().split(":")[0];
-                    final Integer port = Integer.valueOf(rd.getVnc().split(":")[1]);
-                    vncURL = String.format(R.CONFIG.get("mobile_vnc"), host, port);
+                    final String port = rd.getVnc().split(":")[1];
+                    vncURL = String.format(R.CONFIG.get("vnc_mobile"), protocol, host, port);
                 } else {
                     // ws://host:port/websockify format
                     vncURL = rd.getVnc();

@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -138,9 +139,15 @@ public class DesktopFactory extends AbstractFactory {
 		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
 			// TODO: resolve negative case when VNC is not supported
 			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-			final String  host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-			final Integer port = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort();
-			vncURL = String.format(R.CONFIG.get("desktop_vnc"), host, port, rwd.getSessionId().toString());
+		    String protocol = R.CONFIG.get("protocol");
+			String host = R.CONFIG.get("host");
+			String port = R.CONFIG.get("port"); 
+			// If VNC host/port not set user them from Selenim
+			if(StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
+			    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
+			    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
+			}
+			vncURL = String.format(R.CONFIG.get("vnc_desktop"), protocol, host, port, rwd.getSessionId().toString());
 		}
 		return vncURL;
 	}
