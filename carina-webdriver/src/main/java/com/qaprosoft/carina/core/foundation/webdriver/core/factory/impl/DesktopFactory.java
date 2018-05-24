@@ -51,7 +51,7 @@ public class DesktopFactory extends AbstractFactory {
     private static final String RESTART_ALL_SH_PATH = "$HOME/tools/selenium/restart-all.sh";
     private static final String PREFIX_WIN = "cmd /c ";
     private static final String PREFIX_NIX = "/bin/bash -c ";
-
+    
     @Override
     public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
@@ -139,9 +139,9 @@ public class DesktopFactory extends AbstractFactory {
 		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
 			// TODO: resolve negative case when VNC is not supported
 			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-		    String protocol = R.CONFIG.get("protocol");
-			String host = R.CONFIG.get("host");
-			String port = R.CONFIG.get("port"); 
+		    String protocol = R.CONFIG.get(vnc_protocol);
+			String host = R.CONFIG.get(vnc_host);
+			String port = R.CONFIG.get(vnc_port); 
 			// If VNC host/port not set user them from Selenim
 			if(StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
 			    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();

@@ -64,6 +64,8 @@ import io.appium.java_client.screenrecording.ScreenRecordingUploadOptions;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
+	
+	private final static String vnc_mobile = "vnc_mobile";
     
     @Override
     public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
@@ -231,10 +233,10 @@ public class MobileFactory extends AbstractFactory {
             if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
                 if (rd.getVnc().matches("\\w+:\\d+")) {
                     // host:port format
-                    final String protocol = R.CONFIG.get("vnc_protocol");
+                    final String protocol = R.CONFIG.get(vnc_protocol);
                     final String host = rd.getVnc().split(":")[0];
                     final String port = rd.getVnc().split(":")[1];
-                    vncURL = String.format(R.CONFIG.get("vnc_mobile"), protocol, host, port);
+                    vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port);
                 } else {
                     // ws://host:port/websockify format
                     vncURL = rd.getVnc();

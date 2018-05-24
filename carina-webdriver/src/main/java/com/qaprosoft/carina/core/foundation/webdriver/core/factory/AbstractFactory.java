@@ -45,6 +45,10 @@ public abstract class AbstractFactory {
     protected static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
     
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
+    
+    protected static final String vnc_protocol = "vnc_protocol";
+    protected static final String vnc_host = "vnc_host";
+    protected static final String vnc_port = "vnc_port";
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
