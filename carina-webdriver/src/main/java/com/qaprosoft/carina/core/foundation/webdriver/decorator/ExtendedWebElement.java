@@ -178,6 +178,10 @@ public class ExtendedWebElement {
 
 				byContextField = locator.getClass().getDeclaredField("by");
 				byContextField.setAccessible(true);
+				//TODO: identify if it is child element and 
+				//	1. get rootBy
+				//  2. append current "by" to the rootBy 
+				// -> it should allow to search via regular driver and fluent waits - getBy() 
 				this.by = (By) byContextField.get(locator);
 
 				if (tempSearchContext instanceof Proxy) {
@@ -1317,7 +1321,7 @@ public class ExtendedWebElement {
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
 			if (!waitUntil(waitCondition, timeout)) {
-				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(getNameWithLocator()));
+				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
 

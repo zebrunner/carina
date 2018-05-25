@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -46,10 +47,13 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     protected ElementLocatorFactory factory;
 
     private WebDriver webDriver;
+    
+    private By rootBy;
 
-    public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver) {
+    public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver, By rootBy) {
         this.factory = factory;
         this.webDriver = webDriver;
+        this.rootBy = rootBy;
     }
 
     public Object decorate(ClassLoader loader, Field field) {
@@ -76,6 +80,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         if (locator == null) {
             return null;
         }
+        
+        // TODO: if rootBy is not null then we should append current child by to it and init ExtendedWebElement(s)
+        
 
         if (ExtendedWebElement.class.isAssignableFrom(field.getType())) {
             return proxyForLocator(loader, field, locator);
@@ -149,6 +156,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         }
         uiObject.setName(field.getName());
         uiObject.setRootElement(proxy);
+        uiObject.setRootBy(getLocatorBy(locator));
         return uiObject;
     }
 
@@ -178,5 +186,30 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         }
 
         return ((ParameterizedType) genericType).getActualTypeArguments()[0];
+    }
+    
+    private By getLocatorBy(ElementLocator locator) {
+    	By rootBy = null;
+    	
+        //TODO: get root by annotation from ElementLocator to be able to append by for those elements and reuse fluent waits
+		try {
+			Field byContextField = null;
+
+			byContextField = locator.getClass().getDeclaredField("by");
+			byContextField.setAccessible(true);
+			rootBy = (By) byContextField.get(locator);
+
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+		} catch (Throwable thr) {
+			thr.printStackTrace();
+			LOGGER.error("Unable to get rootBy via reflection!", thr);
+		}
+    	
+    	return rootBy;
     }
 }

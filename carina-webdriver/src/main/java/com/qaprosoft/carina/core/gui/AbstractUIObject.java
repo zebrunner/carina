@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,6 +34,7 @@ public abstract class AbstractUIObject extends DriverHelper {
     protected String name;
 
     protected WebElement rootElement;
+    protected By rootBy;
 
     /**
      * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context
@@ -58,7 +60,7 @@ public abstract class AbstractUIObject extends DriverHelper {
     public AbstractUIObject(WebDriver driver, SearchContext searchContext) {
         super(driver);
         ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext);
-        PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
+        PageFactory.initElements(new ExtendedFieldDecorator(factory, driver, rootBy), this);
     }
 
     /**
@@ -75,7 +77,7 @@ public abstract class AbstractUIObject extends DriverHelper {
      *         false - otherwise
      */
     public boolean isUIObjectPresent(int timeout) {
-    	return waitUntil(ExpectedConditions.visibilityOf(rootElement), timeout);
+    	return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
     }
 
     public boolean isUIObjectPresent() {
@@ -94,8 +96,16 @@ public abstract class AbstractUIObject extends DriverHelper {
         return rootElement;
     }
 
-    public void setRootElement(WebElement rootElement) {
-        this.rootElement = rootElement;
+    public void setRootElement(WebElement element) {
+        this.rootElement = element;
+    }
+    
+    public By getRootBy() {
+        return rootBy;
+    }
+    
+    public void setRootBy(By rootBy) {
+        this.rootBy = rootBy;
     }
     
     

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -36,6 +38,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
     private final ElementLocator locator;
     private String name;
 
+    private By locatorBy;
     private Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
 
     public AbstractUIObjectListHandler(Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
@@ -43,6 +46,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
         this.webDriver = webDriver;
         this.locator = locator;
         this.name = name;
+        this.locatorBy = getLocatorBy(locator);
     }
 
     @SuppressWarnings("unchecked")
@@ -68,6 +72,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                 }
                 uiObject.setName(String.format("%s - %d", name, index++));
                 uiObject.setRootElement(element);
+                uiObject.setRootBy(locatorBy);
                 uIObjects.add(uiObject);
             }
         }
@@ -77,5 +82,30 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+    
+    private By getLocatorBy(ElementLocator locator) {
+    	By rootBy = null;
+    	
+        //TODO: get root by annotation from ElementLocator to be able to append by for those elements and reuse fluent waits
+		try {
+			Field byContextField = null;
+
+			byContextField = locator.getClass().getDeclaredField("by");
+			byContextField.setAccessible(true);
+			rootBy = (By) byContextField.get(locator);
+
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+		} catch (Throwable thr) {
+			thr.printStackTrace();
+			LOGGER.error("Unable to get rootBy via reflection!", thr);
+		}
+    	
+    	return rootBy;
     }
 }
