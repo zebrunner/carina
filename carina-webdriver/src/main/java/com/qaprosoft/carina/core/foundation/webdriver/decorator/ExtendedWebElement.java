@@ -278,8 +278,8 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isPresent(By by, long timeout) {
-    	//ExpectedConditions.visibilityOf(element)
-		return waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout);
+		return waitUntil(ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+    			ExpectedConditions.visibilityOfElementLocated(by)), timeout);
 	}
 	
 	
@@ -292,7 +292,9 @@ public class ExtendedWebElement {
      */
 	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
+		
 		final WebDriver drv = getDriver();
+		
 		Timer.start(ACTION_NAME.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
@@ -330,7 +332,7 @@ public class ExtendedWebElement {
     
     private WebElement refindElement() {
         //do not return without element initialization!
-    	//TODO: if is added as part of a hotifx. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
+    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
     	if (searchContext != null) {
     		element = searchContext.findElement(by);
     	} else {
@@ -424,7 +426,10 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-        click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+        //click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+        click(timeout, ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+    			ExpectedConditions.elementToBeClickable(getBy())));
+        
     }
     
 	/**
@@ -434,7 +439,7 @@ public class ExtendedWebElement {
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
-    public void click(long timeout, ExpectedCondition<WebElement> waitCondition) {
+    public void click(long timeout, ExpectedCondition<?> waitCondition) {
     	doAction(ACTION_NAME.CLICK, timeout, waitCondition);
     }
 
@@ -997,7 +1002,8 @@ public class ExtendedWebElement {
      * @return element visibility status.
      */
     public boolean isVisible(long timeout) {
-    	return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), timeout);
+    	return waitUntil(ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+    			ExpectedConditions.visibilityOfElementLocated(by)), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
@@ -1300,13 +1306,13 @@ public class ExtendedWebElement {
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
-	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition) {
+	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition) {
 		// [VD] do not remove null args otherwise all actions without arguments will be broken!
 		Object nullArgs = null;
 		return doAction(actionName, timeout, waitCondition, nullArgs);
 	}
 
-	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<WebElement> waitCondition,
+	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition,
 			Object...inputArgs) {
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
@@ -1597,7 +1603,6 @@ public class ExtendedWebElement {
 		}
 		return driver;
     }
-    
     
 	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
     public By generateByForList(By by, int index) {

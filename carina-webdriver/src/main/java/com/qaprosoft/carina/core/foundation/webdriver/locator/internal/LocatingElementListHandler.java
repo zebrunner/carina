@@ -44,10 +44,28 @@ public class LocatingElementListHandler implements InvocationHandler {
         List<ExtendedWebElement> extendedWebElements = null;
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
-            for (WebElement element : elements) {
+/*            for (WebElement element : elements) {
                 extendedWebElements.add(new ExtendedWebElement(element, name, by));
-            }
+            }*/
+            
+            int i = 1;
+			for (WebElement element : elements) {
+				String tempName = name;
+				try {
+					tempName = element.getText();
+				} catch (Exception e) {
+					 //do nothing and keep 'undefined' for control name 
+				}
+
+				ExtendedWebElement tempElement = new ExtendedWebElement(element, tempName);
+				tempElement.setBy(tempElement.generateByForList(by, i));
+				extendedWebElements.add(tempElement);
+				i++;
+			}
+
         }
+        
+        
 
         try {
             return method.invoke(extendedWebElements, objects);

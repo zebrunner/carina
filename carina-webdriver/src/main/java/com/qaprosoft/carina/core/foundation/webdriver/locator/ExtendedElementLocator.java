@@ -36,6 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.alice.models.dto.RecognitionMetaType;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
@@ -58,7 +63,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
     private String aiCaption;
     private Label aiLabel;
-
+    
     /**
      * Creates a new element locator.
      * 
@@ -109,7 +114,7 @@ public class ExtendedElementLocator implements ElementLocator {
             		exception = null;
             		element = searchContext.findElements(by).get(0);
             	}
-                LOGGER.info("Unable to find element: " + e.getMessage());
+                LOGGER.debug("Unable to find element: " + e.getMessage());
             }
         }
         
@@ -135,21 +140,37 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public List<WebElement> findElements() {
         if (cachedElementList != null && shouldCache) {
-        	LOGGER.info("returning element from cache: " + by);
+        	LOGGER.debug("returning element from cache: " + by);
             return cachedElementList;
         }
 
+		// Hotfix for huge and expected regression in carina: we lost managed
+		// time delays with lists manipulations
+		// Temporary we are going to restore explicit waiter here with hardcoded
+		// timeout before we find better solution
+		// Pros: super fast regression issue which block UI execution
+		// Cons: there is no way to manage timeouts in this places
+
         List<WebElement> elements = null;
     	NoSuchElementException exception = null;
-    	try {
+
+    	for (int i = 0 ; i< Configuration.getInt(Parameter.EXPLICIT_TIMEOUT); i++) {
+    		elements = findElementsSafe(Configuration.getLong(Parameter.EXPLICIT_TIMEOUT));
+    		if (!elements.isEmpty()) {
+    			break;
+    		}
+    		pause(1);
+    	}
+        
+/*    	try {
     		elements = searchContext.findElements(by);
         } catch (StaleElementReferenceException | InvalidElementStateException e) {
         	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
         } catch (NoSuchElementException e) {
             exception = e;
             LOGGER.info("Unable to find elements: " + e.getMessage());
-        }
-    	
+        }*/
+
     	//TODO: incorporate find by AI???
     	
         // If no luck throw general NoSuchElementException
@@ -159,6 +180,8 @@ public class ExtendedElementLocator implements ElementLocator {
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
         // As result for all dynamic lists we have too often out of bound index exceptions
+        
+		shouldCache = true;
         if (shouldCache) {
             cachedElementList = elements;
         }
@@ -180,4 +203,38 @@ public class ExtendedElementLocator implements ElementLocator {
         return element;
     }
 
+    
+    private List<WebElement> findElementsSafe(long timeout) {
+        LOGGER.debug("findElementsSafe timeout: " + timeout);
+        List<WebElement> elements = null;
+    	try {
+    		LOGGER.debug("Searching element via searchContext: " + searchContext.toString() + "; by: " + by);
+    		elements = searchContext.findElements(by);
+        } catch (StaleElementReferenceException | InvalidElementStateException e) {
+        	LOGGER.debug("Searching element via Webdriver: " + ((RemoteWebElement) searchContext).getWrappedDriver().toString() + "; by: " + by);
+        	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
+        } catch (NoSuchElementException e) {
+            LOGGER.debug("Unable to find elements: " + e.getMessage());
+        }
+
+		return elements;
+
+    }
+    
+    /**
+     * pause
+     * 
+     * @param timeout Number
+     */
+    private void pause(Number timeout) {
+    	Timer.start(ACTION_NAME.PAUSE);
+        try {
+            Float timeoutFloat = timeout.floatValue() * 1000;
+            long timeoutLong = timeoutFloat.longValue();
+            Thread.sleep(timeoutLong);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Timer.stop(ACTION_NAME.PAUSE);
+    }
 }
