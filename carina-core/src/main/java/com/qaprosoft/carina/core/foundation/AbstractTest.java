@@ -682,8 +682,8 @@ public abstract class AbstractTest // extends DriverHelper
             Assert.fail("Unable to find driver by name: " + name);
         }
         
-        
-        return castDriver(drv);
+        return drv;
+        //return castDriver(drv);
     }
 
     protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -691,16 +691,17 @@ public abstract class AbstractTest // extends DriverHelper
         if (drv == null) {
             Assert.fail("Unable to find driver by name: " + name);
         }
-        return castDriver(drv);
+        return drv;
+        //return castDriver(drv);
     }
 
-    private WebDriver castDriver(WebDriver drv) {
+/*    private WebDriver castDriver(WebDriver drv) {
         if (drv instanceof EventFiringWebDriver) {
             return ((EventFiringWebDriver) drv).getWrappedDriver();
         } else {
             return drv;
         }
-    }
+    }*/
     
     protected static void quitDrivers() {
         DriverPool.quitDrivers();
