@@ -284,14 +284,7 @@ public class ExtendedWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-		boolean res;
-		if (getCachedElement() != null) {
-			res = waitUntil(ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
-					ExpectedConditions.visibilityOfElementLocated(by)), timeout);
-		} else {
-			res = waitUntil(ExpectedConditions.visibilityOfElementLocated(by), timeout);
-		}
-		return res;
+		return waitUntil(getDefaultCondition(by), timeout);
 	}
 	
 	
@@ -394,7 +387,7 @@ public class ExtendedWebElement {
      * @return String text
      */
     public String getText() {
-    	return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -403,7 +396,7 @@ public class ExtendedWebElement {
      * @return Point location
      */
     public Point getLocation() {
-    	return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -412,7 +405,7 @@ public class ExtendedWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-    	return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -422,7 +415,7 @@ public class ExtendedWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-    	return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), name);
+    	return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
     }
 
     /**
@@ -438,10 +431,7 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-        //click(timeout, ExpectedConditions.elementToBeClickable(getBy()));
-        click(timeout, ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
-    			ExpectedConditions.elementToBeClickable(getBy())));
-        
+        click(timeout, getDefaultCondition(getBy()));
     }
     
 	/**
@@ -468,7 +458,7 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-    	doubleClick(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    	doubleClick(timeout, getDefaultCondition(getBy()));
     }
     /**
      * Double Click on element.
@@ -477,7 +467,7 @@ public class ExtendedWebElement {
 	 * @param waitCondition
 	 *            to check element conditions before action
      */
-    public void doubleClick(long timeout, ExpectedCondition<WebElement> waitCondition) {
+    public void doubleClick(long timeout, ExpectedCondition<?> waitCondition) {
     	doAction(ACTION_NAME.DOUBLE_CLICK, timeout, waitCondition);
     }
 
@@ -495,7 +485,7 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-    	rightClick(timeout, ExpectedConditions.elementToBeClickable(getBy()));
+    	rightClick(timeout, getDefaultCondition(getBy()));
     }
     
     /**
@@ -505,7 +495,7 @@ public class ExtendedWebElement {
 	 * @param waitCondition
 	 *            to check element conditions before action
      */
-    public void rightClick(long timeout, ExpectedCondition<WebElement> waitCondition) {
+    public void rightClick(long timeout, ExpectedCondition<?> waitCondition) {
     	doAction(ACTION_NAME.RIGHT_CLICK, timeout, waitCondition);
     }
     
@@ -523,7 +513,7 @@ public class ExtendedWebElement {
 	 * @param yOffset y offset for moving
      */
     public void hover(Integer xOffset, Integer yOffset) {
-    	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), xOffset, yOffset);
+    	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
     }
     
     /**
@@ -588,7 +578,7 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
-    	sendKeys(keys, timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	sendKeys(keys, timeout, getDefaultCondition(getBy()));
     }
     
 	/**
@@ -599,7 +589,7 @@ public class ExtendedWebElement {
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
-    public void sendKeys(Keys keys, long timeout, ExpectedCondition<WebElement> waitCondition) {
+    public void sendKeys(Keys keys, long timeout, ExpectedCondition<?> waitCondition) {
     	doAction(ACTION_NAME.SEND_KEYS, timeout, waitCondition, keys);
     }
     
@@ -620,7 +610,7 @@ public class ExtendedWebElement {
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
-    	type(text, timeout, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	type(text, timeout, getDefaultCondition(getBy()));
     }
     
 	/**
@@ -631,7 +621,7 @@ public class ExtendedWebElement {
 	 * @param waitCondition
 	 *            to check element conditions before action
 	 */
-    public void type(String text, long timeout, ExpectedCondition<WebElement> waitCondition) {
+    public void type(String text, long timeout, ExpectedCondition<?> waitCondition) {
     	doAction(ACTION_NAME.TYPE, timeout, waitCondition, text);
     }
     
@@ -667,7 +657,7 @@ public class ExtendedWebElement {
      * @param filePath path
      */
     public void attachFile(String filePath) {
-    	doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), filePath);
+    	doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
     }
 
     /**
@@ -676,7 +666,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void check() {
-    	doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -685,7 +675,7 @@ public class ExtendedWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-    	doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -694,7 +684,7 @@ public class ExtendedWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-    	return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -703,7 +693,7 @@ public class ExtendedWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-    	return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -713,7 +703,7 @@ public class ExtendedWebElement {
      */
     @SuppressWarnings("unchecked")
 	public List<String> getSelectedValues() {
-    	return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()));
+    	return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -723,7 +713,7 @@ public class ExtendedWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), selectText);
+    	return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
     }
 
     /**
@@ -733,7 +723,7 @@ public class ExtendedWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), values);
+    	return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
     }
 
     /**
@@ -749,7 +739,7 @@ public class ExtendedWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), matcher);
+    	return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
     }
 
     /**
@@ -759,7 +749,7 @@ public class ExtendedWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), partialSelectText);
+    	return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
     }
 
     /**
@@ -769,7 +759,7 @@ public class ExtendedWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, ExpectedConditions.presenceOfElementLocated(getBy()), index);
+    	return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
     }
 
     // --------------------------------------------------------------------------
@@ -792,16 +782,7 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent(long timeout) {
     	
-		boolean res;
-		if (getCachedElement() != null) {
-			res = waitUntil(ExpectedConditions.and(ExpectedConditions.visibilityOf(getCachedElement()),
-					ExpectedConditions.presenceOfElementLocated(getBy())), timeout);
-		} else {
-			res = waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-	    			ExpectedConditions.visibilityOfElementLocated(getBy())), timeout);
-		}
-		
-		return res;
+    	return waitUntil(getDefaultCondition(getBy()), timeout);
     }
 
     /**
@@ -1671,4 +1652,21 @@ public class ExtendedWebElement {
         return resBy;
     }
 
+    private ExpectedCondition<?> getDefaultCondition() {
+    	return getDefaultCondition(getBy());
+    }
+    
+    private ExpectedCondition<?> getDefaultCondition(By myBy) {
+    	//generate the most popular wiatCondition to check if element visible or present
+    	ExpectedCondition<?> waitCondition = null;
+		if (getCachedElement() != null) {
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+					ExpectedConditions.presenceOfElementLocated(myBy));
+		} else {
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+	    			ExpectedConditions.elementToBeClickable(myBy));
+		}
+		
+		return waitCondition;
+    }
 }
