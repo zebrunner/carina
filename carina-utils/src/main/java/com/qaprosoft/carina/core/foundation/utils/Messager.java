@@ -99,7 +99,7 @@ public enum Messager {
 
     ELEMENT_NOT_PRESENT("FAIL: element '%s' does not present!"),
     
-    ELEMENT_CONDITION_NOT_VERIFIED("FAIL: waitCondition for element '%s' does not present!!"),
+    ELEMENT_CONDITION_NOT_VERIFIED("FAIL: %s - waitCondition for element '%s' not satisfied!"),
 
     ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' does not present"),
 
