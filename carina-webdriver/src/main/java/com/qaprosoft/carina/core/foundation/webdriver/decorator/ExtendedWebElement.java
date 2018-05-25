@@ -274,16 +274,24 @@ public class ExtendedWebElement {
     	return isPresent(getBy(), timeout);
     }
     
-    /**
-     * Check that element with By present within specified timeout.
-     *
-     * @param by - By.
-     * @param timeout - timeout.
-     * @return element existence status.
-     */
-    public boolean isPresent(By by, long timeout) {
-		return waitUntil(ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
-    			ExpectedConditions.visibilityOfElementLocated(by)), timeout);
+	/**
+	 * Check that element with By present within specified timeout.
+	 *
+	 * @param by
+	 *            - By.
+	 * @param timeout
+	 *            - timeout.
+	 * @return element existence status.
+	 */
+	public boolean isPresent(By by, long timeout) {
+		boolean res;
+		if (getCachedElement() != null) {
+			res = waitUntil(ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+					ExpectedConditions.visibilityOfElementLocated(by)), timeout);
+		} else {
+			res = waitUntil(ExpectedConditions.visibilityOfElementLocated(by), timeout);
+		}
+		return res;
 	}
 	
 	
@@ -783,8 +791,17 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-    			ExpectedConditions.visibilityOfElementLocated(getBy())), timeout);
+    	
+		boolean res;
+		if (getCachedElement() != null) {
+			res = waitUntil(ExpectedConditions.and(ExpectedConditions.visibilityOf(getCachedElement()),
+					ExpectedConditions.presenceOfElementLocated(getBy())), timeout);
+		} else {
+			res = waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+	    			ExpectedConditions.visibilityOfElementLocated(getBy())), timeout);
+		}
+		
+		return res;
     }
 
     /**

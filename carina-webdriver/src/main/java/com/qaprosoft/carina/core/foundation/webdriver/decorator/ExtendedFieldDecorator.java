@@ -48,12 +48,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     private WebDriver webDriver;
     
-    private By rootBy;
-
-    public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver, By rootBy) {
+    public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver) {
         this.factory = factory;
         this.webDriver = webDriver;
-        this.rootBy = rootBy;
     }
 
     public Object decorate(ClassLoader loader, Field field) {
@@ -80,9 +77,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         if (locator == null) {
             return null;
         }
-        
-        // TODO: if rootBy is not null then we should append current child by to it and init ExtendedWebElement(s)
-        
 
         if (ExtendedWebElement.class.isAssignableFrom(field.getType())) {
             return proxyForLocator(loader, field, locator);
@@ -162,7 +156,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     @SuppressWarnings("unchecked")
     protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator) {
-        InvocationHandler handler = new LocatingElementListHandler(locator, field.getName(), new LocalizedAnnotations(field).buildBy());
+        InvocationHandler handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
         List<ExtendedWebElement> proxies = (List<ExtendedWebElement>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
 
         return proxies;
