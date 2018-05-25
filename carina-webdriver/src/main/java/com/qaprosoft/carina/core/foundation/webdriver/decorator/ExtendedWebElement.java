@@ -338,9 +338,12 @@ public class ExtendedWebElement {
     private WebElement refindElement() {
         //do not return without element initialization!
     	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-    	if (searchContext != null) {
+    	try {
     		element = searchContext.findElement(by);
-    	} else {
+		} catch (StaleElementReferenceException | InvalidElementStateException e) {
+			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			//use available driver to research again...
+			//TODo: handle case with rootBy to be able to refind also lists etc
     		element = getDriver().findElement(by);
     	}
         return element;
@@ -1651,19 +1654,15 @@ public class ExtendedWebElement {
 
         return resBy;
     }
-
-    private ExpectedCondition<?> getDefaultCondition() {
-    	return getDefaultCondition(getBy());
-    }
     
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
     	//generate the most popular wiatCondition to check if element visible or present
     	ExpectedCondition<?> waitCondition = null;
-		if (getCachedElement() != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+		if (element != null) {
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
 					ExpectedConditions.presenceOfElementLocated(myBy));
 		} else {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
 	    			ExpectedConditions.elementToBeClickable(myBy));
 		}
 		

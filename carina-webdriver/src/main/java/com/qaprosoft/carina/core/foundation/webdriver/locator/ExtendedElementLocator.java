@@ -29,7 +29,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
@@ -98,8 +97,6 @@ public class ExtendedElementLocator implements ElementLocator {
         if (by != null) {
             try {
             	element = searchContext.findElement(by);
-            } catch (StaleElementReferenceException | InvalidElementStateException e) {
-            	element = ((RemoteWebElement) searchContext).getWrappedDriver().findElement(by);
             } catch (NoSuchElementException e) {
                 exception = e;
             	//TODO: on iOS findElement return nothing but findElements return valid single item
@@ -143,11 +140,7 @@ public class ExtendedElementLocator implements ElementLocator {
     	NoSuchElementException exception = null;
 
     	try {
-    		LOGGER.debug("Searching element via searchContext: " + searchContext.toString() + "; by: " + by);
     		elements = searchContext.findElements(by);
-        } catch (StaleElementReferenceException | InvalidElementStateException e) {
-        	LOGGER.debug("Searching element via Webdriver: " + ((RemoteWebElement) searchContext).getWrappedDriver().toString() + "; by: " + by);
-        	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         }
@@ -183,5 +176,6 @@ public class ExtendedElementLocator implements ElementLocator {
         }
         return element;
     }
+
     
 }

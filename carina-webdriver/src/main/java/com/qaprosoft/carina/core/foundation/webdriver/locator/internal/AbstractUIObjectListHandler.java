@@ -24,9 +24,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -74,7 +76,14 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
     	waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(locatorBy),
     			ExpectedConditions.visibilityOfElementLocated(locatorBy)));
 
-        List<WebElement> elements = locator.findElements();
+    	List<WebElement> elements = null;
+    	try {
+    		elements = locator.findElements();
+		} catch (StaleElementReferenceException | InvalidElementStateException e) {
+			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			elements = webDriver.findElements(locatorBy);
+		}
+
         List<T> uIObjects = new ArrayList<T>();
         int index = 0;
         if (elements != null) {
