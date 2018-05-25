@@ -40,7 +40,6 @@ import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
@@ -154,6 +153,7 @@ public class ExtendedElementLocator implements ElementLocator {
         List<WebElement> elements = null;
     	NoSuchElementException exception = null;
 
+    	//TODO: find a way to specify valid by for list of ExtendedWebElements when searchContext is used
     	for (int i = 0 ; i< Configuration.getInt(Parameter.EXPLICIT_TIMEOUT); i++) {
     		elements = findElementsSafe(Configuration.getLong(Parameter.EXPLICIT_TIMEOUT));
     		if (!elements.isEmpty()) {
@@ -162,15 +162,6 @@ public class ExtendedElementLocator implements ElementLocator {
     		pause(1);
     	}
         
-/*    	try {
-    		elements = searchContext.findElements(by);
-        } catch (StaleElementReferenceException | InvalidElementStateException e) {
-        	elements = ((RemoteWebElement) searchContext).getWrappedDriver().findElements(by);
-        } catch (NoSuchElementException e) {
-            exception = e;
-            LOGGER.info("Unable to find elements: " + e.getMessage());
-        }*/
-
     	//TODO: incorporate find by AI???
     	
         // If no luck throw general NoSuchElementException
