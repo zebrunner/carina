@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
@@ -48,7 +47,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
