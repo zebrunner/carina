@@ -65,9 +65,11 @@ public class LocatingElementListHandler implements InvocationHandler {
 		// timeout before we find better solution
 		// Pros: super fast regression issue which block UI execution
 		// Cons: there is no way to manage timeouts in this places
+    	if (!waitUntil(ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+    			ExpectedConditions.visibilityOfElementLocated(by)))) {
+    		LOGGER.error("List is not present: " + by);
+    	}
 
-    	waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(by),
-    			ExpectedConditions.visibilityOfElementLocated(by)));
     	
     	List<WebElement> elements = null;
     	try {
@@ -144,4 +146,5 @@ public class LocatingElementListHandler implements InvocationHandler {
 		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
+	
 }
