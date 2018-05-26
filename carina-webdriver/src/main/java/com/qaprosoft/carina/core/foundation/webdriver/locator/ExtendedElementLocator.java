@@ -20,12 +20,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -154,8 +152,6 @@ public class ExtendedElementLocator implements ElementLocator {
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
         // As result for all dynamic lists we have too often out of bound index exceptions
-        
-		shouldCache = true;
         if (shouldCache) {
             cachedElementList = elements;
         }
