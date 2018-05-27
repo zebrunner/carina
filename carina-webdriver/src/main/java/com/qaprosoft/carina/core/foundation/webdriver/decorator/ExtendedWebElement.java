@@ -1368,16 +1368,22 @@ public class ExtendedWebElement {
 				try {
 					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
-					element.click();
+
+					if (element.isDisplayed()) {
+						element.click();
+					} else {
+						// not visible so we can't interact using selenium or
+						// actions
+						LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
+								+ "' is not visible...");
+						JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+						executor.executeScript("arguments[0].click();", element);
+					}
 				} catch (WebDriverException e) {
 					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
 						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
 						Actions actions = new Actions(getDriver());
 						actions.moveToElement(element).click().perform();
-						
-						//TODO: analyze if we should try to click using js as well
-						//JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-			            //executor.executeScript("arguments[0].click();", element);
 					} else {
 						throw e;
 					}
