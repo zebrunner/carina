@@ -784,8 +784,17 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
+    	ExpectedCondition<?> waitCondition;
     	
-    	return waitUntil(getDefaultCondition(getBy()), timeout);
+		if (element != null) {
+			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
+					ExpectedConditions.presenceOfElementLocated(getBy()));
+		} else {
+			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
+	    			ExpectedConditions.elementToBeClickable(getBy()));
+		}
+
+    	return waitUntil(waitCondition, timeout);
     }
 
     /**
@@ -798,6 +807,61 @@ public class ExtendedWebElement {
         return !isElementPresent(timeout);
     }
 
+    /**
+     * Checks that element clickable.
+     *
+     * @return element clickability status.
+     */
+    public boolean isClickable() {
+        return isClickable(EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Check that element clickable within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @return element clickability status.
+     */
+    public boolean isClickable(long timeout) {
+    	ExpectedCondition<?> waitCondition;
+    	
+		if (element != null) {
+			waitCondition = ExpectedConditions.elementToBeClickable(element);
+		} else {
+			waitCondition = ExpectedConditions.elementToBeClickable(getBy());
+		}
+		
+    	return waitUntil(waitCondition, timeout);
+    }
+
+    /**
+     * Checks that element visible.
+     *
+     * @return element visibility status.
+     */
+    public boolean isVisible() {
+        return isVisible(EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Check that element visible within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @return element visibility status.
+     */
+	public boolean isVisible(long timeout) {
+		ExpectedCondition<?> waitCondition;
+
+		if (element != null) {
+			waitCondition = ExpectedConditions.visibilityOf(element);
+		} else {
+			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+		}
+
+		return waitUntil(waitCondition, timeout);
+	}
+
+	
     /**
      * Check that element with text present.
      *
@@ -975,44 +1039,6 @@ public class ExtendedWebElement {
     @Deprecated
     public boolean isElementNotPresentAfterWait(final long timeout) {
     	return waitUntilElementDisappear(timeout);
-    }
-    /**
-     * Checks that element clickable.
-     *
-     * @return element clickability status.
-     */
-    public boolean isClickable() {
-        return isClickable(EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Check that element clickable within specified timeout.
-     *
-     * @param timeout - timeout.
-     * @return element clickability status.
-     */
-    public boolean isClickable(long timeout) {
-    	return waitUntil(ExpectedConditions.elementToBeClickable(getBy()), timeout);
-    }
-
-    /**
-     * Checks that element visible.
-     *
-     * @return element visibility status.
-     */
-    public boolean isVisible() {
-        return isVisible(EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Check that element visible within specified timeout.
-     *
-     * @param timeout - timeout.
-     * @return element visibility status.
-     */
-    public boolean isVisible(long timeout) {
-    	return waitUntil(ExpectedConditions.or(ExpectedConditions.visibilityOf(getCachedElement()),
-    			ExpectedConditions.visibilityOfElementLocated(by)), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
@@ -1525,6 +1551,7 @@ public class ExtendedWebElement {
 
 				
 				final Select s = new Select(element);
+				// [VD] do not use selectByValue as modern controls could have only visible value without value
 				s.selectByVisibleText(decryptedSelectText);
 				return true;
 			}
@@ -1673,7 +1700,7 @@ public class ExtendedWebElement {
 					ExpectedConditions.presenceOfElementLocated(myBy));
 		} else {
 			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-	    			ExpectedConditions.elementToBeClickable(myBy));
+	    			ExpectedConditions.presenceOfElementLocated(myBy));
 		}
 		
 		return waitCondition;
