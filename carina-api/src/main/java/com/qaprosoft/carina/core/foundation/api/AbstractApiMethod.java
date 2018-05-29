@@ -183,7 +183,7 @@ public abstract class AbstractApiMethod extends HttpClient {
 
         PrintStream ps = null;
         if (logRequest || logResponse) {
-            ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
+            ps = new PrintStream(new LoggingOutputStream( Logger.getLogger("httpLogger"), Level.INFO));
         }
 
         if (logRequest)
