@@ -791,7 +791,7 @@ public class ExtendedWebElement {
 					ExpectedConditions.presenceOfElementLocated(getBy()));
 		} else {
 			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-	    			ExpectedConditions.elementToBeClickable(getBy()));
+	    			ExpectedConditions.presenceOfElementLocated(getBy()));
 		}
 
     	return waitUntil(waitCondition, timeout);
