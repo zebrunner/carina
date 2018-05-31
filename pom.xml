@@ -55,7 +55,7 @@
         <httpclient.version>4.5.3</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
-        <selenium-java.version>3.11.0</selenium-java.version>
+        <selenium-java.version>3.12.0</selenium-java.version>
         <selenium-server.version>3.6.0</selenium-server.version>
         <appium.version>6.0.0-BETA5</appium.version>
         <!-- Qaprosoft integrations -->
