@@ -32,6 +32,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 public class ThreadLogAppender extends AppenderSkeleton {
     // single buffer for each thread test.log file
     private final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<BufferedWriter>();
+    private final ThreadLocal<BufferedWriter> apiLogBuffer = new ThreadLocal<BufferedWriter>();
 
     @Override
     public void append(LoggingEvent event) {
@@ -44,16 +45,27 @@ public class ThreadLogAppender extends AppenderSkeleton {
          */
 
         try {
+            File currentLogFile = new File(ReportContext.getTestDir() + "/test.log");
+            BufferedWriter fwlog, fw = testLogBuffer.get();
+            BufferedWriter fwapi = apiLogBuffer.get();
+            boolean apiMethod = event.getLoggerName().contains("AbstractApiMethod");
+            if (apiMethod) {
+                fw = fwapi;
+                currentLogFile = new File(ReportContext.getTestDir() + "/http.log");
+            }
 
-            BufferedWriter fw = testLogBuffer.get();
             if (fw == null) {
                 // 1st request to log something for this thread/test
-                File testLogFile = new File(ReportContext.getTestDir() + "/test.log");
-                if (!testLogFile.exists())
-                    testLogFile.createNewFile();
-                fw = new BufferedWriter(new FileWriter(testLogFile, true));
-                testLogBuffer.set(fw);
+                if (!currentLogFile.exists())
+                    currentLogFile.createNewFile();
+                fw = new BufferedWriter(new FileWriter(currentLogFile, true));
+                if (apiMethod) {
+                    apiLogBuffer.set(fw);
+                } else {
+                    testLogBuffer.set(fw);
+                }
             }
+
 
             if (event != null) {
                 // append time, thread, class name and device name if any
@@ -94,6 +106,16 @@ public class ThreadLogAppender extends AppenderSkeleton {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            BufferedWriter fw = apiLogBuffer.get();
+            if (fw != null) {
+                fw.close();
+                apiLogBuffer.remove();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
