@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -252,5 +253,17 @@ public class DriverListener implements IConfigurableEventListener {
         currentPositiveMessage.remove();
         currentNegativeMessage.remove();
     }
+
+	@Override
+	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
