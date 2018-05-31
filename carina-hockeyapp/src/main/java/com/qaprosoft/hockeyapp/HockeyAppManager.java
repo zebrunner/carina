@@ -22,10 +22,10 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpHeaders;
@@ -156,9 +156,9 @@ public class HockeyAppManager {
      * @param platformName takes in the platform we wish to download for.
      * @return
      */
-    private List<String> getAppId(String appName, String platformName) {
+    private Map<String, String> getAppId(String appName, String platformName) {
 
-        List<String> appList = new ArrayList<String>();
+        Map<String, String> appMap = new HashMap<>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
                 HOCKEY_APP_URL,
@@ -170,12 +170,17 @@ public class HockeyAppManager {
             if (platformName.equalsIgnoreCase(node.get("platform").asText())
                     && node.get("title").asText().toLowerCase().contains(appName.toLowerCase())) {
                 LOGGER.info(String.format("Found App: %s (%s)", node.get("title"), node.get("public_identifier")));
-                appList.add(node.get("public_identifier").asText());
+                appMap.put(node.get("public_identifier").asText(), node.get("updated_at").asText());
             }
         }
 
-        if (!appList.isEmpty()) {
-            return appList;
+        if (!appMap.isEmpty()) {
+            Map<String, String> sortedMap = appMap.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            return sortedMap;
         }
 
         throw new RuntimeException(String.format("Application Not Found in HockeyApp for Name (%s), Platform (%s)", appName, platformName));
@@ -189,9 +194,9 @@ public class HockeyAppManager {
      *            build.
      * @return
      */
-    private String scanAppForBuild(List<String> appIds, String buildType, String version) {
+    private String scanAppForBuild(Map<String, String> appIds, String buildType, String version) {
 
-        for (String appId : appIds) {
+        for (String appId : appIds.keySet()) {
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
             queryParams.add("page", "1");
             queryParams.add("include_build_urls", "true");
