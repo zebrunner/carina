@@ -853,11 +853,12 @@ public class ExtendedWebElement {
 		ExpectedCondition<?> waitCondition;
 
 		if (element != null) {
-			waitCondition = ExpectedConditions.visibilityOf(element);
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
+					ExpectedConditions.visibilityOfElementLocated(getBy()));
 		} else {
 			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		}
-
+		
 		return waitUntil(waitCondition, timeout);
 	}
 
