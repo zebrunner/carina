@@ -68,6 +68,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 // TODO: [VD] removed deprecated constructor and DriverPool import
 public class ExtendedWebElement {
@@ -445,8 +447,18 @@ public class ExtendedWebElement {
 	 *            to check element conditions before action
 	 */
     public void click(long timeout, ExpectedCondition<?> waitCondition) {
-    	doAction(ACTION_NAME.CLICK, timeout, waitCondition);
+    	if (isMobile()) {
+    		doAction(ACTION_NAME.TAP, timeout, waitCondition);
+    	} else {
+    		doAction(ACTION_NAME.CLICK, timeout, waitCondition);
+    	}
     }
+    
+	private boolean isMobile() {
+		// TODO: investigating potential class cast exception
+		WebDriver driver = getDriver();
+		return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+	}
 
     /**
      * Double Click on element.
@@ -1220,6 +1232,8 @@ public class ExtendedWebElement {
     
 	public interface ActionSteps {
 		void doClick();
+		
+		void doTap();
 
 		void doDoubleClick();
 
@@ -1419,6 +1433,15 @@ public class ExtendedWebElement {
 						throw e;
 					}
 				}
+			}
+			
+			@Override
+			// click for mobile devices
+			public void doTap() {
+				DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+						Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
+
+				element.click();
 			}
 
 			@Override
