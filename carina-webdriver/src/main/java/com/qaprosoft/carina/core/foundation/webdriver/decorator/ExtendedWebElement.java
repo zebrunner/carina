@@ -1282,6 +1282,9 @@ public class ExtendedWebElement {
 		case CLICK:
 			actionSteps.doClick();
 			break;
+		case TAP:
+			actionSteps.doTap();
+			break;
 		case DOUBLE_CLICK:
 			actionSteps.doDoubleClick();
 			break;
