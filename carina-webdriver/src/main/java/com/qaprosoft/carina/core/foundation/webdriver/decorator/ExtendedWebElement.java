@@ -1697,11 +1697,11 @@ public class ExtendedWebElement {
     	//generate the most popular wiatCondition to check if element visible or present
     	ExpectedCondition<?> waitCondition = null;
 		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.presenceOfElementLocated(myBy));
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
+					ExpectedConditions.visibilityOf(element), ExpectedConditions.presenceOfElementLocated(myBy));
 		} else {
 			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-	    			ExpectedConditions.presenceOfElementLocated(myBy));
+					ExpectedConditions.presenceOfElementLocated(myBy));
 		}
 		
 		return waitCondition;
