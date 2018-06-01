@@ -345,7 +345,10 @@ public class ExtendedWebElement {
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			//use available driver to research again...
-			//TODo: handle case with rootBy to be able to refind also lists etc
+			//TODO: handle case with rootBy to be able to refind also lists etc
+    		element = getDriver().findElement(by);
+    	} catch (WebDriverException e) {
+    		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
     		element = getDriver().findElement(by);
     	}
         return element;
