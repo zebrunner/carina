@@ -137,7 +137,8 @@ public class ExtendedWebElement {
     	this.name = name;
     }
     
-    private ExtendedWebElement(WebElement element) {
+    //TODO: make it private in the next release!
+    public ExtendedWebElement(WebElement element) {
         this.element = element;
         
         //read searchContext from not null elements only
