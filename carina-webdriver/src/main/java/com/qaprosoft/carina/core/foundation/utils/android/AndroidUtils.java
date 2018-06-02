@@ -34,10 +34,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
-import io.appium.java_client.PressesKeyCode;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidKeyCode;
+import io.appium.java_client.touch.offset.PointOption;
+import io.appium.java_client.windows.PressesKeyCode;
 
 /**
  * Useful Android utilities. For usage: import
@@ -174,7 +175,8 @@ public class AndroidUtils extends MobileUtils {
         }
     }
     
-    public static void pressBack() {
+    @SuppressWarnings("deprecation")
+	public static void pressBack() {
         ((AndroidDriver<?>) getDriver()).pressKeyCode(AndroidKeyCode.BACK);
     }
 
@@ -202,13 +204,15 @@ public class AndroidUtils extends MobileUtils {
      * Nexus 6P Android 8.0.0 standard keyboard. Coefficients of coordinates for
      * other devices and custom keyboards could be different.
      */
-    public static void pressBottomRightKey() {
+    @SuppressWarnings("rawtypes")
+	public static void pressBottomRightKey() {
     	WebDriver driver = getDriver();
     	Dimension size = driver.manage().window().getSize();
         int height =  size.getHeight();
         int width = size.getWidth();
 
-        new TouchAction((AndroidDriver<?>) driver).tap(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue()).perform();
+		PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue());
+        new TouchAction((AndroidDriver<?>) driver).tap(option).perform();
     }
 
     /**

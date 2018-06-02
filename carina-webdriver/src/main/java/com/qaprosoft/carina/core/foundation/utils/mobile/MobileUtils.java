@@ -35,6 +35,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
+import io.appium.java_client.touch.LongPressOptions;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.ElementOption;
+import io.appium.java_client.touch.offset.PointOption;
 
 public class MobileUtils {
     protected static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
@@ -107,11 +111,13 @@ public class MobileUtils {
     	//TODO: SZ migrate to FluentWaits
         try {
             WebDriver driver = getDriver();
-            TouchAction<?> action = new TouchAction((MobileDriver<?>) driver);
-            action.longPress(element.getElement()).release().perform();
+            @SuppressWarnings("rawtypes")
+			TouchAction<?> action = new TouchAction((MobileDriver<?>) driver);
+            LongPressOptions options = LongPressOptions.longPressOptions().withElement(ElementOption.element(element.getElement()));
+            action.longPress(options).release().perform();
             return true;
         } catch (Exception e) {
-            LOGGER.info("Error occurs: " + e);
+            LOGGER.info("Error occurs during longPress: " + e, e);
         }
         return false;
     }
@@ -124,8 +130,13 @@ public class MobileUtils {
      * @param duration int
      */
     public static void tap(int startx, int starty, int duration) {
-        TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) getDriver());
-        touchAction.press(startx, starty).waitAction(Duration.ofMillis(duration)).release().perform();
+        @SuppressWarnings("rawtypes")
+		TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) getDriver());
+		PointOption<?> startPoint = PointOption.point(startx, starty);
+		WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
+
+		
+        touchAction.press(startPoint).waitAction(waitOptions).release().perform();
     }
 
     /**
@@ -356,7 +367,8 @@ public class MobileUtils {
      * @param endy int
      * @param duration int Millis
      */
-    public static void swipe(int startx, int starty, int endx, int endy, int duration) {
+    @SuppressWarnings("rawtypes")
+	public static void swipe(int startx, int starty, int endx, int endy, int duration) {
         LOGGER.debug("Starting swipe...");
         WebDriver drv = getDriver();
 
@@ -378,9 +390,15 @@ public class MobileUtils {
             endy = Math.max(1, endy);
         }
 
-        LOGGER.debug("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy + "; duration: " + duration);
-        new TouchAction((MobileDriver<?>) drv).press(startx, starty).waitAction(Duration.ofMillis(duration))
-                .moveTo(endx, endy).release().perform();
+		LOGGER.debug("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy
+				+ "; duration: " + duration);
+
+		PointOption<?> startPoint = PointOption.point(startx, starty);
+		PointOption<?> endPoint = PointOption.point(endx, endy);
+		WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
+        
+		new TouchAction((MobileDriver<?>) drv).press(startPoint).waitAction(waitOptions).moveTo(endPoint).release()
+				.perform();
 
         LOGGER.debug("Finished swipe...");
     }
