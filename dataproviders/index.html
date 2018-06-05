@@ -379,15 +379,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#xls-xlsx-csv-data-provider-parametrization" title="XLS / XLSX / CSV data provider parametrization" class="md-nav__link">
-    XLS / XLSX / CSV data provider parametrization
+  <a href="#java-data-provider" title="Java data-provider" class="md-nav__link">
+    Java data-provider
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#testng-data-provider-parametrization" title="TestNG data provider parametrization" class="md-nav__link">
-    TestNG data provider parametrization
+  <a href="#xml-parametrization" title="XML parametrization" class="md-nav__link">
+    XML parametrization
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xlscsv-data-providers" title="XLS/CSV data-providers" class="md-nav__link">
+    XLS/CSV data-providers
   </a>
   
 </li>
@@ -460,15 +467,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#xls-xlsx-csv-data-provider-parametrization" title="XLS / XLSX / CSV data provider parametrization" class="md-nav__link">
-    XLS / XLSX / CSV data provider parametrization
+  <a href="#java-data-provider" title="Java data-provider" class="md-nav__link">
+    Java data-provider
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#testng-data-provider-parametrization" title="TestNG data provider parametrization" class="md-nav__link">
-    TestNG data provider parametrization
+  <a href="#xml-parametrization" title="XML parametrization" class="md-nav__link">
+    XML parametrization
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xlscsv-data-providers" title="XLS/CSV data-providers" class="md-nav__link">
+    XLS/CSV data-providers
   </a>
   
 </li>
@@ -493,24 +507,73 @@
                 
                 
                 <h1 id="dataproviders">Dataproviders</h1>
-<p>Carina test framework provides possibility to write all tests with data providers in one place include parametrization using external XLS/ XLSX/ CSV spreadsheets, TestNG <code>@DataProvider</code> and <code>@Parameters</code> annotations.</p>
-<p>First of all you need to declare test class that extends <code>AbstractTest.java</code> and define test suite in xml document for it.
+<p>Modern test automation frameworks should support data-driven testing, when you are capable to verify variety of edge cases providing test data sets into the tests using external data sources. Carina is not an exclusion, framework supports multiple ways of tests parametrization (see <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java">samples</a>):
+<em> Java data-providers
+</em> XML parametrization
+<em> XLS data-providers
+</em> CSV data-providers</p>
+<h2 id="java-data-provider">Java data-provider</h2>
+<p>As far as Carina is based on TestNG framework you are able to use well known Java data-providers that returns matrix of Objects and passed to appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement method annotated with @DataProvider that will return Object[][] as test data set:</p>
+<pre><code class="java">@Test(dataProvider = &quot;DP1&quot;)
+public void testMuliplyOperation(int a, int b, int c)
+{
+    int actual = a * b;
+    int expected = c;
+    Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
+}
+
+@DataProvider(parallel = false, name = &quot;DP1&quot;)
+public static Object[][] dataprovider()
+{
+    return new Object[][] {
+        { 2, 3, 6 },
+        { 6, 6, 36 },
+        { 5, 8, 40 } 
+    };
+}
+</code></pre>
+
+<h2 id="xml-parametrization">XML parametrization</h2>
+<p>TestNG supports parametrization from XML files, when you organize tests suites using XML files. Parametarized test method should be annotated with @Parameters({ "a", "b", "c" }) and appopriate method arguments should be listed. Also you have to pass all required parameters from XML suite file:</p>
+<pre><code class="java">@Test
+@Parameters({ &quot;a&quot;, &quot;b&quot;, &quot;c&quot; })
+public void testSubstractOperation(int a, int b, int c) {
+    int actual = Integer.valueOf(a) - Integer.valueOf(b);
+    int expected = Integer.valueOf(c);
+    Assert.assertEquals(actual, expected, &quot;Invalid substract result!&quot;);
+}
+
+...
+&lt;test name=&quot;Substract operation test&quot;&gt;
+    &lt;parameter name=&quot;a&quot; value=&quot;12&quot;/&gt;
+    &lt;parameter name=&quot;b&quot; value=&quot;3&quot;/&gt;
+    &lt;parameter name=&quot;c&quot; value=&quot;9&quot;/&gt;
+    &lt;classes&gt;
+        &lt;class name=&quot;com.qaprosoft.carina.demo.DataprovidersSampleTest&quot;&gt;
+            &lt;methods&gt;
+                &lt;include name=&quot;testSubstractOperation&quot;/&gt;
+            &lt;/methods&gt;
+        &lt;/class&gt;
+    &lt;/classes&gt;
+&lt;/test&gt;
+...
+</code></pre>
+
+<h2 id="xlscsv-data-providers">XLS/CSV data-providers</h2>
+<p>Carina test framework provides possibility to write all tests with data providers in one place include parametrization using external XLS/CSV spreadsheets. First of all you need to declare test class that extends <code>AbstractTest.java</code>:
 After that you can specify data providers tests as follows.</p>
-<h2 id="xls-xlsx-csv-data-provider-parametrization">XLS / XLSX / CSV data provider parametrization</h2>
-<p>For XLS/ XLSX/ CSV spreadsheets look at the following code snippet:</p>
-<pre><code class="java">@Test(dataProvider = &quot;DataProvider&quot;, description = &quot;your_description&quot;)
-    @MethodOwner(owner=&quot;your_name&quot;)
+<pre><code class="java">public class DataprovidersSampleTest extends AbstractTest {
+    @Test(dataProvider = &quot;DataProvider&quot;)
     @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
-    public void testSumOperation(String a, String b, String c)
-    {
+    public void testSumOperation(String a, String b, String c) {
         int actual = Integer.valueOf(a) + Integer.valueOf(b);
         int expected = Integer.valueOf(c);
         Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
     }
-
+}
 </code></pre>
 
-<p>This test uses XLS/ XLSX/ CSV files as data sourse. Every row in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code> . Carina test framework initially defines several data providers methods in <code>AbstractTest.java</code>, which you've extended earlier:</p>
+<p>This test uses XLS/CSV files as data sourse. Every row in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code> . Carina test framework initially defines several data providers methods in <code>AbstractTest.java</code>, which you've extended earlier:</p>
 <ul>
 <li>
 <p>createData method (data provider name = "DataProvider") for common usecases</p>
@@ -519,7 +582,7 @@ After that you can specify data providers tests as follows.</p>
 <p>createDataSingeThread method (data provider name = "SingleDataProvider") for single-thread execution.</p>
 </li>
 </ul>
-<p>To specify XLS/ XLSX/ CSV spreadsheets for test you should declare <code>@XlsDataSourceParameters</code> annotaion and define its parameters:</p>
+<p>To specify XLS/CSV spreadsheets for test you should declare <code>@XlsDataSourceParameters</code> annotaion and define its parameters:</p>
 <ul>
 <li>path - file path located in src/test/resources</li>
 <li>sheet - sheet name</li>
@@ -529,48 +592,6 @@ After that you can specify data providers tests as follows.</p>
 <p>Here you can look at the spreadsheet as a data provider example for your further tests:</p>
 <p><img alt="XLS file - Data Provider - screenshot" src="../img/xlsscreen.png" /></p>
 <p>In TUID column you shoud specify your UID. In further columns you can specify arguments for a test and their values in lower rows. They will be used as parameters in <code>@XlsDataSourceParameters</code>. In this example values of a,b,c arguments were defined in 3 sets of values with different TUID.</p>
-<h2 id="testng-data-provider-parametrization">TestNG data provider parametrization</h2>
-<p>Next lets take a look at widely used TestNG Data Provider parametrization. In this case there are common rules for writing this kind of tests:</p>
-<ul>
-<li>create data-provider method that returns <code>Object[][]</code> and set DataProvider annotation.</li>
-<li>specify data-provider name in <code>@Test</code> annotation</li>
-</ul>
-<p>Example:</p>
-<pre><code class="java">@Test(dataProvider = &quot;DP1&quot;, description = &quot;your_description&quot;)
-    @MethodOwner(owner=&quot;your_name&quot;)
-    public void testMuliplyOperation(int a, int b, int c)
-    {
-        int actual = a * b;
-        int expected = c;
-        Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
-    }
-
-    @DataProvider(parallel = false, name = &quot;DP1&quot;)
-    public static Object[][] dataprovider()
-    {
-        return new Object[][]
-        {
-                { 2, 3, 6 },
-                { 6, 6, 36 },
-                { 5, 8, 40 } };
-    }
-
-</code></pre>
-
-<p>Besides you can use TestNG annotation <code>@Parameters</code> for listig all parameter names as in the following code snippet:</p>
-<pre><code class="java">@Test(description = &quot;your_description&quot;)
-    @MethodOwner(owner=&quot;your_name&quot;)
-    @Parameters(
-    { &quot;a&quot;, &quot;b&quot;, &quot;c&quot; })
-    public void testSubstractOperation(int a, int b, int c)
-    {
-        int actual = Integer.valueOf(a) - Integer.valueOf(b);
-        int expected = Integer.valueOf(c);
-        Assert.assertEquals(actual, expected, &quot;Invalid substract result!&quot;);
-    }
-</code></pre>
-
-<p>All of these tests can be consolidated under single java class as it's shown in our <a href="https://github.com/qaprosoft/carina-demo">demo</a> of Carina test framework, where you can find <code>DataprovidersSampleTest.java</code></p>
                 
                   
                 
