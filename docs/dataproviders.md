@@ -8,7 +8,7 @@ Modern test automation frameworks should support data-driven testing, when you a
 * CSV data-providers
 
 ## Java data-provider
-As far as Carina is based on TestNG framework you are able to use well known Java data-providers that returns matrix of Objects and passed to appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement method annotated with @DataProvider that will return Object[][] as test data set:
+As far as Carina is based on TestNG framework you are able to use well known Java data-providers that returns matrix of Objects and passed to appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement method annotated with `@DataProvider` that will return `Object[][]` as test data set:
 ```java
 @Test(dataProvider = "DP1")
 public void testMuliplyOperation(int a, int b, int c)
@@ -30,7 +30,7 @@ public static Object[][] dataprovider()
 ```
 
 ## XML parametrization
-TestNG supports parametrization from XML files, when you organize tests suites using XML files. Parametarized test method should be annotated with @Parameters({ "a", "b", "c" }) and appopriate method arguments should be listed. Also you have to pass all required parameters from XML suite file:
+TestNG supports parametrization from XML files, when you organize tests suites using XML files. Parametarized test method should be annotated with `@Parameters({ "a", "b", "c" })` and appopriate method arguments should be listed. Also you have to pass all required parameters from XML suite file:
 ```java
 @Test
 @Parameters({ "a", "b", "c" })
