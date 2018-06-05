@@ -515,7 +515,7 @@
 <li>CSV data-providers</li>
 </ul>
 <h2 id="java-data-provider">Java data-provider</h2>
-<p>As far as Carina is based on TestNG framework you are able to use well known Java data-providers that returns matrix of Objects and passed to appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement method annotated with @DataProvider that will return Object[][] as test data set:</p>
+<p>As far as Carina is based on TestNG framework you are able to use well known Java data-providers that returns matrix of Objects and passed to appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement method annotated with <code>@DataProvider</code> that will return <code>Object[][]</code> as test data set:</p>
 <pre><code class="java">@Test(dataProvider = &quot;DP1&quot;)
 public void testMuliplyOperation(int a, int b, int c)
 {
@@ -536,7 +536,7 @@ public static Object[][] dataprovider()
 </code></pre>
 
 <h2 id="xml-parametrization">XML parametrization</h2>
-<p>TestNG supports parametrization from XML files, when you organize tests suites using XML files. Parametarized test method should be annotated with @Parameters({ "a", "b", "c" }) and appopriate method arguments should be listed. Also you have to pass all required parameters from XML suite file:</p>
+<p>TestNG supports parametrization from XML files, when you organize tests suites using XML files. Parametarized test method should be annotated with <code>@Parameters({ "a", "b", "c" })</code> and appopriate method arguments should be listed. Also you have to pass all required parameters from XML suite file:</p>
 <pre><code class="java">@Test
 @Parameters({ &quot;a&quot;, &quot;b&quot;, &quot;c&quot; })
 public void testSubstractOperation(int a, int b, int c) {
