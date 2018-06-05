@@ -12,7 +12,7 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 * API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses are dynamically changed by incoming arguments. 
 
-![Alt text](./docs/img/carina.svg "Carina Overview")
+![Alt text](./docs/img/carina_spave.png "Carina Overview")
 
 ## Documentation
 * [User manual](http://qaprosoft.github.io/carina)
