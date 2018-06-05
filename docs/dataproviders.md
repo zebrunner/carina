@@ -87,4 +87,4 @@ Here you can look at the spreadsheet as a data provider example for your further
 
 ![XLS file - Data Provider - screenshot](./img/xlsscreen.png)
 
-In TUID column you shoud specify your UID. In further columns you can specify arguments for a test and their values in lower rows. They will be used as parameters in `@XlsDataSourceParameters`. In this example values of a,b,c arguments were defined in 3 sets of values with different TUID.
+In TUID column you shoud specify some unique test identifier that will be set in the beginning of test name in test results report. In next columns you can specify arguments for a test and their values in lower rows. They will be used as parameters in `@XlsDataSourceParameters`. In this example values of a,b,c arguments were defined in 3 sets of values with different TUID.
