@@ -15,9 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -39,7 +42,10 @@ final public class Artifacts {
     }
 
     public static void add(String name, String link) {
-        add(name, link, null);
+        Calendar c=new GregorianCalendar();
+        c.add(Calendar.DATE, 30);
+        Date d = c.getTime();
+        add(name, link, d);
     }
 
     public static void add(String name, String link, Date expires_at) {
