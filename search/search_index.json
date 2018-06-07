@@ -217,7 +217,7 @@
         }, 
         {
             "location": "/releases/", 
-            "text": "Release notes\n\n\n5.2.4.97 (2018-06-02)\n\n\nEnhancements\n\n\n\n\n\n\nPublished new article for API automation approach:\nhttp://qaprosoft.github.io/carina/automation/api/\n\n\n\n\n\n\nMobileUtils - migrated tap etc operations onto the TouchOptions etc\nNote: if in your code thera direct references onto the TouchActions-\ntap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.\nExample: 859d1f0\n\n\n\n\n\n\nSplit click operation for separated Web and Mobile actions to minimize negative side-effects\n\n\n\n\n\n\nFixes\n\n\n\n\nminor adjustments in UI operations for invisible elements on browsers\n\n\n\n\n[DEPENDENCIES UPDATES]\n\n\n\n\nio.appium:java-client was updated to official 6.0.0 release\n\n\norg.seleniumhq.selenium:selenium-java updated to 3.12.0", 
+            "text": "Release notes\n\n\n5.2.4.97 (2018-06-02)\n\n\nEnhancements\n\n\n\n\n\n\nPublished new article for API automation approach:\nhttp://qaprosoft.github.io/carina/automation/api/\n\n\n\n\n\n\nMobileUtils - migrated tap etc operations onto the TouchOptions etc\nNote: if in your code thera direct references onto the TouchActions-\ntap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.\nExample: 859d1f0\n\n\n\n\n\n\nSplit click operation for separated Web and Mobile actions to minimize negative side-effects\n\n\n\n\n\n\nFixes\n\n\n\n\nminor adjustments in UI operations for invisible elements on browsers\n\n\n\n\n[DEPENDENCIES UPDATES]\n\n\n io.appium:java-client was updated to official 6.0.0 release\n\n org.seleniumhq.selenium:selenium-java updated to 3.12.0", 
             "title": "Release notes"
         }, 
         {
@@ -227,23 +227,8 @@
         }, 
         {
             "location": "/releases/#52497-2018-06-02", 
-            "text": "", 
+            "text": "Enhancements    Published new article for API automation approach:\nhttp://qaprosoft.github.io/carina/automation/api/    MobileUtils - migrated tap etc operations onto the TouchOptions etc\nNote: if in your code thera direct references onto the TouchActions- tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.\nExample: 859d1f0    Split click operation for separated Web and Mobile actions to minimize negative side-effects    Fixes   minor adjustments in UI operations for invisible elements on browsers   [DEPENDENCIES UPDATES]   io.appium:java-client was updated to official 6.0.0 release  org.seleniumhq.selenium:selenium-java updated to 3.12.0", 
             "title": "5.2.4.97 (2018-06-02)"
-        }, 
-        {
-            "location": "/releases/#enhancements", 
-            "text": "Published new article for API automation approach:\nhttp://qaprosoft.github.io/carina/automation/api/    MobileUtils - migrated tap etc operations onto the TouchOptions etc\nNote: if in your code thera direct references onto the TouchActions- tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.\nExample: 859d1f0    Split click operation for separated Web and Mobile actions to minimize negative side-effects", 
-            "title": "Enhancements"
-        }, 
-        {
-            "location": "/releases/#fixes", 
-            "text": "minor adjustments in UI operations for invisible elements on browsers", 
-            "title": "Fixes"
-        }, 
-        {
-            "location": "/releases/#dependencies-updates", 
-            "text": "io.appium:java-client was updated to official 6.0.0 release  org.seleniumhq.selenium:selenium-java updated to 3.12.0", 
-            "title": "[DEPENDENCIES UPDATES]"
         }
     ]
 }
