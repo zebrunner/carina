@@ -65,6 +65,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                     scrollableContainer);
             if (scrolled) {
                 found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
+            }else{
+                throw new RuntimeException("Desired Time Zone Menu item not found.. ");
             }
         }
         LOGGER.info("Select Time Zone Menu item was clicked: " + found);
