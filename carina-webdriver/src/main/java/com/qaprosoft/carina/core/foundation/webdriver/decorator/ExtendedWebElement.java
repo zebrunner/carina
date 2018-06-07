@@ -68,6 +68,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 // TODO: [VD] removed deprecated constructor and DriverPool import
 public class ExtendedWebElement {
@@ -135,7 +137,8 @@ public class ExtendedWebElement {
     	this.name = name;
     }
     
-    private ExtendedWebElement(WebElement element) {
+    //TODO: make it private in the next release!
+    public ExtendedWebElement(WebElement element) {
         this.element = element;
         
         //read searchContext from not null elements only
@@ -343,7 +346,10 @@ public class ExtendedWebElement {
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			//use available driver to research again...
-			//TODo: handle case with rootBy to be able to refind also lists etc
+			//TODO: handle case with rootBy to be able to refind also lists etc
+    		element = getDriver().findElement(by);
+    	} catch (WebDriverException e) {
+    		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
     		element = getDriver().findElement(by);
     	}
         return element;
@@ -445,8 +451,18 @@ public class ExtendedWebElement {
 	 *            to check element conditions before action
 	 */
     public void click(long timeout, ExpectedCondition<?> waitCondition) {
-    	doAction(ACTION_NAME.CLICK, timeout, waitCondition);
+    	if (isMobile()) {
+    		doAction(ACTION_NAME.TAP, timeout, waitCondition);
+    	} else {
+    		doAction(ACTION_NAME.CLICK, timeout, waitCondition);
+    	}
     }
+    
+	private boolean isMobile() {
+		// TODO: investigating potential class cast exception
+		WebDriver driver = getDriver();
+		return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+	}
 
     /**
      * Double Click on element.
@@ -853,11 +869,12 @@ public class ExtendedWebElement {
 		ExpectedCondition<?> waitCondition;
 
 		if (element != null) {
-			waitCondition = ExpectedConditions.visibilityOf(element);
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
+					ExpectedConditions.visibilityOfElementLocated(getBy()));
 		} else {
 			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		}
-
+		
 		return waitUntil(waitCondition, timeout);
 	}
 
@@ -1219,6 +1236,8 @@ public class ExtendedWebElement {
     
 	public interface ActionSteps {
 		void doClick();
+		
+		void doTap();
 
 		void doDoubleClick();
 
@@ -1266,6 +1285,9 @@ public class ExtendedWebElement {
 		switch (actionName) {
 		case CLICK:
 			actionSteps.doClick();
+			break;
+		case TAP:
+			actionSteps.doTap();
 			break;
 		case DOUBLE_CLICK:
 			actionSteps.doDoubleClick();
@@ -1418,6 +1440,15 @@ public class ExtendedWebElement {
 						throw e;
 					}
 				}
+			}
+			
+			@Override
+			// click for mobile devices
+			public void doTap() {
+				DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+						Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
+
+				element.click();
 			}
 
 			@Override
@@ -1696,11 +1727,11 @@ public class ExtendedWebElement {
     	//generate the most popular wiatCondition to check if element visible or present
     	ExpectedCondition<?> waitCondition = null;
 		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.presenceOfElementLocated(myBy));
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
+					ExpectedConditions.visibilityOf(element), ExpectedConditions.presenceOfElementLocated(myBy));
 		} else {
 			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-	    			ExpectedConditions.presenceOfElementLocated(myBy));
+					ExpectedConditions.presenceOfElementLocated(myBy));
 		}
 		
 		return waitCondition;

@@ -928,8 +928,7 @@ public class DriverHelper {
                                 LocatorFrom, xto, yto);
             }
 
-            String msg = Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
-            Screenshot.capture(drv, msg);
+            Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
         } else {
             Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(), to.getNameWithLocator());
         }
@@ -951,9 +950,7 @@ public class DriverHelper {
             WebDriver drv = getDriver();
             (new Actions(drv)).moveToElement(slider.getElement()).dragAndDropBy(slider.getElement(), moveX, moveY)
                     .build().perform();
-            String msg = Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX),
-                    String.valueOf(moveY));
-            Screenshot.capture(drv, msg);
+			Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
         } else {
             Messager.SLIDER_NOT_MOVED.error(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
         }
