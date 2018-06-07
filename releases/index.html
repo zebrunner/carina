@@ -396,9 +396,65 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Release notes
+      </label>
+    
     <a href="./" title="Release notes" class="md-nav__link md-nav__link--active">
       Release notes
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#52497-2018-06-02" title="5.2.4.97 (2018-06-02)" class="md-nav__link">
+    5.2.4.97 (2018-06-02)
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" title="Enhancements" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixes" title="Fixes" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-updates" title="[DEPENDENCIES UPDATES]" class="md-nav__link">
+    [DEPENDENCIES UPDATES]
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -420,6 +476,49 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#52497-2018-06-02" title="5.2.4.97 (2018-06-02)" class="md-nav__link">
+    5.2.4.97 (2018-06-02)
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" title="Enhancements" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixes" title="Fixes" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-updates" title="[DEPENDENCIES UPDATES]" class="md-nav__link">
+    [DEPENDENCIES UPDATES]
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -434,6 +533,31 @@
                 
                 
                 <h1 id="release-notes">Release notes</h1>
+<h2 id="52497-2018-06-02">5.2.4.97 (2018-06-02)</h2>
+<h3 id="enhancements">Enhancements</h3>
+<ul>
+<li>
+<p>Published new article for API automation approach:
+http://qaprosoft.github.io/carina/automation/api/</p>
+</li>
+<li>
+<p>MobileUtils - migrated tap etc operations onto the TouchOptions etc
+Note: if in your code thera direct references onto the TouchActions-&gt;tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.
+Example: 859d1f0</p>
+</li>
+<li>
+<p>Split click operation for separated Web and Mobile actions to minimize negative side-effects</p>
+</li>
+</ul>
+<h3 id="fixes">Fixes</h3>
+<ul>
+<li>minor adjustments in UI operations for invisible elements on browsers</li>
+</ul>
+<h3 id="dependencies-updates">[DEPENDENCIES UPDATES]</h3>
+<ul>
+<li>io.appium:java-client was updated to official 6.0.0 release</li>
+<li>org.seleniumhq.selenium:selenium-java updated to 3.12.0</li>
+</ul>
                 
                   
                 
