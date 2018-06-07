@@ -2,7 +2,7 @@
 
 
 ## 5.2.4.97 (2018-06-02)
-### Enhancements
+**Enhancements**
 
 * Published new article for API automation approach:
 http://qaprosoft.github.io/carina/automation/api/
@@ -13,10 +13,10 @@ Example: 859d1f0
 
 * Split click operation for separated Web and Mobile actions to minimize negative side-effects
 
-### Fixes
+**Fixes**
 
 * minor adjustments in UI operations for invisible elements on browsers
 
-### [DEPENDENCIES UPDATES]
+**[DEPENDENCIES UPDATES]**
 * io.appium:java-client was updated to official 6.0.0 release
 * org.seleniumhq.selenium:selenium-java updated to 3.12.0
