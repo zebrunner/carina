@@ -180,6 +180,7 @@ When you need to validate response structure regardless of the actual values you
 }
 ```
 Now we need to generate schema (you may use any generator you like for example https://jsonschema.net/).
+IMPORTANT: For now schemas of version draft03 and draft04 are supported only. Please use appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
 In tool like this you need to provide original JSON from response then choose some schema options (allow additional properties in objects, mark current object properties as required, hard-code some expected values, ect) and then generate the schema. Copy-paste generated schema into test resources and you're ready to use it in the test.
 ![API flow](../img/api/schema-generator.png)
 Make sure that you change all flags required to true, after that create new file in resources and place into appropriate endpoint package:
