@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -31,6 +32,7 @@ import org.openqa.selenium.Capabilities;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -42,6 +44,8 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Process
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 public class Device extends RemoteDevice {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
@@ -675,6 +679,71 @@ public class Device extends RemoteDevice {
             LOGGER.debug("Related apps had been already uninstalled or flag uninstall_related_apps is disabled.");
         }
 
+    }
+    
+    /**
+     * Extract logcat log using adb
+     * 
+     * @return logcat log
+     */
+    public String getLogcatLog() {
+        // adb -s UDID logcat -d
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
+        StringBuilder tempStr = new StringBuilder();
+        executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
+        LOGGER.info("Logcat log has been extracted.");
+        LOGGER.debug("Logcat logs: ".concat(tempStr.toString()));
+        return tempStr.toString();
+    }
+    
+    /**
+     * Clear logcat log
+     */
+    public void clearLogcatLog() {
+        // adb -s UDID logcat -c
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
+        executor.execute(cmd);
+        LOGGER.info("Logcat logs were cleared.");
+    }
+    
+    /**
+     * Save logcat log to PC (logs will be uploaded in future)
+     * 
+     * @return saved file
+     */
+    public File saveLogcatLog() {
+        String fileName = ReportContext.getTestDir() + "/logcat.log";
+        String log = getLogcatLog();
+        File file = null;
+        try {
+            file = new File(fileName);
+            FileUtils.writeStringToFile(file, log, Charset.defaultCharset());
+        } catch (IOException e) {
+            LOGGER.info(e);
+            LOGGER.info("Error has been occured during attempt to extract logcat log.");
+        }
+        LOGGER.info("Logcat file path: ".concat(fileName));
+        return file;
+    }
+    
+    /**
+     * Save xml layout of the application 
+     * 
+     * @return saved file
+     */
+    public File saveXML() {
+        String fileName = ReportContext.getTestDir() + "/layout.xml";
+        String pageSource = new DriverHelper().performIgnoreException(() -> DriverPool.getDriver().getPageSource());
+        File file = null;
+        try {
+            file = new File(fileName);
+            FileUtils.writeStringToFile(file, pageSource, Charset.defaultCharset());
+        } catch (IOException e) {
+            LOGGER.info(e);
+            LOGGER.info("Error has been met during attempt to extract xml tree.");
+        }
+        LOGGER.info("XML file path: ".concat(fileName));
+        return file;
     }
 
 }

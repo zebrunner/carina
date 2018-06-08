@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1297,5 +1298,25 @@ public class DriverHelper {
 		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
-
+	
+	/**
+	 * Method to handle SocketException due to okhttp factory initialization (java client 6.*).
+	 * Second execution of the same function works as expected.
+	 *  
+	 * @param supplier
+	 * @return result
+	 */
+	public  <T> T performIgnoreException(Supplier<T> supplier) {
+        try {
+            LOGGER.info("Command will be performed with the exception ignoring");
+            return supplier.get();
+        } catch (WebDriverException e) {
+            LOGGER.info("Webdriver exception has been fired. One more attempt to execute action.");
+            LOGGER.info(supplier.toString());
+            LOGGER.info(e);
+            return supplier.get();
+        }
+        
+    }
+	
 }
