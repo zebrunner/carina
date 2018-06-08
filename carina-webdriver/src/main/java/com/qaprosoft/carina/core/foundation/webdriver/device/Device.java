@@ -44,6 +44,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Process
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
 public class Device extends RemoteDevice {
@@ -732,7 +733,7 @@ public class Device extends RemoteDevice {
      */
     public File saveXML() {
         String fileName = ReportContext.getTestDir() + "/layout.xml";
-        String pageSource = DriverPool.getDriver().getPageSource();
+        String pageSource = new DriverHelper().performIgnoreException(() -> DriverPool.getDriver().getPageSource());
         File file = null;
         try {
             file = new File(fileName);
