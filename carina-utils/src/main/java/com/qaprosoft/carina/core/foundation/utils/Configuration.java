@@ -149,6 +149,8 @@ public class Configuration {
 
         MAX_SCREENSHOOT_HISTORY("max_screen_history"),
 
+        MAX_LOG_FILE_SIZE("max_log_file_size"),
+
         RESULT_SORTING("result_sorting"),
 
         KEEP_ALL_SCREENSHOTS("keep_all_screenshots"),
