@@ -62,6 +62,7 @@ public class AbstractTestListener extends TestArgsListener {
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
         Device device = DevicePool.getDevice();
+        LOGGER.info(String.format("Test will be started on device: %s", device.toString()));
         if (DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(device.getOs())) {
             LOGGER.info("Logcat log will be cleared");
             device.clearLogcatLog();
@@ -212,7 +213,11 @@ public class AbstractTestListener extends TestArgsListener {
         }
         
         // XML layout extraction
-        Artifacts.add("XML", device.saveXML().getPath());
+        if (DriverPool.getDrivers().size() != 0) {
+            // skip for API
+            Artifacts.add("XML", device.saveXML().getPath());
+        }
+        
         
         ReportContext.renameTestDir(test);
 
