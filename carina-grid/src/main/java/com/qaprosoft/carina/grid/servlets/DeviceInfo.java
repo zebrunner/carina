@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.openqa.grid.internal.ExternalSessionKey;
-import org.openqa.grid.internal.Registry;
+import org.openqa.grid.internal.GridRegistry;
 import org.openqa.grid.internal.TestSession;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
@@ -45,7 +45,7 @@ public class DeviceInfo extends RegistryBasedServlet {
         this(null);
     }
 
-    public DeviceInfo(Registry registry) {
+    public DeviceInfo(GridRegistry registry) {
         super(registry);
     }
 

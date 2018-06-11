@@ -898,8 +898,13 @@ public class ExtendedWebElement {
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-				ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText)), timeout);
+		ExpectedCondition<Boolean> textCondition;
+		if (element != null) {
+			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+		} else {
+			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+		}
+		return waitUntil(ExpectedConditions.and(getDefaultCondition(getBy()), textCondition), timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
 //    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 //				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);

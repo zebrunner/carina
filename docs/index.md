@@ -1,12 +1,10 @@
 ![Alt text](img/carina_logo.png "Carina Logo")
 
-Carina Automation Framework
-==================
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
 <B>[TRY DEMO PROJECT NOW](https://github.com/qaprosoft/carina-demo)</B>
 
-![Alt text](img/carina.svg "Carina Overview")
+![Alt text](img/carina_space.png "Carina Overview")
 
 * Carina framework is built on top of most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on specific technology stack.
 
