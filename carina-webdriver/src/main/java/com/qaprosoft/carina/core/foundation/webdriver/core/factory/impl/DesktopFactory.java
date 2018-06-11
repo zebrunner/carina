@@ -86,7 +86,7 @@ public class DesktopFactory extends AbstractFactory {
             restartAll(PREFIX_NIX, RESTART_ALL_SH_PATH);
             throw e;
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Unable to create desktop driver");
+            throw new RuntimeException("Unable to create desktop driver", e);
         }
 
         return driver;
