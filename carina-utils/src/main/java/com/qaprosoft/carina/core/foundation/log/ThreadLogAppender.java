@@ -33,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 public class ThreadLogAppender extends AppenderSkeleton {
     // single buffer for each thread test.log file
     private final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<BufferedWriter>();
-    private long maxBytes = Configuration.getLong(Configuration.Parameter.MAX_LOG_FILE_SIZE);;
+    private long maxMegaBytes = Configuration.getLong(Configuration.Parameter.MAX_LOG_FILE_SIZE);;
     private long bytesWritten;
     @Override
     public void append(LoggingEvent event) {
@@ -111,9 +111,9 @@ public class ThreadLogAppender extends AppenderSkeleton {
 
     private void ensureCapacity(int len) throws IOException {
         long newBytesWritten = this.bytesWritten + len;
-        long maxBytes = this.maxBytes *1024 * 1024;
-        if (newBytesWritten > maxBytes)
-            throw new IOException("File size exceeded: " + newBytesWritten + " > " + this.maxBytes);
+        long maxMegaBytes = this.maxMegaBytes *1024 * 1024;
+        if (newBytesWritten > maxMegaBytes)
+            throw new IOException("test Log file size exceeded core limit: " + newBytesWritten + " > " + this.maxMegaBytes);
         this.bytesWritten = newBytesWritten;
     }
 }
