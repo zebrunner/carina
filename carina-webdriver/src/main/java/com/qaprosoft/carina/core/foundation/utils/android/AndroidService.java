@@ -1056,7 +1056,8 @@ public class AndroidService {
 
         String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
-        if (currentAndroidVersion.contains("7.") || (DevicePool.getDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET)) {
+        if (currentAndroidVersion.contains("7.") ||
+                (DevicePool.getDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
             LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
             workflow = ChangeTimeZoneWorkflow.APK;
         }
@@ -1207,10 +1208,11 @@ public class AndroidService {
             openDateTimeSettingsSetupWizard(true, timeFormat);
 
             String res = getCurrentDeviceFocus();
-            if (res.contains("settings.DateTimeSettingsSetupWizard")) {
-                LOGGER.info("On settings.DateTimeSettingsSetupWizard page");
+
+            if (res.contains("settings.Settings$DateTimeSettingsActivity")) {
+                LOGGER.info("On 'settings.Settings$DateTimeSettingsActivity' page");
             } else {
-                LOGGER.error("Not on settings.DateTimeSettingsSetupWizard page");
+                LOGGER.error("Not on 'settings.Settings$DateTimeSettingsActivity' page");
             }
             DateTimeSettingsPage dtSettingsPage = new DateTimeSettingsPage(getDriver());
             if (!dtSettingsPage.isOpened(3)) {
@@ -1358,8 +1360,7 @@ public class AndroidService {
         }
 
         setSystemTime(timeFormat);
-
-        openApp("com.android.settings/.DateTimeSettingsSetupWizard");
+        openApp("com.android.settings/.Settings\\$DateTimeSettingsActivity");
     }
 
     /**

@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.openqa.grid.common.RegistrationRequest;
-import org.openqa.grid.internal.Registry;
+import org.openqa.grid.internal.GridRegistry;
 import org.openqa.grid.internal.RemoteProxy;
 import org.openqa.grid.web.servlet.RegistryBasedServlet;
 
@@ -46,7 +46,7 @@ public class ProxyInfo extends RegistryBasedServlet {
         this(null);
     }
 
-    public ProxyInfo(Registry registry) {
+    public ProxyInfo(GridRegistry registry) {
         super(registry);
     }
 

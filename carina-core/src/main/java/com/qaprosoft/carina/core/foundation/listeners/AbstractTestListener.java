@@ -15,7 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
@@ -38,13 +45,16 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollecto
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.*;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
+import com.qaprosoft.carina.core.foundation.utils.DateUtils;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
@@ -61,11 +71,6 @@ public class AbstractTestListener extends TestArgsListener {
 
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
-        Device device = DevicePool.getDevice();
-        if (DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(device.getOs())) {
-            LOGGER.info("Logcat log will be cleared");
-            device.clearLogcatLog();
-        }
     }
 
     private void passItem(ITestResult result, Messager messager) {
@@ -203,16 +208,6 @@ public class AbstractTestListener extends TestArgsListener {
 
         Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
-        
-        // device log
-        Device device = DevicePool.getDevice();
-        if (device.getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
-            LOGGER.info("Logcat log will be extracted and added as artifact");
-            Artifacts.add("Logcat", device.saveLogcatLog().getPath());
-        }
-        
-        // XML layout extraction
-        Artifacts.add("XML", device.saveXML().getPath());
         
         ReportContext.renameTestDir(test);
 

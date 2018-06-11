@@ -15,7 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.device;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 
 public class DevicePool {
     private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
@@ -30,10 +34,24 @@ public class DevicePool {
         Long threadId = Thread.currentThread().getId();
         LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
+        // clear logcat log for Android devices
+        device.clearSysLog();
+        
         return device;
     }
 
     public static void deregisterDevice() {
+        // device log
+        Device device = getDevice();
+        File sysLogFile = device.saveSysLog();
+        if (sysLogFile != null) {
+            LOGGER.info("Logcat log will be extracted and added as artifact");
+            Artifacts.add("Logcat", sysLogFile.getPath());
+        }
+        
+        // XML layout extraction
+        Artifacts.add("XML", device.generateUiDump().getPath());
+        
         currentDevice.remove();
     }
 
