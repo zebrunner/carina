@@ -1209,10 +1209,10 @@ public class AndroidService {
 
             String res = getCurrentDeviceFocus();
 
-            if (res.contains("settings.Settings$DateTimeSettingsActivity")) {
-                LOGGER.info("On 'settings.Settings$DateTimeSettingsActivity' page");
+            if (res.contains(".Settings$DateTimeSettingsActivity")) {
+                LOGGER.info("On '.Settings$DateTimeSettingsActivity' page");
             } else {
-                LOGGER.error("Not on 'settings.Settings$DateTimeSettingsActivity' page");
+                LOGGER.error("Not on '.Settings$DateTimeSettingsActivity' page");
             }
             DateTimeSettingsPage dtSettingsPage = new DateTimeSettingsPage(getDriver());
             if (!dtSettingsPage.isOpened(3)) {

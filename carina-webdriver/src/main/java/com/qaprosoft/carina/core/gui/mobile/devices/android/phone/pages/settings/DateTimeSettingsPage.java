@@ -17,12 +17,11 @@ package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.setting
 
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
@@ -44,8 +43,6 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     @FindBy(xpath = "//android.widget.ListView")
     protected ExtendedWebElement scrollableContainer;
 
-    // @FindBy(xpath =
-    // "//android.widget.ListView[@resource-id='com.bamnetworks.mobile.android.gameday.atbat:id/drawer_list_view']//android.widget.TextView[contains(@text,'%s')]")
     @FindBy(xpath = "//android.widget.TextView[contains(@text,'%s')]")
     protected ExtendedWebElement tzSelectionBase;
 
@@ -53,6 +50,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     protected ExtendedWebElement nextButton;
 
     protected static final String TIMEZONE_TEXT_BASE = "//android.widget.TextView[contains(@text,'%s')]";
+    protected static final String SELECT_TIME_ZONE_TEXT = "Select time zone";
 
     /**
      * openTimeZoneSetting
@@ -60,9 +58,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     public void openTimeZoneSetting() {
         boolean found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
         if (!found) {
-            boolean scrolled = MobileUtils.swipe(
-                    selectTimeZone,
-                    scrollableContainer);
+            boolean scrolled = AndroidUtils.scroll(SELECT_TIME_ZONE_TEXT, scrollableContainer).isElementPresent();
             if (scrolled) {
                 found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
             } else {
@@ -89,15 +85,11 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         // TODO: Think how to cover GMT+3:00 instead of GMT+03:00 on some devices.
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
-            boolean scrolled = MobileUtils.swipe(
-                    tzSelectionBase.format(tz),
-                    scrollableContainer, defaultSwipeTime);
+            boolean scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
             if (!scrolled) {
                 LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
                 defaultSwipeTime = 30;
-                scrolled = MobileUtils.swipe(
-                        tzSelectionBase.format(tz),
-                        scrollableContainer, defaultSwipeTime);
+                scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
             }
             if (scrolled) {
                 if (timezone.isEmpty()) {
@@ -112,9 +104,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                     }
                     if (!multiTimezoneText) {
                         LOGGER.info("Searching for " + timezone);
-                        scrolled = MobileUtils.swipe(
-                                tzSelectionBase.format(timezone),
-                                scrollableContainer, defaultSwipeTime);
+                        scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
                         if (scrolled) {
                             List<ExtendedWebElement> elements = findExtendedWebElements(By.xpath(String.format(TIMEZONE_TEXT_BASE, tz)), 1);
                             LOGGER.info("Found '" + tz + "' " + elements.size() + " times.");
@@ -124,9 +114,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                             selected = true;
                         } else {
                             LOGGER.error("Did not find timezone by timezone text: " + timezone);
-                            scrolled = MobileUtils.swipe(
-                                    tzSelectionBase.format(tz),
-                                    scrollableContainer, defaultSwipeTime);
+                            scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
                             if (scrolled) {
                                 LOGGER.info("Select timezone by GMT: " + tz);
                                 tzSelectionBase.format(tz).click();
@@ -188,7 +176,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @return boolean
      */
     private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
-        boolean scrolled = MobileUtils.swipe(tzSelectionBase.format(timezone), scrollableContainer, defaultSwipeTime);
+        boolean scrolled = AndroidUtils.scroll(timezone, scrollableContainer).isElementPresent();
         if (scrolled) {
             LOGGER.info("Select timezone by TimeZone text: " + timezone);
             tzSelectionBase.format(timezone).click();
