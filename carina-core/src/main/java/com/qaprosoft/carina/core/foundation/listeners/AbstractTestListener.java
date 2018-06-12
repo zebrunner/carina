@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,6 +56,7 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
@@ -208,6 +210,23 @@ public class AbstractTestListener extends TestArgsListener {
 
         Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
+        
+        // device log
+        Device device = DevicePool.getDevice();
+        if (!device.isNull()) {
+            LOGGER.info("Device isn't null additional artifacts will be extracted.");
+            File sysLogFile = device.saveSysLog();
+            if (sysLogFile != null) {
+                LOGGER.info("Logcat log will be extracted and added as artifact");
+                Artifacts.add("Logcat", sysLogFile.getPath());
+            }
+
+            // XML layout extraction
+            File uiDumpFile = device.generateUiDump();
+            if (uiDumpFile != null) {
+                Artifacts.add("XML", uiDumpFile.getPath());
+            }
+        }
         
         ReportContext.renameTestDir(test);
 
