@@ -43,6 +43,9 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     @FindBy(xpath = "//android.widget.ListView")
     protected ExtendedWebElement scrollableContainer;
 
+    @FindBy(className = "android.widget.ListView")
+    protected ExtendedWebElement scrollableContainerByClassName;
+
     @FindBy(xpath = "//android.widget.TextView[contains(@text,'%s')]")
     protected ExtendedWebElement tzSelectionBase;
 
@@ -58,7 +61,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     public void openTimeZoneSetting() {
         boolean found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
         if (!found) {
-            boolean scrolled = AndroidUtils.scroll(SELECT_TIME_ZONE_TEXT, scrollableContainer).isElementPresent();
+            boolean scrolled = AndroidUtils.scroll(SELECT_TIME_ZONE_TEXT, scrollableContainerByClassName,
+                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
             if (scrolled) {
                 found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
             } else {
@@ -85,11 +89,13 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         // TODO: Think how to cover GMT+3:00 instead of GMT+03:00 on some devices.
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
-            boolean scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
+            boolean scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
+                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
             if (!scrolled) {
                 LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
                 defaultSwipeTime = 30;
-                scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
+                scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
+                        AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
             }
             if (scrolled) {
                 if (timezone.isEmpty()) {
@@ -104,7 +110,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                     }
                     if (!multiTimezoneText) {
                         LOGGER.info("Searching for " + timezone);
-                        scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
+                        scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
+                                AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
                         if (scrolled) {
                             List<ExtendedWebElement> elements = findExtendedWebElements(By.xpath(String.format(TIMEZONE_TEXT_BASE, tz)), 1);
                             LOGGER.info("Found '" + tz + "' " + elements.size() + " times.");
@@ -114,7 +121,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
                             selected = true;
                         } else {
                             LOGGER.error("Did not find timezone by timezone text: " + timezone);
-                            scrolled = AndroidUtils.scroll(tz, scrollableContainer).isElementPresent();
+                            scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
+                                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
                             if (scrolled) {
                                 LOGGER.info("Select timezone by GMT: " + tz);
                                 tzSelectionBase.format(tz).click();
@@ -176,7 +184,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @return boolean
      */
     private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
-        boolean scrolled = AndroidUtils.scroll(timezone, scrollableContainer).isElementPresent();
+        boolean scrolled = AndroidUtils.scroll(timezone, scrollableContainerByClassName,
+                AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
         if (scrolled) {
             LOGGER.info("Select timezone by TimeZone text: " + timezone);
             tzSelectionBase.format(timezone).click();
