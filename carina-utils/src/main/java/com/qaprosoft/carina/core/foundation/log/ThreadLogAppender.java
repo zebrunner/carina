@@ -21,11 +21,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * This appender log groups test outputs by test method/test thread so they don't mess up each other even they runs in parallel.
@@ -33,7 +34,6 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 public class ThreadLogAppender extends AppenderSkeleton {
     // single buffer for each thread test.log file
     private final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<BufferedWriter>();
-    private long maxMegaBytes = Configuration.getLong(Configuration.Parameter.MAX_LOG_FILE_SIZE);;
     private long bytesWritten;
     @Override
     public void append(LoggingEvent event) {
@@ -111,9 +111,9 @@ public class ThreadLogAppender extends AppenderSkeleton {
 
     private void ensureCapacity(int len) throws IOException {
         long newBytesWritten = this.bytesWritten + len;
-        long maxMegaBytes = this.maxMegaBytes *1024 * 1024;
+		long maxMegaBytes = Configuration.getLong(Parameter.MAX_LOG_FILE_SIZE) * 1024 * 1024;
         if (newBytesWritten > maxMegaBytes)
-            throw new IOException("test Log file size exceeded core limit: " + newBytesWritten + " > " + this.maxMegaBytes);
+            throw new IOException("test Log file size exceeded core limit: " + newBytesWritten + " > " + maxMegaBytes);
         this.bytesWritten = newBytesWritten;
     }
 }
