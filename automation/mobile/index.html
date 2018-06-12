@@ -89,7 +89,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <a href="#for-android" tabindex="1" class="md-skip">
+      <a href="#mobile-special-requirements" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -348,15 +348,71 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#for-android" title="For Android:" class="md-nav__link">
-    For Android:
+  <a href="#mobile-special-requirements" title="Mobile special requirements:" class="md-nav__link">
+    Mobile special requirements:
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#for-ios" title="For iOS:" class="md-nav__link">
-    For iOS:
+  <a href="#android-special-requirements" title="Android special requirements:" class="md-nav__link">
+    Android special requirements:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ios-special-requirements" title="iOS special requirements:" class="md-nav__link">
+    iOS special requirements:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mobile-config-properties" title="Mobile config properties" class="md-nav__link">
+    Mobile config properties
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-for-android-of-_configproperties" title="Example for Android of _config.properties:" class="md-nav__link">
+    Example for Android of _config.properties:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-for-ios-of-_configproperties" title="Example for iOS of _config.properties:" class="md-nav__link">
+    Example for iOS of _config.properties:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-page-objects" title="Implementation of Page Objects:" class="md-nav__link">
+    Implementation of Page Objects:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-find-locators-for-android-application" title="How to find locators for Android application" class="md-nav__link">
+    How to find locators for Android application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-find-locators-for-ios-application" title="How to find locators for iOS application" class="md-nav__link">
+    How to find locators for iOS application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-tests" title="Implementation of tests" class="md-nav__link">
+    Implementation of tests
   </a>
   
 </li>
@@ -456,15 +512,71 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#for-android" title="For Android:" class="md-nav__link">
-    For Android:
+  <a href="#mobile-special-requirements" title="Mobile special requirements:" class="md-nav__link">
+    Mobile special requirements:
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#for-ios" title="For iOS:" class="md-nav__link">
-    For iOS:
+  <a href="#android-special-requirements" title="Android special requirements:" class="md-nav__link">
+    Android special requirements:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ios-special-requirements" title="iOS special requirements:" class="md-nav__link">
+    iOS special requirements:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mobile-config-properties" title="Mobile config properties" class="md-nav__link">
+    Mobile config properties
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-for-android-of-_configproperties" title="Example for Android of _config.properties:" class="md-nav__link">
+    Example for Android of _config.properties:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-for-ios-of-_configproperties" title="Example for iOS of _config.properties:" class="md-nav__link">
+    Example for iOS of _config.properties:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-page-objects" title="Implementation of Page Objects:" class="md-nav__link">
+    Implementation of Page Objects:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-find-locators-for-android-application" title="How to find locators for Android application" class="md-nav__link">
+    How to find locators for Android application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-find-locators-for-ios-application" title="How to find locators for iOS application" class="md-nav__link">
+    How to find locators for iOS application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-of-tests" title="Implementation of tests" class="md-nav__link">
+    Implementation of tests
   </a>
   
 </li>
@@ -490,7 +602,19 @@
                 
                   <h1>Mobile automation</h1>
                 
-                <p>We could provide any Appium capabilty in <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing description for the most popular mobile capabilities:</p>
+                <p>Carina framework provides useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through <a href="http://qaprosoft.github.io/carina/automation/web/">Web automation article</a>.</p>
+<h3 id="mobile-special-requirements">Mobile special requirements:</h3>
+<p>To run mobile tests <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before test run.</b></p>
+<h3 id="android-special-requirements">Android special requirements:</h3>
+<p>1) Android SDK(part of <a href="https://developer.android.com/studio/">Android Studio</a>) is important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). 
+2) Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
+Hint: sometimes (especially on Mac) you need to add paths to important folders inside sdk, such as “platform-tools” (here is ADB located), “tools” and “build-tools”(here is aapt located).
+3) .apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.</p>
+<h3 id="ios-special-requirements">iOS special requirements:</h3>
+<p>1) <a href="https://developer.apple.com/xcode/">Xcode</a> is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.
+4) Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correct, but automation on simulator is free. On the other hand, the license is needed to work with the real device.</p>
+<h3 id="mobile-config-properties">Mobile config properties</h3>
+<p>We could provide any Appium capabilty in <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing description for the most popular mobile capabilities:</p>
 <table>
     <tr>
         <th>Attribute</th>
@@ -596,28 +720,122 @@
     </tr>
 </table>
 
-<h3 id="for-android">For Android:</h3>
-<pre><code>#=============== Android Mobile ======================#
-capabilities.deviceName=Samsung_Galaxy_J5
-capabilities.app=s3://qaprosoft.com/android/myapk.*-release.apk
-capabilities.skipUnlock=true
-capabilities.noSign=true
+<p><b>Important:</b>
+- though it’s not necessary to run Selenium, seleniumum_host must be defined.
+- file _config.properties should be located in src/main/resources</p>
+<h3 id="example-for-android-of-_configproperties">Example for Android of _config.properties:</h3>
+<pre><code>#=====================================================#
+#================= Configuration v2 ==================#
+#=====================================================#
+
+selenium_host=http://localhost:4723/wd/hub
+extra_selenium_driver_host=http://localhost:4444/wd/hub
+
+#============ Android Local Mobile ===================#
+
+##for Android 7+ use uiautomator2 instead of Appium
 capabilities.automationName=uiautomator2
-capabilities.newCommandTimeout=180
+capabilities.appPackage=
+capabilities.deviceName=Nexus_6
+capabilities.udid=emulator-5554
+capabilities.noSign=true
+capabilities.deviceType=phone
+capabilities.app=/Users/{user}/qaprosoft/mmf/test-app.apk
 capabilities.platformName=ANDROID
 capabilities.autoGrantPermissions=true
 #=====================================================#
 </code></pre>
 
-<h3 id="for-ios">For iOS:</h3>
-<pre><code>#=================== iOS Mobile ======================#
-capabilities.autoAcceptAlerts=true
-capabilities.app=/opt/apk/my-apk.app
+<p><b>Note:</b>
+To get device’s unique id (UDID) command “adb devices” is used. This command provides a list of devices attached with their UDIDs. For real device it will look like “759b543c” (can be shorter or longer) and for emulator it will be like  “emulator-5554”.</p>
+<h3 id="example-for-ios-of-_configproperties">Example for iOS of _config.properties:</h3>
+<pre><code>#=====================================================#
+#================= Configuration v2 ==================#
+#=====================================================#
+
+selenium_host=http://localhost:4723/wd/hub
+extra_selenium_driver_host=http://localhost:4444/wd/hub
+
+#======== Local Run for iOS Mobile ===============#
+capabilities.app=/Users/{user}/qaprosoft/mmf/TestApp-iphonesimulator.app
+capabilities.platformName=iOS
+capabilities.deviceName=iPhone X
+capabilities.platform=iOS
+capabilities.deviceType=phone
+capabilities.platformVersion=11.4
 capabilities.automationName=XCUITest
-capabilities.newCommandTimeout=180
-capabilities.platformName=IOS
+capabilities.udid=D85FF1CD-D95F-4B78-A007-77A11EBD3ABB
+capabilities.newCommandTimeout=1800
 #=====================================================#
 </code></pre>
+
+<p><b>Note:</b>
+To get device’s unique id (UDID) for emulator command “xcrun simctl list” is useful. It will show the list of simulators with there names, iOS versions, udids and statuses (shutdown or booted). 
+To get UDID from real device you have to plug your phone into a computer and copy it out of iTunes:
+1) Launch iTunes and connect your iPhone.
+2) In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
+3) Reveal the Identifier by clicking on Serial Number.</p>
+<h3 id="implementation-of-page-objects">Implementation of Page Objects:</h3>
+<p>The main idea is the same as in <a href="http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects">web-testing</a> except that css isn’t used in Mobile. 
+ExtendedWebElement(Carina’s implementation of WebElement) is used instead of WebElement and it has methods similar to those that WebElement has but more reliable and convenient.
+<b>Important</b>:
+ - Page should extends com.qaprosoft.carina.core.gui.AbstractPage
+ - Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
+ - Locate Page Object classes in src/main/java package</p>
+<h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
+<p>To obtain locaters of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
+Example:</p>
+<pre><code> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
+ private ExtendedWebElement input;
+</code></pre>
+
+<h3 id="how-to-find-locators-for-ios-application">How to find locators for iOS application</h3>
+<p>To obtain locaters of web elements from iOS app different programs are used, such as GUI Appium itself and convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
+To faster work @Predicate is used. With predicates complicate “xpaths” can’t be used, but “id”, “name”, “className” and etc. search are sufficient. 
+Example:</p>
+<pre><code>@FindBy(xpath = &quot;name = 'DONE'&quot;)
+@Predicate
+protected ExtendedWebElement doneButton;
+</code></pre>
+
+<p>Another possibility to find element is to use @ClassShain annotation.
+Example:</p>
+<pre><code>@FindBy(xpath = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
+@ClassChain
+protected ExtendedWebElement developerText;
+</code></pre>
+
+<h3 id="implementation-of-tests">Implementation of tests</h3>
+<p>Carina framework uses TestNG for test organization. In general test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
+<pre><code>public class SampleTest extends AbstractTest {
+
+    String name = &quot;My name&quot;;
+    String carName = &quot;Mercedes&quot;;
+
+
+    @Test()
+    public void sendName() {
+        FirstPage  firstPage = new FirstPage(getDriver());
+        GoogleTestPage googleTestPage = new GoogleTestPage(getDriver());
+        MyWayOfHelloPage myWayOfHelloPage = new MyWayOfHelloPage(getDriver());
+                firstPage.clickOnGooleButton();
+                googleTestPage.setName(name);
+                googleTestPage.clickOnSpinner();
+                googleTestPage.selectCar(carName);
+                googleTestPage.clickOnSendYourNameButton();
+                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), “Assert message” );
+                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), “Assert message” );
+
+    }
+
+}
+</code></pre>
+
+<p><b>Important:</b>
+-Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
+-Test method should start with org.testng.annotations.Test annotation
+-Use getDriver() method to get driver instance in test
+-Locate tests in src/test/java source folder</p>
                 
                   
                 
