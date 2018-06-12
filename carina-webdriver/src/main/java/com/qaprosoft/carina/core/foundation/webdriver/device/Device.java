@@ -757,12 +757,24 @@ public class Device extends RemoteDevice {
      * @return saved file
      */
     public File generateUiDump() {
+        
+        if (isNull()) {
+            return null;
+        }
+        
+        if (DriverPool.getDrivers().size() == 0) {
+            LOGGER.debug("There is no active drivers in the pool.");
+            return null;
+        }
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
+        
+        
         WebDriver driver = DriverPool.getDriver();
-        String screenshotName = Screenshot.captureFailure(driver, "Generate UI dump");
+        DriverHelper helper = new DriverHelper();
+        String screenshotName = helper.performIgnoreException(() -> Screenshot.captureFailure(driver, "Generate UI dump"));
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
-        String pageSource = new DriverHelper().performIgnoreException(() -> driver.getPageSource());
+        String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
         File file = null;
         try {
             file = new File(fileName);
