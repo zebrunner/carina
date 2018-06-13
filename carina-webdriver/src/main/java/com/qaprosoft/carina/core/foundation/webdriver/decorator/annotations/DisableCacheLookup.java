@@ -22,5 +22,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.TYPE })
-public @interface DisableCachingForcibly {
+public @interface DisableCacheLookup {
 }
