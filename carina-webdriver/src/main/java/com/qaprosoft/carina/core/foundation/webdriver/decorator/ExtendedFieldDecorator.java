@@ -36,8 +36,6 @@ import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCachingForcibly;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingElementListHandler;
@@ -84,9 +82,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
             return proxyForLocator(loader, field, locator);
         }
         if (AbstractUIObject.class.isAssignableFrom(field.getType())) {
-            if(field.isAnnotationPresent(DisableCachingForcibly.class)) {
-                ((ExtendedElementLocator) locator).setShouldDisableCachingForcibly(true);
-            }
             return proxyForAbstractUIObject(loader, field, locator);
         } else if (List.class.isAssignableFrom(field.getType())) {
             Type listType = getListType(field);
