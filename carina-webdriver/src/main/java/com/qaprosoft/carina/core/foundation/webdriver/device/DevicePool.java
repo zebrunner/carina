@@ -30,6 +30,9 @@ public class DevicePool {
         Long threadId = Thread.currentThread().getId();
         LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
+        // clear logcat log for Android devices
+        device.clearSysLog();
+        
         return device;
     }
 

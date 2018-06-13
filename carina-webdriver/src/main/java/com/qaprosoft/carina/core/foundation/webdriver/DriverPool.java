@@ -264,9 +264,11 @@ public final class DriverPool {
 
         try {
             LOGGER.debug("Driver exiting..." + name);
-            deregisterDriver(name);
+//          driver deregistration should be performed a bit later than device deregistration
+//          since there some driver related action on method deregister device
             DevicePool.deregisterDevice();
-
+            deregisterDriver(name);
+            
             drv.quit();
 
             LOGGER.debug("Driver exited..." + name);

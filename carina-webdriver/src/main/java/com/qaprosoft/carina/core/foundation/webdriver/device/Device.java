@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -46,6 +47,7 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 public class Device extends RemoteDevice {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
@@ -682,11 +684,20 @@ public class Device extends RemoteDevice {
     }
     
     /**
-     * Extract logcat log using adb
+     * Extract sys log using adb
      * 
-     * @return logcat log
+     * @return sys log
      */
-    public String getLogcatLog() {
+    public String getSysLog() {
+        if (isNull()) {
+            return "";
+        }
+        
+        if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
+            LOGGER.debug("Logcat log is empty since device is not Android");
+            return "";
+        }
+        
         // adb -s UDID logcat -d
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
         StringBuilder tempStr = new StringBuilder();
@@ -697,9 +708,18 @@ public class Device extends RemoteDevice {
     }
     
     /**
-     * Clear logcat log
+     * Clear sys log
      */
-    public void clearLogcatLog() {
+    public void clearSysLog() {
+        if (isNull()) {
+            return;
+        }
+        
+        if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
+            LOGGER.debug("Logcat log won't be cleared since device is not Android");
+            return;
+        }
+        LOGGER.info(String.format("Test will be started on device: %s", getName()));
         // adb -s UDID logcat -c
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
         executor.execute(cmd);
@@ -707,13 +727,18 @@ public class Device extends RemoteDevice {
     }
     
     /**
-     * Save logcat log to PC (logs will be uploaded in future)
+     * Save logcat log for Android (logs will be uploaded in future as artifacts)
+     * TODO: for iOS
      * 
      * @return saved file
      */
-    public File saveLogcatLog() {
+    public File saveSysLog() {
         String fileName = ReportContext.getTestDir() + "/logcat.log";
-        String log = getLogcatLog();
+        String log = getSysLog();
+        if (log.isEmpty()) {
+            return null;
+        }
+        
         File file = null;
         try {
             file = new File(fileName);
@@ -731,9 +756,25 @@ public class Device extends RemoteDevice {
      * 
      * @return saved file
      */
-    public File saveXML() {
-        String fileName = ReportContext.getTestDir() + "/layout.xml";
-        String pageSource = new DriverHelper().performIgnoreException(() -> DriverPool.getDriver().getPageSource());
+    public File generateUiDump() {
+        
+        if (isNull()) {
+            return null;
+        }
+        
+        if (DriverPool.getDrivers().size() == 0) {
+            LOGGER.debug("There is no active drivers in the pool.");
+            return null;
+        }
+        // TODO: investigate how to connect screenshot with xml dump: screenshot
+        // return File -> Zip png and uix or move this logic to zafira
+        
+        
+        WebDriver driver = DriverPool.getDriver();
+        DriverHelper helper = new DriverHelper();
+        String screenshotName = helper.performIgnoreException(() -> Screenshot.captureFailure(driver, "Generate UI dump"));
+        String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
+        String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
         File file = null;
         try {
             file = new File(fileName);
