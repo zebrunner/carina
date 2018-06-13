@@ -36,12 +36,13 @@ final public class Artifacts {
         return testArtifacts.get();
     }
 
-    public static void add(String name, String link) {
-        Calendar c=new GregorianCalendar();
-        c.add(Calendar.DATE, 30);
-        Date d = c.getTime();
-        add(name, link, d);
-    }
+	public static void add(String name, String link) {
+		/*
+		 * Calendar c=new GregorianCalendar(); c.add(Calendar.DATE, 30); Date d
+		 * = c.getTime(); add(name, link, d);
+		 */
+		add(name, link, null);
+	}
 
     public static void add(String name, String link, Date expires_at) {
         LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expires_at: " + expires_at);
