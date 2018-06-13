@@ -218,13 +218,14 @@ public class AbstractTestListener extends TestArgsListener {
             File sysLogFile = device.saveSysLog();
             if (sysLogFile != null) {
                 LOGGER.info("Logcat log will be extracted and added as artifact");
-                Artifacts.add("Logcat", sysLogFile.getPath());
+                Artifacts.add("Logcat", ReportContext.getSysLogLink(test));
             }
 
             // XML layout extraction
             File uiDumpFile = device.generateUiDump();
             if (uiDumpFile != null) {
-                Artifacts.add("XML", uiDumpFile.getPath());
+                String[] pathParts = uiDumpFile.getPath().split("\\/");
+                Artifacts.add("XML", ReportContext.getUIxLink(test, pathParts[pathParts.length - 1]));
             }
         }
         
