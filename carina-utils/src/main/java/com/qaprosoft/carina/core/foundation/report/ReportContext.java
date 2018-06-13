@@ -463,6 +463,42 @@ public class ReportContext {
 
         return link;
     }
+    
+//    TODO: refactor as soon as getLogLink will be updated
+    public static String getSysLogLink(String test) {
+        String link = "";
+        File testLogFile = new File(ReportContext.getTestDir() + "/" + "logcat.log");
+        if (!testLogFile.exists()) {
+            // no test.log file at all
+            return link;
+        }
+
+        if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+            link = String.format("%s/%d/%s/logcat.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+        } else {
+            link = String.format("file://%s/%s/logcat.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+        }
+        LOGGER.info("Extracted syslog link: ".concat(link));
+        return link;
+    }
+    
+    // TODO: refactor as soon as getLogLink will be updated
+    public static String getUIxLink(String test, String uixFileName) {
+        String link = "";
+        File testLogFile = new File(ReportContext.getTestDir() + "/" + uixFileName);
+        if (!testLogFile.exists()) {
+            // no test.log file at all
+            return link;
+        }
+
+        if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
+            link = String.format("%s/%d/%s/".concat(uixFileName), Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+        } else {
+            link = String.format("file://%s/%s/".concat(uixFileName), baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+        }
+        LOGGER.info("Extracted uix link: ".concat(link));
+        return link;
+    }
 
     /**
      * Returns URL for performance report.
