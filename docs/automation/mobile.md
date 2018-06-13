@@ -2,16 +2,17 @@ Carina framework provides useful and elegant way of Mobile (Android and iOS) Tes
 
 ### Mobile special requirements:
 To run mobile tests [Appium](http://appium.io/) is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before test run.</b>
+ ![Page Object Pattern](../img/appium_design.png)
 	
 ### Android special requirements:	
-1) Android SDK(part of [Android Studio](https://developer.android.com/studio/)) is important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). 
-2) Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
+1. Android SDK(part of [Android Studio](https://developer.android.com/studio/)) is important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). 
+2. Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
 Hint: sometimes (especially on Mac) you need to add paths to important folders inside sdk, such as “platform-tools” (here is ADB located), “tools” and “build-tools”(here is aapt located).
-3) .apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.
+3. .apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.
 
 ### iOS special requirements:
-1) [Xcode](https://developer.apple.com/xcode/) is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.
-4) Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correct, but automation on simulator is free. On the other hand, the license is needed to work with the real device.
+1. [Xcode](https://developer.apple.com/xcode/) is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.
+2. Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correct, but automation on simulator is free. On the other hand, the license is needed to work with the real device.
 
 ### Mobile config properties
 We could provide any Appium capabilty in **config.properties** file using capabilities.name=value format. In the table below we are providing description for the most popular mobile capabilities:
@@ -122,8 +123,8 @@ We could provide any Appium capabilty in **config.properties** file using capabi
 </table>
 
 <b>Important:</b>
-- though it’s not necessary to run Selenium, seleniumum_host must be defined.
-- file _config.properties should be located in src/main/resources
+* though it’s not necessary to run Selenium, seleniumum_host must be defined.
+* file _config.properties should be located in src/main/resources
 
 ### Example for Android of _config.properties:
 ```
@@ -177,17 +178,17 @@ capabilities.newCommandTimeout=1800
 <b>Note:</b>
 To get device’s unique id (UDID) for emulator command “xcrun simctl list” is useful. It will show the list of simulators with there names, iOS versions, udids and statuses (shutdown or booted). 
 To get UDID from real device you have to plug your phone into a computer and copy it out of iTunes:
-1) Launch iTunes and connect your iPhone.
-2) In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
-3) Reveal the Identifier by clicking on Serial Number.
+1. Launch iTunes and connect your iPhone.
+2. In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
+3. Reveal the Identifier by clicking on Serial Number.
 
 ### Implementation of Page Objects:
 The main idea is the same as in [web-testing](http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects) except that css isn’t used in Mobile. 
 ExtendedWebElement(Carina’s implementation of WebElement) is used instead of WebElement and it has methods similar to those that WebElement has but more reliable and convenient.
 <b>Important</b>:
- - Page should extends com.qaprosoft.carina.core.gui.AbstractPage
- - Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
- - Locate Page Object classes in src/main/java package
+ * Page should extends com.qaprosoft.carina.core.gui.AbstractPage
+ * Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
+ * Locate Page Object classes in src/main/java package
 
 ### How to find locators for Android application
 To obtain locaters of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
@@ -244,7 +245,7 @@ public class SampleTest extends AbstractTest {
 ```
 
 <b>Important:</b>
--Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
--Test method should start with org.testng.annotations.Test annotation
--Use getDriver() method to get driver instance in test
--Locate tests in src/test/java source folder
+* Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
+* Test method should start with org.testng.annotations.Test annotation
+* Use getDriver() method to get driver instance in test
+* Locate tests in src/test/java source folder
