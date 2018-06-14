@@ -23,11 +23,14 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
+ * Artifacts - represented by logs, screenshots, videos recorder by tests.
  * 
  * @author akhursevich
  */
 final public class Artifacts {
-	protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
+	
+	private static final Logger LOGGER = Logger.getLogger(Artifacts.class);
+	
 	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 
 	public static void clearArtifacts() {
@@ -42,8 +45,15 @@ final public class Artifacts {
 		add(name, link, R.CONFIG.getInt("artifacts_expiration_seconds"));
 	}
 
-	public static void add(String name, String link, Integer expiresInSeconds) {
-		LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expiresInSeconds: " + expiresInSeconds);
+	/**
+	 * Adds new artifact to test context.
+	 * 
+	 * @param name - artifact name: Log, Demo
+	 * @param link - URL to the artifact
+	 * @param expiresIn - expiration in seconds
+	 */
+	public static void add(String name, String link, Integer expiresIn) {
+		LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expiresIn: " + expiresIn);
 
 		if (name == null || name.isEmpty()) {
 			return;
@@ -53,6 +63,6 @@ final public class Artifacts {
 			return;
 		}
 
-		testArtifacts.get().add(new TestArtifactType(name, link, expiresInSeconds));
+		testArtifacts.get().add(new TestArtifactType(name, link, expiresIn));
 	}
 }
