@@ -354,6 +354,28 @@ public class ExtendedWebElement {
     	}
         return element;
     }
+    
+    private WebElement detectElement() {
+        //do not return without element initialization!
+    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
+    	WebElement el = null;
+    	try {
+    		if (searchContext != null) {
+    			el = searchContext.findElement(by);
+    		} else {
+    			el = getDriver().findElement(by);
+    		}
+		} catch (Exception e) {
+			LOGGER.debug("catched exception: ", e);
+			//use available driver to research again...
+			//TODO: handle case with rootBy to be able to refind also lists etc
+    	}
+    	
+    	if (el != null) {
+    		element = el;
+    	}
+        return el;
+    }
 
     public void setElement(WebElement element) {
         this.element = element;
@@ -1376,7 +1398,7 @@ public class ExtendedWebElement {
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition,
 			Object...inputArgs) {
-		if (waitCondition != null) {
+		if (waitCondition != null && detectElement() == null) {
 			//do verification only if waitCondition is fine
 			if (!waitUntil(waitCondition, timeout)) {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
