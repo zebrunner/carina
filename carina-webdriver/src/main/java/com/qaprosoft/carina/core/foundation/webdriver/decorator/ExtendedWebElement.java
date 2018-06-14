@@ -342,7 +342,12 @@ public class ExtendedWebElement {
         //do not return without element initialization!
     	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
     	try {
-    		element = searchContext.findElement(by);
+    		if (searchContext != null) {
+    			//TODO: use-case when format method is used. Need investigate howto init context in this case as well
+    			element = searchContext.findElement(by);
+    		} else {
+    			element = getDriver().findElement(by);	
+    		}
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			//use available driver to research again...
