@@ -719,6 +719,12 @@ public class Device extends RemoteDevice {
             LOGGER.debug("Logcat log won't be cleared since device is not Android");
             return;
         }
+
+		if (!isStfEnabled()) {
+			//do not use new features if execution is not inside approved cloud
+			return;
+		}
+        
         LOGGER.info(String.format("Test will be started on device: %s", getName()));
         // adb -s UDID logcat -c
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
@@ -733,6 +739,11 @@ public class Device extends RemoteDevice {
      * @return saved file
      */
     public File saveSysLog() {
+		if (!isStfEnabled()) {
+			//do not use new features if execution is not inside approved cloud
+			return null;
+		}
+		
         String fileName = ReportContext.getTestDir() + "/logcat.log";
         String log = getSysLog();
         if (log.isEmpty()) {
@@ -757,10 +768,14 @@ public class Device extends RemoteDevice {
      * @return saved file
      */
     public File generateUiDump() {
-        
         if (isNull()) {
             return null;
         }
+        
+		if (!isStfEnabled()) {
+			//do not use new features if execution is not inside approved cloud
+			return null;
+		}
         
         if (DriverPool.getDrivers().size() == 0) {
             LOGGER.debug("There is no active drivers in the pool.");
@@ -787,4 +802,7 @@ public class Device extends RemoteDevice {
         return file;
     }
 
+    private boolean isStfEnabled() {
+		return R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+    }
 }
