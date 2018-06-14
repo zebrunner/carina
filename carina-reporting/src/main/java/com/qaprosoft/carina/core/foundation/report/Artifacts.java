@@ -19,44 +19,40 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
-/*
- * Link
+/**
+ * 
+ * @author akhursevich
  */
 final public class Artifacts {
-    protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
-    private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
+	protected static final Logger LOGGER = Logger.getLogger(Artifacts.class);
+	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 
-    public static void clearArtifacts() {
-        testArtifacts.remove();
-    }
-
-    public synchronized static Set<TestArtifactType> getArtifacts() {
-        return testArtifacts.get();
-    }
-
-	public static void add(String name, String link) {
-		/*
-		 * Calendar c=new GregorianCalendar(); c.add(Calendar.DATE, 30); Date d
-		 * = c.getTime(); add(name, link, d);
-		 */
-		add(name, link, null);
+	public static void clearArtifacts() {
+		testArtifacts.remove();
 	}
 
-    public static void add(String name, String link, Date expires_at) {
-        LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expires_at: " + expires_at);
-        if (name == null || name.isEmpty()) {
-            return;
-        }
+	public synchronized static Set<TestArtifactType> getArtifacts() {
+		return testArtifacts.get();
+	}
 
-        if (link == null || link.isEmpty()) {
-            return;
-        }
+	public static void add(String name, String link) {
+		add(name, link, R.CONFIG.getInt("artifacts_expiration_seconds"));
+	}
 
-        TestArtifactType testArtifactType = new TestArtifactType(name, link, expires_at);
-        if (!testArtifacts.get().contains(testArtifactType)) {
-            testArtifacts.get().add(new TestArtifactType(name, link, expires_at));
-        }
-    }
+	public static void add(String name, String link, Integer expiresInSeconds) {
+		LOGGER.debug("Adding artifact name: " + name + "; link: " + link + "; expiresInSeconds: " + expiresInSeconds);
+
+		if (name == null || name.isEmpty()) {
+			return;
+		}
+
+		if (link == null || link.isEmpty()) {
+			return;
+		}
+
+		testArtifacts.get().add(new TestArtifactType(name, link, expiresInSeconds));
+	}
 }
