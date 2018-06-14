@@ -836,7 +836,7 @@ public class ExtendedWebElement {
 				if (element.isDisplayed()) {
 					return true;
 				}
-			} catch (NoSuchElementException e) {
+			} catch (Exception e) {
 				//do nothing as element is not found as expected here
 			}
 		}
