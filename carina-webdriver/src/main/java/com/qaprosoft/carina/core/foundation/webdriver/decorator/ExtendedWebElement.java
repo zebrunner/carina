@@ -822,6 +822,16 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
+		// perform at once super-fast single selenium call and only if nothing
+		// found move to waitAction
+		detectElement(); // it should do explicit findElement and reinitialize
+							// internal element member in case of success
+		if (element != null) {
+			if (element.isDisplayed()) {
+				return true;
+			}
+		}
+
     	ExpectedCondition<?> waitCondition;
     	
 		if (element != null) {
