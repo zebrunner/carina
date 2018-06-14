@@ -52,8 +52,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private boolean shouldCache;
     private By by;
     private WebElement cachedElement;
-    private List<WebElement> cachedElementList;
-    private boolean shouldDisableCachingForcibly = false;
 
     private String aiCaption;
     private Label aiLabel;
@@ -70,10 +68,10 @@ public class ExtendedElementLocator implements ElementLocator {
 
         if (field.isAnnotationPresent(FindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
-            this.shouldCache = annotations.isLookupCached();
+            this.shouldCache = true;
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(DisableCacheLookup.class)) {
-                this.shouldDisableCachingForcibly = true;
+            	this.shouldCache = false;
             }
         }
         // Elements to be recognized by Alice
@@ -88,7 +86,7 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-        if (cachedElement != null && shouldCache && !shouldDisableCachingForcibly) {
+        if (cachedElement != null && shouldCache) {
         	LOGGER.debug("returning element from cache: " + by);
             return cachedElement;
         }
@@ -123,7 +121,6 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
 		// 1. enable cache for successfully discovered element to minimize selenium calls
-		shouldCache = true;
         if (shouldCache) {
             cachedElement = element;
         }
@@ -134,11 +131,6 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element list.
      */
     public List<WebElement> findElements() {
-        if (cachedElementList != null && shouldCache) {
-        	LOGGER.debug("returning element from cache: " + by);
-            return cachedElementList;
-        }
-
         List<WebElement> elements = null;
     	NoSuchElementException exception = null;
 
@@ -157,9 +149,6 @@ public class ExtendedElementLocator implements ElementLocator {
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
         // As result for all dynamic lists we have too often out of bound index exceptions
-        if (shouldCache) {
-            cachedElementList = elements;
-        }
 
         return elements;
     }
@@ -178,8 +167,4 @@ public class ExtendedElementLocator implements ElementLocator {
         return element;
     }
 
-	public void setShouldDisableCachingForcibly(boolean shouldDisableCachingForcibly) {
-		this.shouldDisableCachingForcibly = shouldDisableCachingForcibly;
-	}
-    
 }
