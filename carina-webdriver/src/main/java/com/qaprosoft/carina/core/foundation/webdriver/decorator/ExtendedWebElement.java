@@ -832,8 +832,12 @@ public class ExtendedWebElement {
 		detectElement(); // it should do explicit findElement and reinitialize
 							// internal element member in case of success
 		if (element != null) {
-			if (element.isDisplayed()) {
-				return true;
+			try {
+				if (element.isDisplayed()) {
+					return true;
+				}
+			} catch (NoSuchElementException e) {
+				//do nothing as element is not found as expected here
 			}
 		}
 
