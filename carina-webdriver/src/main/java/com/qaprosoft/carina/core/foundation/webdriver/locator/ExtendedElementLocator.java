@@ -36,6 +36,7 @@ import com.qaprosoft.alice.models.dto.RecognitionMetaType;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -52,6 +53,7 @@ public class ExtendedElementLocator implements ElementLocator {
     private By by;
     private WebElement cachedElement;
     private List<WebElement> cachedElementList;
+    private boolean shouldDisableCachingForcibly = false;
 
     private String aiCaption;
     private Label aiLabel;
@@ -70,6 +72,9 @@ public class ExtendedElementLocator implements ElementLocator {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.shouldCache = annotations.isLookupCached();
             this.by = annotations.buildBy();
+            if (field.isAnnotationPresent(DisableCacheLookup.class)) {
+                this.shouldDisableCachingForcibly = true;
+            }
         }
         // Elements to be recognized by Alice
         if (field.isAnnotationPresent(FindByAI.class)) {
@@ -83,7 +88,7 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-        if (cachedElement != null && shouldCache) {
+        if (cachedElement != null && shouldCache && !shouldDisableCachingForcibly) {
         	LOGGER.debug("returning element from cache: " + by);
             return cachedElement;
         }
@@ -173,5 +178,8 @@ public class ExtendedElementLocator implements ElementLocator {
         return element;
     }
 
+	public void setShouldDisableCachingForcibly(boolean shouldDisableCachingForcibly) {
+		this.shouldDisableCachingForcibly = shouldDisableCachingForcibly;
+	}
     
 }
