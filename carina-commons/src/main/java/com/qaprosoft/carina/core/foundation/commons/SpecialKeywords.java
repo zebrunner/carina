@@ -118,7 +118,12 @@ public class SpecialKeywords {
     public static final String ZAFIRA_PROJECT = "zafira_project";
 
     public static final String COMMENT = "comment";
-
+    
+    public static final String ANDROID_START_NODE = "<android[\\w\\.]* ";
+    public static final String ANDROID_END_NODE = "<\\/android[\\w\\.]*>";
+    public static final String ANDROID_START_UIX_NODE = "<node ";
+    public static final String ANDROID_END_UIX_NODE = "</node>";
+    
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
     public static final String CRYPTO_KEY_TYPE = "AES";
@@ -148,4 +153,5 @@ public class SpecialKeywords {
     public static final String STF_ENABLED = "STF_ENABLED";
     public static final String STF_URL = "STF_URL";
     public static final String STF_TOKEN = "STF_TOKEN";
+    
 }
