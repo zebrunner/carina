@@ -1398,7 +1398,13 @@ public class ExtendedWebElement {
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition,
 			Object...inputArgs) {
-		if (waitCondition != null && detectElement() == null) {
+		
+		// do explicit single call to selenium/appium to detect new element before fluentWaits
+		// it should resolve stale element exceptions much more effective 
+		// (more stable and faster for already present but cached incorrectly elements)
+		detectElement();
+		
+		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
 			if (!waitUntil(waitCondition, timeout)) {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
@@ -1424,7 +1430,7 @@ public class ExtendedWebElement {
 			try {
 				element = refindElement();
 			} catch (NoSuchElementException ex) {
-				//no sense to repeite action if refind element didn't help
+				//no sense to repeit action if refind element didn't help
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
