@@ -354,6 +354,28 @@ public class ExtendedWebElement {
     	}
         return element;
     }
+    
+    private WebElement detectElement() {
+        //do not return without element initialization!
+    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
+    	WebElement el = null;
+    	try {
+    		if (searchContext != null) {
+    			el = searchContext.findElement(by);
+    		} else {
+    			el = getDriver().findElement(by);
+    		}
+		} catch (Exception e) {
+			LOGGER.debug("catched exception: ", e);
+			//use available driver to research again...
+			//TODO: handle case with rootBy to be able to refind also lists etc
+    	}
+    	
+    	if (el != null) {
+    		element = el;
+    	}
+        return el;
+    }
 
     public void setElement(WebElement element) {
         this.element = element;
@@ -800,6 +822,16 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
+		// perform at once super-fast single selenium call and only if nothing
+		// found move to waitAction
+		detectElement(); // it should do explicit findElement and reinitialize
+							// internal element member in case of success
+		if (element != null) {
+			if (element.isDisplayed()) {
+				return true;
+			}
+		}
+
     	ExpectedCondition<?> waitCondition;
     	
 		if (element != null) {
@@ -1376,6 +1408,12 @@ public class ExtendedWebElement {
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition,
 			Object...inputArgs) {
+		
+		// do explicit single call to selenium/appium to detect new element before fluentWaits
+		// it should resolve stale element exceptions much more effective 
+		// (more stable and faster for already present but cached incorrectly elements)
+		detectElement();
+		
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
 			if (!waitUntil(waitCondition, timeout)) {
@@ -1402,7 +1440,7 @@ public class ExtendedWebElement {
 			try {
 				element = refindElement();
 			} catch (NoSuchElementException ex) {
-				//no sense to repeite action if refind element didn't help
+				//no sense to repeit action if refind element didn't help
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
