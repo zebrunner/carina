@@ -360,7 +360,7 @@ public class ExtendedWebElement {
         return element;
     }
     
-    private WebElement detectElement() {
+/*    private WebElement detectElement() {
         //do not return without element initialization!
     	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
     	WebElement el = null;
@@ -380,7 +380,7 @@ public class ExtendedWebElement {
     		element = el;
     	}
         return el;
-    }
+    }*/
 
     public void setElement(WebElement element) {
         this.element = element;
@@ -829,7 +829,7 @@ public class ExtendedWebElement {
     public boolean isElementPresent(long timeout) {
 		// perform at once super-fast single selenium call and only if nothing
 		// found move to waitAction
-		detectElement(); // it should do explicit findElement and reinitialize
+		//detectElement(); // it should do explicit findElement and reinitialize
 							// internal element member in case of success
 		if (element != null) {
 			try {
@@ -1421,7 +1421,7 @@ public class ExtendedWebElement {
 		// do explicit single call to selenium/appium to detect new element before fluentWaits
 		// it should resolve stale element exceptions much more effective 
 		// (more stable and faster for already present but cached incorrectly elements)
-		detectElement();
+		//detectElement();
 		
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
