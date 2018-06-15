@@ -164,15 +164,13 @@ public class AndroidUtils extends MobileUtils {
             }
         }
     }
+
     /**
      * Hide keyboard if needed
      */
+    @Deprecated
     public static void hideKeyboard() {
-        try {
-        	((MobileDriver<?>) getDriver()).hideKeyboard();
-        } catch (Exception e) {
-            LOGGER.info("Keyboard was already hided or error occurs: " + e);
-        }
+        MobileUtils.hideKeyboard();
     }
     
     @SuppressWarnings("deprecation")
