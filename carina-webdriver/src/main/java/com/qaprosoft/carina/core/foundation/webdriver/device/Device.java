@@ -790,6 +790,9 @@ public class Device extends RemoteDevice {
         String screenshotName = helper.performIgnoreException(() -> Screenshot.captureFailure(driver, "Generate UI dump"));
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
+        pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
+                replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
+
         File file = null;
         try {
             file = new File(fileName);
@@ -805,4 +808,5 @@ public class Device extends RemoteDevice {
     private boolean isStfEnabled() {
 		return R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
     }
+
 }
