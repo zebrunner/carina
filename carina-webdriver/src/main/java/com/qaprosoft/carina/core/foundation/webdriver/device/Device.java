@@ -23,6 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -689,6 +695,8 @@ public class Device extends RemoteDevice {
      * @return sys log
      */
     public String getSysLog() {
+        int extractionTimeout = 15;
+        
         if (isNull()) {
             return "";
         }
@@ -697,14 +705,41 @@ public class Device extends RemoteDevice {
             LOGGER.debug("Logcat log is empty since device is not Android");
             return "";
         }
-        
-        // adb -s UDID logcat -d
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
-        StringBuilder tempStr = new StringBuilder();
-        executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
-        LOGGER.info("Logcat log has been extracted.");
-        LOGGER.debug("Logcat logs: ".concat(tempStr.toString()));
-        return tempStr.toString();
+        LOGGER.info("Extraction of sys log: " + getAdbName());
+
+        // launch extractor in separate thread to avoid possible hang out
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<String> future = executorService.submit(new Callable<String>() {
+
+         // adb -s UDID logcat -d
+            @Override
+            public String call() throws Exception {
+                LOGGER.info("Start Syslog extraction");
+                String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
+                LOGGER.info("Logcat log has been extracted.");
+                StringBuilder tempStr = new StringBuilder();
+                executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
+                return tempStr.toString();
+            }
+            
+        });
+
+        try {
+            String logs = future.get(extractionTimeout, TimeUnit.SECONDS);
+            pause(extractionTimeout);
+            LOGGER.debug("Logcat logs: ".concat(logs));
+            return logs;
+        } catch (TimeoutException e) {
+            LOGGER.info(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
+            return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
+        } catch (Exception e) {
+//            TODO: add custom handlers for each exceptions based on type
+            LOGGER.info(e);
+            LOGGER.info("Unknown issue was fired. Empty logs will be used.");
+            return "";
+        }
+       
+//        return tempStr.toString();
     }
     
     /**
@@ -725,7 +760,7 @@ public class Device extends RemoteDevice {
 			return;
 		}
         
-        LOGGER.info(String.format("Test will be started on device: %s", getName()));
+        LOGGER.info(String.format("Test will be started on device: %s:%s", getName(), getAdbName()));
         // adb -s UDID logcat -c
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
         executor.execute(cmd);
@@ -739,11 +774,11 @@ public class Device extends RemoteDevice {
      * @return saved file
      */
     public File saveSysLog() {
-		if (!isStfEnabled()) {
+		if (!isConnected()) {
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}
-		
+		LOGGER.info("STF is enabled. Sys log will be extracted...");
         String fileName = ReportContext.getTestDir() + "/logcat.log";
         String log = getSysLog();
         if (log.isEmpty()) {
@@ -772,7 +807,7 @@ public class Device extends RemoteDevice {
             return null;
         }
         
-		if (!isStfEnabled()) {
+		if (!isConnected()) {
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}
@@ -784,7 +819,7 @@ public class Device extends RemoteDevice {
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
         
-        
+        LOGGER.info("UI dump generation...");
         WebDriver driver = DriverPool.getDriver();
         DriverHelper helper = new DriverHelper();
         String screenshotName = helper.performIgnoreException(() -> Screenshot.captureFailure(driver, "Generate UI dump"));
@@ -807,6 +842,20 @@ public class Device extends RemoteDevice {
 
     private boolean isStfEnabled() {
 		return R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+    }
+    
+    private boolean isConnected() {
+        return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
+    }
+    
+    private List<String> getConnectedDevices() {
+        // regexp for connected device. Syntax: udid device
+        String deviceUDID = "(.*)\\tdevice$";
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
+        List<String> cmdOutput = executor.execute(cmd);
+        List<String> connectedDevices = cmdOutput.stream().parallel().filter((d) -> d.matches(deviceUDID)).collect(Collectors.toList());
+        LOGGER.debug("Connected devices: ".concat(connectedDevices.toString()));
+        return connectedDevices;
     }
 
 }
