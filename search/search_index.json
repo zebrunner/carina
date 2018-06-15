@@ -22,7 +22,7 @@
         }, 
         {
             "location": "/project_structure/", 
-            "text": "Carina test project is structured as a standard Maven project:\n\n\ncarina-demo\n|-- pom.xml\n|-- src/test/java        \n|-- src/test/resources\n    |-- api\n    |-- testng_suites\n    |-- xls\n|-- src/main/java\n|-- src/main/resources\n    |-- l18n\n\n\n\n\n\n\nsrc/test/java\n - contains test classes organized using TestNG annotations\n\n\n\n\n\n\n\n\nsrc/test/resources\n - contains TestNG xml files, API templates and XLS data providers\n\n\n\n\n\n\n\n\nsrc/main/java\n - contains page object classes, API domains and additional utilities\n\n\n\n\n\n\n\n\nsrc/main/resources\n - contains l18n bundles, configuration properties files and MyBastis profiles if needed", 
+            "text": "Carina test project is structured as a standard Maven project:\n\n\ncarina-demo\n|-- pom.xml\n|-- src/test/java        \n|-- src/test/resources\n    |-- api\n    |-- testng_suites\n    |-- xls\n|-- src/main/java\n|-- src/main/resources\n    |-- l18n\n\n\n\n\n\n\nsrc/test/java\n - contains test classes organized using TestNG annotations\n\n\n\n\n\n\n\n\nsrc/test/resources\n - contains TestNG xml files, API templates and XLS data providers\n\n\n\n\n\n\n\n\nsrc/main/java\n - contains page object classes, API domains and additional utilities\n\n\n\n\n\n\n\n\nsrc/main/resources\n - contains l18n bundles, configuration properties files and MyBatis profiles if needed", 
             "title": "Project structure"
         }, 
         {
