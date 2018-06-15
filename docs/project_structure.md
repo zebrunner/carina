@@ -26,6 +26,6 @@ carina-demo
 
 ![src/main/java](img/004-Project-structure.png)
 
-* **src/main/resources** - contains l18n bundles, configuration properties files and MyBastis profiles if needed
+* **src/main/resources** - contains l18n bundles, configuration properties files and MyBatis profiles if needed
 
 ![src/main/resources](img/005-Project-structure.png)
