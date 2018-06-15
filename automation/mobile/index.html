@@ -604,15 +604,20 @@
                 
                 <p>Carina framework provides useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through <a href="http://qaprosoft.github.io/carina/automation/web/">Web automation article</a>.</p>
 <h3 id="mobile-special-requirements">Mobile special requirements:</h3>
-<p>To run mobile tests <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before test run.</b></p>
+<p>To run mobile tests <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before test run.</b>
+ <img alt="Page Object Pattern" src="../../img/appium_design.png" /></p>
 <h3 id="android-special-requirements">Android special requirements:</h3>
-<p>1) Android SDK(part of <a href="https://developer.android.com/studio/">Android Studio</a>) is important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). 
-2) Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
-Hint: sometimes (especially on Mac) you need to add paths to important folders inside sdk, such as “platform-tools” (here is ADB located), “tools” and “build-tools”(here is aapt located).
-3) .apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.</p>
+<ol>
+<li>Android SDK(part of <a href="https://developer.android.com/studio/">Android Studio</a>) is important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). </li>
+<li>Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
+Hint: sometimes (especially on Mac) you need to add paths to important folders inside sdk, such as “platform-tools” (here is ADB located), “tools” and “build-tools”(here is aapt located).</li>
+<li>.apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.</li>
+</ol>
 <h3 id="ios-special-requirements">iOS special requirements:</h3>
-<p>1) <a href="https://developer.apple.com/xcode/">Xcode</a> is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.
-4) Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correct, but automation on simulator is free. On the other hand, the license is needed to work with the real device.</p>
+<ol>
+<li><a href="https://developer.apple.com/xcode/">Xcode</a> is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.</li>
+<li>Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correct, but automation on simulator is free. On the other hand, the license is needed to work with the real device.</li>
+</ol>
 <h3 id="mobile-config-properties">Mobile config properties</h3>
 <p>We could provide any Appium capabilty in <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing description for the most popular mobile capabilities:</p>
 <table>
@@ -721,8 +726,8 @@ Hint: sometimes (especially on Mac) you need to add paths to important folders i
 </table>
 
 <p><b>Important:</b>
-- though it’s not necessary to run Selenium, seleniumum_host must be defined.
-- file _config.properties should be located in src/main/resources</p>
+<em> though it’s not necessary to run Selenium, seleniumum_host must be defined.
+</em> file _config.properties should be located in src/main/resources</p>
 <h3 id="example-for-android-of-_configproperties">Example for Android of _config.properties:</h3>
 <pre><code>#=====================================================#
 #================= Configuration v2 ==================#
@@ -772,16 +777,16 @@ capabilities.newCommandTimeout=1800
 <p><b>Note:</b>
 To get device’s unique id (UDID) for emulator command “xcrun simctl list” is useful. It will show the list of simulators with there names, iOS versions, udids and statuses (shutdown or booted). 
 To get UDID from real device you have to plug your phone into a computer and copy it out of iTunes:
-1) Launch iTunes and connect your iPhone.
-2) In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
-3) Reveal the Identifier by clicking on Serial Number.</p>
+1. Launch iTunes and connect your iPhone.
+2. In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
+3. Reveal the Identifier by clicking on Serial Number.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects:</h3>
 <p>The main idea is the same as in <a href="http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects">web-testing</a> except that css isn’t used in Mobile. 
 ExtendedWebElement(Carina’s implementation of WebElement) is used instead of WebElement and it has methods similar to those that WebElement has but more reliable and convenient.
 <b>Important</b>:
- - Page should extends com.qaprosoft.carina.core.gui.AbstractPage
- - Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
- - Locate Page Object classes in src/main/java package</p>
+ * Page should extends com.qaprosoft.carina.core.gui.AbstractPage
+ * Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
+ * Locate Page Object classes in src/main/java package</p>
 <h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
 <p>To obtain locaters of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
 Example:</p>
@@ -832,10 +837,10 @@ protected ExtendedWebElement developerText;
 </code></pre>
 
 <p><b>Important:</b>
--Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
--Test method should start with org.testng.annotations.Test annotation
--Use getDriver() method to get driver instance in test
--Locate tests in src/test/java source folder</p>
+<em> Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
+</em> Test method should start with org.testng.annotations.Test annotation
+<em> Use getDriver() method to get driver instance in test
+</em> Locate tests in src/test/java source folder</p>
                 
                   
                 
