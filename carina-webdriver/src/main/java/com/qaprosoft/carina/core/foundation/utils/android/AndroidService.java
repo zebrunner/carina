@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
@@ -806,7 +807,7 @@ public class AndroidService {
             res = fakeGpsPage.locationSearch(location);
             if (res) {
                 LOGGER.info("Set Fake GPS locale: " + location);
-                AndroidUtils.hideKeyboard();
+                MobileUtils.hideKeyboard();
                 fakeGpsPage.clickSetLocation();
             }
             res = true;
