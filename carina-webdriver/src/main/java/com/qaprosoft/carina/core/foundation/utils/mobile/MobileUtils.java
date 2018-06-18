@@ -135,8 +135,12 @@ public class MobileUtils {
 		PointOption<?> startPoint = PointOption.point(startx, starty);
 		WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
 
-		
-        touchAction.press(startPoint).waitAction(waitOptions).release().perform();
+		if (duration == 0) {
+			//do not perform waiter as using 6.0.0. appium java client we do longpress instead of simple tap even with 0 wait duration
+			touchAction.press(startPoint).release().perform();
+		} else {
+			touchAction.press(startPoint).waitAction(waitOptions).release().perform();
+		}
     }
 
     /**
