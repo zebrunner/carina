@@ -32,8 +32,9 @@ public class IosUtils extends MobileUtils {
 
     /**
      * Hide Keyboard
-     * 
+     * Use com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.hideKeyboard()
      */
+    @Deprecated
     public static void hideKeyboard() {
         try {
             ((IOSDriver<?>) getDriver()).hideKeyboard();

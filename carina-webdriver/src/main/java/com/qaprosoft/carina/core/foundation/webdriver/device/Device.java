@@ -726,11 +726,11 @@ public class Device extends RemoteDevice {
 
         try {
             String logs = future.get(extractionTimeout, TimeUnit.SECONDS);
-            pause(extractionTimeout);
             LOGGER.debug("Logcat logs: ".concat(logs));
             return logs;
         } catch (TimeoutException e) {
             LOGGER.info(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
+            future.cancel(true);
             return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
         } catch (Exception e) {
 //            TODO: add custom handlers for each exceptions based on type
@@ -755,7 +755,7 @@ public class Device extends RemoteDevice {
             return;
         }
 
-		if (!isStfEnabled()) {
+		if (!isConnected()) {
 			//do not use new features if execution is not inside approved cloud
 			return;
 		}
@@ -807,6 +807,7 @@ public class Device extends RemoteDevice {
             return null;
         }
         
+//        TODO: investigate with iOS: how does it work with iOS
 		if (!isConnected()) {
 			//do not use new features if execution is not inside approved cloud
 			return null;
@@ -840,12 +841,12 @@ public class Device extends RemoteDevice {
         return file;
     }
 
-    private boolean isStfEnabled() {
-		return R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-    }
-    
     private boolean isConnected() {
-        return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
+        if (getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
+            return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
+        } else {
+            return false;
+        }
     }
     
     private List<String> getConnectedDevices() {

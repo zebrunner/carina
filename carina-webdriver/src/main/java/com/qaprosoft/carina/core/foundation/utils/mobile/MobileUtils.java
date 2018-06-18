@@ -658,7 +658,19 @@ public class MobileUtils {
             LOGGER.error(e);
         }
     }
-    
+
+    /**
+     * Hide keyboard if needed
+     */
+    public static void hideKeyboard() {
+        try {
+            ((MobileDriver<?>) getDriver()).hideKeyboard();
+        } catch (Exception e) {
+            LOGGER.info("Keyboard was already hided or error occurs: " + e);
+        }
+    }
+
+
 	public static WebDriver getDriver() {
 		WebDriver drv = DriverPool.getDriver();
 		if (drv instanceof EventFiringWebDriver) {
