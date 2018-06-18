@@ -726,11 +726,11 @@ public class Device extends RemoteDevice {
 
         try {
             String logs = future.get(extractionTimeout, TimeUnit.SECONDS);
-            pause(extractionTimeout);
             LOGGER.debug("Logcat logs: ".concat(logs));
             return logs;
         } catch (TimeoutException e) {
             LOGGER.info(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
+            future.cancel(true);
             return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
         } catch (Exception e) {
 //            TODO: add custom handlers for each exceptions based on type

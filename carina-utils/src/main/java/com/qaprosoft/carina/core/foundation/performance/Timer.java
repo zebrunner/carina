@@ -42,15 +42,19 @@ public class Timer {
         Map<String, Long> testTimer = getTimer();
         if (!testTimer.containsKey(operation.getKey())) {
 			// TODO: current exception could stop tests execution which is
-			// inappropriate. Think about erroring only!
-            throw new RuntimeException("Operation not started: " + operation.getKey());
+			// inappropriate. Think about erroring only
+//            Disabled due to socket issue
+//            throw new RuntimeException("Operation not started: " + operation.getKey());
+            LOGGER.error("Operation not started: " + operation.getKey());
+            testTimer.remove(operation.getKey());
+            return;
         }
         
         Map<String, Long> testMertrics = getMetrics();
         long capturedTime = 0;
         if (testMertrics.get(operation.getKey()) != null) {
-        	//summarize operation time
-        	capturedTime = testMertrics.get(operation.getKey());
+            	//summarize operation time
+            	capturedTime = testMertrics.get(operation.getKey());
         }
         testMertrics.put(operation.getKey(), capturedTime + Calendar.getInstance().getTimeInMillis() - testTimer.get(operation.getKey()));
         //remove stopped timer data 
