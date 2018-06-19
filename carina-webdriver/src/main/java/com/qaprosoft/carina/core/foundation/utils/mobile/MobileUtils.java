@@ -659,17 +659,18 @@ public class MobileUtils {
         }
     }
 
-    /**
-     * Hide keyboard if needed
-     */
-    public static void hideKeyboard() {
-        try {
-            ((MobileDriver<?>) getDriver()).hideKeyboard();
-        } catch (Exception e) {
-            LOGGER.info("Keyboard was already hided or error occurs: " + e);
-        }
-    }
-
+	/**
+	 * Hide keyboard if needed
+	 */
+	public static void hideKeyboard() {
+		try {
+			((MobileDriver<?>) getDriver()).hideKeyboard();
+		} catch (Exception e) {
+			if (!e.getMessage().contains("Soft keyboard not present, cannot hide keyboard")) {
+				LOGGER.error("Exception appears during hideKeyboard: " + e);
+			}
+		}
+	}
 
 	public static WebDriver getDriver() {
 		WebDriver drv = DriverPool.getDriver();
