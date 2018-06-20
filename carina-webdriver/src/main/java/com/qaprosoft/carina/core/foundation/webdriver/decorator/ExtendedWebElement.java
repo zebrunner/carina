@@ -1754,7 +1754,11 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("css: ")) {
-        	resBy = By.cssSelector(StringUtils.remove(locator, "css: ") + "[" + index + "]");
+        	resBy = By.cssSelector(StringUtils.remove(locator, "css: ") + ":nth-child(" + index + ")");
+        }
+        
+        if (locator.startsWith("By.cssSelector: ")) {
+        	resBy = By.cssSelector(StringUtils.remove(locator, "By.cssSelector: ") + ":nth-child(" + index + ")");
         }
 
         if (locator.startsWith("tagName: ")) {
