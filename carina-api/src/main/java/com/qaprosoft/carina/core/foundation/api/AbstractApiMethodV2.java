@@ -133,7 +133,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             properties = new Properties();
         }
         if (actualRsBody == null) {
-            throw new RuntimeException("Actual response body is null. Pleae make API call before validation response");
+            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
         }
         TemplateMessage tm = new TemplateMessage();
         tm.setTemplatePath(rsPath);
@@ -157,7 +157,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     public void validateResponseAgainstJSONSchema(String schemaPath) {
         if (actualRsBody == null) {
-            throw new RuntimeException("Actual response body is null. Pleae make API call before validation response");
+            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
         }
         TemplateMessage tm = new TemplateMessage();
         tm.setTemplatePath(schemaPath);
