@@ -29,6 +29,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -60,6 +61,8 @@ public class MobileUtils {
 
     private static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
     private static final int DEFAULT_MAX_SWIPE_COUNT = 50;
+    
+    protected static DriverHelper helper = new DriverHelper();
 
     /**
      * Tap with TouchAction by the center of element
@@ -68,7 +71,8 @@ public class MobileUtils {
      */
     public static void tap(ExtendedWebElement element) {
         Point point = element.getLocation();
-        Dimension size = element.getSize();
+        Dimension size = helper.performIgnoreException(() -> element.getSize());
+		
         tap(point.getX() + size.getWidth() / 2, point.getY() + size.getHeight() / 2);
     }
 
@@ -89,8 +93,10 @@ public class MobileUtils {
      *            element
      */
     public static void longTap(ExtendedWebElement elem) {
-        int width = elem.getSize().getWidth();
-        int height = elem.getSize().getHeight();
+    	Dimension size = helper.performIgnoreException(() -> elem.getSize());
+    	
+        int width = size.getWidth();
+        int height = size.getHeight();
 
         int x = elem.getLocation().getX() + width / 2;
         int y = elem.getLocation().getY() + height / 2;
@@ -377,7 +383,7 @@ public class MobileUtils {
         WebDriver drv = getDriver();
 
         LOGGER.debug("Getting driver dimension size...");
-        Dimension scrSize = drv.manage().window().getSize();
+        Dimension scrSize = helper.performIgnoreException(() -> drv.manage().window().getSize());
         LOGGER.debug("Finished driver dimension size...");
         // explicitly limit range of coordinates
         if (endx > scrSize.width) {
@@ -424,19 +430,20 @@ public class MobileUtils {
 
         Point elementLocation = null;
         Dimension elementDimensions = null;
+        
+		if (container == null) {
+			// whole screen/driver is a container!
+			WebDriver driver = getDriver();
+			elementLocation = new Point(0, 0); // initial left corner for that case
 
-        if (container == null) {
-            // whole screen/driver is a container!
-            WebDriver driver = getDriver();
-            elementLocation = new Point(0, 0); // initial left corner for that case
-            elementDimensions = driver.manage().window().getSize();
-        } else {
-            if (container.isElementNotPresent(5)) {
-                Assert.fail("Cannot swipe! Impossible to find element " + container.getName());
-            }
-            elementLocation = container.getLocation();
-            elementDimensions = container.getSize();
-        }
+			elementDimensions = helper.performIgnoreException(() -> driver.manage().window().getSize());
+		} else {
+			if (container.isElementNotPresent(5)) {
+				Assert.fail("Cannot swipe! Impossible to find element " + container.getName());
+			}
+			elementLocation = container.getLocation();
+			elementDimensions = helper.performIgnoreException(() -> container.getSize());
+		}
 
         double minCoefficient = 0.3;
         double maxCoefficient = 0.6;
