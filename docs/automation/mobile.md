@@ -191,7 +191,7 @@ ExtendedWebElement(Carina’s implementation of WebElement) is used instead of W
  * Locate Page Object classes in src/main/java package
 
 ### How to find locators for Android application
-To obtain locaters of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
+To obtain locators of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
 Example:
 ```
  @FindBy(xpath = "//*[@resource-id='name_input']")
@@ -200,7 +200,7 @@ Example:
 
 
 ### How to find locators for iOS application
-To obtain locaters of web elements from iOS app different programs are used, such as GUI Appium itself and convenient [Macaca App Inspector](https://macacajs.github.io/app-inspector/).
+To obtain locators of web elements from iOS app different programs are used, such as GUI Appium itself and convenient [Macaca App Inspector](https://macacajs.github.io/app-inspector/).
 To faster work @Predicate is used. With predicates complicate “xpaths” can’t be used, but “id”, “name”, “className” and etc. search are sufficient. 
 Example:
 ```
