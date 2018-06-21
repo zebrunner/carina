@@ -788,14 +788,14 @@ ExtendedWebElement(Carina’s implementation of WebElement) is used instead of W
  * Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
  * Locate Page Object classes in src/main/java package</p>
 <h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
-<p>To obtain locaters of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
+<p>To obtain locators of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
 Example:</p>
 <pre><code> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
  private ExtendedWebElement input;
 </code></pre>
 
 <h3 id="how-to-find-locators-for-ios-application">How to find locators for iOS application</h3>
-<p>To obtain locaters of web elements from iOS app different programs are used, such as GUI Appium itself and convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
+<p>To obtain locators of web elements from iOS app different programs are used, such as GUI Appium itself and convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
 To faster work @Predicate is used. With predicates complicate “xpaths” can’t be used, but “id”, “name”, “className” and etc. search are sufficient. 
 Example:</p>
 <pre><code>@FindBy(xpath = &quot;name = 'DONE'&quot;)
