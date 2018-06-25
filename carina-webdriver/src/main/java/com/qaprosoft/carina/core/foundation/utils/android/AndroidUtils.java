@@ -36,6 +36,9 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidKeyCode;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
+import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.touch.offset.PointOption;
 import io.appium.java_client.windows.PressesKeyCode;
 
@@ -87,6 +90,11 @@ public class AndroidUtils extends MobileUtils {
             }
         }
         return false;
+    }
+    
+    public static void pressKeyboardKey(AndroidKey key) {
+        ((AndroidDriver<?>) getDriver()).pressKey(new KeyEvent(key)
+                .withFlag(KeyEventFlag.SOFT_KEYBOARD).withFlag(KeyEventFlag.KEEP_TOUCH_MODE).withFlag(KeyEventFlag.EDITOR_ACTION));
     }
 
     /**
