@@ -23,13 +23,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.NoSuchSessionException;
@@ -62,9 +59,6 @@ public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
-
-    // Collects screenshot comments. Screenshot comments are associated using screenshot file name.
-    private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 
     /**
      * Adds screenshot rule
@@ -122,33 +116,6 @@ public class Screenshot {
             }
         }
         return capture(driver, isTakeScreenshotRules, comment, false);
-    }
-
-    /**
-     * Stores comment for screenshot.
-     *
-     * @param screenId screenId id
-     * @param msg message
-     * 
-     */
-    private static void addScreenshotComment(String screenId, String msg) {
-        if (!StringUtils.isEmpty(screenId)) {
-            screenSteps.put(screenId, msg);
-        }
-    }
-
-    /**
-     * Return comment for screenshot.
-     * 
-     * @param screenId Screen Id
-     * 
-     * @return screenshot comment
-     */
-    public static String getScreenshotComment(String screenId) {
-        String comment = "";
-        if (screenSteps.containsKey(screenId))
-            comment = screenSteps.get(screenId);
-        return comment;
     }
 
     /**
@@ -366,7 +333,7 @@ public class Screenshot {
                 uploadToAmazonS3(test, screenPath, screenName, comment);
 
                 // add screenshot comment to collector
-                addScreenshotComment(screenName, comment);
+                ReportContext.addScreenshotComment(screenName, comment);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (NoSuchSessionException e) {

@@ -48,7 +48,7 @@ public class FileManager {
                 files.add(fileArray[i]);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Unable to get files in dir!", e);
         }
         return files;
     }
