@@ -60,7 +60,6 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactor
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
-import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -290,7 +289,7 @@ public abstract class AbstractTest // extends DriverHelper
             }
 
             ReportContext.removeTempDir(); // clean temp artifacts directory
-            HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
+            //HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
             String browser = getBrowser();
             String deviceName = getDeviceName();

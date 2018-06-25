@@ -16,9 +16,23 @@
 package com.qaprosoft.carina.core.foundation.report;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,6 +40,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 
@@ -34,6 +49,8 @@ import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.ZipManager;
 
 /*
  * Be careful with LOGGER usage here because potentially it could do recursive call together with ThreadLogAppender functionality
@@ -43,6 +60,11 @@ public class ReportContext {
     private static final Logger LOGGER = Logger.getLogger(ReportContext.class);
 
     public static final String ARTIFACTS_FOLDER = "artifacts";
+    
+    private static final String GALLERY_ZIP = "gallery-lib.zip";
+    private static final String REPORT_NAME = "/report.html";
+    private static final int MAX_IMAGE_TITLE = 300;
+    private static final String TITLE = "Test steps demo";
 
     public static final String TEMP_FOLDER = "temp";
 
@@ -59,6 +81,10 @@ public class ReportContext {
     private static final ThreadLocal<File> testDirectory = new ThreadLocal<File>();
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
+    
+    // Collects screenshot comments. Screenshot comments are associated using screenshot file name.
+    private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
+
 
     public static long getRootID() {
         return rootID;
@@ -92,6 +118,8 @@ public class ReportContext {
                 }
 
                 baseDirectory = baseDirectoryTmp;
+                
+                copyGalleryLib();
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Folder not created: " + baseDirectory.getAbsolutePath());
@@ -281,10 +309,12 @@ public class ReportContext {
                     LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
                 }
                 testDir.renameTo(newTestDir);
+                generateTestReport(newTestDir);
             }
         } else {
             LOGGER.error("Unexpected case with absence of test.log for '" + test + "'");
         }
+        
         return testDir;
     }
 
@@ -353,10 +383,8 @@ public class ReportContext {
     }
 
     public static void generateHtmlReport(String content) {
-        generateHtmlReport(content, SpecialKeywords.HTML_REPORT);
-    }
-
-    public static void generateHtmlReport(String content, String emailableReport) {
+    	String emailableReport = SpecialKeywords.HTML_REPORT;
+    	
         try {
             File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
                     Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), emailableReport));
@@ -501,25 +529,6 @@ public class ReportContext {
     }
 
     /**
-     * Returns URL for performance report.
-     * 
-     * @return - URL to test log folder.
-     */
-    public static String getPerformanceReportLink() {
-
-        String link = "";
-        if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
-            // remove report url and make link relative
-            // link = String.format("./%d/report.html", rootID);
-            link = String.format("%s/%d/report.html", Configuration.get(Parameter.REPORT_URL), rootID);
-        } else {
-            link = String.format("file://%s/report.html", baseDirectory);
-        }
-
-        return link;
-    }
-
-    /**
      * Returns URL for cucumber report.
      * 
      * @param CucumberReportFolderName
@@ -611,4 +620,90 @@ public class ReportContext {
             }
         }
     }
+    
+    private static void copyGalleryLib() {
+        File reportsRootDir = new File(System.getProperty("user.dir") + "/" + Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY));
+        if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists()) {
+            try {
+                InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
+                ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
+                        + GALLERY_ZIP)));
+                ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP, reportsRootDir.getAbsolutePath());
+                File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
+                zip.delete();
+            } catch (Exception e) {
+                LOGGER.error("Unable to copyGalleryLib!", e);
+            }
+        }
+    }
+
+    
+    private static void generateTestReport(File testDir) {
+        List<File> images = FileManager.getFilesInDir(testDir);
+        try {
+            List<String> imgNames = new ArrayList<String>();
+            for (File image : images) {
+                imgNames.add(image.getName());
+            }
+            imgNames.remove("thumbnails");
+            imgNames.remove("test.log");
+            imgNames.remove("sql.log");
+            if (imgNames.size() == 0)
+                return;
+
+            Collections.sort(imgNames);
+
+            StringBuilder report = new StringBuilder();
+            for (int i = 0; i < imgNames.size(); i++) {
+                // convert toString
+                String image = R.REPORT.get("image");
+
+                image = image.replace("${image}", imgNames.get(i));
+                image = image.replace("${thumbnail}", imgNames.get(i));
+
+                String title = getScreenshotComment(imgNames.get(i));
+                if (title == null) {
+                    title = "";
+                }
+                image = image.replace("${title}", StringUtils.substring(title, 0, MAX_IMAGE_TITLE));
+                report.append(image);
+            }
+            // String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
+            String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
+            wholeReport = wholeReport.replace("${title}", TITLE);
+            String folder = testDir.getAbsolutePath();
+            FileManager.createFileWithContent(folder + REPORT_NAME, wholeReport);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Stores comment for screenshot.
+     *
+     * @param screenId screenId id
+     * @param msg message
+     * 
+     */
+    public static void addScreenshotComment(String screenId, String msg) {
+        if (!StringUtils.isEmpty(screenId)) {
+            screenSteps.put(screenId, msg);
+        }
+    }
+
+    /**
+     * Return comment for screenshot.
+     * 
+     * @param screenId Screen Id
+     * 
+     * @return screenshot comment
+     */
+    public static String getScreenshotComment(String screenId) {
+        String comment = "";
+        if (screenSteps.containsKey(screenId))
+            comment = screenSteps.get(screenId);
+        return comment;
+    }
+
 }
