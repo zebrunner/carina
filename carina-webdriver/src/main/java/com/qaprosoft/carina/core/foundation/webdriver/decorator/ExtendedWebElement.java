@@ -1438,7 +1438,8 @@ public class ExtendedWebElement {
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
+		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
+			//sometime Appiuminstead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
 			element = refindElement();
@@ -1454,8 +1455,9 @@ public class ExtendedWebElement {
 			}
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
-			LOGGER.error(e.getMessage(), e);
-			// print error messages according to the action type
+			LOGGER.error(e);
+			// print stack trace temporary to be able to handle any problem without extra debugging 
+			e.printStackTrace();
 			throw e;
 		} finally {
 			Timer.stop(actionName);
