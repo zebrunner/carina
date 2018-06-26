@@ -386,16 +386,16 @@ public class MobileUtils {
         Dimension scrSize = helper.performIgnoreException(() -> drv.manage().window().getSize());
         LOGGER.debug("Finished driver dimension size...");
         // explicitly limit range of coordinates
-        if (endx > scrSize.width) {
+        if (endx >= scrSize.width) {
             LOGGER.warn("endx coordinate is bigger then device width! It will be limited!");
             endx = scrSize.width - 1;
         } else {
             endx = Math.max(1, endx);
         }
 
-        if (endy > scrSize.height) {
+        if (endy >= scrSize.height) {
             LOGGER.warn("endy coordinate is bigger then device height! It will be limited!");
-            endy = scrSize.height;
+            endy = scrSize.height - 1;
         } else {
             endy = Math.max(1, endy);
         }
