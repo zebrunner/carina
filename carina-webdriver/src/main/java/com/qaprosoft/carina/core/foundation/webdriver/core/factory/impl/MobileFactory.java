@@ -231,7 +231,7 @@ public class MobileFactory extends AbstractFactory {
                     ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().toString(),
                     rwd.getSessionId().toString());
             if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
-                if (rd.getVnc().matches("\\w+:\\d+")) {
+                if (rd.getVnc().matches(".+:\\d+")) {
                     // host:port format
                     final String protocol = R.CONFIG.get(vnc_protocol);
                     final String host = rd.getVnc().split(":")[0];
