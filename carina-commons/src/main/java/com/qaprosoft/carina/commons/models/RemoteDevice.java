@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.commons.models;
 
+import java.util.Map;
+
 /**
  * RemoteDevice represents base device info used in Selenium Hub.
  * 
@@ -30,6 +32,26 @@ public class RemoteDevice {
     private String vnc;
     private String proxyPort;
 
+    public RemoteDevice(Map<String, Object> caps) {
+		/*
+		 * {deviceType=Phone, proxy_port=9000,
+		 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
+		 * seleniumProtocol=WebDriver, adb_port=5038,
+		 * vnc=wss://stage.qaprosoft.com:7410/websockify, deviceName=Nokia_6_1,
+		 * version=8.1.0, platform=ANDROID, platformVersion=8.1.0,
+		 * automationName=uiautomator2, browserName=Nokia_6_1, maxInstances=1,
+		 * platformName=ANDROID, udid=PL2GAR9822804910}
+		 */
+    	setName(caps.get("deviceName").toString());
+    	setType(caps.get("deviceType").toString());
+    	setOs(caps.get("platform").toString());
+    	setOsVersion(caps.get("platformVersion").toString());
+    	setUdid(caps.get("udid").toString());
+    	
+    	setVnc(caps.get("vnc").toString());
+    	setProxyPort(caps.get("proxy_port").toString());
+    }
+    
     public String getName() {
         return name;
     }

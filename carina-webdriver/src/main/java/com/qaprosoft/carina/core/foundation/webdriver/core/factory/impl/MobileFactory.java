@@ -18,19 +18,12 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 
@@ -152,9 +145,8 @@ public class MobileFactory extends AbstractFactory {
 
             if (device.isNull()) {
                 // TODO: double check that local run with direct appium works fine
-                RemoteDevice remoteDevice = getDeviceInfo(seleniumHost, driver.getSessionId().toString());
+                RemoteDevice remoteDevice = getDeviceInfo(driver);
                 // 3rd party solutions like browserstack or saucelabs return not null
-                // remoteDevice object. But inside nothing useful
                 if (remoteDevice != null && remoteDevice.getName() != null) {
                     device = new Device(remoteDevice);
                 } else {
@@ -198,26 +190,18 @@ public class MobileFactory extends AbstractFactory {
     /**
      * Returns device information from Grid Hub using STF service.
      * 
-     * @param seleniumHost
-     *            - Selenium Grid host
-     * @param sessionId
-     *            - Selenium session id
+     * @param RemoteWebDriver
+     *            - driver
      * @return remote device information
      */
-    private RemoteDevice getDeviceInfo(String seleniumHost, String sessionId) {
+    private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
         RemoteDevice device = null;
         try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(seleniumHost.split("wd")[0] + "grid/admin/DeviceInfo?session=" + sessionId);
-            HttpResponse response = client.execute(request);
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            device = mapper.readValue(response.getEntity().getContent(), RemoteDevice.class);
-        } catch (JsonParseException e) {
-            // do nothing as it is direct call to the Appium without selenium
+        	@SuppressWarnings("unchecked")
+			Map<String, Object> slotCaps = (Map<String, Object>) drv.getCapabilities().getCapability("slotCapabilities");
+        	device = new RemoteDevice(slotCaps);
         } catch (Exception e) {
-            LOGGER.error("Unable to get device info: " + e.getMessage());
+            LOGGER.error("Unable to get device info!", e);
         }
         return device;
     }
@@ -227,9 +211,7 @@ public class MobileFactory extends AbstractFactory {
         String vncURL = null;
         if (driver instanceof RemoteWebDriver) {
             final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-            RemoteDevice rd = getDeviceInfo(
-                    ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().toString(),
-                    rwd.getSessionId().toString());
+			RemoteDevice rd = getDeviceInfo(rwd);
             if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
                 if (rd.getVnc().matches(".+:\\d+")) {
                     // host:port format
