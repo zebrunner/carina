@@ -71,8 +71,7 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
             TestSession session = testslot.getNewSession(requestedCapability);
 
             if (session != null) {
-            		session.getRequestedCapabilities().put("v1", "akhursevich");
-            		requestedCapability.put("v2", "vdelendik");
+            		session.getRequestedCapabilities().put("slotCapabilities", session.getSlot().getCapabilities());
                 return session;
             }
         }
