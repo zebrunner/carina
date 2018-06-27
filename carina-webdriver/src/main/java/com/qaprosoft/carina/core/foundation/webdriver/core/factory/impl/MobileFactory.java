@@ -194,17 +194,46 @@ public class MobileFactory extends AbstractFactory {
      *            - driver
      * @return remote device information
      */
-    private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
-        RemoteDevice device = null;
-        try {
-        	@SuppressWarnings("unchecked")
-			Map<String, Object> slotCaps = (Map<String, Object>) drv.getCapabilities().getCapability("slotCapabilities");
-        	device = new RemoteDevice(slotCaps);
-        } catch (Exception e) {
-            LOGGER.error("Unable to get device info!", e);
-        }
-        return device;
-    }
+	private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
+		RemoteDevice device = new RemoteDevice();
+		try {
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> cap = (Map<String, Object>) drv.getCapabilities().getCapability("slotCapabilities");
+			if (cap.containsKey("udid")) {
+
+				// restore device information from custom slotCapabilities map
+				/*
+				 * {deviceType=Phone, proxy_port=9000,
+				 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
+				 * seleniumProtocol=WebDriver, adb_port=5038,
+				 * vnc=wss://stage.qaprosoft.com:7410/websockify,
+				 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
+				 * platformVersion=8.1.0, automationName=uiautomator2,
+				 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
+				 * udid=PL2GAR9822804910}
+				 */
+
+				// TODO: remove code duplicates with carina-grid DeviceInfo
+				device.setName((String) cap.get("deviceName"));
+				device.setOs((String) cap.get("platformName"));
+				device.setOsVersion((String) cap.get("platformVersion"));
+				device.setType((String) cap.get("deviceType"));
+				device.setUdid((String) cap.get("udid"));
+				if (cap.containsKey("vnc")) {
+					device.setVnc((String) cap.get("vnc"));
+				}
+				if (cap.containsKey("proxy_port")) {
+					device.setProxyPort(String.valueOf(cap.get("proxy_port")));
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Unable to get device info!", e);
+		}
+		return device;
+	}
 
     @Override
     public String getVncURL(WebDriver driver) {
