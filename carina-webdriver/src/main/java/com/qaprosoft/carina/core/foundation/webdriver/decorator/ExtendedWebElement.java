@@ -268,7 +268,16 @@ public class ExtendedWebElement {
     }
 
     /**
-     * Check that element present within specified timeout.
+     * Check that element present or visible.
+     *
+     * @return element presence status.
+     */
+    public boolean isPresent() {
+    	return isPresent(EXPLICIT_TIMEOUT);
+    }
+    
+    /**
+     * Check that element present or visible within specified timeout.
      *
      * @param timeout - timeout.
      * @return element existence status.
