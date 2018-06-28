@@ -32,7 +32,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
@@ -831,7 +830,7 @@ public class Device extends RemoteDevice {
         String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
                 replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-        pageSource = StringEscapeUtils.escapeHtml4(EmojiUtils.emojify(pageSource));
+        pageSource = EmojiUtils.emojify(pageSource);
         
         File file = null;
         try {
