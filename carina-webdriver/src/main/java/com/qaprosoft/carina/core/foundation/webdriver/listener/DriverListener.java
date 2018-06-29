@@ -160,6 +160,7 @@ public class DriverListener implements IConfigurableEventListener {
 					&& !thr.getMessage().contains("chrome not reachable")
 					&& !thr.getMessage().contains("cannot forward the request Connect to")
 					&& !thr.getMessage().contains("Session ID is null. Using WebDriver after calling quit")
+					&& !thr.getMessage().contains("was terminated due to TIMEOUT")
 					&& !thr.getMessage().contains("Session timed out or not found")) {
 				captureScreenshot(thr.getMessage(), driver, null, true);
 			}
