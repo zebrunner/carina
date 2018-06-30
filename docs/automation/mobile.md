@@ -2,7 +2,7 @@ Carina framework provides the useful and elegant way of Mobile (Android and iOS)
 
 ### Mobile special requirements:
 To run mobile tests [Appium](http://appium.io/) is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before the test run.</b>
-(../../img/appium_design.png)
+![Alt text](../../img/appium_design.png "Appium")
 	
 ### Android special requirements:	
 1. Android SDK(part of [Android Studio](https://developer.android.com/studio/)) is an important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). 
