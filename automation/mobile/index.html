@@ -602,13 +602,13 @@
                 
                   <h1>Mobile automation</h1>
                 
-                <p>Carina framework provides useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through <a href="http://qaprosoft.github.io/carina/automation/web/">Web automation article</a>.</p>
+                <p>Carina framework provides the useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through <a href="http://qaprosoft.github.io/carina/automation/web/">Web automation article</a>.</p>
 <h3 id="mobile-special-requirements">Mobile special requirements:</h3>
-<p>To run mobile tests <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before test run.</b>
+<p>To run mobile tests <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before the test run.</b>
  <img alt="Page Object Pattern" src="../../img/appium_design.png" /></p>
 <h3 id="android-special-requirements">Android special requirements:</h3>
 <ol>
-<li>Android SDK(part of <a href="https://developer.android.com/studio/">Android Studio</a>) is important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). </li>
+<li>Android SDK(part of <a href="https://developer.android.com/studio/">Android Studio</a>) is an important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). </li>
 <li>Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
 Hint: sometimes (especially on Mac) you need to add paths to important folders inside sdk, such as “platform-tools” (here is ADB located), “tools” and “build-tools”(here is aapt located).</li>
 <li>.apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.</li>
@@ -616,7 +616,7 @@ Hint: sometimes (especially on Mac) you need to add paths to important folders i
 <h3 id="ios-special-requirements">iOS special requirements:</h3>
 <ol>
 <li><a href="https://developer.apple.com/xcode/">Xcode</a> is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.</li>
-<li>Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correct, but automation on simulator is free. On the other hand, the license is needed to work with the real device.</li>
+<li>Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on simulator is free. On the other hand, the license is needed to work with the real device.</li>
 </ol>
 <h3 id="mobile-config-properties">Mobile config properties</h3>
 <p>We could provide any Appium capabilty in <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing description for the most popular mobile capabilities:</p>
@@ -775,8 +775,8 @@ capabilities.newCommandTimeout=1800
 </code></pre>
 
 <p><b>Note:</b>
-To get device’s unique id (UDID) for emulator command “xcrun simctl list” is useful. It will show the list of simulators with there names, iOS versions, udids and statuses (shutdown or booted). 
-To get UDID from real device you have to plug your phone into a computer and copy it out of iTunes:
+To get device’s unique id (UDID) for emulator command “xcrun simctl list” is useful. It will show the list of simulators with their names, iOS versions, udids and statuses (shutdown or booted). 
+To get UDID from the real device you have to plug your phone into a computer and copy it out of iTunes:
 1. Launch iTunes and connect your iPhone.
 2. In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
 3. Reveal the Identifier by clicking on Serial Number.</p>
@@ -788,7 +788,7 @@ ExtendedWebElement(Carina’s implementation of WebElement) is used instead of W
  * Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
  * Locate Page Object classes in src/main/java package</p>
 <h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
-<p>To obtain locators of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s localed in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
+<p>To obtain locators of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s located in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
 Example:</p>
 <pre><code> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
  private ExtendedWebElement input;
@@ -803,7 +803,7 @@ Example:</p>
 protected ExtendedWebElement doneButton;
 </code></pre>
 
-<p>Another possibility to find element is to use @ClassShain annotation.
+<p>Another possibility to find the element is to use @ClassShain annotation.
 Example:</p>
 <pre><code>@FindBy(xpath = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
 @ClassChain
@@ -811,7 +811,7 @@ protected ExtendedWebElement developerText;
 </code></pre>
 
 <h3 id="implementation-of-tests">Implementation of tests</h3>
-<p>Carina framework uses TestNG for test organization. In general test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
+<p>Carina framework uses TestNG for test organization. In general, test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
 <pre><code>public class SampleTest extends AbstractTest {
 
     String name = &quot;My name&quot;;
