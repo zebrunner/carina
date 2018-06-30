@@ -2,10 +2,10 @@
 Rest API testing is a vital part of integration testing process, it may be used separately or in complex with web, mobile or DB testing. General process may be described by the following steps:
 
 1. Compile HTTP request with required meta data
-2. Send prepared data to required server endpoint
+2. Send prepared data to the required server endpoint
 3. Validate HTTP status and response data
 4. Extract some response data for the next requests
-5. Build call to next (or same) endpoint using (or not using) data from previous response
+5. Build call to next (or same) endpoint using (or not using) data from the previous response
 
 Schema below demonstrates the sequence:
 ![API flow](../img/api/api-flow-new.png)
@@ -21,7 +21,7 @@ files, source code, etc.) based on templates and changing data."
 * Json-schema-validator - library for validating of JSON body for matching to json schema
 
 ### Example of test implementation
-Let's create automated test for next call: POST https://jsonplaceholder.typicode.com/users request with requst body
+Let's create an automated test for next call: POST https://jsonplaceholder.typicode.com/users request with a request body
 ```
 [
     {
@@ -49,7 +49,7 @@ Let's create automated test for next call: POST https://jsonplaceholder.typicode
     }
 ]
 ```
-and response body same as request body
+and response body same as the request body
 
 #### Definition of request and response templates
 If we are going to send POST request we have to create request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in package structure for better maintenance and visibility:
@@ -77,7 +77,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 ```
 
 #### HTTP method and path
-The last step before test implementation itself is association of domain object class and required HTTP method and path.
+The last step before test implementation itself is the association of domain object class and required HTTP method and path.
 It should be defined in /carina-demo/src/main/resources/_api.properties file, key should be equal to domain class name, value has the following pattern {http_method}:{http_path}. HTTP path may contain placeholders, HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
 #=====================================================#
@@ -91,7 +91,7 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
 
 #### API test
-API test is general TestNG test, class should extend APITest, in our case test extend it over AbstractTest that encapsulates some test data and login method. Test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
+API test is the general TestNG test, a class should extend APITest, in our case test extend it over AbstractTest that encapsulates some test data and login method. Test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
 ```
 package com.qaprosoft.carina.demo;
 
@@ -146,13 +146,13 @@ public class APISampleTest extends AbstractTest {
 4. Specify expected HTTP status
 5. Call API
 6. Validate response by template or parse some data by JSON path
-7. Make further calls using data from previos call if needed
+7. Make further calls using data from the previous call if needed
 
 ### Useful features
-Framework contains list of useful feature for requests building and for responses validation. That makes easier support of such tests and and at the same time minimizes amount of test data.
+Framework contains a list of useful feature for requests building and for responses validation. That makes easier support of such tests and at the same time minimizes the amount of test data.
 
 #### Wildcards
-In some cases you may need to generate data in request to make request data unique. The best way of doing this is to use wildcards for data generation:
+In some cases you may need to generate data in the request to make request data unique. The best way of doing this is to use wildcards for data generation:
 ```
 {
     "username": "generate_word(10)",          // Will generate random alphanumeric string with 10 characters
@@ -171,7 +171,7 @@ Another useful way of wildcards usage is response validation. In some cases you 
 ```
 
 #### Validation against JSON schema
-When you need to validate response structure regardless of the actual values you may use validation by JSON schema. In this case you need actual response from service, let's say we have the following:
+When you need to validate response structure regardless of the actual values you may use validation by JSON schema. In this case you need an actual response from service, let's say we have the following:
 ```
 {
     "email": "test@domain.com",
@@ -179,11 +179,11 @@ When you need to validate response structure regardless of the actual values you
     "id": 11111
 }
 ```
-Now we need to generate schema (you may use any generator you like for example https://jsonschema.net/).
-IMPORTANT: For now schemas of version draft03 and draft04 are supported only. Please use appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
-In tool like this you need to provide original JSON from response then choose some schema options (allow additional properties in objects, mark current object properties as required, hard-code some expected values, ect) and then generate the schema. Copy-paste generated schema into test resources and you're ready to use it in the test.
+Now we need to generate a schema (you may use any generator you like for example https://jsonschema.net/).
+IMPORTANT: For now schemas of version draft03 and draft04 are supported only. Please use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
+In the tool like this you need to provide original JSON from response then choose some schema options (allow additional properties in objects, mark current object properties as required, hard-code some expected values, ect) and then generate the schema. Copy-paste generated schema into test resources and you're ready to use it in the test.
 ![API flow](../img/api/schema-generator.png)
-Make sure that you change all flags required to true, after that create new file in resources and place into appropriate endpoint package:
+Make sure that you change all flags required to true, after that create a new file in resources and place into appropriate endpoint package:
 ```
 {
     "type":"object",
@@ -221,9 +221,9 @@ public void testCheckJSONSchema()
 }
 ```
 
-#### Building of requests with array
-There are couple options for building request with array of items provided by framework:
-1. First one use hardcoded placholders for changeable variables.
+#### Building of requests with an array
+There are couple options for building request with an array of items provided by the framework:
+1. First one use hardcoded placeholders for changeable variables.
 ```
 {
    "name": "${name}",
@@ -253,7 +253,7 @@ As you see this structure is pretty flexible. If you need 2 taskTypes items then
 For instance you need to build json which contains taskTypes array. Then template with placeholders will be following:
 It's easy to extend such structure. You just need to add items with similar placeholders increasing their index.
 
-2. Other approach is based on using Freemarker loop. Here is the template example for same JSON:
+2. Anther approach is based on using Freemarker loop. Here is the template example for the same JSON:
 ```
 <#if task_name_1?exists>
     <#assign task_names = [task_name_1]>
@@ -285,12 +285,12 @@ It's easy to extend such structure. You just need to add items with similar plac
    ]
 }
 ```
-This approach is useful when structure of array item is pretty complex. So it makes sense to specify item attributes only once doing it inside #list operation.
+This approach is useful when a structure of array item is pretty complex. So it makes sense to specify item attributes only once doing it inside #list operation.
 This approach also allows to choose amount of array items dynamically.
 But note that you should specify all properties for each item so this view can be not used for negative tests when you need to miss some properties.
 
-#### Validation of responses with array
-Sometimes you could face situation when you need to validate presence of only one (or couple) item in JSON array ignoring rest items.
+#### Validation of responses with an array
+Sometimes you could face a situation when you need to validate presence of only one (or couple) item in JSON array ignoring rest items.
 In such case you can use validation option ARRAY_CONTAINS.
 Here is code sample:
 ```
@@ -317,7 +317,7 @@ Expected array:
     ]
 }
 ```
-And actual response:
+And the actual response:
 ```
 {
     "totalElements": 1017,
@@ -349,7 +349,7 @@ And actual response:
 ```
 
 ### Deserialization of JSON
-Sometimes you may need to transform your json response to POJO. It maybe useful if you need to validate your response using data from database as expected data.
+Sometimes you may need to transform your json response to POJO. It may be useful if you need to validate your response using data from the database as expected data.
 For that purposes it's better to use Jackson libraries that are already included in carina framework.
 For that you have to prepare domain class based on your json structure. Some online resources provide such opportunities. For instance https://timboudreau.com/blog/json/read
 For example we need to deserialize array of Clients from json. Example of required domain object will be:
