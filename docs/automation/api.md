@@ -253,7 +253,7 @@ As you see this structure is pretty flexible. If you need 2 taskTypes items then
 For instance you need to build json which contains taskTypes array. Then template with placeholders will be following:
 It's easy to extend such structure. You just need to add items with similar placeholders increasing their index.
 
-2. Anther approach is based on using Freemarker loop. Here is the template example for the same JSON:
+2. Another approach is based on using Freemarker loop. Here is the template example for the same JSON:
 ```
 <#if task_name_1?exists>
     <#assign task_names = [task_name_1]>
