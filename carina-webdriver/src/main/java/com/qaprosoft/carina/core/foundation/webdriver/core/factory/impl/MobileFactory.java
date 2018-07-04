@@ -226,6 +226,10 @@ public class MobileFactory extends AbstractFactory {
 				if (cap.containsKey("proxy_port")) {
 					device.setProxyPort(String.valueOf(cap.get("proxy_port")));
 				}
+				
+				if (cap.containsKey("remoteURL")) {
+					device.setRemoteURL(String.valueOf(cap.get("remoteURL")));
+				}
 
 			}
 

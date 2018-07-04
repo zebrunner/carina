@@ -25,6 +25,7 @@ import org.openqa.grid.internal.TestSlot;
 import org.openqa.grid.selenium.proxy.DefaultRemoteProxy;
 
 import com.qaprosoft.carina.grid.integration.STF;
+import com.qaprosoft.zafira.models.stf.STFDevice;
 
 /**
  * Mobile proxy that connects/disconnects STF devices.
@@ -62,18 +63,33 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         // any slot left for the given app ?
         for (TestSlot testslot : getTestSlots()) {
 
+        	String udid = (String) testslot.getCapabilities().get("udid");
+        	String remoteURL = null;
+        	
             // Check if device is busy in STF
             if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
-                    && !STF.isDeviceAvailable((String) testslot.getCapabilities().get("udid"))) {
+                    && !STF.isDeviceAvailable(udid)) {
                 return null;
+            } else {
+            	//device is available and free
+				STFDevice stfDevice = STF.getDevice(udid);
+				if (stfDevice != null) {
+					remoteURL = (String) stfDevice.getRemoteConnectUrl();
+				}
+
             }
 
             TestSession session = testslot.getNewSession(requestedCapability);
 
-            if (session != null) {
-            		session.getRequestedCapabilities().put("slotCapabilities", session.getSlot().getCapabilities());
-                return session;
-            }
+			if (session != null) {
+				// append remoteURL into the slotCapabilities object
+				if (remoteURL != null) {
+					session.getSlot().getCapabilities().put("remoteURL", remoteURL);
+				}
+
+				session.getRequestedCapabilities().put("slotCapabilities", session.getSlot().getCapabilities());
+				return session;
+			}
         }
         return null;
     }
