@@ -82,12 +82,15 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
             TestSession session = testslot.getNewSession(requestedCapability);
 
 			if (session != null) {
+				Map<String, Object> slotCapabilities = (Map<String, Object>)session.getSlot().getCapabilities();
+				
 				// append remoteURL into the slotCapabilities object
 				if (remoteURL != null) {
-					session.getSlot().getCapabilities().put("remoteURL", remoteURL);
+					LOGGER.fine("remoteURL " + remoteURL + " has added to returned slotCapabitlities");
+					slotCapabilities.put("remoteURL", remoteURL);
 				}
 
-				session.getRequestedCapabilities().put("slotCapabilities", session.getSlot().getCapabilities());
+				session.getRequestedCapabilities().put("slotCapabilities", slotCapabilities);
 				return session;
 			}
         }
