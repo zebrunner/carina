@@ -69,15 +69,19 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
             // Check if device is busy in STF
             if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
                     && !STF.isDeviceAvailable(udid)) {
+            	LOGGER.fine("device is not available: " + udid);
                 return null;
             } else {
             	//device is available and free
+            	LOGGER.fine("device is available: " + udid);
 				STFDevice stfDevice = STF.getDevice(udid);
 				if (stfDevice != null) {
 					remoteURL = (String) stfDevice.getRemoteConnectUrl();
+					LOGGER.fine("remoteURL by udid: " + remoteURL);
 				}
-
             }
+            
+            LOGGER.fine("remoteURL: " + remoteURL);
 
             TestSession session = testslot.getNewSession(requestedCapability);
 
