@@ -63,32 +63,15 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         // any slot left for the given app ?
         for (TestSlot testslot : getTestSlots()) {
 
-            // Check if device is busy in STF
-        	String udid = (String) testslot.getCapabilities().get("udid");
-            if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
-                    && !STF.isDeviceAvailable(udid)) {
-            	LOGGER.fine("device is not available: " + udid);
-                return null;
-            }
+			// Check if device is busy in STF
+			String udid = (String) testslot.getCapabilities().get("udid");
+			if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability) && !STF.isDeviceAvailable(udid)) {
+				return null;
+			}
             
             TestSession session = testslot.getNewSession(requestedCapability);
-            //obligatory redefine udid after getNewSession
-            udid = (String) testslot.getCapabilities().get("udid");
 
 			if (session != null) {
-				LOGGER.fine("device is available: " + udid);
-				// get existing slot capabilities from slave
-				Map<String, Object> slotCapabilities = (Map<String, Object>)session.getSlot().getCapabilities();
-
-				if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)) {
-					// get remoteURL from STF device and add into custom slotCapabilities if not null 
-					String remoteURL = getDeviceRemoteURL(udid);
-					if (remoteURL != null) {
-						slotCapabilities.put("remoteURL", remoteURL);
-					}
-				}
-				
-				session.getRequestedCapabilities().put("slotCapabilities", slotCapabilities);
 				return session;
 			}
         }
@@ -98,9 +81,11 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
     @Override
     public void beforeSession(TestSession session) {
         super.beforeSession(session);
+        
+        String udid = String.valueOf(session.getSlot().getCapabilities().get("udid"));
         if (STF.isSTFRequired(session.getSlot().getCapabilities(), session.getRequestedCapabilities())) {
-            STF.reserveDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
-            session.getRequestedCapabilities().put("qwe", "rty");
+            STF.reserveDevice(udid);
+            session.getRequestedCapabilities().put("slotCapabilities", getSlotCapabilities(session, udid));
         }
     }
 
@@ -112,16 +97,24 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         }
     }
     
-    private String getDeviceRemoteURL(String udid) {
+    private Map<String, Object> getSlotCapabilities(TestSession session, String udid) {
+		// get existing slot capabilities from session
+    	Map<String, Object> slotCapabilities = (Map<String, Object>)session.getSlot().getCapabilities();
+
+		// get remoteURL from STF device and add into custom slotCapabilities if not null
     	String remoteURL = null;
 
 		STFDevice stfDevice = STF.getDevice(udid);
 		if (stfDevice != null) {
-			LOGGER.fine("Identified " + stfDevice.getModel() + " device by udid: " + udid);	
+			LOGGER.fine("Identified '" + stfDevice.getModel() + "' device by udid: " + udid);	
 			remoteURL = (String) stfDevice.getRemoteConnectUrl();
+			LOGGER.fine("Identified remoteURL '" + remoteURL + "' by udid: " + udid);
 		}
-
-		LOGGER.fine("remoteURL " + remoteURL + " has added to returned slotCapabitlities");		
-    	return remoteURL;
+		if (remoteURL != null) {
+			slotCapabilities.put("remoteURL", remoteURL);
+		}
+				
+        return slotCapabilities;
     }
+
 }
