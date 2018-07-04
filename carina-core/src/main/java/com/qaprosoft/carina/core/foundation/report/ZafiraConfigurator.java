@@ -151,9 +151,4 @@ public class ZafiraConfigurator implements IConfigurator {
         return Artifacts.getArtifacts();
     }
 
-    @Override
-    public String getReportEmails() {
-        // This code is invoked only from ZafiraListener i.e. Zafira integration is already enabled!
-        return Configuration.get(Parameter.EMAIL_LIST);
-    }
 }
