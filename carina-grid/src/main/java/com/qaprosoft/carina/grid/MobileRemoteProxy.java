@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.grid;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -64,8 +65,8 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         for (TestSlot testslot : getTestSlots()) {
 
 			// Check if device is busy in STF
-			String udid = (String) testslot.getCapabilities().get("udid");
-			if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability) && !STF.isDeviceAvailable(udid)) {
+			if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
+					&& !STF.isDeviceAvailable((String) testslot.getCapabilities().get("udid"))) {
 				return null;
 			}
             
@@ -97,24 +98,25 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         }
     }
     
-    private Map<String, Object> getSlotCapabilities(TestSession session, String udid) {
+	private Map<String, Object> getSlotCapabilities(TestSession session, String udid) {
+		//obligatory create new map as original object is UnmodifiableMap
+		Map<String, Object> slotCapabilities = new HashMap<String, Object>();
+		
 		// get existing slot capabilities from session
-    	Map<String, Object> slotCapabilities = (Map<String, Object>)session.getSlot().getCapabilities();
+		slotCapabilities.putAll(session.getSlot().getCapabilities());
 
-		// get remoteURL from STF device and add into custom slotCapabilities if not null
-    	String remoteURL = null;
+		// get remoteURL from STF device and add into custom slotCapabilities map
+		String remoteURL = null;
 
 		STFDevice stfDevice = STF.getDevice(udid);
 		if (stfDevice != null) {
-			LOGGER.fine("Identified '" + stfDevice.getModel() + "' device by udid: " + udid);	
+			LOGGER.fine("Identified '" + stfDevice.getModel() + "' device by udid: " + udid);
 			remoteURL = (String) stfDevice.getRemoteConnectUrl();
 			LOGGER.fine("Identified remoteURL '" + remoteURL + "' by udid: " + udid);
-		}
-		if (remoteURL != null) {
 			slotCapabilities.put("remoteURL", remoteURL);
 		}
-				
-        return slotCapabilities;
-    }
+
+		return slotCapabilities;
+	}
 
 }
