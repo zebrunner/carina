@@ -100,6 +100,7 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         super.beforeSession(session);
         if (STF.isSTFRequired(session.getSlot().getCapabilities(), session.getRequestedCapabilities())) {
             STF.reserveDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
+            session.getRequestedCapabilities().put("qwe", "rty");
         }
     }
 
@@ -118,8 +119,6 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
 		if (stfDevice != null) {
 			LOGGER.fine("Identified " + stfDevice.getModel() + " device by udid: " + udid);	
 			remoteURL = (String) stfDevice.getRemoteConnectUrl();
-		} else {
-			LOGGER.severe("Unable to identify device by udid: " + udid);
 		}
 
 		LOGGER.fine("remoteURL " + remoteURL + " has added to returned slotCapabitlities");		
