@@ -64,36 +64,27 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         for (TestSlot testslot : getTestSlots()) {
 
         	String udid = (String) testslot.getCapabilities().get("udid");
-        	String remoteURL = null;
         	
             // Check if device is busy in STF
             if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
                     && !STF.isDeviceAvailable(udid)) {
             	LOGGER.fine("device is not available: " + udid);
                 return null;
-            } else {
-            	//device is available and free
-            	LOGGER.fine("device is available: " + udid);
-				STFDevice stfDevice = STF.getDevice(udid);
-				if (stfDevice != null) {
-					remoteURL = (String) stfDevice.getRemoteConnectUrl();
-					LOGGER.fine("remoteURL by udid: " + remoteURL);
-				}
             }
             
-            LOGGER.fine("remoteURL: " + remoteURL);
-
             TestSession session = testslot.getNewSession(requestedCapability);
 
 			if (session != null) {
+				LOGGER.fine("device is available: " + udid);
+				// get existing slot capabilities from slave
 				Map<String, Object> slotCapabilities = (Map<String, Object>)session.getSlot().getCapabilities();
-				
-				// append remoteURL into the slotCapabilities object
-				if (remoteURL != null) {
-					LOGGER.fine("remoteURL " + remoteURL + " has added to returned slotCapabitlities");
+
+				if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)) {
+					// get remoteURL from STF device and add into custom slotCapabilities anyway. null is possible as well to be able to handle correctly on core MobileFactory level 
+					String remoteURL = getDeviceRemoteURL(udid); 
 					slotCapabilities.put("remoteURL", remoteURL);
 				}
-
+				
 				session.getRequestedCapabilities().put("slotCapabilities", slotCapabilities);
 				return session;
 			}
@@ -115,5 +106,17 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         if (STF.isSTFRequired(session.getSlot().getCapabilities(), session.getRequestedCapabilities())) {
             STF.returnDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
         }
+    }
+    
+    private String getDeviceRemoteURL(String udid) {
+    	String remoteURL = null;
+
+		STFDevice stfDevice = STF.getDevice(udid);
+		if (stfDevice != null) {
+			remoteURL = (String) stfDevice.getRemoteConnectUrl();
+		}
+
+		LOGGER.fine("remoteURL " + remoteURL + " has added to returned slotCapabitlities");		
+    	return remoteURL;
     }
 }
