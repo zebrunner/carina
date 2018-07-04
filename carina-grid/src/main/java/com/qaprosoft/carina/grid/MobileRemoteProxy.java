@@ -63,9 +63,8 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         // any slot left for the given app ?
         for (TestSlot testslot : getTestSlots()) {
 
-        	String udid = (String) testslot.getCapabilities().get("udid");
-        	
             // Check if device is busy in STF
+        	String udid = (String) testslot.getCapabilities().get("udid");
             if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
                     && !STF.isDeviceAvailable(udid)) {
             	LOGGER.fine("device is not available: " + udid);
@@ -73,6 +72,8 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
             }
             
             TestSession session = testslot.getNewSession(requestedCapability);
+            //obligatory redefine udid after getNewSession
+            udid = (String) testslot.getCapabilities().get("udid");
 
 			if (session != null) {
 				LOGGER.fine("device is available: " + udid);
@@ -80,9 +81,11 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
 				Map<String, Object> slotCapabilities = (Map<String, Object>)session.getSlot().getCapabilities();
 
 				if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)) {
-					// get remoteURL from STF device and add into custom slotCapabilities anyway. null is possible as well to be able to handle correctly on core MobileFactory level 
-					String remoteURL = getDeviceRemoteURL(udid); 
-					slotCapabilities.put("remoteURL", remoteURL);
+					// get remoteURL from STF device and add into custom slotCapabilities if not null 
+					String remoteURL = getDeviceRemoteURL(udid);
+					if (remoteURL != null) {
+						slotCapabilities.put("remoteURL", remoteURL);
+					}
 				}
 				
 				session.getRequestedCapabilities().put("slotCapabilities", slotCapabilities);
@@ -113,7 +116,10 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
 
 		STFDevice stfDevice = STF.getDevice(udid);
 		if (stfDevice != null) {
+			LOGGER.fine("Identified " + stfDevice.getModel() + " device by udid: " + udid);	
 			remoteURL = (String) stfDevice.getRemoteConnectUrl();
+		} else {
+			LOGGER.severe("Unable to identify device by udid: " + udid);
 		}
 
 		LOGGER.fine("remoteURL " + remoteURL + " has added to returned slotCapabitlities");		
