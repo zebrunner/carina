@@ -21,6 +21,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +65,8 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
@@ -94,7 +97,8 @@ public class ExtendedWebElement {
     private WebElement element;
     private String name;
     private By by;
-
+    
+    private boolean caseInsensitive;
     
     //TODO: remove deprecated constructors and combined rest of functionality without code duplicates
     @Deprecated
@@ -155,7 +159,7 @@ public class ExtendedWebElement {
         }
 
 		try {
-			Field locatorField, searchContextField, byContextField = null;
+			Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
 			SearchContext tempSearchContext = null;
 
 			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
@@ -179,6 +183,10 @@ public class ExtendedWebElement {
 				searchContextField.setAccessible(true);
 				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
 
+				caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
+				caseInsensitiveContextField.setAccessible(true);
+                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+
 				byContextField = locator.getClass().getDeclaredField("by");
 				byContextField.setAccessible(true);
 				//TODO: identify if it is child element and 
@@ -198,6 +206,10 @@ public class ExtendedWebElement {
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
 					tempSearchContext = (SearchContext) searchContextField.get(locator);
+					
+					caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
+	                caseInsensitiveContextField.setAccessible(true);
+	                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
 				}
 			}
 
@@ -1126,8 +1138,22 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("By.xpath: ")) {
+            if (caseInsensitive) {
+                //TODO: make a separate method
+                String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b|\\bor\\b))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\bband\\b|\\bor\\b)\\]?)";        
+                Matcher matcher = Pattern.compile(attributePattern).matcher(locator);
+                StringBuffer sb = new StringBuffer();
+                while (matcher.find()) {
+                    String replacement = matcher.group(1) + "translate(" + matcher.group(3)
+                        + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" + matcher.group(5);
+                    matcher.appendReplacement(sb, replacement);
+                }
+                matcher.appendTail(sb);
+                locator = sb.toString();
+            }
             by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
+        
         if (locator.startsWith("linkText: ")) {
             by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
         }
