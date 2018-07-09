@@ -18,7 +18,10 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -36,6 +39,7 @@ import com.qaprosoft.alice.models.dto.RecognitionMetaType;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 
 /**
@@ -50,6 +54,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
     private final SearchContext searchContext;
     private boolean shouldCache;
+    private boolean caseInsensitive;
     private By by;
     private WebElement cachedElement;
 
@@ -69,9 +74,13 @@ public class ExtendedElementLocator implements ElementLocator {
         if (field.isAnnotationPresent(FindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.shouldCache = true;
+            this.caseInsensitive = false;
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(DisableCacheLookup.class)) {
             	this.shouldCache = false;
+            }
+            if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
+                this.caseInsensitive = true;
             }
         }
         // Elements to be recognized by Alice
@@ -96,6 +105,22 @@ public class ExtendedElementLocator implements ElementLocator {
         NoSuchElementException exception = null;
         // Finding element using Selenium
         if (by != null) {
+            if (caseInsensitive) {
+                //TODO: make a separate method
+                String locator = by.toString();
+                locator = StringUtils.remove(locator, "By.xpath: ");
+                String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b|\\bor\\b))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\bband\\b|\\bor\\b)\\]?)";
+                
+                Matcher matcher = Pattern.compile(attributePattern).matcher(locator);
+                StringBuffer sb = new StringBuffer();
+                while (matcher.find()) {
+                    String replacement = matcher.group(1) + "translate(" + matcher.group(3)
+                        + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" + matcher.group(5);
+                    matcher.appendReplacement(sb, replacement);
+                }
+                matcher.appendTail(sb);
+                by = By.xpath(sb.toString());
+            }
             try {
             	element = searchContext.findElement(by);
             } catch (NoSuchElementException e) {
