@@ -1,4 +1,4 @@
-[![Carina - Web automation](http://img.youtube.com/vi/Wgyffk7hJQw/0.jpg)](https://youtu.be/Wgyffk7hJQw)
+[![Carina - Web automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/Wgyffk7hJQw)
 
 Carina framework follows Selenium best practices for web tests automation. If you are familiar with Selenium WebDriver and have already implemented few tests with Page Object pattern the following guide will be pretty much easy for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, all the test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
 

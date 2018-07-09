@@ -1,4 +1,4 @@
-[![Carina - Configuration](http://img.youtube.com/vi/MMviWxCS9x4/0.jpg)](https://youtu.be/MMviWxCS9x4)
+[![Carina - Configuration](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/MMviWxCS9x4)
 
 ### Configuration files
 There are multiple properties files located in src/main/resources:
