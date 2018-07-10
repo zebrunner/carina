@@ -845,11 +845,16 @@ public class Device extends RemoteDevice {
     }
 
     private boolean isConnected() {
-        if (getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
-            return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
-        } else {
-            return false;
-        }
+    	try {
+	        if (getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
+	            return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
+	        } else {
+	            return false;
+	        }
+    	} catch (Throwable thr) {
+    		//do nothing for now
+    		return false;
+    	}
     }
     
     private List<String> getConnectedDevices() {
