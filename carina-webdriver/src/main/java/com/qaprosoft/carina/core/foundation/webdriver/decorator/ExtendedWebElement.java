@@ -180,8 +180,8 @@ public class ExtendedWebElement {
 				searchContextField.setAccessible(true);
 				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
 
-				caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-				caseInsensitiveContextField.setAccessible(true);
+                caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
+                caseInsensitiveContextField.setAccessible(true);
                 this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
 
 				byContextField = locator.getClass().getDeclaredField("by");
@@ -203,10 +203,10 @@ public class ExtendedWebElement {
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
 					tempSearchContext = (SearchContext) searchContextField.get(locator);
-					
-					caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-	                caseInsensitiveContextField.setAccessible(true);
-	                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+
+                    caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
+                    caseInsensitiveContextField.setAccessible(true);
+                    this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
 				}
 			}
 
