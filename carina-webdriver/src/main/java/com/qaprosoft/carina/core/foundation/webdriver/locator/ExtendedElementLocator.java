@@ -106,20 +106,7 @@ public class ExtendedElementLocator implements ElementLocator {
         // Finding element using Selenium
         if (by != null) {
             if (caseInsensitive) {
-                //TODO: make a separate method
-                String locator = by.toString();
-                locator = StringUtils.remove(locator, "By.xpath: ");
-                String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b|\\bor\\b))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\bband\\b|\\bor\\b)\\]?)";
-                
-                Matcher matcher = Pattern.compile(attributePattern).matcher(locator);
-                StringBuffer sb = new StringBuffer();
-                while (matcher.find()) {
-                    String replacement = matcher.group(1) + "translate(" + matcher.group(3)
-                        + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" + matcher.group(5);
-                    matcher.appendReplacement(sb, replacement);
-                }
-                matcher.appendTail(sb);
-                by = By.xpath(sb.toString());
+                by = toCaseInsensitive(by.toString());
             }
             try {
             	element = searchContext.findElement(by);
@@ -190,6 +177,21 @@ public class ExtendedElementLocator implements ElementLocator {
             throw new NoSuchElementException("Unable to find element by AI label: " + aiLabel + ", caption: " + aiCaption);
         }
         return element;
+    }
+    
+    public static By toCaseInsensitive(String locator) {
+        locator = StringUtils.remove(locator, "By.xpath: ");
+        String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b|\\bor\\b))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\bband\\b|\\bor\\b)\\]?)";
+
+        Matcher matcher = Pattern.compile(attributePattern).matcher(locator);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = matcher.group(1) + "translate(" + matcher.group(3)
+                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" + matcher.group(5);
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        return By.xpath(sb.toString());
     }
 
 }
