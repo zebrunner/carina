@@ -1,3 +1,5 @@
+Configure ssh connection based on git documentation [https://help.github.com/articles/connecting-to-github-with-ssh](https://help.github.com/articles/connecting-to-github-with-ssh).
+
 1) **Fork repository** `https://github.com/qaprosoft/carina` to your own user.
 
 2) **Clone your fork to your local machine**:
