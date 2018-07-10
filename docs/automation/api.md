@@ -1,3 +1,5 @@
+[![Carina - API automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/oJL5y8Ovta0)
+
 ### Introduction
 Rest API testing is a vital part of integration testing process, it may be used separately or in complex with web, mobile or DB testing. General process may be described by the following steps:
 
