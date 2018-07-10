@@ -179,6 +179,12 @@ public class ExtendedElementLocator implements ElementLocator {
         return element;
     }
     
+    /**
+     * Transform XPath locator to case insensitive
+     * 
+     * @param locator
+     * @return By
+     */
     public static By toCaseInsensitive(String locator) {
         locator = StringUtils.remove(locator, "By.xpath: ");
         String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b|\\bor\\b))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\bband\\b|\\bor\\b)\\]?)";
