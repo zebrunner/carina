@@ -199,7 +199,11 @@ public enum Messager {
 
     SLIDER_MOVED("PASS: silder '%s' was moved by offset X:'%s' Y:'%s'."),
 
-    SLIDER_NOT_MOVED("FAIL: silder '%s' was moved by offset X:'%s' Y:'%s'!");
+    SLIDER_NOT_MOVED("FAIL: silder '%s' was moved by offset X:'%s' Y:'%s'!"),
+
+    TAP_EXECUTED("PASS: Tap on X:'%s' Y:'%s' was executed."),
+
+    TAP_NOT_EXECUTED("FAIL: Tap on X:'%s' Y:'%s' was not executed.");
 
     private static final Logger LOGGER = Logger.getLogger(Messager.class);
 
