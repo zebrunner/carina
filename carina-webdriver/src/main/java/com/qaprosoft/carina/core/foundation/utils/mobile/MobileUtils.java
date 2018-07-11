@@ -26,11 +26,13 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -136,17 +138,24 @@ public class MobileUtils {
      * @param duration int
      */
     public static void tap(int startx, int starty, int duration) {
-        @SuppressWarnings("rawtypes")
-		TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) getDriver());
-		PointOption<?> startPoint = PointOption.point(startx, starty);
-		WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
+        //TODO: add Screenshot.capture()
+        try {
+            @SuppressWarnings("rawtypes")
+            TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) getDriver());
+            PointOption<?> startPoint = PointOption.point(startx, starty);
+            WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
 
-		if (duration == 0) {
-			//do not perform waiter as using 6.0.0. appium java client we do longpress instead of simple tap even with 0 wait duration
-			touchAction.press(startPoint).release().perform();
-		} else {
-			touchAction.press(startPoint).waitAction(waitOptions).release().perform();
-		}
+            if (duration == 0) {
+                // do not perform waiter as using 6.0.0. appium java client we do longpress instead of simple tap even with 0 wait duration
+                touchAction.press(startPoint).release().perform();
+            } else {
+                touchAction.press(startPoint).waitAction(waitOptions).release().perform();
+            }
+            Messager.TAP_EXECUTED.info(String.valueOf(startx), String.valueOf(starty));
+        } catch (Exception e) {
+            Messager.TAP_NOT_EXECUTED.error(String.valueOf(startx), String.valueOf(starty));
+            throw e;
+        }
     }
 
     /**
