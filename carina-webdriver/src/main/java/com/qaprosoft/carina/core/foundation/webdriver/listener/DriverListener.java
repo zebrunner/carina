@@ -148,6 +148,13 @@ public class DriverListener implements IConfigurableEventListener {
 	@Override
 	public void onException(Throwable thr, WebDriver driver) {
 		if (thr.getMessage() != null) {
+			if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")) {
+				LOGGER.error("Do not generate screenshot for invalid driver!");
+				//prevent recursive crash for onException
+				return;
+			}
+			
+			
 			// handle cases which should't be captured
 			// TODO: analyze maybe we can easier specify list of issues for
 			// capturing here
@@ -161,6 +168,7 @@ public class DriverListener implements IConfigurableEventListener {
 					&& !thr.getMessage().contains("cannot forward the request Connect to")
 					&& !thr.getMessage().contains("Session ID is null. Using WebDriver after calling quit")
 					&& !thr.getMessage().contains("was terminated due to TIMEOUT")
+					&& !thr.getMessage().contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
 					&& !thr.getMessage().contains("Session timed out or not found")) {
 				captureScreenshot(thr.getMessage(), driver, null, true);
 			}
