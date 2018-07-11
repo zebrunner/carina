@@ -1,4 +1,4 @@
-![Alt text](img/carina_logo.png "Carina Logo")
+![Alt text](img/carina.png "Carina Logo")
 
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
