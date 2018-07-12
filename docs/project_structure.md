@@ -1,4 +1,4 @@
-[![Carina - Project structure](http://img.youtube.com/vi/I1u07JspECE/0.jpg)](https://youtu.be/I1u07JspECE)
+[![Carina - Project structure](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/I1u07JspECE)
 
 Carina test project is structured as a standard Maven project:
 ```

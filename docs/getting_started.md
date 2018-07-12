@@ -1,5 +1,5 @@
 
-[![Carina - Getting started](http://img.youtube.com/vi/UtY-KLFnmI8/0.jpg)](https://youtu.be/UtY-KLFnmI8)
+[![Carina - Getting started](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/UtY-KLFnmI8)
 
 * Install and configure JDK 1.8+
 * Install and configure [Apache Maven 3.5.2+](http://maven.apache.org/)

@@ -1,10 +1,10 @@
-[![Carina - Web automation](http://img.youtube.com/vi/Wgyffk7hJQw/0.jpg)](https://youtu.be/Wgyffk7hJQw)
+[![Carina - Web automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/Wgyffk7hJQw)
 
-Carina framework follows Selenium best practices for web tests automation. If you are familiar with Selenium WebDriver and hve already implemented few tests with Page Object pattern the following guide will be pretty much easy for understanding. We have choosen [GSM Arena](https://www.gsmarena.com/) public web site for demontration pursposes, all the the test source code is locted in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
+Carina framework follows Selenium best practices for web tests automation. If you are familiar with Selenium WebDriver and have already implemented few tests with Page Object pattern the following guide will be pretty much easy for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, all the test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
 
 
 ### Implementation of Page Objects
-When you are writing functional tests using Selenium a major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements you will verify some state of the element through various assertions and move on to fetching the next element. You may find WebElements directry in your tests:
+When you are writing functional tests using Selenium a major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements you will verify some state of the element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:
 ```
 List<WebElement> zipCodes = driver.findElements(By.id("zipCodes"));
 for (WebElement zipCode : zipCodes) {
@@ -77,7 +77,7 @@ public class ModelInfoPage extends AbstractPage {
 
 
 ### Implementation of UI Components
-In some cases it is usefull to implement UI Objects that may be reused between multiple Page Objects, for instance top menu or footer may be shared between multiple pages:
+In some cases it is useful to implement UI Objects that may be reused between multiple Page Objects, for top menu or footer instance may be shared between multiple pages:
 ```
 public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = "Home")
@@ -135,11 +135,11 @@ public class HomePage extends AbstractPage {
 **Important:**
 
 * UI Object should extend **com.qaprosoft.carina.core.gui.AbstractUIObject**
-* You should call super constructor **super(driver, searchContext)** where searchContext is instance of **org.openqa.selenium.SearchContext**
+* You should call super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
 * Locate UI Object classes in src/main/java source folder
 
 ### Implementation of tests
-Carina framework uses TestNG for test organization. In general test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
+Carina framework uses TestNG for test organization. In general, test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
 public class WebSampleTest extends AbstractTest {
     @Test(description = "JIRA#AUTO-0009")
@@ -163,7 +163,7 @@ public class WebSampleTest extends AbstractTest {
 }
 
 ```
-It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in test, do not mix that logic.
+It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in the test, do not mix that logic.
 
 **Important:**
 
@@ -173,14 +173,14 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 * Locate tests in src/test/java source folder
 
 ### Test configuration
-There are few critical properties in config.properties file that are required for web tests exexcution:
+There are few critical properties in config.properties file which are required for web tests execution:
 
 * url=http://www.gsmarena.com
 * platform=*
 * browser=chrome
 * browser_version=*
 
-Implemented tests cases should be placed in TestNG xml file according to test group the test belongs to. More details about TestNG configuration you may find in [official documentation](http://testng.org/doc/documentation-main.html).
+Implemented tests cases should be placed in TestNG xml file according to test group the test belongs to. More details about TestNG configuration you may find in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
