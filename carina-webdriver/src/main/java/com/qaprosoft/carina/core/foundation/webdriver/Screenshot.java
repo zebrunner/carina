@@ -144,7 +144,7 @@ public class Screenshot {
         String screenName = capture(driver, true, comment, true);
 
         // XML layout extraction
-        File uiDumpFile = DevicePool.getDevice().generateUiDump();
+        File uiDumpFile = DevicePool.getDevice().generateUiDump(screenName);
         if (uiDumpFile != null) {
             uiDumpFile.getPath().split("\\/");
         }

@@ -804,7 +804,7 @@ public class Device extends RemoteDevice {
      * 
      * @return saved file
      */
-    public File generateUiDump() {
+    public File generateUiDump(String screenshotName) {
         if (isNull()) {
             return null;
         }
@@ -825,7 +825,6 @@ public class Device extends RemoteDevice {
         LOGGER.info("UI dump generation...");
         WebDriver driver = DriverPool.getDriver();
         DriverHelper helper = new DriverHelper();
-        String screenshotName = Screenshot.captureFailure(driver, "Generate UI dump");
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
