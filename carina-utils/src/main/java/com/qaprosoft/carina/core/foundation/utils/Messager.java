@@ -77,7 +77,11 @@ public enum Messager {
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
+    OPENING_URL("INFO: url '%s' is being opening..."),
+    
     OPEN_URL("INFO: url '%s' is opened."),
+    
+    NOT_OPEN_URL("FAIL: url '%s' is not opened!"),
 
     VALIDATION_FAIL("FAIL: '%s' !"),
 

@@ -648,6 +648,10 @@ public class DriverHelper {
                         .get(Parameter.URL) + decryptedURL;
         WebDriver drv = getDriver();
         
+        Messager.OPENING_URL.info(url);
+        
+        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+        
         try {
             drv.get(decryptedURL);
         } catch (UnhandledAlertException e) {
@@ -663,7 +667,7 @@ public class DriverHelper {
         } catch (Exception e) {
         	LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
         }
-		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), null);
+		
     }
 
     /**
