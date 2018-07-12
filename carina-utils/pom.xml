@@ -30,7 +30,6 @@
 		<joda-time.version>2.9.9</joda-time.version>
 
 		<jira-client.version>0.5</jira-client.version>
-		<emoji-version>5.0</emoji-version>
 	</properties>
 
 	<dependencies>
@@ -116,12 +115,6 @@
 		<dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.kcthota</groupId>
-			<artifactId>emoji4j</artifactId>
-			<version>${emoji-version}</version>
 		</dependency>
 	</dependencies>
 

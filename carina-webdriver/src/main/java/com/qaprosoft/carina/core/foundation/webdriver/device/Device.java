@@ -824,13 +824,11 @@ public class Device extends RemoteDevice {
         String pageSource = driver.getPageSource();
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
                 replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-//        [NM]: it corrupts cases with coordinates like "48]" -> "4 and smile"
-//        pageSource = EmojiUtils.emojify(pageSource);
         
         File file = null;
         try {
             file = new File(fileName);
-            FileUtils.writeStringToFile(file, pageSource, Charset.defaultCharset());
+            FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
         } catch (IOException e) {
             LOGGER.info(e);
             LOGGER.info("Error has been met during attempt to extract xml tree.");
