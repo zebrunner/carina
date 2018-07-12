@@ -826,7 +826,8 @@ public class Device extends RemoteDevice {
         String pageSource = driver.getPageSource();
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
                 replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-        pageSource = EmojiUtils.emojify(pageSource);
+//        [NM]: it corrupts cases with coordinates like "48]" -> "4 and smile"
+//        pageSource = EmojiUtils.emojify(pageSource);
         
         File file = null;
         try {
