@@ -53,8 +53,6 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 
-import emoji4j.EmojiUtils;
-
 public class Device extends RemoteDevice {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
 
