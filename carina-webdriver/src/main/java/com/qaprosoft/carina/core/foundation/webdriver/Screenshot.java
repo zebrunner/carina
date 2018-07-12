@@ -44,6 +44,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
@@ -140,7 +141,14 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static String captureFailure(WebDriver driver, String comment) {
-        return capture(driver, true, comment, true);
+        String screenName = capture(driver, true, comment, true);
+
+        // XML layout extraction
+        File uiDumpFile = DevicePool.getDevice().generateUiDump();
+        if (uiDumpFile != null) {
+            uiDumpFile.getPath().split("\\/");
+        }
+        return screenName;
     }
 
     /**
