@@ -51,9 +51,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Process
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 import emoji4j.EmojiUtils;
 
@@ -824,9 +822,8 @@ public class Device extends RemoteDevice {
         
         LOGGER.info("UI dump generation...");
         WebDriver driver = DriverPool.getDriver();
-        DriverHelper helper = new DriverHelper();
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
-        String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
+        String pageSource = driver.getPageSource();
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
                 replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
         pageSource = EmojiUtils.emojify(pageSource);
