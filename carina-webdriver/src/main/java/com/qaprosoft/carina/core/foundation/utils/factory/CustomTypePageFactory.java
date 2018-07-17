@@ -83,15 +83,14 @@ public class CustomTypePageFactory {
         LOGGER.debug("Major version of device OS: " + majorVersionNumber);
         for (Class<? extends T> clazz : setClasses) {
             if (clazz.getAnnotation(DeviceType.class) == null || clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
-                LOGGER.debug("Removing as parentClass is not satisfied or due to absence of @DeviceType annotation:"
-                        + clazz.getClass().getName());
+                LOGGER.debug(
+                        String.format("Removing as parentClass (%s) is not satisfied or due to absence of @DeviceType annotation on class: %s", parentClass.getName(), clazz.getName()));
                 continue;
             }
             DeviceType dt = clazz.getAnnotation(DeviceType.class);
 
+            LOGGER.debug(String.format("Expected screenType: %s, Actual screenType: %s", screenType, dt.pageType()));
             if (dt.pageType().equals(screenType)) {
-                LOGGER.debug("Expected screenType: " + screenType);
-                LOGGER.debug("Actual screenType: " + dt.pageType());
                 if (Arrays.asList(dt.version()).contains(deviceVersion)) {
                     LOGGER.debug("Expected version: " + deviceVersion);
                     LOGGER.debug("Actual versions: " + dt.version());
