@@ -51,11 +51,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Process
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-
-import emoji4j.EmojiUtils;
 
 public class Device extends RemoteDevice {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
@@ -804,7 +800,7 @@ public class Device extends RemoteDevice {
      * 
      * @return saved file
      */
-    public File generateUiDump() {
+    public File generateUiDump(String screenshotName) {
         if (isNull()) {
             return null;
         }
@@ -824,18 +820,15 @@ public class Device extends RemoteDevice {
         
         LOGGER.info("UI dump generation...");
         WebDriver driver = DriverPool.getDriver();
-        DriverHelper helper = new DriverHelper();
-        String screenshotName = Screenshot.captureFailure(driver, "Generate UI dump");
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
-        String pageSource = helper.performIgnoreException(() -> driver.getPageSource());
+        String pageSource = driver.getPageSource();
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
                 replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-        pageSource = EmojiUtils.emojify(pageSource);
         
         File file = null;
         try {
             file = new File(fileName);
-            FileUtils.writeStringToFile(file, pageSource, Charset.defaultCharset());
+            FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
         } catch (IOException e) {
             LOGGER.info(e);
             LOGGER.info("Error has been met during attempt to extract xml tree.");
