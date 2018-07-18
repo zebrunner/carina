@@ -26,13 +26,12 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -358,7 +357,7 @@ public class MobileUtils {
 
         while (!isVisible && currentCount-- > 0) {
             LOGGER.debug("Element not present! Swipe " + direction + " will be executed to element: " + element.getNameWithLocator().toString());
-            swipeInDevice(container, direction, duration);
+            swipeInContainer(container, direction, duration);
 
             LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
             isVisible = element.isVisible(1);
@@ -368,7 +367,7 @@ public class MobileUtils {
         while (bothDirections && !isVisible && currentCount-- > 0) {
             LOGGER.debug(
                     "Element not present! Swipe " + oppositeDirection + " will be executed to element: " + element.getNameWithLocator().toString());
-            swipeInDevice(container, oppositeDirection, duration);
+            swipeInContainer(container, oppositeDirection, duration);
             LOGGER.info("Swipe was executed. Attempts remain: " + currentCount);
             isVisible = element.isVisible(1);
         }
@@ -423,14 +422,14 @@ public class MobileUtils {
     }
 
     /**
-     * swipeInDevice
+     * swipeInContainer
      * 
      * @param container ExtendedWebElement
      * @param direction Direction
      * @param duration int
      * @return boolean
      */
-    private static boolean swipeInDevice(ExtendedWebElement container, Direction direction, int duration) {
+    public static boolean swipeInContainer(ExtendedWebElement container, Direction direction, int duration) {
 
         int startx = 0;
         int starty = 0;
@@ -525,7 +524,7 @@ public class MobileUtils {
      */
     public static void swipeUp(final int duration) {
         LOGGER.info("Swipe up will be executed.");
-        swipeInDevice(null, Direction.UP, duration);
+        swipeInContainer(null, Direction.UP, duration);
     }
 
     /**
@@ -547,7 +546,7 @@ public class MobileUtils {
      */
     public static void swipeDown(final int duration) {
         LOGGER.info("Swipe down will be executed.");
-        swipeInDevice(null, Direction.DOWN, duration);
+        swipeInContainer(null, Direction.DOWN, duration);
     }
 
     /**
@@ -582,7 +581,7 @@ public class MobileUtils {
 	 */
     public static void swipeLeft(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe left will be executed.");
-        swipeInDevice(container, Direction.LEFT, duration);
+        swipeInContainer(container, Direction.LEFT, duration);
     }
 
     /**
@@ -617,7 +616,7 @@ public class MobileUtils {
 	 */
     public static void swipeRight(ExtendedWebElement container, final int duration) {
         LOGGER.info("Swipe right will be executed.");
-        swipeInDevice(container, Direction.RIGHT, duration);
+        swipeInContainer(container, Direction.RIGHT, duration);
     }
 
     /**
