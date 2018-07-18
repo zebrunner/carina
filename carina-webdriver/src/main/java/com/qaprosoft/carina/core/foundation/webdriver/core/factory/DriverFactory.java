@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -124,24 +125,26 @@ public class DriverFactory {
 		return listeners.toArray(new WebDriverEventListener[listeners.size()]);
 	}
 
-	/**
-	 * Creates Zafira artifact that contains link to VNC websocket
-	 * 
-	 * @param vncURL - websocket URL
-	 */
-	private static void streamVNC(String vncURL) {
-		try {
-			if (!StringUtils.isEmpty(vncURL) && Reporter.getCurrentTestResult().getAttribute("ztid") != null
-					&& ZafiraSingleton.INSTANCE.isRunning()) {
-				TestArtifactType artifact = new TestArtifactType();
-				artifact.setName(String.format("Live video %s", SDF.format(new Date())));
-				artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
-				artifact.setLink(vncURL);
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
-			}
-		} catch (Exception e) {
-			LOGGER.error("Unable to stream VNC: " + e.getMessage(), e);
-		}
-	}
+    /**
+     * Creates Zafira artifact that contains link to VNC websocket
+     * 
+     * @param vncURL - websocket URL
+     */
+    private static void streamVNC(String vncURL) {
+        try {
+            ITestResult res = Reporter.getCurrentTestResult();
+            if (res != null) {
+                if (!StringUtils.isEmpty(vncURL) && res.getAttribute("ztid") != null && ZafiraSingleton.INSTANCE.isRunning()) {
+                    TestArtifactType artifact = new TestArtifactType();
+                    artifact.setName(String.format("Live video %s", SDF.format(new Date())));
+                    artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
+                    artifact.setLink(vncURL);
+                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unable to stream VNC: " + e.getMessage(), e);
+        }
+    }
 	
 }
