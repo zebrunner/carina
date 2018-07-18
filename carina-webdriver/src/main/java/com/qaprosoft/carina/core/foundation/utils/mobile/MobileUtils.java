@@ -21,20 +21,17 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -355,11 +352,7 @@ public class MobileUtils {
         default:
             throw new RuntimeException("Unsupported direction for swipeInContainerTillElement: " + direction);
         }
-        
-//        DriverPool drvPool = new DriverPool();
-        String drvSessionId = ((RemoteWebDriver)getDriver()).getSessionId().toString();
-        WebDriver driver = getDriver();
-        String pageSource = getDriver().getPageSource();
+
         int currentCount = count;
 
         while (!isVisible && currentCount-- > 0) {
