@@ -91,13 +91,17 @@ public class DriverFactory {
 	 */
 	public static TestArtifactType getLiveVideoArtifact() {
 		ITestResult res = Reporter.getCurrentTestResult();
-		if (ZafiraSingleton.INSTANCE.isRunning() && res != null && res.getAttribute("ztid") != null) {
+		LOGGER.debug("getting live video artifact if any...");
+		Object ztid = res.getAttribute("ztid");
+		if (ZafiraSingleton.INSTANCE.isRunning() && res != null && ztid != null) {
+			LOGGER.debug("zafira test id (ztid) exists: " + ztid);
 			TestArtifactType artifact = liveVideoArtifact.get();
 			if (artifact != null) {
+				LOGGER.debug("artifact exists: " + artifact.getName());
 				artifact.setTestId((Long) res.getAttribute("ztid"));
 				liveVideoArtifact.remove();
+				return artifact;
 			}
-			return artifact;
 		} 
 		return null;
 	}
@@ -111,14 +115,18 @@ public class DriverFactory {
 		try {
 			if (!StringUtils.isEmpty(vncURL) && ZafiraSingleton.INSTANCE.isRunning()) {
 				TestArtifactType artifact = new TestArtifactType();
-				artifact.setName(String.format("Live video %s", SDF.format(new Date())));
+				String name = String.format("Live video %s", SDF.format(new Date()));
+				LOGGER.debug("Register live video artifact name: " + name + "; vnc: " + vncURL);
+				artifact.setName(name);
 				artifact.setLink(vncURL);
 
 				if (Reporter.getCurrentTestResult().getAttribute("ztid") != null) {
 					artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
 					ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+					LOGGER.debug("Registered live video artifact " + name + " into zafira");
 				} else {
 					// remember current driver session and register later in DriverListener
+					LOGGER.debug("Remember live video artifact " + name + " as it was started in before suite/class/method");
 					liveVideoArtifact.set(artifact);
 				}
 			}

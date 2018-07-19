@@ -42,12 +42,12 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void afterAlertAccept(WebDriver driver) {
-        captureScreenshot("Alert accepted", driver);
+        onAfterAction("Alert accepted", driver);
     }
 
     @Override
     public void afterAlertDismiss(WebDriver driver) {
-        captureScreenshot("Alert dismissed", driver);
+        onAfterAction("Alert dismissed", driver);
     }
 
     @Override
@@ -69,23 +69,23 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void afterNavigateBack(WebDriver driver) {
-        captureScreenshot("Navigated back", driver);
+        onAfterAction("Navigated back", driver);
     }
 
     @Override
     public void afterNavigateForward(WebDriver driver) {
-        captureScreenshot("Navigated forward", driver);
+        onAfterAction("Navigated forward", driver);
     }
 
     @Override
     public void afterNavigateRefresh(WebDriver driver) {
-        captureScreenshot("Page refreshed", driver);
+        onAfterAction("Page refreshed", driver);
     }
 
     @Override
     public void afterNavigateTo(String url, WebDriver driver) {
         String comment = String.format("URL '%s' opened", url);
-        captureScreenshot(comment, driver);
+        onAfterAction(comment, driver);
     }
 
     @Override
@@ -242,10 +242,11 @@ public class DriverListener implements WebDriverEventListener {
          */
     }
 
-    private void captureScreenshot(String comment, WebDriver driver) {
+    private void onAfterAction(String comment, WebDriver driver) {
     	//TODO: investigate better place for below code which register live video test artifacts
         TestArtifactType artifact = DriverFactory.getLiveVideoArtifact();
         if (artifact != null) {
+        	LOGGER.debug("Registered live video artifact " + artifact.getName() + " into zafira");
             ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
         }
         
