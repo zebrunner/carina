@@ -110,7 +110,7 @@ public class DesktopFactory extends AbstractFactory {
             return new SafariCapabilities().getCapability(name);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.toLowerCase().contains(browser)) {
+        } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
             DesiredCapabilities caps = new EdgeCapabilities().getCapability(name);
             if (browser.equalsIgnoreCase("edge") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
                 //hotfix for the browserstack integration where browser should be declared as "Edge"  
