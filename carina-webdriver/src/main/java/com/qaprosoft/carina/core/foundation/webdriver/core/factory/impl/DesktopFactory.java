@@ -95,13 +95,13 @@ public class DesktopFactory extends AbstractFactory {
     }
 
     public DesiredCapabilities getCapabilities(String name) {
-        String browser = Configuration.get(Parameter.BROWSER).toLowerCase();
+        String browser = Configuration.get(Parameter.BROWSER);
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
         	DesiredCapabilities caps = new IECapabilities().getCapability(name);
-        	if (browser.contains("ie") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
+        	if (browser.equalsIgnoreCase("ie") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
         		//hotfix for the browserstack integration where browser should be declared as "IE"  
         		caps.setBrowserName("IE");
         	}
@@ -112,7 +112,7 @@ public class DesktopFactory extends AbstractFactory {
             return new ChromeCapabilities().getCapability(name);
         } else if (BrowserType.EDGE.toLowerCase().contains(browser)) {
             DesiredCapabilities caps = new EdgeCapabilities().getCapability(name);
-            if (browser.contains("edge") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
+            if (browser.equalsIgnoreCase("edge") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
                 //hotfix for the browserstack integration where browser should be declared as "Edge"  
                 caps.setBrowserName("Edge");
             }
