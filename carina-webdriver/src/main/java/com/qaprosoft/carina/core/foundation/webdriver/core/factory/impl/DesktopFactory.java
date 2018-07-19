@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -89,6 +90,7 @@ public class DesktopFactory extends AbstractFactory {
             throw new RuntimeException("Unable to create desktop driver", e);
         }
 
+        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), getBrowserVersion(driver));
         return driver;
     }
 
@@ -164,5 +166,20 @@ public class DesktopFactory extends AbstractFactory {
         default:
             return 1;
         }
+    }
+	
+    private String getBrowserVersion(WebDriver driver) {
+        String browser_version = Configuration.get(Parameter.BROWSER_VERSION);
+        try {
+            Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
+            browser_version = cap.getVersion().toString();
+            if (browser_version != null) {
+                browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
+                LOGGER.info(browser_version);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unable to get actual browser version!", e);
+        }
+        return browser_version;
     }
 }
