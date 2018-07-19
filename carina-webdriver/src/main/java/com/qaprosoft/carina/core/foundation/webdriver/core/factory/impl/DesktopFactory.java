@@ -101,7 +101,7 @@ public class DesktopFactory extends AbstractFactory {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
         	DesiredCapabilities caps = new IECapabilities().getCapability(name);
-        	if (browser.equalsIgnoreCase("ie")) {
+        	if (browser.equalsIgnoreCase("ie") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
         		//hotfix for the browserstack integration where browser should be declared as "IE"  
         		caps.setBrowserName("IE");
         	}
@@ -110,8 +110,13 @@ public class DesktopFactory extends AbstractFactory {
             return new SafariCapabilities().getCapability(name);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.toLowerCase().contains(browser)) {
-            return new EdgeCapabilities().getCapability(name);
+        } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
+            DesiredCapabilities caps = new EdgeCapabilities().getCapability(name);
+            if (browser.equalsIgnoreCase("edge") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
+                //hotfix for the browserstack integration where browser should be declared as "Edge"  
+                caps.setBrowserName("Edge");
+            }
+            return caps;
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
         }
@@ -175,7 +180,6 @@ public class DesktopFactory extends AbstractFactory {
             browser_version = cap.getVersion().toString();
             if (browser_version != null) {
                 browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
-                LOGGER.info(browser_version);
             }
         } catch (Exception e) {
             LOGGER.error("Unable to get actual browser version!", e);
