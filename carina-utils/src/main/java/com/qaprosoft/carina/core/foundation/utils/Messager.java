@@ -32,25 +32,48 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  */
 
 public enum Messager {
-    TEST_STARTED("INFO:%s TEST [%s] STARTED at [%s]"),
+    TEST_STARTED(
+            "\r\n" +
+                    "======================================================================================================================================\r\n"
+                    +
+                    "INFO:%s TEST [%s] STARTED at [%s]"),
 
-    TEST_PASSED("INFO:%s TEST [%s] PASSED at [%s]"),
+    TEST_PASSED(
+            "\r\n" +
+                    "INFO:%s TEST [%s] PASSED at [%s] \r\n" +
+                    "======================================================================================================================================"),
 
-    TEST_SKIPPED("INFO:%s TEST [%s] SKIPPED at [%s] - %s"),
+    TEST_SKIPPED(
+            "\r\n" +
+                    "INFO:%s TEST [%s] SKIPPED at [%s] - %s\r\n" +
+                    "======================================================================================================================================"),
 
-    TEST_SKIPPED_AS_ALREADY_PASSED("INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s]"),
+    TEST_SKIPPED_AS_ALREADY_PASSED(
+            "\r\n" +
+                    "INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s]\r\n" +
+                    "======================================================================================================================================"),
 
-    TEST_FAILED("INFO:%s TEST [%s] FAILED at [%s] - %s"),
+    TEST_FAILED(
+            "\r\n" +
+                    "INFO:%s TEST [%s] FAILED at [%s] - %s\r\n" +
+                    "======================================================================================================================================"),
 
-    RETRY_RETRY_FAILED("INFO:%s TEST [%s] RETRY %s of %s FAILED - %s"),
+    RETRY_RETRY_FAILED(
+            "\r\n" +
+                    "INFO:%s TEST [%s] RETRY %s of %s FAILED - %s\r\n" +
+                    "--------------------------------------------------------------------------------------------------------------------------------------"),
 
-    CONFIG_STARTED("INFO:%s CONFIG [%s] START at [%s]"),
+    CONFIG_STARTED(
+            "INFO:%s CONFIG [%s] START at [%s]"),
 
-    CONFIG_PASSED("INFO:%s CONFIG [%s] PASS at [%s]"),
+    CONFIG_PASSED(
+            "INFO:%s CONFIG [%s] PASS at [%s]"),
 
-    CONFIG_SKIPPED("INFO:%s CONFIG [%s] SKIP at [%s] - %s"),
+    CONFIG_SKIPPED(
+            "INFO:%s CONFIG [%s] SKIP at [%s] - %s"),
 
-    CONFIG_FAILED("INFO:%s CONFIG [%s] FAIL at [%s] - %s"),
+    CONFIG_FAILED(
+            "INFO:%s CONFIG [%s] FAIL at [%s] - %s"),
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
