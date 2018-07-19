@@ -21,26 +21,24 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class DriverListener implements IConfigurableEventListener {
+public class DriverListener implements WebDriverEventListener {
 
     private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
 
     private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
     private final static ThreadLocal<String> currentNegativeMessage = new ThreadLocal<String>();
-
-    @Override
-    public boolean enabled() {
-        // custom listener should be enabled forever as UI actions logging moved to this class
-        return true;
-    }
 
     @Override
     public void afterAlertAccept(WebDriver driver) {
@@ -245,6 +243,12 @@ public class DriverListener implements IConfigurableEventListener {
     }
 
     private void captureScreenshot(String comment, WebDriver driver) {
+    	//TODO: investigate better place for below code which register live video test artifacts
+        TestArtifactType artifact = DriverFactory.getLiveVideoArtifact();
+        if (artifact != null) {
+            ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+        }
+        
         captureScreenshot(comment, driver, null, false);
     }
 

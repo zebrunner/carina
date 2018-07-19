@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -33,7 +34,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.IConfigurableEventListener;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -50,6 +50,8 @@ public class DriverFactory {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 	
 	private static final String defaultCarinaEventListener = "com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener";
+	
+	protected static ThreadLocal<TestArtifactType> liveVideoArtifact = new ThreadLocal<TestArtifactType>();
 
 	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities,
 			String seleniumHost) {
@@ -81,6 +83,50 @@ public class DriverFactory {
 		return driver;
 	}
 
+
+	/**
+	 * Return registered live video artifacts if any from before suite/class/method phase if any
+	 * 
+	 * @return registered live video artifact
+	 */
+	public static TestArtifactType getLiveVideoArtifact() {
+		ITestResult res = Reporter.getCurrentTestResult();
+		if (ZafiraSingleton.INSTANCE.isRunning() && res != null && res.getAttribute("ztid") != null) {
+			TestArtifactType artifact = liveVideoArtifact.get();
+			if (artifact != null) {
+				artifact.setTestId((Long) res.getAttribute("ztid"));
+				liveVideoArtifact.remove();
+			}
+			return artifact;
+		} 
+		return null;
+	}
+	
+	/**
+	 * Create/Remember Zafira artifact that contains link to VNC websocket
+	 * 
+	 * @param vncURL - websocket URL
+	 */
+	private static void streamVNC(String vncURL) {
+		try {
+			if (!StringUtils.isEmpty(vncURL) && ZafiraSingleton.INSTANCE.isRunning()) {
+				TestArtifactType artifact = new TestArtifactType();
+				artifact.setName(String.format("Live video %s", SDF.format(new Date())));
+				artifact.setLink(vncURL);
+
+				if (Reporter.getCurrentTestResult().getAttribute("ztid") != null) {
+					artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
+					ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+				} else {
+					// remember current driver session and register later in DriverListener
+					liveVideoArtifact.set(artifact);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("Unable to stream VNC: " + e.getMessage(), e);
+		}
+	}
+	
 	/**
 	 * Reads 'driver_event_listeners' configuration property and initializes
 	 * appropriate array of driver event listeners.
@@ -92,12 +138,10 @@ public class DriverFactory {
 		try {
 			//explicitely add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.ScreenshotEventListener
 			Class<?> clazz = Class.forName(defaultCarinaEventListener);
-			if (IConfigurableEventListener.class.isAssignableFrom(clazz)) {
-				IConfigurableEventListener listener = (IConfigurableEventListener) clazz.newInstance();
-				if (listener.enabled()) {
-					listeners.add(listener);
-					LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
-				}
+			if (WebDriverEventListener.class.isAssignableFrom(clazz)) {
+				WebDriverEventListener listener = (WebDriverEventListener) clazz.newInstance();
+				listeners.add(listener);
+				LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
 			}
 
 			String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);
@@ -108,12 +152,10 @@ public class DriverFactory {
 						continue;
 					}
 					clazz = Class.forName(listenerClass);
-					if (IConfigurableEventListener.class.isAssignableFrom(clazz)) {
-						IConfigurableEventListener listener = (IConfigurableEventListener) clazz.newInstance();
-						if (listener.enabled()) {
-							listeners.add(listener);
-							LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
-						}
+					if (WebDriverEventListener.class.isAssignableFrom(clazz)) {
+						WebDriverEventListener listener = (WebDriverEventListener) clazz.newInstance();
+						listeners.add(listener);
+						LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
 					}
 				}
 			}
@@ -124,24 +166,5 @@ public class DriverFactory {
 		return listeners.toArray(new WebDriverEventListener[listeners.size()]);
 	}
 
-	/**
-	 * Creates Zafira artifact that contains link to VNC websocket
-	 * 
-	 * @param vncURL - websocket URL
-	 */
-	private static void streamVNC(String vncURL) {
-		try {
-			if (!StringUtils.isEmpty(vncURL) && Reporter.getCurrentTestResult().getAttribute("ztid") != null
-					&& ZafiraSingleton.INSTANCE.isRunning()) {
-				TestArtifactType artifact = new TestArtifactType();
-				artifact.setName(String.format("Live video %s", SDF.format(new Date())));
-				artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
-				artifact.setLink(vncURL);
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
-			}
-		} catch (Exception e) {
-			LOGGER.error("Unable to stream VNC: " + e.getMessage(), e);
-		}
-	}
-	
+
 }
