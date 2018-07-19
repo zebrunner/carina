@@ -62,6 +62,7 @@ public class MobileUtils {
 
     private static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
     private static final int DEFAULT_MAX_SWIPE_COUNT = 50;
+    private static final int DEFAULT_MIN_SWIPE_COUNT = 1;
     
     protected static DriverHelper helper = new DriverHelper();
 
@@ -423,13 +424,26 @@ public class MobileUtils {
 
     /**
      * swipeInContainer
-     * 
+     *
      * @param container ExtendedWebElement
      * @param direction Direction
      * @param duration int
      * @return boolean
      */
     public static boolean swipeInContainer(ExtendedWebElement container, Direction direction, int duration) {
+        return swipeInContainer(container, direction, DEFAULT_MIN_SWIPE_COUNT, duration);
+    }
+
+    /**
+     * swipeInContainer
+     * 
+     * @param container ExtendedWebElement
+     * @param direction Direction
+     * @param count int
+     * @param duration int
+     * @return boolean
+     */
+    public static boolean swipeInContainer(ExtendedWebElement container, Direction direction, int count, int duration) {
 
         int startx = 0;
         int starty = 0;
@@ -496,14 +510,19 @@ public class MobileUtils {
         }
 
         LOGGER.debug(String.format("Swipe from (X = %d; Y = %d) to (X = %d; Y = %d)", startx, starty, endx, endy));
+
         try {
-            swipe(startx, starty, endx, endy, duration);
+            for (int i = 0; i < count; ++i) {
+                swipe(startx, starty, endx, endy, duration);
+            }
             return true;
         } catch (Exception e) {
             LOGGER.error(String.format("Error during Swipe from (X = %d; Y = %d) to (X = %d; Y = %d): %s", startx, starty, endx, endy, e));
         }
         return false;
     }
+
+
 
     /**
      * Swipe up several times
