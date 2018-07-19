@@ -166,5 +166,4 @@ public class DriverFactory {
 		return listeners.toArray(new WebDriverEventListener[listeners.size()]);
 	}
 
-
 }
