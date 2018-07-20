@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
+import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -229,7 +229,7 @@ public final class DriverPool {
             }
 
         } finally {
-            NDC.pop();
+            MDC.remove("device");
         }
 
         // start default driver. Device can be nullDevice...
@@ -285,7 +285,7 @@ public final class DriverPool {
 
         } finally {
             // TODO analyze how to forcibly kill session on device
-            NDC.pop();
+            MDC.remove("device");
         }
     }
 
@@ -340,7 +340,7 @@ public final class DriverPool {
                 }
                 // push custom device name for log4j default messages
                 if (!device.isNull()) {
-                    NDC.push(" [" + device.getName() + "] ");
+                    MDC.put("device", "[" + device.getName() + "] ");
                 }
                 
 				// moved proxy start logic here since device will be initialized here only
