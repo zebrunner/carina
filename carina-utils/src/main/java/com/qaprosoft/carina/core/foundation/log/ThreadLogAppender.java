@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -68,6 +69,7 @@ public class ThreadLogAppender extends AppenderSkeleton {
                 // System.out.println("time: " + time);
 
                 long threadId = Thread.currentThread().getId();
+                MDC.put("threadId", "-" + String.valueOf(threadId));
                 // System.out.println("thread: " + threadId);
                 String fileName = event.getLocationInformation().getFileName();
                 // System.out.println("fileName: " + fileName);
