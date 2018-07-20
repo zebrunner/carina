@@ -22,9 +22,10 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.testng.ITestResult;
+import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -34,7 +35,16 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DriverListener implements WebDriverEventListener {
-
+	// 1. register live vnc url in DriverFactory (method streamVNC should return valid TestArtifactType
+	// 2. DriverFactory->getEventListeners(TestArtifactType vncArtifact)
+	// 3. declare vncArtifact using constructor in DriverListener
+	// 4. onBefore any action try to register vncArtifact in Zafira. Detailed use-cases find in onBeforeAction method 
+	protected TestArtifactType vncArtifact;
+	
+	public DriverListener(TestArtifactType vncArtifact) {
+		this.vncArtifact = vncArtifact;
+	}
+	
     private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
 
     private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
@@ -95,52 +105,52 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void beforeAlertAccept(WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeAlertDismiss(WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeClickOn(WebElement element, WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeFindBy(By by, WebElement element, WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeNavigateBack(WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeNavigateForward(WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeNavigateRefresh(WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeNavigateTo(String script, WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
     @Override
     public void beforeScript(String script, WebDriver driver) {
-        // Do nothing
+    	onBeforeAction();
     }
 
 	@Override
@@ -154,8 +164,6 @@ public class DriverListener implements WebDriverEventListener {
 			
 			
 			// handle cases which should't be captured
-			// TODO: analyze maybe we can easier specify list of issues for
-			// capturing here
 			if (!thr.getMessage().contains("StaleObjectException")
 					&& !thr.getMessage().contains("InvalidElementStateException")
 					&& !thr.getMessage().contains("stale element reference")
@@ -193,14 +201,13 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void afterSwitchToWindow(String arg0, WebDriver arg1) {
-        // TODO Auto-generated method stub
+        // do nothing
 
     }
 
     @Override
     public void beforeSwitchToWindow(String arg0, WebDriver arg1) {
-        // TODO Auto-generated method stub
-
+    	onBeforeAction();
     }
 
     private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
@@ -216,42 +223,34 @@ public class DriverListener implements WebDriverEventListener {
             Screenshot.capture(driver, comment);
         }
         
-        /*
-         * if (element != null) {
-         * ReportContext.saveScreenshot(Screen.getInstance(driver)
-         * .capture(ScreenArea.VISIBLE_SCREEN).highlight(element.getLocation()).comment(comment).getImage());
-         * } else {
-         * ReportContext.saveScreenshot(Screen.getInstance(driver)
-         * .capture(ScreenArea.VISIBLE_SCREEN).comment(comment).getImage());
-         * }
-         */
         resetMessages();
 
-        // examples of new screenshooting approaches
-        /*
-         * LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-         * .capture(ScreenArea.VISIBLE_SCREEN).highlight(element.getLocation()).comment(comment).getImage()));
-         * 
-         * LOGGER.info(ReportContext.saveScreenshot(Screen.getInstance(driver)
-         * .capture(ScreenArea.VISIBLE_SCREEN).comment("Alert accepted").getImage()));
-         * 
-         * ReportContext.saveScreenshot(Screen.getInstance(driver).capture(ScreenArea.VISIBLE_SCREEN)
-         * .highlight(element.getLocation()).comment(comment).getImage());
-         * 
-         * 
-         */
     }
 
     private void onAfterAction(String comment, WebDriver driver) {
-    	//TODO: investigate better place for below code which register live video test artifacts
-        TestArtifactType artifact = DriverFactory.getLiveVideoArtifact();
-        if (artifact != null) {
-        	LOGGER.debug("Registered live video artifact " + artifact.getName() + " into zafira");
-            ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
-        }
-        
         captureScreenshot(comment, driver, null, false);
     }
+    
+
+	private void onBeforeAction() {
+		// 4a. if "tzid" not exist inside vncArtifact and exists in Reporter ->
+		// register new vncArtifact in Zafira.
+		// 4b. if "tzid" already exists in current artifact but in Reporter
+		// there is
+		// another value. Use case for class/suite mode when we share the same
+		// driver across different tests
+
+		ITestResult res = Reporter.getCurrentTestResult();
+		if (res != null && res.getAttribute("ztid") != null) {
+			Long ztid = (Long) res.getAttribute("ztid");
+			if (ztid != vncArtifact.getTestId()) {
+				vncArtifact.setTestId(ztid);
+				LOGGER.debug("Registered live video artifact " + vncArtifact.getName() + " into zafira");
+				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);
+			}
+
+		}
+	}
 
     public static String getMessage(boolean errorMessage) {
     	if (errorMessage) {
@@ -273,14 +272,13 @@ public class DriverListener implements WebDriverEventListener {
 
 	@Override
 	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
-		// TODO Auto-generated method stub
+		// do nothing
 		
 	}
 
 	@Override
 	public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
-		// TODO Auto-generated method stub
-		
+		onBeforeAction();
 	}
 
 }
