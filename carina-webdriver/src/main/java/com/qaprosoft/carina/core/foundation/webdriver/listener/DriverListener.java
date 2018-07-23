@@ -233,11 +233,8 @@ public class DriverListener implements WebDriverEventListener {
     
 
 	private void onBeforeAction() {
-		// 4a. if "tzid" not exist inside vncArtifact and exists in Reporter ->
-		// register new vncArtifact in Zafira.
-		// 4b. if "tzid" already exists in current artifact but in Reporter
-		// there is
-		// another value. Use case for class/suite mode when we share the same
+		// 4a. if "tzid" not exist inside vncArtifact and exists in Reporter -> register new vncArtifact in Zafira.
+		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
 		// driver across different tests
 
 		ITestResult res = Reporter.getCurrentTestResult();
