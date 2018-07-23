@@ -116,6 +116,8 @@ public class SpecialKeywords {
     public static final String SKIP_EXECUTION = "SKIP_EXECUTION";
 
     public static final String ZAFIRA_PROJECT = "zafira_project";
+    public static final String ACTUAL_BROWSER_VERSION = "actual_browser_version";
+    
 
     public static final String COMMENT = "comment";
     

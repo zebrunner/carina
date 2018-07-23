@@ -30,6 +30,7 @@ import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -90,7 +91,7 @@ public class DesktopFactory extends AbstractFactory {
             throw new RuntimeException("Unable to create desktop driver", e);
         }
 
-        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), getBrowserVersion(driver));
+        R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
         return driver;
     }
 
