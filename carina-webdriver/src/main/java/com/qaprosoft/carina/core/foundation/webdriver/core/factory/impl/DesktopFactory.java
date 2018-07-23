@@ -100,11 +100,7 @@ public class DesktopFactory extends AbstractFactory {
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
-        	DesiredCapabilities caps = new IECapabilities().getCapability(name);
-        	if (browser.equalsIgnoreCase("ie") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
-        		//hotfix for the browserstack integration where browser should be declared as "IE"  
-        		caps.setBrowserName("IE");
-        	}
+            DesiredCapabilities caps = new IECapabilities().getCapability(name);
             return caps;
         } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
@@ -112,10 +108,8 @@ public class DesktopFactory extends AbstractFactory {
             return new ChromeCapabilities().getCapability(name);
         } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
             DesiredCapabilities caps = new EdgeCapabilities().getCapability(name);
-            if (browser.equalsIgnoreCase("edge") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
-                //hotfix for the browserstack integration where browser should be declared as "Edge"  
-                caps.setBrowserName("Edge");
-            }
+            // forcibly override browser name to edge for support 3rd party solutions like browserstack
+            caps.setBrowserName(browser);
             return caps;
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
@@ -179,7 +173,9 @@ public class DesktopFactory extends AbstractFactory {
             Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
             browser_version = cap.getVersion().toString();
             if (browser_version != null) {
-                browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
+                if (browser_version.contains(".")) {
+                    browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Unable to get actual browser version!", e);
