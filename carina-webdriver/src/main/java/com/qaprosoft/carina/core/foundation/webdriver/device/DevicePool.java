@@ -58,6 +58,11 @@ public class DevicePool {
         return nullDevice;
     }
 
+    public static boolean isRegistered() {
+        Device device = currentDevice.get();
+        return device != null;
+    }
+    
     private static void setDevice(Device device) {
         long threadId = Thread.currentThread().getId();
         LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
