@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
@@ -28,8 +26,8 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.UnreachableBrowserException;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -48,10 +46,6 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 public class DesktopFactory extends AbstractFactory {
 
     private static DesiredCapabilities staticCapabilities;
-    private static final String RESTART_ALL_BAT_PATH = "C:\\Tools\\selenium-server\\restart-all.bat";
-    private static final String RESTART_ALL_SH_PATH = "$HOME/tools/selenium/restart-all.sh";
-    private static final String PREFIX_WIN = "cmd /c ";
-    private static final String PREFIX_NIX = "/bin/bash -c ";
     
     @Override
     public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
@@ -81,16 +75,11 @@ public class DesktopFactory extends AbstractFactory {
             }
             
             driver = new RemoteWebDriver(ce, capabilities);
-        } catch (UnreachableBrowserException e) {
-            // try to restart selenium hub
-            restartAll(PREFIX_WIN, RESTART_ALL_BAT_PATH);
-            restartAll(PREFIX_NIX, RESTART_ALL_SH_PATH);
-            throw e;
         } catch (MalformedURLException e) {
             throw new RuntimeException("Unable to create desktop driver", e);
         }
 
-        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), getBrowserVersion(driver));
+        R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
         return driver;
     }
 
@@ -100,11 +89,7 @@ public class DesktopFactory extends AbstractFactory {
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
-        	DesiredCapabilities caps = new IECapabilities().getCapability(name);
-        	if (browser.equalsIgnoreCase("ie") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
-        		//hotfix for the browserstack integration where browser should be declared as "IE"  
-        		caps.setBrowserName("IE");
-        	}
+            DesiredCapabilities caps = new IECapabilities().getCapability(name);
             return caps;
         } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
@@ -112,10 +97,8 @@ public class DesktopFactory extends AbstractFactory {
             return new ChromeCapabilities().getCapability(name);
         } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
             DesiredCapabilities caps = new EdgeCapabilities().getCapability(name);
-            if (browser.equalsIgnoreCase("edge") && R.CONFIG.getBoolean("capabilities.browserstack.local")) {
-                //hotfix for the browserstack integration where browser should be declared as "Edge"  
-                caps.setBrowserName("Edge");
-            }
+            // forcibly override browser name to edge for support 3rd party solutions like browserstack
+            caps.setBrowserName(browser);
             return caps;
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
@@ -127,17 +110,6 @@ public class DesktopFactory extends AbstractFactory {
             staticCapabilities = new DesiredCapabilities();
         }
         staticCapabilities.setCapability(name, value);
-    }
-
-    private void restartAll(String cmdPrefix, String filePath) {
-        if (new File(filePath).exists()) {
-            LOGGER.info("Following command will be executed: " + cmdPrefix + filePath);
-            try {
-                Runtime.getRuntime().exec(cmdPrefix + filePath);
-            } catch (IOException e) {
-                throw new RuntimeException("Cannot restart selenium server");
-            }
-        }
     }
 
 	@Override
@@ -179,7 +151,9 @@ public class DesktopFactory extends AbstractFactory {
             Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
             browser_version = cap.getVersion().toString();
             if (browser_version != null) {
-                browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
+                if (browser_version.contains(".")) {
+                    browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Unable to get actual browser version!", e);
