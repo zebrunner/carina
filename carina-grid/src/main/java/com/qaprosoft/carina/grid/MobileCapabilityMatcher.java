@@ -32,12 +32,14 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
     private static final String PLATFORM_VERSION = "platformVersion";
     private static final String DEVICE_NAME = "deviceName";
     private static final String DEVICE_TYPE = "deviceType";
+    private static final String DEVICE_POOL = "devicePool";
     private static final String UDID = "udid";
 
     @Override
     public boolean matches(Map<String, Object> nodeCapability, Map<String, Object> requestedCapability) {
         if (requestedCapability.containsKey(PLATFORM_NAME) || requestedCapability.containsKey(PLATFORM_VERSION)
-                || requestedCapability.containsKey(DEVICE_NAME) || requestedCapability.containsKey(UDID)) {
+                || requestedCapability.containsKey(DEVICE_NAME) || requestedCapability.containsKey(UDID)
+                || requestedCapability.containsKey(DEVICE_POOL)) {
             // Mobile-based capabilities
             return extensionCapabilityCheck(nodeCapability, requestedCapability);
         } else {
@@ -57,6 +59,12 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
      */
     private boolean extensionCapabilityCheck(Map<String, Object> nodeCapability,
             Map<String, Object> requestedCapability) {
+    	
+    		// If devicePool is found in requested capabilities then more likely deviceName=ANY for QPS_GGR usage
+    		if(requestedCapability.containsKey(DEVICE_POOL)) {
+    			requestedCapability.put(DEVICE_NAME, requestedCapability.get(DEVICE_POOL));
+		}
+    	
         for (String key : requestedCapability.keySet()) {
             String expectedValue = requestedCapability.get(key) != null ? requestedCapability.get(key).toString()
                     : null;

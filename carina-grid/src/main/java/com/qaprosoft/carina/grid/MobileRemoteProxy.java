@@ -15,9 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.grid;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.GridRegistry;
 import org.openqa.grid.internal.TestSession;
@@ -25,6 +27,7 @@ import org.openqa.grid.internal.TestSlot;
 import org.openqa.grid.selenium.proxy.DefaultRemoteProxy;
 
 import com.qaprosoft.carina.grid.integration.STF;
+import com.qaprosoft.zafira.models.stf.STFDevice;
 
 /**
  * Mobile proxy that connects/disconnects STF devices.
@@ -62,17 +65,17 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         // any slot left for the given app ?
         for (TestSlot testslot : getTestSlots()) {
 
-            // Check if device is busy in STF
-            if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
-                    && !STF.isDeviceAvailable((String) testslot.getCapabilities().get("udid"))) {
-                return null;
-            }
-
+			// Check if device is busy in STF
+			if (STF.isSTFRequired(testslot.getCapabilities(), requestedCapability)
+					&& !STF.isDeviceAvailable((String) testslot.getCapabilities().get("udid"))) {
+				return null;
+			}
+            
             TestSession session = testslot.getNewSession(requestedCapability);
 
-            if (session != null) {
-                return session;
-            }
+			if (session != null) {
+				return session;
+			}
         }
         return null;
     }
@@ -80,8 +83,16 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
     @Override
     public void beforeSession(TestSession session) {
         super.beforeSession(session);
+        
+        String udid = String.valueOf(session.getSlot().getCapabilities().get("udid"));
         if (STF.isSTFRequired(session.getSlot().getCapabilities(), session.getRequestedCapabilities())) {
-            STF.reserveDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
+            STF.reserveDevice(udid);
+            //session.getRequestedCapabilities().put("slotCapabilities", getSlotCapabilities(session, udid));
+        }
+        
+        if (!StringUtils.isEmpty(udid)) {
+        	// this is our mobile Android or iOS device
+        	session.getRequestedCapabilities().put("slotCapabilities", getSlotCapabilities(session, udid));
         }
     }
 
@@ -92,4 +103,27 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
             STF.returnDevice(String.valueOf(session.getSlot().getCapabilities().get("udid")));
         }
     }
+    
+	private Map<String, Object> getSlotCapabilities(TestSession session, String udid) {
+		//obligatory create new map as original object is UnmodifiableMap
+		Map<String, Object> slotCapabilities = new HashMap<String, Object>();
+		
+		// get existing slot capabilities from session
+		slotCapabilities.putAll(session.getSlot().getCapabilities());
+
+		if (STF.isSTFRequired(session.getSlot().getCapabilities(), session.getRequestedCapabilities())) {
+			// get remoteURL from STF device and add into custom slotCapabilities map
+			String remoteURL = null;
+			STFDevice stfDevice = STF.getDevice(udid);
+			if (stfDevice != null) {
+				LOGGER.fine("Identified '" + stfDevice.getModel() + "' device by udid: " + udid);
+				remoteURL = (String) stfDevice.getRemoteConnectUrl();
+				LOGGER.fine("Identified remoteURL '" + remoteURL + "' by udid: " + udid);
+				slotCapabilities.put("remoteURL", remoteURL);
+			}
+		}
+
+		return slotCapabilities;
+	}
+
 }
