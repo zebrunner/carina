@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -326,6 +327,15 @@ public class AndroidUtils extends MobileUtils {
 		// TODO: support multi threaded WebDriver's removing DriverPool usage
 		WebDriver drv = getDriver();
 
+        //workaorund for appium issue: https://github.com/appium/appium/issues/10159
+        if (scrollToEle.contains(",")) {
+            scrollToEle = StringUtils.join(StringUtils.split(scrollToEle, ","),
+                    ",", 0, 2);
+            if (eleSelectorType.equals(SelectorType.TEXT)) {
+                eleSelectorType = SelectorType.TEXT_CONTAINS;
+            }
+        }
+
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
@@ -378,6 +388,14 @@ public class AndroidUtils extends MobileUtils {
 		// TODO: support multi threaded WebDriver's removing DriverPool usage
 		WebDriver drv = getDriver();
 
+        //workaorund for appium issue: https://github.com/appium/appium/issues/10159
+        if (scrollToEle.contains(",")) {
+            scrollToEle = StringUtils.join(StringUtils.split(scrollToEle, ","),
+                    ",", 0, 2);
+            if (eleSelectorType.equals(SelectorType.TEXT)) {
+                eleSelectorType = SelectorType.TEXT_CONTAINS;
+            }
+        }
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
@@ -429,6 +447,15 @@ public class AndroidUtils extends MobileUtils {
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 		// TODO: support multi threaded WebDriver's removing DriverPool usage
 		WebDriver drv = getDriver();
+
+        //workaorund for appium issue: https://github.com/appium/appium/issues/10159
+        if (scrollToEle.contains(",")) {
+            scrollToEle = StringUtils.join(StringUtils.split(scrollToEle, ","),
+                    ",", 0, 2);
+            if (eleSelectorType.equals(SelectorType.TEXT)) {
+                eleSelectorType = SelectorType.TEXT_CONTAINS;
+            }
+        }
 
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
