@@ -27,6 +27,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -111,7 +112,10 @@ public abstract class AbstractFactory {
     protected TestArtifactType initVideoArtifact(String videoName) {
         TestArtifactType artifact = new TestArtifactType();
         artifact.setName("Video " + SDF.format(new Date()));
-        artifact.setTestId((Long) Reporter.getCurrentTestResult().getAttribute("ztid"));
+        ITestResult res = Reporter.getCurrentTestResult();
+        if (res != null) {
+        	artifact.setTestId((Long) res.getAttribute("ztid"));
+        }
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
         return artifact;
     }
