@@ -250,3 +250,98 @@ public class SampleTest extends AbstractTest {
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder
+
+### How to use CustomTypePageFactory
+Carina provides a solution to mobile testing on iOS/Android platforms with the same test-code. For both platforms you should use [Page Object Design Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern) but in a bit improved way.
+Each page has 3 realizations in 3 packages:
+ * common page Base in common package with common methods and elements;
+ * iOS page in ios package with iOS methods and elements;
+ * Android page in android package with Android methods and elements.
+
+iOS and Android pages should extends Base Page and have the same name. Annotation @DeviceType would provide information about device type and parent (common) page.
+
+**Examples:**
+
+**Common (Base) Page**
+```
+public abstract class HomePageBase extends AbstractPage {
+
+    public HomePageBase(WebDriver driver) {
+        super(driver);
+    }
+
+    public abstract PhoneFinderPageBase openPhoneFinder();
+
+    public abstract ComparePageBase openComparePage();
+}
+```
+
+**Android Page**
+```
+@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = HomePageBase.class)
+public class HomePage extends HomePageBase {
+
+    @FindBy(xpath = "//android.widget.TextView[@resource-id='itemTitle' and @text='Phone Finder']")
+    protected ExtendedWebElement phoneFinderTextView;
+
+    @FindBy(xpath = "//android.widget.TextView[@resource-id='itemTitle' and @text='compare']")
+    protected ExtendedWebElement compareTextView;
+
+    public HomePage(WebDriver driver) {
+        super(driver);
+    }
+
+    @Override
+    public PhoneFinderPageBase openPhoneFinder() {
+        phoneFinderTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), PhoneFinderPageBase.class);
+    }
+
+    @Override
+    public ComparePageBase openComparePage() {
+        compareTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), ComparePageBase.class);
+    }
+```
+
+**iOS Page**
+```
+@DeviceType(pageType = Type.IOS_PHONE, parentClass = HomePageBase.class)
+public class HomePage extends HomePageBase {
+
+    @FindBy(xpath = "name = 'Phone Finder'")
+    @Predicate
+    private ExtendedWebElement phoneFinderTextView;
+
+    @FindBy(xpath = "name = 'Compare'")
+    @Predicate
+    private ExtendedWebElement compareTextView;
+
+    public HomePage(WebDriver driver) {
+        super(driver);
+    }
+
+    @Override
+    public PhoneFinderPageBase openPhoneFinder() {
+        phoneFinderTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), PhoneFinderPageBase.class);
+    }
+
+    @Override
+    public ComparePageBase openComparePage() {
+        compareTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), ComparePageBase.class);
+    }
+```
+
+Carina will get the right version according to using driver (identified in _config.properties) if you will create new page using CustomTypeFactory
+
+**Example:**
+```
+@Test
+    public void comparePhonesTest() {
+        HomePageBase homePage = CustomTypePageFactory.initPage(getDriver(), HomePageBase.class);
+        ComparePageBase phoneFinderPage = homePage.openCompare();
+        ...
+    }
+```
