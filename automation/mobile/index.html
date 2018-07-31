@@ -857,11 +857,13 @@ protected ExtendedWebElement developerText;
 </em> Locate tests in src/test/java source folder</p>
 <h3 id="how-to-use-customtypepagefactory">How to use CustomTypePageFactory</h3>
 <p>Carina provides technique to combine Desktop/iOS/Android tests into the single test class/method. For all platforms you should use <a href="https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern">Page Object Design Pattern</a> but in a bit improved way.
-Each page has abstract declaration and different implementations if needed (by default 3 ones should be enough: Desktop, iOS/Android):
- * Common abstract page in common package with common methods and elements;
- * Desktop page in desktop package with desktop methods and elements;
- * iOS page in ios package with iOS methods and elements;
- * Android page in android package with Android methods and elements.</p>
+Each page has abstract declaration and different implementations if needed (by default 3 ones should be enough: Desktop, iOS/Android):</p>
+<ul>
+<li>Common abstract page in common package with common methods and elements;</li>
+<li>Desktop page in desktop package with desktop methods and elements;</li>
+<li>iOS page in ios package with iOS methods and elements;</li>
+<li>Android page in android package with Android methods and elements.</li>
+</ul>
 <p>Child pages should extends BasePage implementing all abstract methods. Annotation @DeviceType would provide information about device type and parent (common) page.</p>
 <p><strong>Examples:</strong></p>
 <p><strong>Common (Base) Page</strong></p>
