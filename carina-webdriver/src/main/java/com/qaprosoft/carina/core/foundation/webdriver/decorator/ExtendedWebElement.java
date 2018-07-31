@@ -322,19 +322,15 @@ public class ExtendedWebElement {
 		final WebDriver drv = getDriver();
 		
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(NoSuchSessionException.class);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
+				.ignoring(NoSuchSessionException.class);
+		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
 			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
-		} catch (StaleElementReferenceException e) {
-			//TODO: test carefully this change
-			LOGGER.error("catched StaleElementReferenceException", e);
-			element = refindElement();
-			wait.until(condition);
-			return true;
 		} catch (NoSuchElementException | TimeoutException e) {
 			// don't write exception even in debug mode
 			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
@@ -965,7 +961,7 @@ public class ExtendedWebElement {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
-			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+			textCondition = ExpectedConditions.or(ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText), ExpectedConditions.textToBePresentInElement(element, decryptedText));
 		} else {
 			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
 		}
