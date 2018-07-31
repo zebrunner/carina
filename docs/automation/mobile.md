@@ -252,7 +252,7 @@ public class SampleTest extends AbstractTest {
 * Locate tests in src/test/java source folder
 
 ### How to use CustomTypePageFactory
-Carina provides a solution to mobile testing on iOS/Android platforms with the same test-code. For both platforms you should use [Page Object Design Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern) but in a bit improved way.
+Carina provides technique to combine Desktop/iOS/Android tests into the single test class/method. For all platforms you should use [Page Object Design Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern) but in a bit improved way.
 Each page has abstract declaration and a lot of implementations if needed (by default 3 ones should be enough: desktop, iOS/Android):
  * common page Base in common package with common methods and elements;
  * iOS page in ios package with iOS methods and elements;
