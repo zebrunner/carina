@@ -325,19 +325,20 @@ public class ExtendedWebElement {
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(NoSuchSessionException.class);
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
-		} catch (NoSuchElementException | TimeoutException e) {
-			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
-			result = false;
 		} catch (StaleElementReferenceException e) {
 			//TODO: test carefully this change
 			LOGGER.error("catched StaleElementReferenceException", e);
 			element = refindElement();
 			wait.until(condition);
 			return true;
+		} catch (NoSuchElementException | TimeoutException e) {
+			// don't write exception even in debug mode
+			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
+			result = false;
 		} catch (Exception e) {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
