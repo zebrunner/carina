@@ -963,7 +963,7 @@ public class ExtendedWebElement {
 		} else {
 			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
 		}
-		return waitUntil(ExpectedConditions.and(getDefaultCondition(getBy()), textCondition), timeout);
+		return waitUntil(textCondition, timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
 //    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 //				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
