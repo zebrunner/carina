@@ -333,6 +333,11 @@ public class ExtendedWebElement {
 			// don't write exception even in debug mode
 			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
 			result = false;
+		} catch (StaleElementReferenceException e) {
+			LOGGER.error("catched StaleElementReferenceException", e);
+			element = refindElement();
+			wait.until(condition);
+			return true;
 		} catch (Exception e) {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
