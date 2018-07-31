@@ -322,8 +322,7 @@ public class ExtendedWebElement {
 		final WebDriver drv = getDriver();
 		
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(NoSuchSessionException.class);
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
 			wait.until(condition);
@@ -334,6 +333,7 @@ public class ExtendedWebElement {
 			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
 			result = false;
 		} catch (StaleElementReferenceException e) {
+			//TODO: test carefully this change
 			LOGGER.error("catched StaleElementReferenceException", e);
 			element = refindElement();
 			wait.until(condition);
