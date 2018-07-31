@@ -254,6 +254,7 @@ public class SampleTest extends AbstractTest {
 ### How to use CustomTypePageFactory
 Carina provides technique to combine Desktop/iOS/Android tests into the single test class/method. For all platforms you should use [Page Object Design Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern) but in a bit improved way.
 Each page has abstract declaration and different implementations if needed (by default 3 ones should be enough: Desktop, iOS/Android):
+
  * Common abstract page in common package with common methods and elements;
  * Desktop page in desktop package with desktop methods and elements;
  * iOS page in ios package with iOS methods and elements;
