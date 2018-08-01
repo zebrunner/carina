@@ -21,12 +21,16 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.NoSuchSessionException;
@@ -320,11 +324,13 @@ public class Screenshot {
                             Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
                 }
 
-                ImageIO.write(screen, "PNG", new File(screenPath));
+                File screenFile = new File(screenPath);
+                ImageIO.write(screen, "PNG", screenFile);
 
                 // Create screenshot thumbnail
                 String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-                ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+                File thumbFile = new File(thumbScreenPath);
+                ImageIO.write(thumbScreen, "PNG", thumbFile);
                 resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
@@ -340,6 +346,9 @@ public class Screenshot {
                 }
                 uploadToAmazonS3(test, screenPath, screenName, comment);
 
+                if(Configuration.getBoolean(Parameter.APPEND_SCREENSHOTS)) {
+                    appendToLog(thumbFile, screenFile);
+                }
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (IOException e) {
@@ -353,6 +362,36 @@ public class Screenshot {
             }
         }
         return screenName;
+    }
+
+    /**
+     * Appends thumb and screenshot to log with a correlation id
+     *
+     * @param thumbFile - file containing a small screenshot
+     * @param screenFile - file containing a large screenshot
+     */
+    private static void appendToLog(File thumbFile, File screenFile) {
+        String correlationId = UUID.randomUUID().toString();
+        appendToLogBySize(thumbFile, ScreenSize.THUMB, correlationId);
+        appendToLogBySize(screenFile, ScreenSize.FULL, correlationId);
+    }
+
+    /**
+     * Builds a base64 string with metadata (#screenSize#correlationId@base64String) and appends it to log
+     *
+     * @param imageFile - file containing a screenshot
+     * @param screenSize - type of the screen size
+     * @param correlationId - screenshot correlation id
+     */
+    private static void appendToLogBySize(File imageFile, ScreenSize screenSize, String correlationId) {
+        String base64String = null;
+        String metadata = "#" + screenSize.getAlias() + "#" + correlationId + "@";
+        try {
+            base64String = new String(Base64.encodeBase64(FileUtils.readFileToByteArray(imageFile)), StandardCharsets.US_ASCII);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        LOGGER.info(metadata + base64String);
     }
 
     private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName, String comment) {
@@ -450,5 +489,26 @@ public class Screenshot {
     private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
         BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
         return screenShot;
+    }
+
+    enum ScreenSize {
+
+        THUMB("small", "S"), FULL("large", "L");
+
+        private String name;
+        private String alias;
+
+        ScreenSize(String name, String alias) {
+            this.name = name;
+            this.alias = alias;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getAlias() {
+            return alias;
+        }
     }
 }
