@@ -199,8 +199,8 @@ public class MobileFactory extends AbstractFactory {
 		try {
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> cap = (Map<String, Object>) drv.getCapabilities().getCapability("slotCapabilities");
-			if (cap.containsKey("udid")) {
+			Map<String, Object> cap = (Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES);
+			if (cap != null && cap.containsKey("udid")) {
 
 				// restore device information from custom slotCapabilities map
 				/*

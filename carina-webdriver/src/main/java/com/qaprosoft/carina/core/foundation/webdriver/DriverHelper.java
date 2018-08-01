@@ -664,6 +664,8 @@ public class DriverHelper {
     		} else {
     			driver.manage().window().maximize();
     		}
+        } catch (WebDriverException e) {
+        	LOGGER.warn("Unable to maximize browser: " + e.getMessage());
         } catch (Exception e) {
         	LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
         }

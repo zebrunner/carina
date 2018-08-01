@@ -250,3 +250,116 @@ public class SampleTest extends AbstractTest {
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder
+
+### How to use CustomTypePageFactory
+Carina provides technique to combine Desktop/iOS/Android tests into the single test class/method. For all platforms you should use [Page Object Design Pattern](https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern) but in a bit improved way.
+Each page has abstract declaration and different implementations if needed (by default 3 ones should be enough: Desktop, iOS/Android):
+
+ * Common abstract page in common package with common methods and elements;
+ * Desktop page in desktop package with desktop methods and elements;
+ * iOS page in ios package with iOS methods and elements;
+ * Android page in android package with Android methods and elements.
+
+Child pages should extends BasePage implementing all abstract methods. Annotation @DeviceType would provide information about device type and parent (common) page.
+
+**Examples:**
+
+**Common (Base) Page**
+```
+public abstract class HomePageBase extends AbstractPage {
+
+    public HomePageBase(WebDriver driver) {
+        super(driver);
+    }
+
+    public abstract PhoneFinderPageBase openPhoneFinder();
+
+    public abstract ComparePageBase openComparePage();
+}
+```
+
+**Android Page**
+```
+@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = HomePageBase.class)
+public class HomePage extends HomePageBase {
+
+    @FindBy(xpath = "//android.widget.TextView[@resource-id='itemTitle' and @text='Phone Finder']")
+    protected ExtendedWebElement phoneFinderTextView;
+
+    @FindBy(xpath = "//android.widget.TextView[@resource-id='itemTitle' and @text='compare']")
+    protected ExtendedWebElement compareTextView;
+
+    public HomePage(WebDriver driver) {
+        super(driver);
+    }
+
+    @Override
+    public PhoneFinderPageBase openPhoneFinder() {
+        phoneFinderTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), PhoneFinderPageBase.class);
+    }
+
+    @Override
+    public ComparePageBase openComparePage() {
+        compareTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), ComparePageBase.class);
+    }
+```
+
+**iOS Page**
+```
+@DeviceType(pageType = Type.IOS_PHONE, parentClass = HomePageBase.class)
+public class HomePage extends HomePageBase {
+
+    @FindBy(xpath = "name = 'Phone Finder'")
+    @Predicate
+    private ExtendedWebElement phoneFinderTextView;
+
+    @FindBy(xpath = "name = 'Compare'")
+    @Predicate
+    private ExtendedWebElement compareTextView;
+
+    public HomePage(WebDriver driver) {
+        super(driver);
+    }
+
+    @Override
+    public PhoneFinderPageBase openPhoneFinder() {
+        phoneFinderTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), PhoneFinderPageBase.class);
+    }
+
+    @Override
+    public ComparePageBase openComparePage() {
+        compareTextView.click();
+        return CustomTypePageFactory.initPage(getDriver(), ComparePageBase.class);
+    }
+```
+
+Inside each tests Carina operates with abstract base page using CustomTypePageFactory and substitute it by real implementation based on desired capabilities in _config.properties etc.
+
+**Example:**
+```
+@Test
+    public void comparePhonesTest() {
+        HomePageBase homePage = CustomTypePageFactory.initPage(getDriver(), HomePageBase.class);
+        ComparePageBase phoneFinderPage = homePage.openCompare();
+        ...
+    }
+```
+
+If there are differences in application according to OS version just implement pages for different versions and include version parameter in @DeviceTypeae for each page
+
+**Example:**
+
+For Android 8 (either 8.0 or 8.1)
+```
+@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8”, parentClass = HomePageBase.class)
+public class HomePage extends HomePageBase {
+```
+
+Or for specific version
+```
+@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8.1”, parentClass = HomePageBase.class)
+public class HomePage extends HomePageBase {
+```

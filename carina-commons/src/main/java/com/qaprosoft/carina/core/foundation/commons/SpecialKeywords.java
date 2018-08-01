@@ -149,6 +149,8 @@ public class SpecialKeywords {
     public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
     public static final String MOBILE_PROXY_PORT = "capabilities.proxyPort";
+    
+    public static final String  SLOT_CAPABILITIES = "slotCapabilities";
 
 
     // ------------- STF PROPERTIES ---------------------------------
