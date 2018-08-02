@@ -36,6 +36,8 @@ import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingElementListHandler;
@@ -77,6 +79,10 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         if (locator == null) {
             return null;
         }
+		if (((ExtendedElementLocatorFactory) factory).isRootElementUsed()) {
+			LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
+			((ExtendedElementLocator) locator).setShouldCache(false);
+		}
 
         if (ExtendedWebElement.class.isAssignableFrom(field.getType())) {
             return proxyForLocator(loader, field, locator);
@@ -129,6 +135,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> T proxyForAbstractUIObject(ClassLoader loader, Field field,
             ElementLocator locator) {
+    	LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
+    	((ExtendedElementLocator) locator).setShouldCache(false);
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
@@ -165,6 +173,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> List<T> proxyForListUIObjects(ClassLoader loader, Field field,
             ElementLocator locator) {
+    	LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
+    	((ExtendedElementLocator) locator).setShouldCache(false);
         InvocationHandler handler = new AbstractUIObjectListHandler<T>((Class<?>) getListType(field), webDriver,
                 locator, field.getName());
         List<T> proxies = (List<T>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);

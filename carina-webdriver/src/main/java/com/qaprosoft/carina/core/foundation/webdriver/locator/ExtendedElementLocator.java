@@ -200,4 +200,8 @@ public class ExtendedElementLocator implements ElementLocator {
         return By.xpath(sb.toString());
     }
 
+	public void setShouldCache(boolean shouldCache) {
+		this.shouldCache = shouldCache;
+	}
+
 }
