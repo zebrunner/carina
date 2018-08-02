@@ -65,10 +65,10 @@ public class LocatingElementListHandler implements InvocationHandler {
 		// timeout before we find better solution
 		// Pros: super fast regression issue which block UI execution
 		// Cons: there is no way to manage timeouts in this places
-    	if (!waitUntil(ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-    			ExpectedConditions.visibilityOfElementLocated(by)))) {
-    		LOGGER.error("List is not present: " + by);
-    	}
+//    	if (!waitUntil(ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+//    			ExpectedConditions.visibilityOfElementLocated(by)))) {
+//    		LOGGER.error("List is not present: " + by);
+//    	}
 
     	
     	List<WebElement> elements = null;
@@ -95,8 +95,8 @@ public class LocatingElementListHandler implements InvocationHandler {
 					 //do nothing and keep 'undefined' for control name 
 				}
 
-				ExtendedWebElement tempElement = new ExtendedWebElement(element, tempName);
-				tempElement.setBy(tempElement.generateByForList(by, i));
+				ExtendedWebElement tempElement = new ExtendedWebElement(element, tempName, by);
+//				tempElement.setBy(tempElement.generateByForList(by, i));
 				extendedWebElements.add(tempElement);
 				i++;
 			}
