@@ -37,6 +37,7 @@ import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
@@ -353,8 +354,12 @@ public class Screenshot {
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-            } catch (NoSuchSessionException e) {
-            	//do nothing as no way to make screenshot using invalid driver 
+            } catch (WebDriverException e) {
+                if (e.getMessage() != null && e.getMessage().contains("current view have 'secure' flag set")) {
+                    LOGGER.warn("Unable to capture screenshot: " + e.getMessage());
+                } else {
+                    throw e;
+                }
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot!", e);
             } finally {
