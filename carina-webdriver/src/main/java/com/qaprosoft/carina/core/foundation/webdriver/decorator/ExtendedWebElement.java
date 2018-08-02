@@ -1769,30 +1769,7 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("By.xpath: ")) {
-        	String leftPart = StringUtils.remove(locator, "By.xpath: ");
-        	String rightPart = new String();
-        	String separator = "";
-        	boolean isFound = false;
-        	while (locator.contains("/")) {
-        		try {
-        			resBy = By.xpath(leftPart + "[" + index + "]" + separator + rightPart);
-        			searchContext.findElement(resBy);
-        			isFound = true;
-        			break;
-        		} catch (NoSuchElementException e) {
-        			rightPart = StringUtils.substringAfterLast(leftPart, "/");
-        			leftPart = StringUtils.substringBeforeLast(leftPart, "/");
-        			separator = "/";
-        			if ("/".equals(leftPart.substring(leftPart.length() - 1))) {
-        				separator = "//";
-        				leftPart = StringUtils.removeEnd(leftPart, "/");
-        			}
-        		} catch (Exception e) {
-        			throw new RuntimeException("Can't get element from list in current search context " + locator + ". Please check xpath expression", e);
-        		}
-        	}
-        	if(!isFound)
-        		throw new RuntimeException("Can't get element from list in current search context " + locator + ". Please check xpath expression");
+        	resBy = By.xpath(StringUtils.remove(locator, "By.xpath: ") + "[" + index + "]");
         }
         if (locator.startsWith("linkText: ")) {
         	resBy = By.linkText(StringUtils.remove(locator, "linkText: ") + "[" + index + "]");
