@@ -19,6 +19,8 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DriverCommand;
+import org.testng.ITestResult;
+import org.testng.Reporter;
 
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -45,30 +47,34 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
     
     private boolean recording = false;
     
-    private TestArtifactType artifact;
+    private TestArtifactType videoArtifact;
     
     public MobileRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt, TestArtifactType artifact) {
         this.commandExecutor = commandExecutor;
         this.startRecordingOpt = startRecordingOpt;
         this.stopRecordingOpt = stopRecordingOpt;
-        this.artifact = artifact;
+        this.videoArtifact = artifact;
     }
 
     @Override
     public void beforeEvent(Command command) {
-        if (recording && DriverCommand.QUIT.equals(command.getName())) {
-            try {
-                commandExecutor.execute(new Command(command.getSessionId(), 
-                        MobileCommand.STOP_RECORDING_SCREEN, 
-                        MobileCommand.stopRecordingScreenCommand((BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()));
+    	if (recording) {
+    		onBeforeEvent();
+    		
+            if (DriverCommand.QUIT.equals(command.getName())) {
+                try {
+                    commandExecutor.execute(new Command(command.getSessionId(), 
+                            MobileCommand.STOP_RECORDING_SCREEN, 
+                            MobileCommand.stopRecordingScreenCommand((BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()));
 
-                if (ZafiraSingleton.INSTANCE.isRunning()) {
-                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
+                    if (ZafiraSingleton.INSTANCE.isRunning()) {
+                        ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
                 }
-            } catch (Exception e) {
-                LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
             }
-        }
+    	}
     }
 
     @Override
@@ -84,4 +90,20 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
             }
         }
     }
+    
+	private void onBeforeEvent() {
+		// 4a. if "tzid" not exist inside videoArtifact and exists in Reporter -> register new videoArtifact in Zafira.
+		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
+		// driver across different tests
+		
+		ITestResult res = Reporter.getCurrentTestResult();
+		if (res != null && res.getAttribute("ztid") != null) {
+			Long ztid = (Long) res.getAttribute("ztid");
+			if (ztid != videoArtifact.getTestId()) {
+				videoArtifact.setTestId(ztid);
+				LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
+				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+			}
+		}
+	}
 }
