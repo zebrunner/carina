@@ -192,7 +192,7 @@ public class ExtendedWebElement {
 				// -> it should allow to search via regular driver and fluent waits - getBy() 
 				this.by = (By) byContextField.get(locator);
 
-				if (tempSearchContext instanceof Proxy) {
+				while (tempSearchContext instanceof Proxy) {
 					innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
 
 					locatorField = innerProxy.getClass().getDeclaredField("locator");
