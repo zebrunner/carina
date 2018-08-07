@@ -25,6 +25,7 @@ import org.openqa.selenium.support.pagefactory.Annotations;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 
@@ -66,7 +67,10 @@ public class LocalizedAnnotations extends Annotations {
 		} else if (getField().isAnnotationPresent(ClassChain.class)) {
 			param = StringUtils.remove(param, "By.xpath: ");
 			by = MobileBy.iOSClassChain(param);
-		} else {
+		} else if (getField().isAnnotationPresent(AccessibilityId.class)) {
+		    param = StringUtils.remove(param, "By.name: ");
+            by = MobileBy.AccessibilityId(param);
+        } else {
 			by = createBy(param);
 		}
         return by;
