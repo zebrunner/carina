@@ -237,7 +237,7 @@ public class HockeyAppManager {
             return true;
         }
 
-        if (version.equalsIgnoreCase(node.get("shortversion").asText())) {
+        if (version.equalsIgnoreCase(node.get("shortversion").asText() + "." + node.get("version").asText()) || version.equalsIgnoreCase(node.get("shortversion").asText())) {
             return true;
         }
         return false;
