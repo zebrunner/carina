@@ -210,7 +210,7 @@ public class HockeyAppManager {
             JsonNode buildResults = restTemplate.exchange(retrieveBuilds, JsonNode.class).getBody();
 
             for (JsonNode node : buildResults.get("app_versions")) {
-                if (checkBuild(version, node) && checkTitleForCorrectPattern(buildType.toLowerCase(), node) || checkNotesForCorrectBuild(buildType.toLowerCase(), node)) {
+                if (checkBuild(version, node) && (checkTitleForCorrectPattern(buildType.toLowerCase(), node) || checkNotesForCorrectBuild(buildType.toLowerCase(), node))) {
                     LOGGER.info("Downloading Version: " + node);
                     versionNumber = node.get("shortversion").asText();
                     revision = node.get("version").asText();
