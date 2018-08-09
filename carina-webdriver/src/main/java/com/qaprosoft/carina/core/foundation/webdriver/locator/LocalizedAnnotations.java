@@ -58,21 +58,21 @@ public class LocalizedAnnotations extends Annotations {
             }
 
         }
-        
-		if (getField().isAnnotationPresent(Predicate.class)) {
-			// TODO: analyze howto determine iOS or Android predicate
-			param = StringUtils.remove(param, "By.xpath: ");
-			by = MobileBy.iOSNsPredicateString(param);
-			// by = MobileBy.AndroidUIAutomator(param);
-		} else if (getField().isAnnotationPresent(ClassChain.class)) {
-			param = StringUtils.remove(param, "By.xpath: ");
-			by = MobileBy.iOSClassChain(param);
-		} else if (getField().isAnnotationPresent(AccessibilityId.class)) {
-		    param = StringUtils.remove(param, "By.name: ");
+
+        if (getField().isAnnotationPresent(Predicate.class)) {
+            // TODO: analyze howto determine iOS or Android predicate
+            param = StringUtils.remove(param, "By.xpath: ");
+            by = MobileBy.iOSNsPredicateString(param);
+            // by = MobileBy.AndroidUIAutomator(param);
+        } else if (getField().isAnnotationPresent(ClassChain.class)) {
+            param = StringUtils.remove(param, "By.xpath: ");
+            by = MobileBy.iOSClassChain(param);
+        } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
+            param = StringUtils.remove(param, "By.name: ");
             by = MobileBy.AccessibilityId(param);
         } else {
-			by = createBy(param);
-		}
+            by = createBy(param);
+        }
         return by;
     }
 
