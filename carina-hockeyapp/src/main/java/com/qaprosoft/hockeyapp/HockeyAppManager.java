@@ -200,6 +200,7 @@ public class HockeyAppManager {
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
             queryParams.add("page", "1");
             queryParams.add("include_build_urls", "true");
+            queryParams.add("per_page", "50");
 
             RequestEntity<String> retrieveBuilds = buildRequestEntity(
                     HOCKEY_APP_URL,
