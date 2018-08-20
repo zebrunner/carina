@@ -27,6 +27,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.listener.ZafiraListener;
+import com.qaprosoft.zafira.models.dto.TestType;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -58,6 +62,8 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
  */
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
+
+    private static final String AMAZON_KEY_FORMAT = "%s/%s/";
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
 
@@ -320,7 +326,9 @@ public class Screenshot {
                             Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
                 }
 
-                ImageIO.write(screen, "PNG", new File(screenPath));
+                File screenshot = new File(screenPath);
+
+                ImageIO.write(screen, "PNG", screenshot);
 
                 // Create screenshot thumbnail
                 String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
@@ -339,6 +347,7 @@ public class Screenshot {
                     test = "undefined";
                 }
                 uploadToAmazonS3(test, screenPath, screenName, comment);
+                uploadToAmazonS3(screenshot);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -385,6 +394,25 @@ public class Screenshot {
         }
 
         AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath, metadata);
+    }
+
+    /**
+     * Upload screenshot file to Amazon S3 using zafira client
+     * @param screenshot - existing screenshot {@link File}
+     */
+    private static void uploadToAmazonS3(File screenshot) {
+        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS_V2)) {
+            LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
+            return;
+        }
+        TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
+        String url;
+        try {
+            url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
+            ZafiraMessager.RAW_MESSAGE.info(url);
+        } catch (Exception e) {
+            LOGGER.error("Can't save file to Amazon S3", e);
+        }
     }
 
     /**
