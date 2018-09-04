@@ -208,8 +208,9 @@ public class AbstractTestListener extends TestArgsListener {
         // register configuration step as test artifact
         String test = TestNamingUtil.getCanonicalTestName(result);
 
-        Artifacts.add("Logs", ReportContext.getTestLogLink(test));
-        Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
+        // TODO: do not publish log/demo anymore
+        //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
+        //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
         
         // device log
         Device device = DevicePool.getDevice();
