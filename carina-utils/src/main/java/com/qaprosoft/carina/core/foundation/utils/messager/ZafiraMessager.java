@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.utils.messager;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -19,6 +20,11 @@ public enum ZafiraMessager implements IMessager {
 
     ZafiraMessager(String pattern) {
         this.pattern = pattern;
+    }
+
+    public static <T> T custom(Level level, T object) {
+        LOGGER.log(level, object);
+        return object;
     }
 
     @Override

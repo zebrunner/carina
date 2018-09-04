@@ -24,13 +24,19 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
+import com.qaprosoft.zafira.log.MetaInfoLevel;
+import com.qaprosoft.zafira.log.MetaInfoMessage;
 import com.qaprosoft.zafira.models.dto.TestType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -63,9 +69,11 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
-    private static final String AMAZON_KEY_FORMAT = "%s/%s/";
+    private static final String AMAZON_KEY_FORMAT = "/ARTIFACTS/SCREENSHOTS/%s/%s/";
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+
+    private static ExecutorService executorService = Executors.newFixedThreadPool(50);
 
     /**
      * Adds screenshot rule
@@ -405,11 +413,23 @@ public class Screenshot {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return;
         }
+        String correlationId = UUID.randomUUID().toString();
         TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
-        String url;
         try {
-            url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
-            ZafiraMessager.RAW_MESSAGE.info(url);
+            executorService.execute(() -> {
+                try {
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
+                    ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                            .addHeader("AMAZON_PATH", url)
+                            .addHeader("TEST_ID", String.valueOf(test.getId()))
+                            .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
+                } catch (Exception e) {
+                    LOGGER.error("Can't save file to Amazon S3", e);
+                }
+            });
+            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                    .addHeader("AMAZON_PATH", null)
+                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
         } catch (Exception e) {
             LOGGER.error("Can't save file to Amazon S3", e);
         }
