@@ -416,6 +416,9 @@ public class Screenshot {
         String correlationId = UUID.randomUUID().toString();
         TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
         try {
+            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                    .addHeader("AMAZON_PATH", null)
+                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
             executorService.execute(() -> {
                 try {
                     String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
@@ -427,9 +430,6 @@ public class Screenshot {
                     LOGGER.error("Can't save file to Amazon S3", e);
                 }
             });
-            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                    .addHeader("AMAZON_PATH", null)
-                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
         } catch (Exception e) {
             LOGGER.error("Can't save file to Amazon S3", e);
         }
