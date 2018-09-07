@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.utils.messager;
+package com.qaprosoft.carina.core.foundation.utils;
 
 import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.utils.messager.IMessager;
 
 /**
  * ReportMessage is used for reporting informational and error messages both
@@ -24,6 +26,7 @@ import org.apache.log4j.Logger;
  * @author akhursevich
  */
 
+// TODO: move to messager package
 public enum Messager implements IMessager {
 	
     TEST_STARTED("INFO: %s TEST [%s] STARTED at [%s]"),
