@@ -1202,6 +1202,9 @@ public class ExtendedWebElement {
             by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
+        if (locator.startsWith("By.AccessibilityId: ")) {
+            by = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
+        }
         return new ExtendedWebElement(by, name, getDriver());
     }
 
@@ -1841,6 +1844,9 @@ public class ExtendedWebElement {
         	resBy = MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
         }
 
+        if (locator.startsWith("By.AccessibilityId: ")) {
+            resBy = MobileBy.AccessibilityId(StringUtils.remove(locator, "By.AccessibilityId: ") + "[" + index + "]");
+        }
         return resBy;
     }
     

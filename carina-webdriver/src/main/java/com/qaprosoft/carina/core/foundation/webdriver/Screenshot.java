@@ -29,10 +29,10 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qaprosoft.amazon.AmazonS3Manager;
@@ -344,8 +344,15 @@ public class Screenshot {
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-            } catch (NoSuchSessionException e) {
-            	//do nothing as no way to make screenshot using invalid driver 
+            } catch (WebDriverException e) {
+                if (e.getMessage() != null && (e.getMessage().contains("current view have 'secure' flag set")
+                        || e.getMessage().contains("no such window: window was already closed")
+                        || e.getMessage().contains("Error communicating with the remote browser. It may have died")
+                        || e.getMessage().contains("unexpected alert open"))) {
+                    LOGGER.warn("Unable to capture screenshot: " + e.getMessage());
+                } else {
+                    throw e;
+                }
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot!", e);
             } finally {
