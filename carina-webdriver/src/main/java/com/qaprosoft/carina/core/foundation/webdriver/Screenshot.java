@@ -36,6 +36,7 @@ import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
 import com.qaprosoft.zafira.models.dto.TestType;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
@@ -69,7 +70,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
-    private static final String AMAZON_KEY_FORMAT = "/ARTIFACTS/SCREENSHOTS/%s/%s/";
+    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/%s/";
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
 
