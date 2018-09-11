@@ -256,6 +256,8 @@ public class Configuration {
 
         S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
 
+        S3_SAVE_SCREENSHOTS_V2("s3_save_screenshots_v2"),
+
         // HockeyApp token
         HOCKEYAPP_TOKEN("hockeyapp_token"),
 

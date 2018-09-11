@@ -24,9 +24,20 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.listener.ZafiraListener;
+import com.qaprosoft.zafira.log.MetaInfoLevel;
+import com.qaprosoft.zafira.log.MetaInfoMessage;
+import com.qaprosoft.zafira.models.dto.TestType;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -59,7 +70,11 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
+    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/%s/";
+
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+
+    private static ExecutorService executorService = Executors.newFixedThreadPool(50);
 
     /**
      * Adds screenshot rule
@@ -320,7 +335,9 @@ public class Screenshot {
                             Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
                 }
 
-                ImageIO.write(screen, "PNG", new File(screenPath));
+                File screenshot = new File(screenPath);
+
+                ImageIO.write(screen, "PNG", screenshot);
 
                 // Create screenshot thumbnail
                 String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
@@ -339,6 +356,7 @@ public class Screenshot {
                     test = "undefined";
                 }
                 uploadToAmazonS3(test, screenPath, screenName, comment);
+                uploadToAmazonS3(screenshot);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -385,6 +403,37 @@ public class Screenshot {
         }
 
         AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath, metadata);
+    }
+
+    /**
+     * Upload screenshot file to Amazon S3 using zafira client
+     * @param screenshot - existing screenshot {@link File}
+     */
+    private static void uploadToAmazonS3(File screenshot) {
+        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS_V2)) {
+            LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
+            return;
+        }
+        String correlationId = UUID.randomUUID().toString();
+        TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
+        try {
+            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                    .addHeader("AMAZON_PATH", null)
+                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
+            executorService.execute(() -> {
+                try {
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
+                    ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                            .addHeader("AMAZON_PATH", url)
+                            .addHeader("TEST_ID", String.valueOf(test.getId()))
+                            .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
+                } catch (Exception e) {
+                    LOGGER.error("Can't save file to Amazon S3", e);
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("Can't save file to Amazon S3", e);
+        }
     }
 
     /**

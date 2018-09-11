@@ -240,7 +240,7 @@ public class DriverListener implements WebDriverEventListener {
 		ITestResult res = Reporter.getCurrentTestResult();
 		if (res != null && res.getAttribute("ztid") != null) {
 			Long ztid = (Long) res.getAttribute("ztid");
-			if (ztid != vncArtifact.getTestId()) {
+			if (ztid != vncArtifact.getTestId() && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
 				vncArtifact.setTestId(ztid);
 				LOGGER.debug("Registered live video artifact " + vncArtifact.getName() + " into zafira");
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);
