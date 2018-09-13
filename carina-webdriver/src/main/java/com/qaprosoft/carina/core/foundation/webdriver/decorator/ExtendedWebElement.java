@@ -881,11 +881,17 @@ public class ExtendedWebElement {
 				return true;
 			}
 
-			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
-				refindElement();
-				waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-						ExpectedConditions.presenceOfElementLocated(getBy()));
+				try {
+					refindElement();
+					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
+							ExpectedConditions.presenceOfElementLocated(getBy()));
+				} catch (NoSuchElementException e) {
+					// search element based on By if exception was thrown
+					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
+							ExpectedConditions.presenceOfElementLocated(getBy()));
+				}
 			}
 		} else {
 			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
@@ -982,18 +988,21 @@ public class ExtendedWebElement {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
-			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-			boolean tmpResult = waitUntil(textCondition, 0);
+			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
+			boolean tmpResult = waitUntil(tmpCondition, 0);
 			
-			if (tmpResult) {
-				return true;
-			}
-
 			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
-				refindElement();
-				textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+				try {
+					refindElement();
+					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+				} catch (NoSuchElementException e) {
+					// search element based on By if exception was thrown
+					textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+				}
 			}
+			
+			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 		} else {
 			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
 		}
