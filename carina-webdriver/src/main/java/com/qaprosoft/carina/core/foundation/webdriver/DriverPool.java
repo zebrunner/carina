@@ -210,9 +210,6 @@ public final class DriverPool {
         try {
             LOGGER.debug("Driver restarting...");
             deregisterDriver(DEFAULT);
-            if (!isSameDevice) {
-                DevicePool.deregisterDevice();
-            }
             
             drv.quit();
 
