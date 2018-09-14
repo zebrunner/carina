@@ -712,9 +712,9 @@ public class Device extends RemoteDevice {
          // adb -s UDID logcat -d
             @Override
             public String call() throws Exception {
-                LOGGER.info("Start Syslog extraction");
+                LOGGER.debug("Start Syslog extraction");
                 String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
-                LOGGER.info("Logcat log has been extracted.");
+                LOGGER.debug("Logcat log has been extracted.");
                 StringBuilder tempStr = new StringBuilder();
                 executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
                 return tempStr.toString();
@@ -762,7 +762,7 @@ public class Device extends RemoteDevice {
         // adb -s UDID logcat -c
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
         executor.execute(cmd);
-        LOGGER.info("Logcat logs were cleared.");
+        LOGGER.debug("Logcat logs were cleared.");
     }
     
     /**
@@ -818,7 +818,7 @@ public class Device extends RemoteDevice {
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
         
-        LOGGER.info("UI dump generation...");
+        LOGGER.debug("UI dump generation...");
         WebDriver driver = DriverPool.getDriver();
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = driver.getPageSource();
@@ -833,7 +833,7 @@ public class Device extends RemoteDevice {
             LOGGER.info(e);
             LOGGER.info("Error has been met during attempt to extract xml tree.");
         }
-        LOGGER.info("XML file path: ".concat(fileName));
+        LOGGER.debug("XML file path: ".concat(fileName));
         return file;
     }
 
