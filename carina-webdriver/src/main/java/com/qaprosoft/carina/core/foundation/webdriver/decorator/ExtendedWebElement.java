@@ -703,8 +703,8 @@ public class ExtendedWebElement {
     /**
     /**
      * Scroll to element (applied only for desktop).
+     * Useful for desktop with React 
      */
-    @Deprecated
     public void scrollTo() {
         if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             LOGGER.debug("scrollTo javascript is unsupported for mobile devices!");
