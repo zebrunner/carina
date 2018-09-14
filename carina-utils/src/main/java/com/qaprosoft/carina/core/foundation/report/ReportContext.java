@@ -506,7 +506,7 @@ public class ReportContext {
         } else {
             link = String.format("file://%s/%s/logcat.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
         }
-        LOGGER.info("Extracted syslog link: ".concat(link));
+        LOGGER.debug("Extracted syslog link: ".concat(link));
         return link;
     }
     

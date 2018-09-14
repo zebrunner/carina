@@ -215,10 +215,10 @@ public class AbstractTestListener extends TestArgsListener {
         // device log
         Device device = DevicePool.getDevice();
         if (!device.isNull()) {
-            LOGGER.info("Device isn't null additional artifacts will be extracted.");
+            LOGGER.debug("Device isn't null additional artifacts will be extracted.");
             File sysLogFile = device.saveSysLog();
             if (sysLogFile != null) {
-                LOGGER.info("Logcat log will be extracted and added as artifact");
+                LOGGER.debug("Logcat log will be extracted and added as artifact");
                 Artifacts.add("Logcat", ReportContext.getSysLogLink(test));
             }
         }

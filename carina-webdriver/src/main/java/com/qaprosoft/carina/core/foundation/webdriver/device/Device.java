@@ -703,7 +703,7 @@ public class Device extends RemoteDevice {
             LOGGER.debug("Logcat log is empty since device is not Android");
             return "";
         }
-        LOGGER.info("Extraction of sys log: " + getAdbName());
+        LOGGER.debug("Extraction of sys log: " + getAdbName());
 
         // launch extractor in separate thread to avoid possible hang out
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -776,7 +776,7 @@ public class Device extends RemoteDevice {
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}
-		LOGGER.info("STF is enabled. Sys log will be extracted...");
+		LOGGER.debug("STF is enabled. Sys log will be extracted...");
         String fileName = ReportContext.getTestDir() + "/logcat.log";
         String log = getSysLog();
         if (log.isEmpty()) {
@@ -791,7 +791,7 @@ public class Device extends RemoteDevice {
             LOGGER.info(e);
             LOGGER.info("Error has been occured during attempt to extract logcat log.");
         }
-        LOGGER.info("Logcat file path: ".concat(fileName));
+        LOGGER.debug("Logcat file path: ".concat(fileName));
         return file;
     }
     
