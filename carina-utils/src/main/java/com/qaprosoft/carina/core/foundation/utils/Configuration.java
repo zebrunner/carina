@@ -153,8 +153,6 @@ public class Configuration {
 
         RESULT_SORTING("result_sorting"),
 
-        KEEP_ALL_SCREENSHOTS("keep_all_screenshots"),
-
         BIG_SCREEN_WIDTH("big_screen_width"),
 
         BIG_SCREEN_HEIGHT("big_screen_height"),

@@ -365,23 +365,6 @@ public class ReportContext {
         }
     }
 
-    public static void removeTestScreenshots() {
-        try {
-            // Lists all files in folder
-            File parentFolder = ReportContext.getTestDir();
-            File fList[] = parentFolder.listFiles();
-            for (int i = 0; i < fList.length; i++) {
-                if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".html")) {
-                    fList[i].delete();
-                }
-            }
-            File thumbnailsFolder = new File(parentFolder.getAbsoluteFile() + "/thumbnails");
-            FileUtils.deleteDirectory(thumbnailsFolder);
-        } catch (Exception e) {
-            LOGGER.error("Exception discovered during screenshots removing! " + e);
-        }
-    }
-
     public static void generateHtmlReport(String content) {
     	String emailableReport = SpecialKeywords.HTML_REPORT;
     	

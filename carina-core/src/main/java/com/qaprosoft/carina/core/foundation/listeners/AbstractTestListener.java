@@ -46,8 +46,6 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollecto
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
@@ -534,13 +532,7 @@ public class AbstractTestListener extends TestArgsListener {
         }
 
         if (!FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
-            if (TestResultType.PASS.equals(resultType) && !Configuration.getBoolean(Parameter.KEEP_ALL_SCREENSHOTS)) {
-                // remove physically all screenshots if test/config pass and KEEP_ALL_SCREENSHOTS=false to improve
-                // cooperation with CI tools
-                ReportContext.removeTestScreenshots();
-            } else {
-                linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
-            }
+            linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
         }
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
