@@ -125,10 +125,8 @@ public enum R {
      * @return boolean
      */
     public boolean containsKey(String key) {
-    	boolean res = CONFIG.resourceFile.equals(resourceFile) ? propertiesHolder.get(resourceFile).containsKey(key)
+    	return CONFIG.resourceFile.equals(resourceFile) ? propertiesHolder.get(resourceFile).containsKey(key)
                 : propertiesHolder.get(resourceFile).containsKey(key);
-    	
-    	return res;
     }
 
     /**

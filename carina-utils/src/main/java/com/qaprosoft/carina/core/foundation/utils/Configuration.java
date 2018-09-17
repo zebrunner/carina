@@ -197,10 +197,6 @@ public class Configuration {
 
         SUITE_NAME("suite_name"),
 
-        CI_URL("ci_url"),
-
-        CI_BUILD("ci_build"),
-
         JIRA_UPDATER("jira_updater"),
 
         JIRA_URL("jira_url"),

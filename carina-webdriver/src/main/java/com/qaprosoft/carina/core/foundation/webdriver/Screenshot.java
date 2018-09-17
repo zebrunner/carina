@@ -30,14 +30,6 @@ import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
-import com.qaprosoft.zafira.listener.ZafiraListener;
-import com.qaprosoft.zafira.log.MetaInfoLevel;
-import com.qaprosoft.zafira.log.MetaInfoMessage;
-import com.qaprosoft.zafira.models.dto.TestType;
-import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -53,10 +45,17 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.listener.ZafiraListener;
+import com.qaprosoft.zafira.log.MetaInfoLevel;
+import com.qaprosoft.zafira.log.MetaInfoMessage;
+import com.qaprosoft.zafira.models.dto.TestType;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
