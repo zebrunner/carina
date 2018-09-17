@@ -324,7 +324,7 @@ public abstract class AbstractTest // extends DriverHelper
             // Generate and send email report using regular method
             EmailReportGenerator report = new EmailReportGenerator(title, env,
                     Configuration.get(Parameter.APP_VERSION), deviceName,
-                    browser, DateUtils.now(), DateUtils.timeDiff(startDate), getCIJobReference(),
+                    browser, DateUtils.now(), DateUtils.timeDiff(startDate),
                     EmailReportItemCollector.getTestResults(),
                     EmailReportItemCollector.getCreatedItems());
 
@@ -486,17 +486,6 @@ public abstract class AbstractTest // extends DriverHelper
                         reportLinks);
             }
         }
-    }
-
-    // TODO: remove method and CI_* arguments from core
-    private String getCIJobReference() {
-        String ciTestJob = null;
-        if (!Configuration.isNull(Parameter.CI_URL)
-                && !Configuration.isNull(Parameter.CI_BUILD)) {
-            ciTestJob = Configuration.get(Parameter.CI_URL)
-                    + Configuration.get(Parameter.CI_BUILD);
-        }
-        return ciTestJob;
     }
 
     /**
