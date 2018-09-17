@@ -703,7 +703,7 @@ public class Device extends RemoteDevice {
             LOGGER.debug("Logcat log is empty since device is not Android");
             return "";
         }
-        LOGGER.info("Extraction of sys log: " + getAdbName());
+        LOGGER.debug("Extraction of sys log: " + getAdbName());
 
         // launch extractor in separate thread to avoid possible hang out
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -712,9 +712,9 @@ public class Device extends RemoteDevice {
          // adb -s UDID logcat -d
             @Override
             public String call() throws Exception {
-                LOGGER.info("Start Syslog extraction");
+                LOGGER.debug("Start Syslog extraction");
                 String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
-                LOGGER.info("Logcat log has been extracted.");
+                LOGGER.debug("Logcat log has been extracted.");
                 StringBuilder tempStr = new StringBuilder();
                 executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
                 return tempStr.toString();
@@ -762,7 +762,7 @@ public class Device extends RemoteDevice {
         // adb -s UDID logcat -c
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
         executor.execute(cmd);
-        LOGGER.info("Logcat logs were cleared.");
+        LOGGER.debug("Logcat logs were cleared.");
     }
     
     /**
@@ -776,7 +776,7 @@ public class Device extends RemoteDevice {
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}
-		LOGGER.info("STF is enabled. Sys log will be extracted...");
+		LOGGER.debug("STF is enabled. Sys log will be extracted...");
         String fileName = ReportContext.getTestDir() + "/logcat.log";
         String log = getSysLog();
         if (log.isEmpty()) {
@@ -791,7 +791,7 @@ public class Device extends RemoteDevice {
             LOGGER.info(e);
             LOGGER.info("Error has been occured during attempt to extract logcat log.");
         }
-        LOGGER.info("Logcat file path: ".concat(fileName));
+        LOGGER.debug("Logcat file path: ".concat(fileName));
         return file;
     }
     
@@ -818,7 +818,7 @@ public class Device extends RemoteDevice {
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
         
-        LOGGER.info("UI dump generation...");
+        LOGGER.debug("UI dump generation...");
         WebDriver driver = DriverPool.getDriver();
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = driver.getPageSource();
@@ -833,7 +833,7 @@ public class Device extends RemoteDevice {
             LOGGER.info(e);
             LOGGER.info("Error has been met during attempt to extract xml tree.");
         }
-        LOGGER.info("XML file path: ".concat(fileName));
+        LOGGER.debug("XML file path: ".concat(fileName));
         return file;
     }
 

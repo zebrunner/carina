@@ -15,14 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.testng.Reporter;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.messager.IMessager;
 
 /**
  * ReportMessage is used for reporting informational and error messages both
@@ -31,49 +26,28 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  * @author akhursevich
  */
 
-public enum Messager {
-    TEST_STARTED(
-            "\r\n" +
-                    "======================================================================================================================================\r\n"
-                    +
-                    "INFO:%s TEST [%s] STARTED at [%s]"),
+// TODO: move to messager package
+public enum Messager implements IMessager {
+	
+    TEST_STARTED("INFO: %s TEST [%s] STARTED at [%s]"),
 
-    TEST_PASSED(
-            "\r\n" +
-                    "INFO:%s TEST [%s] PASSED at [%s] \r\n" +
-                    "======================================================================================================================================"),
+    TEST_PASSED("INFO: %s TEST [%s] PASSED at [%s]"),
 
-    TEST_SKIPPED(
-            "\r\n" +
-                    "INFO:%s TEST [%s] SKIPPED at [%s] - %s\r\n" +
-                    "======================================================================================================================================"),
+    TEST_SKIPPED("INFO: %s TEST [%s] SKIPPED at [%s] - %s"),
 
-    TEST_SKIPPED_AS_ALREADY_PASSED(
-            "\r\n" +
-                    "INFO:%s TEST [%s] SKIPPED as already passed in previous run at [%s]\r\n" +
-                    "======================================================================================================================================"),
+    TEST_SKIPPED_AS_ALREADY_PASSED("INFO: %s TEST [%s] SKIPPED as already passed in previous run at [%s]"),
 
-    TEST_FAILED(
-            "\r\n" +
-                    "INFO:%s TEST [%s] FAILED at [%s] - %s\r\n" +
-                    "======================================================================================================================================"),
+    TEST_FAILED("INFO: %s TEST [%s] FAILED at [%s] - %s"),
 
-    RETRY_RETRY_FAILED(
-            "\r\n" +
-                    "INFO:%s TEST [%s] RETRY %s of %s FAILED - %s\r\n" +
-                    "--------------------------------------------------------------------------------------------------------------------------------------"),
+    RETRY_RETRY_FAILED("INFO: %s TEST [%s] RETRY %s of %s FAILED - %s"),
 
-    CONFIG_STARTED(
-            "INFO:%s CONFIG [%s] START at [%s]"),
+    CONFIG_STARTED("INFO: %s CONFIG [%s] START at [%s]"),
 
-    CONFIG_PASSED(
-            "INFO:%s CONFIG [%s] PASS at [%s]"),
+    CONFIG_PASSED("INFO: %s CONFIG [%s] PASS at [%s]"),
 
-    CONFIG_SKIPPED(
-            "INFO:%s CONFIG [%s] SKIP at [%s] - %s"),
+    CONFIG_SKIPPED("INFO: %s CONFIG [%s] SKIP at [%s] - %s"),
 
-    CONFIG_FAILED(
-            "INFO:%s CONFIG [%s] FAIL at [%s] - %s"),
+    CONFIG_FAILED("INFO: %s CONFIG [%s] FAIL at [%s] - %s"),
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
@@ -211,71 +185,19 @@ public enum Messager {
 
     private static final Logger LOGGER = Logger.getLogger(Messager.class);
 
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-
     private String pattern;
 
     Messager(String pattern) {
         this.pattern = pattern;
     }
 
-    public String getMessage(String... args) {
-        return create(args);
+    @Override
+    public String getPattern() {
+        return this.pattern;
     }
 
-    /**
-     * Logs info message using message pattern and incoming parameters.
-     * 
-     * @param args
-     *            for insert into patterns
-     * @return generated message
-     */
-    public String info(String... args) {
-        String message = create(args);
-        LOGGER.info(message);
-        return message;
-    }
-    
-    /**
-     * Logs error message and adds message to TestNG report.
-     * 
-     * @param args
-     *            for insert into patterns
-     * @return generated message
-     */
-    public String error(String... args) {
-        String message = create(args);
-        Reporter.log(message);
-        LOGGER.error(message);
-        return message;
-    }
-
-    /**
-     * Generates error message using message pattern and incoming parameters.
-     * 
-     * @param args
-     *            for insert into pattern
-     * @return generated message
-     */
-    private String create(String... args) {
-        String message = "";
-        try {
-            // Changes symbols to '*' if starts with 'crypto_'
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] != null) {
-                    Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
-                    if (matcher.find()) {
-                        int start = args[i].indexOf(":") + 1;
-                        int end = args[i].indexOf("}");
-                        args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
-                    }
-                }
-            }
-            message = String.format(pattern, (Object[]) args);
-        } catch (Exception e) {
-            LOGGER.error("Report message creation error!");
-            e.printStackTrace();
-        }
-        return message;
+    @Override
+    public Logger getLogger() {
+        return LOGGER;
     }
 }

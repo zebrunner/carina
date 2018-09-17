@@ -119,6 +119,17 @@ public enum R {
     public void put(String key, String value) {
         propertiesHolder.get(resourceFile).put(key, value);
     }
+    
+    /**
+     * Verify if key is declared in data map.
+     * @return boolean
+     */
+    public boolean containsKey(String key) {
+    	boolean res = CONFIG.resourceFile.equals(resourceFile) ? propertiesHolder.get(resourceFile).containsKey(key)
+                : propertiesHolder.get(resourceFile).containsKey(key);
+    	
+    	return res;
+    }
 
     /**
      * Returns value either from systems properties or config properties context.
