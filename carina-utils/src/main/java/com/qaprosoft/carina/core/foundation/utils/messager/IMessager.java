@@ -68,8 +68,8 @@ public interface IMessager {
                 if (args[i] != null) {
                     Matcher matcher = CRYPTO_PATTERN.matcher(args[i]);
                     if (matcher.find()) {
-                        int start = args[i].indexOf(":") + 1;
-                        int end = args[i].indexOf("}");
+                        int start = args[i].indexOf(':') + 1;
+                        int end = args[i].indexOf('}');
                         args[i] = StringUtils.replace(args[i], matcher.group(), StringUtils.repeat('*', end - start));
                     }
                 }
