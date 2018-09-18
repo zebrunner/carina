@@ -55,14 +55,10 @@ public class ZipManager {
                         try {
                             copyInputStream(is, bos);
                         } finally {
-                            if (bos != null) {
-                                bos.close();
-                            }
+							bos.close();
                         }
                     } finally {
-                        if (fos != null) {
-                            fos.close();
-                        }
+						fos.close();
                     }
                 } finally {
                     if (is != null) {
@@ -74,9 +70,7 @@ public class ZipManager {
             LOGGER.error(e);
         } finally {
             try {
-                if (zipFile != null) {
-                    zipFile.close();
-                }
+                zipFile.close();
             } catch (IOException e) {
                 LOGGER.error(e);
             }
