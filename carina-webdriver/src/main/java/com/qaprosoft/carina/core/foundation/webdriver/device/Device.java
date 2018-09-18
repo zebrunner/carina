@@ -216,40 +216,7 @@ public class Device extends RemoteDevice {
 
     }
 
-    public int startRecording(String pathToFile) {
-        if (!Configuration.getBoolean(Parameter.VIDEO_RECORDING)) {
-            return -1;
-        }
-
-        if (this.isNull())
-            return -1;
-
-        dropFile(pathToFile);
-
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "screenrecord", "--bit-rate", "1000000",
-                "--verbose", pathToFile);
-
-        try {
-            ProcessBuilderExecutor pb = new ProcessBuilderExecutor(cmd);
-
-            pb.start();
-            return pb.getPID();
-
-        } catch (ExecutorException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    public void stopRecording(Integer pid) {
-        if (isNull())
-            return;
-
-        if (pid != null && pid != -1) {
-            Platform.killProcesses(Arrays.asList(pid));
-        }
-    }
-
+    @Deprecated
     public void dropFile(String pathToFile) {
         if (this.isNull())
             return;
@@ -290,6 +257,7 @@ public class Device extends RemoteDevice {
         return !getFullPackageByName(packageName).contains("not found");
     }
 
+    @Deprecated
     public void pullFile(String pathFrom, String pathTo) {
         if (isNull())
             return;
