@@ -218,7 +218,7 @@ public class ExtendedWebElement {
 				return;
 			}
 
-			if (tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+			if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
 				locatorField = tempSearchContext.getClass().getDeclaredField("underlyingElement");
 				locatorField.setAccessible(true);
