@@ -87,6 +87,10 @@ public class ZipManager {
         byte[] buffer = new byte[1024];
         int len;
 
+        if (in == null) {
+        	return;
+        }
+        
         while ((len = in.read(buffer)) >= 0)
             out.write(buffer, 0, len);
 
