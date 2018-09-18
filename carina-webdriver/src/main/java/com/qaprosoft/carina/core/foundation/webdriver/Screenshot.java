@@ -37,8 +37,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
@@ -46,7 +44,6 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
@@ -345,16 +342,6 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-
-                // TODO: Move upload to S3 into the async calls closer to the end of test to upload whole bundle
-                // Also investigate possibility to remove reference onto the test name
-                String test = "";
-                if (TestNamingUtil.isTestNameRegistered()) {
-                    test = TestNamingUtil.getTestNameByThread();
-                } else {
-                    test = "undefined";
-                }
-                uploadToAmazonS3(test, screenPath, screenName, comment);
                 uploadToAmazonS3(screenshot);
 
                 // add screenshot comment to collector
@@ -379,37 +366,12 @@ public class Screenshot {
         return screenName;
     }
 
-    private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName, String comment) {
-        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
-            LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
-            return;
-        }
-        // TODO: not good solution...
-        Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
-
-        String testName = test.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String key = runId + "/" + testName + "/" + screenName;
-        if (runId == -1) {
-            key = "/LOCAL/" + ReportContext.getRootID() + "/" + testName + "/" + screenName;
-        }
-        LOGGER.debug("Key: " + key);
-        LOGGER.debug("FullScreenPath: " + fullScreenPath);
-        String screenshotBucket = Configuration.get(Parameter.S3_SCREENSHOT_BUCKET_NAME);
-
-        ObjectMetadata metadata = new ObjectMetadata();
-        if (!comment.isEmpty()) {
-            metadata.addUserMetadata(SpecialKeywords.COMMENT, comment);
-        }
-
-        AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath, metadata);
-    }
-
     /**
-     * Upload screenshot file to Amazon S3 using zafira client
+     * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
     private static void uploadToAmazonS3(File screenshot) {
-        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS_V2)) {
+        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return;
         }

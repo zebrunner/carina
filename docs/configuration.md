@@ -380,11 +380,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>./s3</td>
 	</tr>
 		<tr>
-		<td>s3_screenshot_bucket_name</td>
-		<td>Bucket name on S3 Amamzon for saving report screenshots</td>
-		<td>Screenshot bucket name</td>
-	</tr>
-		<tr>
 		<td>s3_save_screenshots</td>
 		<td>If enabled screenshots would be saved on S3 Amamzon</td>
 		<td>false, true</td>
