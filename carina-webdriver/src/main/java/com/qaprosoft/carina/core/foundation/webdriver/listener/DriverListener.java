@@ -176,6 +176,12 @@ public class DriverListener implements WebDriverEventListener {
 				throw new RuntimeException(thr);
 			}
 			
+			String urlPrefix = "";
+			try {
+				urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
+			} catch (Exception e) {
+				//do  nothing
+			}
 			
 			// handle cases which should't be captured
 			if (!thr.getMessage().contains("StaleObjectException")
@@ -190,7 +196,9 @@ public class DriverListener implements WebDriverEventListener {
 					&& !thr.getMessage().contains("was terminated due to TIMEOUT")
 					&& !thr.getMessage().contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
 					&& !thr.getMessage().contains("Session timed out or not found")) {
-				captureScreenshot(thr.getMessage(), driver, null, true);
+				captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
+			} else {
+				LOGGER.error(urlPrefix + thr.getMessage());
 			}
 		}
 	}
