@@ -70,7 +70,9 @@ public class ZipManager {
             LOGGER.error(e);
         } finally {
             try {
-                zipFile.close();
+                if (zipFile != null) {
+                    zipFile.close();
+                }
             } catch (IOException e) {
                 LOGGER.error(e);
             }
