@@ -179,6 +179,9 @@ public class MobileFactory extends AbstractFactory {
 
         if (!device.isNull()) {
             capabilities.setCapability("udid", device.getUdid());
+            // disable Selenium Hum <-> STF verification as device already
+            // connected by this test (restart driver on the same device is invoked)
+            capabilities.setCapability("STF_ENABLED", "false");
         }
 
         return capabilities;
