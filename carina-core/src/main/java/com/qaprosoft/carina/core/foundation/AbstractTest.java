@@ -731,11 +731,13 @@ public abstract class AbstractTest // extends DriverHelper
                 PrintWriter out = null;
                 try {
                     out = new PrintWriter(file);
+                    out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
+                    out.flush();
                 } catch (FileNotFoundException e) {
                     LOGGER.error("Unable to write metadata to json file: " + file.getAbsolutePath(), e);
+                } finally {
+                    out.close();
                 }
-                out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
-                out.flush();
                 LOGGER.debug("Created medata for '" + key + "' object...");
             }
 
