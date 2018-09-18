@@ -162,6 +162,20 @@ public class DriverListener implements WebDriverEventListener {
 				return;
 			}
 			
+			// handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
+			// Example:
+
+			// 10:25:20 2018-09-14 10:29:39 DriverListener [TestNG-31] [ERROR]
+			// [iPhone_6s] An unknown server-side error occurred while
+			// processing the command. Original error: The application under
+			// test with bundle id 'Q5AWL8WCY6.iMapMyRun' is not running,
+			// possibly crashed (WARNING: The server did not provide any
+			// stacktrace information)
+			
+			if (thr.getMessage().contains("is not running, possibly crashed")) {
+				throw new RuntimeException(thr);
+			}
+			
 			
 			// handle cases which should't be captured
 			if (!thr.getMessage().contains("StaleObjectException")
@@ -240,7 +254,7 @@ public class DriverListener implements WebDriverEventListener {
 		ITestResult res = Reporter.getCurrentTestResult();
 		if (res != null && res.getAttribute("ztid") != null) {
 			Long ztid = (Long) res.getAttribute("ztid");
-			if (ztid != vncArtifact.getTestId()) {
+			if (ztid != vncArtifact.getTestId() && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
 				vncArtifact.setTestId(ztid);
 				LOGGER.debug("Registered live video artifact " + vncArtifact.getName() + " into zafira");
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);

@@ -153,8 +153,6 @@ public class Configuration {
 
         RESULT_SORTING("result_sorting"),
 
-        KEEP_ALL_SCREENSHOTS("keep_all_screenshots"),
-
         BIG_SCREEN_WIDTH("big_screen_width"),
 
         BIG_SCREEN_HEIGHT("big_screen_height"),
@@ -198,10 +196,6 @@ public class Configuration {
         CRYPTO_KEY_PATH("crypto_key_path"),
 
         SUITE_NAME("suite_name"),
-
-        CI_URL("ci_url"),
-
-        CI_BUILD("ci_build"),
 
         JIRA_UPDATER("jira_updater"),
 
@@ -255,6 +249,8 @@ public class Configuration {
         S3_SCREENSHOT_BUCKET_NAME("s3_screenshot_bucket_name"),
 
         S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
+
+        S3_SAVE_SCREENSHOTS_V2("s3_save_screenshots_v2"),
 
         // HockeyApp token
         HOCKEYAPP_TOKEN("hockeyapp_token"),

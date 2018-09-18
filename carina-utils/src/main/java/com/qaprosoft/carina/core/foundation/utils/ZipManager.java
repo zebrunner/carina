@@ -55,14 +55,10 @@ public class ZipManager {
                         try {
                             copyInputStream(is, bos);
                         } finally {
-                            if (bos != null) {
-                                bos.close();
-                            }
+							bos.close();
                         }
                     } finally {
-                        if (fos != null) {
-                            fos.close();
-                        }
+						fos.close();
                     }
                 } finally {
                     if (is != null) {
@@ -87,6 +83,10 @@ public class ZipManager {
         byte[] buffer = new byte[1024];
         int len;
 
+        if (in == null) {
+        	return;
+        }
+        
         while ((len = in.read(buffer)) >= 0)
             out.write(buffer, 0, len);
 

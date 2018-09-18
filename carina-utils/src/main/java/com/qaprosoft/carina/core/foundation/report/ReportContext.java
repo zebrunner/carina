@@ -154,14 +154,16 @@ public class ReportContext {
 
     public static synchronized File getArtifactsFolder() {
         if (artifactsDirectory == null) {
+        	String absolutePath = getBaseDir().getAbsolutePath();
+        	
             try {
             	if (Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
-            		artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(getBaseDir().getAbsolutePath(), "utf-8"), ARTIFACTS_FOLDER));
+            		artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(absolutePath, "utf-8"), ARTIFACTS_FOLDER));
             	} else {
             		artifactsDirectory = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER));
             	}
             } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Folder not created: " + artifactsDirectory.getAbsolutePath());
+                throw new RuntimeException("Artifacts folder not created in base dir: " + absolutePath);
             }
             
             boolean isCreated = artifactsDirectory.exists() && artifactsDirectory.isDirectory();
@@ -180,15 +182,15 @@ public class ReportContext {
 
     public static synchronized File getMetadataFolder() {
         if (metaDataDirectory == null) {
+        	String absolutePath = getBaseDir().getAbsolutePath();
             try {
-                metaDataDirectory = new File(
-                        String.format("%s/%s/metadata", URLDecoder.decode(getBaseDir().getAbsolutePath(), "utf-8"), ARTIFACTS_FOLDER));
+                metaDataDirectory = new File(String.format("%s/%s/metadata", URLDecoder.decode(absolutePath, "utf-8")), ARTIFACTS_FOLDER);
             } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Artifacts metadata folder not created: " + metaDataDirectory.getAbsolutePath());
+                throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
             }
             boolean isCreated = metaDataDirectory.mkdir();
             if (!isCreated) {
-                throw new RuntimeException("Artifacts metadata folder not created: " + metaDataDirectory.getAbsolutePath());
+                throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
             }
         }
         return metaDataDirectory;
@@ -365,23 +367,6 @@ public class ReportContext {
         }
     }
 
-    public static void removeTestScreenshots() {
-        try {
-            // Lists all files in folder
-            File parentFolder = ReportContext.getTestDir();
-            File fList[] = parentFolder.listFiles();
-            for (int i = 0; i < fList.length; i++) {
-                if (fList[i].getName().endsWith(".png") || fList[i].getName().endsWith(".html")) {
-                    fList[i].delete();
-                }
-            }
-            File thumbnailsFolder = new File(parentFolder.getAbsoluteFile() + "/thumbnails");
-            FileUtils.deleteDirectory(thumbnailsFolder);
-        } catch (Exception e) {
-            LOGGER.error("Exception discovered during screenshots removing! " + e);
-        }
-    }
-
     public static void generateHtmlReport(String content) {
     	String emailableReport = SpecialKeywords.HTML_REPORT;
     	
@@ -389,7 +374,7 @@ public class ReportContext {
             File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
                     Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), emailableReport));
 
-            // if file doesnt exists, then create it
+            // if file doesn't exists, then create it
             if (!reportFile.exists()) {
                 reportFile.createNewFile();
             }
@@ -400,14 +385,10 @@ public class ReportContext {
                 try {
                     bw.write(content);
                 } finally {
-                    if (bw != null) {
-                        bw.close();
-                    }
+					bw.close();
                 }
             } finally {
-                if (fw != null) {
-                    fw.close();
-                }
+				fw.close();
             }
 
         } catch (IOException e) {
@@ -506,7 +487,7 @@ public class ReportContext {
         } else {
             link = String.format("file://%s/%s/logcat.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
         }
-        LOGGER.info("Extracted syslog link: ".concat(link));
+        LOGGER.debug("Extracted syslog link: ".concat(link));
         return link;
     }
     

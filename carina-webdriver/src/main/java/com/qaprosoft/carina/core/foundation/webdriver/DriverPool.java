@@ -68,15 +68,16 @@ public final class DriverPool {
     }
 
     /**
-     * Get first registered driver from Pool.
+     * @deprecated (Obsolete method which will be removed in 6.0 core generation. Standard getDriver(..) should be reused!)
      * 
+     * Get first registered driver from Pool.
      * @return default WebDriver
      */
     @Deprecated
     public static WebDriver getExistingDriver() {
         ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
         if (currentDrivers.size() == 0) {
-            throw new RuntimeException("Unable to find exiting river in DriverPool!");
+            throw new RuntimeException("Unable to find exiting driver in DriverPool!");
         }
 
         if (currentDrivers.size() > 0) {
@@ -210,9 +211,6 @@ public final class DriverPool {
         try {
             LOGGER.debug("Driver restarting...");
             deregisterDriver(DEFAULT);
-            if (!isSameDevice) {
-                DevicePool.deregisterDevice();
-            }
             
             drv.quit();
 

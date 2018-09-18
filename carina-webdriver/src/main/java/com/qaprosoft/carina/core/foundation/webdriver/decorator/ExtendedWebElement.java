@@ -59,8 +59,8 @@ import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
@@ -218,7 +218,7 @@ public class ExtendedWebElement {
 				return;
 			}
 
-			if (tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+			if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
 				locatorField = tempSearchContext.getClass().getDeclaredField("underlyingElement");
 				locatorField.setAccessible(true);

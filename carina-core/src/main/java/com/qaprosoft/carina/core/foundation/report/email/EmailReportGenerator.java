@@ -15,7 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.email;
 
-import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.*;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.getCucumberReportResultLink;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberReportFolderExists;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberTest;
+import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.useJSinCucumberReport;
 import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
 
 import java.util.Collections;
@@ -62,7 +65,6 @@ public class EmailReportGenerator {
     private static final String VERSION_PLACEHOLDER = "${version}";
     private static final String FINISH_DATE_PLACEHOLDER = "${finish_date}";
     private static final String ELAPSED_TIME_PLACEHOLDER = "${elapsed_time}";
-    private static final String CI_TEST_JOB = "${ci_test_job}";
     private static final String PASS_COUNT_PLACEHOLDER = "${pass_count}";
     private static final String FAIL_COUNT_PLACEHOLDER = "${fail_count}";
     private static final String SKIP_COUNT_PLACEHOLDER = "${skip_count}";
@@ -97,7 +99,6 @@ public class EmailReportGenerator {
     private int skipCount = 0;
 
     public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate, String elapsedTime,
-            String ciTestJob,
             List<TestResultItem> testResultItems, List<String> createdItems) {
         emailBody = emailBody.replace(TITLE_PLACEHOLDER, title);
         emailBody = emailBody.replace(ENV_PLACEHOLDER, url);
@@ -106,7 +107,6 @@ public class EmailReportGenerator {
         emailBody = emailBody.replace(BROWSER_PLACEHOLDER, browser);
         emailBody = emailBody.replace(FINISH_DATE_PLACEHOLDER, finishDate);
         emailBody = emailBody.replace(ELAPSED_TIME_PLACEHOLDER, elapsedTime);
-        emailBody = emailBody.replace(CI_TEST_JOB, !StringUtils.isEmpty(ciTestJob) ? ciTestJob : "");
         emailBody = emailBody.replace(RESULTS_PLACEHOLDER, getTestResultsList(testResultItems));
         emailBody = emailBody.replace(PASS_COUNT_PLACEHOLDER, String.valueOf(passCount));
         emailBody = emailBody.replace(FAIL_COUNT_PLACEHOLDER, String.valueOf(failCount));
