@@ -196,6 +196,7 @@ public class DriverListener implements WebDriverEventListener {
 					&& !thr.getMessage().contains("was terminated due to TIMEOUT")
 					&& !thr.getMessage().contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
 					&& !thr.getMessage().contains("Session timed out or not found")) {
+				LOGGER.error(thr); // temporary put into the logs whole stacktrace
 				captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
 			}
 		}
