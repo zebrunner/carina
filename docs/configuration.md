@@ -330,8 +330,8 @@ All project configuration properties are located in **_config.properties** file.
 		<td>true, false</td>
 	</tr>
 	<tr>
-		<td>video_recording</td>
-		<td>If feature is test will be recorded</td>
+		<td>optimize_video_recording</td>
+		<td>Enable video recording only for the final retry attempt</td>
 		<td>true, false</td>
 	</tr>
 	<tr>

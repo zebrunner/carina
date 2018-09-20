@@ -284,10 +284,6 @@ public class AbstractTestListener extends TestArgsListener {
 
         ReportContext.getBaseDir(); // create directory for logging as soon as possible
 
-        /*
-         * //dropbox client initialization if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty()) {
-         * dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN)); }
-         */
         super.onStart(context);
     }
 
