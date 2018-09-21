@@ -29,6 +29,15 @@ public class RemoteDevice {
     private String remoteURL;
     private String vnc;
     private String proxyPort;
+    private String browserName;
+
+    public String getBrowserName() {
+        return browserName;
+    }
+
+    public void setBrowserName(String browserName) {
+        this.browserName = browserName;
+    }
 
     public String getName() {
         return name;

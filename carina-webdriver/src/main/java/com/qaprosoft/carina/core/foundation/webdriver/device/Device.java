@@ -43,11 +43,8 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.Platform;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.ProcessBuilderExecutor;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
@@ -151,6 +148,10 @@ public class Device extends RemoteDevice {
     public boolean isTv() {
         return getType().equalsIgnoreCase(SpecialKeywords.TV);
     }
+    
+    public boolean isSafari() {
+        return getBrowserName().equalsIgnoreCase(SpecialKeywords.SAFARI);
+    }
 
     public Type getDeviceType() {
         if (isNull()) {
@@ -169,6 +170,9 @@ public class Device extends RemoteDevice {
         } else if (getOs().equalsIgnoreCase(SpecialKeywords.IOS) || getOs().equalsIgnoreCase(SpecialKeywords.MAC)) {
             if (isTablet()) {
                 return Type.IOS_TABLET;
+            }
+            if (isSafari()) {
+                return Type.IOS_SAFARI;
             }
             return Type.IOS_PHONE;
         }
