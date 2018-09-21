@@ -192,7 +192,7 @@ public class ExtendedElementLocator implements ElementLocator {
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             String replacement = matcher.group(1) + "translate(" + matcher.group(5)
-                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" + matcher.group(7);
+                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÄÃÇČÉÈÊËĔŒĞĢÎÏÍÌÔÖŌÒÓØŜŞßÙÛÜŪŸ', 'abcdefghijklmnopqrstuvwxyzàáâäåçčéèêëĕœğģîïíìôöōòóøŝşßùûüūÿ') " + matcher.group(7);
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
