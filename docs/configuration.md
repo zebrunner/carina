@@ -70,11 +70,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Boolean</td>
 	</tr>
 	<tr>
-		<td>keep_all_screenshots</td>
-		<td>Keep screenshots artifacts even for passed tests.</td>
-		<td></td>
-	</tr>
-	<tr>
 		<td>report_url</td>
 		<td>Direct HTTP link to Jenkins workspace report folder. Automatically specified by CI</td>
 		<td>http://localhost:8888/job /my_project/1/eTAF_Report</td>
@@ -335,8 +330,8 @@ All project configuration properties are located in **_config.properties** file.
 		<td>true, false</td>
 	</tr>
 	<tr>
-		<td>video_recording</td>
-		<td>If feature is test will be recorded</td>
+		<td>optimize_video_recording</td>
+		<td>Enable video recording only for the final retry attempt</td>
 		<td>true, false</td>
 	</tr>
 	<tr>
@@ -383,11 +378,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>s3_local_storage</td>
 		<td>Directory for downloading artefacts</td>
 		<td>./s3</td>
-	</tr>
-		<tr>
-		<td>s3_screenshot_bucket_name</td>
-		<td>Bucket name on S3 Amamzon for saving report screenshots</td>
-		<td>Screenshot bucket name</td>
 	</tr>
 		<tr>
 		<td>s3_save_screenshots</td>

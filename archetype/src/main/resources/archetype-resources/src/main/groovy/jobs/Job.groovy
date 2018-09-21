@@ -24,14 +24,12 @@ class Job {
                     case ~/^.*web.*${symbol_dollar}/:
                         configure addExtensibleChoice('browser', 'gc_BROWSER', 'Select a browser to run tests against.', 'chrome')
                         booleanParam('auto_screenshot', true, 'Generate screenshots automatically during the test')
-                        booleanParam('keep_all_screenshots', true, 'Keep screenshots even if the tests pass')
                         break;
                     case ~/^.*android.*${symbol_dollar}/:
                         choiceParam('device', getDeviceList(suiteName), "Select the Device a Test will run against.  ALL - Any available device, PHONE - Any available phone, TABLET - Any tablet")
                         stringParam('build', '.*', "latest - use fresh build artifact from S3 or local storage;")
                         booleanParam('recoveryMode', true, 'Restart application between retries')
                         booleanParam('auto_screenshot', true, 'Generate screenshots automatically during the test')
-                        booleanParam('keep_all_screenshots', true, 'Keep screenshots even if the tests pass')
                         configure addHiddenParameter('browser', '', 'NULL')
                         break;
                     default:

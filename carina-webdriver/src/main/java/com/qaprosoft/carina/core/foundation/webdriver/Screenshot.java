@@ -24,6 +24,9 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
@@ -34,18 +37,22 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.listener.ZafiraListener;
+import com.qaprosoft.zafira.log.MetaInfoLevel;
+import com.qaprosoft.zafira.log.MetaInfoMessage;
+import com.qaprosoft.zafira.models.dto.TestType;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -59,7 +66,11 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
+    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/%s/";
+
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+
+    private static ExecutorService executorService = Executors.newFixedThreadPool(50);
 
     /**
      * Adds screenshot rule
@@ -320,7 +331,9 @@ public class Screenshot {
                             Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
                 }
 
-                ImageIO.write(screen, "PNG", new File(screenPath));
+                File screenshot = new File(screenPath);
+
+                ImageIO.write(screen, "PNG", screenshot);
 
                 // Create screenshot thumbnail
                 String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
@@ -329,16 +342,7 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-
-                // TODO: Move upload to S3 into the async calls closer to the end of test to upload whole bundle
-                // Also investigate possibility to remove reference onto the test name
-                String test = "";
-                if (TestNamingUtil.isTestNameRegistered()) {
-                    test = TestNamingUtil.getTestNameByThread();
-                } else {
-                    test = "undefined";
-                }
-                uploadToAmazonS3(test, screenPath, screenName, comment);
+                uploadToAmazonS3(screenshot);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -362,29 +366,38 @@ public class Screenshot {
         return screenName;
     }
 
-    private static void uploadToAmazonS3(String test, String fullScreenPath, String screenName, String comment) {
+    /**
+     * Upload screenshot file to Amazon S3 using Zafira Client
+     * @param screenshot - existing screenshot {@link File}
+     */
+    private static void uploadToAmazonS3(File screenshot) {
         if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return;
         }
-        // TODO: not good solution...
-        Long runId = Long.valueOf(System.getProperty("zafira_run_id"));
-
-        String testName = test.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String key = runId + "/" + testName + "/" + screenName;
-        if (runId == -1) {
-            key = "/LOCAL/" + ReportContext.getRootID() + "/" + testName + "/" + screenName;
+        String correlationId = UUID.randomUUID().toString();
+        TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
+        try {
+            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                    .addHeader("AMAZON_PATH", null)
+                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
+            executorService.execute(() -> {
+                try {
+                	LOGGER.info("Uploading to AWS: " + screenshot.getName());
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
+                    LOGGER.info("Uploaded to AWS: " + screenshot.getName());
+                    ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                            .addHeader("AMAZON_PATH", url)
+                            .addHeader("TEST_ID", String.valueOf(test.getId()))
+                            .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
+                    LOGGER.info("Updated AWS metadata: " + screenshot.getName());
+                } catch (Exception e) {
+                    LOGGER.error("Can't save file to Amazon S3", e);
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("Can't save file to Amazon S3", e);
         }
-        LOGGER.debug("Key: " + key);
-        LOGGER.debug("FullScreenPath: " + fullScreenPath);
-        String screenshotBucket = Configuration.get(Parameter.S3_SCREENSHOT_BUCKET_NAME);
-
-        ObjectMetadata metadata = new ObjectMetadata();
-        if (!comment.isEmpty()) {
-            metadata.addUserMetadata(SpecialKeywords.COMMENT, comment);
-        }
-
-        AmazonS3Manager.getInstance().put(screenshotBucket, key, fullScreenPath, metadata);
     }
 
     /**

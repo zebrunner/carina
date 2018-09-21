@@ -162,9 +162,30 @@ public class DriverListener implements WebDriverEventListener {
 				return;
 			}
 			
+			// handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
+			// Example:
+
+			// 10:25:20 2018-09-14 10:29:39 DriverListener [TestNG-31] [ERROR]
+			// [iPhone_6s] An unknown server-side error occurred while
+			// processing the command. Original error: The application under
+			// test with bundle id 'Q5AWL8WCY6.iMapMyRun' is not running,
+			// possibly crashed (WARNING: The server did not provide any
+			// stacktrace information)
+			
+			if (thr.getMessage().contains("is not running, possibly crashed")) {
+				throw new RuntimeException(thr);
+			}
+			
+			String urlPrefix = "";
+			try {
+				urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
+			} catch (Exception e) {
+				//do  nothing
+			}
 			
 			// handle cases which should't be captured
 			if (!thr.getMessage().contains("StaleObjectException")
+					&& !thr.getMessage().contains("was terminated due to FORWARDING_TO_NODE_FAILED")
 					&& !thr.getMessage().contains("InvalidElementStateException")
 					&& !thr.getMessage().contains("stale element reference")
 					&& !thr.getMessage().contains("no such element: Unable to locate element")
@@ -176,7 +197,8 @@ public class DriverListener implements WebDriverEventListener {
 					&& !thr.getMessage().contains("was terminated due to TIMEOUT")
 					&& !thr.getMessage().contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
 					&& !thr.getMessage().contains("Session timed out or not found")) {
-				captureScreenshot(thr.getMessage(), driver, null, true);
+				LOGGER.error(thr); // temporary put into the logs whole stacktrace
+				captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
 			}
 		}
 	}
@@ -240,7 +262,7 @@ public class DriverListener implements WebDriverEventListener {
 		ITestResult res = Reporter.getCurrentTestResult();
 		if (res != null && res.getAttribute("ztid") != null) {
 			Long ztid = (Long) res.getAttribute("ztid");
-			if (ztid != vncArtifact.getTestId()) {
+			if (ztid != vncArtifact.getTestId() && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
 				vncArtifact.setTestId(ztid);
 				LOGGER.debug("Registered live video artifact " + vncArtifact.getName() + " into zafira");
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);

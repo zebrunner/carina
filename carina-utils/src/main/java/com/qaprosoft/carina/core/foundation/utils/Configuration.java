@@ -153,8 +153,6 @@ public class Configuration {
 
         RESULT_SORTING("result_sorting"),
 
-        KEEP_ALL_SCREENSHOTS("keep_all_screenshots"),
-
         BIG_SCREEN_WIDTH("big_screen_width"),
 
         BIG_SCREEN_HEIGHT("big_screen_height"),
@@ -199,10 +197,6 @@ public class Configuration {
 
         SUITE_NAME("suite_name"),
 
-        CI_URL("ci_url"),
-
-        CI_BUILD("ci_build"),
-
         JIRA_UPDATER("jira_updater"),
 
         JIRA_URL("jira_url"),
@@ -223,13 +217,11 @@ public class Configuration {
 
         // Appium 1.1.x mobile capabilities: iOS and Android
         MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
-
-        // DROPBOX_ACCESS_TOKEN("dropbox_access_token"),
-
-        VIDEO_RECORDING("video_recording"),
+        
+        // Enable video recording capabilities only for the final retry attempt
+        OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
 
         // TestRail
-
         TESTRAIL_URL("testrail_url"),
 
         TESTRAIL_USER("testrail_user"),
@@ -252,8 +244,6 @@ public class Configuration {
         S3_LOCAL_STORAGE("s3_local_storage"),
 
         // Amazon-Screenshot
-        S3_SCREENSHOT_BUCKET_NAME("s3_screenshot_bucket_name"),
-
         S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
 
         // HockeyApp token
