@@ -33,6 +33,7 @@ public @interface DeviceType {
                 "android"),
         ANDROID_TV("android_tv", "android"),
         IOS_TABLET("ios_tablet", "ios"),
+        IOS_SAFARI("ios_safari", "ios"),
         IOS_PHONE(
                 "ios_phone",
                 "ios");
