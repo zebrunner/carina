@@ -94,7 +94,7 @@ public class MobileFactory extends AbstractFactory {
 
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
-                    if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
+                    if (isVideoEnabled()) {
                         
                         final String videoName = UUID.randomUUID().toString();
                         
@@ -116,7 +116,7 @@ public class MobileFactory extends AbstractFactory {
 
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
 
-                    if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
+                    if (isVideoEnabled()) {
                         
                         final String videoName = UUID.randomUUID().toString();
                         

@@ -138,6 +138,8 @@ public class SpecialKeywords {
 
     // ------------- CAPABILITIES PROPERTIES --------------------------
     public static final String CAPABILITIES = "capabilities";
+    public static final String ENABLE_VIDEO = "capabilities.enableVideo";
+    
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
     public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
     public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
@@ -149,6 +151,7 @@ public class SpecialKeywords {
     public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
     public static final String MOBILE_PROXY_PORT = "capabilities.proxyPort";
+    
     
     public static final String  SLOT_CAPABILITIES = "slotCapabilities";
 

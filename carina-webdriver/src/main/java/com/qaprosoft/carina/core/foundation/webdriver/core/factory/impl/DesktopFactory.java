@@ -66,8 +66,7 @@ public class DesktopFactory extends AbstractFactory {
         try {
             
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            
-            if (R.CONFIG.getBoolean("capabilities.enableVideo")) {
+            if (isVideoEnabled()) {
                 final String videoName = UUID.randomUUID().toString();
                 capabilities.setCapability("videoName", videoName + ".mp4");
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality"))));

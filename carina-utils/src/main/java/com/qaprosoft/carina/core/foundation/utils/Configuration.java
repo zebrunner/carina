@@ -217,13 +217,11 @@ public class Configuration {
 
         // Appium 1.1.x mobile capabilities: iOS and Android
         MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
-
-        // DROPBOX_ACCESS_TOKEN("dropbox_access_token"),
-
-        VIDEO_RECORDING("video_recording"),
+        
+        // Enable video recording capabilities only for the final retry attempt
+        OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
 
         // TestRail
-
         TESTRAIL_URL("testrail_url"),
 
         TESTRAIL_USER("testrail_user"),
