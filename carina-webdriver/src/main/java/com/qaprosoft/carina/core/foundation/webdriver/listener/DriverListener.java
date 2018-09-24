@@ -185,6 +185,7 @@ public class DriverListener implements WebDriverEventListener {
 			
 			// handle cases which should't be captured
 			if (!thr.getMessage().contains("StaleObjectException")
+					&& !thr.getMessage().contains("StaleElementReferenceException")
 					&& !thr.getMessage().contains("was terminated due to FORWARDING_TO_NODE_FAILED")
 					&& !thr.getMessage().contains("InvalidElementStateException")
 					&& !thr.getMessage().contains("stale element reference")
