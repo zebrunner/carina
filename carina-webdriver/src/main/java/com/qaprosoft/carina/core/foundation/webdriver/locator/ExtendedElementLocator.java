@@ -105,7 +105,7 @@ public class ExtendedElementLocator implements ElementLocator {
         NoSuchElementException exception = null;
         // Finding element using Selenium
         if (by != null) {
-            if (caseInsensitive) {
+            if (caseInsensitive && !by.toString().contains("translate(")) {
                 by = toCaseInsensitive(by.toString());
             }
             try {
@@ -186,14 +186,13 @@ public class ExtendedElementLocator implements ElementLocator {
      * @return By
      */
     public static By toCaseInsensitive(String locator) {
-        locator = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b|\\bor\\b))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\bband\\b|\\bor\\b)\\]?)";
-
-        Matcher matcher = Pattern.compile(attributePattern).matcher(locator);
+        String xpath = StringUtils.remove(locator, "By.xpath: ");
+        String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b\\s?(\\bcontains\\b\\()?|\\bor\\b\\s?(\\bcontains\\b\\()?))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\band\\b|\\bor\\b)\\]?)";
+        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
-            String replacement = matcher.group(1) + "translate(" + matcher.group(3)
-                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" + matcher.group(5);
+            String replacement = matcher.group(1) + "translate(" + matcher.group(5)
+                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÄÃÇČÉÈÊËĔŒĞĢÎÏÍÌÔÖŌÒÓØŜŞßÙÛÜŪŸ', 'abcdefghijklmnopqrstuvwxyzàáâäåçčéèêëĕœğģîïíìôöōòóøŝşßùûüūÿ') " + matcher.group(7);
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
