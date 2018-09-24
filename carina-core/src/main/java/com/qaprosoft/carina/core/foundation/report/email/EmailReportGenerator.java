@@ -15,12 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.email;
 
-import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.getCucumberReportResultLink;
-import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberReportFolderExists;
-import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.isCucumberTest;
-import static com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner.useJSinCucumberReport;
-import static com.qaprosoft.carina.core.foundation.report.ReportContext.isArtifactsFolderExists;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -83,10 +77,6 @@ public class EmailReportGenerator {
     private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
     private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
 
-    // Cucumber section
-    private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
-    private static final String CUCUMBER_JS_PLACEHOLDER = "${js_placeholder}";
-
     private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
     private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
     private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
@@ -113,10 +103,6 @@ public class EmailReportGenerator {
         emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
         emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
         emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
-
-        // Cucumber section
-        emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResults());
-        emailBody = emailBody.replace(CUCUMBER_JS_PLACEHOLDER, getCucumberJavaScript());
     }
 
     public String getEmailBody() {
@@ -353,36 +339,6 @@ public class EmailReportGenerator {
             reasonText = reasonText.replace("\n", "<br/>");
         }
         return reasonText;
-    }
-
-    public String getCucumberResults() {
-        String result = "";
-
-        if ((isArtifactsFolderExists()) && (isCucumberTest()) && (isCucumberReportFolderExists())) {
-
-            String link = getCucumberReportResultLink();
-            String feature1 = "";
-            if (useJSinCucumberReport()) {
-                feature1 = String.format("%s %n %s %n %s %n %s %n %s %n %s", "<input class='hide' id='hd-1' type='checkbox'>",
-                        "<label for='hd-1'>Show Cucumber Results</label> ", "<div>",
-                        "<iframe name='frm' id='mainframe' src='" + link
-                                + "' scrolling='yes'  width='90%'height='100%' align='center' frameborder='0' allowtransparency='no' target='_self' >",
-                        "</iframe>", "</div><br/>");
-            }
-            result = String.format("<br/><b><a href='%s' style='color: green;' target='_blank'> Open Cucumber Report in new Window </a></b><br/>%s",
-                    link, feature1);
-            LOGGER.info("Cucumber result: " + result);
-        }
-
-        return result;
-    }
-
-    private String getCucumberJavaScript() {
-        String result = "";
-        if ((isArtifactsFolderExists()) && (isCucumberTest()) && (isCucumberReportFolderExists()) && (useJSinCucumberReport())) {
-            result = "<link rel=\"stylesheet\" type=\"text/css\" href=\"gallery-lib/cucumber.css\">";
-        }
-        return result;
     }
 
 }
