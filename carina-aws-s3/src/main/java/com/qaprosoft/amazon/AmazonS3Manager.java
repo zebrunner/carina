@@ -29,9 +29,18 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
@@ -50,14 +59,16 @@ public class AmazonS3Manager {
             synchronized (AmazonS3Manager.class) {
                 if (instance == null) {
                     instance = new AmazonS3Manager();
-                    String accessKey = Configuration.get(Parameter.ACCESS_KEY_ID);
-                    String secretKey = Configuration.get(Parameter.SECRET_KEY);
+                    CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+                    Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+                    
+                    String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
+                    String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
 
                     System.setProperty("aws.accessKeyId", accessKey);
                     System.setProperty("aws.secretKey", secretKey);
 
                     s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
-
                 }
             }
         }
