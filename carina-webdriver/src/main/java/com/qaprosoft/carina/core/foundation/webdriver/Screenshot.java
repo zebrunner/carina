@@ -54,6 +54,7 @@ import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -70,6 +71,8 @@ public class Screenshot {
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(50);
+    
+    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/";
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
 
@@ -384,7 +387,7 @@ public class Screenshot {
             executorService.execute(() -> {
                 try {
                 	LOGGER.info("Uploading to AWS: " + screenshot.getName());
-                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format("/%s/", DATE_FORMAT.format(new Date())));
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
                     LOGGER.info("Uploaded to AWS: " + screenshot.getName());
                     ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                             .addHeader("AMAZON_PATH", url)
