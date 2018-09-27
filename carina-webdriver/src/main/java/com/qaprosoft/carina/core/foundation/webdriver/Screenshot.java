@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -51,8 +54,6 @@ import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
-import com.qaprosoft.zafira.models.dto.TestType;
-import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -66,11 +67,11 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
-    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/%s/";
-
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(50);
+    
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
 
     /**
      * Adds screenshot rule
@@ -376,7 +377,6 @@ public class Screenshot {
             return;
         }
         String correlationId = UUID.randomUUID().toString();
-        TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
         try {
             ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                     .addHeader("AMAZON_PATH", null)
@@ -384,11 +384,11 @@ public class Screenshot {
             executorService.execute(() -> {
                 try {
                 	LOGGER.info("Uploading to AWS: " + screenshot.getName());
-                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format("/%s/", DATE_FORMAT.format(new Date())));
                     LOGGER.info("Uploaded to AWS: " + screenshot.getName());
                     ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                             .addHeader("AMAZON_PATH", url)
-                            .addHeader("TEST_ID", String.valueOf(test.getId()))
+                            .addHeader("CI_TEST_ID", ZafiraListener.getThreadCiTestId())
                             .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
                     LOGGER.info("Updated AWS metadata: " + screenshot.getName());
                 } catch (Exception e) {
