@@ -379,7 +379,8 @@ public class Screenshot {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return;
         }
-        String correlationId = UUID.randomUUID().toString();
+        final String correlationId = UUID.randomUUID().toString();
+        final String ciTestId = ZafiraListener.getThreadCiTestId();
         try {
             ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                     .addHeader("AMAZON_PATH", null)
@@ -391,7 +392,7 @@ public class Screenshot {
                     LOGGER.debug("Uploaded to AWS: " + screenshot.getName());
                     ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                             .addHeader("AMAZON_PATH", url)
-                            .addHeader("CI_TEST_ID", ZafiraListener.getThreadCiTestId())
+                            .addHeader("CI_TEST_ID", ciTestId)
                             .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
                     LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
                 } catch (Exception e) {
