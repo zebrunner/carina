@@ -26,12 +26,12 @@ public class CommonUtils {
 
     /**
      * pause
-     * 
+     *
      * @param timeout Number
      */
     public static void pause(Number timeout) {
     	Timer.start(ACTION_NAME.PAUSE);
-        LOGGER.info(String.format("Will wait for %s seconds", timeout));
+        LOGGER.debug(String.format("Will wait for %s seconds", timeout));
         try {
             Float timeoutFloat = timeout.floatValue() * 1000;
             long timeoutLong = timeoutFloat.longValue();
@@ -39,7 +39,7 @@ public class CommonUtils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOGGER.info("Pause is overed. Keep going..");
+        LOGGER.debug("Pause is overed. Keep going..");
         Timer.stop(ACTION_NAME.PAUSE);
     }
 }

@@ -386,14 +386,14 @@ public class Screenshot {
                     .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
             executorService.execute(() -> {
                 try {
-                	LOGGER.info("Uploading to AWS: " + screenshot.getName());
+                	    LOGGER.debug("Uploading to AWS: " + screenshot.getName());
                     String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
-                    LOGGER.info("Uploaded to AWS: " + screenshot.getName());
+                    LOGGER.debug("Uploaded to AWS: " + screenshot.getName());
                     ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                             .addHeader("AMAZON_PATH", url)
                             .addHeader("CI_TEST_ID", ZafiraListener.getThreadCiTestId())
                             .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
-                    LOGGER.info("Updated AWS metadata: " + screenshot.getName());
+                    LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
                 } catch (Exception e) {
                     LOGGER.error("Can't save file to Amazon S3", e);
                 }
