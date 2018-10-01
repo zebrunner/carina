@@ -75,6 +75,10 @@ public class Screenshot {
     private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/";
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
+    
+    private Screenshot() {
+    	//hide default constructor
+    }
 
     /**
      * Adds screenshot rule
