@@ -259,7 +259,7 @@ public class Screenshot {
     }
 
     /**
-     * Captures web-browser screenshot, creates thumbnail and copies both images to specified screenshots location.
+     * Captures application screenshot, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
      *            instance used for capturing.
@@ -323,6 +323,10 @@ public class Screenshot {
                     screen = takeVisibleScreenshot(driver, augmentedDriver);
                 }
 
+                if (screen == null) {
+                	//do nothong and return empty 
+                	return "";
+                }
                 BufferedImage thumbScreen = screen;
 
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
@@ -437,7 +441,7 @@ public class Screenshot {
      * 
      * @return screenshot image
      */
-    private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
+    private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
         BufferedImage screenShot;
         if (driver.getClass().toString().contains("java_client")) {
             // Mobile Native app
@@ -467,8 +471,8 @@ public class Screenshot {
      * 
      * @return screenshot image
      */
-    private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws IOException {
-        BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+    private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
+    	BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
         return screenShot;
     }
 }
