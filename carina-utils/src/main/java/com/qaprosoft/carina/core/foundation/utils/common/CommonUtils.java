@@ -23,6 +23,10 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 public class CommonUtils {
 
     private static final Logger LOGGER = Logger.getLogger(CommonUtils.class);
+    
+    private CommonUtils() {
+    	//hide public constructor
+    }
 
     /**
      * pause
