@@ -135,6 +135,8 @@ public class Screenshot {
     }
 
     /**
+     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
+     * 
      * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
@@ -193,6 +195,8 @@ public class Screenshot {
     }
 
     /**
+     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
+     * 
      * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
@@ -208,6 +212,8 @@ public class Screenshot {
     }
 
     /**
+     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
+     * 
      * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
