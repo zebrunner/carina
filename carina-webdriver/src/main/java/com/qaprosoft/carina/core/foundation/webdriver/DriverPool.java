@@ -459,8 +459,9 @@ public final class DriverPool {
                 single_driver = null;
             }
 
-            Assert.assertFalse(drivers.get(threadId).containsKey(name),
-                    "Driver '" + name + "' was not deregistered from map for thread: " + threadId);
+            if (drivers.get(threadId).containsKey(name)) {
+				LOGGER.error("Driver '" + name + "' was not deregistered from map for thread: " + threadId);
+            }
         } else {
             LOGGER.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);
         }
