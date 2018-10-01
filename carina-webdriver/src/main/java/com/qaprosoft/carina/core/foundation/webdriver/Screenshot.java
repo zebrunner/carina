@@ -295,8 +295,6 @@ public class Screenshot {
                 File testScreenRootDir = ReportContext.getTestDir();
 
                 // Capture full page screenshot and resize
-                // TODO: implement naming strategy for screenshots wihtout test names
-                // String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
                 screenName = System.currentTimeMillis() + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
@@ -315,7 +313,7 @@ public class Screenshot {
         				
         				augmentedDriver = driver = (WebDriver) locatorField.get(innerProxy); 
     				} catch (Exception e) {
-    					//do nothing and recieve augmenting warning in the logs
+    					//do nothing and receive augmenting warning in the logs
     				}
                 }
     				
@@ -334,7 +332,7 @@ public class Screenshot {
                 }
 
                 if (screen == null) {
-                	//do nothong and return empty 
+                	//do nothing and return empty 
                 	return "";
                 }
                 BufferedImage thumbScreen = screen;
