@@ -350,7 +350,7 @@ public class ExtendedWebElement {
         	//TODO: investigate maybe searchContext better to use here!
         	element = getDriver().findElement(by);
         } else {
-        	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
+        	throw new NoSuchElementException("Unable to detect element using By: " + by.toString());
         }
 
         return element;
