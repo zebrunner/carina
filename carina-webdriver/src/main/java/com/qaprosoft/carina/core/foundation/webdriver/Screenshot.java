@@ -259,7 +259,7 @@ public class Screenshot {
             BufferedImage screen;
 
             // Create screenshot
-            screen = takeVisibleScreenshot(driver, augmentedDriver);
+            screen = takeVisibleScreenshot(augmentedDriver);
 
             ImageIO.write(screen, "PNG", new File(screenPath));
 
@@ -332,7 +332,7 @@ public class Screenshot {
                 if (fullSize) {
                     screen = takeFullScreenshot(driver, augmentedDriver);
                 } else {
-                    screen = takeVisibleScreenshot(driver, augmentedDriver);
+                    screen = takeVisibleScreenshot(augmentedDriver);
                 }
 
                 if (screen == null) {
@@ -428,9 +428,9 @@ public class Screenshot {
      * @param path
      *            - path to screenshot file.
      */
-    private static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
+    private static void resizeImg(BufferedImage bufferdImage, int width, int height, String path) {
         try {
-            bufImage = Scalr.resize(bufImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
+            BufferedImage bufImage = Scalr.resize(bufferdImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
                     Scalr.OP_ANTIALIAS);
             if (bufImage.getHeight() > height) {
                 bufImage = Scalr.crop(bufImage, bufImage.getWidth(), height);
@@ -483,8 +483,7 @@ public class Screenshot {
      * 
      * @return screenshot image
      */
-    private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
-    	BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
-        return screenShot;
+    private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
+    	return ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
     }
 }
