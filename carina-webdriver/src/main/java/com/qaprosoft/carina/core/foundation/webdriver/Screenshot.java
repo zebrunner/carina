@@ -306,7 +306,7 @@ public class Screenshot {
                 //hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
     				try {
-        				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) driver));
+        				InvocationHandler innerProxy = Proxy.getInvocationHandler((Proxy) driver);
         				// "arg$2" is by default RemoteWebDriver;
         				// "arg$1" is EventFiringWebDriver
         				// wrap into try/catch to make sure we don't affect test execution
