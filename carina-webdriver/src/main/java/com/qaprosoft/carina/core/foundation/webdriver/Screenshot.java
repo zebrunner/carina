@@ -433,7 +433,7 @@ public class Screenshot {
             }
             ImageIO.write(bufImage, "png", new File(path));
         } catch (Exception e) {
-            LOGGER.error("Image scaling problem!");
+            LOGGER.error("Image scaling problem!", e);
         }
     }
 
