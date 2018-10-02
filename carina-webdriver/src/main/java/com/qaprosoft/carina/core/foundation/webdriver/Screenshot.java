@@ -365,16 +365,9 @@ public class Screenshot {
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
-                if (e.getMessage() != null && (e.getMessage().contains("current view have 'secure' flag set")
-                        || e.getMessage().contains("no such window: window was already closed")
-                        || e.getMessage().contains("Error communicating with the remote browser. It may have died")
-                        || e.getMessage().contains("unexpected alert open"))) {
-                    LOGGER.warn("Unable to capture screenshot: " + e.getMessage());
-                } else {
-                    throw e;
-                }
+            	LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
             } catch (Exception e) {
-                LOGGER.error("Unable to capture screenshot!", e);
+                LOGGER.error("Unable to capture screenshot due to the Exception!", e);
             } finally {
             	Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
