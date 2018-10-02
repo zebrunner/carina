@@ -368,6 +368,7 @@ public final class DriverPool {
         }
 
         if (!init) {
+        	//TODO: think about this runtime exception 
             throw new RuntimeException(init_throwable);
         }
 
