@@ -172,6 +172,7 @@ public class DriverListener implements WebDriverEventListener {
 			// possibly crashed (WARNING: The server did not provide any
 			// stacktrace information)
 			
+			//TODO: investigate if we run @AfterMethod etc system events after this crash
 			if (thr.getMessage().contains("is not running, possibly crashed")) {
 				throw new RuntimeException(thr);
 			}
