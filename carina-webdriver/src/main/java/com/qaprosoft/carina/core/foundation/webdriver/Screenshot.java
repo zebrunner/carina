@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +54,6 @@ import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
-import com.qaprosoft.zafira.models.dto.TestType;
 import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
@@ -66,11 +68,17 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
-    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/%s/";
-
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(50);
+    
+    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/";
+    
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
+    
+    private Screenshot() {
+    	//hide default constructor
+    }
 
     /**
      * Adds screenshot rule
@@ -131,6 +139,8 @@ public class Screenshot {
     }
 
     /**
+     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
+     * 
      * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
@@ -189,6 +199,8 @@ public class Screenshot {
     }
 
     /**
+     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
+     * 
      * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
@@ -204,6 +216,8 @@ public class Screenshot {
     }
 
     /**
+     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
+     * 
      * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
      * 
      * @param driver
@@ -245,7 +259,7 @@ public class Screenshot {
             BufferedImage screen;
 
             // Create screenshot
-            screen = takeVisibleScreenshot(driver, augmentedDriver);
+            screen = takeVisibleScreenshot(augmentedDriver);
 
             ImageIO.write(screen, "PNG", new File(screenPath));
 
@@ -285,8 +299,6 @@ public class Screenshot {
                 File testScreenRootDir = ReportContext.getTestDir();
 
                 // Capture full page screenshot and resize
-                // TODO: implement naming strategy for screenshots wihtout test names
-                // String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
                 screenName = System.currentTimeMillis() + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
@@ -296,7 +308,7 @@ public class Screenshot {
                 //hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
     				try {
-        				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) driver));
+        				InvocationHandler innerProxy = Proxy.getInvocationHandler((Proxy) driver);
         				// "arg$2" is by default RemoteWebDriver;
         				// "arg$1" is EventFiringWebDriver
         				// wrap into try/catch to make sure we don't affect test execution
@@ -305,7 +317,7 @@ public class Screenshot {
         				
         				augmentedDriver = driver = (WebDriver) locatorField.get(innerProxy); 
     				} catch (Exception e) {
-    					//do nothing and recieve augmenting warning in the logs
+    					//do nothing and receive augmenting warning in the logs
     				}
                 }
     				
@@ -320,11 +332,11 @@ public class Screenshot {
                 if (fullSize) {
                     screen = takeFullScreenshot(driver, augmentedDriver);
                 } else {
-                    screen = takeVisibleScreenshot(driver, augmentedDriver);
+                    screen = takeVisibleScreenshot(augmentedDriver);
                 }
 
                 if (screen == null) {
-                	//do nothong and return empty 
+                	//do nothing and return empty 
                 	return "";
                 }
                 BufferedImage thumbScreen = screen;
@@ -379,22 +391,22 @@ public class Screenshot {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return;
         }
-        String correlationId = UUID.randomUUID().toString();
-        TestType test = ZafiraListener.getTestbythread().get(Thread.currentThread().getId());
+        final String correlationId = UUID.randomUUID().toString();
+        final String ciTestId = ZafiraListener.getThreadCiTestId();
         try {
             ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                     .addHeader("AMAZON_PATH", null)
                     .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
             executorService.execute(() -> {
                 try {
-                	LOGGER.info("Uploading to AWS: " + screenshot.getName());
-                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, test.getTestRunId(), test.getId()));
-                    LOGGER.info("Uploaded to AWS: " + screenshot.getName());
+                	    LOGGER.debug("Uploading to AWS: " + screenshot.getName());
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
+                    LOGGER.debug("Uploaded to AWS: " + screenshot.getName());
                     ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                             .addHeader("AMAZON_PATH", url)
-                            .addHeader("TEST_ID", String.valueOf(test.getId()))
+                            .addHeader("CI_TEST_ID", ciTestId)
                             .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
-                    LOGGER.info("Updated AWS metadata: " + screenshot.getName());
+                    LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
                 } catch (Exception e) {
                     LOGGER.error("Can't save file to Amazon S3", e);
                 }
@@ -416,16 +428,16 @@ public class Screenshot {
      * @param path
      *            - path to screenshot file.
      */
-    private static void resizeImg(BufferedImage bufImage, int width, int height, String path) {
+    private static void resizeImg(BufferedImage bufferdImage, int width, int height, String path) {
         try {
-            bufImage = Scalr.resize(bufImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
+            BufferedImage bufImage = Scalr.resize(bufferdImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
                     Scalr.OP_ANTIALIAS);
             if (bufImage.getHeight() > height) {
                 bufImage = Scalr.crop(bufImage, bufImage.getWidth(), height);
             }
             ImageIO.write(bufImage, "png", new File(path));
         } catch (Exception e) {
-            LOGGER.error("Image scaling problem!");
+            LOGGER.error("Image scaling problem!", e);
         }
     }
 
@@ -471,8 +483,7 @@ public class Screenshot {
      * 
      * @return screenshot image
      */
-    private static BufferedImage takeVisibleScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
-    	BufferedImage screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
-        return screenShot;
+    private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
+    	return ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
     }
 }
