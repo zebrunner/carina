@@ -153,11 +153,6 @@ public class MobileFactory extends AbstractFactory {
                     device = new Device(driver.getCapabilities());
                 }
 
-                boolean stfEnabled = R.CONFIG
-                        .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-                if (stfEnabled) {
-                    device.connectRemote();
-                }
                 DevicePool.registerDevice(device);
             }
             // will be performed just in case uninstall_related_apps flag marked as true

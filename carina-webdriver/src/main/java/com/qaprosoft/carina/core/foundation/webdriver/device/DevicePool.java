@@ -17,6 +17,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.R;
+
 public class DevicePool {
     private static final Logger LOGGER = Logger.getLogger(DevicePool.class);
 
@@ -25,6 +28,13 @@ public class DevicePool {
     private static ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
 
     public static Device registerDevice(Device device) {
+    	
+        boolean stfEnabled = R.CONFIG
+                .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+        if (stfEnabled) {
+            device.connectRemote();
+        }
+        
         // register current device to be able to transfer it into Zafira at the end of the test
         setDevice(device);
         Long threadId = Thread.currentThread().getId();
@@ -37,6 +47,18 @@ public class DevicePool {
     }
 
     public static void deregisterDevice() {
+    	Device device = currentDevice.get();
+    	if (device == null) {
+    		throw new RuntimeException("Unable to deregister null device!");
+    	}
+    	
+        boolean stfEnabled = R.CONFIG
+                .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+        if (stfEnabled) {
+            device.disconnectRemote();
+        }
+        
+    	
         currentDevice.remove();
     }
 
