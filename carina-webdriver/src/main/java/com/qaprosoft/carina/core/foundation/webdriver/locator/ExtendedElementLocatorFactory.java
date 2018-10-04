@@ -23,10 +23,17 @@ import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
 public final class ExtendedElementLocatorFactory implements ElementLocatorFactory {
     private final SearchContext searchContext;
+    
+    private boolean isRootElementUsed;
 
-    public ExtendedElementLocatorFactory(SearchContext searchContext) {
+    public ExtendedElementLocatorFactory(SearchContext searchContext, boolean isRootElementUsed) {
         this.searchContext = searchContext;
+        this.isRootElementUsed = isRootElementUsed;
     }
+    
+	public boolean isRootElementUsed() {
+		return isRootElementUsed;
+	}
 
     public ElementLocator createLocator(Field field) {
         return new ExtendedElementLocator(searchContext, field);

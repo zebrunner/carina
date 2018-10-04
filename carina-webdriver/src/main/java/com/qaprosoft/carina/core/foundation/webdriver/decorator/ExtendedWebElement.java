@@ -92,6 +92,7 @@ public class ExtendedWebElement {
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private WebElement element;
+    private Throwable originalException;
     private String name;
     private By by;
     
@@ -192,7 +193,7 @@ public class ExtendedWebElement {
 				// -> it should allow to search via regular driver and fluent waits - getBy() 
 				this.by = (By) byContextField.get(locator);
 
-				if (tempSearchContext instanceof Proxy) {
+				while (tempSearchContext instanceof Proxy) {
 					innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
 
 					locatorField = innerProxy.getClass().getDeclaredField("locator");
@@ -318,24 +319,34 @@ public class ExtendedWebElement {
      */
 	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
+		originalException = null;
 		
 		final WebDriver drv = getDriver();
 		
 		Timer.start(ACTION_NAME.WAIT);
 		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
+		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
-		} catch (NoSuchElementException | TimeoutException e) {
+		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: NoSuchElementException e..." + getNameWithLocator());
 			result = false;
-		} catch (Exception e) {
+			originalException = e;
+		} catch (TimeoutException e) { 
+			LOGGER.debug("waitUntil: TimeoutException e..." + getNameWithLocator());
+			result = false;
+			originalException = e.getCause();
+		}
+		catch (Exception e) {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
 			result = false;
+			originalException = e;
 		}
 		Timer.stop(ACTION_NAME.WAIT);
 		return result;
@@ -864,9 +875,27 @@ public class ExtendedWebElement {
 		if (element != null) {
 			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
 					ExpectedConditions.presenceOfElementLocated(getBy()));
+			boolean tmpResult = waitUntil(waitCondition, 0);
+
+			if (tmpResult) {
+				return true;
+			}
+
+			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+				try {
+					refindElement();
+					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
+							ExpectedConditions.presenceOfElementLocated(getBy()));
+				} catch (NoSuchElementException e) {
+					// search element based on By if exception was thrown
+					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
+							ExpectedConditions.presenceOfElementLocated(getBy()));
+				}
+			}
 		} else {
 			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-	    			ExpectedConditions.presenceOfElementLocated(getBy()));
+					ExpectedConditions.presenceOfElementLocated(getBy()));
 		}
 
     	return waitUntil(waitCondition, timeout);
@@ -959,11 +988,25 @@ public class ExtendedWebElement {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
+			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
+			boolean tmpResult = waitUntil(tmpCondition, 0);
+			
+			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
+				try {
+					refindElement();
+					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+				} catch (NoSuchElementException e) {
+					// search element based on By if exception was thrown
+					textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+				}
+			}
+			
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 		} else {
 			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
 		}
-		return waitUntil(ExpectedConditions.and(getDefaultCondition(getBy()), textCondition), timeout);
+		return waitUntil(textCondition, timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
 //    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 //				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
@@ -1450,7 +1493,14 @@ public class ExtendedWebElement {
 		
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
-			if (!waitUntil(waitCondition, timeout)) {
+			
+			boolean tmpResult = waitUntil(waitCondition, 0);
+			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+				LOGGER.debug("StaleElementReferenceException detected in doAction!");
+				refindElement();
+			}
+			
+			if (!tmpResult && !waitUntil(waitCondition, timeout)) {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
