@@ -175,9 +175,9 @@ public enum Messager implements IMessager {
 
     CHECKBOX_UNCHECKED("PASS: index '%s' was unchecked."),
 
-    SLIDER_MOVED("PASS: silder '%s' was moved by offset X:'%s' Y:'%s'."),
+    SLIDER_MOVED("PASS: slider '%s' was moved by offset X:'%s' Y:'%s'."),
 
-    SLIDER_NOT_MOVED("FAIL: silder '%s' was moved by offset X:'%s' Y:'%s'!"),
+    SLIDER_NOT_MOVED("FAIL: slider '%s' was NOT moved by offset X:'%s' Y:'%s'!"),
 
     TAP_EXECUTED("PASS: Tap on X:'%s' Y:'%s' was executed."),
 
