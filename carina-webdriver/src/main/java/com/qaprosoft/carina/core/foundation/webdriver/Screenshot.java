@@ -294,6 +294,11 @@ public class Screenshot {
 
         if (isTakeScreenshot) {
             try {
+            	if (!isCaptured(comment)) {
+            		LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+            		return screenName;
+            	}
+            	
             	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
@@ -479,4 +484,40 @@ public class Screenshot {
     private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
     	return ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
     }
+    
+
+	/**
+	 * Analyze if screenshot can be captured using the most common reason when
+	 * driver is died etc.
+	 * 
+	 * @param String
+	 *            - error message (stacktrace).
+	 * 
+	 * @return boolean
+	 */
+	public static boolean isCaptured(String message) {
+		// [VD] do not use below line as it is too common!
+		// || message.contains("timeout")
+		if (message == null) {
+			// unable to detect driver invalid status so return true
+			return true;
+		}
+		// disable screenshot if error message contains any of this info
+		boolean disableScreenshot = message.contains("StaleObjectException")
+				|| message.contains("StaleElementReferenceException")
+				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
+				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
+				|| message.contains("no such element: Unable to locate element")
+				|| message.contains("no such window: window was already closed")
+				|| message.contains("An element could not be located on the page using the given search parameters")
+				|| message.contains("current view have 'secure' flag set")
+				|| message.contains("Error communicating with the remote browser. It may have died")
+				|| message.contains("unexpected alert open") || message.contains("chrome not reachable")
+				|| message.contains("cannot forward the request Connect to")
+				|| message.contains("Session ID is null. Using WebDriver after calling quit")
+				|| message.contains("was terminated due to TIMEOUT")
+				|| message.contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
+				|| message.contains("Session timed out or not found");
+		return !disableScreenshot;
+	}
 }

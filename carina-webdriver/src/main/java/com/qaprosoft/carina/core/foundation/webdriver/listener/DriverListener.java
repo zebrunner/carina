@@ -185,24 +185,7 @@ public class DriverListener implements WebDriverEventListener {
 			}
 			
 			// handle cases which should't be captured
-			if (!thr.getMessage().contains("StaleObjectException")
-					&& !thr.getMessage().contains("StaleElementReferenceException")
-					&& !thr.getMessage().contains("was terminated due to FORWARDING_TO_NODE_FAILED")
-					&& !thr.getMessage().contains("InvalidElementStateException")
-					&& !thr.getMessage().contains("stale element reference")
-					&& !thr.getMessage().contains("no such element: Unable to locate element")
-					&& !thr.getMessage().contains("no such window: window was already closed")
-					&& !thr.getMessage().contains("An element could not be located on the page using the given search parameters")
-					//&& !thr.getMessage().contains("timeout")
-					&& !thr.getMessage().contains("current view have 'secure' flag set")
-					&& !thr.getMessage().contains("Error communicating with the remote browser. It may have died")
-					&& !thr.getMessage().contains("unexpected alert open")
-					&& !thr.getMessage().contains("chrome not reachable")
-					&& !thr.getMessage().contains("cannot forward the request Connect to")
-					&& !thr.getMessage().contains("Session ID is null. Using WebDriver after calling quit")
-					&& !thr.getMessage().contains("was terminated due to TIMEOUT")
-					&& !thr.getMessage().contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
-					&& !thr.getMessage().contains("Session timed out or not found")) {
+			if (Screenshot.isCaptured(thr.getMessage())) {
 				captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
 			}
 		}
