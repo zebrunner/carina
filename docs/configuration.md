@@ -161,7 +161,7 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>browsermob_port</td>
-		<td>The port number for BrowserMob proxy (if nothing or 0 specified that any free port will be reused)</td>
+		<td>The port number for BrowserMob proxy (if nothing or 0 specified then any free port will be reused)</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
