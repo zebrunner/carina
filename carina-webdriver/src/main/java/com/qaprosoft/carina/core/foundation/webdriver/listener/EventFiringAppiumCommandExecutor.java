@@ -165,7 +165,8 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                     return new WebDriverException("The appium server has accidentally died!", rootCause);
                 }).orElseGet((Supplier<WebDriverException>) () -> new WebDriverException(rootCause.getMessage(), rootCause));
             }
-            throwIfUnchecked(t);
+            // temporary keep throwing only WebDriverException exception 
+            // throwIfUnchecked(t);
             throw new WebDriverException(t);
         } finally {
             if (DriverCommand.QUIT.equals(command.getName())) {
