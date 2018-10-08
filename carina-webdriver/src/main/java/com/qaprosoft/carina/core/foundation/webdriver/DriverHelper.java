@@ -1309,8 +1309,8 @@ public class DriverHelper {
 	 * Method to handle SocketException due to okhttp factory initialization (java client 6.*).
 	 * Second execution of the same function works as expected.
 	 *  
-	 * @param <T> supplier
-	 * @return <T> result
+	 * @param Object supplier
+	 * @return Object result
 	 */
 	public <T> T performIgnoreException(Supplier<T> supplier) {
         try {
