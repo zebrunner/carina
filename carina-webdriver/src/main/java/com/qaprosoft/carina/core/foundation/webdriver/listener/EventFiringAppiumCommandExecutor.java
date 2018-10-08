@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Throwables.throwIfUnchecked;
 import static java.util.Optional.ofNullable;
 
 import java.io.IOException;
@@ -165,7 +164,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                     return new WebDriverException("The appium server has accidentally died!", rootCause);
                 }).orElseGet((Supplier<WebDriverException>) () -> new WebDriverException(rootCause.getMessage(), rootCause));
             }
-            // temporary keep throwing only WebDriverException exception 
+            // [VD] never enable throwIfUnchecked as it generates RuntimeException and corrupt TestNG main thread!   
             // throwIfUnchecked(t);
             throw new WebDriverException(t);
         } finally {
