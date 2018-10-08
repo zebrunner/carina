@@ -490,7 +490,7 @@ public class Screenshot {
 	 * Analyze if screenshot can be captured using the most common reason when
 	 * driver is died etc.
 	 * 
-	 * @param String
+	 * @param message
 	 *            - error message (stacktrace).
 	 * 
 	 * @return boolean

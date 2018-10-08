@@ -182,7 +182,7 @@ public class ExtendedElementLocator implements ElementLocator {
     /**
      * Transform XPath locator to case insensitive
      * 
-     * @param locator
+     * @param locator - locator as a String
      * @return By
      */
     public static By toCaseInsensitive(String locator) {

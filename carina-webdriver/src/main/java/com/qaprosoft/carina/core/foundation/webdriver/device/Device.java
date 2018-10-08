@@ -766,7 +766,7 @@ public class Device extends RemoteDevice {
     
     /**
      * Save xml layout of the application 
-     * 
+     * @param screenshotName - png file name to generate appropriate uix  
      * @return saved file
      */
     public File generateUiDump(String screenshotName) {

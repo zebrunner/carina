@@ -111,7 +111,7 @@ public abstract class AbstractFactory {
     
     /**
      * Generate test artifact for zafira upload.
-     * @param videoName 
+     * @param videoName - video link name
      * @return test artifact with video details
      */
     protected TestArtifactType initVideoArtifact(String videoName) {
