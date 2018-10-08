@@ -1305,7 +1305,8 @@ public class DriverHelper {
 		return result;
 	}
 	
-	/**
+	//TODO: uncomment javadoc when T could be described correctly
+	/*
 	 * Method to handle SocketException due to okhttp factory initialization (java client 6.*).
 	 * Second execution of the same function works as expected.
 	 *  
