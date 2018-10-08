@@ -31,7 +31,10 @@ public class Ownership {
     public enum OwnerType {
         PRIMARY,
         SECONDARY
-    };
+    }
+
+    private Ownership() {
+    }
 
     public static String getMethodOwner(ITestResult result, OwnerType type) {
 
@@ -68,15 +71,15 @@ public class Ownership {
                 if (testMethod.isAnnotationPresent(MethodOwner.class)) {
                     MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
                     switch (type) {
-                    case PRIMARY:
-                        owner = methodAnnotation.owner();
-                        LOGGER.debug("Method " + testMethod + " primary owner is " + owner);
-                        break;
+                        case PRIMARY:
+                            owner = methodAnnotation.owner();
+                            LOGGER.debug("Method " + testMethod + " primary owner is " + owner);
+                            break;
 
-                    case SECONDARY:
-                        owner = methodAnnotation.secondaryOwner();
-                        LOGGER.debug("Method " + testMethod + " secondary owner is " + owner);
-                        break;
+                        case SECONDARY:
+                            owner = methodAnnotation.secondaryOwner();
+                            LOGGER.debug("Method " + testMethod + " secondary owner is " + owner);
+                            break;
                     }
 
                 }
