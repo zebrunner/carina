@@ -1,63 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/getting_started/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/project_structure/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/configuration/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/execution/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
+        
     <url>
-     <loc>None</loc>
+     <loc>/automation/web/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+        
     <url>
-     <loc>None</loc>
+     <loc>/automation/mobile/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+        
     <url>
-     <loc>None</loc>
+     <loc>/automation/api/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+        
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/dataproviders/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/security/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/contribution/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
+     <loc>/releases/</loc>
      <lastmod>2018-10-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
 </urlset>
