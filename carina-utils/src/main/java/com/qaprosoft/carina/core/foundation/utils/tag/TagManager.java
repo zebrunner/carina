@@ -20,14 +20,19 @@ import org.testng.ITestResult;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TagManager {
     protected static final Logger LOGGER = Logger.getLogger(TagManager.class);
 
+    private static final String FORBIDDEN_TAG_NAMES = "priority|feature";
+
     private TagManager() {
     }
 
-    public static HashMap<String, String> getTag(ITestResult result) {
+    public static Map<String, String> getTag(ITestResult result) {
 
         // Get a handle to the class and method
         Class<?> testClass;
@@ -50,14 +55,18 @@ public class TagManager {
             if (testMethod != null) {
                 if (testMethod.isAnnotationPresent(TestTag.class)) {
                     TestTag methodAnnotation = testMethod.getAnnotation(TestTag.class);
-                    tag.put(methodAnnotation.name(), methodAnnotation.value());
-                    LOGGER.debug(methodAnnotation.name() + " : " + methodAnnotation.value());
+                    if (checkForbiddenTagNames(methodAnnotation.name())) {
+                        tag.put(methodAnnotation.name(), methodAnnotation.value());
+                        LOGGER.debug(methodAnnotation.name() + " : " + methodAnnotation.value());
+                    }
                 }
                 if (testMethod.isAnnotationPresent(TestTag.List.class)) {
                     TestTag.List methodAnnotation = testMethod.getAnnotation(TestTag.List.class);
                     for (TestTag tagLocal : methodAnnotation.value()) {
-                        tag.put(tagLocal.name(), tagLocal.value());
-                        LOGGER.debug(tagLocal.name() + " : " + tagLocal.value());
+                        if (checkForbiddenTagNames(tagLocal.name())) {
+                            tag.put(tagLocal.name(), tagLocal.value());
+                            LOGGER.debug(tagLocal.name() + " : " + tagLocal.value());
+                        }
                     }
                 }
             }
@@ -66,6 +75,18 @@ public class TagManager {
             LOGGER.error(e);
         }
         return tag;
+    }
+
+    private static boolean checkForbiddenTagNames(String content) {
+        Pattern pattern = Pattern.compile(FORBIDDEN_TAG_NAMES);
+        if (content != null) {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                LOGGER.error("TestTag name contains one of forbidden tag name: " + content);
+                return false;
+            }
+        }
+        return true;
     }
 
 }
