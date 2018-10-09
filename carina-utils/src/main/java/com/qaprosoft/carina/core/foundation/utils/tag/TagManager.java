@@ -32,7 +32,7 @@ public class TagManager {
     private TagManager() {
     }
 
-    public static Map<String, String> getTag(ITestResult result) {
+    public static Map<String, String> getTags(ITestResult result) {
 
         // Get a handle to the class and method
         Class<?> testClass;
