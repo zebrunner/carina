@@ -21,7 +21,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tests for {@link TagManager}
@@ -56,7 +56,7 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
     public void testTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        HashMap<String, String> tag = TagManager.getTag(result);
+        Map<String, String> tag = TagManager.getTag(result);
         Assert.assertTrue(tag.containsKey(TAG_NAME));
         Assert.assertEquals(tag.get(TAG_NAME), TAG_VALUE);
     }
@@ -67,12 +67,53 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     public void testRepeatableTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        HashMap<String, String> tags = TagManager.getTag(result);
+        Map<String, String> tags = TagManager.getTag(result);
         Assert.assertTrue(tags.containsKey(TAG_NAME));
         Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
         Assert.assertTrue(tags.containsKey(TAG_NAME2));
         Assert.assertEquals(tags.get(TAG_NAME2), TAG_VALUE2);
     }
 
+    @Test
+    @TestPriority(Priority.P2)
+    @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
+    @TestTag(name = TAG_NAME, value = TAG_VALUE)
+    @TestTag(name = "priority", value = "P0")
+    @TestTag(name = "feature", value = "feature1")
+    public void testForbiddenTags() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        Map<String, String> tags = TagManager.getTag(result);
+        Assert.assertFalse(tags.containsKey("priority"));
+        Assert.assertFalse(tags.containsKey("feature"));
+        Assert.assertTrue(tags.containsKey(TAG_NAME));
+        Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
+        Assert.assertTrue(tags.containsKey(TAG_NAME2));
+        Assert.assertEquals(tags.get(TAG_NAME2), TAG_VALUE2);
+        Assert.assertEquals(tags.size(), 2);
+    }
+
+    @Test
+    @TestPriority(Priority.P1)
+    @TestTag(name = "priority", value = "P5")
+    public void testForbiddenPriorityTag() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        String priority = PriorityManager.getPriority(result);
+        Assert.assertEquals(priority, "P1");
+        Map<String, String> tags = TagManager.getTag(result);
+        Assert.assertFalse(tags.containsKey("priority"));
+        Assert.assertEquals(tags.size(), 0);
+    }
+
+    @Test
+    @TestPriority(Priority.P2)
+    @TestTag(name = "feature", value = "P5")
+    public void testForbiddenFeatureTag() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        String priority = PriorityManager.getPriority(result);
+        Assert.assertEquals(priority, "P2");
+        Map<String, String> tags = TagManager.getTag(result);
+        Assert.assertFalse(tags.containsKey("feature"));
+        Assert.assertEquals(tags.size(), 0);
+    }
 
 }

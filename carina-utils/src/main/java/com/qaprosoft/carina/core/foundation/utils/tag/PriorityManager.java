@@ -48,12 +48,10 @@ public class PriorityManager {
                 }
             }
 
-            if (testMethod != null) {
-                if (testMethod.isAnnotationPresent(TestPriority.class)) {
-                    TestPriority methodAnnotation = testMethod.getAnnotation(TestPriority.class);
-                    priority = methodAnnotation.value().name();
-                    LOGGER.debug("Method " + testMethod + " priority is " + priority);
-                }
+            if (testMethod != null && testMethod.isAnnotationPresent(TestPriority.class)) {
+                TestPriority methodAnnotation = testMethod.getAnnotation(TestPriority.class);
+                priority = methodAnnotation.value().name();
+                LOGGER.debug("Method " + testMethod + " priority is " + priority);
             }
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
