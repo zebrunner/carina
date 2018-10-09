@@ -348,7 +348,14 @@ public final class DriverPool {
 				if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
 					int proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
 					if (!device.isNull()) {
-						proxyPort = Integer.parseInt(device.getProxyPort());
+						try{
+							proxyPort = Integer.parseInt(device.getProxyPort());
+						} catch(NumberFormatException e) {
+							// use default from _config.properties. Use-case for
+							// iOS devices which doesn't have proxy_port as part
+							// of capabilities
+							proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
+						}
 					}
 					ProxyPool.startProxy(proxyPort);
 				}

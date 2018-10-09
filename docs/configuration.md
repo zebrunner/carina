@@ -156,12 +156,12 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>browsermob_proxy</td>
-		<td>Boolean parameter which enable or disable set up of mobile proxy</td>
+		<td>Boolean parameter which enable or disable automatic BrowserMob proxy launch</td>
 		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>browsermob_port</td>
-		<td>The port number for mobile browser (make sense only for local debugging)</td>
+		<td>The port number for BrowserMob proxy (if nothing or 0 specified then any free port will be reused)</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
