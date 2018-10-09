@@ -26,7 +26,7 @@ import java.util.HashMap;
 /**
  * Tests for {@link TagManager}
  */
-public class TagTest {
+public class TagManagerTest {
 
     private static final String TAG_NAME = "tag1";
     private static final String TAG_NAME2 = "tag2";
@@ -43,11 +43,11 @@ public class TagTest {
     }
 
     @Test
-    @TestPriority(Priority.Compliance)
+    @TestPriority(Priority.P0)
     public void testPriorityCompliance() {
         ITestResult result = Reporter.getCurrentTestResult();
         String priority = PriorityManager.getPriority(result);
-        Assert.assertEquals(priority, "Compliance");
+        Assert.assertEquals(priority, "P0");
     }
 
 
