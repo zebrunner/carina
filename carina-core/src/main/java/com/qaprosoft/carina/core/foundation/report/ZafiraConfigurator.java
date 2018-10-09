@@ -153,18 +153,22 @@ public class ZafiraConfigurator implements IConfigurator {
     public Set<TagType> getTestTags(ITestResult test) {
         Set<TagType> tags = new HashSet();
 
-        TagType priority = new TagType();
-        priority.setName(SpecialKeywords.TEST_PRIORITY_KEY);
-        priority.setValue(PriorityManager.getPriority(test));
-        tags.add(priority);
+        String testPriority = PriorityManager.getPriority(test);
+        if (testPriority != null && !testPriority.isEmpty()) {
+            TagType priority = new TagType();
+            priority.setName(SpecialKeywords.TEST_PRIORITY_KEY);
+            priority.setValue(testPriority);
+            tags.add(priority);
+        }
 
         Map<String, String> testTags = TagManager.getTags(test);
-        TagType tagEntry = new TagType();
-        for (Map.Entry<String, String> entry : testTags.entrySet()) {
+
+        testTags.entrySet().stream().forEach((entry) -> {
+            TagType tagEntry = new TagType();
             tagEntry.setName(entry.getKey());
             tagEntry.setValue(entry.getValue());
             tags.add(tagEntry);
-        }
+        });
         return tags;
     }
 
