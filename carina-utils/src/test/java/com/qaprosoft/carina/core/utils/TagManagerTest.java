@@ -15,24 +15,31 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.tag.*;
+import com.qaprosoft.zafira.models.dto.TagType;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests for {@link TagManager}
  */
 public class TagManagerTest {
+    protected static final Logger LOGGER = Logger.getLogger(TagManagerTest.class);
 
     private static final String TAG_NAME = "tag1";
     private static final String TAG_NAME2 = "tag2";
     private static final String TAG_VALUE = "testTag1";
     private static final String TAG_VALUE2 = "testTag2";
-
+    private static final String FORBIDDEN_KEY_PRIORITY = "priority";
+    private static final String FORBIDDEN_KEY_FEATURE = "feature";
 
     @Test
     @TestPriority(Priority.P2)
@@ -56,7 +63,7 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
     public void testTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        Map<String, String> tag = TagManager.getTag(result);
+        Map<String, String> tag = TagManager.getTags(result);
         Assert.assertTrue(tag.containsKey(TAG_NAME));
         Assert.assertEquals(tag.get(TAG_NAME), TAG_VALUE);
     }
@@ -67,7 +74,7 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     public void testRepeatableTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        Map<String, String> tags = TagManager.getTag(result);
+        Map<String, String> tags = TagManager.getTags(result);
         Assert.assertTrue(tags.containsKey(TAG_NAME));
         Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
         Assert.assertTrue(tags.containsKey(TAG_NAME2));
@@ -78,13 +85,13 @@ public class TagManagerTest {
     @TestPriority(Priority.P2)
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
-    @TestTag(name = "priority", value = "P0")
-    @TestTag(name = "feature", value = "feature1")
+    @TestTag(name = FORBIDDEN_KEY_PRIORITY, value = "P0")
+    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "feature1")
     public void testForbiddenTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        Map<String, String> tags = TagManager.getTag(result);
-        Assert.assertFalse(tags.containsKey("priority"));
-        Assert.assertFalse(tags.containsKey("feature"));
+        Map<String, String> tags = TagManager.getTags(result);
+        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_PRIORITY));
+        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
         Assert.assertTrue(tags.containsKey(TAG_NAME));
         Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
         Assert.assertTrue(tags.containsKey(TAG_NAME2));
@@ -94,26 +101,72 @@ public class TagManagerTest {
 
     @Test
     @TestPriority(Priority.P1)
-    @TestTag(name = "priority", value = "P5")
+    @TestTag(name = FORBIDDEN_KEY_PRIORITY, value = "P5")
     public void testForbiddenPriorityTag() {
         ITestResult result = Reporter.getCurrentTestResult();
         String priority = PriorityManager.getPriority(result);
         Assert.assertEquals(priority, "P1");
-        Map<String, String> tags = TagManager.getTag(result);
-        Assert.assertFalse(tags.containsKey("priority"));
+        Map<String, String> tags = TagManager.getTags(result);
+        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_PRIORITY));
         Assert.assertEquals(tags.size(), 0);
     }
 
     @Test
     @TestPriority(Priority.P2)
-    @TestTag(name = "feature", value = "P5")
+    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "P5")
     public void testForbiddenFeatureTag() {
         ITestResult result = Reporter.getCurrentTestResult();
         String priority = PriorityManager.getPriority(result);
         Assert.assertEquals(priority, "P2");
-        Map<String, String> tags = TagManager.getTag(result);
-        Assert.assertFalse(tags.containsKey("feature"));
+        Map<String, String> tags = TagManager.getTags(result);
+        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
         Assert.assertEquals(tags.size(), 0);
+    }
+
+    @Test
+    @TestPriority(Priority.P2)
+    @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
+    @TestTag(name = TAG_NAME, value = TAG_VALUE)
+    @TestTag(name = FORBIDDEN_KEY_PRIORITY, value = "P0")
+    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "feature1")
+    public void testZafiraGetTagsMethod() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        Map<String, String> tags = TagManager.getTags(result);
+        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_PRIORITY));
+        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
+        Assert.assertTrue(tags.containsKey(TAG_NAME));
+        Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
+        Assert.assertTrue(tags.containsKey(TAG_NAME2));
+        Assert.assertEquals(tags.get(TAG_NAME2), TAG_VALUE2);
+        Assert.assertEquals(tags.size(), 2);
+        Set<TagType> tagsTypes = getTestTags(result);
+        LOGGER.info(tagsTypes.toString());
+        Assert.assertEquals(tagsTypes.size(), 3);
+        for (TagType entry : tagsTypes) {
+            if (entry.getValue().equals(SpecialKeywords.TEST_PRIORITY_KEY)) {
+                Assert.assertEquals(entry.getValue(), "P2");
+            }
+        }
+
+    }
+
+    private Set<TagType> getTestTags(ITestResult test) {
+        Set<TagType> tags = new HashSet();
+
+        TagType priority = new TagType();
+        priority.setName(SpecialKeywords.TEST_PRIORITY_KEY);
+        priority.setValue(PriorityManager.getPriority(test));
+        tags.add(priority);
+
+        Map<String, String> testTags = TagManager.getTags(test);
+        TagType tagEntry = new TagType();
+        for (Map.Entry<String, String> entry : testTags.entrySet()) {
+            tagEntry.setName(entry.getKey());
+            tagEntry.setValue(entry.getValue());
+            tags.add(tagEntry);
+        }
+        return tags;
+
     }
 
 }
