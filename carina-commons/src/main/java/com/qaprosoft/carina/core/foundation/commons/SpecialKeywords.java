@@ -125,6 +125,9 @@ public class SpecialKeywords {
     public static final String ANDROID_END_NODE = "<\\/android[\\w\\.]*>";
     public static final String ANDROID_START_UIX_NODE = "<node ";
     public static final String ANDROID_END_UIX_NODE = "</node>";
+
+    public static final String TEST_PRIORITY_KEY = "priority";
+    public static final String TEST_FEATURE_KEY = "feature";
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
