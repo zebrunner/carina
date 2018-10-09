@@ -80,8 +80,7 @@ public class Ownership {
                 }
             }
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return owner;
     }
