@@ -70,19 +70,19 @@ public class TagManager {
                     }
                 }
             }
-
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         }
         return tag;
     }
 
+
     private static boolean checkForbiddenTagNames(String content) {
         Pattern pattern = Pattern.compile(FORBIDDEN_TAG_NAMES);
         if (content != null) {
             Matcher matcher = pattern.matcher(content);
             while (matcher.find()) {
-                LOGGER.error("TestTag name contains one of forbidden tag name: " + content);
+                LOGGER.error("TestTag name contains one of the forbidden tag names: " + content);
                 return false;
             }
         }
