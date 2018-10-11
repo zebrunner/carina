@@ -70,12 +70,12 @@ public class Ownership {
                 switch (type) {
                     case PRIMARY:
                         owner = methodAnnotation.owner();
-                        LOGGER.debug("Method " + testMethod + " primary owner is " + owner);
+                        LOGGER.debug("Method '" + testMethod + "' primary owner is: " + owner);
                         break;
 
                     case SECONDARY:
                         owner = methodAnnotation.secondaryOwner();
-                        LOGGER.debug("Method " + testMethod + " secondary owner is " + owner);
+                        LOGGER.debug("Method '" + testMethod + "' secondary owner is: " + owner);
                         break;
                 }
             }
