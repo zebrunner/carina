@@ -76,7 +76,7 @@ public class DesktopVideoRecorder {
      * Requirements:
      * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
      * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while "QuickTime" format is supported by Apple’s QuickTime Player.
+     * while "QuickTime" format is supported by Apple's QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      * 
@@ -95,7 +95,7 @@ public class DesktopVideoRecorder {
      * Requirements:
      * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
      * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while "QuickTime" format is supported by Apple’s QuickTime Player.
+     * while "QuickTime" format is supported by Apple's QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      * 
@@ -116,7 +116,7 @@ public class DesktopVideoRecorder {
      * Requirements:
      * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
      * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while "QuickTime" format is supported by Apple’s QuickTime Player.
+     * while "QuickTime" format is supported by Apple's QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      * 
@@ -156,7 +156,7 @@ public class DesktopVideoRecorder {
      * Requirements:
      * ScreenRecoder supports "AVI" and "QuickTime" format for recording the video.
      * For "AVI" format you need to install TSCC Codec (Techsmith Screen Capture Codec)
-     * while "QuickTime" format is supported by Apple’s QuickTime Player.
+     * while "QuickTime" format is supported by Apple's QuickTime Player.
      * https://www.techsmith.com/download.html
      * https://1481d.wpc.azureedge.net/801481D/origin.assets.techsmith.com/Downloads/TSCC.msi
      *
