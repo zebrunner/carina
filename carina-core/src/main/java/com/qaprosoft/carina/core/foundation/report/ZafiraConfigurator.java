@@ -151,6 +151,7 @@ public class ZafiraConfigurator implements IConfigurator {
 
     @Override
     public Set<TagType> getTestTags(ITestResult test) {
+        LOGGER.debug("Collecting TestTags");
         Set<TagType> tags = new HashSet();
 
         String testPriority = PriorityManager.getPriority(test);
@@ -169,6 +170,8 @@ public class ZafiraConfigurator implements IConfigurator {
             tagEntry.setValue(entry.getValue());
             tags.add(tagEntry);
         });
+
+        LOGGER.debug("Found " + tags.size() + " new TestTags");
         return tags;
     }
 
