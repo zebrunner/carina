@@ -57,7 +57,7 @@ public class TagManager {
                     TestTag methodAnnotation = testMethod.getAnnotation(TestTag.class);
                     if (checkForbiddenTagNames(methodAnnotation.name())) {
                         tag.put(methodAnnotation.name(), methodAnnotation.value());
-                        LOGGER.debug(methodAnnotation.name() + " : " + methodAnnotation.value());
+                        LOGGER.debug("Method '" + testMethod + "' tag pair: " + methodAnnotation.name() + " : " + methodAnnotation.value());
                     }
                 }
                 if (testMethod.isAnnotationPresent(TestTag.List.class)) {
@@ -65,7 +65,7 @@ public class TagManager {
                     for (TestTag tagLocal : methodAnnotation.value()) {
                         if (checkForbiddenTagNames(tagLocal.name())) {
                             tag.put(tagLocal.name(), tagLocal.value());
-                            LOGGER.debug(tagLocal.name() + " : " + tagLocal.value());
+                            LOGGER.debug("Method '" + testMethod + "' tag pair: " + tagLocal.name() + " : " + tagLocal.value());
                         }
                     }
                 }

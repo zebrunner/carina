@@ -51,7 +51,7 @@ public class PriorityManager {
             if (testMethod != null && testMethod.isAnnotationPresent(TestPriority.class)) {
                 TestPriority methodAnnotation = testMethod.getAnnotation(TestPriority.class);
                 priority = methodAnnotation.value().name();
-                LOGGER.debug("Method " + testMethod + " priority is " + priority);
+                LOGGER.debug("Method '" + testMethod + "' priority is: " + priority);
             }
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
@@ -61,6 +61,7 @@ public class PriorityManager {
 
     private static String getSuitePriority(ITestContext context) {
         String priority = context.getSuite().getParameter("suitePriority");
+        LOGGER.debug("suitePriority is: " + priority);
         if (priority == null) {
             priority = "";
         }
