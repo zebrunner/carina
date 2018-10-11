@@ -40,7 +40,7 @@
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
-        <maven-javadoc-plugin.version>2.3</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!-- Testings -->
         <testng.version>6.8.8</testng.version>
