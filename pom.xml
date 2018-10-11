@@ -37,6 +37,7 @@
         <!-- Define project's dependency version properties here -->
         <source.version>1.8</source.version>
         <target.version>1.8</target.version>
+        <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
@@ -149,6 +150,7 @@
                         </plugin>
                         <plugin>
                             <artifactId>maven-assembly-plugin</artifactId>
+                            <version>${maven-assembly-plugin.version}</version>
                             <configuration>
                                 <archive>
                                     <manifest>
