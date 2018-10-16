@@ -21,7 +21,6 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -54,11 +53,12 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
-import com.qaprosoft.carina.core.foundation.api.APIMethodBuilder;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -94,22 +94,18 @@ import com.qaprosoft.hockeyapp.HockeyAppManager;
  * @author Alex Khursevich
  */
 @Listeners({ AbstractTestListener.class })
-public abstract class AbstractTest // extends DriverHelper
-{
+public abstract class AbstractTest {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
-
-    protected APIMethodBuilder apiMethodBuilder;
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
 
-    // 3rd party integrations
-    protected long startDate;
-
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) {
+        
+        Timer.start(ACTION_NAME.RUN_SUITE);
 
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
@@ -131,7 +127,6 @@ public abstract class AbstractTest // extends DriverHelper
             LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
         }
 
-        startDate = new Date().getTime();
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
 
@@ -225,17 +220,11 @@ public abstract class AbstractTest // extends DriverHelper
             skipExecution("Based on rule listed above");
         }
 
-        // do nothing for now
-        apiMethodBuilder = new APIMethodBuilder();
     }
 
     @AfterMethod(alwaysRun = true)
     public void executeAfterTestMethod(ITestResult result) {
         try {
-            if (apiMethodBuilder != null) {
-                apiMethodBuilder.close();
-            }
-
             DriverMode driverMode = Configuration.getDriverMode();
 
             if (driverMode == DriverMode.METHOD_MODE) {
@@ -319,9 +308,11 @@ public abstract class AbstractTest // extends DriverHelper
             String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD);
 
             // Generate and send email report using regular method
+            
+            
             EmailReportGenerator report = new EmailReportGenerator(title, env,
                     Configuration.get(Parameter.APP_VERSION), deviceName,
-                    browser, DateUtils.now(), DateUtils.timeDiff(startDate),
+                    browser, DateUtils.now(), DateUtils.timeFortmat(Timer.stop(ACTION_NAME.RUN_SUITE)),
                     EmailReportItemCollector.getTestResults(),
                     EmailReportItemCollector.getCreatedItems());
 
@@ -365,6 +356,8 @@ public abstract class AbstractTest // extends DriverHelper
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            
         }
 
     }

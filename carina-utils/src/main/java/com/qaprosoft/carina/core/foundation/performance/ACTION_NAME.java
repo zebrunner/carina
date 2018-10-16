@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.performance;
 import com.qaprosoft.carina.core.foundation.performance.Timer.IPerformanceOperation;
 
 public enum ACTION_NAME implements IPerformanceOperation {
+	RUN_SUITE("run_suite"),
     CLICK("click"),
     TAP("tap"),
     DOUBLE_CLICK("double_click"),

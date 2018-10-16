@@ -30,6 +30,12 @@ public class Timer {
     //data structure for current timer only
     private static ThreadLocal<ConcurrentHashMap<String, Long>> timer = new ThreadLocal<ConcurrentHashMap<String, Long>>();
 
+    /**
+     * Start timer to track IPerformanceOperation action.
+     * 
+     * @param operation
+     *            IPerformanceOperation.
+     */
     public static synchronized void start(IPerformanceOperation operation) {
         Map<String, Long> testTimer = getTimer();
         if (testTimer.containsKey(operation.getKey())) {
@@ -38,16 +44,23 @@ public class Timer {
         testTimer.put(operation.getKey(), Calendar.getInstance().getTimeInMillis());
     }
 
-    public static synchronized void stop(IPerformanceOperation operation) {
+    /**
+     * Stop timer and calculate summarized execution time for the action 
+     * 
+     * @param operation
+     *            IPerformanceOperation.
+     * @return long elapsedTime from last start/stop.
+     */
+    public static synchronized long stop(IPerformanceOperation operation) {
         Map<String, Long> testTimer = getTimer();
         if (!testTimer.containsKey(operation.getKey())) {
 			// TODO: current exception could stop tests execution which is
-			// inappropriate. Think about erroring only
+			// inappropriate. Think about error'ing only
 //            Disabled due to socket issue
 //            throw new RuntimeException("Operation not started: " + operation.getKey());
             LOGGER.error("Operation not started: " + operation.getKey());
             testTimer.remove(operation.getKey());
-            return;
+            return 0;
         }
         
         Map<String, Long> testMertrics = getMetrics();
@@ -56,11 +69,17 @@ public class Timer {
             	//summarize operation time
             	capturedTime = testMertrics.get(operation.getKey());
         }
-        testMertrics.put(operation.getKey(), capturedTime + Calendar.getInstance().getTimeInMillis() - testTimer.get(operation.getKey()));
-        //remove stopped timer data 
+        
+        long elapsedTime = testTimer.get(operation.getKey());
+        testMertrics.put(operation.getKey(), capturedTime + Calendar.getInstance().getTimeInMillis() - elapsedTime);
+        //remove stopped timer data
         testTimer.remove(operation.getKey());
+        
+        return elapsedTime;
     }
 
+
+    //TODO: investigate if this caal from ZafiraConfigurator could remove "ACTION_NAME.RUN_SUITE" data 
     public static synchronized Map<String, Long> readAndClear() {
         Map<String, Long> testTimer = getTimer();
         for (String key : testTimer.keySet()) {
