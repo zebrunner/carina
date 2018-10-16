@@ -105,10 +105,7 @@ public abstract class AbstractTest // extends DriverHelper
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
 
-    protected static ThreadLocal<String> suiteNameAppender = new ThreadLocal<String>();
-
     // 3rd party integrations
-    protected String browserVersion = "";
     protected long startDate;
 
     @BeforeSuite(alwaysRun = true)
@@ -392,10 +389,6 @@ public abstract class AbstractTest // extends DriverHelper
             browser = Configuration.get(Parameter.BROWSER);
         }
 
-        if (!browserVersion.isEmpty()) {
-            browser = browser + " " + browserVersion;
-        }
-
         return browser;
     }
 
@@ -450,20 +443,7 @@ public abstract class AbstractTest // extends DriverHelper
             suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
         }
 
-        String appender = getSuiteNameAppender();
-        if (appender != null && !appender.isEmpty()) {
-            suiteName = suiteName + " - " + appender;
-        }
-
         return suiteName;
-    }
-
-    protected void setSuiteNameAppender(String appender) {
-        suiteNameAppender.set(appender);
-    }
-
-    protected String getSuiteNameAppender() {
-        return suiteNameAppender.get();
     }
 
     private void printExecutionSummary(List<TestResultItem> tris) {
