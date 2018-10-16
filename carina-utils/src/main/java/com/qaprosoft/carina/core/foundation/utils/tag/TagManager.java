@@ -55,7 +55,7 @@ public class TagManager {
             if (testMethod != null) {
                 if (testMethod.isAnnotationPresent(TestTag.class)) {
                     TestTag methodAnnotation = testMethod.getAnnotation(TestTag.class);
-                    if (checkForbiddenTagNames(methodAnnotation.name())) {
+                    if (isValid(methodAnnotation.name())) {
                         tag.put(methodAnnotation.name(), methodAnnotation.value());
                         LOGGER.debug("Method '" + testMethod + "' tag pair: " + methodAnnotation.name() + " : " + methodAnnotation.value());
                     }
@@ -63,7 +63,7 @@ public class TagManager {
                 if (testMethod.isAnnotationPresent(TestTag.List.class)) {
                     TestTag.List methodAnnotation = testMethod.getAnnotation(TestTag.List.class);
                     for (TestTag tagLocal : methodAnnotation.value()) {
-                        if (checkForbiddenTagNames(tagLocal.name())) {
+                        if (isValid(tagLocal.name())) {
                             tag.put(tagLocal.name(), tagLocal.value());
                             LOGGER.debug("Method '" + testMethod + "' tag pair: " + tagLocal.name() + " : " + tagLocal.value());
                         }
@@ -77,7 +77,7 @@ public class TagManager {
     }
 
 
-    private static boolean checkForbiddenTagNames(String content) {
+    private static boolean isValid(String content) {
         Pattern pattern = Pattern.compile(FORBIDDEN_TAG_NAMES);
         if (content != null) {
             Matcher matcher = pattern.matcher(content);
