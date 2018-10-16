@@ -15,15 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.ownership;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
-
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
 
 public class Ownership {
     protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
@@ -31,7 +30,10 @@ public class Ownership {
     public enum OwnerType {
         PRIMARY,
         SECONDARY
-    };
+    }
+
+    private Ownership() {
+    }
 
     public static String getMethodOwner(ITestResult result, OwnerType type) {
 
@@ -63,27 +65,22 @@ public class Ownership {
                 }
             }
 
-            if (testMethod != null) {
-                // Extract the MethodOwner owner - if present
-                if (testMethod.isAnnotationPresent(MethodOwner.class)) {
-                    MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-                    switch (type) {
+            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
+                MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
+                switch (type) {
                     case PRIMARY:
                         owner = methodAnnotation.owner();
-                        LOGGER.debug("Method " + testMethod + " primary owner is " + owner);
+                        LOGGER.debug("Method '" + testMethod + "' primary owner is: " + owner);
                         break;
 
                     case SECONDARY:
                         owner = methodAnnotation.secondaryOwner();
-                        LOGGER.debug("Method " + testMethod + " secondary owner is " + owner);
+                        LOGGER.debug("Method '" + testMethod + "' secondary owner is: " + owner);
                         break;
-                    }
-
                 }
             }
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return owner;
     }
