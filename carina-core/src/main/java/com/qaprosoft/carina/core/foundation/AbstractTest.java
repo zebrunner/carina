@@ -28,7 +28,6 @@ import org.testng.annotations.Listeners;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
-import com.qaprosoft.carina.core.foundation.listeners.HealthCheckListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -41,7 +40,7 @@ import com.qaprosoft.zafira.listener.ZafiraListener;
  * 
  * @author Alex Khursevich
  */
-@Listeners({ CarinaListener.class, ZafiraListener.class, HealthCheckListener.class })
+@Listeners({ CarinaListener.class, ZafiraListener.class })
 public abstract class AbstractTest {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
