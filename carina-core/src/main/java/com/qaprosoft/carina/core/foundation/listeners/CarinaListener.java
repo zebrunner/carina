@@ -48,7 +48,6 @@ import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
@@ -300,15 +299,9 @@ public class CarinaListener extends AbstractTestListener {
             // Update JIRA
             Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 
-            // generate and send email report by Zafira to test group of people
-            String emailList = Configuration.get(Parameter.EMAIL_LIST);
-            String failureEmailList = Configuration.get(Parameter.FAILURE_EMAIL_LIST);
-            String senderEmail = Configuration.get(Parameter.SENDER_EMAIL);
-            String senderPassword = Configuration.get(Parameter.SENDER_PASSWORD);
-
-            // Generate and send email report using regular method
+            LOGGER.debug("Generating email report...");
             
-            
+            // Generate emailable html report using regular method
             EmailReportGenerator report = new EmailReportGenerator(title, env,
                     Configuration.get(Parameter.APP_VERSION), deviceName,
                     browser, DateUtils.now(),
@@ -316,28 +309,10 @@ public class CarinaListener extends AbstractTestListener {
                     EmailReportItemCollector.getCreatedItems());
 
             String emailContent = report.getEmailBody();
-
-            if (!R.ZAFIRA.getBoolean("zafira_enabled")) {
-                // Do not send email if run is running with enabled Zafira
-                EmailManager.send(title, emailContent,
-                        emailList,
-                        senderEmail,
-                        senderPassword);
-
-                if (testResult.equals(TestResultType.FAIL) && !failureEmailList.isEmpty()) {
-                    EmailManager.send(title, emailContent,
-                            failureEmailList,
-                            senderEmail,
-                            senderPassword);
-                }
-            }
-
             // Store emailable report under emailable-report.html
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
-
-            LOGGER.debug("Generating email report...");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {

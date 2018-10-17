@@ -161,10 +161,6 @@ public class Configuration {
 
         SMALL_SCREEN_HEIGHT("small_screen_height"),
 
-        SENDER_EMAIL("sender_email"),
-
-        SENDER_PASSWORD("sender_pswd"),
-
         INIT_RETRY_COUNT("init_retry_count"),
 
         INIT_RETRY_INTERVAL("init_retry_interval"),
