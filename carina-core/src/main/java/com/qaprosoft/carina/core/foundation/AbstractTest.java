@@ -97,7 +97,6 @@ public abstract class AbstractTest {
         }
         
         return drv;
-        //return castDriver(drv);
     }
 
     protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -106,6 +105,5 @@ public abstract class AbstractTest {
             Assert.fail("Unable to find driver by name: " + name);
         }
         return drv;
-        //return castDriver(drv);
     }
 }
