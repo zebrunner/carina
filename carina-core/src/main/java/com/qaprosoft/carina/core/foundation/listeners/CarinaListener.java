@@ -48,7 +48,6 @@ import org.testng.xml.XmlTest;
 
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.jayway.restassured.RestAssured;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
@@ -137,12 +136,6 @@ public class CarinaListener extends AbstractTestListener {
                 + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
         LOGGER.debug("Updated data_provider_thread_count="
                 + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-
-        if (!Configuration.isNull(Parameter.URL)) {
-            if (!Configuration.get(Parameter.URL).isEmpty()) {
-                RestAssured.baseURI = Configuration.get(Parameter.URL);
-            }
-        }
 
         try {
             L10N.init();

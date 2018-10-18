@@ -290,6 +290,17 @@ public class AbstractTestListener extends TestListenerAdapter {
 
     @Override
     public void onTestStart(ITestResult result) {
+        //declare carina custom RetryAnalyzer annotation for each test method
+        IRetryAnalyzer retryAnalyzer = new RetryAnalyzer();
+        IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
+        if (curRetryAnalyzer == null) {
+            result.getMethod().setRetryAnalyzer(retryAnalyzer);
+        } else {
+            if (!"com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer".equals(curRetryAnalyzer.getClass().getName())) {
+                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
+            }
+        }
+        
         generateParameters(result);
 
         if (!result.getTestContext().getCurrentXmlTest().getTestParameters()
@@ -349,23 +360,12 @@ public class AbstractTestListener extends TestListenerAdapter {
 
     @Override
     public void onTestFailure(ITestResult result) {
-        int count = RetryCounter.getRunCount();
-        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
-        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
+        failItem(result, Messager.TEST_FAILED);
+        afterTest(result);
 
-        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
-        if (count < maxCount && retry == null) {
-            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
-                    + result.getMethod().getMethodName());
-        }
-
-        if (count < maxCount && retry != null && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
-        } else {
-            failItem(result, Messager.TEST_FAILED);
-            afterTest(result);
-        }
-
+        // already achieved max retry count. need reset it for the next test if any
+        RetryCounter.resetCounter();
+        
         super.onTestFailure(result);
     }
 
@@ -386,10 +386,30 @@ public class AbstractTestListener extends TestListenerAdapter {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
             return;
         }
+        
+        int count = RetryCounter.getRunCount();
+        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
+        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
+        
+        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
+        if (count > 0 && retry == null) {
+            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
+                    + result.getMethod().getMethodName());
+        } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
+            failRetryItem(result, Messager.RETRY_RETRY_FAILED, count - 1, maxCount);
+            //TODO: try to change current result->method status to failed
+            result.setStatus(2);
+            afterTest(result);
+            super.onTestFailure(result);
+        } else {
+            skipItem(result, Messager.TEST_SKIPPED);
+            afterTest(result);
+            super.onTestSkipped(result);
+        }
 
-        skipItem(result, Messager.TEST_SKIPPED);
-        afterTest(result);
-        super.onTestSkipped(result);
+        //skipItem(result, Messager.TEST_SKIPPED);
+        //afterTest(result);
+        //super.onTestSkipped(result);
     }
 
     @Override

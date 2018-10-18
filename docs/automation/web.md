@@ -186,11 +186,6 @@ Implemented tests cases should be placed in TestNG xml file according to test gr
 
 <suite verbose="1" name="Carina Demo Tests - Web tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
 
-	<listeners>
-		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer"/>
-		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-	</listeners>
-
 	<test name="GSM arena web tests">
 		<classes>
 			<class name="com.qaprosoft.carina.demo.WebSampleTest" />

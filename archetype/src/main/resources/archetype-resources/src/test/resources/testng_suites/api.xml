@@ -13,11 +13,6 @@
 	<parameter name="jenkinsEnvironments" value="DEMO" />
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
 
-	<listeners>
-		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer" />
-		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-	</listeners>
-
 	<test name="User API tests">
 		<classes>
 			<class name="${package}.carina.demo.APISampleTest" />
