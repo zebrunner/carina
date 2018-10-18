@@ -415,36 +415,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>Basic template for property name.</td>
 	</tr>
 		<tr>
-		<td>cucumber_tests</td>
-		<td>If parametrs contains true Cucumber tests will be started</td>
-		<td>true, false</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests_app_version</td>
-		<td>Version of app using in Cucumber tests</td>
-		<td>2.013</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests_name</td>
-		<td>Cucucmber tests name</td>
-		<td>cucumber tests</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests_results_image_resize</td>
-		<td>Percent of Scaling from default image. 100 - same size</td>
-		<td>Integer</td>
-	</tr>
-		<tr>
-		<td>cucumber_report_subfolder</td>
-		<td>Subfolder on Jenkins (jenkins_url/{someNumbersFr EveryRun}/ artifacts/CucumberReport/ {cucumber_report_subfolder})</td>
-		<td>cucumber-reports</td>
-	</tr>
-		<tr>
-		<td>cucumber_user_js_in_report</td>
-		<td>Enabled parameter help to get more beautiful reports</td>
-		<td>true, false</td>
-	</tr>
-		<tr>
 		<td>tls_keysecure_location</td>
 		<td>Path to directory with tls secure keys</td>
 		<td>./tls/keysecure</td>

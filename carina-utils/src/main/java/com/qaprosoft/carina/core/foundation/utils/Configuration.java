@@ -256,19 +256,6 @@ public class Configuration {
 
         ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
 
-        // For cucumber tests
-        CUCUMBER_TESTS("cucumber_tests"),
-
-        CUCUMBER_TESTS_APP_VERSION("cucumber_tests_app_version"),
-
-        CUCUMBER_TESTS_NAME("cucumber_tests_name"),
-
-        CUCUMBER_TESTS_RESULTS_IMAGE_RESIZE("cucumber_tests_results_image_resize"),
-
-        CUCUMBER_USE_JS_IN_REPORT("cucumber_user_js_in_report"),
-
-        CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder"),
-
         // TLS
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
 
