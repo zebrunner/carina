@@ -34,6 +34,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.TestListenerAdapter;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -58,7 +59,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
-public class AbstractTestListener extends TestArgsListener {
+public class AbstractTestListener extends TestListenerAdapter {
     private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
@@ -289,7 +290,7 @@ public class AbstractTestListener extends TestArgsListener {
 
     @Override
     public void onTestStart(ITestResult result) {
-        super.onTestStart(result);
+        generateParameters(result);
 
         if (!result.getTestContext().getCurrentXmlTest().getTestParameters()
                 .containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
@@ -313,6 +314,28 @@ public class AbstractTestListener extends TestArgsListener {
 
         startItem(result, Messager.TEST_STARTED);
 
+    }
+    
+    private void generateParameters(ITestResult result) {
+        if (result != null && result.getParameters() != null) {
+            for (int i = 0; i < result.getParameters().length; i++) {
+                if (result.getParameters()[i] instanceof String) {
+                    result.getParameters()[i] = ParameterGenerator.process(result.getParameters()[i].toString());
+                }
+
+                if (result.getParameters()[i] instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
+                    for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
+                        Object param = ParameterGenerator.process(entry.getValue());
+                        if (param != null)
+                            dynamicAgrs.put(entry.getKey(), param.toString());
+                        else
+                            dynamicAgrs.put(entry.getKey(), null);
+                    }
+                }
+            }
+        }
     }
 
     @Override

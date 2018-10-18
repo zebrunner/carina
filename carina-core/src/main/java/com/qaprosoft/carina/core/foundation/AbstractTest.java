@@ -23,15 +23,18 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
+import org.testng.SkipException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 
@@ -70,6 +73,12 @@ public abstract class AbstractTest {
         return objects;
     }
 
+    protected void setBug(String id) {
+        String test = TestNamingUtil.getTestNameByThread();
+        TestNamingUtil.associateBug(test, id);
+    }
+
+    
     /**
      * Pause for specified timeout.
      *
@@ -83,6 +92,11 @@ public abstract class AbstractTest {
     public void pause(Double timeout) {
         CommonUtils.pause(timeout);
     }
+    
+    protected void skipExecution(String message) {
+        throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
+    }
+
     // --------------------------------------------------------------------------
     // Web Drivers
     // --------------------------------------------------------------------------

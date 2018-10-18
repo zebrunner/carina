@@ -36,7 +36,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ISuite;
-import org.testng.ISuiteListener;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.SkipException;
@@ -70,7 +69,6 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
@@ -85,7 +83,7 @@ import com.qaprosoft.hockeyapp.HockeyAppManager;
  * 
  * @author Alex Khursevich
  */
-public class CarinaListener extends AbstractTestListener implements ISuiteListener {
+public class CarinaListener extends AbstractTestListener {
     protected static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -184,7 +182,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         updateAppPath();
-
+        
+        onHealthCheck(context.getSuite());
     }
 
 
@@ -585,11 +584,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
 
-    protected void setBug(String id) {
-        String test = TestNamingUtil.getTestNameByThread();
-        TestNamingUtil.associateBug(test, id);
-    }
-
     protected void skipExecution(String message) {
         throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
     }
@@ -633,8 +627,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
     
     
-    @Override
-    public void onStart(ISuite suite) {
+    protected void onHealthCheck(ISuite suite) {
         String healthCheckClass = Configuration.get(Parameter.HEALTH_CHECK_CLASS);
         if (suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey()) != null) {
             // redefine by suite arguments as they have higher priority
@@ -654,10 +647,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         checkHealth(suite, healthCheckClass, healthCheckMethodsArray);
     }
     
-    @Override
-    public void onFinish(ISuite suite) {
-        // do nothing
-    }
 
     private void checkHealth(ISuite suite, String className, String[] methods) {
 
