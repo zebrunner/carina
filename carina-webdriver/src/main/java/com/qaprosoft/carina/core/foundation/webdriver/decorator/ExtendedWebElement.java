@@ -98,23 +98,6 @@ public class ExtendedWebElement {
     
     private boolean caseInsensitive;
     
-    //TODO: remove deprecated constructors and combined rest of functionality without code duplicates
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
-        this(element, name);
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver) {
-        this(element, name);
-        this.by = by;
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, WebDriver driver) {
-    	this(element);
-    }
-    
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
@@ -591,26 +574,6 @@ public class ExtendedWebElement {
     	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
     }
     
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     */
-    @Deprecated
-    public void clickHiddenElement() {
-    	clickHiddenElement(EXPLICIT_TIMEOUT);
-    }
-    
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     *
-     * @param timeout to wait
-     */
-    @Deprecated
-    public void clickHiddenElement(long timeout) {
-    	click(timeout);
-    }
-
     /**
      * Click onto element if it present.
      *
@@ -1119,21 +1082,6 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
-    @Deprecated
-    public void tapWithCoordinates(double x, double y) {
-        HashMap<String, Double> tapObject = new HashMap<String, Double>();
-        tapObject.put("x", x);
-        tapObject.put("y", y);
-        final WebDriver drv = getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) drv;
-        js.executeScript("mobile: tap", tapObject);
-    }
-
-    @Deprecated
-    public void waitUntilElementNotPresent(final long timeout) {
-    	waitUntilElementDisappear(timeout);
-    }
-    
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
         	//TODO: investigate maybe searchContext better to use here!
@@ -1151,18 +1099,6 @@ public class ExtendedWebElement {
     	
     	return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
 				ExpectedConditions.invisibilityOf(element)), timeout);
-    }
-
-    /**
-     * is Element Not Present After Wait
-     *
-     * @param timeout in seconds
-     * @return boolean - false if element still present after wait - otherwise
-     *         true if it disappear
-     */
-    @Deprecated
-    public boolean isElementNotPresentAfterWait(final long timeout) {
-    	return waitUntilElementDisappear(timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
