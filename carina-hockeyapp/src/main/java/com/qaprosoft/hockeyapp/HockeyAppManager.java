@@ -318,7 +318,7 @@ public class HockeyAppManager {
         if (patternList.length <= 1) {
             throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
         }
-        
+
         List<String> updatedPatternlist = new ArrayList<>();
 
         String patternToReplace = ".*[ -]%s[ -].*";
@@ -343,8 +343,10 @@ public class HockeyAppManager {
     private boolean scanningAllNotes(List<String> patternList, String noteField) {
         boolean foundMessages = true;
 
+        LOGGER.debug(String.format("Message to Scan: %s", noteField));
         for (String pattern : patternList) {
             foundMessages &= searchFieldsForString(pattern, noteField);
+            LOGGER.debug(String.format("Checking Found Messages for (%s).  Initial Result (%s), Full Reset (%s)", pattern, searchFieldsForString(pattern, noteField), foundMessages));
         }
 
         return foundMessages;
