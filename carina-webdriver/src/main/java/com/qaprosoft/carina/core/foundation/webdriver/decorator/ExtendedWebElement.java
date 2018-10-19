@@ -1082,6 +1082,16 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
+    @Deprecated
+    public void tapWithCoordinates(double x, double y) {
+        HashMap<String, Double> tapObject = new HashMap<String, Double>();
+        tapObject.put("x", x);
+        tapObject.put("y", y);
+        final WebDriver drv = getDriver();
+        JavascriptExecutor js = (JavascriptExecutor) drv;
+        js.executeScript("mobile: tap", tapObject);
+    }
+    
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
         	//TODO: investigate maybe searchContext better to use here!
