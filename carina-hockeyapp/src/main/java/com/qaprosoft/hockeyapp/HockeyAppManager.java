@@ -318,13 +318,15 @@ public class HockeyAppManager {
         if (patternList.length <= 1) {
             throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
         }
+        
+        List<String> updatedPatternlist = new ArrayList<>();
 
         String patternToReplace = ".*[ -]%s[ -].*";
-        String patternToMatch = String.format(patternToReplace, patternList[0]);
-        String patternToMatchTwo = String.format(patternToReplace, patternList[1]);
+        for (String currentPattern : patternList) {
+            updatedPatternlist.add(String.format(patternToReplace, currentPattern));
+        }
 
-        if (patternList.length > 1 && searchFieldsForString(patternToMatch, nodeField)
-                && searchFieldsForString(patternToMatchTwo, nodeField)) {
+        if (patternList.length > 1 && scanningAllNotes(updatedPatternlist, nodeField)) {
             return true;
         }
 
@@ -336,5 +338,15 @@ public class HockeyAppManager {
         Matcher m = p.matcher(stringToSearch);
 
         return m.find();
+    }
+
+    private boolean scanningAllNotes(List<String> patternList, String noteField) {
+        boolean foundMessages = true;
+
+        for (String pattern : patternList) {
+            foundMessages &= searchFieldsForString(pattern, noteField);
+        }
+
+        return foundMessages;
     }
 }
