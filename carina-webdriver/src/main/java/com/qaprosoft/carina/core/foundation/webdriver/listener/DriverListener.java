@@ -288,4 +288,14 @@ public class DriverListener implements WebDriverEventListener {
 		onBeforeAction();
 	}
 
+	@Override
+	public void afterGetText(WebElement arg0, WebDriver arg1, String arg2) {
+		// do nothing		
+	}
+
+	@Override
+	public void beforeGetText(WebElement arg0, WebDriver arg1) {
+		// do nothing		
+	}
+
 }

@@ -133,6 +133,11 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
 		<!-- For ZafiraListener -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
