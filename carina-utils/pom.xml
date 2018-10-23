@@ -110,6 +110,12 @@
 			<groupId>net.rcarz</groupId>
 			<artifactId>jira-client</artifactId>
 			<version>${jira-client.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
