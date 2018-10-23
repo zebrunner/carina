@@ -180,6 +180,7 @@ public class CarinaListener extends AbstractTestListener {
     }
 
 
+    //TODO: dins a way to stop/quite driver in class mode
 /*    @AfterClass(alwaysRun = true)
     public void executeAfterTestClass(ITestContext context) throws Throwable {
         if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
@@ -191,7 +192,7 @@ public class CarinaListener extends AbstractTestListener {
     @Override
     public void onTestStart(ITestResult result) {
         // handle expected skip
-        Method testMethod = result.getMethod().getMethod();
+        Method testMethod = result.getMethod().getConstructorOrMethod().getMethod();
         if (ExpectedSkipManager.getInstance().isSkip(testMethod, result.getTestContext())) {
             skipExecution("Based on rule listed above");
         }
