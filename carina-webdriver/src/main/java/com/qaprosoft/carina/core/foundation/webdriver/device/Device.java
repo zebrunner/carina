@@ -48,9 +48,9 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
-public class Device extends RemoteDevice {
+public class Device extends RemoteDevice implements IDriverPool {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
 
     /**
@@ -777,7 +777,7 @@ public class Device extends RemoteDevice {
 			return null;
 		}
         
-        if (DriverPool.getDrivers().size() == 0) {
+        if (getDrivers().size() == 0) {
             LOGGER.debug("There is no active drivers in the pool.");
             return null;
         }
@@ -785,7 +785,7 @@ public class Device extends RemoteDevice {
         // return File -> Zip png and uix or move this logic to zafira
         
         LOGGER.debug("UI dump generation...");
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = driver.getPageSource();
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).

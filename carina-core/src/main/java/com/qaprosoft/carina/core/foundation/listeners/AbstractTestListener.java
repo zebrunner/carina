@@ -53,13 +53,13 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
-public class AbstractTestListener extends TestListenerAdapter {
+public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
@@ -632,7 +632,7 @@ public class AbstractTestListener extends TestListenerAdapter {
     private String takeScreenshot(ITestResult result, String msg) {
         String screenId = "";
 
-        ConcurrentHashMap<String, WebDriver> drivers = DriverPool.getDrivers();
+        ConcurrentHashMap<String, WebDriver> drivers = getDrivers();
 
         for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
             String driverName = entry.getKey();

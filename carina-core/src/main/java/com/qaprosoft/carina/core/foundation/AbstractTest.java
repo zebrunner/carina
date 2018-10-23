@@ -18,9 +18,6 @@ package com.qaprosoft.carina.core.foundation;
 import java.lang.annotation.Annotation;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
@@ -35,7 +32,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 
 /*
@@ -44,7 +41,7 @@ import com.qaprosoft.zafira.listener.ZafiraListener;
  * @author Alex Khursevich
  */
 @Listeners({ CarinaListener.class, ZafiraListener.class })
-public abstract class AbstractTest {
+public abstract class AbstractTest implements IDriverPool {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -97,27 +94,4 @@ public abstract class AbstractTest {
         throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
     }
 
-    // --------------------------------------------------------------------------
-    // Web Drivers
-    // --------------------------------------------------------------------------
-    protected WebDriver getDriver() {
-        return getDriver(DriverPool.DEFAULT);
-    }
-
-    protected WebDriver getDriver(String name) {
-        WebDriver drv = DriverPool.getDriver(name);
-        if (drv == null) {
-            Assert.fail("Unable to find driver by name: " + name);
-        }
-        
-        return drv;
-    }
-
-    protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
-        WebDriver drv = DriverPool.getDriver(name, capabilities, seleniumHost);
-        if (drv == null) {
-            Assert.fail("Unable to find driver by name: " + name);
-        }
-        return drv;
-    }
 }

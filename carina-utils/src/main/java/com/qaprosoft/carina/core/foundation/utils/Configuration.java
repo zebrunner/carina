@@ -59,8 +59,6 @@ public class Configuration {
      */
 
     public enum DriverMode {
-        SUITE_MODE("suite_mode"),
-
         CLASS_MODE("class_mode"),
 
         METHOD_MODE("method_mode");

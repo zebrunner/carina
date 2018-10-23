@@ -32,8 +32,6 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ITestContext;
@@ -71,7 +69,6 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -267,10 +264,8 @@ public class CarinaListener extends AbstractTestListener {
     public void onFinish(ITestContext context) {
         super.onFinish(context);
         try {
-            if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
-                LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");
-                quitDrivers();
-            }
+            //forcibly quit all drivers
+            quitDrivers();
 
             ReportContext.removeTempDir(); // clean temp artifacts directory
             //HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
@@ -582,45 +577,6 @@ public class CarinaListener extends AbstractTestListener {
         throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
     }
 
-    // --------------------------------------------------------------------------
-    // Web Drivers
-    // --------------------------------------------------------------------------
-    protected WebDriver getDriver() {
-        return getDriver(DriverPool.DEFAULT);
-    }
-
-    protected WebDriver getDriver(String name) {
-        WebDriver drv = DriverPool.getDriver(name);
-        if (drv == null) {
-            Assert.fail("Unable to find driver by name: " + name);
-        }
-        
-        return drv;
-        //return castDriver(drv);
-    }
-
-    protected WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
-        WebDriver drv = DriverPool.getDriver(name, capabilities, seleniumHost);
-        if (drv == null) {
-            Assert.fail("Unable to find driver by name: " + name);
-        }
-        return drv;
-        //return castDriver(drv);
-    }
-
-/*    private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringWebDriver) {
-            return ((EventFiringWebDriver) drv).getWrappedDriver();
-        } else {
-            return drv;
-        }
-    }*/
-    
-    protected static void quitDrivers() {
-        DriverPool.quitDrivers();
-    }
-    
-    
     protected void onHealthCheck(ISuite suite) {
         String healthCheckClass = Configuration.get(Parameter.HEALTH_CHECK_CLASS);
         if (suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey()) != null) {

@@ -21,17 +21,15 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -707,12 +705,13 @@ public class MobileUtils {
 	}
 
 	public static WebDriver getDriver() {
-		WebDriver drv = DriverPool.getDriver();
+		throw new RuntimeException("This static method cannot hide the instance method from IDriverPool");
+/*		WebDriver drv = DriverPool.getDriver();
 		if (drv instanceof EventFiringWebDriver) {
 			return ((EventFiringWebDriver) drv).getWrappedDriver();
 		} else {
 			return drv;
 		}
-	}
+*/	}
 
 }
