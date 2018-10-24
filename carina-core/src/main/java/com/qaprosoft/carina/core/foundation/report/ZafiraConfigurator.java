@@ -108,7 +108,7 @@ public class ZafiraConfigurator implements IConfigurator {
     @Override
     public String getPrimaryOwner(ITestResult test) {
         // TODO: re-factor that
-        return Ownership.getMethodOwner(test, OwnerType.PRIMARY);
+        return Ownership.getMethodOwner(test, OwnerType.PLATFORM);
     }
 
     @Override

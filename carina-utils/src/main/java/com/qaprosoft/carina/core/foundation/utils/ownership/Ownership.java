@@ -16,6 +16,8 @@
 package com.qaprosoft.carina.core.foundation.utils.ownership;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -27,9 +29,12 @@ import java.util.Map;
 public class Ownership {
     protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
 
+    private static final String SECOND_OWNER_DEFAULT_PLATFORM = "IOS";
+
     public enum OwnerType {
         PRIMARY,
-        SECONDARY
+        SECONDARY,
+        PLATFORM
     }
 
     private Ownership() {
@@ -65,20 +70,23 @@ public class Ownership {
                 }
             }
 
-            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
-                MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-                switch (type) {
-                    case PRIMARY:
-                        owner = methodAnnotation.owner();
-                        LOGGER.debug("Method '" + testMethod + "' primary owner is: " + owner);
-                        break;
+            if (testMethod != null) {
+                if (testMethod.isAnnotationPresent(MethodOwner.class)) {
+                    MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
+                    owner = returnCorrectOwner(methodAnnotation.owner(), methodAnnotation.secondaryOwner(), methodAnnotation.platform(), type);
+                }
+                if (testMethod.isAnnotationPresent(MethodOwner.List.class)) {
+                    MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
+                    for (MethodOwner local : methodAnnotation.value()) {
 
-                    case SECONDARY:
-                        owner = methodAnnotation.secondaryOwner();
-                        LOGGER.debug("Method '" + testMethod + "' secondary owner is: " + owner);
-                        break;
+                        String localOwner = returnCorrectOwner(local.owner(), local.secondaryOwner(), local.platform(), type);
+                        if (!localOwner.isEmpty()) {
+                            owner = localOwner;
+                        }
+                    }
                 }
             }
+
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         }
@@ -91,5 +99,56 @@ public class Ownership {
             owner = "";
         }
         return owner;
+    }
+
+
+    private static String returnCorrectOwner(String primaryOwner, String secondOwner, String platform, OwnerType type) {
+        String owner = "";
+        if (platform.isEmpty()) {
+            switch (type) {
+                case PRIMARY:
+                    owner = primaryOwner;
+                    LOGGER.debug("Method primary owner is: " + owner);
+                    return owner;
+
+                case SECONDARY:
+                    owner = secondOwner;
+                    LOGGER.debug("Method secondary owner is: " + owner);
+                    return owner;
+                default:
+                    String currentPlatform = getCurrentPlatform();
+                    if (!currentPlatform.isEmpty()) {
+                        if (currentPlatform.equalsIgnoreCase(SECOND_OWNER_DEFAULT_PLATFORM)) {
+                            LOGGER.debug("Method owner for platform '" + SECOND_OWNER_DEFAULT_PLATFORM + "' is: " + secondOwner);
+                            return secondOwner;
+                        }
+                    }
+                    return primaryOwner;
+            }
+        } else {
+            String currentPlatform = getCurrentPlatform();
+            if (!currentPlatform.isEmpty()) {
+                if (currentPlatform.equalsIgnoreCase(platform)) {
+                    LOGGER.debug("Method owner for platform '" + platform + "' is: " + primaryOwner);
+                    return primaryOwner;
+                }
+            }
+        }
+        return owner;
+    }
+
+    private static String getCurrentPlatform() {
+        String platformName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM);
+        String platform = Configuration.get(Configuration.Parameter.PLATFORM);
+        if (platform.isEmpty() && platform.length() == 0) {
+            LOGGER.debug("Capability 'platform' is empty!");
+        } else {
+            if (platformName.isEmpty() && platformName.length() == 0) {
+                LOGGER.debug("Capability 'platformName' which is used in Android/iOS for is empty!");
+                platformName = platform;
+            }
+        }
+        LOGGER.debug(platformName);
+        return platformName;
     }
 }

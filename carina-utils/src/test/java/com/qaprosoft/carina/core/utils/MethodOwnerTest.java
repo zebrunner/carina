@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import org.testng.Assert;
@@ -29,12 +32,24 @@ public class MethodOwnerTest {
 
     private static final String OWNER = "testowner";
     private static final String SECONDARY_OWNER = "testSecondOwner";
+    private static final String DESKTOP_OWNER = "testDesktopOwner";
+    private static final String IOS_OWNER = "testIOSOwner";
 
     @Test
     @MethodOwner(owner = OWNER)
+    @MethodOwner(owner = SECONDARY_OWNER, platform = "ios")
     public void testMethodOwner() {
         ITestResult result = Reporter.getCurrentTestResult();
         String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PRIMARY);
+        Assert.assertEquals(ownerName, OWNER);
+    }
+
+    @Test
+    @MethodOwner(owner = OWNER)
+    @MethodOwner(owner = SECONDARY_OWNER, platform = "ios")
+    public void testMethodOwnerEmptyPlatform() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
         Assert.assertEquals(ownerName, OWNER);
     }
 
@@ -47,4 +62,63 @@ public class MethodOwnerTest {
         String secondOwnerName = Ownership.getMethodOwner(result, Ownership.OwnerType.SECONDARY);
         Assert.assertEquals(secondOwnerName, SECONDARY_OWNER);
     }
+
+    @Test
+    @MethodOwner(owner = OWNER, platform = "android")
+    @MethodOwner(owner = SECONDARY_OWNER, platform = "ios")
+    @MethodOwner(owner = DESKTOP_OWNER, platform = "desktop")
+    public void testMethodOwnerByPlatform() {
+        R.CONFIG.put(Configuration.Parameter.PLATFORM.getKey(), "DESKTOP");
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, DESKTOP_OWNER);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "IOS");
+        ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, SECONDARY_OWNER);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "ANDROID");
+        ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, OWNER);
+        R.CONFIG.put(Configuration.Parameter.PLATFORM.getKey(), "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+    }
+
+    @Test
+    @MethodOwner(owner = OWNER, platform = "android")
+    @MethodOwner(owner = SECONDARY_OWNER, platform = "ios")
+    @MethodOwner(owner = DESKTOP_OWNER, platform = "desktop")
+    public void testMethodOwnerByEmptyPlatform() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, "");
+    }
+
+    @Test
+    @MethodOwner(owner = OWNER, secondaryOwner = SECONDARY_OWNER)
+    public void testMethodSecondaryOwnerByPlatform() {
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "IOS");
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, SECONDARY_OWNER);
+        String secondOwnerName = Ownership.getMethodOwner(result, Ownership.OwnerType.SECONDARY);
+        Assert.assertEquals(secondOwnerName, SECONDARY_OWNER);
+        R.CONFIG.put(Configuration.Parameter.PLATFORM.getKey(), "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+    }
+
+    @Test
+    @MethodOwner(owner = OWNER, secondaryOwner = SECONDARY_OWNER)
+    @MethodOwner(owner = IOS_OWNER, platform = "ios")
+    public void testMethodSecondaryOwnerWoPlatform() {
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, OWNER);
+        String secondOwnerName = Ownership.getMethodOwner(result, Ownership.OwnerType.SECONDARY);
+        Assert.assertEquals(secondOwnerName, SECONDARY_OWNER);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "IOS");
+        ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PLATFORM);
+        Assert.assertEquals(ownerName, IOS_OWNER);
+        R.CONFIG.put(Configuration.Parameter.PLATFORM.getKey(), "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+    }
+
 }
