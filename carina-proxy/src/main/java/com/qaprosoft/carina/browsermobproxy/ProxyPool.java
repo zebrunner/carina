@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
+import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -101,7 +102,7 @@ public final class ProxyPool {
     // ------------------------- BOWSERMOB PROXY ---------------------
     
     private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
-    
+
     // TODO: investigate possibility to return interface to support JettyProxy
     /**
      * start BrowserMobProxy Server
@@ -134,6 +135,15 @@ public final class ProxyPool {
         if (!proxy.isStarted()) {
             LOGGER.info("Starting BrowserMob proxy...");
             killProcessByPort(proxyPort);
+            String chainedProxy = R.CONFIG.get("browsermob_chained_proxy");
+            if (chainedProxy.length() > 0) {
+                Integer chainedPort = 443;
+                if (R.CONFIG.get("browsermob_chained_proxy_port").length() > 0) {
+                    chainedPort = R.CONFIG.getInt("browsermob_chained_proxy_port");
+                }
+                proxy.setChainedProxy(new InetSocketAddress(chainedProxy, chainedPort));
+                LOGGER.info("Chained Proxy Set: " + proxy.getChainedProxy().getAddress() + "; port: " + proxy.getChainedProxy().getPort());
+            }
             proxy.start(proxyPort);
         } else {
             LOGGER.info("BrowserMob proxy is already started on port " + proxy.getPort());
