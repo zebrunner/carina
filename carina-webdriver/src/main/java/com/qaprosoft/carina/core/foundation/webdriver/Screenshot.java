@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -397,8 +398,9 @@ public class Screenshot {
                     .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
             executorService.execute(() -> {
                 try {
-                	    LOGGER.debug("Uploading to AWS: " + screenshot.getName());
-                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
+                    int expiresIn = R.CONFIG.getInt("artifacts_expiration_seconds");
+                	LOGGER.debug("Uploading to AWS: " + screenshot.getName() + ". Expires in " + expiresIn + " seconds.");
+                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, expiresIn, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
                     LOGGER.debug("Uploaded to AWS: " + screenshot.getName());
                     ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                             .addHeader("AMAZON_PATH", url)
@@ -417,7 +419,7 @@ public class Screenshot {
     /**
      * Resizes image according to specified dimensions.
      * 
-     * @param bufImage
+     * @param bufferedImage
      *            - image to resize.
      * @param width
      *            - new image width.
@@ -426,9 +428,9 @@ public class Screenshot {
      * @param path
      *            - path to screenshot file.
      */
-    private static void resizeImg(BufferedImage bufferdImage, int width, int height, String path) {
+    private static void resizeImg(BufferedImage bufferedImage, int width, int height, String path) {
         try {
-            BufferedImage bufImage = Scalr.resize(bufferdImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
+            BufferedImage bufImage = Scalr.resize(bufferedImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
                     Scalr.OP_ANTIALIAS);
             if (bufImage.getHeight() > height) {
                 bufImage = Scalr.crop(bufImage, bufImage.getWidth(), height);
