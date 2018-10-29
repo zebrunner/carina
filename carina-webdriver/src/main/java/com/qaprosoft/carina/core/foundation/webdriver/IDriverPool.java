@@ -39,7 +39,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public interface IDriverPool {
-    static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
+    static final Logger logger = Logger.getLogger(IDriverPool.class);
     static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
     static final String DEFAULT = "default";
@@ -95,14 +95,14 @@ public interface IDriverPool {
                 && Configuration.getInt(Parameter.THREAD_COUNT) == 1
                 && Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
             Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
-            LOGGER.debug(
+            logger.debug(
                     "Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
             for (int i = 0; i < threads.length; i++) {
                 currentDrivers = drivers.get(threads[i].getId());
                 if (currentDrivers != null) {
                     if (currentDrivers.containsKey(name)) {
                         drv = currentDrivers.get(name);
-                        LOGGER.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
+                        logger.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
                         break;
                     }
                 }
@@ -110,7 +110,7 @@ public interface IDriverPool {
         }
 
         if (drv == null) {
-            LOGGER.debug("Starting new driver as nothing was found in the pool");
+            logger.debug("Starting new driver as nothing was found in the pool");
             drv = createDriver(name, capabilities, seleniumHost, DevicePool.getNullDevice());
         }
 
@@ -127,7 +127,7 @@ public interface IDriverPool {
      * @return default WebDriver
      */
     public static WebDriver getDriver(SessionId sessionId) {
-    	LOGGER.debug("Detecting WebDriver by sessionId...");
+    	logger.debug("Detecting WebDriver by sessionId...");
     	ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
     	
     	// [VD] code duplication from getDrivers!!!
@@ -148,9 +148,9 @@ public interface IDriverPool {
     		
     		SessionId drvSessionId = ((RemoteWebDriver)drv).getSessionId();
     		
-    		LOGGER.debug("analyzing driver: " + drvSessionId.toString());
+    		logger.debug("analyzing driver: " + drvSessionId.toString());
     		if (sessionId.equals(drvSessionId)) {
-    			LOGGER.debug("Detected WebDriver by sessionId");
+    			logger.debug("Detected WebDriver by sessionId");
     			return drv;
     		}
     	}
@@ -183,7 +183,7 @@ public interface IDriverPool {
         }
 
         try {
-            LOGGER.debug("Driver restarting...");
+            logger.debug("Driver restarting...");
             deregisterDriver(DEFAULT);
             if (!isSameDevice) {
                 DevicePool.deregisterDevice();
@@ -191,12 +191,12 @@ public interface IDriverPool {
             
             drv.quit();
 
-            LOGGER.debug("Driver exited during restart...");
+            logger.debug("Driver exited during restart...");
         } catch (WebDriverException e) {
-            LOGGER.debug("Error message detected during driver restart: " + e.getMessage(), e);
+            logger.debug("Error message detected during driver restart: " + e.getMessage(), e);
             // do nothing
         } catch (Exception e) {
-            LOGGER.debug("Error discovered during driver restart: " + e.getMessage(), e);
+            logger.debug("Error discovered during driver restart: " + e.getMessage(), e);
 
             // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
             if (!e.getMessage().contains("Session ID is null.")) {
@@ -238,7 +238,7 @@ public interface IDriverPool {
         }
 
         try {
-            LOGGER.debug("Driver exiting..." + name);
+            logger.debug("Driver exiting..." + name);
 //          driver deregistration should be performed a bit later than device deregistration
 //          since there some driver related action on method deregister device
             DevicePool.deregisterDevice();
@@ -246,12 +246,12 @@ public interface IDriverPool {
             
             drv.quit();
 
-            LOGGER.debug("Driver exited..." + name);
+            logger.debug("Driver exited..." + name);
         } catch (WebDriverException e) {
-            LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
+            logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
             // do nothing
         } catch (Exception e) {
-            LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
+            logger.debug("Error discovered during driver quit: " + e.getMessage(), e);
 
             // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
             if (!e.getMessage().contains("Session ID is null.")) {
@@ -301,7 +301,7 @@ public interface IDriverPool {
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
         while (!init && count++ < maxCount) {
             try {
-                LOGGER.debug("initDriver start...");
+                logger.debug("initDriver start...");
 
                 drv = DriverFactory.create(name, device, capabilities, seleniumHost);
                 
@@ -334,12 +334,12 @@ public interface IDriverPool {
 					ProxyPool.startProxy(proxyPort);
 				}
 
-                LOGGER.debug("initDriver finish...");
+                logger.debug("initDriver finish...");
 
             } catch (Throwable thr) {
                 // DevicePool.ignoreDevice();
                 DevicePool.deregisterDevice();
-                LOGGER.error(
+                logger.error(
                         String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s",
                                 name, count, maxCount, thr.getMessage()),
                         thr);
@@ -382,7 +382,7 @@ public interface IDriverPool {
         currentDrivers.put(name, driver);
         Assert.assertTrue(drivers.get(threadId).containsKey(name),
                 "Driver '" + name + "' was not registered in map for thread: " + threadId);
-        LOGGER.debug("##########   REGISTER driver for threadId: " + threadId);
+        logger.debug("##########   REGISTER driver for threadId: " + threadId);
     }
 
     /**
@@ -412,7 +412,7 @@ public interface IDriverPool {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
         int size = currentDrivers.size();
-        LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+        logger.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
 
@@ -428,14 +428,14 @@ public interface IDriverPool {
         ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
         if (currentDrivers.containsKey(name)) {
-            LOGGER.debug("########## DEREGISTER driver for threadId: " + threadId);
+            logger.debug("########## DEREGISTER driver for threadId: " + threadId);
             currentDrivers.remove(name);
 
             if (drivers.get(threadId).containsKey(name)) {
-				LOGGER.error("Driver '" + name + "' was not deregistered from map for thread: " + threadId);
+				logger.error("Driver '" + name + "' was not deregistered from map for thread: " + threadId);
             }
         } else {
-            LOGGER.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);
+            logger.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);
         }
         ProxyPool.stopProxy();
     }
