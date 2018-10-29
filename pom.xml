@@ -60,7 +60,7 @@
         <selenium-server.version>3.12.0</selenium-server.version>
         <appium.version>6.1.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>3.3.46</zafira-client.version>
+        <zafira-client.version>3.3.47</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
@@ -88,7 +88,7 @@
         <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -99,7 +99,7 @@
         <repository>
             <id>qaprosoft_3rdparty</id>
             <name>Qaprosoft Thirdparty</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/thirdparty/</url>
+            <url>https://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
         </repository>
     </repositories>
     <profiles>
