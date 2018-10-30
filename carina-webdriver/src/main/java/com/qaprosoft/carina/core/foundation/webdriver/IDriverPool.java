@@ -40,14 +40,12 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public interface IDriverPool {
     static final Logger logger = Logger.getLogger(IDriverPool.class);
-    static final int MAX_DRIVER_COUNT = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
     static final String DEFAULT = "default";
 
     static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 
     static final ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
-
 
     /**
      * Get default driver. If no default driver discovered it will be created.
@@ -369,11 +367,13 @@ public interface IDriverPool {
     default public void registerDriver(WebDriver driver, String name) {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-        if (currentDrivers.size() == MAX_DRIVER_COUNT) {
+        int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
+        
+        if (currentDrivers.size() == maxDriverCount) {
             // TODO: after moving driver creation to DriverPoolEx need to add
             // such verification before driver start
             Assert.fail(
-                    "Unable to register driver as you reached max number of drivers per thread: " + MAX_DRIVER_COUNT);
+                    "Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
         }
         if (currentDrivers.containsKey(name)) {
             Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
