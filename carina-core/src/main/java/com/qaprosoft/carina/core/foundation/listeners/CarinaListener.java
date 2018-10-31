@@ -58,7 +58,6 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollecto
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
@@ -176,18 +175,15 @@ public class CarinaListener extends AbstractTestListener {
         onHealthCheck(context.getSuite());
     }
 
-
-    //TODO: dins a way to stop/quite driver in class mode
-/*    @AfterClass(alwaysRun = true)
-    public void executeAfterTestClass(ITestContext context) throws Throwable {
-        if (Configuration.getDriverMode() == DriverMode.CLASS_MODE) {
-            LOGGER.debug("Deinitialize driver(s) in UITest->AfterClass.");
-            quitDrivers();
-        }
-    }*/
-
     @Override
     public void onTestStart(ITestResult result) {
+        String[] dependedUponMethods = result.getMethod().getMethodsDependedUpon();
+        
+        if (dependedUponMethods.length == 0) {
+            LOGGER.debug("Deinitialize driver(s) on test start as no dependencies detected.");
+            quitDrivers();
+        }
+        
         // handle expected skip
         Method testMethod = result.getMethod().getConstructorOrMethod().getMethod();
         if (ExpectedSkipManager.getInstance().isSkip(testMethod, result.getTestContext())) {
@@ -219,13 +215,6 @@ public class CarinaListener extends AbstractTestListener {
         
     public void onTestFinish(ITestResult result) {
         try {
-            DriverMode driverMode = Configuration.getDriverMode();
-
-            if (driverMode == DriverMode.METHOD_MODE) {
-                LOGGER.debug("Deinitialize driver(s) in @AfterMethod.");
-                quitDrivers();
-            }
-
             // TODO: improve later removing duplicates with AbstractTestListener
             // handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
             if (result.getThrowable() != null && result.getThrowable().getMessage() != null

@@ -55,26 +55,6 @@ public class Configuration {
     }
 
     /**
-     * All available configuration for diver initialization phase.
-     */
-
-    public enum DriverMode {
-        CLASS_MODE("class_mode"),
-
-        METHOD_MODE("method_mode");
-
-        private final String key;
-
-        DriverMode(String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
-    }
-
-    /**
      * All available configuration parameter keys along with default values.
      */
     public enum Parameter {
@@ -91,8 +71,6 @@ public class Configuration {
         BROWSER_VERSION("browser_version"),
 
         SELENIUM_HOST("selenium_host"),
-
-        DRIVER_MODE("driver_mode"),
 
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 
@@ -309,10 +287,6 @@ public class Configuration {
 
     public static boolean getBoolean(Parameter param) {
         return Boolean.valueOf(get(param).trim());
-    }
-
-    public static DriverMode getDriverMode() {
-        return DriverMode.valueOf(get(Parameter.DRIVER_MODE).trim().toUpperCase());
     }
 
     @Deprecated

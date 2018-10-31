@@ -30,9 +30,6 @@ public class DriverPoolExTest implements IDriverPool {
     private final static String CUSTOM1 = "custom-1-driver";
     private final static String CUSTOM2 = "custom-2-driver";
 
-    private final static String CLASS_MODE = "class_mode";
-    // private final static String METHOD_MODE = "method_mode";
-
     @Mock
     private WebDriver mockDriverSuite;
 
@@ -51,7 +48,6 @@ public class DriverPoolExTest implements IDriverPool {
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite() {
         R.CONFIG.put("driver_type", "desktop");
-        R.CONFIG.put("driver_mode", CLASS_MODE);
         R.CONFIG.put("max_driver_count", "2");
 
         R.CONFIG.put("thread_count", "1");
@@ -64,8 +60,6 @@ public class DriverPoolExTest implements IDriverPool {
 
     @Test()
     public void registerDefaultDriver() {
-        Assert.assertEquals(CLASS_MODE, R.CONFIG.get("driver_mode"), "driver_mode is invalid!");
-
         registerDriver(mockDriverDefault, IDriverPool.DEFAULT);
         Assert.assertEquals(1, size(), "Number of registered driver is not valid!");
         Assert.assertTrue(isDriverRegistered(IDriverPool.DEFAULT), "Default driver is not registered!");
@@ -164,5 +158,5 @@ public class DriverPoolExTest implements IDriverPool {
 
         deregisterDrivers();
     }
-
+     
 }

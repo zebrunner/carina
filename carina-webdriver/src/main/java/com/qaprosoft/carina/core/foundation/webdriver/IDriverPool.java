@@ -31,7 +31,6 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
@@ -82,15 +81,13 @@ public interface IDriverPool {
      */
     default public WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
         WebDriver drv = null;
-        DriverMode driverMode = Configuration.getDriverMode();
         Long threadId = Thread.currentThread().getId();
 
         ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
 
         if (currentDrivers.containsKey(name)) {
             drv = currentDrivers.get(name);
-        } else if ((driverMode == DriverMode.CLASS_MODE || driverMode == DriverMode.METHOD_MODE)
-                && Configuration.getInt(Parameter.THREAD_COUNT) == 1
+        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == 1
                 && Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
             Thread[] threads = getGroupThreads(Thread.currentThread().getThreadGroup());
             logger.debug(
