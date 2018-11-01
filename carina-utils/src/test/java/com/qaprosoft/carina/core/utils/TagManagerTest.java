@@ -39,7 +39,6 @@ public class TagManagerTest {
     private static final String TAG_VALUE = "testTag1";
     private static final String TAG_VALUE2 = "testTag2";
     private static final String FORBIDDEN_KEY_PRIORITY = "priority";
-    private static final String FORBIDDEN_KEY_FEATURE = "feature";
 
     @Test
     @TestPriority(Priority.P2)
@@ -56,7 +55,6 @@ public class TagManagerTest {
         String priority = PriorityManager.getPriority(result);
         Assert.assertEquals(priority, "P0");
     }
-
 
     @Test
     @TestPriority(value = Priority.P1)
@@ -86,12 +84,10 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
     @TestTag(name = FORBIDDEN_KEY_PRIORITY, value = "P0")
-    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "feature1")
     public void testForbiddenTags() {
         ITestResult result = Reporter.getCurrentTestResult();
         Map<String, String> tags = TagManager.getTags(result);
         Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_PRIORITY));
-        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
         Assert.assertTrue(tags.containsKey(TAG_NAME));
         Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
         Assert.assertTrue(tags.containsKey(TAG_NAME2));
@@ -113,29 +109,15 @@ public class TagManagerTest {
 
     @Test
     @TestPriority(Priority.P2)
-    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "P5")
-    public void testForbiddenFeatureTag() {
-        ITestResult result = Reporter.getCurrentTestResult();
-        String priority = PriorityManager.getPriority(result);
-        Assert.assertEquals(priority, "P2");
-        Map<String, String> tags = TagManager.getTags(result);
-        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
-        Assert.assertEquals(tags.size(), 0);
-    }
-
-    @Test
-    @TestPriority(Priority.P2)
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
     @TestTag(name = FORBIDDEN_KEY_PRIORITY, value = "P0")
-    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "feature1")
     public void testZafiraGetTagsMethod() {
         ITestResult result = Reporter.getCurrentTestResult();
         Map<String, String> tags = TagManager.getTags(result);
         String priority = PriorityManager.getPriority(result);
         Assert.assertEquals(priority, "P2");
         Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_PRIORITY));
-        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
         Assert.assertTrue(tags.containsKey(TAG_NAME));
         Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
         Assert.assertTrue(tags.containsKey(TAG_NAME2));
@@ -160,14 +142,12 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
     @TestTag(name = FORBIDDEN_KEY_PRIORITY, value = "P0")
-    @TestTag(name = FORBIDDEN_KEY_FEATURE, value = "feature1")
     public void testZafiraGetTagsMethodWoPriority() {
         ITestResult result = Reporter.getCurrentTestResult();
         String priority = PriorityManager.getPriority(result);
         Assert.assertEquals(priority, "");
         Map<String, String> tags = TagManager.getTags(result);
         Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_PRIORITY));
-        Assert.assertFalse(tags.containsKey(FORBIDDEN_KEY_FEATURE));
         Assert.assertTrue(tags.containsKey(TAG_NAME));
         Assert.assertEquals(tags.get(TAG_NAME), TAG_VALUE);
         Assert.assertTrue(tags.containsKey(TAG_NAME2));

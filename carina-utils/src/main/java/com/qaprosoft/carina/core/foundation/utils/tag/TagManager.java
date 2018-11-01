@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public class TagManager {
     protected static final Logger LOGGER = Logger.getLogger(TagManager.class);
 
-    private static final String FORBIDDEN_TAG_NAMES = "priority|feature";
+    private static final String FORBIDDEN_TAG_NAMES = "priority";
 
     private TagManager() {
     }
