@@ -319,12 +319,14 @@ public class HockeyAppManager {
             throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
         }
 
-        String patternToReplace = ".*[ -]%s[ -].*";
-        String patternToMatch = String.format(patternToReplace, patternList[0]);
-        String patternToMatchTwo = String.format(patternToReplace, patternList[1]);
+        List<String> updatedPatternlist = new ArrayList<>();
 
-        if (patternList.length > 1 && searchFieldsForString(patternToMatch, nodeField)
-                && searchFieldsForString(patternToMatchTwo, nodeField)) {
+        String patternToReplace = ".*[ -]%s[ -].*";
+        for (String currentPattern : patternList) {
+            updatedPatternlist.add(String.format(patternToReplace, currentPattern));
+        }
+
+        if (patternList.length > 1 && scanningAllNotes(updatedPatternlist, nodeField)) {
             return true;
         }
 
@@ -336,5 +338,17 @@ public class HockeyAppManager {
         Matcher m = p.matcher(stringToSearch);
 
         return m.find();
+    }
+
+    private boolean scanningAllNotes(List<String> patternList, String noteField) {
+        boolean foundMessages = true;
+
+        LOGGER.debug(String.format("Message to Scan: %s", noteField));
+        for (String pattern : patternList) {
+            foundMessages &= searchFieldsForString(pattern, noteField);
+            LOGGER.debug(String.format("Checking Found Messages for (%s).  Initial Result (%s), Full Reset (%s)", pattern, searchFieldsForString(pattern, noteField), foundMessages));
+        }
+
+        return foundMessages;
     }
 }
