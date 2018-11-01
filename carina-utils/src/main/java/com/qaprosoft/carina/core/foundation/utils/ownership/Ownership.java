@@ -138,17 +138,8 @@ public class Ownership {
     }
 
     private static String getCurrentPlatform() {
-        String platformName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM);
-        String platform = Configuration.get(Configuration.Parameter.PLATFORM);
-        if (platform.isEmpty() && platform.length() == 0) {
-            LOGGER.debug("Capability 'platform' is empty!");
-        } else {
-            if (platformName.isEmpty() && platformName.length() == 0) {
-                LOGGER.debug("Capability 'platformName' which is used in Android/iOS for is empty!");
-                platformName = platform;
-            }
-        }
-        LOGGER.debug(platformName);
-        return platformName;
+        String platform = Configuration.getPlatform();
+        LOGGER.debug(platform);
+        return platform;
     }
 }
