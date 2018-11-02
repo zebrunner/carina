@@ -5,56 +5,27 @@
 
 <suite verbose="1" name="Carina Demo Tests - API sample tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
 
-	<parameter name="suiteOwner" value="demo" />
-	<parameter name="zafira_project" value="UNKNOWN" />
-	<parameter name="jenkinsJobCreation" value="true" />
-	<parameter name="jenkinsJobFolder" value="DEMO" />
-	<parameter name="jenkinsJobName" value="API-Demo-Test" />
-	<parameter name="jenkinsEnvironments" value="DEMO" />
-	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
+	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="zafira_project" value="UNKNOWN"/>
+	<parameter name="jenkinsJobCreation" value="true"/>
+	<parameter name="jenkinsJobName" value="API-Demo-Test"/>
+	<parameter name="jenkinsJobType" value="api"/>
+	<parameter name="jenkinsEnvironments" value="DEMO"/>
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+
+	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+	<parameter name="jenkinsPipelineLanguages" value="fr_FR:fr,en_US:en,es_ES:es,it_IT:it,de_DE:de,pt_PT:pt,zh_CN:zh-rCN,ja_JP:ja,ko_KR:ko"/>
+	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 
 	<listeners>
-		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer" />
+		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer"/>
 		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
 	</listeners>
 
 	<test name="User API tests">
 		<classes>
 			<class name="${package}.carina.demo.APISampleTest" />
-		</classes>
-	</test>
-
-	<test name="Sum operation test">
-		<classes>
-			<class name="${package}.carina.demo.DataprovidersSampleTest">
-				<methods>
-					<include name="testSumOperation"/>
-				</methods>
-			</class>
-		</classes>
-	</test>
-
-	<test name="Multiply operation test">
-		<classes>
-			<class name="${package}.carina.demo.DataprovidersSampleTest">
-				<methods>
-					<include name="testMuliplyOperation"/>
-				</methods>
-			</class>
-		</classes>
-	</test>
-
-
-	<test name="Substract operation test">
-		<parameter name="a" value="12"/>
-		<parameter name="b" value="3"/>
-		<parameter name="c" value="9"/>
-		<classes>
-			<class name="${package}.carina.demo.DataprovidersSampleTest">
-				<methods>
-					<include name="testSubstractOperation"/>
-				</methods>
-			</class>
 		</classes>
 	</test>
 

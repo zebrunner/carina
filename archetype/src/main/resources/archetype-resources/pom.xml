@@ -11,23 +11,43 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <carina-core.version>LATEST</carina-core.version>
+    <carina-core_version>RELEASE</carina-core_version>
     <httpclient.version>4.5.3</httpclient.version>
+    <log4j.version>1.2.17</log4j.version>
     <java.version>1.8</java.version>
     <suite>api</suite>
   </properties>
+
+    <repositories>
+        <repository>
+            <id>qaprosoft_snapshots</id>
+            <name>Qaprosoft Snapshots</name>
+            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
+        </repository>
+    </repositories>
+
 
   <dependencies>
     <dependency>
       <groupId>com.qaprosoft</groupId>
       <artifactId>carina-core</artifactId>
-      <version>${carina-core.version}</version>
+      <version>${carina-core_version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>${httpclient.version}</version>
     </dependency>
+     <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>${log4j.version}</version>
+     </dependency>
   </dependencies>
 
   <build>
@@ -41,6 +61,25 @@
           <target>${java.version}</target>
         </configuration>
       </plugin>
+	<plugin>
+		<groupId>org.jacoco</groupId>
+		<artifactId>jacoco-maven-plugin</artifactId>
+		<version>0.7.9</version>
+		<executions>
+			<execution>
+				<goals>
+					<goal>prepare-agent</goal>
+				</goals>
+			</execution>
+			<execution>
+				<id>report</id>
+				<phase>prepare-package</phase>
+				<goals>
+					<goal>report</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -49,12 +88,7 @@
           <suiteXmlFiles>
             <suiteXmlFile>${project.build.directory}/test-classes/testng_suites/${suite}.xml</suiteXmlFile>
           </suiteXmlFiles>
-          <properties>
-            <!--property>
-              <name>listener</name>
-              <value>com.qaprosoft.carina.core.foundation.listeners.HealthCheckListener,com.qaprosoft.zafira.listener.ZafiraListener</value>
-            </property-->
-          </properties>
+          <properties></properties>
         </configuration>
       </plugin>
     </plugins>

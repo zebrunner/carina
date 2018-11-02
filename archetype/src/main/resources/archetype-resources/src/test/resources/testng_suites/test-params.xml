@@ -1,0 +1,67 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite verbose="1" name="Carina Demo - Test Cutom Params creation" skipfailedinvocationcounts="false" junit="false" parallel="tests" annotations="JDK">
+
+	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="zafira_project" value="UNKNOWN"/>
+	<parameter name="jenkinsJobCreation" value="true"/>
+	<parameter name="jenkinsJobName" value="API-CustomParams-Demo"/>
+	<parameter name="jenkinsJobType" value="api"/>
+	<parameter name="jenkinsEnvironments" value="DEMO"/>
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+
+	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+
+	<!-- example declaring non default retry_count -->
+	<parameter name="jenkinsDefaultRetryCount" value="2"/>
+
+	<!-- declaring custom arguments-->
+    	<parameter name="stringParam::stringArg::custom string desc" value="string value" />
+    	<parameter name="booleanParam::booleanArg::custom boolean desc" value="true" />
+    	<parameter name="hiddenParam::hiddenArg::custom hidden desc" value="hidden value" />
+    	<parameter name="choiceParam::choiceArg::custom choice desc" value="1, 2, 3" />
+
+	<listeners>
+		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer"/>
+		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
+	</listeners>
+
+	<test name="Sum operation test">
+		<classes>
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
+				<methods>
+					<include name="testSumOperation"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+	<test name="Multiply operation test">
+		<classes>
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
+				<methods>
+					<include name="testMuliplyOperation"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+	<test name="Substract operation test">
+		<parameter name="a" value="12"/>
+		<parameter name="b" value="3"/>
+		<parameter name="c" value="9"/>
+		<classes>
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
+				<methods>
+					<include name="testSubstractOperation"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+</suite>

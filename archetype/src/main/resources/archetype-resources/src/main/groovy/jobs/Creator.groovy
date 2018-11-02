@@ -37,10 +37,10 @@ void createJobs() {
 
             if (currentSuite.toXml().contains("jenkinsJobCreation")) {
             
-                def jobFolder = currentSuite.getParameter("jenkinsJobFolder").toString()
-    			folder(jobFolder) {
-        			displayName(jobFolder)
-    			}
+                def jobFolder = "Automation"
+  		folder(jobFolder) {
+        		displayName(jobFolder)
+    		}
     			
                 String suiteName = currentSuiteItem.path
                 String suiteFrontRemoval = "testng_suites/"

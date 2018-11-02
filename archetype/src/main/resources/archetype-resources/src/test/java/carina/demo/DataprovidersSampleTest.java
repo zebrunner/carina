@@ -18,19 +18,22 @@
  */
 package ${package}.carina.demo;
 
+import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
+import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
+import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import ${package}.carina.core.foundation.AbstractTest;
+import ${package}.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import ${package}.carina.core.foundation.utils.ownership.MethodOwner;
 
 /**
  * This sample shows how to use data-providers.
  *
- * @author akhursevich
+ * @author qpsdemo
  */
 public class DataprovidersSampleTest extends AbstractTest {
     /**
@@ -42,7 +45,7 @@ public class DataprovidersSampleTest extends AbstractTest {
      * data-source unique identifier, use TUID or set of parameters - dsArgs - column names from spreadsheet
      */
     @Test(dataProvider = "DataProvider", description = "JIRA${symbol_pound}DEMO-0005")
-    @MethodOwner(owner = "akhursevich")
+    @MethodOwner(owner = "qpsdemo")
     @XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c")
     public void testSumOperation(String a, String b, String c) {
         int actual = Integer.valueOf(a) + Integer.valueOf(b);
@@ -57,7 +60,9 @@ public class DataprovidersSampleTest extends AbstractTest {
      * name in @Test annotation.
      */
     @Test(dataProvider = "DP1", description = "JIRA${symbol_pound}DEMO-0006")
-    @MethodOwner(owner = "akhursevich")
+    @MethodOwner(owner = "qpsdemo")
+    @TestPriority(Priority.P3)
+    @TestTag(name = "area multi", value = "data provider multiply")
     public void testMuliplyOperation(int a, int b, int c) {
         int actual = a * b;
         int expected = c;
@@ -79,7 +84,7 @@ public class DataprovidersSampleTest extends AbstractTest {
      * test_suites/dataproviders.xml).
      */
     @Test(description = "JIRA${symbol_pound}DEMO-0007")
-    @MethodOwner(owner = "akhursevich")
+    @MethodOwner(owner = "qpsdemo")
     @Parameters({ "a", "b", "c" })
     public void testSubstractOperation(int a, int b, int c) {
         int actual = Integer.valueOf(a) - Integer.valueOf(b);
