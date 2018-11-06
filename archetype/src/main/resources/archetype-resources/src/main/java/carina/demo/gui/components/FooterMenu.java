@@ -26,6 +26,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 import ${package}.carina.demo.gui.pages.CompareModelsPage;
 import ${package}.carina.demo.gui.pages.HomePage;
+import ${package}.carina.demo.gui.pages.NewsPage;
 
 public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = "Home")
@@ -33,6 +34,9 @@ public class FooterMenu extends AbstractUIObject {
 
     @FindBy(linkText = "Compare")
     private ExtendedWebElement compareLink;
+
+    @FindBy(linkText = "News")
+    private ExtendedWebElement newsLink;
 
     public FooterMenu(WebDriver driver, SearchContext searchContext) {
         super(driver, searchContext);
@@ -46,5 +50,10 @@ public class FooterMenu extends AbstractUIObject {
     public CompareModelsPage openComparePage() {
         compareLink.click();
         return new CompareModelsPage(driver);
+    }
+
+    public NewsPage openNewsPage() {
+        newsLink.click();
+        return new NewsPage(driver);
     }
 }

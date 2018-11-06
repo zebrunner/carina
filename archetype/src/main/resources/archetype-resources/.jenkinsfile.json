@@ -1,0 +1,12 @@
+{
+   "name": "carina-demo",
+   "sub_projects": [
+     {
+       "name": ".",
+       "suite_filter": "src/test/resources/testng_suites",
+       "zafira_filter": "src/main/resources/zafira.properties",
+       "pr_checker": true,
+       "deployable": false
+     }
+   ]
+ }

@@ -3,24 +3,25 @@
 #set( $symbol_escape = '\' )
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite verbose="1" name="Carina Demo Tests - API sample tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
+<suite verbose="1" name="Carina Demo Tests - Tags tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
 
-	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="suiteOwner" value="qpsdemoSuite"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobCreation" value="true"/>
-	<parameter name="jenkinsJobName" value="API-Demo-Test"/>
+	<parameter name="jenkinsJobName" value="Tags-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
 
 	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
-	<parameter name="jenkinsPipelineLanguages" value="fr_FR:fr,en_US:en,es_ES:es,it_IT:it,de_DE:de,pt_PT:pt,zh_CN:zh-rCN,ja_JP:ja,ko_KR:ko"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 
-	<test name="User API tests">
+	<parameter name="suitePriority" value="P6"/>
+
+	<test name="Tags tests">
 		<classes>
-			<class name="${package}.carina.demo.APISampleTest" />
+			<class name="${package}.carina.demo.TagManagerTest" />
 		</classes>
 	</test>
 

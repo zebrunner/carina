@@ -16,33 +16,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ${package}.carina.demo.gui.components.compare;
+package ${package}.carina.demo.gui.components;
 
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.AbstractUIObject;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
-public class CondidateBlock extends AbstractUIObject {
-    @FindBy(xpath = ".//input[contains(@id, 'sSearch')]")
-    private ExtendedWebElement inputField;
+public class NewsItem extends AbstractUIObject {
 
-    @FindBy(xpath = ".//div[contains(@class, 'autocomplete-search')]//a[not(@class)]")
-    private List<ExtendedWebElement> autocompleteSearchElements;
+    @FindBy(xpath="./a")
+    public ExtendedWebElement titleLink;
 
-    public CondidateBlock(WebDriver driver, SearchContext searchContext) {
-        super(driver, searchContext);
+    public NewsItem(WebDriver driver, SearchContext sc) {
+        super(driver, sc);
     }
 
-    public void sendKeysToInputField(String text) {
-        inputField.click();
-        inputField.type(text);
-    }
-
-    public void getFirstPhone() {
-        autocompleteSearchElements.get(0).click();
+    public String readTitle() {
+        return titleLink.getElement().getText();
     }
 }
