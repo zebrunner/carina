@@ -120,6 +120,11 @@ All project configuration properties are located in **_config.properties** file.
 		<td>"8.0", "52.1"</td>
 	</tr>
 		<tr>
+		<td>browser_locale</td>
+		<td>Browser language or nothing to use default English version. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
+		<td>"es", "fr"</td>
+	</tr>
+		<tr>
 		<td>driver_mode</td>
 		<td>Rule for defining WebDriver lifecycle.</td>
 		<td>method_mode / class_mode / suite_mode</td>
@@ -127,7 +132,7 @@ All project configuration properties are located in **_config.properties** file.
 	<tr>
 		<td>driver_event_listeners</td>
 		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be instances of WebDriverEventListener</td>
-		<td>com.someCompane.core .EventListener</td>
+		<td>com.someCompane.core.EventListener</td>
 	</tr>
 		<tr>
 		<td>max_driver_count</td>
