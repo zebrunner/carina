@@ -91,6 +91,8 @@ public class Configuration {
         BROWSER("browser"),
 
         BROWSER_VERSION("browser_version"),
+        
+        BROWSER_LOCALE("browser_locale"),
 
         SELENIUM_HOST("selenium_host"),
 

@@ -26,6 +26,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class FirefoxCapabilities extends AbstractCapabilities {
@@ -48,6 +49,13 @@ public class FirefoxCapabilities extends AbstractCapabilities {
 
     public FirefoxProfile getDefaultFirefoxProfile() {
         FirefoxProfile profile = new FirefoxProfile();
+        
+        //update browser language
+        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
+        if (!browserLocale.isEmpty()) {
+        	LOGGER.info("Set Firefox lanaguage to: " + browserLocale);
+        	profile.setPreference("intl.accept_languages", browserLocale);
+        }
 
         boolean generated = false;
         int newPort = 7055;

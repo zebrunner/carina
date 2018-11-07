@@ -26,6 +26,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class ChromeCapabilities extends AbstractCapabilities {
@@ -38,6 +39,13 @@ public class ChromeCapabilities extends AbstractCapabilities {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("test-type");
+        
+        //update browser language
+        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
+        if (!browserLocale.isEmpty()) {
+        	LOGGER.info("Set Chrome lanaguage to: " + browserLocale);
+        	options.addArguments("--lang=" + browserLocale);
+        }
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
