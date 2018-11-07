@@ -18,7 +18,10 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class OperaCapabilities extends AbstractCapabilities {
@@ -28,6 +31,12 @@ public class OperaCapabilities extends AbstractCapabilities {
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
+        //update browser language
+        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
+        if (!browserLocale.isEmpty()) {
+        	Assert.fail("Unable to change Opera locale via selenium! (" + browserLocale + ")");
+        }
+        
         //TODO: add support for AUTO_DOWNLOAD and PROXY
         return capabilities;
     }
