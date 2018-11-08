@@ -55,12 +55,12 @@ public class ChromeCapabilities extends AbstractCapabilities {
             options.setExperimentalOption("prefs", chromePrefs);
         }
 
-        Proxy proxy = setupProxy();
+/*        Proxy proxy = setupProxy();
         if (proxy != null) {
         	// explicitely add proxy as chrome option
         	// https://github.com/SeleniumHQ/selenium/issues/5299
         	options.setProxy(proxy);
-        }
+        }*/
         
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         return capabilities;
