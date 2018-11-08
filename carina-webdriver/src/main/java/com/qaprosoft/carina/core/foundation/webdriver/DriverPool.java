@@ -356,8 +356,8 @@ public final class DriverPool {
 							// of capabilities
 							proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
 						}
+						ProxyPool.startProxy(proxyPort);
 					}
-					ProxyPool.startProxy(proxyPort);
 				}
 
                 LOGGER.debug("initDriver finish...");
