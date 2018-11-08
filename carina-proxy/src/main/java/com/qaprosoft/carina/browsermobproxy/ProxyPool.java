@@ -63,8 +63,13 @@ public final class ProxyPool {
             
             R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put("proxy_port", port.toString());
-            R.CONFIG.put("proxy_protocols", "http");
-            
+            // [VD] do not override protocols to use http only! That's block https traffic analysis
+            //R.CONFIG.put("proxy_protocols", "http");
+
+            // follow steps to configure https traffic sniffering: https://github.com/lightbody/browsermob-proxy#ssl-support
+            // the most important are:
+            // download - https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer
+            // import to system (for android we should use certifiate installer in system settings->security...)
         }
     }
 
