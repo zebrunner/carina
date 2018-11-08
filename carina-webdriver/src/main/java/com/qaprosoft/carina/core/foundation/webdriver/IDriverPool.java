@@ -511,4 +511,67 @@ public interface IDriverPool {
         return java.util.Arrays.copyOf(threads, n);
     }
 
+    
+    @Deprecated
+    public static WebDriver getDefaultDriver() {
+        WebDriver drv = null;
+        String name = DEFAULT;
+        Long threadId = Thread.currentThread().getId();
+
+        ConcurrentHashMap<String, WebDriver> currentDrivers = getStaticDrivers();
+
+        if (currentDrivers.containsKey(name)) {
+            drv = currentDrivers.get(name);
+        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == 1
+                && Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
+            Thread[] threads = getStaticGroupThreads(Thread.currentThread().getThreadGroup());
+            logger.debug(
+                    "Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
+            for (int i = 0; i < threads.length; i++) {
+                currentDrivers = drivers.get(threads[i].getId());
+                if (currentDrivers != null) {
+                    if (currentDrivers.containsKey(name)) {
+                        drv = currentDrivers.get(name);
+                        logger.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (drv == null) {
+        	throw new RuntimeException("no default driver detected!");
+        }
+
+        // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener and all logging will be lost!
+        return drv;
+    }
+    
+    
+    @Deprecated
+    public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
+        Long threadId = Thread.currentThread().getId();
+
+        if (drivers.get(threadId) == null) {
+            ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
+            drivers.put(threadId, currentDrivers);
+        }
+        return drivers.get(threadId);
+    }
+
+    @Deprecated
+    public static Thread[] getStaticGroupThreads(final ThreadGroup group) {
+        if (group == null)
+            throw new NullPointerException("Null thread group");
+        int nAlloc = group.activeCount();
+        int n = 0;
+        Thread[] threads;
+        do {
+            nAlloc *= 2;
+            threads = new Thread[nAlloc];
+            n = group.enumerate(threads);
+        } while (n == nAlloc);
+        return java.util.Arrays.copyOf(threads, n);
+    }
+    
 }
