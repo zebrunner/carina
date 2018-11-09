@@ -130,7 +130,7 @@ public final class ProxyPool {
             proxy = proxies.get(threadId);
         } 
         
-        // case when proxy was already instantiatead but port doesn't correspond to current device
+        // case when proxy was already instantiated but port doesn't correspond to current device
         if (null == proxy || proxy.getPort() != proxyPort) {
             proxy = ProxyPool.createProxy();
             proxies.put(Thread.currentThread().getId(), proxy);
@@ -138,6 +138,7 @@ public final class ProxyPool {
         
         if (!proxy.isStarted()) {
             LOGGER.info("Starting BrowserMob proxy...");
+        	// TODO: [VD] confirmed with MB that restart was added just in case. Maybe comment/remove?
             killProcessByPort(proxyPort);
             proxy.start(proxyPort);
         } else {
@@ -262,6 +263,10 @@ public final class ProxyPool {
      * @param port
      */
     private static void killProcessByPort(int port) {
+    	if (port == 0) {
+    		//do nothing as it is default dynamic browsermob proxy
+    		return;
+    	}
         LOGGER.info(String.format("Process on port %d will be closed.", port));
         //TODO: make OS independent
         try {
