@@ -117,6 +117,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 	}
 	
+	// TODO refactor. Move FTP methods to utility.
 	private void uploadToFTP(byte [] bytes) {
 		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%","");
 		URI uri = null;
