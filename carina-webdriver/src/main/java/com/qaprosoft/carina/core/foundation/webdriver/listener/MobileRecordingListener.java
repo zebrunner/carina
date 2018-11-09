@@ -15,6 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
+
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -22,6 +28,7 @@ import org.openqa.selenium.remote.DriverCommand;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -63,14 +70,15 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
     		
             if (DriverCommand.QUIT.equals(command.getName())) {
                 try {
-                    commandExecutor.execute(new Command(command.getSessionId(), 
+                	String file = commandExecutor.execute(new Command(command.getSessionId(), 
                             MobileCommand.STOP_RECORDING_SCREEN, 
-                            MobileCommand.stopRecordingScreenCommand((BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()));
-
+                            MobileCommand.stopRecordingScreenCommand((BaseStopScreenRecordingOptions) stopRecordingOpt).getValue())).getValue().toString();
+                	byte [] decode = Base64.getDecoder().decode(file);
+                	uploadToFTP(decode);
                     if (ZafiraSingleton.INSTANCE.isRunning()) {
                         ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
                 }
             }
@@ -105,5 +113,19 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
 			}
 		}
+	}
+	
+	private void uploadToFTP(byte [] bytes) {
+		FTPClient client = new FTPClient();
+	    try (InputStream stream = new ByteArrayInputStream(bytes);){
+	        client.connect("192.168.88.114");
+	        client.login(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"));
+	        client.setFileType(FTP.BINARY_FILE_TYPE);
+	        client.storeFile(videoArtifact.getName(), stream);
+	        client.logout();
+	        client.disconnect();
+	    } catch (Exception e) {
+	        LOGGER.debug("Exception while downloading to server", e);
+	    } 
 	}
 }

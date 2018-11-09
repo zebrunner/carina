@@ -107,6 +107,12 @@
 			<artifactId>ashot</artifactId>
 			<version>${ashot.version}</version>
 		</dependency>
+		
+		<dependency>
+   			 <groupId>commons-net</groupId>
+    		<artifactId>commons-net</artifactId>
+    		<version>3.3</version>
+		</dependency>
 
 		<!--<dependency>
 			<groupId>commons-httpclient</groupId>

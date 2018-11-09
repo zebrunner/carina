@@ -47,7 +47,6 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoType;
 import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 import io.appium.java_client.screenrecording.ScreenRecordingUploadOptions;
 
@@ -122,13 +121,13 @@ public class MobileFactory extends AbstractFactory {
                         
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
                                 .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality")))
-                                .withVideoType(VideoType.MP4)
+//                                .withVideoType(VideoType.MP4)
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
 
-                        IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions()
-                                .withUploadOptions(new ScreenRecordingUploadOptions()
-                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
-                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
+                        IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
+//                                .withUploadOptions(new ScreenRecordingUploadOptions()
+//                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
+//                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
                     }
