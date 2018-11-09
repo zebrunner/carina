@@ -31,7 +31,6 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
-
     protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
     
     // ------------------------- BOWSERMOB PROXY ---------------------
