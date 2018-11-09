@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Base64;
 
 import org.apache.commons.net.ftp.FTP;
@@ -115,17 +117,28 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 	}
 	
+	// TODO refactor. Move FTP methods to utility.
 	private void uploadToFTP(byte [] bytes) {
-		FTPClient client = new FTPClient();
-	    try (InputStream stream = new ByteArrayInputStream(bytes);){
-	        client.connect("192.168.88.114");
-	        client.login(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"));
-	        client.setFileType(FTP.BINARY_FILE_TYPE);
-	        client.storeFile(videoArtifact.getName(), stream);
-	        client.logout();
-	        client.disconnect();
-	    } catch (Exception e) {
-	        LOGGER.debug("Exception while downloading to server", e);
-	    } 
+		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%","");
+		URI uri = null;
+		try {
+			uri = new URI(ftpUrl);
+		} catch (URISyntaxException e1) {
+			LOGGER.error("Incorrect URL format for screen record ftp parameter");
+		}
+		if (null != uri) {
+			String ftpHost = uri.getHost();
+			FTPClient client = new FTPClient();
+		    try (InputStream stream = new ByteArrayInputStream(bytes);){
+		        client.connect(ftpHost);
+		        client.login(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"));
+		        client.setFileType(FTP.BINARY_FILE_TYPE);
+		        client.storeFile(videoArtifact.getName() + ".mp4", stream);
+		        client.logout();
+		        client.disconnect();
+		    } catch (Exception e) {
+		        LOGGER.debug("Exception while downloading to server", e);
+		    } 
+		}
 	}
 }
