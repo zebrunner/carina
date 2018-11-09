@@ -31,7 +31,8 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
-    protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
+
+	protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
     
     // ------------------------- BOWSERMOB PROXY ---------------------
     // TODO: investigate possibility to return interface to support JettyProxy
