@@ -82,10 +82,12 @@ public class SpecialKeywords {
     public static final String TEST_METHOD_NAME_ARGS_MAP = "testMethodNameArgsMap";
     public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";
     public static final String JIRA_ARGS_MAP = "jiraArgsMap";
+    
     public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
     public static final String TESTRAIL_CASES_ID = "testRailCases";
     public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
     public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
+    public static final String TESTRAIL_TESTCASE_UUID = "TESTRAIL_TESTCASE_UUID";
     public static final String BUG_ARGS_MAP = "bugArgsMap";
     public static final String DO_NOT_RUN_TESTS = "doNotRunTests";
 
@@ -166,5 +168,7 @@ public class SpecialKeywords {
 
     
     // ------------- qTEST PROPERTIES -------------------------------
-    public static final String QTEST_TESTCASE_ID = "QTEST_TESTCASE_ID";
+    public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
+    public static final String QTEST_CYCLE_ID = "qTestCycleId";
+    public static final String QTEST_PROJECT_ID = "qTestProjectId";
 }

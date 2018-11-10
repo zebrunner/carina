@@ -21,8 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+* @deprecated Obsolete annotation. It will be removed in 6.0 core completely. Only usage through TestNG suite xml parameters is allowed. 
  * This defines the 'TestRailSuite' annotation used to specify the TestRail Suite id and project for the test being executed
  */
+@Deprecated
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = ElementType.TYPE)
 public @interface TestRailSuite {

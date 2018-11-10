@@ -29,6 +29,7 @@ import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.QTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRailManager;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -172,10 +173,19 @@ public class ZafiraConfigurator implements IConfigurator {
             tags.add(tagEntry);
         });
         
-        Set<String> qTestTags = QTestManager.getTestCases(test);
+        Set<String> testRailTags = TestRailManager.getTestCasesUuid(test);
+        testRailTags.forEach((entry) -> {
+            TagType tagEntry = new TagType();
+            tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
+            tagEntry.setValue(entry);
+            tags.add(tagEntry);
+        });
+
+        
+        Set<String> qTestTags = QTestManager.getTestCasesUuid(test);
         qTestTags.forEach((entry) -> {
             TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_ID);
+            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
             tagEntry.setValue(entry);
             tags.add(tagEntry);
         });
