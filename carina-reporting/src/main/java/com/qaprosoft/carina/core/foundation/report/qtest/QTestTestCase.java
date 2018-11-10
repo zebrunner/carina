@@ -28,11 +28,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QTestTestCase {
     String id();
+    String platform() default "";
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})
     @interface List {
-
         QTestTestCase[] value();
     }
 }

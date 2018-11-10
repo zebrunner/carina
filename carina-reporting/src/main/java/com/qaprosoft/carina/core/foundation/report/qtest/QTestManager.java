@@ -22,6 +22,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+
 public class QTestManager {
     protected static final Logger LOGGER = Logger.getLogger(QTestManager.class);
 
@@ -51,14 +53,18 @@ public class QTestManager {
             if (testMethod != null) {
                 if (testMethod.isAnnotationPresent(QTestTestCase.class)) {
                 	QTestTestCase methodAnnotation = testMethod.getAnnotation(QTestTestCase.class);
-                	testCases.add(methodAnnotation.id());
-                	LOGGER.debug("qTest test case id '" + methodAnnotation.id() + "' is registered.");
+                	if (isSupportedPlatform(methodAnnotation.platform())) {
+	                	testCases.add(methodAnnotation.id());
+	                	LOGGER.debug("qTest test case id '" + methodAnnotation.id() + "' is registered.");
+                	}
                 }
                 if (testMethod.isAnnotationPresent(QTestTestCase.List.class)) {
                 	QTestTestCase.List methodAnnotation = testMethod.getAnnotation(QTestTestCase.List.class);
                     for (QTestTestCase tcLocal : methodAnnotation.value()) {
-                    	testCases.add(tcLocal.id());
-                    	LOGGER.debug("qTest test case id '" + tcLocal.id() + "' is registered.");
+                    	if (isSupportedPlatform(tcLocal.platform())) {
+                    		testCases.add(tcLocal.id());
+                    		LOGGER.debug("qTest test case id '" + tcLocal.id() + "' is registered.");
+                    	}
                    }
                 }
             }
@@ -66,6 +72,12 @@ public class QTestManager {
             LOGGER.error(e);
         }
         return testCases;
+    }
+    
+    
+    private static boolean isSupportedPlatform(String platform) {
+    	// in case of platform absence (empty) we suppose to have platform independent testcase id annotation(s) 
+    	return platform.equals(Configuration.getPlatform()) || platform.isEmpty();
     }
 
 }

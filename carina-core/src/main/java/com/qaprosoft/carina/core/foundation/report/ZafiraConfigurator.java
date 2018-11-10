@@ -15,9 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.report.qtest.QTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -35,14 +45,6 @@ import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -152,7 +154,7 @@ public class ZafiraConfigurator implements IConfigurator {
     @Override
     public Set<TagType> getTestTags(ITestResult test) {
         LOGGER.debug("Collecting TestTags");
-        Set<TagType> tags = new HashSet();
+        Set<TagType> tags = new HashSet<TagType>();
 
         String testPriority = PriorityManager.getPriority(test);
         if (testPriority != null && !testPriority.isEmpty()) {
@@ -163,11 +165,18 @@ public class ZafiraConfigurator implements IConfigurator {
         }
 
         Map<String, String> testTags = TagManager.getTags(test);
-
         testTags.entrySet().stream().forEach((entry) -> {
             TagType tagEntry = new TagType();
             tagEntry.setName(entry.getKey());
             tagEntry.setValue(entry.getValue());
+            tags.add(tagEntry);
+        });
+        
+        Set<String> qTestTags = QTestManager.getTestCases(test);
+        qTestTags.forEach((entry) -> {
+            TagType tagEntry = new TagType();
+            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_ID);
+            tagEntry.setValue(entry);
             tags.add(tagEntry);
         });
 
