@@ -26,6 +26,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
+//TODO: howto init testrail testcase uuid values from dataProvider?
 public class TestRailManager {
     protected static final Logger LOGGER = Logger.getLogger(TestRailManager.class);
 
@@ -33,12 +34,17 @@ public class TestRailManager {
     }
 
     public static Set<String> getTestCasesUuid(ITestResult result) {
-        int suiteID = getSuiteId(result.getTestContext());
+        Set<String> testCases = new HashSet<String>();
         int projectID = getProjectId(result.getTestContext());
+        int suiteID = getSuiteId(result.getTestContext());
+        
+        if (projectID == -1 || suiteID == -1) {
+        	//return empty set as no integration tags/parameters detected
+        	return testCases;
+        }
 
         // Get a handle to the class and method
         Class<?> testClass;
-        Set<String> testCases = new HashSet<String>();
         try {
             testClass = Class.forName(result.getMethod().getTestClass().getName());
 
@@ -87,13 +93,21 @@ public class TestRailManager {
     }
     
     private static int getProjectId(ITestContext context) {
-    	String project = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
-        return Integer.valueOf(project.trim());
+    	String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
+        if (id != null) {
+        	return Integer.valueOf(id.trim());
+        } else {
+        	return -1;
+        }
     }
     
     private static int getSuiteId(ITestContext context) {
-        String suite = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
-        return Integer.valueOf(suite.trim());
+        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
+        if (id != null) {
+        	return Integer.valueOf(id.trim());
+        } else {
+        	return -1;
+        }
     }
 
 

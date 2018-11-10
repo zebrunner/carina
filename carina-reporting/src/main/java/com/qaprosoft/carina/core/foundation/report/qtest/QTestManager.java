@@ -26,6 +26,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
+//TODO: howto init qTest testcase uuid values from dataProvider?
 public class QTestManager {
     protected static final Logger LOGGER = Logger.getLogger(QTestManager.class);
 
@@ -33,12 +34,19 @@ public class QTestManager {
     }
 
     public static Set<String> getTestCasesUuid(ITestResult result) {
-        int cycleID = getCycleId(result.getTestContext());
+        Set<String> testCases = new HashSet<String>();
+
         int projectID = getProjectId(result.getTestContext());
+        int cycleID = getCycleId(result.getTestContext());
+        
+        if (projectID == -1 || cycleID == -1) {
+        	//return empty set as no integration tags/parameters detected
+        	return testCases;
+        }
+
         
         // Get a handle to the class and method
         Class<?> testClass;
-        Set<String> testCases = new HashSet<String>();
         try {
             testClass = Class.forName(result.getMethod().getTestClass().getName());
 
@@ -87,13 +95,21 @@ public class QTestManager {
     }
     
     private static int getProjectId(ITestContext context) {
-    	String project = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
-        return Integer.valueOf(project.trim());
+    	String id = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
+        if (id != null) {
+        	return Integer.valueOf(id.trim());
+        } else {
+        	return -1;
+        }
     }
     
     private static int getCycleId(ITestContext context) {
-        String cycle = context.getSuite().getParameter(SpecialKeywords.QTEST_CYCLE_ID);
-        return Integer.valueOf(cycle.trim());
+        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_CYCLE_ID);
+        if (id != null) {
+        	return Integer.valueOf(id.trim());
+        } else {
+        	return -1;
+        }
     }
 
 }
