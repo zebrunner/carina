@@ -15,18 +15,18 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.zafira.models.dto.TagType;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import java.lang.reflect.Method;
+import java.util.*;
 
 //TODO: howto init testrail testcase uuid values from dataProvider?
+//Works now with annotation and csv/xls files.
 public class TestRailManager {
     protected static final Logger LOGGER = Logger.getLogger(TestRailManager.class);
 
@@ -35,13 +35,12 @@ public class TestRailManager {
 
     public static Set<String> getTestCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
-        int projectID = getProjectId(result.getTestContext());
-        int suiteID = getSuiteId(result.getTestContext());
-        
-        if (projectID == -1 || suiteID == -1) {
-        	//return empty set as no integration tags/parameters detected
-        	return testCases;
-        }
+
+        List<String> dataProviderIds = getCasesIdFromDataProvider(result);
+
+        testCases.addAll(dataProviderIds);
+
+        LOGGER.debug(dataProviderIds);
 
         // Get a handle to the class and method
         Class<?> testClass;
@@ -61,23 +60,30 @@ public class TestRailManager {
             }
 
             if (testMethod != null) {
-                if (testMethod.isAnnotationPresent(TestRailTestCase.class)) {
-                	TestRailTestCase methodAnnotation = testMethod.getAnnotation(TestRailTestCase.class);
-                	if (isSupportedPlatform(methodAnnotation.platform())) {
-                		String uuid = projectID + "-" + suiteID + "-" + methodAnnotation.id();
-	                	testCases.add(uuid);
-	                	LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
-                	}
+                if (testMethod.isAnnotationPresent(TestRailCases.class)) {
+                    TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
+                    if (isSupportedPlatform(methodAnnotation.platform())) {
+                        String[] testCaseList = methodAnnotation.testCasesId().split(",");
+                        for (String tcase : testCaseList) {
+                            String uuid = tcase;
+                            testCases.add(uuid);
+                            LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
+                        }
+
+                    }
                 }
-                if (testMethod.isAnnotationPresent(TestRailTestCase.List.class)) {
-                	TestRailTestCase.List methodAnnotation = testMethod.getAnnotation(TestRailTestCase.List.class);
-                    for (TestRailTestCase tcLocal : methodAnnotation.value()) {
-                    	if (isSupportedPlatform(tcLocal.platform())) {
-                    		String uuid = projectID + "-" + suiteID + "-" + tcLocal.id();
-    	                	testCases.add(uuid);
-    	                	LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
-                    	}
-                   }
+                if (testMethod.isAnnotationPresent(TestRailCases.List.class)) {
+                    TestRailCases.List methodAnnotation = testMethod.getAnnotation(TestRailCases.List.class);
+                    for (TestRailCases tcLocal : methodAnnotation.value()) {
+                        if (isSupportedPlatform(tcLocal.platform())) {
+                            String[] testCaseList = tcLocal.testCasesId().split(",");
+                            for (String tcase : testCaseList) {
+                                String uuid = tcase;
+                                testCases.add(uuid);
+                                LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
+                            }
+                        }
+                    }
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -85,30 +91,80 @@ public class TestRailManager {
         }
         return testCases;
     }
-    
-    
-    private static boolean isSupportedPlatform(String platform) {
-    	// in case of platform absence (empty) we suppose to have platform independent testcase id annotation(s) 
-    	return platform.equals(Configuration.getPlatform()) || platform.isEmpty();
-    }
-    
-    private static int getProjectId(ITestContext context) {
-    	String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
+
+    public static int getProjectId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
         if (id != null) {
-        	return Integer.valueOf(id.trim());
+            return Integer.valueOf(id.trim());
         } else {
-        	return -1;
-        }
-    }
-    
-    private static int getSuiteId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
-        if (id != null) {
-        	return Integer.valueOf(id.trim());
-        } else {
-        	return -1;
+            return -1;
         }
     }
 
+    public static int getSuiteId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
+        if (id != null) {
+            return Integer.valueOf(id.trim());
+        } else {
+            return -1;
+        }
+    }
+
+    //TODO: Think where to add it in ZafiraListener and how to show it.
+    //From other side it may be possible to reuse getArtifacts.
+    public static Set<TagType> addTestRailTagsAfterTest(ITestResult test, boolean debug) {
+        Set<TagType> tags = new HashSet<TagType>();
+
+        Set<String> testCases = new HashSet<String>();
+
+        int projectID = TestRailManager.getProjectId(test.getTestContext());
+        int suiteID = TestRailManager.getSuiteId(test.getTestContext());
+
+        testCases = getTestCasesUuid(test);
+
+        //Collect testrail ids from new annotations
+        LOGGER.debug(testCases.toString());
+
+        //Collect all testrail ids from Dataprovider, setCases, XLS, etc
+        List<String> testRailIds = TestRail.getCases(test);
+
+        LOGGER.debug(testRailIds.toString());
+
+        //Remove duplicates.
+        testRailIds.removeAll(testCases);
+
+        LOGGER.debug("Missed testrail ids: " + testRailIds.toString());
+
+        if (projectID != -1 && suiteID != -1 || debug) {
+            testRailIds.forEach((entry) -> {
+                TagType tagEntry = new TagType();
+                tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
+                tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
+                tags.add(tagEntry);
+            });
+        }
+        LOGGER.info("Found " + tags.size() + " new TestRailIds");
+        return tags;
+    }
+
+
+    private static List<String> getCasesIdFromDataProvider(ITestResult result) {
+        List<String> cases = new ArrayList<String>();
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> testNameTestRailMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
+        if (testNameTestRailMap != null) {
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (testNameTestRailMap.containsKey(testHash) && testNameTestRailMap.get(testHash) != null) {
+                cases = new ArrayList<String>(Arrays.asList(testNameTestRailMap.get(testHash).split(",")));
+            }
+        }
+        return cases;
+    }
+
+
+    private static boolean isSupportedPlatform(String platform) {
+        // in case of platform absence (empty) we suppose to have platform independent testcase id annotation(s)
+        return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
+    }
 
 }

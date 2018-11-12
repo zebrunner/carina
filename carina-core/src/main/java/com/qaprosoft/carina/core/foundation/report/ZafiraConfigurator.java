@@ -15,15 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
@@ -46,6 +37,14 @@ import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -172,23 +171,13 @@ public class ZafiraConfigurator implements IConfigurator {
             tagEntry.setValue(entry.getValue());
             tags.add(tagEntry);
         });
-        
-        Set<String> testRailTags = TestRailManager.getTestCasesUuid(test);
-        testRailTags.forEach((entry) -> {
-            TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
-            tagEntry.setValue(entry);
-            tags.add(tagEntry);
-        });
 
-        
-        Set<String> qTestTags = QTestManager.getTestCasesUuid(test);
-        qTestTags.forEach((entry) -> {
-            TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
-            tagEntry.setValue(entry);
-            tags.add(tagEntry);
-        });
+
+        //Add testrail tags
+        tags.addAll(getTestRailTags(test));
+
+        //Add qTest tags
+        tags.addAll(getQTestTags(test));
 
         LOGGER.debug("Found " + tags.size() + " new TestTags");
         return tags;
@@ -202,5 +191,42 @@ public class ZafiraConfigurator implements IConfigurator {
         TestRail.clearCases();
         return Artifacts.getArtifacts();
     }
+
+
+    //Moved them separately for future easier reusing if getTestTags will be overridden.
+    //TODO: Should we make them public or protected?
+    private Set<TagType> getTestRailTags(ITestResult test) {
+
+        Set<TagType> tags = new HashSet<TagType>();
+        Set<String> testRailTags = TestRailManager.getTestCasesUuid(test);
+        int projectID = TestRailManager.getProjectId(test.getTestContext());
+        int suiteID = TestRailManager.getSuiteId(test.getTestContext());
+
+        //do not add test rail id if no integration tags/parameters detected
+        if (projectID != -1 && suiteID != -1) {
+            testRailTags.forEach((entry) -> {
+                TagType tagEntry = new TagType();
+                tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
+                tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
+                tags.add(tagEntry);
+            });
+        }
+        return tags;
+    }
+
+    private Set<TagType> getQTestTags(ITestResult test) {
+        Set<TagType> tags = new HashSet<TagType>();
+
+        Set<String> qTestTags = QTestManager.getTestCasesUuid(test);
+        qTestTags.forEach((entry) -> {
+            TagType tagEntry = new TagType();
+            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
+            tagEntry.setValue(entry);
+            tags.add(tagEntry);
+        });
+
+        return tags;
+    }
+
 
 }
