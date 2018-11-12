@@ -405,14 +405,13 @@ public class Configuration {
         String platform = Configuration.get(Parameter.PLATFORM);
 
         // redefine platform if capabilities.platform is available
-        String prefix = SpecialKeywords.CAPABILITIES + ".";
-        if (!R.CONFIG.get(prefix + "platform").isEmpty()) {
-            platform = R.CONFIG.get(prefix + "platform");
+        if (!R.CONFIG.get("capabilities.platform").isEmpty()) {
+            platform = R.CONFIG.get("capabilities.platform");
         }
 
         // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get(prefix + "platformName").isEmpty()) {
-            platform = R.CONFIG.get(prefix + "platformName");
+        if (!R.CONFIG.get("capabilities.platformName").isEmpty()) {
+            platform = R.CONFIG.get("capabilities.platformName");
         }
         return platform;
     }

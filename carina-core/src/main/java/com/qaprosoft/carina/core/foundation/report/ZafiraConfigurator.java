@@ -18,7 +18,9 @@ package com.qaprosoft.carina.core.foundation.report;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.report.qtest.QTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRailManager;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -152,7 +154,7 @@ public class ZafiraConfigurator implements IConfigurator {
     @Override
     public Set<TagType> getTestTags(ITestResult test) {
         LOGGER.debug("Collecting TestTags");
-        Set<TagType> tags = new HashSet();
+        Set<TagType> tags = new HashSet<TagType>();
 
         String testPriority = PriorityManager.getPriority(test);
         if (testPriority != null && !testPriority.isEmpty()) {
@@ -163,13 +165,19 @@ public class ZafiraConfigurator implements IConfigurator {
         }
 
         Map<String, String> testTags = TagManager.getTags(test);
-
         testTags.entrySet().stream().forEach((entry) -> {
             TagType tagEntry = new TagType();
             tagEntry.setName(entry.getKey());
             tagEntry.setValue(entry.getValue());
             tags.add(tagEntry);
         });
+
+
+        //Add testrail tags
+        tags.addAll(getTestRailTags(test));
+
+        //Add qTest tags
+        tags.addAll(getQTestTags(test));
 
         LOGGER.debug("Found " + tags.size() + " new TestTags");
         return tags;
@@ -183,5 +191,42 @@ public class ZafiraConfigurator implements IConfigurator {
         TestRail.clearCases();
         return Artifacts.getArtifacts();
     }
+
+
+    //Moved them separately for future easier reusing if getTestTags will be overridden.
+    //TODO: Should we make them public or protected?
+    private Set<TagType> getTestRailTags(ITestResult test) {
+
+        Set<TagType> tags = new HashSet<TagType>();
+        Set<String> testRailTags = TestRailManager.getTestCasesUuid(test);
+        int projectID = TestRailManager.getProjectId(test.getTestContext());
+        int suiteID = TestRailManager.getSuiteId(test.getTestContext());
+
+        //do not add test rail id if no integration tags/parameters detected
+        if (projectID != -1 && suiteID != -1) {
+            testRailTags.forEach((entry) -> {
+                TagType tagEntry = new TagType();
+                tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
+                tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
+                tags.add(tagEntry);
+            });
+        }
+        return tags;
+    }
+
+    private Set<TagType> getQTestTags(ITestResult test) {
+        Set<TagType> tags = new HashSet<TagType>();
+
+        Set<String> qTestTags = QTestManager.getTestCasesUuid(test);
+        qTestTags.forEach((entry) -> {
+            TagType tagEntry = new TagType();
+            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
+            tagEntry.setValue(entry);
+            tags.add(tagEntry);
+        });
+
+        return tags;
+    }
+
 
 }

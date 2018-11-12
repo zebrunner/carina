@@ -15,16 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
-/**
- * This defines the 'TestRailCases' annotation used to specify the
- * TestRail test case ides that the TestNG test maps to
- * 
- */
-@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target(value = java.lang.annotation.ElementType.METHOD)
+@Repeatable(TestRailCases.List.class)
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface TestRailCases {
     String testCasesId();
+
+    String platform() default "";
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD})
+    @interface List {
+        TestRailCases[] value();
+    }
 }
