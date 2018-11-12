@@ -47,7 +47,7 @@ public class FtpUtils {
 		}
 	}
 
-	public static void upload(String ftpHost, int port, String user, String password, InputStream is,
+	private static void upload(String ftpHost, int port, String user, String password, InputStream is,
 			String fileName) {
 		FTPClient ftp = new FTPClient();
 		try {
