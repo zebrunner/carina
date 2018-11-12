@@ -15,25 +15,26 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.reporting;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRailManager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
- * Tests for {@link TestRailManager}
+ * Tests for {@link ITestRailManager}
  */
-public class TestRailTest extends AbstractTest {
+public class TestRailTest extends AbstractTest implements ITestRailManager {
 
     protected static final Logger LOGGER = Logger.getLogger(TestRailTest.class);
 
@@ -47,7 +48,7 @@ public class TestRailTest extends AbstractTest {
     public void testTestRailList() {
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(EXPECTED_TEST_ID), "TestRail should contain id=" + EXPECTED_TEST_ID);
 
@@ -62,7 +63,7 @@ public class TestRailTest extends AbstractTest {
     public void testTestRailSimple() {
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
@@ -75,7 +76,7 @@ public class TestRailTest extends AbstractTest {
     public void testTestRailMix() {
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
@@ -90,7 +91,7 @@ public class TestRailTest extends AbstractTest {
     public void testTestRailMulti() {
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
@@ -105,13 +106,13 @@ public class TestRailTest extends AbstractTest {
     public void testTestRailByPlatform() {
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertEquals(testRailUdids.size(), 0);
 
         R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS);
 
-        testRailUdids = TestRailManager.getTestCasesUuid(result);
+        testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
@@ -119,7 +120,7 @@ public class TestRailTest extends AbstractTest {
 
         R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID);
 
-        testRailUdids = TestRailManager.getTestCasesUuid(result);
+        testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
 
@@ -131,18 +132,18 @@ public class TestRailTest extends AbstractTest {
     @Test
     @TestRailCases(testCasesId = FIRST_TEST_ID + ",3333")
     public void testTestRailSetting() {
-        setTestRailCase("3333,5555".split(","));
+        setCases("3333,5555".split(","));
 
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Set<TagType> tags = new HashSet<TagType>();
 
-        Set<String> testRailTags = TestRailManager.getTestCasesUuid(result);
+        Set<String> testRailTags = getTestRailCasesUuid(result);
 
-        int projectID = TestRailManager.getProjectId(result.getTestContext());
-        int suiteID = TestRailManager.getSuiteId(result.getTestContext());
+        int projectID = getTestRailProjectId(result.getTestContext());
+        int suiteID = getTestRailSuiteId(result.getTestContext());
 
         //do not add test rail id if no integration tags/parameters detected
         Set<TagType> finalTags = tags;
@@ -152,14 +153,6 @@ public class TestRailTest extends AbstractTest {
             tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
             finalTags.add(tagEntry);
         });
-
-        tags.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
-            Object currentValue = entry.getValue();
-            LOGGER.info(currentKey + "=" + currentValue);
-        });
-
-        tags = TestRailManager.addTestRailTagsAfterTest(result, true);
 
         tags.stream().forEachOrdered((entry) -> {
             Object currentKey = entry.getName();

@@ -15,12 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.QTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRailManager;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -37,21 +46,13 @@ import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
  *
  * @author akhursevich
  */
-public class ZafiraConfigurator implements IConfigurator {
+public class ZafiraConfigurator implements IConfigurator, ITestRailManager {
     protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
 
     @Override
@@ -178,7 +179,7 @@ public class ZafiraConfigurator implements IConfigurator {
 
         //Add qTest tags
         tags.addAll(getQTestTags(test));
-
+        
         LOGGER.debug("Found " + tags.size() + " new TestTags");
         return tags;
     }
@@ -198,9 +199,9 @@ public class ZafiraConfigurator implements IConfigurator {
     private Set<TagType> getTestRailTags(ITestResult test) {
 
         Set<TagType> tags = new HashSet<TagType>();
-        Set<String> testRailTags = TestRailManager.getTestCasesUuid(test);
-        int projectID = TestRailManager.getProjectId(test.getTestContext());
-        int suiteID = TestRailManager.getSuiteId(test.getTestContext());
+        Set<String> testRailTags = getTestRailCasesUuid(test);
+        int projectID = getTestRailProjectId(test.getTestContext());
+        int suiteID = getTestRailSuiteId(test.getTestContext());
 
         //do not add test rail id if no integration tags/parameters detected
         if (projectID != -1 && suiteID != -1) {

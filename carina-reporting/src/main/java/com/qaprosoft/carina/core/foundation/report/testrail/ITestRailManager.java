@@ -15,28 +15,36 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.zafira.models.dto.TagType;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
-//TODO: howto init testrail testcase uuid values from dataProvider?
-//Works now with annotation and csv/xls files.
-public class TestRailManager {
-    protected static final Logger LOGGER = Logger.getLogger(TestRailManager.class);
+public interface ITestRailManager extends ITestCases  {
+    static final Logger LOGGER = Logger.getLogger(ITestRailManager.class);
 
-    private TestRailManager() {
-    }
-
-    public static Set<String> getTestCasesUuid(ITestResult result) {
+    default public Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
-        List<String> dataProviderIds = getCasesIdFromDataProvider(result);
+        List<String> dataProviderIds = new ArrayList<String>();
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> testNameTestRailMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
+        if (testNameTestRailMap != null) {
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (testNameTestRailMap.containsKey(testHash) && testNameTestRailMap.get(testHash) != null) {
+            	dataProviderIds = new ArrayList<String>(Arrays.asList(testNameTestRailMap.get(testHash).split(",")));
+            }
+        }
 
         testCases.addAll(dataProviderIds);
 
@@ -62,7 +70,8 @@ public class TestRailManager {
             if (testMethod != null) {
                 if (testMethod.isAnnotationPresent(TestRailCases.class)) {
                     TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
-                    if (isSupportedPlatform(methodAnnotation.platform())) {
+                    String platform = methodAnnotation.platform();
+                    if (platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty()) {
                         String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
@@ -75,7 +84,9 @@ public class TestRailManager {
                 if (testMethod.isAnnotationPresent(TestRailCases.List.class)) {
                     TestRailCases.List methodAnnotation = testMethod.getAnnotation(TestRailCases.List.class);
                     for (TestRailCases tcLocal : methodAnnotation.value()) {
-                        if (isSupportedPlatform(tcLocal.platform())) {
+                    	
+                        String platform = tcLocal.platform();
+                        if (platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty()) {
                             String[] testCaseList = tcLocal.testCasesId().split(",");
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;
@@ -89,10 +100,17 @@ public class TestRailManager {
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         }
+        
+        // append cases id values from ITestCases map (custom TestNG provider)
+        List<String> customCases = getCases();
+        testCases.addAll(customCases);
+        
+        clearCases();
+        
         return testCases;
     }
 
-    public static int getProjectId(ITestContext context) {
+    default public int getTestRailProjectId(ITestContext context) {
         String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
         if (id != null) {
             return Integer.valueOf(id.trim());
@@ -101,70 +119,13 @@ public class TestRailManager {
         }
     }
 
-    public static int getSuiteId(ITestContext context) {
+    default public int getTestRailSuiteId(ITestContext context) {
         String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
         if (id != null) {
             return Integer.valueOf(id.trim());
         } else {
             return -1;
         }
-    }
-
-    //TODO: Think where to add it in ZafiraListener and how to show it.
-    //From other side it may be possible to reuse getArtifacts.
-    public static Set<TagType> addTestRailTagsAfterTest(ITestResult test, boolean debug) {
-        Set<TagType> tags = new HashSet<TagType>();
-
-        Set<String> testCases = new HashSet<String>();
-
-        int projectID = TestRailManager.getProjectId(test.getTestContext());
-        int suiteID = TestRailManager.getSuiteId(test.getTestContext());
-
-        testCases = getTestCasesUuid(test);
-
-        //Collect testrail ids from new annotations
-        LOGGER.debug(testCases.toString());
-
-        //Collect all testrail ids from Dataprovider, setCases, XLS, etc
-        List<String> testRailIds = TestRail.getCases(test);
-
-        LOGGER.debug(testRailIds.toString());
-
-        //Remove duplicates.
-        testRailIds.removeAll(testCases);
-
-        LOGGER.debug("Missed testrail ids: " + testRailIds.toString());
-
-        if (projectID != -1 && suiteID != -1 || debug) {
-            testRailIds.forEach((entry) -> {
-                TagType tagEntry = new TagType();
-                tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
-                tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
-                tags.add(tagEntry);
-            });
-        }
-        LOGGER.info("Found " + tags.size() + " new TestRailIds");
-        return tags;
-    }
-
-
-    private static List<String> getCasesIdFromDataProvider(ITestResult result) {
-        List<String> cases = new ArrayList<String>();
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testNameTestRailMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
-        if (testNameTestRailMap != null) {
-            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-            if (testNameTestRailMap.containsKey(testHash) && testNameTestRailMap.get(testHash) != null) {
-                cases = new ArrayList<String>(Arrays.asList(testNameTestRailMap.get(testHash).split(",")));
-            }
-        }
-        return cases;
-    }
-
-
-    private static boolean isSupportedPlatform(String platform) {
-        // in case of platform absence (empty) we suppose to have platform independent testcase id annotation(s)
-        return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
     }
 
 }

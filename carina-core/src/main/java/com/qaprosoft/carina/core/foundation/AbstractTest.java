@@ -66,6 +66,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -94,7 +95,7 @@ import com.qaprosoft.hockeyapp.HockeyAppManager;
  * @author Alex Khursevich
  */
 @Listeners({ AbstractTestListener.class })
-public abstract class AbstractTest // extends DriverHelper
+public abstract class AbstractTest implements ITestCases
 {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
@@ -507,7 +508,9 @@ public abstract class AbstractTest // extends DriverHelper
      *
      * @param cases to set
      */
+    @Deprecated
     protected void setTestRailCase(String... cases) {
+        setCases(cases);
         TestRail.setCasesID(cases);
     }
 
