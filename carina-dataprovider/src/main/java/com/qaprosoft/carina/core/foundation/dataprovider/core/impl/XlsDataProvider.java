@@ -70,6 +70,9 @@ public class XlsDataProvider extends BaseDataProvider {
         if (!parameters.testRailColumn().isEmpty())
             testRailColumn = parameters.testRailColumn();
 
+        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
+            testRailColumn = parameters.qTestColumn();
+
         String testMethodColumn = "";
         if (!parameters.testMethodColumn().isEmpty())
             testMethodColumn = parameters.testMethodColumn();

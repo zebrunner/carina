@@ -15,21 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.reporting;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.testng.Assert;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.annotations.Test;
-
 import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TagType;
+import org.apache.log4j.Logger;
+import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.Reporter;
+import org.testng.annotations.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Tests for {@link ITestRailManager}
@@ -125,18 +124,17 @@ public class TestRailTest extends AbstractTest implements ITestRailManager {
         Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
 
         Assert.assertEquals(testRailUdids.size(), 1);
+
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
     }
 
 
-    //Temp test
     @Test
     @TestRailCases(testCasesId = FIRST_TEST_ID + ",3333")
     public void testTestRailSetting() {
         setCases("3333,5555".split(","));
 
         ITestResult result = Reporter.getCurrentTestResult();
-
-        Set<String> testRailUdids = getTestRailCasesUuid(result);
 
         Set<TagType> tags = new HashSet<TagType>();
 
@@ -145,7 +143,6 @@ public class TestRailTest extends AbstractTest implements ITestRailManager {
         int projectID = getTestRailProjectId(result.getTestContext());
         int suiteID = getTestRailSuiteId(result.getTestContext());
 
-        //do not add test rail id if no integration tags/parameters detected
         Set<TagType> finalTags = tags;
         testRailTags.forEach((entry) -> {
             TagType tagEntry = new TagType();
@@ -160,8 +157,9 @@ public class TestRailTest extends AbstractTest implements ITestRailManager {
             LOGGER.info(currentKey + "=" + currentValue);
         });
 
+        Assert.assertEquals(tags.size(), 3);
+
     }
 
 
-    //testRailCasesArgsMap
 }
