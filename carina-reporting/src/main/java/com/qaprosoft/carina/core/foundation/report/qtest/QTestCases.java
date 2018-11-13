@@ -13,8 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.utils.tag;
+package com.qaprosoft.carina.core.foundation.report.qtest;
 
-public enum Priority {
-    P0,P1,P2,P3,P4,P5,P6
+import java.lang.annotation.*;
+
+/**
+ * This defines the 'QTestCases' annotation used to specify the
+ * qTest test case id values that the TestNG test maps to
+ */
+
+@Repeatable(QTestCases.List.class)
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface QTestCases {
+    String id();
+
+    String platform() default "";
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD})
+    @interface List {
+        QTestCases[] value();
+    }
 }

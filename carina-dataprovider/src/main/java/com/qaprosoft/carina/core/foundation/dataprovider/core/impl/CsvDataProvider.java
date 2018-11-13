@@ -66,6 +66,10 @@ public class CsvDataProvider extends BaseDataProvider {
 
         jiraColumn = parameters.jiraColumn();
         testRailColumn = parameters.testRailColumn();
+
+        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
+            testRailColumn = parameters.qTestColumn();
+
         testMethodColumn = parameters.testMethodColumn();
         testMethodOwnerColumn = parameters.testMethodOwnerColumn();
         bugColumn = parameters.bugColumn();

@@ -45,6 +45,8 @@ public @interface XlsDataSourceParameters {
 
     String testRailColumn() default "";
 
+    String qTestColumn() default "";
+
     String testMethodColumn() default "";
 
     String testMethodOwnerColumn() default "";

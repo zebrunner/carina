@@ -13,8 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.utils.tag;
+package com.qaprosoft.carina.core.foundation.report.testrail;
 
-public enum Priority {
-    P0,P1,P2,P3,P4,P5,P6
+import java.util.ArrayList;
+import java.util.List;
+
+public interface ITestCases {
+    ThreadLocal<List<String>> casesIds = ThreadLocal.withInitial(ArrayList::new);
+
+    default List<String> getCases() {
+        return casesIds.get();
+    }
+
+    default void setCases(String... cases) {
+        for (String _case : cases) {
+            casesIds.get().add(_case);
+        }
+    }
+
+    default void clearCases() {
+        casesIds.set(new ArrayList<String>());
+    }
+
 }
