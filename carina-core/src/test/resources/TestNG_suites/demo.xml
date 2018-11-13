@@ -24,4 +24,11 @@
 		</classes>
 	</test>
 
+
+	<test verbose="1" name="WebDriver">
+		<classes>
+			<class name="com.qaprosoft.carina.core.foundation.webdriver.DriverPoolExTest" />
+		</classes>
+	</test>
+
 </suite>

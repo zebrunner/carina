@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Tests for {@link IQTestManager}
  */
-public class QTestTest extends AbstractTest implements IQTestManager {
+public class QTestTest implements IQTestManager {
 
     protected static final Logger LOGGER = Logger.getLogger(QTestTest.class);
 
