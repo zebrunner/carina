@@ -114,13 +114,7 @@ public class DriverPoolExTest {
                 "Returned driver is not the same as registered!");
     }
 
-/*    @Test(dependsOnMethods = "registerDefaultDriver", expectedExceptions = {
-            AssertionError.class }, expectedExceptionsMessageRegExp = "Driver 'default' is already registered for thread: 1")
-    public void registerTwiceDefaultDriver() {
-        DriverPool.registerDriver(mockDriverDefault, DriverPool.DEFAULT);
-    }*/
-
-    @Test(dependsOnMethods = { "registerDefaultDriver", "registerTwiceDefaultDriver" })
+    @Test(dependsOnMethods = { "registerDefaultDriver" })
     public void deregisterDefaultDriver() {
         DriverPool.deregisterDriver(DriverPool.DEFAULT);
         Assert.assertFalse(DriverPool.isDriverRegistered(DriverPool.DEFAULT), "Default driver is not deregistered!");
