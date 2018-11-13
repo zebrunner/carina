@@ -107,7 +107,7 @@
 			<artifactId>ashot</artifactId>
 			<version>${ashot.version}</version>
 		</dependency>
-
+		
 		<!--<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
