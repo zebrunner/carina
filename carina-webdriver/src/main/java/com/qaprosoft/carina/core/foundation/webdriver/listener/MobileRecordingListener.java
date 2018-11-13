@@ -130,7 +130,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 		if (null != uri) {
 			String ftpHost = uri.getHost();
-			String destinationFileName = uri.getPath().replace("/", "");
+			String destinationFileName = uri.getPath().replace("/", "").replace("video", "");
 			FtpUtils.uploadData(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), data,
 					destinationFileName);
 		}
