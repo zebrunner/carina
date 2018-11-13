@@ -122,7 +122,7 @@ public class MobileFactory extends AbstractFactory {
                         
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
                                 .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality")))
-                                .withVideoType(VideoType.MP4)
+                                .withVideoType(VideoType.H264)
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();

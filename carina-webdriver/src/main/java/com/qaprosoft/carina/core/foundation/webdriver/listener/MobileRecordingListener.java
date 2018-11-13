@@ -76,7 +76,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 									MobileCommand.stopRecordingScreenCommand(
 											(BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
 							.getValue().toString();
-					uploadToFTP(data, command.getSessionId().toString());
+					uploadToFTP(data);
 					if (ZafiraSingleton.INSTANCE.isRunning()) {
 						ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
 					}
@@ -120,8 +120,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 	}
 
-	private void uploadToFTP(String data, String fileName) {
-		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%", "");
+	private void uploadToFTP(String data) {
+		String ftpUrl = videoArtifact.getLink();
 		URI uri = null;
 		try {
 			uri = new URI(ftpUrl);
@@ -130,7 +130,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 		if (null != uri) {
 			String ftpHost = uri.getHost();
-			String destinationFileName = fileName + ".mp4";
+			String[] segments = uri.getPath().split("/");
+			String destinationFileName = segments[segments.length-1];
 			FtpUtils.uploadData(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), data,
 					destinationFileName);
 		}
