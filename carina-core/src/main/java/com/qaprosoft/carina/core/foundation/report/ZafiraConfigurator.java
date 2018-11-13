@@ -15,21 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
-import com.qaprosoft.carina.core.foundation.report.qtest.QTestManager;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
+import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
+import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -46,13 +37,21 @@ import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
  *
  * @author akhursevich
  */
-public class ZafiraConfigurator implements IConfigurator, ITestRailManager {
+public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTestManager {
     protected static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
 
     @Override
@@ -218,13 +217,18 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager {
     private Set<TagType> getQTestTags(ITestResult test) {
         Set<TagType> tags = new HashSet<TagType>();
 
-        Set<String> qTestTags = QTestManager.getTestCasesUuid(test);
-        qTestTags.forEach((entry) -> {
-            TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
-            tagEntry.setValue(entry);
-            tags.add(tagEntry);
-        });
+        Set<String> qTestTags = getQTestCasesUuid(test);
+        int projectID = getQTestProjectId(test.getTestContext());
+        int cycleID = getQTestCycleId(test.getTestContext());
+
+        if (projectID != -1 && cycleID != -1) {
+            qTestTags.forEach((entry) -> {
+                TagType tagEntry = new TagType();
+                tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
+                tagEntry.setValue(projectID + "-" + cycleID + "-" +entry);
+                tags.add(tagEntry);
+            });
+        }
 
         return tags;
     }

@@ -7,10 +7,21 @@
 	<parameter name="TestRailSuiteId" value="1" />
 	<parameter name="TestRailProjectId" value="1" />
 
-	<test verbose="1" name="Grid tests">
+
+	<parameter name="qTestProjectId" value="2" />
+	<parameter name="qTestCycleId" value="2" />
+
+
+	<test verbose="1" name="TestRail tests">
 		<classes>
 			<class name="com.qaprosoft.carina.core.foundation.reporting.TestRailTest" />
 		</classes>
 	</test>
-	
+
+	<test verbose="1" name="QTest tests">
+		<classes>
+			<class name="com.qaprosoft.carina.core.foundation.reporting.QTestTest" />
+		</classes>
+	</test>
+
 </suite>

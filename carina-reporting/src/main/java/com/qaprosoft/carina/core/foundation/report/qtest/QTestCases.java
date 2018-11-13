@@ -18,21 +18,21 @@ package com.qaprosoft.carina.core.foundation.report.qtest;
 import java.lang.annotation.*;
 
 /**
- * This defines the 'QTestTestCase' annotation used to specify the
+ * This defines the 'QTestCases' annotation used to specify the
  * qTest test case id values that the TestNG test maps to
- * 
  */
 
-@Repeatable(QTestTestCase.List.class)
+@Repeatable(QTestCases.List.class)
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface QTestTestCase {
+public @interface QTestCases {
     String id();
+
     String platform() default "";
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})
     @interface List {
-        QTestTestCase[] value();
+        QTestCases[] value();
     }
 }

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.testrail;
+package com.qaprosoft.carina.core.foundation.report.qtest;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
@@ -24,26 +25,25 @@ import org.testng.ITestResult;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public interface ITestRailManager extends ITestCases {
-    Logger LOGGER = Logger.getLogger(ITestRailManager.class);
+public interface IQTestManager extends ITestCases {
+    Logger LOGGER = Logger.getLogger(IQTestManager.class);
 
-    default Set<String> getTestRailCasesUuid(ITestResult result) {
+    default Set<String> getQTestCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
         //add cases form xls/cvs dataprovider
-        int projectID = getTestRailProjectId(result.getTestContext());
-        int suiteID = getTestRailSuiteId(result.getTestContext());
+        int projectID = getQTestProjectId(result.getTestContext());
+        int cycleID = getQTestCycleId(result.getTestContext());
 
-        //do not add test rail id if no integration tags/parameters detected
-        if (projectID != -1 && suiteID != -1) {
+        if (projectID != -1 && cycleID != -1) {
 
             List<String> dataProviderIds = new ArrayList<String>();
             @SuppressWarnings("unchecked")
-            Map<Object[], String> testNameTestRailMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
-            if (testNameTestRailMap != null) {
+            Map<Object[], String> testNameQTestMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
+            if (testNameQTestMap != null) {
                 String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-                if (testNameTestRailMap.containsKey(testHash) && testNameTestRailMap.get(testHash) != null) {
-                    dataProviderIds = new ArrayList<String>(Arrays.asList(testNameTestRailMap.get(testHash).split(",")));
+                if (testNameQTestMap.containsKey(testHash) && testNameQTestMap.get(testHash) != null) {
+                    dataProviderIds = new ArrayList<String>(Arrays.asList(testNameQTestMap.get(testHash).split(",")));
                 }
             }
 
@@ -51,6 +51,7 @@ public interface ITestRailManager extends ITestCases {
 
             LOGGER.debug(dataProviderIds);
         }
+
 
         // Get a handle to the class and method
         Class<?> testClass;
@@ -70,30 +71,30 @@ public interface ITestRailManager extends ITestCases {
             }
 
             if (testMethod != null) {
-                if (testMethod.isAnnotationPresent(TestRailCases.class)) {
-                    TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
+                if (testMethod.isAnnotationPresent(QTestCases.class)) {
+                    QTestCases methodAnnotation = testMethod.getAnnotation(QTestCases.class);
                     String platform = methodAnnotation.platform();
                     if (platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty()) {
-                        String[] testCaseList = methodAnnotation.testCasesId().split(",");
+                        String[] testCaseList = methodAnnotation.id().split(",");
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
                             testCases.add(uuid);
-                            LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
+                            LOGGER.debug("qTest test case uuid '" + uuid + "' is registered.");
                         }
 
                     }
                 }
-                if (testMethod.isAnnotationPresent(TestRailCases.List.class)) {
-                    TestRailCases.List methodAnnotation = testMethod.getAnnotation(TestRailCases.List.class);
-                    for (TestRailCases tcLocal : methodAnnotation.value()) {
+                if (testMethod.isAnnotationPresent(QTestCases.List.class)) {
+                    QTestCases.List methodAnnotation = testMethod.getAnnotation(QTestCases.List.class);
+                    for (QTestCases tcLocal : methodAnnotation.value()) {
 
                         String platform = tcLocal.platform();
                         if (platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty()) {
-                            String[] testCaseList = tcLocal.testCasesId().split(",");
+                            String[] testCaseList = tcLocal.id().split(",");
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;
                                 testCases.add(uuid);
-                                LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
+                                LOGGER.debug("qTest test case uuid '" + uuid + "' is registered.");
                             }
                         }
                     }
@@ -112,8 +113,9 @@ public interface ITestRailManager extends ITestCases {
         return testCases;
     }
 
-    default int getTestRailProjectId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
+
+    default int getQTestProjectId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
         if (id != null) {
             return Integer.valueOf(id.trim());
         } else {
@@ -121,8 +123,8 @@ public interface ITestRailManager extends ITestCases {
         }
     }
 
-    default int getTestRailSuiteId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
+    default int getQTestCycleId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_CYCLE_ID);
         if (id != null) {
             return Integer.valueOf(id.trim());
         } else {
