@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Tests for {@link ITestRailManager}
  */
-public class TestRailTest extends AbstractTest implements ITestRailManager {
+public class TestRailTest implements ITestRailManager {
 
     protected static final Logger LOGGER = Logger.getLogger(TestRailTest.class);
 
