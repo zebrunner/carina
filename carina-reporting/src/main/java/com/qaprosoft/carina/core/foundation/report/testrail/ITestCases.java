@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.qtest;
+package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import java.lang.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * This defines the 'QTestTestCase' annotation used to specify the
- * qTest test case id values that the TestNG test maps to
- * 
- */
+public interface ITestCases {
+    ThreadLocal<List<String>> casesIds = ThreadLocal.withInitial(ArrayList::new);
 
-@Repeatable(QTestTestCase.List.class)
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface QTestTestCase {
-    String id();
-    String platform() default "";
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
-    @interface List {
-        QTestTestCase[] value();
+    default List<String> getCases() {
+        return casesIds.get();
     }
+
+    default void setCases(String... cases) {
+        for (String _case : cases) {
+            casesIds.get().add(_case);
+        }
+    }
+
+    default void clearCases() {
+        casesIds.set(new ArrayList<String>());
+    }
+
 }

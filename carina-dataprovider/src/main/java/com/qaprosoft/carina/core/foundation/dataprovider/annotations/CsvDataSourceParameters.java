@@ -47,6 +47,8 @@ public @interface CsvDataSourceParameters {
 
     String testRailColumn() default "";
 
+    String qTestColumn() default "";
+
     String testMethodColumn() default "";
 
     String testMethodOwnerColumn() default "";

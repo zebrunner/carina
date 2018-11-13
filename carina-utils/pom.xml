@@ -30,6 +30,8 @@
 		<joda-time.version>2.9.9</joda-time.version>
 
 		<jira-client.version>0.5</jira-client.version>
+		
+		<common-net.version>3.3</common-net.version>
 	</properties>
 
 	<dependencies>
@@ -103,6 +105,13 @@
 		    <groupId>joda-time</groupId>
 		    <artifactId>joda-time</artifactId>
 		    <version>${joda-time.version}</version>
+		</dependency>
+		
+		<!-- FTP client -->
+		<dependency>
+   			 <groupId>commons-net</groupId>
+    		<artifactId>commons-net</artifactId>
+    		<version>${common-net.version}</version>
 		</dependency>
 
 		<!-- Jira -->
