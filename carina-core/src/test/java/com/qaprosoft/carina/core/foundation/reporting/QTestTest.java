@@ -15,20 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.reporting;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
-import com.qaprosoft.carina.core.foundation.report.qtest.QTestCases;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
+import com.qaprosoft.carina.core.foundation.report.qtest.QTestCases;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link IQTestManager}
