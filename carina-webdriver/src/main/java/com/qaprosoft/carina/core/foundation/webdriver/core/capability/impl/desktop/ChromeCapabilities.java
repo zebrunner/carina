@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
