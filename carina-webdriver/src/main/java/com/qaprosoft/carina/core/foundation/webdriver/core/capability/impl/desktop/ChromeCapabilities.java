@@ -58,12 +58,12 @@ public class ChromeCapabilities extends AbstractCapabilities {
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
 
-        Proxy proxy = setupProxy();
+/*        Proxy proxy = setupProxy();
         if (proxy != null) {
         	// explicitely add proxy as chrome option
         	// https://github.com/SeleniumHQ/selenium/issues/5299
         	options.setProxy(proxy);
-        }
+        }*/
 
         
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
