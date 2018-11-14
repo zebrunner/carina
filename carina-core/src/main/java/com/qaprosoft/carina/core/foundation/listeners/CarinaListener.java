@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,7 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ITestContext;
@@ -68,6 +70,8 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
+import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
+import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -85,6 +89,8 @@ public class CarinaListener extends AbstractTestListener {
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
+    
+    private static final ThreadLocal<List<String>> driversToQuit = new ThreadLocal<List<String>>();
 
     @Override
     public void onStart(ITestContext context) {
@@ -174,14 +180,58 @@ public class CarinaListener extends AbstractTestListener {
         
         onHealthCheck(context.getSuite());
     }
+    
+    @Override
+    public void beforeConfiguration(ITestResult result) {
+        super.beforeConfiguration(result);
+        // remember active test phase to organize valid driver pool manipulation process 
+        if (result.getMethod().isBeforeSuiteConfiguration()) {
+            TestPhase.setActivePhase(Phase.BEFORE_SUITE);
+        }
+        
+        if (result.getMethod().isBeforeClassConfiguration()) {
+            TestPhase.setActivePhase(Phase.BEFORE_CLASS);
+        }
+        
+        if (result.getMethod().isBeforeMethodConfiguration()) {
+            TestPhase.setActivePhase(Phase.BEFORE_METHOD);
+        }
+        
+        if (result.getMethod().isAfterMethodConfiguration()) {
+            TestPhase.setActivePhase(Phase.AFTER_METHOD);
+        }
+        
+        if (result.getMethod().isAfterClassConfiguration()) {
+            TestPhase.setActivePhase(Phase.AFTER_CLASS);
+        }
+        
+        if (result.getMethod().isAfterSuiteConfiguration()) {
+            TestPhase.setActivePhase(Phase.AFTER_SUITE);
+        }
+
+        // mark all existing drivers for removal if no dependencies detected ontestStart phase.
+        // only marked on this stage will be closed to keep those which were launched in before suite/slass/method  
+        List<String> driverNames = new ArrayList<String>();
+        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+        for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+            driverNames.add(entry.getKey());
+        }
+        driversToQuit.set(driverNames);
+        
+    }
 
     @Override
     public void onTestStart(ITestResult result) {
         String[] dependedUponMethods = result.getMethod().getMethodsDependedUpon();
         
-        if (dependedUponMethods.length == 0) {
-            LOGGER.debug("Deinitialize driver(s) on test start as no dependencies detected.");
-            quitDrivers();
+        if (dependedUponMethods.length == 0 && driversToQuit.get() != null) {
+            LOGGER.debug("Deinitialize marked for removal driver(s) on test start as no dependencies detected.");
+            driversToQuit.get().forEach((driver) -> {
+                quitDriver(driver);
+            });
+        } else {
+            //reset driversToQuit if any for current step as dependency detected
+            driversToQuit.set(new ArrayList<String>());
         }
         
         // handle expected skip

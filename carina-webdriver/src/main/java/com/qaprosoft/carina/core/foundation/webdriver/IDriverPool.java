@@ -33,6 +33,7 @@ import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
@@ -42,9 +43,19 @@ public interface IDriverPool {
 
     static final String DEFAULT = "default";
 
+    static final ConcurrentHashMap<Phase, WebDriver> drivers2 = new ConcurrentHashMap<Phase, WebDriver>();
+    
+//    //thread local independent set of drivers available across whole suite 
+//    static final ConcurrentHashMap<String, WebDriver> beforeSuiteDrivers = new ConcurrentHashMap<String, WebDriver>();
+//
+//    // set of drivers for class mode lifecycle
+//    static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> beforeClassDrivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
+//
+//    // set of drivers initialized on @BeforeMethod - they should be cleaned as default drivers if no dependencies detected
+//    static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> beforeMethodDrivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
+    
+    // the most popular drivers started inside tests
     static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
-
-    static final ThreadLocal<Integer> adbVideoRecorderPid = new ThreadLocal<Integer>();
 
     /**
      * Get default driver. If no default driver discovered it will be created.
