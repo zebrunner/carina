@@ -31,7 +31,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 public abstract class AbstractCapabilities {
@@ -64,9 +63,6 @@ public abstract class AbstractCapabilities {
         // add capabilities based on dynamic _config.properties variables
         capabilities = initCapabilities(capabilities);
         
-        //register among capabilities current TestNG phase
-        capabilities.setCapability(SpecialKeywords.TESTNG_PHASE_NAME, TestPhase.getActivePhase());
-
         return capabilities;
     }
 

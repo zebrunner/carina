@@ -33,7 +33,6 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ITestContext;
@@ -70,6 +69,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
+import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
@@ -90,8 +90,6 @@ public class CarinaListener extends AbstractTestListener {
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
     
-    private static final ThreadLocal<List<String>> driversToQuit = new ThreadLocal<List<String>>();
-
     @Override
     public void onStart(ITestContext context) {
         super.onStart(context);
@@ -191,10 +189,31 @@ public class CarinaListener extends AbstractTestListener {
         
         if (result.getMethod().isBeforeClassConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_CLASS);
+            //TODO: analyze cases when AfterClass is not declared inside test java class
+            // maybe move into the BEFORE_CLASS
+            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+            // 1. quit all Phase.BEFORE_CLASS drivers for current thread as it is new configuration call/class 
+            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+                CarinaDriver drv = entry.getValue();
+                if (Phase.BEFORE_CLASS.equals(drv.getPhase())) {
+                    quitDriver(entry.getKey());
+                }
+            }
         }
         
         if (result.getMethod().isBeforeMethodConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_METHOD);
+            
+            //TODO: test use-case with dependency
+            LOGGER.debug("Deinitialize unused driver(s) on before test method start.");
+            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+            // 1. quit all Phase.METHOD drivers for current thread
+            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+                CarinaDriver drv = entry.getValue();
+                if (Phase.METHOD.equals(drv.getPhase())) {
+                    quitDriver(entry.getKey());
+                }
+            }
         }
         
         if (result.getMethod().isAfterMethodConfiguration()) {
@@ -203,35 +222,43 @@ public class CarinaListener extends AbstractTestListener {
         
         if (result.getMethod().isAfterClassConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_CLASS);
+            //TODO: analyze cases when AfterClass is not declared inside test java class
+            // maybe move into the BEFORE_CLASS
+            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+            // 1. quit all Phase.BEFORE_CLASS drivers for current thread as it is new configuration call/class 
+            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+                CarinaDriver drv = entry.getValue();
+                if (Phase.BEFORE_CLASS.equals(drv.getPhase())) {
+                    deregisterDriver(entry.getKey());
+                }
+            }
         }
         
         if (result.getMethod().isAfterSuiteConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
         }
-
-        // mark all existing drivers for removal if no dependencies detected ontestStart phase.
-        // only marked on this stage will be closed to keep those which were launched in before suite/slass/method  
-        List<String> driverNames = new ArrayList<String>();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-        for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
-            driverNames.add(entry.getKey());
-        }
-        driversToQuit.set(driverNames);
         
     }
 
     @Override
     public void onTestStart(ITestResult result) {
+        TestPhase.setActivePhase(Phase.METHOD);
         String[] dependedUponMethods = result.getMethod().getMethodsDependedUpon();
         
-        if (dependedUponMethods.length == 0 && driversToQuit.get() != null) {
-            LOGGER.debug("Deinitialize marked for removal driver(s) on test start as no dependencies detected.");
-            driversToQuit.get().forEach((driver) -> {
-                quitDriver(driver);
-            });
-        } else {
-            //reset driversToQuit if any for current step as dependency detected
-            driversToQuit.set(new ArrayList<String>());
+        if (dependedUponMethods.length == 0) {
+            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+            // 1. quit all Phase.METHOD drivers for current thread
+            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+                CarinaDriver drv = entry.getValue();
+                if (Phase.METHOD.equals(drv.getPhase())) {
+                    quitDriver(entry.getKey());
+                }
+                
+                // all before_method drivers move into METHOD to be able to quit them on next onTestStart!
+                if (Phase.BEFORE_METHOD.equals(drv.getPhase())) {
+                    drv.setPhase(Phase.METHOD);
+                }
+            }
         }
         
         // handle expected skip

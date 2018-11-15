@@ -157,9 +157,6 @@ public class SpecialKeywords {
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
     public static final String MOBILE_PROXY_PORT = "capabilities.proxyPort";
     
-    public static final String TESTNG_PHASE_NAME = "testng-phase";
-    
-    
     public static final String  SLOT_CAPABILITIES = "slotCapabilities";
 
 

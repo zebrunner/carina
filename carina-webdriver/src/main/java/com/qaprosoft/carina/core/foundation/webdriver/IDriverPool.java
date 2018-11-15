@@ -15,8 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -40,22 +41,13 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public interface IDriverPool {
     static final Logger logger = Logger.getLogger(IDriverPool.class);
-
     static final String DEFAULT = "default";
 
-    static final ConcurrentHashMap<Phase, WebDriver> drivers2 = new ConcurrentHashMap<Phase, WebDriver>();
-    
-//    //thread local independent set of drivers available across whole suite 
-//    static final ConcurrentHashMap<String, WebDriver> beforeSuiteDrivers = new ConcurrentHashMap<String, WebDriver>();
-//
-//    // set of drivers for class mode lifecycle
-//    static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> beforeClassDrivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
-//
-//    // set of drivers initialized on @BeforeMethod - they should be cleaned as default drivers if no dependencies detected
-//    static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> beforeMethodDrivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
-    
+    // unified set of Carina WebDrivers 
+    static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
+  
     // the most popular drivers started inside tests
-    static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
+    //static final ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>> drivers = new ConcurrentHashMap<Long, ConcurrentHashMap<String, WebDriver>>();
 
     /**
      * Get default driver. If no default driver discovered it will be created.
@@ -92,11 +84,17 @@ public interface IDriverPool {
      */
     default public WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
         WebDriver drv = null;
-        Long threadId = Thread.currentThread().getId();
 
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-
+        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
         if (currentDrivers.containsKey(name)) {
+            drv = currentDrivers.get(name).getDriver();
+        }
+
+        //Long threadId = Thread.currentThread().getId();
+        //ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+        
+        //TODO [VD] do we really need finding by groupThreads?
+/*        if (currentDrivers.containsKey(name)) {
             drv = currentDrivers.get(name);
         } else if (Configuration.getInt(Parameter.THREAD_COUNT) == 1
                 && Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
@@ -113,7 +111,7 @@ public interface IDriverPool {
                     }
                 }
             }
-        }
+        }*/
 
         if (drv == null) {
             logger.debug("Starting new driver as nothing was found in the pool");
@@ -134,19 +132,10 @@ public interface IDriverPool {
      */
     public static WebDriver getDriver(SessionId sessionId) {
     	logger.debug("Detecting WebDriver by sessionId...");
-    	ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
     	
-    	// [VD] code duplication from getDrivers!!!
-        Long threadId = Thread.currentThread().getId();
-
-        if (drivers.get(threadId) != null) {
-        	currentDrivers = drivers.get(threadId);
-        } else {
-        	throw new RuntimeException("Unable to find driver from empty pool!");
-        }
-    	
-    	for (Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
-    		WebDriver drv = entry.getValue();
+    	//TODO: [VD] do we need to get preliminary current drivers here to skip analysis for the drivers from different threads?
+    	for (CarinaDriver carinDriver : driversPool) {
+    		WebDriver drv = carinDriver.getDriver();
     		if (drv instanceof EventFiringWebDriver) {
     			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
     			drv = eventFirDriver.getWrappedDriver();
@@ -275,9 +264,10 @@ public interface IDriverPool {
      */
     default public void quitDrivers() {
 
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+        //ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
 
-        for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+        for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
             quitDriver(entry.getKey());
         }
 
@@ -374,7 +364,8 @@ public interface IDriverPool {
      */
     default public void registerDriver(WebDriver driver, String name) {
         Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+        
         int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
         
         if (currentDrivers.size() == maxDriverCount) {
@@ -387,10 +378,9 @@ public interface IDriverPool {
             Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
         }
 
-        currentDrivers.put(name, driver);
-        Assert.assertTrue(drivers.get(threadId).containsKey(name),
-                "Driver '" + name + "' was not registered in map for thread: " + threadId);
-        logger.debug("##########   REGISTER driver for threadId: " + threadId);
+        //new 6.0 approach to manipulate drivers via regular Set
+        CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId);
+        driversPool.add(carinaDriver);
     }
 
     /**
@@ -402,13 +392,7 @@ public interface IDriverPool {
      * @return boolean
      */
     default public boolean isDriverRegistered(String name) {
-        Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
-
-        if (currentDrivers == null) {
-            return false;
-        }
-        return currentDrivers.containsKey(name);
+        return getDrivers().containsKey(name);
     }
 
     /**
@@ -418,8 +402,7 @@ public interface IDriverPool {
      */
     default public int size() {
         Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = drivers.get(threadId);
-        int size = currentDrivers.size();
+        int size = getDrivers().size();
         logger.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
@@ -433,15 +416,11 @@ public interface IDriverPool {
      */
     default public void deregisterDriver(String name) {
         long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
+        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
 
         if (currentDrivers.containsKey(name)) {
-            logger.debug("########## DEREGISTER driver for threadId: " + threadId);
-            currentDrivers.remove(name);
-
-            if (drivers.get(threadId).containsKey(name)) {
-				logger.error("Driver '" + name + "' was not deregistered from map for thread: " + threadId);
-            }
+            logger.debug("########## DEREGISTER '" + name + "' driver for threadId: " + threadId );
+            driversPool.remove(currentDrivers.get(name));
         } else {
             logger.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);
         }
@@ -453,9 +432,7 @@ public interface IDriverPool {
      * 
      */
     default public void deregisterDrivers() {
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-
-        for (Map.Entry<String, WebDriver> entry : currentDrivers.entrySet()) {
+        for (Map.Entry<String, CarinaDriver> entry : getDrivers().entrySet()) {
             deregisterDriver(entry.getKey());
         }
     }
@@ -485,69 +462,36 @@ public interface IDriverPool {
         deregisterDriver(name);
         registerDriver(driver, name);
     }
-
+    
     /**
-     * Return all drivers registered in the DriverPool for this thread
+     * Return all drivers registered in the DriverPool for this thread including on Before Suite/Class/Method stages 
      * 
-     * @return ConcurrentHashMap of driver names and WebDrivers
+     * @return ConcurrentHashMap of driver names and Carina WebDrivers
      * 
      */
-    default public ConcurrentHashMap<String, WebDriver> getDrivers() {
+    default public ConcurrentHashMap<String, CarinaDriver> getDrivers() {
         Long threadId = Thread.currentThread().getId();
-
-        if (drivers.get(threadId) == null) {
-            ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-            drivers.put(threadId, currentDrivers);
+        ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
+        // look inside driversPool and return all before_suite drivers and drivers mounted to the current thread_id
+        for (CarinaDriver drv : driversPool) {
+        	if (Phase.BEFORE_SUITE.equals(drv.getPhase())) {
+        		// append all existing drivers in beforeSuite mode into the current list
+        		currentDrivers.put(drv.getName(), drv);
+        	} else if (threadId.equals(drv.getThreadId())) {
+        		currentDrivers.put(drv.getName(), drv);
+        	}
         }
-        return drivers.get(threadId);
+        return currentDrivers;
     }
-
-    /**
-     * Return all threads associated with current multithreading test
-     * 
-     * @return Thread[]
-     * 
-     */
-    default public Thread[] getGroupThreads(final ThreadGroup group) {
-        if (group == null)
-            throw new NullPointerException("Null thread group");
-        int nAlloc = group.activeCount();
-        int n = 0;
-        Thread[] threads;
-        do {
-            nAlloc *= 2;
-            threads = new Thread[nAlloc];
-            n = group.enumerate(threads);
-        } while (n == nAlloc);
-        return java.util.Arrays.copyOf(threads, n);
-    }
-
     
     @Deprecated
     public static WebDriver getDefaultDriver() {
         WebDriver drv = null;
         String name = DEFAULT;
-        Long threadId = Thread.currentThread().getId();
-
         ConcurrentHashMap<String, WebDriver> currentDrivers = getStaticDrivers();
 
         if (currentDrivers.containsKey(name)) {
             drv = currentDrivers.get(name);
-        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == 1
-                && Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
-            Thread[] threads = getStaticGroupThreads(Thread.currentThread().getThreadGroup());
-            logger.debug(
-                    "Try to find driver by ThreadGroup id values! Current ThreadGroup count is: " + threads.length);
-            for (int i = 0; i < threads.length; i++) {
-                currentDrivers = drivers.get(threads[i].getId());
-                if (currentDrivers != null) {
-                    if (currentDrivers.containsKey(name)) {
-                        drv = currentDrivers.get(name);
-                        logger.debug("##########        GET ThreadGroupId: " + threadId + "; driver: " + drv);
-                        break;
-                    }
-                }
-            }
         }
 
         if (drv == null) {
@@ -562,27 +506,17 @@ public interface IDriverPool {
     @Deprecated
     public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
         Long threadId = Thread.currentThread().getId();
-
-        if (drivers.get(threadId) == null) {
-            ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-            drivers.put(threadId, currentDrivers);
+        ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
+        // look inside driversPool and return all before_suite drivers and drivers mounted to the current thread_id
+        for (CarinaDriver drv : driversPool) {
+        	if (Phase.BEFORE_SUITE.equals(drv.getPhase())) {
+        		// append all existing drivers in beforeSuite mode into the current list
+        		currentDrivers.put(drv.getName(), drv.getDriver());
+        	} else if (threadId.equals(drv.getThreadId())) {
+        		currentDrivers.put(drv.getName(), drv.getDriver());
+        	}
         }
-        return drivers.get(threadId);
-    }
-
-    @Deprecated
-    public static Thread[] getStaticGroupThreads(final ThreadGroup group) {
-        if (group == null)
-            throw new NullPointerException("Null thread group");
-        int nAlloc = group.activeCount();
-        int n = 0;
-        Thread[] threads;
-        do {
-            nAlloc *= 2;
-            threads = new Thread[nAlloc];
-            n = group.enumerate(threads);
-        } while (n == nAlloc);
-        return java.util.Arrays.copyOf(threads, n);
+        return currentDrivers;
     }
     
 }

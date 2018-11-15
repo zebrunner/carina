@@ -53,6 +53,7 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -632,11 +633,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     private String takeScreenshot(ITestResult result, String msg) {
         String screenId = "";
 
-        ConcurrentHashMap<String, WebDriver> drivers = getDrivers();
+        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
-        for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
+        for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
             String driverName = entry.getKey();
-            WebDriver drv = entry.getValue();
+            WebDriver drv = entry.getValue().getDriver();
 
             if (drv instanceof EventFiringWebDriver) {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
