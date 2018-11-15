@@ -400,12 +400,27 @@ public interface IDriverPool {
      * 
      * @return int
      */
+    default public int getDriversCount() {
+        Long threadId = Thread.currentThread().getId();
+        int size = getDrivers().size();
+        logger.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+        return size;
+    }
+    
+    /**
+     * @deprecated use {@link #getDriversCount()} instead.
+     * Return number of registered driver per thread
+     * 
+     * @return int
+     */
+    @Deprecated
     default public int size() {
         Long threadId = Thread.currentThread().getId();
         int size = getDrivers().size();
         logger.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
+
 
     /**
      * Deregister driver by name from the DriverPool
