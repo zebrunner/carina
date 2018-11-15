@@ -90,93 +90,106 @@ public class CarinaListener extends AbstractTestListener {
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
     
+    protected static boolean initialized = false;
+    
     @Override
     public void onStart(ITestContext context) {
         super.onStart(context);
         
-        // Add shutdown hook
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-        // Set log4j properties
-        PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
+        // move below code to synchronized block to init it at once.
+        // in comparison with @BeforeSuite testNG annotation it can be executed several times depending on suite xml connt
+        if (initialized) {
+            //TODO: [VD] remove below message later 
+            LOGGER.info("Do nothing as onStart/BeforeSuite already initialized.");
+            return;
+        }
+        synchronized (this) {
+            initialized = true;
 
-        try {
-            Logger root = Logger.getRootLogger();
-            Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-            while (allLoggers.hasMoreElements()) {
-                Category tmpLogger = (Category) allLoggers.nextElement();
-                if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-                    tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+            // Add shutdown hook
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+            // Set log4j properties
+            PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
+    
+            try {
+                Logger root = Logger.getRootLogger();
+                Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+                while (allLoggers.hasMoreElements()) {
+                    Category tmpLogger = (Category) allLoggers.nextElement();
+                    if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
+                        tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+                    }
                 }
+            } catch (NoSuchMethodError e) {
+                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
             }
-        } catch (NoSuchMethodError e) {
-            LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
+    
+            LOGGER.info(Configuration.asString());
+            // Configuration.validateConfiguration();
+    
+            LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+            context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+            LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+    
+            // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
+            int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+            if (count > 0) {
+                LOGGER.debug("Updated 'data_provider_thread_count' from "
+                        + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
+                context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
+            } else {
+                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
+                        String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
+                LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+            }
+    
+            LOGGER.debug("Default data_provider_thread_count="
+                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+            LOGGER.debug("Updated data_provider_thread_count="
+                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+    
+            try {
+                L10N.init();
+            } catch (Exception e) {
+                LOGGER.error("L10N bundle is not initialized successfully!", e);
+            }
+    
+            try {
+                I18N.init();
+            } catch (Exception e) {
+                LOGGER.error("I18N bundle is not initialized successfully!", e);
+            }
+    
+            try {
+                L10Nparser.init();
+            } catch (Exception e) {
+                LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
+            }
+    
+            // TODO: move out from AbstractTest->executeBeforeTestSuite
+            String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+            if (!customCapabilities.isEmpty()) {
+                // redefine core CONFIG properties using custom capabilities file
+                new CapabilitiesLoader().loadCapabilities(customCapabilities);
+            }
+    
+            String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
+            if (!extraCapabilities.isEmpty()) {
+                // redefine core CONFIG properties using extra capabilities file
+                new CapabilitiesLoader().loadCapabilities(extraCapabilities);
+            }
+    
+            try {
+                TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
+            } catch (Exception e) {
+                LOGGER.error("TestRail is not initialized successfully!", e);
+            }
+    
+            updateAppPath();
+            
+            onHealthCheck(context.getSuite());
         }
-
-        LOGGER.info(Configuration.asString());
-        // Configuration.validateConfiguration();
-
-        LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-        context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-        LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-
-        // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
-        int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
-        if (count > 0) {
-            LOGGER.debug("Updated 'data_provider_thread_count' from "
-                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
-            context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
-        } else {
-            LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
-                    String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
-            LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-        }
-
-        LOGGER.debug("Default data_provider_thread_count="
-                + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-        LOGGER.debug("Updated data_provider_thread_count="
-                + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-
-        try {
-            L10N.init();
-        } catch (Exception e) {
-            LOGGER.error("L10N bundle is not initialized successfully!", e);
-        }
-
-        try {
-            I18N.init();
-        } catch (Exception e) {
-            LOGGER.error("I18N bundle is not initialized successfully!", e);
-        }
-
-        try {
-            L10Nparser.init();
-        } catch (Exception e) {
-            LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
-        }
-
-        // TODO: move out from AbstractTest->executeBeforeTestSuite
-        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty()) {
-            // redefine core CONFIG properties using custom capabilities file
-            new CapabilitiesLoader().loadCapabilities(customCapabilities);
-        }
-
-        String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
-        if (!extraCapabilities.isEmpty()) {
-            // redefine core CONFIG properties using extra capabilities file
-            new CapabilitiesLoader().loadCapabilities(extraCapabilities);
-        }
-
-        try {
-            TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
-        } catch (Exception e) {
-            LOGGER.error("TestRail is not initialized successfully!", e);
-        }
-
-        updateAppPath();
-        
-        onHealthCheck(context.getSuite());
     }
     
     @Override
