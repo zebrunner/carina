@@ -229,7 +229,7 @@ public class CarinaListener extends AbstractTestListener {
             for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
                 CarinaDriver drv = entry.getValue();
                 if (Phase.BEFORE_CLASS.equals(drv.getPhase())) {
-                    deregisterDriver(entry.getKey());
+                    quitDriver(entry.getKey());
                 }
             }
         }

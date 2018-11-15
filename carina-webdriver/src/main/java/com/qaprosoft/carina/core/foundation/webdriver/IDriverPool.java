@@ -441,42 +441,6 @@ public interface IDriverPool {
         }
         ProxyPool.stopProxy();
     }
-
-    /**
-     * Deregister all drivers from the DriverPool for current thread
-     * 
-     */
-    default public void deregisterDrivers() {
-        for (Map.Entry<String, CarinaDriver> entry : getDrivers().entrySet()) {
-            deregisterDriver(entry.getKey());
-        }
-    }
-
-    /**
-     * Replace default driver in the DriverPool
-     * 
-     * @param driver
-     *            WebDriver
-     * 
-     */
-    default public void replaceDriver(WebDriver driver) {
-        replaceDriver(driver, DEFAULT);
-    }
-
-    /**
-     * Replace named driver in the DriverPool
-     * 
-     * @param driver
-     *            WebDriver
-     * 
-     * @param name
-     *            String driver name
-     * 
-     */
-    default public void replaceDriver(WebDriver driver, String name) {
-        deregisterDriver(name);
-        registerDriver(driver, name);
-    }
     
     /**
      * Return all drivers registered in the DriverPool for this thread including on Before Suite/Class/Method stages 
