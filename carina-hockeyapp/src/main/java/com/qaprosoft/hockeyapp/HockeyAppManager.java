@@ -321,7 +321,7 @@ public class HockeyAppManager {
 
         List<String> updatedPatternlist = new ArrayList<>();
 
-        String patternToReplace = ".*[ -]%s[ -].*";
+        String patternToReplace = ".*[ ->]%s[ -<].*";
         for (String currentPattern : patternList) {
             updatedPatternlist.add(String.format(patternToReplace, currentPattern));
         }
