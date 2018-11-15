@@ -332,14 +332,12 @@ public interface IDriverPool {
 
                 logger.debug("initDriver finish...");
 
-            } catch (Throwable thr) {
+            } catch (Exception e) {
                 // DevicePool.ignoreDevice();
                 DevicePool.deregisterDevice();
-                logger.error(
-                        String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s",
-                                name, count, maxCount, thr.getMessage()),
-                        thr);
-                init_throwable = thr;
+				logger.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
+						maxCount, e.getMessage()), e);
+                init_throwable = e;
                 CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
             }
         }

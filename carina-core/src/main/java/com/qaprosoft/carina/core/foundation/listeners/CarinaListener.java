@@ -320,8 +320,7 @@ public class CarinaListener extends AbstractTestListener {
             Artifacts.clearArtifacts();
 
         } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterTestMethod: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.error("Exception in AbstractTest->executeAfterTestMethod!", e);
         }
 
     }
@@ -389,10 +388,9 @@ public class CarinaListener extends AbstractTestListener {
             LOGGER.debug("Finish email report generation.");
 
         } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterSuite: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.error("Exception in AbstractTest->executeAfterSuite.", e);
         } finally {
-            
+            //do nothing
         }
 
     }
@@ -752,7 +750,9 @@ public class CarinaListener extends AbstractTestListener {
                 } catch (FileNotFoundException e) {
                     LOGGER.error("Unable to write metadata to json file: " + file.getAbsolutePath(), e);
                 } finally {
-                    out.close();
+                    if (out != null) {
+                        out.close();
+                    }
                 }
                 LOGGER.debug("Created medata for '" + key + "' object...");
             }
