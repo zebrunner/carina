@@ -15,12 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.testng.ISuite;
+import org.testng.ITestResult;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -37,14 +45,6 @@ import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ITestResult;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Carina-based implementation of IConfigurator that provides better integration with Zafira reporting tool.
@@ -186,9 +186,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public Set<TestArtifactType> getArtifacts(ITestResult test) {
         // Generate additional artifacts links on test run
-        test.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(test));
-        TestRail.updateAfterTest(test, (String) test.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-        TestRail.clearCases();
         return Artifacts.getArtifacts();
     }
 

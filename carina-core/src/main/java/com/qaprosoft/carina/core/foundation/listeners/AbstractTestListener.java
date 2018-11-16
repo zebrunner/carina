@@ -44,7 +44,6 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -224,12 +223,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         }
         
         ReportContext.renameTestDir(test);
-
-        // Populate TestRail Cases
-
-        result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
-        TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-        TestRail.clearCases();
 
         TestNamingUtil.releaseTestInfoByThread();
     }

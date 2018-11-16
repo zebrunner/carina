@@ -340,21 +340,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>true, false</td>
 	</tr>
 	<tr>
-		<td>testrail_url</td>
-		<td>Url to TestRail</td>
-		<td>https:/yourcompany.testrail.net</td>
-	</tr>
-	<tr>
-		<td>testrail_user</td>
-		<td>TestRail user email</td>
-		<td>admin@yourcompany.com</td>
-	</tr>
-		<tr>
-		<td>testrail_updater</td>
-		<td>Class contains logic to update TestRail. <b>Note</b> Custom updater have to implement EmptyTestRailUpdater, by default methods do nothing</td>
-		<td>Custom class</td>
-	</tr>
-		<tr>
 		<td>testrail_milestone</td>
 		<td>Milestone to set on TestRail for run</td>
 		<td>some-milestone</td>

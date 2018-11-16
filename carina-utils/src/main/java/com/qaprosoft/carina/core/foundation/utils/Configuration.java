@@ -196,14 +196,6 @@ public class Configuration {
         OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
 
         // TestRail
-        TESTRAIL_URL("testrail_url"),
-
-        TESTRAIL_USER("testrail_user"),
-
-        TESTRAIL_PASSWORD("testrail_password"),
-
-        TESTRAIL_UPDATER("testrail_updater"),
-
         TESTRAIL_MILESTONE("testrail_milestone"),
 
         TESTRAIL_ASSIGNEE_USER("testrail_assignee"),

@@ -28,7 +28,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
@@ -47,17 +46,6 @@ public abstract class AbstractTest implements IDriverPool, ITestCases {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-
-    /**
-     * Redefine TestRails cases from test.
-     *
-     * @param cases to set
-     */
-    @Deprecated
-    protected void setTestRailCase(String... cases) {
-        setCases(cases);
-        TestRail.setCasesID(cases);
-    }
 
     @DataProvider(name = "DataProvider", parallel = true)
     public Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {

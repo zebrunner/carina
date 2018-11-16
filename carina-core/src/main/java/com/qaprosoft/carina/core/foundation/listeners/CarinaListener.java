@@ -56,7 +56,6 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -178,12 +177,6 @@ public class CarinaListener extends AbstractTestListener {
             if (!extraCapabilities.isEmpty()) {
                 // redefine core CONFIG properties using extra capabilities file
                 new CapabilitiesLoader().loadCapabilities(extraCapabilities);
-            }
-    
-            try {
-                TestRail.updateBeforeSuite(context, this.getClass().getName(), getTitle(context));
-            } catch (Exception e) {
-                LOGGER.error("TestRail is not initialized successfully!", e);
             }
     
             updateAppPath();
