@@ -13,6 +13,7 @@ pages:
     - Security: security.md
     - Contribution: contribution.md
     - Release notes: releases.md
+    - Proxy: proxy.md
 theme:
   name: 'material'
 repo_url: https://github.com/qaprosoft/carina
