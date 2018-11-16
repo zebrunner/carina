@@ -104,31 +104,40 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public String getOwner(ISuite suite) {
         String owner = suite.getParameter("suiteOwner");
+        LOGGER.debug("owner: " + owner);
         return owner != null ? owner : "";
     }
 
     @Override
     public String getPrimaryOwner(ITestResult test) {
         // TODO: re-factor that
-        return Ownership.getMethodOwner(test, OwnerType.PRIMARY);
+        String primaryOwner = Ownership.getMethodOwner(test, OwnerType.PRIMARY); 
+        LOGGER.debug("primaryOwner: " + primaryOwner);
+        return primaryOwner;
     }
 
     @Override
     public String getSecondaryOwner(ITestResult test) {
         // TODO: re-factor that
-        return Ownership.getMethodOwner(test, OwnerType.SECONDARY);
+        String secondaryOwner = Ownership.getMethodOwner(test, OwnerType.SECONDARY);
+        LOGGER.debug("secondaryOwner: " + secondaryOwner);
+        return secondaryOwner;
     }
 
     @Override
     public String getTestName(ITestResult test) {
         // TODO: avoid TestNamingUtil
-        return TestNamingUtil.getCanonicalTestName(test);
+        String testName = TestNamingUtil.getCanonicalTestName(test);
+        LOGGER.debug("testName: " + testName);
+        return testName;
     }
 
     @Override
     public String getTestMethodName(ITestResult test) {
         // TODO: avoid TestNamingUtil
-        return TestNamingUtil.getCanonicalTestMethodName(test);
+        String testMethodName = TestNamingUtil.getCanonicalTestMethodName(test);
+        LOGGER.debug("testMethodName: " + testMethodName);
+        return testMethodName;
     }
 
     @Override
@@ -138,7 +147,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public int getRunCount(ITestResult test) {
-        return RetryCounter.getRunCount();
+        int runCount = RetryCounter.getRunCount();
+        LOGGER.debug("runCount: " + runCount);
+        return runCount;
     }
 
     @Override
@@ -148,12 +159,12 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public DriverMode getDriverMode() {
-        return DriverMode.valueOf(R.CONFIG.get("driver_mode").toUpperCase());
+        return DriverMode.valueOf("METHOD_MODE");
     }
 
     @Override
     public Set<TagType> getTestTags(ITestResult test) {
-        LOGGER.debug("Collecting TestTags");
+        LOGGER.debug("Collecting TestTags...");
         Set<TagType> tags = new HashSet<TagType>();
 
         String testPriority = PriorityManager.getPriority(test);
@@ -185,6 +196,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public Set<TestArtifactType> getArtifacts(ITestResult test) {
+        LOGGER.debug("Collecting artifacts...");
         // Generate additional artifacts links on test run
         return Artifacts.getArtifacts();
     }
@@ -193,7 +205,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     //Moved them separately for future easier reusing if getTestTags will be overridden.
     //TODO: Should we make them public or protected?
     private Set<TagType> getTestRailTags(ITestResult test) {
-
+        LOGGER.debug("Collecting TestRail Tags...");
         Set<TagType> tags = new HashSet<TagType>();
         Set<String> testRailTags = getTestRailCasesUuid(test);
         int projectID = getTestRailProjectId(test.getTestContext());
@@ -208,10 +220,12 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
                 tags.add(tagEntry);
             });
         }
+        LOGGER.debug("Found " + tags.size() + " new TestRail tags");
         return tags;
     }
 
     private Set<TagType> getQTestTags(ITestResult test) {
+        LOGGER.debug("Collecting qTest Tags...");
         Set<TagType> tags = new HashSet<TagType>();
 
         Set<String> qTestTags = getQTestCasesUuid(test);
@@ -227,6 +241,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
             });
         }
 
+        LOGGER.debug("Found " + tags.size() + " new qTest tags");
         return tags;
     }
 
