@@ -90,7 +90,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="../#raising-inbuilt-proxy-server" tabindex="1" class="md-skip">
+      <a href="../#operating-with-proxies" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -424,8 +424,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#raising-inbuilt-proxy-server" title="Raising inbuilt proxy-server" class="md-nav__link">
-    Raising inbuilt proxy-server
+  <a href="#operating-with-proxies" title="Operating with Proxies" class="md-nav__link">
+    Operating with Proxies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raising-inbuilt-proxy-server-browsermob" title="Raising inbuilt proxy-server (BrowserMob)" class="md-nav__link">
+    Raising inbuilt proxy-server (BrowserMob)
   </a>
   
     <nav class="md-nav">
@@ -493,8 +500,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#raising-inbuilt-proxy-server" title="Raising inbuilt proxy-server" class="md-nav__link">
-    Raising inbuilt proxy-server
+  <a href="#operating-with-proxies" title="Operating with Proxies" class="md-nav__link">
+    Operating with Proxies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raising-inbuilt-proxy-server-browsermob" title="Raising inbuilt proxy-server (BrowserMob)" class="md-nav__link">
+    Raising inbuilt proxy-server (BrowserMob)
   </a>
   
     <nav class="md-nav">
@@ -553,28 +567,45 @@
                 
                   <h1>Proxy</h1>
                 
-                <h3 id="raising-inbuilt-proxy-server">Raising inbuilt proxy-server</h3>
-<p>There is inbuilt proxy-server library BrowserMobProxy in carina-proxy module. By default it is being started on any free port and requires following properties in your <strong>config.properties</strong> file:</p>
-<pre><code>browsermob_proxy=true
+                <h3 id="operating-with-proxies">Operating with Proxies</h3>
+<p>There is possibility to send all test traffic via the proxy included embelled light-weight BrowserMob proxy server.
+Ther are several properties available to manage all kind of proxies usage:</p>
+<pre><code>proxy_host=NULL
+proxy_port=NULL
+proxy_protocols=http,https,ftp
+proxy_set_to_system=true
+browsermob_proxy=false
 browsermob_disabled_mitm=false
+browsermob_port=0
 </code></pre>
 
-<p>First property <strong>browsermob_proxy</strong> will start proxy instance on every test method start. Second property <strong>browsermob_disabled_mitm</strong> is needed to be set to false to declare enable working with <strong>https</strong>.</p>
+<p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
+Also to enable proxy for TestNG Java process <strong>proxy_set_to_system</strong> must be specifed to <strong>true</strong> otherwise only WebDrivers and API clients will be proxied</p>
+<p>Note: Above settings mostly required to get public internet access through corporate proxies.</p>
+<h3 id="raising-inbuilt-proxy-server-browsermob">Raising inbuilt proxy-server (BrowserMob)</h3>
+<p>Also Carina can start embedded proxy to proxy/view/filter requests/responses. There is inbuilt library BrowserMobProxy in carina-proxy module. Below you can find BrowserMob proxy related parameters in your <strong>config.properties</strong> file:</p>
+<pre><code>browsermob_proxy=true
+browsermob_disabled_mitm=false
+browsermob_port=0
+</code></pre>
+
+<p>With enabled <strong>browsermob_proxy</strong> Carina will start dedicated proxy instance on every test method. </p>
+<p><strong>browsermob_port=0</strong> means that Carina dynamically identify free port for proxy session.</p>
+<p><strong>browsermob_disabled_mitm</strong> is disabled by default. </p>
+<p><strong>Important!</strong> If you have troubles with  SSL traffic sniffering first thing you should do - change <strong>browsermob_disabled_mitm</strong> property value!</p>
 <h4 id="using-proxy-server-in-java-code">Using proxy-server in java code:</h4>
 <ol>
-<li>Create driver instance first:</li>
+<li>Make sure driver instance is already started:</li>
 </ol>
 <pre><code>getDriver();
 </code></pre>
 
-<ol>
-<li>Then create proxy instance (all necessary capabilities will be set into created driver):</li>
-</ol>
+<p>Note: During driver startup Carina automatically start proxy and adjust browser capabilities to track desired protocols. To get proxy instance for the current test/thread you can call:</p>
 <pre><code>BrowserMobProxy proxy = ProxyPool.getProxy();
 </code></pre>
 
 <ol>
-<li>Setting captured content type:</li>
+<li>Enable required Har capture type using::</li>
 </ol>
 <pre><code>proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
 </code></pre>
@@ -596,17 +627,15 @@ CaptureType.REQUEST_CONTENT
 
 //Some testing activity...
 
-proxy.stop();
-
 //Saving har to a file...
 File file = new File(HAR_NAME + &quot;.har&quot;);
 Assert.assertNotNull(proxy.getHar(), &quot;Har is NULL!&quot;);
 
-        try {
-            proxy.getHar().writeTo(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+try {
+    proxy.getHar().writeTo(file);
+} catch (IOException e) {
+    e.printStackTrace();
+}
 </code></pre>
 
 <p>Your .har file will be created in project root folder</p>
