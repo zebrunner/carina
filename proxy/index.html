@@ -465,6 +465,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#adding-ssl-sertificate-into-java-keystore" title="Adding ssl sertificate into Java keystore:" class="md-nav__link">
+    Adding ssl sertificate into Java keystore:
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-mac-and-linux-users" title="For Mac and Linux users:" class="md-nav__link">
+    For Mac and Linux users:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -532,6 +552,26 @@
           <li class="md-nav__item">
   <a href="#for-mac-users" title="For Mac users:" class="md-nav__link">
     For Mac users:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-ssl-sertificate-into-java-keystore" title="Adding ssl sertificate into Java keystore:" class="md-nav__link">
+    Adding ssl sertificate into Java keystore:
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-mac-and-linux-users" title="For Mac and Linux users:" class="md-nav__link">
+    For Mac and Linux users:
   </a>
   
 </li>
@@ -674,6 +714,17 @@ try {
 <li>Make sure red cross on your certificate turned into a blue one:</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../img/SSLInstallStep5.png" /></p>
+<h4 id="adding-ssl-sertificate-into-java-keystore">Adding ssl sertificate into Java keystore:</h4>
+<p>If you are still getting following exception:</p>
+<pre><code>javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+</code></pre>
+
+<p>you may need to set up <strong>ca-certificate-rsa.cer</strong> into your Java keystore.</p>
+<h5 id="for-mac-and-linux-users">For Mac and Linux users:</h5>
+<pre><code>sudo keytool -importcert -alias browsermob -file pathToYourCertificateLocation/BrowserMobCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
+</code></pre>
+
+<p>You will be asked to enter your Mac profile password and a Java keystore password (by default: changeit).</p>
                 
                   
                 
