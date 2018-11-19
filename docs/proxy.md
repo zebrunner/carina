@@ -106,3 +106,18 @@ To add and configure content filters look [here](https://github.com/lightbody/br
 6. Make sure red cross on your certificate turned into a blue one:
 
 ![Adding ssl certificate](img/SSLInstallStep5.png)
+
+#### Adding ssl sertificate into Java keystore:
+
+If you are still getting following exception:
+```
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+```
+you may need to set up **ca-certificate-rsa.cer** into your Java keystore.
+
+##### For Mac and Linux users:
+
+```
+sudo keytool -importcert -alias browsermob -file pathToYourCertificateLocation/BrowserMobCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
+```
+You will be asked to enter your Mac profile password and a Java keystore password (by default: changeit).
