@@ -89,22 +89,10 @@ public class CarinaListener extends AbstractTestListener {
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
     
-    protected static boolean initialized = false;
+    protected static boolean initialized = false;    
     
-    @Override
-    public void onStart(ITestContext context) {
-        super.onStart(context);
-        
-        // move below code to synchronized block to init it at once.
-        // in comparison with @BeforeSuite testNG annotation it can be executed several times depending on suite xml connt
-        if (initialized) {
-            //TODO: [VD] remove below message later 
-            LOGGER.info("Do nothing as onStart/BeforeSuite already initialized.");
-            return;
-        }
-        synchronized (this) {
-            initialized = true;
-
+    static {
+        try {
             // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
             // Set log4j properties
@@ -129,28 +117,6 @@ public class CarinaListener extends AbstractTestListener {
     
             LOGGER.info(Configuration.asString());
             // Configuration.validateConfiguration();
-    
-            LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-            context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-            LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-    
-            // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
-            int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
-            if (count > 0) {
-                LOGGER.debug("Updated 'data_provider_thread_count' from "
-                        + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
-                context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
-            } else {
-                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
-                        String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
-                LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-            }
-    
-            LOGGER.debug("Default data_provider_thread_count="
-                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-            LOGGER.debug("Updated data_provider_thread_count="
-                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
     
             try {
                 L10N.init();
@@ -185,6 +151,47 @@ public class CarinaListener extends AbstractTestListener {
     
             updateAppPath();
             
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onStart(ITestContext context) {
+        super.onStart(context);
+        
+        // move below code to synchronized block to init it at once.
+        // in comparison with @BeforeSuite testNG annotation it can be executed several times depending on suite xml connt
+        if (initialized) {
+            //TODO: [VD] remove below message later 
+            LOGGER.info("Do nothing as onStart/BeforeSuite already initialized.");
+            return;
+        }
+        synchronized (this) {
+            initialized = true;
+    
+            LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+            context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+            LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
+    
+            // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
+            int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+            if (count > 0) {
+                LOGGER.debug("Updated 'data_provider_thread_count' from "
+                        + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
+                context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
+            } else {
+                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
+                        String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
+                LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+            }
+    
+            LOGGER.debug("Default data_provider_thread_count="
+                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+            LOGGER.debug("Updated data_provider_thread_count="
+                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
+    
             onHealthCheck(context.getSuite());
         }
     }
@@ -530,7 +537,7 @@ public class CarinaListener extends AbstractTestListener {
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
-    private void updateAppPath() {
+    private static void updateAppPath() {
 
         try {
             if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
@@ -553,7 +560,7 @@ public class CarinaListener extends AbstractTestListener {
     /**
      * Method to update MOBILE_APP path in case if apk is located in Hockey App.
      */
-    private void updateHockeyAppPath() {
+    private static void updateHockeyAppPath() {
         // hockeyapp://appName/platformName/buildType/version
         Pattern HOCKEYAPP_PATTERN = Pattern
                 .compile("hockeyapp:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
@@ -589,7 +596,7 @@ public class CarinaListener extends AbstractTestListener {
     /**
      * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
      */
-    private void updateS3AppPath() {
+    private static void updateS3AppPath() {
         Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
         // get app path to be sure that we need(do not need) to download app from s3 bucket
         String mobileAppPath = Configuration.getMobileApp();
