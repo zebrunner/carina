@@ -26,7 +26,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
@@ -37,14 +36,13 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.zafira.listener.ZafiraListener;
 
 /*
  * AbstractTest - base test for UI and API tests.
  * 
  * @author Alex Khursevich
  */
-@Listeners({ CarinaListener.class, ZafiraListener.class })
+@Listeners({ CarinaListener.class })
 public abstract class AbstractTest implements IDriverPool, ITestCases {
 
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);

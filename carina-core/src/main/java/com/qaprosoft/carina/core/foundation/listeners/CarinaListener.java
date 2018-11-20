@@ -79,6 +79,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
+import com.qaprosoft.zafira.listener.ZafiraListener;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -92,6 +93,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
+    
+    //carina should have enabled static ZafiraListener  
+    protected static ZafiraListener zafiraListener = new ZafiraListener();
     
     static {
         try {
@@ -144,6 +148,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onStart(ISuite suite) {
+        zafiraListener.onStart(suite);
         //register programmatically carina based BeforeSuite/BeforeClass and BeforeMethod to execute those configuration part obligatory
 /*        XmlTest xmlTest = new XmlTest(suite.getXmlSuite());
         xmlTest.setName("Sample Test");
@@ -157,7 +162,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             
         suite.getXmlSuite().addTest(xmlTest);*/
 
-        
         try {
             Logger root = Logger.getRootLogger();
             Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
@@ -202,6 +206,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onStart(ITestContext context) {
+        zafiraListener.onStart(context);
         LOGGER.info("CarinaListener->OnTestStart(context): " + context.getName());
         super.onStart(context);
     }
@@ -272,6 +277,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestStart(ITestResult result) {
+        zafiraListener.onTestStart(result);
+        
         TestPhase.setActivePhase(Phase.METHOD);
         String[] dependedUponMethods = result.getMethod().getMethodsDependedUpon();
         
@@ -304,18 +311,24 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        zafiraListener.onTestSuccess(result);
+        
         onTestFinish(result);
         super.onTestSuccess(result);
     }
     
     @Override
     public void onTestFailure(ITestResult result) {
+        zafiraListener.onTestFailure(result);
+        
         onTestFinish(result);
         super.onTestFailure(result);
     }
     
     @Override
     public void onTestSkipped(ITestResult result) {
+        zafiraListener.onTestSkipped(result);
+        
         onTestFinish(result);
         super.onTestSkipped(result);        
     }
@@ -356,6 +369,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     @Override
     public void onFinish(ITestContext context) {
+        zafiraListener.onFinish(context);
         super.onFinish(context);
         
         LOGGER.info("CarinaListener->onFinish(context): " + context.getName());
@@ -367,7 +381,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     @Override
     public void onFinish(ISuite suite) {
-        LOGGER.info(suite); 
+        zafiraListener.onFinish(suite);
         
         try {
             ReportContext.removeTempDir(); // clean temp artifacts directory
