@@ -100,23 +100,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // Set log4j properties
             PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
     
-            try {
-                Logger root = Logger.getRootLogger();
-                Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-                while (allLoggers.hasMoreElements()) {
-                    Category tmpLogger = (Category) allLoggers.nextElement();
-                    LOGGER.debug("loggerName: " + tmpLogger.getName());
-                    if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-                        tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-                    }
-                    if (tmpLogger.getName().contains("ZafiraConfigurator")) {
-                        tmpLogger.setLevel(Level.toLevel("DEBUG"));
-                    }
-                }
-            } catch (NoSuchMethodError e) {
-                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-            }
-    
             LOGGER.info(Configuration.asString());
             // Configuration.validateConfiguration();
     
@@ -174,6 +157,23 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             
         suite.getXmlSuite().addTest(xmlTest);*/
 
+        
+        try {
+            Logger root = Logger.getRootLogger();
+            Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+            while (allLoggers.hasMoreElements()) {
+                Category tmpLogger = (Category) allLoggers.nextElement();
+                LOGGER.info("loggerName: " + tmpLogger.getName());
+                if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
+                    tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+                }
+                if (tmpLogger.getName().contains("ZafiraConfigurator")) {
+                    tmpLogger.setLevel(Level.toLevel("DEBUG"));
+                }
+            }
+        } catch (NoSuchMethodError e) {
+            LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
+        }
         
         LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
         suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
