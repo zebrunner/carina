@@ -189,9 +189,6 @@ public class Configuration {
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
 
-        // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
-        
         // Enable video recording capabilities only for the final retry attempt
         OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
 

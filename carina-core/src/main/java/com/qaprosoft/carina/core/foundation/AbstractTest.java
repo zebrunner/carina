@@ -21,8 +21,12 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
@@ -46,6 +50,25 @@ public abstract class AbstractTest implements IDriverPool, ITestCases {
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
+        //do nothing
+    }
+    
+    @BeforeClass(alwaysRun = true)
+    public void beforeClass() {
+        //do nothing
+    }
+    
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() {
+        //do nothing
+    }
+    
+/*    @Test()
+    public void fakeTest() {
+        //do nothing
+    }*/
 
     @DataProvider(name = "DataProvider", parallel = true)
     public Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {

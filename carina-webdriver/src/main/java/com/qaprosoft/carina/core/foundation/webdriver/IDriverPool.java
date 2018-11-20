@@ -227,10 +227,6 @@ public interface IDriverPool {
         // 1. create for each driver their own video file.
         // 2. save it using unique driver/test/thread name - maybe time in ms
         // 3. register link onto the video as test artifact
-        Device device = DevicePool.getDevice();
-        if (!device.isNull()) {
-            device.screenOff();
-        }
 
         try {
             logger.debug("Driver exiting..." + name);
@@ -478,7 +474,6 @@ public interface IDriverPool {
         // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener and all logging will be lost!
         return drv;
     }
-    
     
     @Deprecated
     public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {

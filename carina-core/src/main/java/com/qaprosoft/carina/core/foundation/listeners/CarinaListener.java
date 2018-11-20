@@ -33,8 +33,10 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.ISuite;
+import org.testng.ISuiteListener;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.SkipException;
@@ -48,6 +50,7 @@ import org.testng.xml.XmlTest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
@@ -69,6 +72,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
@@ -81,15 +85,13 @@ import com.qaprosoft.hockeyapp.HockeyAppManager;
  * 
  * @author Alex Khursevich
  */
-public class CarinaListener extends AbstractTestListener {
+public class CarinaListener extends AbstractTestListener implements ISuiteListener {
     protected static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
-    
-    protected static boolean initialized = false;    
     
     static {
         try {
@@ -155,45 +157,52 @@ public class CarinaListener extends AbstractTestListener {
             e.printStackTrace();
         }
     }
+    
+
+    @Override
+    public void onStart(ISuite suite) {
+        //register programmatically carina based BeforeSuite/BeforeClass and BeforeMethod to execute those configuration part obligatory
+/*        XmlTest xmlTest = new XmlTest(suite.getXmlSuite());
+        xmlTest.setName("Sample Test");
+
+        // Create a list which can contain the classes that you want to run.
+        List<XmlClass> myClasses = new ArrayList<XmlClass>();
+        myClasses.add(new XmlClass("com.qaprosoft.carina.core.foundation.AbstractTest"));
+
+        // Assign that to the XmlTest Object created earlier.
+        xmlTest.setXmlClasses(myClasses);
+            
+        suite.getXmlSuite().addTest(xmlTest);*/
+
+        
+        LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
+        suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+        LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
+
+        // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
+        int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+        if (count > 0) {
+            LOGGER.debug("Updated 'data_provider_thread_count' from "
+                    + suite.getXmlSuite().getDataProviderThreadCount() + " to " + count);
+            suite.getXmlSuite().setDataProviderThreadCount(count);
+        } else {
+            LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
+                    String.valueOf(suite.getXmlSuite().getDataProviderThreadCount()));
+            LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+        }
+
+        LOGGER.debug("Default data_provider_thread_count="
+                + suite.getXmlSuite().getDataProviderThreadCount());
+        LOGGER.debug("Updated data_provider_thread_count="
+                + suite.getXmlSuite().getDataProviderThreadCount());
+
+        onHealthCheck(suite);
+    }
 
     @Override
     public void onStart(ITestContext context) {
         super.onStart(context);
-        
-        // move below code to synchronized block to init it at once.
-        // in comparison with @BeforeSuite testNG annotation it can be executed several times depending on suite xml connt
-        if (initialized) {
-            //TODO: [VD] remove below message later 
-            LOGGER.info("Do nothing as onStart/BeforeSuite already initialized.");
-            return;
-        }
-        synchronized (this) {
-            initialized = true;
-    
-            LOGGER.debug("Default thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-            context.getCurrentXmlTest().getSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-            LOGGER.debug("Updated thread_count=" + context.getCurrentXmlTest().getSuite().getThreadCount());
-    
-            // update DataProviderThreadCount if any property is provided otherwise sync with value from suite xml file
-            int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
-            if (count > 0) {
-                LOGGER.debug("Updated 'data_provider_thread_count' from "
-                        + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount() + " to " + count);
-                context.getCurrentXmlTest().getSuite().setDataProviderThreadCount(count);
-            } else {
-                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
-                        String.valueOf(context.getCurrentXmlTest().getSuite().getDataProviderThreadCount()));
-                LOGGER.debug("Updated 'data_provider_thread_count': " + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-            }
-    
-            LOGGER.debug("Default data_provider_thread_count="
-                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-            LOGGER.debug("Updated data_provider_thread_count="
-                    + context.getCurrentXmlTest().getSuite().getDataProviderThreadCount());
-    
-            onHealthCheck(context.getSuite());
-        }
     }
     
     @Override
@@ -253,6 +262,9 @@ public class CarinaListener extends AbstractTestListener {
         
         if (result.getMethod().isAfterSuiteConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
+            
+            //forcibly quit all drivers
+            quitDrivers();
         }
         
     }
@@ -307,7 +319,7 @@ public class CarinaListener extends AbstractTestListener {
         super.onTestSkipped(result);        
     }
         
-    public void onTestFinish(ITestResult result) {
+    private void onTestFinish(ITestResult result) {
         try {
             // TODO: improve later removing duplicates with AbstractTestListener
             // handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
@@ -339,23 +351,29 @@ public class CarinaListener extends AbstractTestListener {
         } catch (Exception e) {
             LOGGER.error("Exception in AbstractTest->executeAfterTestMethod!", e);
         }
-
     }
-
+    
     @Override
     public void onFinish(ITestContext context) {
         super.onFinish(context);
+        
+        //TODO: refactor jira updater to make it s functional interface
+        // Update JIRA
+        Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
+    }
+    
+    @Override
+    public void onFinish(ISuite suite) {
+        LOGGER.info(suite); 
+        
         try {
-            //forcibly quit all drivers
-            quitDrivers();
-
             ReportContext.removeTempDir(); // clean temp artifacts directory
             //HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
             String browser = getBrowser();
             String deviceName = getDeviceName();
             // String suiteName = getSuiteName(context);
-            String title = getTitle(context);
+            String title = getTitle(suite.getXmlSuite());
 
             TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             String status = testResult.getName();
@@ -373,8 +391,8 @@ public class CarinaListener extends AbstractTestListener {
 
             ReportContext.getTempDir().delete();
 
-            // Update JIRA
-            Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
+//            // Update JIRA
+//            Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
 
             LOGGER.debug("Generating email report...");
             
@@ -409,7 +427,6 @@ public class CarinaListener extends AbstractTestListener {
         } finally {
             //do nothing
         }
-
     }
 
     // TODO: remove this private method
@@ -435,7 +452,7 @@ public class CarinaListener extends AbstractTestListener {
         return browser;
     }
 
-    protected String getTitle(ITestContext context) {
+    protected String getTitle(XmlSuite suite) {
         String browser = getBrowser();
         if (!browser.isEmpty()) {
             browser = " " + browser; // insert the space before
@@ -452,17 +469,17 @@ public class CarinaListener extends AbstractTestListener {
             app_version = Configuration.get(Parameter.APP_VERSION) + " - ";
         }
 
-        String suiteName = getSuiteName(context);
-        String xmlFile = getSuiteFileName(context);
+        String suiteName = getSuiteName(suite);
+        String xmlFile = getSuiteFileName(suite);
 
         title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, device, browser);
 
         return title;
     }
 
-    private String getSuiteFileName(ITestContext context) {
+    private String getSuiteFileName(XmlSuite suite) {
         // TODO: investigate why we need such method and suite file name at all
-        String fileName = context.getSuite().getXmlSuite().getFileName();
+        String fileName = suite.getFileName();
         if (fileName == null) {
             fileName = "undefined";
         }
@@ -475,12 +492,12 @@ public class CarinaListener extends AbstractTestListener {
         return fileName;
     }
 
-    protected String getSuiteName(ITestContext context) {
+    protected String getSuiteName(XmlSuite suite) {
 
         String suiteName = "";
 
-        if (context.getSuite().getXmlSuite() != null && !"Default suite".equals(context.getSuite().getXmlSuite().getName())) {
-            suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? context.getSuite().getXmlSuite().getName()
+        if (suite != null && !"Default suite".equals(suite.getName())) {
+            suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? suite.getName()
                     : Configuration.get(Parameter.SUITE_NAME);
         } else {
             suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title") : Configuration.get(Parameter.SUITE_NAME);
@@ -778,10 +795,40 @@ public class CarinaListener extends AbstractTestListener {
                 LOGGER.debug("Generating collected metadada finish...");
             }
         }
+        
+        private void quitAllDrivers() {
+            // as it is shutdown hook just try to quit all registered drivers on by one
+            for (CarinaDriver carinaDriver : IDriverPool.driversPool) {
+                //it is expected that all drivers are killed in appropriate aftermethod/class/suite blocks
+                String name = carinaDriver.getName();
+                LOGGER.warn("Trying to quite driver '" + name + "' on shutdown hook action!");
+                ProxyPool.stopProxy();
+                
+                try {
+                    logger.debug("Driver exiting..." + name);
+                    carinaDriver.getDriver().quit();
+                    logger.debug("Driver exited..." + name);
+                } catch (WebDriverException e) {
+                    logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
+                    // do nothing
+                } catch (Exception e) {
+                    logger.debug("Error discovered during driver quit: " + e.getMessage(), e);
+
+                    // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+                    if (!e.getMessage().contains("Session ID is null.")) {
+                        throw e;
+                    }
+                } finally {
+                    //do nothing
+                }
+            }
+        }
+
 
         @Override
         public void run() {
             LOGGER.debug("Running shutdown hook");
+            quitAllDrivers();
             generateMetadata();
         }
 
