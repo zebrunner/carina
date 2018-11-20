@@ -109,7 +109,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
                         tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
                     }
-                    if (tmpLogger.getName().contains("com.qaprosoft.carina.core.foundation.report")) {
+                    if (tmpLogger.getName().contains("ZafiraConfigurator")) {
                         tmpLogger.setLevel(Level.toLevel("DEBUG"));
                     }
                 }
