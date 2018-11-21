@@ -1,22 +1,46 @@
-### Raising inbuilt proxy-server
-There is inbuilt proxy-server library BrowserMobProxy in carina-proxy module. By default it is being started on any free port and requires following properties in your **config.properties** file:
+### Operating with Proxies
+There is possibility to send all test traffic via the proxy included embelled light-weight BrowserMob proxy server.
+Ther are several properties available to manage all kind of proxies usage:
+```
+proxy_host=NULL
+proxy_port=NULL
+proxy_protocols=http,https,ftp
+proxy_set_to_system=true
+browsermob_proxy=false
+browsermob_disabled_mitm=false
+browsermob_port=0
+```
+Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
+Also to enable proxy for TestNG Java process **proxy_set_to_system** must be specifed to **true** otherwise only WebDrivers and API clients will be proxied
+
+Note: Above settings mostly required to get public internet access through corporate proxies.
+
+### Raising inbuilt proxy-server (BrowserMob)
+Also Carina can start embedded proxy to proxy/view/filter requests/responses. There is inbuilt library BrowserMobProxy in carina-proxy module. Below you can find BrowserMob proxy related parameters in your **config.properties** file:
 ```
 browsermob_proxy=true
 browsermob_disabled_mitm=false
+browsermob_port=0
 ```
-First property **browsermob_proxy** will start proxy instance on every test method start. Second property **browsermob_disabled_mitm** is needed to be set to false to declare enable working with **https**.
+With enabled **browsermob_proxy** Carina will start dedicated proxy instance on every test method. 
+
+**browsermob_port=0** means that Carina dynamically identify free port for proxy session.
+
+**browsermob_disabled_mitm** is disabled by default. 
+
+**Important!** If you have troubles with  SSL traffic sniffering first thing you should do - change **browsermob_disabled_mitm** property value!
 
 #### Using proxy-server in java code:
 
-1. Create driver instance first:
+1. Make sure driver instance is already started:
 ```
 getDriver();
 ```
-2. Then create proxy instance (all necessary capabilities will be set into created driver):
+Note: During driver startup Carina automatically start proxy and adjust browser capabilities to track desired protocols. To get proxy instance for the current test/thread you can call:
 ```
 BrowserMobProxy proxy = ProxyPool.getProxy();
 ```
-3. Setting captured content type:
+2. Enable required Har capture type using::
 ```
 proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
 ```
@@ -37,17 +61,15 @@ proxy.newHar(HAR_NAME);
 
 //Some testing activity...
 
-proxy.stop();
-
 //Saving har to a file...
 File file = new File(HAR_NAME + ".har");
 Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
 
-        try {
-            proxy.getHar().writeTo(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+try {
+    proxy.getHar().writeTo(file);
+} catch (IOException e) {
+    e.printStackTrace();
+}
 ```
 Your .har file will be created in project root folder
 
@@ -84,3 +106,18 @@ To add and configure content filters look [here](https://github.com/lightbody/br
 6. Make sure red cross on your certificate turned into a blue one:
 
 ![Adding ssl certificate](img/SSLInstallStep5.png)
+
+#### Adding ssl sertificate into Java keystore:
+
+If you are still getting following exception:
+```
+javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+```
+you may need to set up **ca-certificate-rsa.cer** into your Java keystore.
+
+##### For Mac and Linux users:
+
+```
+sudo keytool -importcert -alias browsermob -file pathToYourCertificateLocation/BrowserMobCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
+```
+You will be asked to enter your Mac profile password and a Java keystore password (by default: changeit).
