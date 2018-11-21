@@ -283,7 +283,7 @@ public interface IDriverPool {
      *            Device where we want to start driver
      * @return WebDriver
      */
-    default public WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost, Device device) {
+    default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost, Device device) {
         boolean init = false;
         int count = 0;
         WebDriver drv = null;
@@ -356,7 +356,7 @@ public interface IDriverPool {
      *            String driver name
      * 
      */
-    default public void registerDriver(WebDriver driver, String name) {
+    default void registerDriver(WebDriver driver, String name) {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
         
@@ -385,10 +385,12 @@ public interface IDriverPool {
      *
      * @return boolean
      */
-    default public boolean isDriverRegistered(String name) {
+    default boolean isDriverRegistered(String name) {
         return getDrivers().containsKey(name);
     }
 
+    
+    //TODO: think about hiding getDriversCount and removing size
     /**
      * Return number of registered driver per thread
      * 
@@ -423,7 +425,7 @@ public interface IDriverPool {
      *            String driver name
      * 
      */
-    default public void deregisterDriver(String name) {
+    default void deregisterDriver(String name) {
         long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
 
