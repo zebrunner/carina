@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TagType;
 
@@ -161,5 +162,43 @@ public class TestRailTest implements ITestRailManager {
 
     }
 
+    @Test
+    @TestRailCases(testCasesId = FIRST_TEST_ID, locale = "en")
+    @TestRailCases(testCasesId = SECOND_TEST_ID, locale = "fr")
+    public void testTestRailByLocale() {
+        ITestResult result = Reporter.getCurrentTestResult();
 
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
+
+        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertEquals(testRailUdids.size(), 1);
+
+        R.CONFIG.put(Parameter.LOCALE.getKey(), "fr");
+        testRailUdids = getTestRailCasesUuid(result);
+
+        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
+        Assert.assertEquals(testRailUdids.size(), 1);
+        
+        R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
+    }
+
+    @Test
+    @TestRailCases(testCasesId = FIRST_TEST_ID, language = "en")
+    @TestRailCases(testCasesId = SECOND_TEST_ID, language = "fr")
+    public void testTestRailBylanguage() {
+        ITestResult result = Reporter.getCurrentTestResult();
+
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
+
+        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertEquals(testRailUdids.size(), 1);
+
+        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "fr");
+        testRailUdids = getTestRailCasesUuid(result);
+
+        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
+        Assert.assertEquals(testRailUdids.size(), 1);
+        
+        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "en");
+    }
 }

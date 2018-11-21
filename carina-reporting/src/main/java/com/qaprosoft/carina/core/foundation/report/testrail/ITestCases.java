@@ -18,6 +18,9 @@ package com.qaprosoft.carina.core.foundation.report.testrail;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
 public interface ITestCases {
     ThreadLocal<List<String>> casesIds = ThreadLocal.withInitial(ArrayList::new);
 
@@ -35,4 +38,15 @@ public interface ITestCases {
         casesIds.set(new ArrayList<String>());
     }
 
+    default boolean isValidPlatform(String platform) {
+        return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
+    }
+    
+    default boolean isValidLanguage(String language) {
+        return language.equalsIgnoreCase(Configuration.get(Parameter.LANGUAGE)) || language.isEmpty();
+    }
+    
+    default boolean isValidLocale(String locale) {
+        return locale.equalsIgnoreCase(Configuration.get(Parameter.LOCALE)) || locale.isEmpty();
+    }
 }
