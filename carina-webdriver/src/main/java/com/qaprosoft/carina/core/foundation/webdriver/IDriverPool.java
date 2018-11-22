@@ -375,8 +375,7 @@ public interface IDriverPool {
                     "Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
         }
         if (currentDrivers.containsKey(name)) {
-        	Phase cdrvPhase = currentDrivers.get(name).getPhase();
-            Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId + " in " + cdrvPhase + " phase");
+            Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
         }
 
         //new 6.0 approach to manipulate drivers via regular Set
