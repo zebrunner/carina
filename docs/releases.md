@@ -1,6 +1,6 @@
-# Release notes
+Release notes
 
-## (Pre-release) 6.0.188-SNAPSHOT
+# (Pre-release) 6.0.188-SNAPSHOT
 ==================
 
 ## Enhancements
@@ -15,10 +15,8 @@
 * refactored onStart/onFinish actions using ISuiteListener and static initialization block
 * Simplified integration with Zafira and successfully resolved registration issues in multi-threading mode
 * temporary enabled debug logging for ZafiraConfigurator component only
-
 ## [DEPENDENCIES UPDATES]
 zafira-client 3.3.37->3.3.68-SNAPSHOT (based on TestNG 6.14.3)
-
 
 ## 6.0-beta10
 * Removed Empty/Default/Custom testRail updater from Carina and all required dto classes. Integration with 3rd party testcase management tools will be allowed through the https://github.com/qaprosoft/zafira only!
@@ -77,11 +75,9 @@ Example:
 * Removed cucumber integration as not used feature
 * Removed all deprecated methods in DriverHelper
 * Removed deprecated constructors in ExtendedWebElement class
-
 ## Fixes
 * removed soapui.log4j.config property 
 * reused new getConstructorOrMethod() function for getting methods instances
-
 ## [DEPENDENCIES UPDATES]
 6.8.8->6.14.3
 due to the security alerts bumped up:
@@ -91,8 +87,7 @@ org.testng 6.8.8->6.14.3
 org.seleniumhq.selenium 3.12.0->3.14.0
 
 
-
-##5.3.3.129 (2018-11-21)
+#5.3.3.129 (2018-11-21)
 ==================
 
 ## Enhancements
@@ -110,7 +105,8 @@ org.seleniumhq.selenium 3.12.0->3.14.0
 ## [DEPENDENCIES UPDATES]
 * exclude out-of-date 1.38 org.bouncycastle dependency
 
-##5.3.2.127 (2018-11-07)
+
+#5.3.2.127 (2018-11-07)
 ==================
 
 ## Enhancements
@@ -125,11 +121,10 @@ org.seleniumhq.selenium 3.12.0->3.14.0
 ## [DEPENDENCIES UPDATES]
 * com.qaprosoft.zafira-client updated to 3.3.47
 
-##5.3.1.125 (2018-10-16)
+#5.3.1.125 (2018-10-16)
 ==================
 
 ## Enhancements
-
 * Incorporated Carina pipeline build process into the common qps-pipeline library with such possibilities opened for everyone:
   * Automatic snapshot build deployment based on PullRequest sources when "build-snapshot" label is assigned to the PR or "build-snapshot" is present in PR title
   * Configured automatic PR checker static code analysis using Sonar PR checker
@@ -149,11 +144,10 @@ N/A
 * com.qaprosoft.zafira-client updated to 3.3.46
 
 
-##5.3.0.124 (2018-10-08)
+#5.3.0.124 (2018-10-08)
 ==================
 
 ## Enhancements
-
 * Refactored List<ExtendedWebElement> and AbstractUI objects to speedup objects manipulations
 * Switched to latest ZafiraClient (3.3.44) with screenshots publishing into AWS S3
 * Implemented async screenshot images publishing to AWS S3
@@ -168,7 +162,6 @@ N/A
 * Removed obsolete start/stop recording methods for Device
 * Pushed to log WebDriver url when any exception is captured
 * Be able to crypto aws access keys: http://qaprosoft.github.io/carina/security/
-  
 ## Fixes
 * Found a root cause of the TestNG main thread crashes and delivered fixes (children DriverListener threads can't raise unchecked RuntimeException)
 * Fixed huge regression defect with STF integration (added explicit adb disconnect to correctly stop device usage)
@@ -176,17 +169,14 @@ N/A
 * Fixed most of the serious Sonar complains
 * Handled StaleElementReferenceException which appeared in 1.9.0 Appium
 * Fix @CaseInsensitiveXPath annotation usage for more complicated xpath values
-
 ## [DEPENDENCIES UPDATES]
 * com.qaprosoft.zafira-client updated to 3.3.44
 
 
-
-##5.2.5.119 (2018-08-23)
+#5.2.5.119 (2018-08-23)
 ==================
 
 ## Enhancements
-
 * Disabled live screenshots appender into the Zafira Reporting Tool due to the performance degradation of elasticsearch
 * Improved custom capabilities transfer between carina and custom mobile selenium-hub
 * Added documentationabout CustomTypePageFactory usage to generate unified Desktop/Android/iOS test classes: http://qaprosoft.github.io/carina/automation/mobile/
@@ -203,14 +193,10 @@ N/A
 ## [DEPENDENCIES UPDATES]
 * com.qaprosoft.zafira-client updated to 3.0.43
 
-
-
-
-## 5.2.4.111 (2018-07-24)
+# 5.2.4.111 (2018-07-24)
 ==================
 
 ## Enhancements
-
 * Published new article for API and Mobile automation approaches:
 http://qaprosoft.github.io/carina/automation/api/
 http://qaprosoft.github.io/carina/automation/mobile/
@@ -252,10 +238,9 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 * com.qaprosoft.zafira-client updated to 3.0.40
 
 
+# 5.2.4.97 (2018-06-02)
 
-## 5.2.4.97 (2018-06-02)
 **Enhancements**
-
 * Published new article for API automation approach:
 http://qaprosoft.github.io/carina/automation/api/
 
@@ -266,7 +251,6 @@ Example: 859d1f0
 * Split click operation for separated Web and Mobile actions to minimize negative side-effects
 
 **Fixes**
-
 * minor adjustments in UI operations for invisible elements on browsers
 
 **[DEPENDENCIES UPDATES]**
