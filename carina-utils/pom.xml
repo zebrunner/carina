@@ -36,10 +36,6 @@
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-commons</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>

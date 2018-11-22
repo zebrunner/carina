@@ -40,10 +40,6 @@
 		</dependency>
 
 		<!-- Test utilities -->
-		<!--<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-		</dependency>-->
 
 		<!-- needed for spring RestTemplate stuff -->
 		<dependency>
@@ -51,7 +47,6 @@
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-
 
 	</dependencies>
 
