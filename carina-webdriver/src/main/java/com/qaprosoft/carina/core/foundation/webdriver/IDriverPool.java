@@ -87,7 +87,13 @@ public interface IDriverPool {
 
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
         if (currentDrivers.containsKey(name)) {
-            drv = currentDrivers.get(name).getDriver();
+        	CarinaDriver cdrv = currentDrivers.get(name);
+            drv = cdrv.getDriver();
+            if (Phase.BEFORE_SUITE.equals(cdrv.getPhase())) {
+            	logger.info("Before suite registered driver will be returned.");
+            } else {
+            	logger.debug(cdrv.getPhase() + " registered driver will be returned.");
+            } 
         }
 
         //Long threadId = Thread.currentThread().getId();
