@@ -2,7 +2,6 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import static org.mockito.Mockito.mock;
 
-import org.apache.log4j.Logger;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -14,7 +13,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 
 public class BeforeSuiteTest implements IDriverPool {
 	
-	private static final Logger LOGGER = Logger.getLogger(BeforeSuiteTest.class);
 	private static final String BEFOR_CLASS_DRIVER_NAME = "custom-1-driver";
 	private static final String BEFOR_METHOD_DRIVER_NAME = "custom-2-driver";
 	private static final String METHOD_DRIVER_NAME = "custom-3-driver";
@@ -30,17 +28,13 @@ public class BeforeSuiteTest implements IDriverPool {
 
 	@Mock
 	private WebDriver mockMethodDriver;
-
-	@BeforeSuite(alwaysRun = true)
-	public void beforeSuite() {
+	
+	@Test
+	public void beforeSuiteDriverSuccessfulRegistered() {
 		R.CONFIG.put("max_driver_count", "6");
 		TestPhase.setActivePhase(Phase.BEFORE_SUITE);
 		this.mockSuiteDriver1 = mock(WebDriver.class);
 		registerDriver(mockSuiteDriver1, IDriverPool.DEFAULT);
-	}
-	
-	@Test
-	public void beforeSuiteDriverSuccessfulRegistered() {
 		Assert.assertEquals(driversPool.size(), 1, "Driver pool is empty after before suite driver has been registered");
 		Assert.assertEquals(getDriver(), mockSuiteDriver1, "Incorrect driver has been returned");
 		changeBeforeSuiteDriverThread();
@@ -97,10 +91,7 @@ public class BeforeSuiteTest implements IDriverPool {
 	private void changeBeforeSuiteDriverThread() {
 		for (CarinaDriver cDriver : driversPool) {
 			if (Phase.BEFORE_SUITE.equals(cDriver.getPhase())) {
-				long currentThreadID = cDriver.getThreadId();
 				long newThreadID = cDriver.getThreadId() + 1;
-				LOGGER.debug("Current thread ID : " + currentThreadID);
-				LOGGER.debug("New thread ID : " + newThreadID);
 				cDriver.setThreadId(newThreadID);
 			}
 		}

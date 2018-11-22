@@ -47,6 +47,7 @@ public class DriverPoolTest implements IDriverPool{
 
 	    @BeforeSuite(alwaysRun = true)
 	    public void beforeSuite() {
+	    	quitDrivers();
 	        R.CONFIG.put("driver_type", "desktop");
 	        R.CONFIG.put("max_driver_count", "2");
 
