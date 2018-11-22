@@ -179,6 +179,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
         }
         
+        //TODO: moved into separate class/method
         LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
         suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
         LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
