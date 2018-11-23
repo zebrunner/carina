@@ -1,7 +1,6 @@
 # Release notes
 
-5.3.3.129 (2018-11-21)
-======
+### 5.3.3.129 (2018-11-21)
 
 **Enhancements**
 
@@ -22,8 +21,8 @@
 * exclude out-of-date 1.38 org.bouncycastle dependency
 
 
-5.3.2.127 (2018-11-07)
-======
+
+### 5.3.2.127 (2018-11-07)
 
 **Enhancements**
 
@@ -41,8 +40,7 @@
 * com.qaprosoft.zafira-client updated to 3.3.47
 
 
-5.3.1.125 (2018-10-16)
-======
+### 5.3.1.125 (2018-10-16)
 
 **Enhancements**
 
@@ -67,8 +65,8 @@ N/A
 * com.qaprosoft.zafira-client updated to 3.3.46
 
 
-5.3.0.124 (2018-10-08)
-======
+
+### 5.3.0.124 (2018-10-08)
 
 **Enhancements**
 
@@ -101,8 +99,8 @@ N/A
 * com.qaprosoft.zafira-client updated to 3.3.44
 
 
-5.2.5.119 (2018-08-23)
-======
+
+### 5.2.5.119 (2018-08-23)
 
 **Enhancements**
 
@@ -125,8 +123,7 @@ N/A
 * com.qaprosoft.zafira-client updated to 3.0.43
 
 
-5.2.4.111 (2018-07-24)
-======
+### 5.2.4.111 (2018-07-24)
 
 **Enhancements**
 
@@ -172,8 +169,8 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 * com.qaprosoft.zafira-client updated to 3.0.40
 
 
-5.2.4.97 (2018-06-02)
-======
+
+### 5.2.4.97 (2018-06-02)
 
 **Enhancements**
 
