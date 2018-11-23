@@ -4,6 +4,7 @@
 ======
 
 **Enhancements**
+
 * Workaround Appium issue and enabled iOS Apps video recording
 * Introduced new TestRail and QTest cases annotations
 * Enabled secure (https) traffic sniffering via embedded proxy by default
@@ -11,11 +12,13 @@
 * Published documentation about [proxy usage](http://qaprosoft.github.io/carina/proxy/)
 
 **Fixes**
+
 * Removed workaround for https://github.com/SeleniumHQ/selenium/issues/5299 as not required anymore. 
    * Note: tested on Chrome 69 and selenium-standalone 3.11.0-3.141.5
 * [#525](https://github.com/qaprosoft/carina/issues/525) Incorrect video count in test info
 
 **[DEPENDENCIES UPDATES]**
+
 * exclude out-of-date 1.38 org.bouncycastle dependency
 
 
@@ -23,15 +26,18 @@
 ======
 
 **Enhancements**
+
 * Added possibility to start localized Chrome and Firefox browsers using "browser_locale" property
 * Updated carina archetype content
 * Updated [snapshots qaprosoft](ttps://ci.qaprosoft.com/nexus/content/repositories) repositories to use https protocol.
 * Switched to latest ZafiraClient (3.3.47) with improvements to the AWS S3 screenshots uploading. We can provide expiresIn in seconds for each uploaded image
 
 **Fixes**
+
 * Only "priority" tag name keep in reserved system names pool
 
 **[DEPENDENCIES UPDATES]**
+
 * com.qaprosoft.zafira-client updated to 3.3.47
 
 
@@ -39,6 +45,7 @@
 ======
 
 **Enhancements**
+
 * Incorporated Carina pipeline build process into the common qps-pipeline library with such possibilities opened for everyone:
   * Automatic snapshot build deployment based on PullRequest sources when "build-snapshot" label is assigned to the PR or "build-snapshot" is present in PR title
   * Configured automatic PR checker static code analysis using Sonar PR checker
@@ -47,9 +54,11 @@
 * Switched to latest ZafiraClient (3.3.46) with custom tags registration funcitonality
 
 **Fixes**
+
 N/A
 
 **[DEPENDENCIES UPDATES]**
+
 * maven-surefire-plugin 2.12.4->2.22.1
 * maven-compiler-plugin 3.1->3.8.0
 * maven-javadoc-plugin 2.3 -> 3.0.1
@@ -62,6 +71,7 @@ N/A
 ======
 
 **Enhancements**
+
 * Refactored List<ExtendedWebElement> and AbstractUI objects to speedup objects manipulations
 * Switched to latest ZafiraClient (3.3.44) with screenshots publishing into AWS S3
 * Implemented async screenshot images publishing to AWS S3
@@ -78,6 +88,7 @@ N/A
 * Be able to crypto aws access keys: http://qaprosoft.github.io/carina/security/
   
 **Fixes**
+
 * Found a root cause of the TestNG main thread crashes and delivered fixes (children DriverListener threads can't raise unchecked RuntimeException)
 * Fixed huge regression defect with STF integration (added explicit adb disconnect to correctly stop device usage)
 * Added explcit io.netty for carina-proxy module
@@ -86,6 +97,7 @@ N/A
 * Fix @CaseInsensitiveXPath annotation usage for more complicated xpath values
 
 **[DEPENDENCIES UPDATES]**
+
 * com.qaprosoft.zafira-client updated to 3.3.44
 
 
@@ -93,6 +105,7 @@ N/A
 ======
 
 **Enhancements**
+
 * Disabled live screenshots appender into the Zafira Reporting Tool due to the performance degradation of elasticsearch
 * Improved custom capabilities transfer between carina and custom mobile selenium-hub
 * Added documentationabout CustomTypePageFactory usage to generate unified Desktop/Android/iOS test classes: http://qaprosoft.github.io/carina/automation/mobile/
@@ -101,12 +114,14 @@ N/A
 * Updated carina default archetype
 
 **Fixes**
+
 * Updated copyright info
 * Workaround applied for appium issue: https://github.com/appium/appium/issues/10159
 * Hide some stacktrace messages during browser maximize as warning (mostly for the executing web tests on mobile devices/browsers)
 * Cleanup in DesktopFactory removing obsolete functionality
 
 **[DEPENDENCIES UPDATES]**
+
 * com.qaprosoft.zafira-client updated to 3.0.43
 
 
@@ -114,6 +129,7 @@ N/A
 ======
 
 **Enhancements**
+
 * Published new article for API and Mobile automation approaches:
 http://qaprosoft.github.io/carina/automation/api/
 http://qaprosoft.github.io/carina/automation/mobile/
@@ -150,6 +166,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 * Added thread name and id into the thread log appender messaging
 
 **[DEPENDENCIES UPDATES]**
+
 * io.appium:java-client was updated to official 6.1.0 release
 * org.seleniumhq.selenium:selenium-java updated to 3.12.0
 * com.qaprosoft.zafira-client updated to 3.0.40
@@ -159,6 +176,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 ======
 
 **Enhancements**
+
 * Published new article for API automation approach:
 http://qaprosoft.github.io/carina/automation/api/
 
@@ -169,8 +187,10 @@ Example: 859d1f0
 * Split click operation for separated Web and Mobile actions to minimize negative side-effects
 
 **Fixes**
+
 * minor adjustments in UI operations for invisible elements on browsers
 
 **[DEPENDENCIES UPDATES]**
+
 * io.appium:java-client was updated to official 6.0.0 release
 * org.seleniumhq.selenium:selenium-java updated to 3.12.0
