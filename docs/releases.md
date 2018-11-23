@@ -2,7 +2,7 @@
 
 
 5.3.3.129 (2018-11-21)
-==================
+======
 
 ## Enhancements
 * Workaround Appium issue and enabled iOS Apps video recording
@@ -21,7 +21,7 @@
 
 
 5.3.2.127 (2018-11-07)
-==================
+======
 
 ## Enhancements
 * Added possibility to start localized Chrome and Firefox browsers using "browser_locale" property
@@ -37,7 +37,7 @@
 
 
 5.3.1.125 (2018-10-16)
-==================
+======
 
 ## Enhancements
 * Incorporated Carina pipeline build process into the common qps-pipeline library with such possibilities opened for everyone:
@@ -60,7 +60,7 @@ N/A
 
 
 5.3.0.124 (2018-10-08)
-==================
+======
 
 ## Enhancements
 * Refactored List<ExtendedWebElement> and AbstractUI objects to speedup objects manipulations
@@ -91,7 +91,7 @@ N/A
 
 
 5.2.5.119 (2018-08-23)
-==================
+======
 
 ## Enhancements
 * Disabled live screenshots appender into the Zafira Reporting Tool due to the performance degradation of elasticsearch
@@ -112,7 +112,7 @@ N/A
 
 
 5.2.4.111 (2018-07-24)
-==================
+======
 
 ## Enhancements
 * Published new article for API and Mobile automation approaches:
@@ -157,7 +157,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 
 
 5.2.4.97 (2018-06-02)
-==================
+======
 
 **Enhancements**
 * Published new article for API automation approach:
