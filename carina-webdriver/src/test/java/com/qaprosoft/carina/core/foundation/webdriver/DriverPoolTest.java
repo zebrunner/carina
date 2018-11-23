@@ -49,8 +49,6 @@ public class DriverPoolTest implements IDriverPool{
 	    public void beforeSuite() {
 	    	quitDrivers();
 	        R.CONFIG.put("driver_type", "desktop");
-	        R.CONFIG.put("max_driver_count", "2");
-
 	        R.CONFIG.put("thread_count", "1");
 	        R.CONFIG.put("data_provider_thread_count", "1");
 
@@ -61,6 +59,8 @@ public class DriverPoolTest implements IDriverPool{
 
 	    @Test()
 	    public void registerDefaultDriver() {
+	    	R.CONFIG.put("max_driver_count", "2");
+	    	
 	        registerDriver(mockDriverDefault, IDriverPool.DEFAULT);
 	        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
 	        Assert.assertTrue(isDriverRegistered(IDriverPool.DEFAULT), "Default driver is not registered!");

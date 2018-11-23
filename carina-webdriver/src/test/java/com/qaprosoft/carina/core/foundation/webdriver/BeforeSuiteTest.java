@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -28,6 +28,11 @@ public class BeforeSuiteTest implements IDriverPool {
 
 	@Mock
 	private WebDriver mockMethodDriver;
+	
+	@AfterClass(alwaysRun = true)
+	public void afterClass() {
+		quitDrivers();
+	}
 	
 	@Test
 	public void beforeSuiteDriverSuccessfulRegistered() {
