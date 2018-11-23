@@ -448,121 +448,91 @@
                 
                 <h1 id="release-notes">Release notes</h1>
 <h1 id="533129-2018-11-21">5.3.3.129 (2018-11-21)</h1>
-<h2 id="enhancements">Enhancements</h2>
-<ul>
-<li>Workaround Appium issue and enabled iOS Apps video recording</li>
-<li>Introduced new TestRail and QTest cases annotations</li>
-<li>Enabled secure (https) traffic sniffering via embedded proxy by default</li>
-<li>Removed dependencies conflicts to make browsermobproxy workable for secure content </li>
-<li>Published documentation about <a href="http://qaprosoft.github.io/carina/proxy/">proxy usage</a></li>
-</ul>
-<h2 id="fixes">Fixes</h2>
-<ul>
-<li>Removed workaround for https://github.com/SeleniumHQ/selenium/issues/5299 as not required anymore. </li>
-<li>Note: tested on Chrome 69 and selenium-standalone 3.11.0-3.141.5</li>
-<li><a href="https://github.com/qaprosoft/carina/issues/525">#525</a> Incorrect video count in test info</li>
-</ul>
-<h2 id="dependencies-updates">[DEPENDENCIES UPDATES]</h2>
-<ul>
-<li>exclude out-of-date 1.38 org.bouncycastle dependency</li>
-</ul>
+<p><strong>Enhancements</strong>
+<em> Workaround Appium issue and enabled iOS Apps video recording
+</em> Introduced new TestRail and QTest cases annotations
+<em> Enabled secure (https) traffic sniffering via embedded proxy by default
+</em> Removed dependencies conflicts to make browsermobproxy workable for secure content 
+* Published documentation about <a href="http://qaprosoft.github.io/carina/proxy/">proxy usage</a></p>
+<p><strong>Fixes</strong>
+<em> Removed workaround for https://github.com/SeleniumHQ/selenium/issues/5299 as not required anymore. 
+   * Note: tested on Chrome 69 and selenium-standalone 3.11.0-3.141.5
+</em> <a href="https://github.com/qaprosoft/carina/issues/525">#525</a> Incorrect video count in test info</p>
+<p><strong>[DEPENDENCIES UPDATES]</strong>
+* exclude out-of-date 1.38 org.bouncycastle dependency</p>
 <h1 id="532127-2018-11-07">5.3.2.127 (2018-11-07)</h1>
-<h2 id="enhancements_1">Enhancements</h2>
-<ul>
-<li>Added possibility to start localized Chrome and Firefox browsers using "browser_locale" property</li>
-<li>Updated carina archetype content</li>
-<li>Updated <a href="ttps://ci.qaprosoft.com/nexus/content/repositories">snapshots qaprosoft</a> repositories to use https protocol.</li>
-<li>Switched to latest ZafiraClient (3.3.47) with improvements to the AWS S3 screenshots uploading. We can provide expiresIn in seconds for each uploaded image</li>
-</ul>
-<h2 id="fixes_1">Fixes</h2>
-<ul>
-<li>Only "priority" tag name keep in reserved system names pool</li>
-</ul>
-<h2 id="dependencies-updates_1">[DEPENDENCIES UPDATES]</h2>
-<ul>
-<li>com.qaprosoft.zafira-client updated to 3.3.47</li>
-</ul>
+<p><strong>Enhancements</strong>
+<em> Added possibility to start localized Chrome and Firefox browsers using "browser_locale" property
+</em> Updated carina archetype content
+<em> Updated <a href="ttps://ci.qaprosoft.com/nexus/content/repositories">snapshots qaprosoft</a> repositories to use https protocol.
+</em> Switched to latest ZafiraClient (3.3.47) with improvements to the AWS S3 screenshots uploading. We can provide expiresIn in seconds for each uploaded image</p>
+<p><strong>Fixes</strong>
+* Only "priority" tag name keep in reserved system names pool</p>
+<p><strong>[DEPENDENCIES UPDATES]</strong>
+* com.qaprosoft.zafira-client updated to 3.3.47</p>
 <h1 id="531125-2018-10-16">5.3.1.125 (2018-10-16)</h1>
-<h2 id="enhancements_2">Enhancements</h2>
-<ul>
-<li>Incorporated Carina pipeline build process into the common qps-pipeline library with such possibilities opened for everyone:</li>
-<li>Automatic snapshot build deployment based on PullRequest sources when "build-snapshot" label is assigned to the PR or "build-snapshot" is present in PR title</li>
-<li>Configured automatic PR checker static code analysis using Sonar PR checker</li>
-<li>Configured full static code analysis and snapshot build generation after merge to master</li>
-<li>@TestTag and @TestPriority annotations developed to be able to assign P0-P6 priorities to any test method and any custom tag like "feature" etc</li>
-<li>Switched to latest ZafiraClient (3.3.46) with custom tags registration funcitonality</li>
-</ul>
-<h2 id="fixes_2">Fixes</h2>
-<p>N/A</p>
-<h2 id="dependencies-updates_2">[DEPENDENCIES UPDATES]</h2>
-<ul>
-<li>maven-surefire-plugin 2.12.4-&gt;2.22.1</li>
-<li>maven-compiler-plugin 3.1-&gt;3.8.0</li>
-<li>maven-javadoc-plugin 2.3 -&gt; 3.0.1</li>
-<li>maven-assembly-plugin 2.4.1 -&gt; 3.1.0</li>
-<li>maven-source-plugin 2.4 -&gt; 3.0.1</li>
-<li>com.qaprosoft.zafira-client updated to 3.3.46</li>
-</ul>
+<p><strong>Enhancements</strong>
+<em> Incorporated Carina pipeline build process into the common qps-pipeline library with such possibilities opened for everyone:
+  * Automatic snapshot build deployment based on PullRequest sources when "build-snapshot" label is assigned to the PR or "build-snapshot" is present in PR title
+  * Configured automatic PR checker static code analysis using Sonar PR checker
+  * Configured full static code analysis and snapshot build generation after merge to master
+</em> @TestTag and @TestPriority annotations developed to be able to assign P0-P6 priorities to any test method and any custom tag like "feature" etc
+* Switched to latest ZafiraClient (3.3.46) with custom tags registration funcitonality</p>
+<p><strong>Fixes</strong>
+N/A</p>
+<p><strong>[DEPENDENCIES UPDATES]</strong>
+<em> maven-surefire-plugin 2.12.4-&gt;2.22.1
+</em> maven-compiler-plugin 3.1-&gt;3.8.0
+<em> maven-javadoc-plugin 2.3 -&gt; 3.0.1
+</em> maven-assembly-plugin 2.4.1 -&gt; 3.1.0
+<em> maven-source-plugin 2.4 -&gt; 3.0.1
+</em> com.qaprosoft.zafira-client updated to 3.3.46</p>
 <h1 id="530124-2018-10-08">5.3.0.124 (2018-10-08)</h1>
-<h2 id="enhancements_3">Enhancements</h2>
-<ul>
-<li>Refactored List<ExtendedWebElement> and AbstractUI objects to speedup objects manipulations</li>
-<li>Switched to latest ZafiraClient (3.3.44) with screenshots publishing into AWS S3</li>
-<li>Implemented async screenshot images publishing to AWS S3</li>
-<li>Added optimize_video_recording parameter. If true video will be captured only for the final retry and as result failed only.</li>
-<li>Handled application crash on iOS with proper exception as only it happens</li>
-<li>Improved logging messages and format to sync with new gallery and log viewer</li>
-<li>Removed obsolete Parameter(s)</li>
-<li>ci_url</li>
-<li>ci_build</li>
-<li>keep_all_screenshots</li>
-<li>Removed obsolete com.qaprosoft.carina.core.foundation.webdriver.appium package</li>
-<li>Removed obsolete start/stop recording methods for Device</li>
-<li>Pushed to log WebDriver url when any exception is captured</li>
-<li>Be able to crypto aws access keys: http://qaprosoft.github.io/carina/security/</li>
-</ul>
-<h2 id="fixes_3">Fixes</h2>
-<ul>
-<li>Found a root cause of the TestNG main thread crashes and delivered fixes (children DriverListener threads can't raise unchecked RuntimeException)</li>
-<li>Fixed huge regression defect with STF integration (added explicit adb disconnect to correctly stop device usage)</li>
-<li>Added explcit io.netty for carina-proxy module</li>
-<li>Fixed most of the serious Sonar complains</li>
-<li>Handled StaleElementReferenceException which appeared in 1.9.0 Appium</li>
-<li>Fix @CaseInsensitiveXPath annotation usage for more complicated xpath values</li>
-</ul>
-<h2 id="dependencies-updates_3">[DEPENDENCIES UPDATES]</h2>
-<ul>
-<li>com.qaprosoft.zafira-client updated to 3.3.44</li>
-</ul>
+<p><strong>Enhancements</strong>
+<em> Refactored List<ExtendedWebElement> and AbstractUI objects to speedup objects manipulations
+</em> Switched to latest ZafiraClient (3.3.44) with screenshots publishing into AWS S3
+<em> Implemented async screenshot images publishing to AWS S3
+</em> Added optimize_video_recording parameter. If true video will be captured only for the final retry and as result failed only.
+<em> Handled application crash on iOS with proper exception as only it happens
+</em> Improved logging messages and format to sync with new gallery and log viewer
+<em> Removed obsolete Parameter(s)
+  * ci_url
+  * ci_build
+  * keep_all_screenshots
+</em> Removed obsolete com.qaprosoft.carina.core.foundation.webdriver.appium package
+<em> Removed obsolete start/stop recording methods for Device
+</em> Pushed to log WebDriver url when any exception is captured
+* Be able to crypto aws access keys: http://qaprosoft.github.io/carina/security/</p>
+<p><strong>Fixes</strong>
+<em> Found a root cause of the TestNG main thread crashes and delivered fixes (children DriverListener threads can't raise unchecked RuntimeException)
+</em> Fixed huge regression defect with STF integration (added explicit adb disconnect to correctly stop device usage)
+<em> Added explcit io.netty for carina-proxy module
+</em> Fixed most of the serious Sonar complains
+<em> Handled StaleElementReferenceException which appeared in 1.9.0 Appium
+</em> Fix @CaseInsensitiveXPath annotation usage for more complicated xpath values</p>
+<p><strong>[DEPENDENCIES UPDATES]</strong>
+* com.qaprosoft.zafira-client updated to 3.3.44</p>
 <h1 id="525119-2018-08-23">5.2.5.119 (2018-08-23)</h1>
-<h2 id="enhancements_4">Enhancements</h2>
-<ul>
-<li>Disabled live screenshots appender into the Zafira Reporting Tool due to the performance degradation of elasticsearch</li>
-<li>Improved custom capabilities transfer between carina and custom mobile selenium-hub</li>
-<li>Added documentationabout CustomTypePageFactory usage to generate unified Desktop/Android/iOS test classes: http://qaprosoft.github.io/carina/automation/mobile/</li>
-<li>Added live VNC streaming support for drivers started in before suite/class/method actions</li>
-<li>Added new public static method DevicePool.isRegistered()</li>
-<li>Updated carina default archetype</li>
-</ul>
-<h2 id="fixes_4">Fixes</h2>
-<ul>
-<li>Updated copyright info</li>
-<li>Workaround applied for appium issue: https://github.com/appium/appium/issues/10159</li>
-<li>Hide some stacktrace messages during browser maximize as warning (mostly for the executing web tests on mobile devices/browsers)</li>
-<li>Cleanup in DesktopFactory removing obsolete functionality</li>
-</ul>
-<h2 id="dependencies-updates_4">[DEPENDENCIES UPDATES]</h2>
-<ul>
-<li>com.qaprosoft.zafira-client updated to 3.0.43</li>
-</ul>
+<p><strong>Enhancements</strong>
+<em> Disabled live screenshots appender into the Zafira Reporting Tool due to the performance degradation of elasticsearch
+</em> Improved custom capabilities transfer between carina and custom mobile selenium-hub
+<em> Added documentationabout CustomTypePageFactory usage to generate unified Desktop/Android/iOS test classes: http://qaprosoft.github.io/carina/automation/mobile/
+</em> Added live VNC streaming support for drivers started in before suite/class/method actions
+<em> Added new public static method DevicePool.isRegistered()
+</em> Updated carina default archetype</p>
+<p><strong>Fixes</strong>
+<em> Updated copyright info
+</em> Workaround applied for appium issue: https://github.com/appium/appium/issues/10159
+<em> Hide some stacktrace messages during browser maximize as warning (mostly for the executing web tests on mobile devices/browsers)
+</em> Cleanup in DesktopFactory removing obsolete functionality</p>
+<p><strong>[DEPENDENCIES UPDATES]</strong>
+* com.qaprosoft.zafira-client updated to 3.0.43</p>
 <h1 id="524111-2018-07-24">5.2.4.111 (2018-07-24)</h1>
-<h2 id="enhancements_5">Enhancements</h2>
-<ul>
-<li>
-<p>Published new article for API and Mobile automation approaches:
+<p><strong>Enhancements</strong>
+* Published new article for API and Mobile automation approaches:
 http://qaprosoft.github.io/carina/automation/api/
 http://qaprosoft.github.io/carina/automation/mobile/</p>
-</li>
+<ul>
 <li>
 <p>Improved actual browser_version identification and it's registration in Zafira Reporting Tool</p>
 </li>
@@ -593,24 +563,20 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 <p>Improved integration with qps-pipeline to support demo screenshots publishing to CI for aborted testruns as well</p>
 </li>
 </ul>
-<h2 id="fixes_5">Fixes</h2>
-<ul>
-<li>minor adjustments in UI operations for invisible elements on browsers</li>
-<li>fixed integration with ZafiraClient to specify default expiration for test artifacts (30 days)</li>
-<li>Resolve issues with default Timer operations (error messages instead of RuntimeException)</li>
-<li>Handled annoying cast exception "java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String" which is produced mistakenly by Appium instead of StaleElementException </li>
-<li>Fixed potential recursive callss in DriverListener-&gt;onException method</li>
-<li>Fixed vnc pattern usage for live video streaming (Web and Android mobile)</li>
-<li>Fixed UIX schema files generation for Android mobile pages</li>
-<li>Fixed IE/Edge capabilities generation for use-case with BrowserStack</li>
-<li>Added thread name and id into the thread log appender messaging</li>
-</ul>
-<h2 id="dependencies-updates_5">[DEPENDENCIES UPDATES]</h2>
-<ul>
-<li>io.appium:java-client was updated to official 6.1.0 release</li>
-<li>org.seleniumhq.selenium:selenium-java updated to 3.12.0</li>
-<li>com.qaprosoft.zafira-client updated to 3.0.40</li>
-</ul>
+<p><strong>Fixes</strong>
+<em> minor adjustments in UI operations for invisible elements on browsers
+</em> fixed integration with ZafiraClient to specify default expiration for test artifacts (30 days)
+<em> Resolve issues with default Timer operations (error messages instead of RuntimeException)
+</em> Handled annoying cast exception "java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String" which is produced mistakenly by Appium instead of StaleElementException 
+<em> Fixed potential recursive callss in DriverListener-&gt;onException method
+</em> Fixed vnc pattern usage for live video streaming (Web and Android mobile)
+<em> Fixed UIX schema files generation for Android mobile pages
+</em> Fixed IE/Edge capabilities generation for use-case with BrowserStack
+* Added thread name and id into the thread log appender messaging</p>
+<p><strong>[DEPENDENCIES UPDATES]</strong>
+<em> io.appium:java-client was updated to official 6.1.0 release
+</em> org.seleniumhq.selenium:selenium-java updated to 3.12.0
+* com.qaprosoft.zafira-client updated to 3.0.40</p>
 <h1 id="52497-2018-06-02">5.2.4.97 (2018-06-02)</h1>
 <p><strong>Enhancements</strong>
 * Published new article for API automation approach:
