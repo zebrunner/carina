@@ -272,7 +272,12 @@ All project configuration properties are located in **_config.properties** file.
 		<tr>
 		<td>core_log_level</td>
 		<td>Level for Carina logging</td>
-		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE </td>
+		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
+	</tr>
+		<tr>
+		<td>core_log_packages</td>
+		<td>Comma separated list of core packages where you want to redefine log level</td>
+		<td>com.qaprosoft.carina.core, ZafiraConfigurator etc</td>
 	</tr>
 		<tr>
 		<td>log_all_json</td>

@@ -160,6 +160,8 @@ public class Configuration {
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 
         CORE_LOG_LEVEL("core_log_level"),
+        
+        CORE_LOG_PACKAGES("core_log_packages"),
 
         LOG_ALL_JSON("log_all_json"),
 
