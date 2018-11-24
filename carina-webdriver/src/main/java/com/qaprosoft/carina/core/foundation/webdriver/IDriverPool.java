@@ -241,9 +241,10 @@ public interface IDriverPool {
             DevicePool.deregisterDevice();
             deregisterDriver(name);
             
+            
+            logger.debug("Driver starting quit..." + name);
             drv.quit();
-
-            logger.debug("Driver exited..." + name);
+            logger.debug("Driver finsihed quite." + name);
         } catch (WebDriverException e) {
             logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
             // do nothing

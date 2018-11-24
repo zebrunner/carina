@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -188,7 +187,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull())
             return;
 
-        LOGGER.info("adb connect " + getRemoteURL());
+        LOGGER.debug("adb connect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
         executor.execute(cmd);
         CommonUtils.pause(1);
@@ -262,48 +261,6 @@ public class Device extends RemoteDevice implements IDriverPool {
 
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "pull", pathFrom, pathTo);
         executor.execute(cmd);
-    }
-
-    private Boolean getScreenState() {
-        // determine current screen status
-        // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys",
-                "input_method");
-        List<String> output = executor.execute(cmd);
-
-        Boolean screenState = null;
-        String line;
-
-        Iterator<String> itr = output.iterator();
-        while (itr.hasNext()) {
-            // mScreenOn - default value for the most of Android devices
-            // mInteractive - for Nexuses
-            line = itr.next();
-            if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
-                screenState = true;
-                break;
-            }
-            if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
-                screenState = false;
-                break;
-            }
-        }
-
-        if (screenState == null) {
-            LOGGER.error(getUdid()
-                    + ": Unable to determine existing device screen state!");
-            return screenState; // no actions required if state is not recognized.
-        }
-
-        if (screenState) {
-            LOGGER.debug(getUdid() + ": screen is ON");
-        }
-
-        if (!screenState) {
-            LOGGER.debug(getUdid() + ": screen is OFF");
-        }
-
-        return screenState;
     }
 
     public void pressKey(int key) {

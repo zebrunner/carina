@@ -167,7 +167,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     Category tmpLogger = (Category) allLoggers.nextElement();
                     LOGGER.debug("loggerName: " + tmpLogger.getName());
                     for (String coreLogPackage : coreLogPackages) {
-                        if (tmpLogger.getName().contains(coreLogPackage)) {
+                        if (tmpLogger.getName().contains(coreLogPackage.trim())) {
                             LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to " + Configuration.get(Parameter.CORE_LOG_LEVEL));
                             tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
                         }
