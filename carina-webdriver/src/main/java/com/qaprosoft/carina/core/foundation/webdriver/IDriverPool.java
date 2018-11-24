@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -186,10 +187,15 @@ public interface IDriverPool {
             logger.debug("Current device is: " + device.getName());
             //try to get all existing capabilities from driver and append device udid explicitly
             WebDriver castedDriver = ((EventFiringWebDriver) drv).getWrappedDriver();
-            caps = (DesiredCapabilities) ((RemoteWebDriver)castedDriver).getCapabilities();
-            logger.debug("detected capabilities from current driver:  " + caps);
+            Capabilities existingCaps = ((RemoteWebDriver)castedDriver).getCapabilities();
+            logger.debug("detected capabilities from current driver:  " + existingCaps);
+            // pushing one by one all capabilities into DesiredCapabilities for request
+            caps = new DesiredCapabilities();
+            for (String cap : existingCaps.asMap().keySet()) {
+            	caps.setCapability(cap, existingCaps.getCapability(cap));
+            }
+            logger.debug("Add udid: " + device.getUdid() + " to capabilities.");
             caps.setCapability("udid", device.getUdid());
-            logger.debug("Added udid: " + device.getUdid() + " to capabilities.");
         }
 
         try {
