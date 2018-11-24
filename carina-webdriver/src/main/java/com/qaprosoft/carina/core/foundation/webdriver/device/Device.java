@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +37,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 
+import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -49,6 +52,8 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+
+import io.appium.java_client.android.AndroidDriver;
 
 public class Device extends RemoteDevice implements IDriverPool {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
@@ -245,10 +250,10 @@ public class Device extends RemoteDevice implements IDriverPool {
     public List<String> getInstalledPackages() {
         String deviceUdid = getAdbName();
         LOGGER.info("Device udid: ".concat(deviceUdid));
-        String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list", "packages");
-        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
-        List<String> packagesList = executor.execute(cmd);
-        return packagesList;
+        Map<String, Object> listPackagesCmd = ImmutableMap
+                .of("command", "pm", "args", Arrays.asList("list packages"));
+        LOGGER.info("Following cmd will be executed: " + listPackagesCmd.toString());
+        return executeCmd(listPackagesCmd);
     }
 
     public boolean isAppInstall(final String packageName) {
@@ -267,9 +272,10 @@ public class Device extends RemoteDevice implements IDriverPool {
     private Boolean getScreenState() {
         // determine current screen status
         // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys",
-                "input_method");
-        List<String> output = executor.execute(cmd);
+        Map<String, Object> dumpsysCmd = ImmutableMap
+                .of("command", "dumpsys", "args", Arrays.asList("input_method"));
+
+        List<String> output = executeCmd(dumpsysCmd);
 
         Boolean screenState = null;
         String line;
@@ -310,9 +316,10 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull())
             return;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "input",
-                "keyevent", String.valueOf(key));
-        executor.execute(cmd);
+        Map<String, Object> keyEventCmd = ImmutableMap
+                .of("command", "input keyevent", "args", Arrays.asList(String.valueOf(key)));
+        
+        executeCmd(keyEventCmd);
     }
 
     public void pause(long timeout) {
@@ -334,8 +341,10 @@ public class Device extends RemoteDevice implements IDriverPool {
         // adb -s UDID shell pm clear com.myfitnesspal.android
         String packageName = getApkPackageName(app);
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "pm", "clear", packageName);
-        executor.execute(cmd);
+        Map<String, Object> clearPackageCmd = ImmutableMap
+                .of("command", "pm", "args", Arrays.asList("clear",packageName));
+        
+        executeCmd(clearPackageCmd);
     }
 
     public String getApkPackageName(String apkFile) {
@@ -452,8 +461,9 @@ public class Device extends RemoteDevice implements IDriverPool {
         String[] res = new String[3];
         res[0] = packageName;
 
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys", "package", packageName);
-        List<String> output = executor.execute(cmd);
+        Map<String, Object> cmd = ImmutableMap
+                .of("command", "dumpsys", "args", Arrays.asList("package", packageName));
+        List<String> output = executeCmd(cmd);
 
         for (String line : output) {
             LOGGER.debug(line);
@@ -611,10 +621,11 @@ public class Device extends RemoteDevice implements IDriverPool {
             @Override
             public String call() throws Exception {
                 LOGGER.debug("Start Syslog extraction");
-                String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
+                Map<String, Object> cmd = ImmutableMap
+                        .of("command", "logcat", "args", Arrays.asList("-d"));
                 LOGGER.debug("Logcat log has been extracted.");
                 StringBuilder tempStr = new StringBuilder();
-                executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
+                executeCmd(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
                 return tempStr.toString();
             }
             
@@ -658,8 +669,9 @@ public class Device extends RemoteDevice implements IDriverPool {
         
         LOGGER.info(String.format("Test will be started on device: %s:%s", getName(), getAdbName()));
         // adb -s UDID logcat -c
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
-        executor.execute(cmd);
+        Map<String, Object> cmd = ImmutableMap
+                .of("command", "logcat", "args", Arrays.asList("-c"));
+        executeCmd(cmd);
         LOGGER.debug("Logcat logs were cleared.");
     }
     
@@ -758,4 +770,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         return connectedDevices;
     }
 
+    private List<String> executeCmd(Map<String, Object> cmd) {
+        return Arrays.asList(((String) ((AndroidDriver<?>) ((EventFiringWebDriver) getDriver()).getWrappedDriver()).executeScript("mobile: shell", cmd)).split("\\r?\\n"));
+    }
 }
