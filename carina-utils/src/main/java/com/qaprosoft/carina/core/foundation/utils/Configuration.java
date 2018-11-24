@@ -373,6 +373,7 @@ public class Configuration {
     }
 
     public static String getDriverType(DesiredCapabilities capabilities) {
+    	LOGGER.info("getDriverType by capabilities: " + capabilities);
     	if (capabilities == null) {
     		//calculate driver type based on config.properties arguments
     		return getDriverType();
