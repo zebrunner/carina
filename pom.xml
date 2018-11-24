@@ -503,7 +503,7 @@
         <snapshotRepository>
             <id>deploymentRepo</id>
             <name>Qaprosoft Snapshots</name>
-            <url>http://ci.qaprosoft.com:8081/nexus/content/repositories/snapshots/</url>
+            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
