@@ -366,20 +366,21 @@ public class Configuration {
 
         String platform = getPlatform();
         if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
+        	LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
 
+        LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
 
     public static String getDriverType(DesiredCapabilities capabilities) {
-    	LOGGER.info("getDriverType by capabilities: " + capabilities);
     	if (capabilities == null) {
     		//calculate driver type based on config.properties arguments
     		return getDriverType();
     	}
     	
-    	// calculate driver type based on capability values
+    	LOGGER.debug("Detecting driver_type by capabilities: " + capabilities);
     	String platform = "";
     	if (capabilities.getCapability("platform") != null) {
     		platform = capabilities.getCapability("platform").toString();
@@ -390,14 +391,17 @@ public class Configuration {
     	}
     	
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
+        	LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
         
         // handle use-case when we provide only uuid object among desired capabilities
     	if (capabilities.getCapability("udid") != null) {
+    		LOGGER.debug("Detected MOBILE driver_type by uuid inside capabilities");
     		return SpecialKeywords.MOBILE;
     	}
 
+    	LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
     public static String getMobileApp() {

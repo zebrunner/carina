@@ -90,7 +90,7 @@ public class MobileFactory extends AbstractFactory {
         	String udid = capabilities.getCapability("udid").toString();
         	capabilities = getCapabilities(name);
         	capabilities.setCapability("udid", udid);
-        	LOGGER.info("Appended udid to cpabilities: " + capabilities);
+        	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
         try {
@@ -148,7 +148,6 @@ public class MobileFactory extends AbstractFactory {
 
             Device device = DevicePool.getNullDevice();
             if (device.isNull()) {
-                // TODO: double check that local run with direct appium works fine
                 RemoteDevice remoteDevice = getDeviceInfo(driver);
                 // 3rd party solutions like browserstack or saucelabs return not null
                 if (remoteDevice != null && remoteDevice.getName() != null) {
