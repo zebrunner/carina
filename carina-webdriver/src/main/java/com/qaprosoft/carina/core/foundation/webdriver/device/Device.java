@@ -208,7 +208,7 @@ public class Device extends RemoteDevice implements IDriverPool {
 
         // [VD] No need to do adb command as stopping STF session do it correctly
         // in new STF we have huge problems with sessions disconnect
-        LOGGER.info("adb disconnect " + getRemoteURL());
+        LOGGER.debug("adb disconnect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
         executor.execute(cmd);
 
@@ -226,7 +226,7 @@ public class Device extends RemoteDevice implements IDriverPool {
     public String getFullPackageByName(final String name) {
 
         List<String> packagesList = getInstalledPackages();
-        LOGGER.info("Found packages: ".concat(packagesList.toString()));
+        LOGGER.debug("Found packages: ".concat(packagesList.toString()));
         String resultPackage = null;
         for (String packageStr : packagesList) {
             if (packageStr.matches(String.format(".*%s.*", name))) {
@@ -244,9 +244,9 @@ public class Device extends RemoteDevice implements IDriverPool {
 
     public List<String> getInstalledPackages() {
         String deviceUdid = getAdbName();
-        LOGGER.info("Device udid: ".concat(deviceUdid));
+        LOGGER.debug("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list", "packages");
-        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
+        LOGGER.debug("Following cmd will be executed: " + Arrays.toString(cmd));
         List<String> packagesList = executor.execute(cmd);
         return packagesList;
     }
@@ -296,11 +296,11 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
 
         if (screenState) {
-            LOGGER.info(getUdid() + ": screen is ON");
+            LOGGER.debug(getUdid() + ": screen is ON");
         }
 
         if (!screenState) {
-            LOGGER.info(getUdid() + ": screen is OFF");
+            LOGGER.debug(getUdid() + ": screen is OFF");
         }
 
         return screenState;
@@ -523,10 +523,10 @@ public class Device extends RemoteDevice implements IDriverPool {
             installApp(proxySetterFileName);
         }
         String deviceUdid = getAdbName();
-        LOGGER.info("Device udid: ".concat(deviceUdid));
+        LOGGER.debug("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "am", "start", "-n",
                 "tk.elevenk.proxysetter/.MainActivity", "-e", "host", host, "-e", "port", port, "-e", "ssid", ssid, "-e", "key", password);
-        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
+        LOGGER.debug("Following cmd will be executed: " + Arrays.toString(cmd));
         executor.execute(cmd);
     }
 
@@ -625,13 +625,12 @@ public class Device extends RemoteDevice implements IDriverPool {
             LOGGER.debug("Logcat logs: ".concat(logs));
             return logs;
         } catch (TimeoutException e) {
-            LOGGER.info(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
+            LOGGER.warn(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
             future.cancel(true);
             return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
         } catch (Exception e) {
 //            TODO: add custom handlers for each exceptions based on type
-            LOGGER.info(e);
-            LOGGER.info("Unknown issue was fired. Empty logs will be used.");
+            LOGGER.warn("Unknown issue was fired. Empty logs will be used.", e);
             return "";
         }
        
@@ -686,8 +685,7 @@ public class Device extends RemoteDevice implements IDriverPool {
             file = new File(fileName);
             FileUtils.writeStringToFile(file, log, Charset.defaultCharset());
         } catch (IOException e) {
-            LOGGER.info(e);
-            LOGGER.info("Error has been occured during attempt to extract logcat log.");
+            LOGGER.warn("Error has been occured during attempt to extract logcat log.", e);
         }
         LOGGER.debug("Logcat file path: ".concat(fileName));
         return file;
@@ -728,8 +726,7 @@ public class Device extends RemoteDevice implements IDriverPool {
             file = new File(fileName);
             FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
         } catch (IOException e) {
-            LOGGER.info(e);
-            LOGGER.info("Error has been met during attempt to extract xml tree.");
+            LOGGER.warn("Error has been met during attempt to extract xml tree.", e);
         }
         LOGGER.debug("XML file path: ".concat(fileName));
         return file;

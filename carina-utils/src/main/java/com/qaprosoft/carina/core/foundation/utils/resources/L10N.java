@@ -265,7 +265,7 @@ public class L10N {
         } catch (Exception e) {
             LOGGER.debug("There is no l10n_encoding parameter in config properties.");
         }
-        LOGGER.info("Will use L10N encoding: " + encoding);
+        LOGGER.debug("Will use L10N encoding: " + encoding);
         return encoding.toUpperCase().contains("UTF-8");
     }
 }

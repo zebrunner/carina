@@ -165,9 +165,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
                 while (allLoggers.hasMoreElements()) {
                     Category tmpLogger = (Category) allLoggers.nextElement();
-                    LOGGER.info("loggerName: " + tmpLogger.getName());
-                    if (coreLogPackages.contains(tmpLogger.getName())) {
-                        tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+                    LOGGER.debug("loggerName: " + tmpLogger.getName());
+                    for (String coreLogPackage : coreLogPackages) {
+                        if (tmpLogger.getName().contains(coreLogPackage)) {
+                            LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to " + Configuration.get(Parameter.CORE_LOG_LEVEL));
+                            tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+                        }
                     }
                 }
             } catch (NoSuchMethodError e) {
