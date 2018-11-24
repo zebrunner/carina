@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -133,7 +132,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
 
         setUdid(deviceUdid);
-        
+
         String proxyPort = R.CONFIG.get(SpecialKeywords.MOBILE_PROXY_PORT);
         if (capabilities.getCapability("proxy_port") != null) {
             proxyPort = capabilities.getCapability("proxy_port").toString();
@@ -275,7 +274,7 @@ public class Device extends RemoteDevice implements IDriverPool {
 
         Map<String, Object> keyEventCmd = ImmutableMap
                 .of("command", "input keyevent", "args", Arrays.asList(String.valueOf(key)));
-        
+
         executeCmd(keyEventCmd);
     }
 
@@ -299,8 +298,8 @@ public class Device extends RemoteDevice implements IDriverPool {
         String packageName = getApkPackageName(app);
 
         Map<String, Object> clearPackageCmd = ImmutableMap
-                .of("command", "pm", "args", Arrays.asList("clear",packageName));
-        
+                .of("command", "pm", "args", Arrays.asList("clear", packageName));
+
         executeCmd(clearPackageCmd);
     }
 
@@ -551,7 +550,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
 
     }
-    
+
     /**
      * Extract sys log using adb
      * 
@@ -559,11 +558,11 @@ public class Device extends RemoteDevice implements IDriverPool {
      */
     public String getSysLog() {
         int extractionTimeout = 15;
-        
+
         if (isNull()) {
             return "";
         }
-        
+
         if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
             LOGGER.debug("Logcat log is empty since device is not Android");
             return "";
@@ -574,7 +573,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<String> future = executorService.submit(new Callable<String>() {
 
-         // adb -s UDID logcat -d
+            // adb -s UDID logcat -d
             @Override
             public String call() throws Exception {
                 LOGGER.debug("Start Syslog extraction");
@@ -585,7 +584,7 @@ public class Device extends RemoteDevice implements IDriverPool {
                 executeCmd(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
                 return tempStr.toString();
             }
-            
+
         });
 
         try {
@@ -597,14 +596,14 @@ public class Device extends RemoteDevice implements IDriverPool {
             future.cancel(true);
             return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
         } catch (Exception e) {
-//            TODO: add custom handlers for each exceptions based on type
+            // TODO: add custom handlers for each exceptions based on type
             LOGGER.warn("Unknown issue was fired. Empty logs will be used.", e);
             return "";
         }
-       
-//        return tempStr.toString();
+
+        // return tempStr.toString();
     }
-    
+
     /**
      * Clear sys log
      */
@@ -612,17 +611,17 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull()) {
             return;
         }
-        
+
         if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
             LOGGER.debug("Logcat log won't be cleared since device is not Android");
             return;
         }
 
-		if (!isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return;
-		}
-        
+        if (!isConnected()) {
+            // do not use new features if execution is not inside approved cloud
+            return;
+        }
+
         LOGGER.info(String.format("Test will be started on device: %s:%s", getName(), getAdbName()));
         // adb -s UDID logcat -c
         Map<String, Object> cmd = ImmutableMap
@@ -630,7 +629,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         executeCmd(cmd);
         LOGGER.debug("Logcat logs were cleared.");
     }
-    
+
     /**
      * Save logcat log for Android (logs will be uploaded in future as artifacts)
      * TODO: for iOS
@@ -638,17 +637,17 @@ public class Device extends RemoteDevice implements IDriverPool {
      * @return saved file
      */
     public File saveSysLog() {
-		if (!isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return null;
-		}
-		LOGGER.debug("STF is enabled. Sys log will be extracted...");
+        if (!isConnected()) {
+            // do not use new features if execution is not inside approved cloud
+            return null;
+        }
+        LOGGER.debug("STF is enabled. Sys log will be extracted...");
         String fileName = ReportContext.getTestDir() + "/logcat.log";
         String log = getSysLog();
         if (log.isEmpty()) {
             return null;
         }
-        
+
         File file = null;
         try {
             file = new File(fileName);
@@ -659,37 +658,38 @@ public class Device extends RemoteDevice implements IDriverPool {
         LOGGER.debug("Logcat file path: ".concat(fileName));
         return file;
     }
-    
+
     /**
-     * Save xml layout of the application 
-     * @param screenshotName - png file name to generate appropriate uix  
+     * Save xml layout of the application
+     * 
+     * @param screenshotName - png file name to generate appropriate uix
      * @return saved file
      */
     public File generateUiDump(String screenshotName) {
         if (isNull()) {
             return null;
         }
-        
-//        TODO: investigate with iOS: how does it work with iOS
-		if (!isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return null;
-		}
-        
+
+        // TODO: investigate with iOS: how does it work with iOS
+        if (!isConnected()) {
+            // do not use new features if execution is not inside approved cloud
+            return null;
+        }
+
         if (getDrivers().size() == 0) {
             LOGGER.debug("There is no active drivers in the pool.");
             return null;
         }
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
-        
+
         LOGGER.debug("UI dump generation...");
         WebDriver driver = getDriver();
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = driver.getPageSource();
-        pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
-                replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-        
+        pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE)
+                .replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
+
         File file = null;
         try {
             file = new File(fileName);
@@ -702,18 +702,18 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     private boolean isConnected() {
-    	try {
-	        if (getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
-	            return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
-	        } else {
-	            return false;
-	        }
-    	} catch (Throwable thr) {
-    		//do nothing for now
-    		return false;
-    	}
+        try {
+            if (getOs().equalsIgnoreCase(DeviceType.Type.ANDROID_PHONE.getFamily())) {
+                return getConnectedDevices().stream().parallel().anyMatch((m) -> m.contains(getAdbName()));
+            } else {
+                return false;
+            }
+        } catch (Throwable thr) {
+            // do nothing for now
+            return false;
+        }
     }
-    
+
     private List<String> getConnectedDevices() {
         // regexp for connected device. Syntax: udid device
         String deviceUDID = "(.*)\\tdevice$";
@@ -725,6 +725,8 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     private List<String> executeCmd(Map<String, Object> cmd) {
-        return Arrays.asList(((String) ((AndroidDriver<?>) ((EventFiringWebDriver) getDriver()).getWrappedDriver()).executeScript("mobile: shell", cmd)).split("\\r?\\n"));
+        return Arrays
+                .asList(((String) ((AndroidDriver<?>) ((EventFiringWebDriver) getDriver()).getWrappedDriver()).executeScript("mobile: shell", cmd))
+                        .split("\\r?\\n"));
     }
 }
