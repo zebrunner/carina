@@ -391,6 +391,11 @@ public class Configuration {
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.MOBILE;
         }
+        
+        // handle use-case when we provide only uuid object among desired capabilities
+    	if (capabilities.getCapability("udid") != null) {
+    		return SpecialKeywords.MOBILE;
+    	}
 
         return SpecialKeywords.DESKTOP;
     }
