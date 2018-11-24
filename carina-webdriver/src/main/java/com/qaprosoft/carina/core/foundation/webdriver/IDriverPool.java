@@ -185,7 +185,8 @@ public interface IDriverPool {
             device = DevicePool.getDevice();
             logger.debug("Current device is: " + device.getName());
             //try to get all existing capabilities from driver and append device udid explicitly
-            caps = (DesiredCapabilities) ((RemoteWebDriver)drv).getCapabilities();
+            WebDriver castedDriver = ((EventFiringWebDriver) drv).getWrappedDriver();
+            caps = (DesiredCapabilities) ((RemoteWebDriver)castedDriver).getCapabilities();
             logger.debug("detected capabilities from current driver:  " + caps);
             caps.setCapability("udid", device.getUdid());
             logger.debug("Added udid: " + device.getUdid() + " to capabilities.");
