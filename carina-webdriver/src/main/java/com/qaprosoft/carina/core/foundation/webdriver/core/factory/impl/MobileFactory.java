@@ -86,7 +86,7 @@ public class MobileFactory extends AbstractFactory {
         //if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
-        } else if (capabilities.asMap().size() == 1 && capabilities.is("udid")) {
+        } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
         	String udid = capabilities.getCapability("udid").toString();
         	capabilities = getCapabilities(name);
         	capabilities.setCapability("udid", udid);
