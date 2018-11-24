@@ -61,7 +61,7 @@ public class MobileFactory extends AbstractFactory {
 	private final static String vnc_mobile = "vnc_mobile";
     
     @Override
-    public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
@@ -83,8 +83,14 @@ public class MobileFactory extends AbstractFactory {
         LOGGER.debug("selenium: " + seleniumHost);
 
         RemoteWebDriver driver = null;
+        //if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
-            capabilities = getCapabilities(name, device);
+            capabilities = getCapabilities(name);
+        } else if (capabilities.asMap().size() == 1 && capabilities.is("udid")) {
+        	String udid = capabilities.getCapability("udid").toString();
+        	capabilities = getCapabilities(name);
+        	capabilities.setCapability("udid", udid);
+        	LOGGER.info("Appended udid to cpabilities: " + capabilities);
         }
 
         try {
@@ -140,6 +146,7 @@ public class MobileFactory extends AbstractFactory {
                 }
             }
 
+            Device device = DevicePool.getNullDevice();
             if (device.isNull()) {
                 // TODO: double check that local run with direct appium works fine
                 RemoteDevice remoteDevice = getDeviceInfo(driver);
@@ -165,18 +172,8 @@ public class MobileFactory extends AbstractFactory {
         return driver;
     }
 
-    private DesiredCapabilities getCapabilities(String name, Device device) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = new MobileCapabilies().getCapability(name);
-
-        if (!device.isNull()) {
-            capabilities.setCapability("udid", device.getUdid());
-            // disable Selenium Hum <-> STF verification as device already
-            // connected by this test (restart driver on the same device is invoked)
-            capabilities.setCapability("STF_ENABLED", "false");
-        }
-
-        return capabilities;
+    private DesiredCapabilities getCapabilities(String name) {
+        return new MobileCapabilies().getCapability(name);
     }
 
     /**

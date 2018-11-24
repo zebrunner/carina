@@ -38,7 +38,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
@@ -49,7 +48,7 @@ public class DesktopFactory extends AbstractFactory {
     private static DesiredCapabilities staticCapabilities;
     
     @Override
-    public WebDriver create(String name, Device device, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
@@ -83,7 +82,8 @@ public class DesktopFactory extends AbstractFactory {
         return driver;
     }
 
-    public DesiredCapabilities getCapabilities(String name) {
+    @SuppressWarnings("deprecation")
+	public DesiredCapabilities getCapabilities(String name) {
         String browser = Configuration.get(Parameter.BROWSER);
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {

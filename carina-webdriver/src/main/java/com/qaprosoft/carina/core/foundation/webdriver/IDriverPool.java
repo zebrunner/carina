@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -180,20 +179,12 @@ public interface IDriverPool {
     default public WebDriver restartDriver(boolean isSameDevice) {
         WebDriver drv = getDriver(DEFAULT);
         Device device = DevicePool.getNullDevice();
-        DesiredCapabilities caps = null;
+        DesiredCapabilities caps = new DesiredCapabilities();
+        
         if (isSameDevice) {
-        	logger.debug("Get current device as driver is going to be rstarted on the same device.");
+        	logger.debug("Get current device as driver is going to be restarted on the same device...");
             device = DevicePool.getDevice();
             logger.debug("Current device is: " + device.getName());
-            //try to get all existing capabilities from driver and append device udid explicitly
-            WebDriver castedDriver = ((EventFiringWebDriver) drv).getWrappedDriver();
-            Capabilities existingCaps = ((RemoteWebDriver)castedDriver).getCapabilities();
-            logger.debug("detected capabilities from current driver:  " + existingCaps);
-            // pushing one by one all capabilities into DesiredCapabilities for request
-            caps = new DesiredCapabilities();
-            for (String cap : existingCaps.asMap().keySet()) {
-            	caps.setCapability(cap, existingCaps.getCapability(cap));
-            }
             logger.debug("Add udid: " + device.getUdid() + " to capabilities.");
             caps.setCapability("udid", device.getUdid());
         }
@@ -224,7 +215,6 @@ public interface IDriverPool {
         }
 
         return createDriver(DEFAULT, caps, null);
-
     }
 
     /**
@@ -317,7 +307,7 @@ public interface IDriverPool {
             try {
                 logger.debug("initDriver start...");
 
-                drv = DriverFactory.create(name, device, capabilities, seleniumHost);
+                drv = DriverFactory.create(name, capabilities, seleniumHost);
                 
                 registerDriver(drv, name);
 
