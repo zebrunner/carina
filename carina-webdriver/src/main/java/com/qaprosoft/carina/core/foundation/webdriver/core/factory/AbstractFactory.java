@@ -65,6 +65,7 @@ public abstract class AbstractFactory {
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */
+    //TODO: [VD] remove "Device device" arg completely from create method
     abstract public WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String seleniumHost);
 
     /**

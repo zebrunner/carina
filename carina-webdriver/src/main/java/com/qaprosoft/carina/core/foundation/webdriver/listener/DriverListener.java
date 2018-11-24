@@ -177,6 +177,11 @@ public class DriverListener implements WebDriverEventListener {
 				throw new RuntimeException(thr);
 			}
 			
+			if (thr.getMessage().contains("Method has not yet been implemented")) {
+				// do nothing
+				return;
+			}
+			
 			String urlPrefix = "";
 			try {
 				urlPrefix = "url: " + driver.getCurrentUrl() + "\n";

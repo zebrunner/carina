@@ -121,7 +121,7 @@ public interface IDriverPool {
 
         if (drv == null) {
             logger.debug("Starting new driver as nothing was found in the pool");
-            drv = createDriver(name, capabilities, seleniumHost, DevicePool.getNullDevice());
+            drv = createDriver(name, capabilities, seleniumHost);
         }
 
         // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener and all logging will be lost!
@@ -179,8 +179,17 @@ public interface IDriverPool {
     default public WebDriver restartDriver(boolean isSameDevice) {
         WebDriver drv = getDriver(DEFAULT);
         Device device = DevicePool.getNullDevice();
+        DesiredCapabilities caps = null;
         if (isSameDevice) {
+        	logger.debug("Get current device as driver is going to be rstarted on the same device.");
             device = DevicePool.getDevice();
+            logger.debug("Current device is: " + device.getName());
+            //try to get all existing capabilities from driver and append device udid explicitly
+            WebDriver castedDriver = ((EventFiringWebDriver) drv).getWrappedDriver();
+            caps = (DesiredCapabilities) ((RemoteWebDriver)castedDriver).getCapabilities();
+            logger.debug("detected capabilities from current driver:  " + caps);
+            caps.setCapability("udid", device.getUdid());
+            logger.debug("Added udid: " + device.getUdid() + " to capabilities.");
         }
 
         try {
@@ -208,8 +217,7 @@ public interface IDriverPool {
             MDC.remove("device");
         }
 
-        // start default driver. Device can be nullDevice...
-        return createDriver(DEFAULT, null, null, device);
+        return createDriver(DEFAULT, caps, null);
 
     }
 
@@ -241,9 +249,10 @@ public interface IDriverPool {
             DevicePool.deregisterDevice();
             deregisterDriver(name);
             
+            
+            logger.debug("Driver starting quit..." + name);
             drv.quit();
-
-            logger.debug("Driver exited..." + name);
+            logger.debug("Driver finsihed quite." + name);
         } catch (WebDriverException e) {
             logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
             // do nothing
@@ -289,11 +298,12 @@ public interface IDriverPool {
      *            Device where we want to start driver
      * @return WebDriver
      */
-    default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost, Device device) {
+    default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
         boolean init = false;
         int count = 0;
         WebDriver drv = null;
         Throwable init_throwable = null;
+        Device device = DevicePool.getNullDevice();
 
         // 1 - is default run without retry
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
@@ -436,7 +446,7 @@ public interface IDriverPool {
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
 
         if (currentDrivers.containsKey(name)) {
-            logger.debug("########## DEREGISTER '" + name + "' driver for threadId: " + threadId );
+            logger.debug("Deregister '" + name + "' driver from pool for threadId: " + threadId );
             driversPool.remove(currentDrivers.get(name));
         } else {
             logger.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);

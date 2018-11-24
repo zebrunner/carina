@@ -157,21 +157,25 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             
         suite.getXmlSuite().addTest(xmlTest);*/
 
-        try {
-            Logger root = Logger.getRootLogger();
-            Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-            while (allLoggers.hasMoreElements()) {
-                Category tmpLogger = (Category) allLoggers.nextElement();
-                LOGGER.info("loggerName: " + tmpLogger.getName());
-                if (tmpLogger.getName().equals("com.qaprosoft.carina.core")) {
-                    tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+        List<String> coreLogPackages = new ArrayList<String>(Arrays.asList(Configuration.get(Parameter.CORE_LOG_PACKAGES).split(",")));
+        if (coreLogPackages.size() > 0 && !"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
+            // do core log level change only if custom properties are declared
+            try {
+                Logger root = Logger.getRootLogger();
+                Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+                while (allLoggers.hasMoreElements()) {
+                    Category tmpLogger = (Category) allLoggers.nextElement();
+                    LOGGER.debug("loggerName: " + tmpLogger.getName());
+                    for (String coreLogPackage : coreLogPackages) {
+                        if (tmpLogger.getName().contains(coreLogPackage.trim())) {
+                            LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to " + Configuration.get(Parameter.CORE_LOG_LEVEL));
+                            tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+                        }
+                    }
                 }
-                if (tmpLogger.getName().contains("ZafiraConfigurator")) {
-                    tmpLogger.setLevel(Level.toLevel("DEBUG"));
-                }
+            } catch (NoSuchMethodError e) {
+                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
             }
-        } catch (NoSuchMethodError e) {
-            LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
         }
         
         //TODO: moved into separate class/method
