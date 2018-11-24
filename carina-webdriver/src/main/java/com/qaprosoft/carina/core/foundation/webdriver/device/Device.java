@@ -269,49 +269,6 @@ public class Device extends RemoteDevice implements IDriverPool {
         executor.execute(cmd);
     }
 
-    private Boolean getScreenState() {
-        // determine current screen status
-        // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        Map<String, Object> dumpsysCmd = ImmutableMap
-                .of("command", "dumpsys", "args", Arrays.asList("input_method"));
-
-        List<String> output = executeCmd(dumpsysCmd);
-
-        Boolean screenState = null;
-        String line;
-
-        Iterator<String> itr = output.iterator();
-        while (itr.hasNext()) {
-            // mScreenOn - default value for the most of Android devices
-            // mInteractive - for Nexuses
-            line = itr.next();
-            if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
-                screenState = true;
-                break;
-            }
-            if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
-                screenState = false;
-                break;
-            }
-        }
-
-        if (screenState == null) {
-            LOGGER.error(getUdid()
-                    + ": Unable to determine existing device screen state!");
-            return screenState; // no actions required if state is not recognized.
-        }
-
-        if (screenState) {
-            LOGGER.info(getUdid() + ": screen is ON");
-        }
-
-        if (!screenState) {
-            LOGGER.info(getUdid() + ": screen is OFF");
-        }
-
-        return screenState;
-    }
-
     public void pressKey(int key) {
         if (isNull())
             return;
