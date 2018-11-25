@@ -65,6 +65,7 @@
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
         <!-- Others -->
+        <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
         <monte-repack.version>1.0</monte-repack.version>
         <json-simple.version>1.1</json-simple.version>
         <rest-assured.version>2.9.0</rest-assured.version>
@@ -432,6 +433,11 @@
                 <groupId>io.appium</groupId>
                 <artifactId>java-client</artifactId>
                 <version>${appium.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk</artifactId>
+                <version>${aws-java-sdk.version}</version>
             </dependency>
             <!-- Test utilities -->
             <dependency>
