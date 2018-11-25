@@ -31,6 +31,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
@@ -156,7 +157,7 @@ public interface IDriverPool {
     		}
     	}
 
-    	throw new RuntimeException("Unable to find driver using sessionId artifacts. Returning default one!");
+    	throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
     	//TODO: take a look into the replaceDriver case and how sessionId are regenerated on page objects
     }
 
@@ -482,7 +483,7 @@ public interface IDriverPool {
         }
 
         if (drv == null) {
-        	throw new RuntimeException("no default driver detected!");
+        	throw new DriverPoolException("no default driver detected!");
         }
 
         // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener and all logging will be lost!
