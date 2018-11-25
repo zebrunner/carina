@@ -388,9 +388,7 @@ public class L10Nparser {
                 return true;
             }
         } else {
-            if (ret) {
-                LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
-            }
+            LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
             return true;
         }
     }
