@@ -37,6 +37,12 @@
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-proxy</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -87,6 +93,12 @@
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-validator</artifactId>
 			<version>2.2.6</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

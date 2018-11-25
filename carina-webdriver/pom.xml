@@ -24,7 +24,6 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<guava.version>21.0</guava.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
@@ -43,6 +42,12 @@
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-proxy</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
