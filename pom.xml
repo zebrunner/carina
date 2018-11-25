@@ -57,8 +57,8 @@
         <httpclient.version>4.5.3</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
-        <selenium-java.version>3.14.0</selenium-java.version>
-        <selenium-server.version>3.14.0</selenium-server.version>
+        <selenium-java.version>3.141.59</selenium-java.version>
+        <selenium-server.version>3.141.59</selenium-server.version>
         <appium.version>6.1.0</appium.version>
         <!-- Qaprosoft integrations -->
         <zafira-client.version>3.3.68-SNAPSHOT</zafira-client.version>
