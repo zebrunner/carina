@@ -492,6 +492,10 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 			</exclusion>
+			<exclusion>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+			</exclusion>
 		</exclusions>
             </dependency>
             <dependency>
