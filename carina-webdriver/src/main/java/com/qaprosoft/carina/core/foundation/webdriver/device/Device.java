@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -48,9 +47,9 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
-public class Device extends RemoteDevice {
+public class Device extends RemoteDevice implements IDriverPool {
     private static final Logger LOGGER = Logger.getLogger(Device.class);
 
     /**
@@ -188,7 +187,7 @@ public class Device extends RemoteDevice {
         if (isNull())
             return;
 
-        LOGGER.info("adb connect " + getRemoteURL());
+        LOGGER.debug("adb connect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
         executor.execute(cmd);
         CommonUtils.pause(1);
@@ -208,7 +207,7 @@ public class Device extends RemoteDevice {
 
         // [VD] No need to do adb command as stopping STF session do it correctly
         // in new STF we have huge problems with sessions disconnect
-        LOGGER.info("adb disconnect " + getRemoteURL());
+        LOGGER.debug("adb disconnect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
         executor.execute(cmd);
 
@@ -226,7 +225,7 @@ public class Device extends RemoteDevice {
     public String getFullPackageByName(final String name) {
 
         List<String> packagesList = getInstalledPackages();
-        LOGGER.info("Found packages: ".concat(packagesList.toString()));
+        LOGGER.debug("Found packages: ".concat(packagesList.toString()));
         String resultPackage = null;
         for (String packageStr : packagesList) {
             if (packageStr.matches(String.format(".*%s.*", name))) {
@@ -244,9 +243,9 @@ public class Device extends RemoteDevice {
 
     public List<String> getInstalledPackages() {
         String deviceUdid = getAdbName();
-        LOGGER.info("Device udid: ".concat(deviceUdid));
+        LOGGER.debug("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "pm", "list", "packages");
-        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
+        LOGGER.debug("Following cmd will be executed: " + Arrays.toString(cmd));
         List<String> packagesList = executor.execute(cmd);
         return packagesList;
     }
@@ -262,116 +261,6 @@ public class Device extends RemoteDevice {
 
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "pull", pathFrom, pathTo);
         executor.execute(cmd);
-    }
-
-    private Boolean getScreenState() {
-        // determine current screen status
-        // adb -s <udid> shell dumpsys input_method | find "mScreenOn"
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "dumpsys",
-                "input_method");
-        List<String> output = executor.execute(cmd);
-
-        Boolean screenState = null;
-        String line;
-
-        Iterator<String> itr = output.iterator();
-        while (itr.hasNext()) {
-            // mScreenOn - default value for the most of Android devices
-            // mInteractive - for Nexuses
-            line = itr.next();
-            if (line.contains("mScreenOn=true") || line.contains("mInteractive=true")) {
-                screenState = true;
-                break;
-            }
-            if (line.contains("mScreenOn=false") || line.contains("mInteractive=false")) {
-                screenState = false;
-                break;
-            }
-        }
-
-        if (screenState == null) {
-            LOGGER.error(getUdid()
-                    + ": Unable to determine existing device screen state!");
-            return screenState; // no actions required if state is not recognized.
-        }
-
-        if (screenState) {
-            LOGGER.info(getUdid() + ": screen is ON");
-        }
-
-        if (!screenState) {
-            LOGGER.info(getUdid() + ": screen is OFF");
-        }
-
-        return screenState;
-    }
-
-    public void screenOff() {
-        if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            return;
-        }
-        if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
-            return;
-        }
-
-        if (isNull())
-            return;
-
-        Boolean screenState = getScreenState();
-        if (screenState == null) {
-            return;
-        }
-        if (screenState) {
-            String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "input",
-                    "keyevent", "26");
-            executor.execute(cmd);
-
-            CommonUtils.pause(5);
-
-            screenState = getScreenState();
-            if (screenState) {
-                LOGGER.error(getUdid() + ": screen is still ON!");
-            }
-
-            if (!screenState) {
-                LOGGER.info(getUdid() + ": screen turned off.");
-            }
-        }
-    }
-
-    public void screenOn() {
-        if (!Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            return;
-        }
-
-        if (!Configuration.getBoolean(Parameter.MOBILE_SCREEN_SWITCHER)) {
-            return;
-        }
-
-        if (isNull())
-            return;
-
-        Boolean screenState = getScreenState();
-        if (screenState == null) {
-            return;
-        }
-
-        if (!screenState) {
-            String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell",
-                    "input", "keyevent", "26");
-            executor.execute(cmd);
-
-            CommonUtils.pause(5);
-            // verify that screen is Off now
-            screenState = getScreenState();
-            if (!screenState) {
-                LOGGER.error(getUdid() + ": screen is still OFF!");
-            }
-
-            if (screenState) {
-                LOGGER.info(getUdid() + ": screen turned on.");
-            }
-        }
     }
 
     public void pressKey(int key) {
@@ -591,10 +480,10 @@ public class Device extends RemoteDevice {
             installApp(proxySetterFileName);
         }
         String deviceUdid = getAdbName();
-        LOGGER.info("Device udid: ".concat(deviceUdid));
+        LOGGER.debug("Device udid: ".concat(deviceUdid));
         String[] cmd = CmdLine.createPlatformDependentCommandLine("adb", "-s", deviceUdid, "shell", "am", "start", "-n",
                 "tk.elevenk.proxysetter/.MainActivity", "-e", "host", host, "-e", "port", port, "-e", "ssid", ssid, "-e", "key", password);
-        LOGGER.info("Following cmd will be executed: " + Arrays.toString(cmd));
+        LOGGER.debug("Following cmd will be executed: " + Arrays.toString(cmd));
         executor.execute(cmd);
     }
 
@@ -693,13 +582,12 @@ public class Device extends RemoteDevice {
             LOGGER.debug("Logcat logs: ".concat(logs));
             return logs;
         } catch (TimeoutException e) {
-            LOGGER.info(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
+            LOGGER.warn(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
             future.cancel(true);
             return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
         } catch (Exception e) {
 //            TODO: add custom handlers for each exceptions based on type
-            LOGGER.info(e);
-            LOGGER.info("Unknown issue was fired. Empty logs will be used.");
+            LOGGER.warn("Unknown issue was fired. Empty logs will be used.", e);
             return "";
         }
        
@@ -754,8 +642,7 @@ public class Device extends RemoteDevice {
             file = new File(fileName);
             FileUtils.writeStringToFile(file, log, Charset.defaultCharset());
         } catch (IOException e) {
-            LOGGER.info(e);
-            LOGGER.info("Error has been occured during attempt to extract logcat log.");
+            LOGGER.warn("Error has been occured during attempt to extract logcat log.", e);
         }
         LOGGER.debug("Logcat file path: ".concat(fileName));
         return file;
@@ -777,7 +664,7 @@ public class Device extends RemoteDevice {
 			return null;
 		}
         
-        if (DriverPool.getDrivers().size() == 0) {
+        if (getDrivers().size() == 0) {
             LOGGER.debug("There is no active drivers in the pool.");
             return null;
         }
@@ -785,7 +672,7 @@ public class Device extends RemoteDevice {
         // return File -> Zip png and uix or move this logic to zafira
         
         LOGGER.debug("UI dump generation...");
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
         String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
         String pageSource = driver.getPageSource();
         pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
@@ -796,8 +683,7 @@ public class Device extends RemoteDevice {
             file = new File(fileName);
             FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
         } catch (IOException e) {
-            LOGGER.info(e);
-            LOGGER.info("Error has been met during attempt to extract xml tree.");
+            LOGGER.warn("Error has been met during attempt to extract xml tree.", e);
         }
         LOGGER.debug("XML file path: ".concat(fileName));
         return file;

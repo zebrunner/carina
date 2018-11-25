@@ -24,6 +24,8 @@ public @interface TestRailCases {
     String testCasesId();
 
     String platform() default "";
+    String language() default "";
+    String locale() default "";
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})

@@ -4,6 +4,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite verbose="1" name="Carina Demo Tests - Tags tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
+	<listeners>
+        	<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
+	</listeners>
 
 	<parameter name="suiteOwner" value="qpsdemoSuite"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
@@ -18,11 +21,6 @@
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 
 	<parameter name="suitePriority" value="P6"/>
-
-	<listeners>
-		<listener class-name="com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer"/>
-		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-	</listeners>
 
 	<test name="Tags tests">
 		<classes>

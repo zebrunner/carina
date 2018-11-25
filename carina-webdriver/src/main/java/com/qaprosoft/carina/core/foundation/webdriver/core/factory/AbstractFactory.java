@@ -36,7 +36,6 @@ import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
@@ -65,7 +64,7 @@ public abstract class AbstractFactory {
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, Device device, DesiredCapabilities capabilities, String seleniumHost);
+    abstract public WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.

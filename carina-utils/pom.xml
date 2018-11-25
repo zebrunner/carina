@@ -24,8 +24,8 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<pdfbox.version>1.8.7</pdfbox.version>
-		<jackson-databind.version>2.8.9</jackson-databind.version>
+		<pdfbox.version>1.8.16</pdfbox.version>
+		<jackson-databind.version>2.8.11.1</jackson-databind.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
 
@@ -36,10 +36,6 @@
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-commons</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
@@ -87,6 +83,12 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
 			<version>${pdfbox.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -119,6 +121,20 @@
 			<groupId>net.rcarz</groupId>
 			<artifactId>jira-client</artifactId>
 			<version>${jira-client.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
@@ -130,16 +146,11 @@
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>zafira-client</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
 		</dependency>
 
 		<!-- For ZafiraListener -->

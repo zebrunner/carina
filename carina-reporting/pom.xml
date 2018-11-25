@@ -47,16 +47,6 @@
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>zafira-client</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<!-- monte-repack video recording -->
@@ -68,6 +58,16 @@
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
 		</dependency>
 
 	</dependencies>

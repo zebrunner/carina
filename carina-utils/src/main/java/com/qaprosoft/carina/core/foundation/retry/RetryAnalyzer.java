@@ -31,8 +31,6 @@ public class RetryAnalyzer implements IRetryAnalyzer {
             RetryCounter.incrementRunCount();
             return true;
         }
-        // already achieved max retry count. need reset it for the next test if any
-        RetryCounter.resetCounter();
         return false;
     }
 

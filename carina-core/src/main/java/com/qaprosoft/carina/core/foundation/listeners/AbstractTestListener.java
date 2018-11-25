@@ -34,6 +34,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.TestListenerAdapter;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -43,7 +44,6 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
@@ -52,13 +52,14 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
-public class AbstractTestListener extends TestArgsListener {
+public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
 
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
@@ -223,12 +224,6 @@ public class AbstractTestListener extends TestArgsListener {
         
         ReportContext.renameTestDir(test);
 
-        // Populate TestRail Cases
-
-        result.setAttribute(SpecialKeywords.TESTRAIL_CASES_ID, TestRail.getCases(result));
-        TestRail.updateAfterTest(result, (String) result.getTestContext().getAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE));
-        TestRail.clearCases();
-
         TestNamingUtil.releaseTestInfoByThread();
     }
 
@@ -289,7 +284,18 @@ public class AbstractTestListener extends TestArgsListener {
 
     @Override
     public void onTestStart(ITestResult result) {
-        super.onTestStart(result);
+        //declare carina custom RetryAnalyzer annotation for each test method
+        IRetryAnalyzer retryAnalyzer = new RetryAnalyzer();
+        IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
+        if (curRetryAnalyzer == null) {
+            result.getMethod().setRetryAnalyzer(retryAnalyzer);
+        } else {
+            if (!"com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer".equals(curRetryAnalyzer.getClass().getName())) {
+                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
+            }
+        }
+        
+        generateParameters(result);
 
         if (!result.getTestContext().getCurrentXmlTest().getTestParameters()
                 .containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
@@ -314,6 +320,28 @@ public class AbstractTestListener extends TestArgsListener {
         startItem(result, Messager.TEST_STARTED);
 
     }
+    
+    private void generateParameters(ITestResult result) {
+        if (result != null && result.getParameters() != null) {
+            for (int i = 0; i < result.getParameters().length; i++) {
+                if (result.getParameters()[i] instanceof String) {
+                    result.getParameters()[i] = ParameterGenerator.process(result.getParameters()[i].toString());
+                }
+
+                if (result.getParameters()[i] instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
+                    for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
+                        Object param = ParameterGenerator.process(entry.getValue());
+                        if (param != null)
+                            dynamicAgrs.put(entry.getKey(), param.toString());
+                        else
+                            dynamicAgrs.put(entry.getKey(), null);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public void onTestSuccess(ITestResult result) {
@@ -326,23 +354,12 @@ public class AbstractTestListener extends TestArgsListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
-        int count = RetryCounter.getRunCount();
-        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
-        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
+        failItem(result, Messager.TEST_FAILED);
+        afterTest(result);
 
-        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
-        if (count < maxCount && retry == null) {
-            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
-                    + result.getMethod().getMethodName());
-        }
-
-        if (count < maxCount && retry != null && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_RETRY_FAILED, count, maxCount);
-        } else {
-            failItem(result, Messager.TEST_FAILED);
-            afterTest(result);
-        }
-
+        // already achieved max retry count. need reset it for the next test if any
+        RetryCounter.resetCounter();
+        
         super.onTestFailure(result);
     }
 
@@ -363,10 +380,30 @@ public class AbstractTestListener extends TestArgsListener {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
             return;
         }
+        
+        int count = RetryCounter.getRunCount();
+        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
+        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
+        
+        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
+        if (count > 0 && retry == null) {
+            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
+                    + result.getMethod().getMethodName());
+        } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
+            failRetryItem(result, Messager.RETRY_RETRY_FAILED, count - 1, maxCount);
+            //TODO: try to change current result->method status to failed
+            result.setStatus(2);
+            afterTest(result);
+            super.onTestFailure(result);
+        } else {
+            skipItem(result, Messager.TEST_SKIPPED);
+            afterTest(result);
+            super.onTestSkipped(result);
+        }
 
-        skipItem(result, Messager.TEST_SKIPPED);
-        afterTest(result);
-        super.onTestSkipped(result);
+        //skipItem(result, Messager.TEST_SKIPPED);
+        //afterTest(result);
+        //super.onTestSkipped(result);
     }
 
     @Override
@@ -589,11 +626,11 @@ public class AbstractTestListener extends TestArgsListener {
     private String takeScreenshot(ITestResult result, String msg) {
         String screenId = "";
 
-        ConcurrentHashMap<String, WebDriver> drivers = DriverPool.getDrivers();
+        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
-        for (Map.Entry<String, WebDriver> entry : drivers.entrySet()) {
+        for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
             String driverName = entry.getKey();
-            WebDriver drv = entry.getValue();
+            WebDriver drv = entry.getValue().getDriver();
 
             if (drv instanceof EventFiringWebDriver) {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();

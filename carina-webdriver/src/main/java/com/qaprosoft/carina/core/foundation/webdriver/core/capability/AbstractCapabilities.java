@@ -62,7 +62,7 @@ public abstract class AbstractCapabilities {
 
         // add capabilities based on dynamic _config.properties variables
         capabilities = initCapabilities(capabilities);
-
+        
         return capabilities;
     }
 

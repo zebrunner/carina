@@ -32,10 +32,6 @@
 
 	<dependencies>
 		<!-- Carina Core sub-modules -->
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-proxy</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-dataprovider</artifactId>
@@ -48,10 +44,6 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-crypto</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-webdriver</artifactId>
@@ -67,24 +59,6 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-		</dependency>
-		<!-- Cucumber -->
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-testng</artifactId>
-			<version>${cucumber.testng.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-java</artifactId>
-			<version>${cucumber.java.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.masterthought</groupId>
-			<artifactId>cucumber-reporting</artifactId>
-			<version>${cucumber.reporting}</version>
 		</dependency>
 
 		<!-- For ZafiraListener -->

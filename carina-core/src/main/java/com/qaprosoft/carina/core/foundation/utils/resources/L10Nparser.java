@@ -362,25 +362,20 @@ public class L10Nparser {
      */
     public static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
         String l10n_default = L10N.getText(locKey, actualLocale);
-        String l10n_utf = L10N.getUTFText(locKey, actualLocale);
-        boolean ret, ret_utf;
+        boolean ret;
 
         if (skipPunctuationAndNumbers) {
             ret = removeNumbersAndPunctuation(expectedText).toLowerCase().contains(removeNumbersAndPunctuation(l10n_default).toLowerCase());
-            ret_utf = removeNumbersAndPunctuation(expectedText).toLowerCase().contains(removeNumbersAndPunctuation(l10n_utf).toLowerCase());
         } else {
             ret = expectedText.contains(l10n_default);
-            ret_utf = expectedText.contains(l10n_utf);
         }
 
-        if (!ret && !ret_utf) {
+        if (!ret) {
             if (!newLocalization) {
                 LOGGER.error(
-                        "Actual text should be localized and be equal to: '" + l10n_default + "'. Or to: '" + l10n_utf + "'. But currently it is '"
-                                + expectedText + "'.");
-                assertErrorMsg = "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Or '" + l10n_utf + "', length="
-                        + l10n_utf.length()
-                        + ". Actually: '" + expectedText + "', length=" + expectedText.length() + ".";
+                        "Actual text should be localized and be equal to: '" + l10n_default + "'. But currently it is '" + expectedText + "'.");
+                assertErrorMsg = "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Actually: '" + expectedText + "', length="
+                        + expectedText.length() + ".";
                 return false;
             } else {
                 if (skipPunctuationAndNumbers) {
@@ -393,12 +388,7 @@ public class L10Nparser {
                 return true;
             }
         } else {
-            if (ret) {
-                LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
-            }
-            if (ret_utf) {
-                LOGGER.info("Found localization text '" + expectedText + "' in UTF-8 encoding : " + l10n_utf);
-            }
+            LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
             return true;
         }
     }

@@ -23,18 +23,18 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.AbstractElementExtractor;
 
-public class DivisionElementExtractor extends AbstractElementExtractor {
+public class DivisionElementExtractor extends AbstractElementExtractor implements IDriverPool {
 
     private Logger LOGGER = Logger.getLogger(DivisionElementExtractor.class);
 
     @Override
     public ExtendedWebElement getElementsByCoordinates(int x, int y) {
         String elementName = String.format("Element founded by x:%d - y:%d", x, y);
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
         List<WebElement> elements = getEndLevelElements(driver);
         WebElement tempElement;
         int index = 0;
