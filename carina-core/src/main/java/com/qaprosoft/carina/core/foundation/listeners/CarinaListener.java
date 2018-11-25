@@ -137,7 +137,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             updateAppPath();
             
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Undefined failure during static carina listener init!", e);
         }
     }
     
