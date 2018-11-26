@@ -125,6 +125,9 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	// To generate file name we have to extract it from video artifact link.
 	private void uploadToFTP(String data) {
 	    LOGGER.debug("Uploading in async mode started in thread ID : " + Thread.currentThread().getId());
+	    LOGGER.debug("Link to video artifact : " + videoArtifact.getLink());
+	    LOGGER.debug("Screen record ftp : " + R.CONFIG.get("screen_record_ftp"));
+	    LOGGER.debug("Screen record host : " + R.CONFIG.get("screen_record_host"));
 	    long start = System.currentTimeMillis();
 		String videoUrl = videoArtifact.getLink();
 		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%","");
@@ -142,10 +145,10 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			String destinationFileName = segments[segments.length-1];
 			FtpUtils.uploadData(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), data,
 					destinationFileName);
+			long finish = System.currentTimeMillis();
+	        LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
 		} else {
 			LOGGER.error("The video won't be uploaded due to incorrect ftp or video recording parameters");
 		}
-		long finish = System.currentTimeMillis();
-		LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
 	}
 }
