@@ -40,6 +40,7 @@ public class FtpUtils {
 	public static void uploadData(String ftpHost, int port, String user, String password, String data,
 			String destinationFileName) {
 		byte[] decode = Base64.getDecoder().decode(data);
+		LOGGER.debug("Data size to upload: " + data.length());
 		try (InputStream is = new ByteArrayInputStream(decode)) {
 			upload(ftpHost, port, user, password, is, destinationFileName);
 		} catch (IOException e) {
@@ -65,7 +66,7 @@ public class FtpUtils {
 			try {
 				ftp.storeFile(fileName, is);
 			} catch (IOException e) {
-				LOGGER.error("Exception while storing file to FTP");
+				LOGGER.error("Exception while storing file to FTP", e);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Exception while uploading while to FTP", e);
@@ -80,9 +81,10 @@ public class FtpUtils {
 				ftp.logout();
 				ftp.disconnect();
 			} catch (Exception ioe) {
-				LOGGER.error("Exception while disconnecting ftp");
+				LOGGER.error("Exception while disconnecting ftp", ioe);
 			}
 		}
+		LOGGER.debug("FTP has been successfully disconnected.");
 	}
 
 }
