@@ -50,6 +50,9 @@ public class FtpUtils {
 
 	private static void upload(String ftpHost, int port, String user, String password, InputStream is,
 			String fileName) {
+	    LOGGER.debug("FTP host to upload data : " + ftpHost);
+	    LOGGER.debug("FTP port to upload data : " + port);
+        LOGGER.debug("Destination file name : " + fileName);
 		FTPClient ftp = new FTPClient();
 		try {
 			int reply;
