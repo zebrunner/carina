@@ -15,33 +15,33 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.proxy.SystemProxy;
+import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.proxy.CaptureType;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.proxy.SystemProxy;
-
-import net.lightbody.bmp.BrowserMobProxy;
-
-import static com.jayway.restassured.RestAssured.given;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class BrowserMobTest {
     private static String header = "my_header";
     private static String headerValue = "my_value";
     private static String testUrl = "https://ci.qaprosoft.com";
+    private static String filterKey = "</html>";
+    private static String requestMethod = "GET";
 
     @BeforeClass(alwaysRun = true)
     public void beforeClass() {
-        // do nothing
         R.CONFIG.put("browsermob_proxy", "true");
         R.CONFIG.put("browsermob_port", "0");
         R.CONFIG.put("proxy_set_to_system", "true");
@@ -88,11 +88,9 @@ public class BrowserMobTest {
         Assert.assertFalse(ProxyPool.isProxyRegistered(), "Proxy wasn't stopped!");
     }
 
-
     @Test
     public void testBrowserModProxyResponseFiltering() {
-        List<String> contentList = new ArrayList<>();
-        String key = "<html>";
+        List<String> content = new ArrayList<>();
 
         ProxyPool.setupBrowserMobProxy();
         SystemProxy.setupProxy();
@@ -101,22 +99,16 @@ public class BrowserMobTest {
         proxy.newHar();
 
         proxy.addResponseFilter((request, contents, messageInfo) -> {
-            if (contents.getTextContents().contains(key.toLowerCase())) {
-                contentList.add(contents.getTextContents());
+            if (contents.getTextContents().contains(filterKey)) {
+                content.add(contents.getTextContents());
             }
         });
 
-        given()
-                .baseUri(testUrl)
-                .when()
-                .get()
-                .then()
-                .assertThat()
-                .statusCode(200);
+        makeHttpRequest(testUrl, requestMethod);
 
         Assert.assertNotNull(proxy.getHar(), "Har is unexpectedly null!");
-        Assert.assertEquals(contentList.size(), 1,"Filtered response number is not as expected!");
-        Assert.assertTrue(contentList.get(0).contains(key), "Response doesn't contain expected key!");
+        Assert.assertEquals(content.size(), 1,"Filtered response number is not as expected!");
+        Assert.assertTrue(content.get(0).contains(filterKey), "Response doesn't contain expected key!");
     }
 
     private void initialiseProxy() {
@@ -125,5 +117,20 @@ public class BrowserMobTest {
 
         BrowserMobProxy proxy = ProxyPool.getProxy();
         proxy.addHeader(header, headerValue);
+    }
+
+    private void makeHttpRequest(String requestUrl, String requestMethod) {
+        URL url;
+        HttpURLConnection con;
+        Integer httpResponseStatus;
+        try {
+            url = new URL(requestUrl);
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod(requestMethod);
+            httpResponseStatus = con.getResponseCode();
+            Assert.assertTrue(httpResponseStatus < 399, "Response code is not as expected!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
