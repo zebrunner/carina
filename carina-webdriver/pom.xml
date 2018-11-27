@@ -24,7 +24,6 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<guava.version>21.0</guava.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
@@ -43,12 +42,13 @@
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-proxy</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
-		<!--<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-crypto</artifactId>
-		</dependency>-->
 
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
@@ -75,24 +75,10 @@
 			<artifactId>selenium-java</artifactId>
 		</dependency>
 
-
-		<!-- Guava -->
-		<!--<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
-		</dependency>-->
-
 		<!-- Appium -->
 		<dependency>
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.code.gson</groupId>
-					<artifactId>gson</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -106,25 +92,19 @@
 			<groupId>ru.yandex.qatools.ashot</groupId>
 			<artifactId>ashot</artifactId>
 			<version>${ashot.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.gson</groupId>
+					<artifactId>gson</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-remote-driver</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
-		<!--<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>${commons-httpclient.version}</version>
-		</dependency>-->
-
 		<!-- HTTP utilities -->
-		<!--<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${apache-http.version}</version>
-		</dependency>-->
-		<!--<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>${apache-http.version}</version>
-		</dependency>-->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
@@ -157,10 +137,6 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>alice-client</artifactId>
 		</dependency>
-		<!--<dependency>
-		  <groupId>org.apache.commons</groupId>
-		  <artifactId>commons-configuration2</artifactId>
-		</dependency>-->
 
 		<!-- Reflections -->
 		<dependency>

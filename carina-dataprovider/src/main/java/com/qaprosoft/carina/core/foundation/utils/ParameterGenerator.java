@@ -117,12 +117,7 @@ public class ParameterGenerator {
                 int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
                 int end = param.indexOf("}");
                 String key = param.substring(start, end);
-                if (!L10N.isUTF) {
-                    param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
-                } else {
-                    param = StringUtils.replace(param, matcher.group(), L10N.getUTFText(key));
-                }
-
+                param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
             }
             // in case if L10N pattern was applied
             if (!initStrL10N.equalsIgnoreCase(param)) {

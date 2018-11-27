@@ -22,16 +22,16 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.AbstractElementExtractor;
 
-public class ScreenElementExtractor extends AbstractElementExtractor {
+public class ScreenElementExtractor extends AbstractElementExtractor implements IDriverPool {
 
     @Override
     public ExtendedWebElement getElementsByCoordinates(int x, int y) {
         String elementName = String.format("Element founded by x:%d - y:%d", x, y);
-        WebDriver driver = DriverPool.getDriver();
+        WebDriver driver = getDriver();
         List<WebElement> elements = getEndLevelElements(driver);
         List<WebElement> result = new ArrayList<WebElement>();
         Rectangle rect;

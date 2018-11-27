@@ -31,7 +31,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -48,8 +47,7 @@ public class DriverFactory {
 	
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 	
-	public static WebDriver create(String testName, Device device, DesiredCapabilities capabilities,
-			String seleniumHost) {
+	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
 
@@ -67,7 +65,7 @@ public class DriverFactory {
 			throw new RuntimeException("Unsupported driver_type: " + driverType);
 		}
 
-		WebDriver driver = factory.create(testName, device, capabilities, seleniumHost);
+		WebDriver driver = factory.create(testName, capabilities, seleniumHost);
 		
 		TestArtifactType vncArtifact = streamVNC(factory.getVncURL(driver));
 		

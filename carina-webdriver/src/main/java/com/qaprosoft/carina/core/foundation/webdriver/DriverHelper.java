@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -70,10 +69,6 @@ public class DriverHelper {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
-    //TODO: remove in next release
-    @Deprecated
-    protected static final long IMPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 3;
-    
     protected static final long SHORT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 3;
 
     protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
@@ -105,83 +100,6 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Base UI interaction operations
     // --------------------------------------------------------------------------
-    /**
-     * Set implicit timeout.
-     * 
-     * @param timeout in seconds. Minimal value - 1 second
-     */
-    @Deprecated
-    public void setImplicitTimeout(long timeout) {
-    	LOGGER.error("DO NOTHING AS IMPLICIT_TIMEOUT IS NOT REQUIRED ANYMORE!");
-    }
-
-    /**
-     *
-     * @param element ExtendedWebElement
-     * @param waitPeriod long in seconds.
-     * @return true if element become clickable
-     */
-    @Deprecated
-    public boolean waitForElementToBeClickable(ExtendedWebElement element, long waitPeriod) {
-        return waitForElementToBeClickable(element, (int) waitPeriod);
-    }
-
-    /**
-     * Wait for element to be clickable. Alternative for isElementPresent with
-     * other condition.
-     * 
-     * @param element
-     *            ExtendedWebElement
-     * @param waitPeriod int in seconds.
-     * @return true if element become clickable
-     */
-    @Deprecated
-    public boolean waitForElementToBeClickable(ExtendedWebElement element, int waitPeriod) {
-        return element.isClickable(waitPeriod);
-    }
-
-    /**
-     * Check that element present.
-     * 
-     * @param extWebElement
-     *            ExtendedWebElement
-     * @return element existence status.
-     */
-    @Deprecated
-    public boolean isElementPresent(final ExtendedWebElement extWebElement) {
-        return isElementPresent(extWebElement, EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Check that element present within specified timeout.
-     * 
-     * @param extWebElement
-     *            ExtendedWebElement
-     * @param timeout
-     *            - timeout.
-     * @return element existence status.
-     */
-    @Deprecated
-    public boolean isElementPresent(final ExtendedWebElement extWebElement, long timeout) {
-        if (extWebElement == null)
-            return false;
-        return extWebElement.isElementPresent(timeout);
-    }
-
-    @Deprecated
-    public boolean isElementPresent(String controlInfo, final WebElement element) {
-        return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent();
-    }
-
-    @Deprecated
-    public boolean isElementPresent(String controlInfo, final WebElement element, long timeout) {
-        return new ExtendedWebElement(element, controlInfo, getDriver()).isElementPresent(timeout);
-    }
-
-    @Deprecated
-    public boolean isElementPresent(String controlInfo, final By by) {
-        return new ExtendedWebElement(by, controlInfo).isElementPresent();
-    }
     /**
      * Method which quickly looks for all element and check that they present
      * during EXPLICIT_TIMEOUT
@@ -417,66 +335,6 @@ public class DriverHelper {
     }
 
     /**
-     * Types text to specified element.
-     * 
-     * @param extWebElement to type text to
-     * @param text
-     *            to type.
-     */
-    @Deprecated
-    public void type(final ExtendedWebElement extWebElement, String text) {
-        extWebElement.type(text);
-    }
-
-    /**
-     * Types text to specified element.
-     * 
-     * @param control WebElement to type text to
-     * @param controlInfo String
-     * @param text to type
-     * 
-     */
-    @Deprecated
-    public void type(String controlInfo, WebElement control, String text) {
-        type(new ExtendedWebElement(control, controlInfo, getDriver()), text);
-    }
-
-    /**
-     * Clicks on element.
-     * 
-     * @param extendedWebElement to click on
-     *
-     */
-    @Deprecated
-    public void click(final ExtendedWebElement extendedWebElement) {
-        click(extendedWebElement, EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Clicks on element.
-     * 
-     * @param extendedWebElement to click on
-     * @param timeout to wait
-     *
-     */
-    @Deprecated
-    public void click(final ExtendedWebElement extendedWebElement, long timeout) {
-        extendedWebElement.click(timeout);
-    }
-
-    /**
-     * Clicks on element.
-     * 
-     * @param control WebElement to click on
-     * @param controlInfo String
-     *
-     */
-    @Deprecated
-    public void click(String controlInfo, WebElement control) {
-        click(new ExtendedWebElement(control, controlInfo, getDriver()));
-    }
-
-    /**
      * Clicks on element.
      * 
      * @param elements ExtendedWebElements to click
@@ -512,127 +370,6 @@ public class DriverHelper {
         if (!clicked) {
             throw new RuntimeException("Unable to click onto any elements from array: " + elements.toString());
         }
-    }
-
-    /**
-     * Clicks on element.
-     * 
-     * @param extWebElement element to check presence and click
-     * 
-     * @return boolean
-     *
-     */
-    @Deprecated
-    public boolean clickIfPresent(final ExtendedWebElement extWebElement) {
-        return clickIfPresent(extWebElement, EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Clicks on element.
-     * 
-     * @param extWebElement element to check presence and click
-     * @param timeout to wait
-     * 
-     * @return boolean
-     *
-     */
-    @Deprecated
-    public boolean clickIfPresent(final ExtendedWebElement extWebElement, long timeout) {
-        return extWebElement.clickIfPresent(timeout);
-    }
-
-    /**
-     * Double Clicks on element.
-     * 
-     * @param extendedWebElement to do dowble click
-     *
-     */
-    @Deprecated
-    public void doubleClick(final ExtendedWebElement extendedWebElement) {
-        extendedWebElement.doubleClick();
-    }
-
-    /**
-     * Double Clicks on element.
-     * 
-     * @param controlInfo String
-     * @param control WebElement
-     *
-     */
-    @Deprecated
-    public void doubleClick(String controlInfo, WebElement control) {
-        doubleClick(new ExtendedWebElement(control, controlInfo, getDriver()));
-    }
-
-    /**
-     * Mouse Right click to element.
-     * 
-     * @param extendedWebElement to do right click
-     * 
-     */
-    @Deprecated
-    public void rightClick(final ExtendedWebElement extendedWebElement) {
-        extendedWebElement.rightClick();
-    }
-
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     * 
-     * @param extendedWebElement to click hidden element
-     * 
-     * @return boolean
-     */
-    @Deprecated
-    public boolean clickHiddenElement(final ExtendedWebElement extendedWebElement) {
-        extendedWebElement.clickHiddenElement();
-        return true;
-    }
-    /**
-     * Check checkbox
-     * 
-     * @param checkbox
-     *            Element
-     */
-    @Deprecated
-    public void check(ExtendedWebElement checkbox) {
-        checkbox.check();
-    }
-
-    /**
-     * Uncheck checkbox
-     * 
-     * @param checkbox
-     *            Element
-     */
-    @Deprecated
-    public void uncheck(ExtendedWebElement checkbox) {
-        checkbox.uncheck();
-    }
-
-    /**
-     * Get checkbox state.
-     * 
-     * @param checkbox
-     *            - checkbox to test
-     * @return - current state
-     */
-    @Deprecated
-    public boolean isChecked(final ExtendedWebElement checkbox) {
-        return checkbox.isChecked();
-    }
-
-    /**
-     * Inputs file path to specified element.
-     *
-     * @param extendedWebElement
-     *            Element
-     * @param filePath
-     *            path
-     */
-    @Deprecated
-    public void attachFile(final ExtendedWebElement extendedWebElement, String filePath) {
-        extendedWebElement.attachFile(filePath);
     }
 
     /**
@@ -781,130 +518,11 @@ public class DriverHelper {
         refresh();
     }
 
-    /**
-     * Selects text in specified select element.
-     *
-     * @param extendedWebElement
-     *            Element
-     * @param selectText
-     *            select text
-     * @return true if item selected, otherwise false.
-     */
-    @Deprecated
-    public boolean select(final ExtendedWebElement extendedWebElement, final String selectText) {
-        return extendedWebElement.select(selectText);
-    }
-
-    /**
-     * Select multiple text values in specified select element.
-     * 
-     * @param extendedWebElement final ExtendedWebElement
-     * @param values final String[]
-     * 
-     * @return boolean
-     */
-    @Deprecated
-    public boolean select(final ExtendedWebElement extendedWebElement, final String[] values) {
-        return extendedWebElement.select(values);
-    }
-
-    @Deprecated
-    public void select(String controlInfo, WebElement control, String selectText) {
-        select(new ExtendedWebElement(control, controlInfo, getDriver()), selectText);
-    }
-
-    /**
-     * Selects value according to text value matcher.
-     *
-     * @param extendedWebElement
-     *            Element
-     * @param matcher
-     *            {@link} BaseMatcher
-     * @return true if item selected, otherwise false.
-     */
-    @Deprecated
-    public boolean selectByMatcher(final ExtendedWebElement extendedWebElement, final BaseMatcher<String> matcher) {
-        return extendedWebElement.selectByMatcher(matcher);
-    }
-
-    /**
-     * Selects first value according to partial text value.
-     * 
-     * @param extendedWebElement
-     *            Element
-     * @param partialSelectText
-     *            select by partial text
-     * @return true if item selected, otherwise false.
-     */
-    @Deprecated
-    public boolean selectByPartialText(final ExtendedWebElement extendedWebElement, final String partialSelectText) {
-        return extendedWebElement.selectByPartialText(partialSelectText);
-    }
-
-    /**
-     * Selects item by index in specified select element.
-     * 
-     * @param extendedWebElement final ExtendedWebElement
-     * @param index to select by
-     * 
-     * @return true if item selected, otherwise false.
-     */
-    @Deprecated
-    public boolean select(final ExtendedWebElement extendedWebElement, final int index) {
-        return extendedWebElement.select(index);
-    }
-
-    @Deprecated
-    public void select(String controlInfo, WebElement control, int index) {
-        select(new ExtendedWebElement(control, controlInfo, getDriver()), index);
-    }
-
-    /**
-     * Hovers over element.
-     * 
-     * @param extendedWebElement
-     *            final ExtendedWebElement
-     *
-     */
-    @Deprecated
-    public void hover(final ExtendedWebElement extendedWebElement) {
-        hover(extendedWebElement, null, null);
-    }
-
-    @Deprecated
-    public void hover(final ExtendedWebElement extendedWebElement, Integer xOffset, Integer yOffset) {
-    	extendedWebElement.hover(xOffset, yOffset);
-    }
-
-    @Deprecated
-    public void hover(String controlInfo, WebElement control) {
-        hover(new ExtendedWebElement(control, controlInfo, getDriver()));
-    }
-
     public void pressTab() {
         Actions builder = new Actions(getDriver());
         builder.sendKeys(Keys.TAB).perform();
     }
 
-    @Deprecated
-    public void sendKeys(String keys) {
-        final String decryptedKeys = cryptoTool.decryptByPattern(keys, CRYPTO_PATTERN);
-        Actions builder = new Actions(getDriver());
-        builder.sendKeys(decryptedKeys).perform();
-    }
-
-    /**
-     * Close alert modal by JS.
-     */
-    @Deprecated
-    public void silentAlert() {
-        WebDriver drv = getDriver();
-
-        ((JavascriptExecutor) drv).executeScript("window.alert = function(msg) { return true; }");
-        ((JavascriptExecutor) drv).executeScript("window.confirm = function(msg) { return true; }");
-        ((JavascriptExecutor) drv).executeScript("window.prompt = function(msg) { return true; }");
-
-    }
 
     /**
      * Drags and drops element to specified place.
@@ -916,7 +534,7 @@ public class DriverHelper {
      */
     public void dragAndDrop(final ExtendedWebElement from, final ExtendedWebElement to) {
 
-        if (isElementPresent(from) && isElementPresent(to)) {
+        if (from.isElementPresent() && to.isElementPresent()) {
             WebDriver drv = getDriver();
             if (!drv.toString().contains("safari")) {
                 Actions builder = new Actions(drv);
@@ -953,7 +571,7 @@ public class DriverHelper {
      */
     public void slide(ExtendedWebElement slider, int moveX, int moveY) {
     	//TODO: SZ migrate to FluentWaits
-        if (isElementPresent(slider)) {
+        if (slider.isElementPresent()) {
             WebDriver drv = getDriver();
             (new Actions(drv)).moveToElement(slider.getElement()).dragAndDropBy(slider.getElement(), moveX, moveY)
                     .build().perform();
@@ -961,30 +579,6 @@ public class DriverHelper {
         } else {
             Messager.SLIDER_NOT_MOVED.error(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
         }
-    }
-
-    /**
-     * Get selected elements from one-value select.
-     * 
-     * @param select
-     *            Element
-     * @return selected value
-     */
-    @Deprecated
-    public String getSelectedValue(ExtendedWebElement select) {
-        return select.getSelectedValue();
-    }
-
-    /**
-     * Get selected elements from multi-value select.
-     * 
-     * @param select
-     *            Element
-     * @return selected value
-     */
-    @Deprecated
-    public List<String> getSelectedValues(ExtendedWebElement select) {
-        return select.getSelectedValues();
     }
 
     /**
@@ -1139,17 +733,6 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Helpers
     // --------------------------------------------------------------------------
-
-	/**
-	 * Sends enter to element.
-	 * 
-	 * @param extendedWebElement
-	 *            to send enter.
-	 */
-    @Deprecated
-	public void pressEnter(final ExtendedWebElement extendedWebElement) {
-		extendedWebElement.sendKeys(Keys.ENTER);
-	}
     
     /**
      * Find Extended Web Element on page using By.
@@ -1269,12 +852,6 @@ public class DriverHelper {
         }
         return driver;
     }
-
-    @Deprecated
-    public ExtendedWebElement format(ExtendedWebElement element, Object... objects) {
-        return element.format(objects);
-    }
-
     
     /**
      * Wait until any condition happens.

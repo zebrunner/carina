@@ -272,7 +272,12 @@ All project configuration properties are located in **_config.properties** file.
 		<tr>
 		<td>core_log_level</td>
 		<td>Level for Carina logging</td>
-		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE </td>
+		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
+	</tr>
+		<tr>
+		<td>core_log_packages</td>
+		<td>Comma separated list of core packages where you want to redefine log level</td>
+		<td>com.qaprosoft.carina.core, ZafiraConfigurator etc</td>
 	</tr>
 		<tr>
 		<td>log_all_json</td>
@@ -340,21 +345,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>true, false</td>
 	</tr>
 	<tr>
-		<td>testrail_url</td>
-		<td>Url to TestRail</td>
-		<td>https:/yourcompany.testrail.net</td>
-	</tr>
-	<tr>
-		<td>testrail_user</td>
-		<td>TestRail user email</td>
-		<td>admin@yourcompany.com</td>
-	</tr>
-		<tr>
-		<td>testrail_updater</td>
-		<td>Class contains logic to update TestRail. <b>Note</b> Custom updater have to implement EmptyTestRailUpdater, by default methods do nothing</td>
-		<td>Custom class</td>
-	</tr>
-		<tr>
 		<td>testrail_milestone</td>
 		<td>Milestone to set on TestRail for run</td>
 		<td>some-milestone</td>
@@ -418,36 +408,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>add_new_localization_property_name</td>
 		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
 		<td>Basic template for property name.</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests</td>
-		<td>If parametrs contains true Cucumber tests will be started</td>
-		<td>true, false</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests_app_version</td>
-		<td>Version of app using in Cucumber tests</td>
-		<td>2.013</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests_name</td>
-		<td>Cucucmber tests name</td>
-		<td>cucumber tests</td>
-	</tr>
-		<tr>
-		<td>cucumber_tests_results_image_resize</td>
-		<td>Percent of Scaling from default image. 100 - same size</td>
-		<td>Integer</td>
-	</tr>
-		<tr>
-		<td>cucumber_report_subfolder</td>
-		<td>Subfolder on Jenkins (jenkins_url/{someNumbersFr EveryRun}/ artifacts/CucumberReport/ {cucumber_report_subfolder})</td>
-		<td>cucumber-reports</td>
-	</tr>
-		<tr>
-		<td>cucumber_user_js_in_report</td>
-		<td>Enabled parameter help to get more beautiful reports</td>
-		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>

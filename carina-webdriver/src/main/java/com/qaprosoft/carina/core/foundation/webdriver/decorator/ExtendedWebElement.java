@@ -59,11 +59,11 @@ import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
@@ -71,7 +71,6 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
-// TODO: [VD] removed deprecated constructor and DriverPool import
 public class ExtendedWebElement {
     private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
 
@@ -81,7 +80,7 @@ public class ExtendedWebElement {
 
     private static Wait<WebDriver> wait;
     
-    // we should keep both properties: drivre and searchContext obligatory
+    // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
     // searchContext is used for searching element by default
     private WebDriver driver;
@@ -97,23 +96,6 @@ public class ExtendedWebElement {
     private By by;
     
     private boolean caseInsensitive;
-    
-    //TODO: remove deprecated constructors and combined rest of functionality without code duplicates
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, WebDriver driver) {
-        this(element, name);
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, String name, By by, WebDriver driver) {
-        this(element, name);
-        this.by = by;
-    }
-
-    @Deprecated
-    public ExtendedWebElement(WebElement element, WebDriver driver) {
-    	this(element);
-    }
     
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -139,8 +121,7 @@ public class ExtendedWebElement {
     	this.name = name;
     }
     
-    //TODO: make it private in the next release!
-    public ExtendedWebElement(WebElement element) {
+    private ExtendedWebElement(WebElement element) {
         this.element = element;
         
         //read searchContext from not null elements only
@@ -187,7 +168,7 @@ public class ExtendedWebElement {
 
 				byContextField = locator.getClass().getDeclaredField("by");
 				byContextField.setAccessible(true);
-				//TODO: identify if it is child element and 
+				//TODO: identify if it is a child element and 
 				//	1. get rootBy
 				//  2. append current "by" to the rootBy 
 				// -> it should allow to search via regular driver and fluent waits - getBy() 
@@ -213,7 +194,6 @@ public class ExtendedWebElement {
 
 			if (tempSearchContext instanceof EventFiringWebDriver) {
 				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) tempSearchContext;
-				//this.searchContext = tempSearchContext;
 				this.driver = eventFirDriver.getWrappedDriver();
 				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
 				return;
@@ -239,7 +219,7 @@ public class ExtendedWebElement {
 				}
 				//this.driver = (WebDriver) tempSearchContext;
 				// that's the only place to use DriverPool to get driver.
-				this.driver = DriverPool.getDriver(sessionId);
+				this.driver = IDriverPool.getDriver(sessionId);
 			} else {
 				LOGGER.error(tempSearchContext);
 			}
@@ -264,7 +244,6 @@ public class ExtendedWebElement {
     }
 
     public WebElement getElement() {
-    	//TODO: think about legacy selenium call support as a feature
     	element = refindElement();
     	return element;
     }
@@ -389,28 +368,6 @@ public class ExtendedWebElement {
         return element;
     }
     
-/*    private WebElement detectElement() {
-        //do not return without element initialization!
-    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-    	WebElement el = null;
-    	try {
-    		if (searchContext != null) {
-    			el = searchContext.findElement(by);
-    		} else {
-    			el = getDriver().findElement(by);
-    		}
-		} catch (Exception e) {
-			LOGGER.debug("catched exception: ", e);
-			//use available driver to research again...
-			//TODO: handle case with rootBy to be able to refind also lists etc
-    	}
-    	
-    	if (el != null) {
-    		element = el;
-    	}
-        return el;
-    }*/
-
     public void setElement(WebElement element) {
         this.element = element;
     }
@@ -591,26 +548,6 @@ public class ExtendedWebElement {
     	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
     }
     
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     */
-    @Deprecated
-    public void clickHiddenElement() {
-    	clickHiddenElement(EXPLICIT_TIMEOUT);
-    }
-    
-    /**
-     * Click Hidden Element. useful when element present in DOM but actually is
-     * not visible. And can't be clicked by standard click.
-     *
-     * @param timeout to wait
-     */
-    @Deprecated
-    public void clickHiddenElement(long timeout) {
-    	click(timeout);
-    }
-
     /**
      * Click onto element if it present.
      *
@@ -1083,8 +1020,7 @@ public class ExtendedWebElement {
         if (isPresent(by, timeout)) {
         	return new ExtendedWebElement(getElement().findElement(by), name, by);
         } else {
-        	//TODO: reuse no_such_element_exception
-        	throw new RuntimeException("Unable to find dynamic element using By: " + by.toString());
+        	throw new NoSuchElementException("Unable to find dynamic element using By: " + by.toString());
         }
     }
 
@@ -1099,7 +1035,7 @@ public class ExtendedWebElement {
         if (isPresent(by, timeout)) {
         	webElements = getElement().findElements(by);
         } else {
-        	throw new RuntimeException("Unable to find dynamic elements using By: " + by.toString());
+        	throw new NoSuchElementException("Unable to find dynamic elements using By: " + by.toString());
         }
 
         int i = 1;
@@ -1128,11 +1064,6 @@ public class ExtendedWebElement {
         JavascriptExecutor js = (JavascriptExecutor) drv;
         js.executeScript("mobile: tap", tapObject);
     }
-
-    @Deprecated
-    public void waitUntilElementNotPresent(final long timeout) {
-    	waitUntilElementDisappear(timeout);
-    }
     
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
@@ -1151,18 +1082,6 @@ public class ExtendedWebElement {
     	
     	return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
 				ExpectedConditions.invisibilityOf(element)), timeout);
-    }
-
-    /**
-     * is Element Not Present After Wait
-     *
-     * @param timeout in seconds
-     * @return boolean - false if element still present after wait - otherwise
-     *         true if it disappear
-     */
-    @Deprecated
-    public boolean isElementNotPresentAfterWait(final long timeout) {
-    	return waitUntilElementDisappear(timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
@@ -1797,7 +1716,7 @@ public class ExtendedWebElement {
 		return output;
 	}
 
-    private WebDriver getDriver() {
+    public WebDriver getDriver() {
 		if (driver == null) {
 			LOGGER.error("There is no any initialized driver for ExtendedWebElement: " + getNameWithLocator());
 			throw new RuntimeException(

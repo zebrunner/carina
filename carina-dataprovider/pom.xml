@@ -47,22 +47,11 @@
 			<version>${opencsv.version}</version>
 		</dependency>
 
-		<!--<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>${apache-poi.version}</version>
-		</dependency>-->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>${apache-poi.version}</version>
 		</dependency>
-
-
-		<!--dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency-->
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

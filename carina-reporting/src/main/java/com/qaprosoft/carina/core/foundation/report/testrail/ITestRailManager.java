@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.report.testrail;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -73,7 +75,9 @@ public interface ITestRailManager extends ITestCases {
                 if (testMethod.isAnnotationPresent(TestRailCases.class)) {
                     TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
                     String platform = methodAnnotation.platform();
-                    if (platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty()) {
+                    String language = methodAnnotation.language();
+                    String locale = methodAnnotation.locale();
+                    if (isValidPlatform(platform) && isValidLanguage(language) && isValidLocale(locale)) {
                         String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
@@ -88,7 +92,9 @@ public interface ITestRailManager extends ITestCases {
                     for (TestRailCases tcLocal : methodAnnotation.value()) {
 
                         String platform = tcLocal.platform();
-                        if (platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty()) {
+                        String language = tcLocal.language();
+                        String locale = tcLocal.locale();
+                        if (isValidPlatform(platform) && isValidLanguage(language) && isValidLocale(locale)) {
                             String[] testCaseList = tcLocal.testCasesId().split(",");
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;
@@ -129,5 +135,5 @@ public interface ITestRailManager extends ITestCases {
             return -1;
         }
     }
-
+    
 }

@@ -26,12 +26,12 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
@@ -706,8 +706,9 @@ public class MobileUtils {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static WebDriver getDriver() {
-		WebDriver drv = DriverPool.getDriver();
+		WebDriver drv = IDriverPool.getDefaultDriver();
 		if (drv instanceof EventFiringWebDriver) {
 			return ((EventFiringWebDriver) drv).getWrappedDriver();
 		} else {

@@ -84,7 +84,6 @@ public class SpecialKeywords {
     public static final String JIRA_ARGS_MAP = "jiraArgsMap";
     
     public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
-    public static final String TESTRAIL_CASES_ID = "testRailCases";
     public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
     public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
     public static final String TESTRAIL_TESTCASE_UUID = "TESTRAIL_TESTCASE_UUID";
@@ -156,7 +155,6 @@ public class SpecialKeywords {
     public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
     public static final String MOBILE_PROXY_PORT = "capabilities.proxyPort";
-    
     
     public static final String  SLOT_CAPABILITIES = "slotCapabilities";
 

@@ -55,28 +55,6 @@ public class Configuration {
     }
 
     /**
-     * All available configuration for diver initialization phase.
-     */
-
-    public enum DriverMode {
-        SUITE_MODE("suite_mode"),
-
-        CLASS_MODE("class_mode"),
-
-        METHOD_MODE("method_mode");
-
-        private final String key;
-
-        DriverMode(String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
-    }
-
-    /**
      * All available configuration parameter keys along with default values.
      */
     public enum Parameter {
@@ -95,8 +73,6 @@ public class Configuration {
         BROWSER_LOCALE("browser_locale"),
 
         SELENIUM_HOST("selenium_host"),
-
-        DRIVER_MODE("driver_mode"),
 
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 
@@ -163,10 +139,6 @@ public class Configuration {
 
         SMALL_SCREEN_HEIGHT("small_screen_height"),
 
-        SENDER_EMAIL("sender_email"),
-
-        SENDER_PASSWORD("sender_pswd"),
-
         INIT_RETRY_COUNT("init_retry_count"),
 
         INIT_RETRY_INTERVAL("init_retry_interval"),
@@ -188,6 +160,8 @@ public class Configuration {
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 
         CORE_LOG_LEVEL("core_log_level"),
+        
+        CORE_LOG_PACKAGES("core_log_packages"),
 
         LOG_ALL_JSON("log_all_json"),
 
@@ -217,21 +191,10 @@ public class Configuration {
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
 
-        // Appium 1.1.x mobile capabilities: iOS and Android
-        MOBILE_SCREEN_SWITCHER("mobile_screen_switcher"),
-        
         // Enable video recording capabilities only for the final retry attempt
         OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
 
         // TestRail
-        TESTRAIL_URL("testrail_url"),
-
-        TESTRAIL_USER("testrail_user"),
-
-        TESTRAIL_PASSWORD("testrail_password"),
-
-        TESTRAIL_UPDATER("testrail_updater"),
-
         TESTRAIL_MILESTONE("testrail_milestone"),
 
         TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
@@ -261,19 +224,6 @@ public class Configuration {
         ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
 
         ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
-
-        // For cucumber tests
-        CUCUMBER_TESTS("cucumber_tests"),
-
-        CUCUMBER_TESTS_APP_VERSION("cucumber_tests_app_version"),
-
-        CUCUMBER_TESTS_NAME("cucumber_tests_name"),
-
-        CUCUMBER_TESTS_RESULTS_IMAGE_RESIZE("cucumber_tests_results_image_resize"),
-
-        CUCUMBER_USE_JS_IN_REPORT("cucumber_user_js_in_report"),
-
-        CUCUMBER_REPORT_SUBFOLDER("cucumber_report_subfolder"),
 
         // TLS
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
@@ -330,10 +280,6 @@ public class Configuration {
 
     public static boolean getBoolean(Parameter param) {
         return Boolean.valueOf(get(param).trim());
-    }
-
-    public static DriverMode getDriverMode() {
-        return DriverMode.valueOf(get(Parameter.DRIVER_MODE).trim().toUpperCase());
     }
 
     @Deprecated
@@ -420,9 +366,11 @@ public class Configuration {
 
         String platform = getPlatform();
         if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
+        	LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
 
+        LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
 
@@ -432,7 +380,7 @@ public class Configuration {
     		return getDriverType();
     	}
     	
-    	// calculate driver type based on capability values
+    	LOGGER.debug("Detecting driver_type by capabilities: " + capabilities);
     	String platform = "";
     	if (capabilities.getCapability("platform") != null) {
     		platform = capabilities.getCapability("platform").toString();
@@ -443,9 +391,17 @@ public class Configuration {
     	}
     	
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
+        	LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
+        
+        // handle use-case when we provide only uuid object among desired capabilities
+    	if (capabilities.getCapability("udid") != null) {
+    		LOGGER.debug("Detected MOBILE driver_type by uuid inside capabilities");
+    		return SpecialKeywords.MOBILE;
+    	}
 
+    	LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
     public static String getMobileApp() {

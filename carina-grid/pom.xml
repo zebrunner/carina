@@ -32,12 +32,6 @@
     <dependency>
       <groupId>com.qaprosoft</groupId>
       <artifactId>zafira-client</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <build>

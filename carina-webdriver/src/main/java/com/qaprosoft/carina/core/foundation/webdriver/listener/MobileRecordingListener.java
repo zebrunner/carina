@@ -67,9 +67,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
-			onBeforeEvent();
-
 			if (DriverCommand.QUIT.equals(command.getName())) {
+				onBeforeEvent();
 				try {
 					String data = commandExecutor
 							.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
@@ -120,20 +119,27 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 	}
 
+	// To get host address for video uploading we have to use screen_record_ftp parameter. 
+	// To generate file name we have to extract it from video artifact link.
 	private void uploadToFTP(String data) {
-		String ftpUrl = videoArtifact.getLink();
-		URI uri = null;
+		String videoUrl = videoArtifact.getLink();
+		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%","");
+		URI ftpUri = null;
+		URI videoUri = null;
 		try {
-			uri = new URI(ftpUrl);
+			ftpUri = new URI(ftpUrl);
+			videoUri = new URI(videoUrl);
 		} catch (URISyntaxException e1) {
 			LOGGER.error("Incorrect URL format for screen record ftp parameter");
 		}
-		if (null != uri) {
-			String ftpHost = uri.getHost();
-			String[] segments = uri.getPath().split("/");
+		if (null != ftpUri && null != videoUri) {
+			String ftpHost = ftpUri.getHost();
+			String[] segments = videoUri.getPath().split("/");
 			String destinationFileName = segments[segments.length-1];
 			FtpUtils.uploadData(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), data,
 					destinationFileName);
+		} else {
+			LOGGER.error("The video won't be uploaded due to incorrect ftp or video recording parameters");
 		}
 	}
 }

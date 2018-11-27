@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import static com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.getDriver;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
@@ -40,8 +37,9 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExec
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
+import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps.FakeGpsPage;
@@ -51,7 +49,7 @@ import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchange
 
 import io.appium.java_client.android.AndroidDriver;
 
-public class AndroidService {
+public class AndroidService implements IDriverPool {
 
     private static final Logger LOGGER = Logger.getLogger(AndroidService.class);
 
@@ -785,7 +783,7 @@ public class AndroidService {
      * startFakeGPS to emulate GPS location
      *
      * @param location String - existing city (for ex. New York)
-     * @param restartApk - if true DriverPool.restartDriver(true);
+     * @param restartApk - if true restartDriver(true);
      * @return boolean return true if everything is ok.
      */
     public boolean setFakeGPSLocation(String location, boolean restartApk) {
@@ -812,7 +810,7 @@ public class AndroidService {
             }
             res = true;
             if (restartApk)
-                DriverPool.restartDriver(true);
+                restartDriver(true);
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
@@ -831,7 +829,7 @@ public class AndroidService {
     /**
      * stopFakeGPS stop using Fake GPS
      *
-     * @param restartApk - if true DriverPool.restartDriver(true);
+     * @param restartApk - if true restartDriver(true);
      * @return boolean
      */
     public boolean stopFakeGPS(boolean restartApk) {
@@ -851,7 +849,7 @@ public class AndroidService {
             LOGGER.info("STOP Fake GPS locale");
             res = fakeGpsPage.clickStopFakeGps();
             if (restartApk)
-                DriverPool.restartDriver(true);
+                restartDriver(true);
         } catch (Exception e) {
             LOGGER.error("Exception: ", e);
         }
@@ -1274,7 +1272,7 @@ public class AndroidService {
         String actualTZ = getDeviceActualTimeZone();
         if (isRequiredTimeZone(actualTZ, expectedZone)) {
             LOGGER.info("Required timeZone '" + expectedZone + "' was set by " + workflow.toString() + ". Restarting driver to apply changes.");
-            DriverPool.restartDriver(true);
+            restartDriver(true);
             res = true;
         } else {
             LOGGER.error("TimeZone was not changed by " + workflow.toString() + ". Actual TZ is: " + actualTZ);

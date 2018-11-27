@@ -177,6 +177,11 @@ public class DriverListener implements WebDriverEventListener {
 				throw new RuntimeException(thr);
 			}
 			
+			if (thr.getMessage().contains("Method has not yet been implemented")) {
+				// do nothing
+				return;
+			}
+			
 			String urlPrefix = "";
 			try {
 				urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
@@ -286,6 +291,16 @@ public class DriverListener implements WebDriverEventListener {
 	@Override
 	public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
 		onBeforeAction();
+	}
+
+	@Override
+	public void afterGetText(WebElement arg0, WebDriver arg1, String arg2) {
+		// do nothing		
+	}
+
+	@Override
+	public void beforeGetText(WebElement arg0, WebDriver arg1) {
+		// do nothing		
 	}
 
 }
