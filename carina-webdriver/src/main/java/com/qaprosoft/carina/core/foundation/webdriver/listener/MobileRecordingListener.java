@@ -77,8 +77,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 											(BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
 							.getValue().toString();
 					LOGGER.debug("Video will be uploaded to ftp. Test thread ID : " + Thread.currentThread().getId());
-//					CompletableFuture.runAsync(() -> {uploadToFTP(data);});
-					uploadToFTP(data);
+					CompletableFuture.runAsync(() -> {uploadToFTP(data);});
 					if (ZafiraSingleton.INSTANCE.isRunning()) {
 						ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
 					}
