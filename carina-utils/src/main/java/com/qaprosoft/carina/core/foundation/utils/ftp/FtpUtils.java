@@ -26,9 +26,9 @@ public class FtpUtils {
 		try (InputStream is = new FileInputStream(filePassToUpload)) {
 			upload(ftpHost, port, user, password, is, fileName);
 		} catch (FileNotFoundException e) {
-			LOGGER.error("File is not found. Specify correct file pass");
+			LOGGER.info("File is not found. Specify correct file pass");
 		} catch (IOException e) {
-			LOGGER.error("Exception while opening file for upload.");
+			LOGGER.info("Exception while opening file for upload.");
 		}
 	}
 
@@ -40,35 +40,51 @@ public class FtpUtils {
 	public static void uploadData(String ftpHost, int port, String user, String password, String data,
 			String destinationFileName) {
 		byte[] decode = Base64.getDecoder().decode(data);
+		LOGGER.debug("Data size to upload: " + data.length());
+		LOGGER.debug("Encoded data size to upload: " + decode.length);
 		try (InputStream is = new ByteArrayInputStream(decode)) {
 			upload(ftpHost, port, user, password, is, destinationFileName);
 		} catch (IOException e) {
-			LOGGER.error("Exception while opening file for upload.");
+			LOGGER.info("Exception while opening file for upload.");
 		}
 	}
 
 	private static void upload(String ftpHost, int port, String user, String password, InputStream is,
 			String fileName) {
+	    LOGGER.debug("FTP host to upload data : " + ftpHost);
+	    LOGGER.debug("FTP port to upload data : " + port);
+        LOGGER.debug("Destination file name : " + fileName);
+        long start = System.currentTimeMillis();
 		FTPClient ftp = new FTPClient();
 		try {
 			int reply;
 			ftp.connect(ftpHost, port);
 			LOGGER.debug("Connected to server : " + ftpHost);
 			reply = ftp.getReplyCode();
+			LOGGER.debug("Reply code is : " + reply);
 			if (!FTPReply.isPositiveCompletion(reply)) {
 				ftp.disconnect();
-				LOGGER.error("FTP server refused connection.");
+				LOGGER.info("FTP server refused connection. Reply code is : " + reply);
 				throw new Exception("FTP server refused connection.");
 			}
-			ftp.login(user, password);
+			if (!ftp.login(user, password)) {
+			    throw new Exception("Login to ftp failed. Check user credentials.");
+			};
+			LOGGER.debug("User has been successfully logged in.");
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			try {
-				ftp.storeFile(fileName, is);
+			    ftp.enterLocalPassiveMode();
+				if (ftp.storeFile(fileName, is)) {
+				    long finish = System.currentTimeMillis();
+                    LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
+				} else {
+				    LOGGER.info("Some issues occures during storing file to FTP. storeFile method returns false.");			    
+				}
 			} catch (IOException e) {
-				LOGGER.error("Exception while storing file to FTP");
+				LOGGER.info("Exception while storing file to FTP", e);
 			}
 		} catch (Exception e) {
-			LOGGER.error("Exception while uploading while to FTP", e);
+			LOGGER.info("Exception while uploading while to FTP", e);
 		} finally {
 			ftpDisconnect(ftp);
 		}
@@ -80,9 +96,10 @@ public class FtpUtils {
 				ftp.logout();
 				ftp.disconnect();
 			} catch (Exception ioe) {
-				LOGGER.error("Exception while disconnecting ftp");
+				LOGGER.error("Exception while disconnecting ftp", ioe);
 			}
 		}
+		LOGGER.debug("FTP has been successfully disconnected.");
 	}
 
 }

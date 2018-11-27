@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
@@ -75,7 +76,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 									MobileCommand.stopRecordingScreenCommand(
 											(BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
 							.getValue().toString();
-					uploadToFTP(data);
+					LOGGER.debug("Video will be uploaded to ftp. Test thread ID : " + Thread.currentThread().getId());
+					CompletableFuture.runAsync(() -> {uploadToFTP(data);});
 					if (ZafiraSingleton.INSTANCE.isRunning()) {
 						ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
 					}
@@ -122,6 +124,10 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	// To get host address for video uploading we have to use screen_record_ftp parameter. 
 	// To generate file name we have to extract it from video artifact link.
 	private void uploadToFTP(String data) {
+	    LOGGER.debug("Uploading in async mode started in thread ID : " + Thread.currentThread().getId());
+	    LOGGER.debug("Link to video artifact : " + videoArtifact.getLink());
+	    LOGGER.debug("Screen record ftp : " + R.CONFIG.get("screen_record_ftp"));
+	    LOGGER.debug("Screen record host : " + R.CONFIG.get("screen_record_host"));
 		String videoUrl = videoArtifact.getLink();
 		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%","");
 		URI ftpUri = null;

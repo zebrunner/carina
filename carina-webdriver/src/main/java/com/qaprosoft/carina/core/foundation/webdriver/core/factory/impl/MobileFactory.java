@@ -109,10 +109,10 @@ public class MobileFactory extends AbstractFactory {
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
                                 .withBitRate(getBitrate(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality"))));
 
-                        AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions()
-                                .withUploadOptions(new ScreenRecordingUploadOptions()
-                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
-                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
+                        AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions();
+//                                .withUploadOptions(new ScreenRecordingUploadOptions()
+//                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
+//                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         ce.getListeners()
                                 .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
