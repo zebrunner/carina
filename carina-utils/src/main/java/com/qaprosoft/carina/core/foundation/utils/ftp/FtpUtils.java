@@ -26,9 +26,9 @@ public class FtpUtils {
 		try (InputStream is = new FileInputStream(filePassToUpload)) {
 			upload(ftpHost, port, user, password, is, fileName);
 		} catch (FileNotFoundException e) {
-			LOGGER.error("File is not found. Specify correct file pass");
+			LOGGER.info("File is not found. Specify correct file pass");
 		} catch (IOException e) {
-			LOGGER.error("Exception while opening file for upload.");
+			LOGGER.info("Exception while opening file for upload.");
 		}
 	}
 
@@ -44,7 +44,7 @@ public class FtpUtils {
 		try (InputStream is = new ByteArrayInputStream(decode)) {
 			upload(ftpHost, port, user, password, is, destinationFileName);
 		} catch (IOException e) {
-			LOGGER.error("Exception while opening file for upload.");
+			LOGGER.info("Exception while opening file for upload.");
 		}
 	}
 
@@ -53,26 +53,32 @@ public class FtpUtils {
 	    LOGGER.debug("FTP host to upload data : " + ftpHost);
 	    LOGGER.debug("FTP port to upload data : " + port);
         LOGGER.debug("Destination file name : " + fileName);
+        long start = System.currentTimeMillis();
 		FTPClient ftp = new FTPClient();
 		try {
 			int reply;
 			ftp.connect(ftpHost, port);
 			LOGGER.debug("Connected to server : " + ftpHost);
 			reply = ftp.getReplyCode();
+			LOGGER.debug("Reply code is : " + reply);
 			if (!FTPReply.isPositiveCompletion(reply)) {
 				ftp.disconnect();
-				LOGGER.error("FTP server refused connection.");
+				LOGGER.info("FTP server refused connection. Reply code is : " + reply);
 				throw new Exception("FTP server refused connection.");
 			}
-			ftp.login(user, password);
+			if (!ftp.login(user, password)) {
+			    throw new Exception("Login to ftp failed. Check user credentials.");
+			};
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			try {
 				ftp.storeFile(fileName, is);
+				long finish = System.currentTimeMillis();
+	            LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
 			} catch (IOException e) {
-				LOGGER.error("Exception while storing file to FTP", e);
+				LOGGER.info("Exception while storing file to FTP", e);
 			}
 		} catch (Exception e) {
-			LOGGER.error("Exception while uploading while to FTP", e);
+			LOGGER.info("Exception while uploading while to FTP", e);
 		} finally {
 			ftpDisconnect(ftp);
 		}
