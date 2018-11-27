@@ -73,11 +73,12 @@ public class FtpUtils {
 			LOGGER.debug("User has been successfully logged in.");
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			try {
+			    ftp.enterLocalPassiveMode();
 				if (ftp.storeFile(fileName, is)) {
 				    long finish = System.currentTimeMillis();
                     LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
 				} else {
-				    LOGGER.info("SOme issues occures during storing file to FTP. storeFile method returns false.");			    
+				    LOGGER.info("Some issues occures during storing file to FTP. storeFile method returns false.");			    
 				}
 			} catch (IOException e) {
 				LOGGER.info("Exception while storing file to FTP", e);
