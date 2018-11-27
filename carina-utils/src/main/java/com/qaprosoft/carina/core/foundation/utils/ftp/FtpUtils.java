@@ -41,6 +41,7 @@ public class FtpUtils {
 			String destinationFileName) {
 		byte[] decode = Base64.getDecoder().decode(data);
 		LOGGER.debug("Data size to upload: " + data.length());
+		LOGGER.debug("Encoded data size to upload: " + decode.length);
 		try (InputStream is = new ByteArrayInputStream(decode)) {
 			upload(ftpHost, port, user, password, is, destinationFileName);
 		} catch (IOException e) {
@@ -69,11 +70,15 @@ public class FtpUtils {
 			if (!ftp.login(user, password)) {
 			    throw new Exception("Login to ftp failed. Check user credentials.");
 			};
+			LOGGER.debug("User has been successfully logged in.");
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			try {
-				ftp.storeFile(fileName, is);
-				long finish = System.currentTimeMillis();
-	            LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
+				if (ftp.storeFile(fileName, is)) {
+				    long finish = System.currentTimeMillis();
+                    LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
+				} else {
+				    LOGGER.info("SOme issues occures during storing file to FTP. storeFile method returns false.");			    
+				}
 			} catch (IOException e) {
 				LOGGER.info("Exception while storing file to FTP", e);
 			}
