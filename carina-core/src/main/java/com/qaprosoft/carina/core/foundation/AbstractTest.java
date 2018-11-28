@@ -46,28 +46,24 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 public abstract class AbstractTest implements IDriverPool, ITestCases {
 
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
-
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+    
+    
     @BeforeSuite(alwaysRun = true)
-    public void beforeSuite() {
+    private void onBeforeSuite() {
         //do nothing
     }
     
     @BeforeClass(alwaysRun = true)
-    public void beforeClass() {
+    private void onBeforeClass() {
         //do nothing
     }
     
     @BeforeMethod(alwaysRun = true)
-    public void beforeMethod() {
+    private void onBeforeMethod() {
         //do nothing
     }
     
-/*    @Test()
-    public void fakeTest() {
-        //do nothing
-    }*/
-
     @DataProvider(name = "DataProvider", parallel = true)
     public Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {
         Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
