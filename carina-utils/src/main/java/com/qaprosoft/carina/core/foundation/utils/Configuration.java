@@ -195,10 +195,17 @@ public class Configuration {
         OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
 
         // TestRail
+        TESTRAIL_RUN_NAME("testrail_run_name"),
+        
         TESTRAIL_MILESTONE("testrail_milestone"),
 
         TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
-
+        
+        // qTest
+        QTEST_CYCLE_NAME("qtest_cycle_name"),
+        
+        QTEST_SUITE_NAME("qtest_suite_name"),
+        
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
 
