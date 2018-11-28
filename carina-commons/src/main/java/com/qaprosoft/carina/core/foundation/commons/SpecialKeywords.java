@@ -167,6 +167,5 @@ public class SpecialKeywords {
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
-    public static final String QTEST_CYCLE_ID = "qTestCycleId";
     public static final String QTEST_PROJECT_ID = "qTestProjectId";
 }

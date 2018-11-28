@@ -230,13 +230,12 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
         Set<String> qTestTags = getQTestCasesUuid(test);
         int projectID = getQTestProjectId(test.getTestContext());
-        int cycleID = getQTestCycleId(test.getTestContext());
 
-        if (projectID != -1 && cycleID != -1) {
+        if (projectID != -1) {
             qTestTags.forEach((entry) -> {
                 TagType tagEntry = new TagType();
                 tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
-                tagEntry.setValue(projectID + "-" + cycleID + "-" +entry);
+                tagEntry.setValue(projectID + "-" + entry);
                 tags.add(tagEntry);
             });
         }

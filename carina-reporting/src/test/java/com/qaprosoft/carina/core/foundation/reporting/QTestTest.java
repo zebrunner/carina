@@ -148,13 +148,12 @@ public class QTestTest implements IQTestManager {
         Set<String> QTestTags = getQTestCasesUuid(result);
 
         int projectID = getQTestProjectId(result.getTestContext());
-        int suiteID = getQTestCycleId(result.getTestContext());
 
         Set<TagType> finalTags = tags;
         QTestTags.forEach((entry) -> {
             TagType tagEntry = new TagType();
             tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
-            tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
+            tagEntry.setValue(projectID + "-" + entry);
             finalTags.add(tagEntry);
         });
 

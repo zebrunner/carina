@@ -38,9 +38,7 @@ public interface IQTestManager extends ITestCases {
 
         //add cases form xls/cvs dataprovider
         int projectID = getQTestProjectId(result.getTestContext());
-        int cycleID = getQTestCycleId(result.getTestContext());
-
-        if (projectID != -1 && cycleID != -1) {
+        if (projectID != -1) {
 
             List<String> dataProviderIds = new ArrayList<String>();
             @SuppressWarnings("unchecked")
@@ -125,15 +123,6 @@ public interface IQTestManager extends ITestCases {
 
     default int getQTestProjectId(ITestContext context) {
         String id = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
-        } else {
-            return -1;
-        }
-    }
-
-    default int getQTestCycleId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_CYCLE_ID);
         if (id != null) {
             return Integer.valueOf(id.trim());
         } else {
