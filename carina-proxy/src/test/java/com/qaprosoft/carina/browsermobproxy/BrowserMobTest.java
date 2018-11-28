@@ -88,7 +88,7 @@ public class BrowserMobTest {
         Assert.assertFalse(ProxyPool.isProxyRegistered(), "Proxy wasn't stopped!");
     }
 
-    @Test
+/*    @Test
     public void testBrowserModProxyResponseFiltering() {
         List<String> content = new ArrayList<>();
 
@@ -109,7 +109,7 @@ public class BrowserMobTest {
         Assert.assertNotNull(proxy.getHar(), "Har is unexpectedly null!");
         Assert.assertEquals(content.size(), 1,"Filtered response number is not as expected!");
         Assert.assertTrue(content.get(0).contains(filterKey), "Response doesn't contain expected key!");
-    }
+    }*/
 
     private void initialize() {
         ProxyPool.setupBrowserMobProxy();
