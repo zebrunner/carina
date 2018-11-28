@@ -55,20 +55,20 @@ public class BrowserMobTest {
 
     @Test
     public void testIsBrowserModStarted() {
-        initialise();
+        initialize();
         Assert.assertTrue(ProxyPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
     }
 
     @Test
     public void testBrowserModProxySystemIntegration() {
-        initialise();
+        initialize();
         Assert.assertEquals(Configuration.get(Parameter.PROXY_HOST), System.getProperty("http.proxyHost"));
         Assert.assertEquals(Configuration.get(Parameter.PROXY_PORT), System.getProperty("http.proxyPort"));
     }
 
     @Test
     public void testBrowserModProxyHeader() {
-        initialise();
+        initialize();
         Map<String, String> headers = ProxyPool.getProxy().getAllHeaders();
         Assert.assertTrue(headers.containsKey(header), "There is no custom header: " + header);
         Assert.assertTrue(headers.get(header).equals(headerValue), "There is no custom header value: " + headerValue);
@@ -111,7 +111,7 @@ public class BrowserMobTest {
         Assert.assertTrue(content.get(0).contains(filterKey), "Response doesn't contain expected key!");
     }
 
-    private void initialise() {
+    private void initialize() {
         ProxyPool.setupBrowserMobProxy();
         SystemProxy.setupProxy();
 
