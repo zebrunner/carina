@@ -710,11 +710,6 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 
 &lt;suite verbose=&quot;1&quot; name=&quot;Carina Demo Tests - Web tests&quot; skipfailedinvocationcounts=&quot;false&quot; junit=&quot;false&quot; parallel=&quot;tests&quot; data-provider-thread-count=&quot;50&quot; annotations=&quot;JDK&quot;&gt;
 
-    &lt;listeners&gt;
-        &lt;listener class-name=&quot;com.qaprosoft.carina.core.foundation.retry.AnnotationTransformer&quot;/&gt;
-        &lt;listener class-name=&quot;com.qaprosoft.zafira.listener.ZafiraListener&quot;/&gt;
-    &lt;/listeners&gt;
-
     &lt;test name=&quot;GSM arena web tests&quot;&gt;
         &lt;classes&gt;
             &lt;class name=&quot;com.qaprosoft.carina.demo.WebSampleTest&quot; /&gt;
