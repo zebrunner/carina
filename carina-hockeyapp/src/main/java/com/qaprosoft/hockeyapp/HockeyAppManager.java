@@ -95,25 +95,42 @@ public class HockeyAppManager {
         }
 
         String fileName = folder + "/" + createFileName(appName, buildType, platformName);
+        File fileToLocate = null;
 
-        // TODO: incorporate file exists and size verification to skip re download the same build artifacts
-
+        //TODO:  Make sure to use the correct paths here
         try {
-            LOGGER.debug("Beginning Transfer of HockeyApp Build");
-            URL downloadLink = new URL(buildToDownload);
-            int retryCount = 0;
-            boolean retry = true;
-            while (retry && retryCount <= 5) {
-                retry = downloadBuild(fileName, downloadLink);
-                retryCount = retryCount + 1;
+            File file = new File(folder);
+            File[] listOfFiles = file.listFiles();
+
+            for(int i = 0; i < listOfFiles.length; ++i){
+                if(listOfFiles[i].isFile() && listOfFiles[i].getName().contains(fileName)){
+                    LOGGER.info("File has been Located Locally.  File path is: " + listOfFiles[i].getAbsolutePath());
+                    fileToLocate = listOfFiles[i];
+                }
             }
-            LOGGER.debug(String.format("HockeyApp Build (%s) was retrieved", fileName));
         } catch (Exception ex) {
-            LOGGER.error(String.format("Error Thrown When Attempting to Transfer HockeyApp Build (%s)", ex.getMessage()), ex);
+            LOGGER.error(String.format("Error Attempting to Look for Existing File: %s", ex.getMessage()), ex);
+        }
+
+        if (fileToLocate == null) {
+            try {
+                LOGGER.debug("Beginning Transfer of HockeyApp Build");
+                URL downloadLink = new URL(buildToDownload);
+                int retryCount = 0;
+                boolean retry = true;
+                while (retry && retryCount <= 5) {
+                    retry = downloadBuild(fileName, downloadLink);
+                    retryCount = retryCount + 1;
+                }
+                LOGGER.debug(String.format("HockeyApp Build (%s) was retrieved", fileName));
+            } catch (Exception ex) {
+                LOGGER.error(String.format("Error Thrown When Attempting to Transfer HockeyApp Build (%s)", ex.getMessage()), ex);
+            }
+        } else {
+            LOGGER.info("Preparing to use local version of HockeyApp Build...");
         }
 
         return new File(fileName);
-
     }
 
     /**
@@ -321,7 +338,7 @@ public class HockeyAppManager {
 
         List<String> updatedPatternlist = new ArrayList<>();
 
-        String patternToReplace = ".*[ -]%s[ -].*";
+        String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
         for (String currentPattern : patternList) {
             updatedPatternlist.add(String.format(patternToReplace, currentPattern));
         }
