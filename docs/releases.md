@@ -78,7 +78,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 * org.testng 6.8.8->6.14.3
 
 
-#### Migration Steps
+**Migration Steps**
 
 * Visit [Migration Steps](http://qaprosoft.github.io/carina/migration/) for details.
 
