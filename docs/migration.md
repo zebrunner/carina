@@ -1,6 +1,7 @@
 ### Migration steps from 5.3.3.xx to 6.0.x carina
 
 Due to the architectual changes, code cleanup etc 6.0 carina-core generation is not compatible with 5.3 anymore.
+
 * Visit [Release Notes](http://qaprosoft.github.io/carina/releases/) for details.
 
 1) Listeners Updates
@@ -88,4 +89,4 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
    return CustomTypePageFactory.initPage(getDriver(), PlayerPageBase.class);
 ```
 
-### Communicate via [carina-support](emailto:carina-support@qaprosoft.com) to get migration support for free...
+8) Communicate via [carina-support](emailto:carina-support@qaprosoft.com) to get migration support for free...

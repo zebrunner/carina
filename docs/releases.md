@@ -5,26 +5,26 @@
 **Enhancements**
 
 * Starting from 6.0.x carina-core became a listener with unified CarinaListener class:
-   * most of the AbstractTest core methods moved to CarinaListener
-   * incorporated HealthCheckListener as part of CarinaListener
-   * splited initialization logic into static block and ISuiteListener->onStart(suite) method
-   * incorporated DriverPool cleanup on shutdown hook
-   * **Note:** some changes are incompatible in comparison with 5.x.x versions and need manual updates according to the **Migration Steps** 
+    * most of the AbstractTest core methods moved to CarinaListener
+    * incorporated HealthCheckListener as part of CarinaListener
+    * splited initialization logic into static block and ISuiteListener->onStart(suite) method
+    * incorporated DriverPool cleanup on shutdown hook
+    * **Note:** some changes are incompatible in comparison with 5.x.x versions and need manual updates according to the **Migration Steps** 
 * Migrated to the latest 6.14.3 TestNG version with fully supported retry execution feature
 * Updated build numbering structure according all qaprosoft projects:
-   * **6**.0.0 - core generation
-   * 6.**0**.0 - service pack release
-   * 6.0.**0** - cross release build number which starts from 0 in 6th generation (in 5.x.x.x release latest build number is 5.3.3.**129**)
+    * **6**.0.0 - core generation
+    * 6.**0**.0 - service pack release
+    * 6.0.**0** - cross release build number which starts from 0 in 6th generation (in 5.x.x.x release latest build number is 5.3.3.**129**)
 * Finalized integration rules for Zafira integration:
-   * Add ZafiraListener in global pom.xml to inject it for all CI runs
-   * Add ZafiraListener into each TestNG suite to be able to run locally with Zafira integration
-   * Note: carina archetype updated accordingly
+    * Add ZafiraListener in global pom.xml to inject it for all CI runs
+    * Add ZafiraListener into each TestNG suite to be able to run locally with Zafira integration
+    * Note: carina archetype updated accordingly
 * Refactored DriverPool class and deliver it as functional IDriverPool interface
-   * It allowed to remove driver_mode property and calculate driver lifecycle automatically based on rules below:
-      * All drivers started during @BeforeSuite phase are saved across all suite run
-      * All drivers started during @BeforeClass phase are saved across current test class run
-      * All drivers started during @BeforeMethod phase or inside method are saved only for current method and closed automatically
-      * To be able to keep "method mode" drivers just use dependsOnMethods property in @Test annotation.
+    * It allowed to remove driver_mode property and calculate driver lifecycle automatically based on rules below:
+         * All drivers started during @BeforeSuite phase are saved across all suite run
+         * All drivers started during @BeforeClass phase are saved across current test class run
+         * All drivers started during @BeforeMethod phase or inside method are saved only for current method and closed automatically
+         * To be able to keep "method mode" drivers just use dependsOnMethods property in @Test annotation.
 ```
 Example:
     @Test()
@@ -78,7 +78,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 * org.testng 6.8.8->6.14.3
 
 
-### Migration Steps
+#### Migration Steps
 
 * Visit [Migration Steps](http://qaprosoft.github.io/carina/migration/) for details.
 
