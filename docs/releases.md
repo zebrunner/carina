@@ -69,17 +69,16 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 
 **[DEPENDENCIES UPDATES]**
 
-TestNG 6.8.8->6.14.3
-zafira-client 3.3.37->3.3.68-SNAPSHOT (due to the changed TestNG)
-selenium-server 3.14.0->3.141.59
-selenium-java 3.14.0->3.141.59
-__due to the security alerts bumped up:__
-jackson-databind.version 2.8.9->2.8.11.1
-org.apache.pdfbox 1.8.7->1.8.16
-org.testng 6.8.8->6.14.3
-org.seleniumhq.selenium 3.12.0->3.14.0
+* TestNG 6.8.8->6.14.3
+* zafira-client 3.3.37->3.3.68-SNAPSHOT (due to the changed TestNG)
+* selenium-server 3.14.0->3.141.59
+* selenium-java 3.14.0->3.141.59
+* jackson-databind.version 2.8.9->2.8.11.1
+* org.apache.pdfbox 1.8.7->1.8.16
+* org.testng 6.8.8->6.14.3
 
-## Migration Steps
+
+### Migration Steps
 
 * Visit [Migration Steps](http://qaprosoft.github.io/carina/migration/) for details.
 
