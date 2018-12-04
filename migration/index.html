@@ -431,8 +431,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#communicate-via-carina-supportqaprosoftcom-to-get-migration-support-for-free" title="Communicate via carina-support@qaprosoft.com to get migration support for free..." class="md-nav__link">
-    Communicate via carina-support@qaprosoft.com to get migration support for free...
+  <a href="#communicate-via-carina-support-to-get-migration-support-for-free" title="Communicate via carina-support to get migration support for free..." class="md-nav__link">
+    Communicate via carina-support to get migration support for free...
   </a>
   
 </li>
@@ -486,8 +486,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#communicate-via-carina-supportqaprosoftcom-to-get-migration-support-for-free" title="Communicate via carina-support@qaprosoft.com to get migration support for free..." class="md-nav__link">
-    Communicate via carina-support@qaprosoft.com to get migration support for free...
+  <a href="#communicate-via-carina-support-to-get-migration-support-for-free" title="Communicate via carina-support to get migration support for free..." class="md-nav__link">
+    Communicate via carina-support to get migration support for free...
   </a>
   
 </li>
@@ -516,8 +516,10 @@
                 <h3 id="migration-steps-from-533xx-to-60x-carina">Migration steps from 5.3.3.xx to 6.0.x carina</h3>
 <p>Due to the architectual changes, code cleanup etc 6.0 carina-core generation is not compatible with 5.3 anymore.
 * Visit <a href="http://qaprosoft.github.io/carina/releases/">Release Notes</a> for details.</p>
-<p>1) Listeners Updates
-   * AnnotationTransformer is part of CarinaListener so it should be removed from all TestNG suites and pom.xml files:</p>
+<p>1) Listeners Updates</p>
+<ul>
+<li>AnnotationTransformer is part of CarinaListener so it should be removed from all TestNG suites and pom.xml files:</li>
+</ul>
 <pre><code>    // remove below lines from each TestNG suites and pom.xml files
     &lt;listeners&gt;
         &lt;listener
@@ -534,13 +536,23 @@
     &lt;/listeners&gt;
 </code></pre>
 
-<p>2) Apache Maven plugins upgrade
-   * all plugins where upgraded on core level and we recommend to bump up below plugins to the newest versions on project leveles as well:
-     * maven-compiler-plugin 3.2 -&gt; 3.8.0
-     * maven-surefire-plugin 2.18.1 -&gt; 2.22.1</p>
-<p>3) DriverPool was refactored and is delivered as IDriverPool intefrace with default functionality
-   * No changes on test classes level if they extends AbstractTest
-   * For each services layer which used static DriverPool functionality we should:</p>
+<p>2) Apache Maven plugins upgrade</p>
+<ul>
+<li>all plugins where upgraded on core level and we recommend to bump up below plugins to the newest versions on project leveles as well:<ul>
+<li>maven-compiler-plugin 3.2 -&gt; 3.8.0</li>
+<li>maven-surefire-plugin 2.18.1 -&gt; 2.22.1</li>
+</ul>
+</li>
+</ul>
+<p>3) DriverPool was refactored and is delivered as IDriverPool intefrace with default functionality</p>
+<ul>
+<li>
+<p>No changes on test classes level if they extends AbstractTest</p>
+</li>
+<li>
+<p>For each services layer which used static DriverPool functionality we should:</p>
+</li>
+</ul>
 <pre><code>   // add &quot;implements IDriverPool&quot; for each service class
    public class TestService implements IDriverPool {
    ...
@@ -549,11 +561,13 @@
    WebDriver drv = getDriver();
 </code></pre>
 
-<p>4) Cucumber functionality was completely removed in 6.0 so just remove all dependent classes if any. Inform carina-support@qaprosoft.com if you want to have cucumber module in Carina.</p>
+<p>4) Cucumber functionality was completely removed in 6.0 so just remove all dependent classes if any. Inform <a href="emailto:carina-support@qaprosoft.com">carina-support</a> if you want to restore cucumber module in Carina.</p>
 <p>5) All TestRail updaters, interfaces etc was removed. Carina can't push at runtime data to 3rd party Reporting Tools. 
    Carina can register only TestRail related tags in Zafira Reporting Tool and real integration was moved to the qps-pipeline level with much more easier development, maintenance and support</p>
-<p>6) DriverHelper (AbstractPage) - deprecated methods removal
-   * click, type, hoved, select etc</p>
+<p>6) DriverHelper (AbstractPage) - deprecated methods removal</p>
+<ul>
+<li>click, type, hoved, select etc</li>
+</ul>
 <pre><code>   ExtendedWebElement element;
    String value = &quot;value&quot;;
    type(element, value); -&gt; element.type(value);
@@ -584,14 +598,16 @@
    element.isClickable(LONG_TIMEOUT);
 </code></pre>
 
-<p>7) CustomTypePageFactory-&gt;initPage method has obligatory driver as 1st argument. 
-   * transferring driver as argument should resolve invalid calls on services layer when we got too often "driver already quit..." </p>
+<p>7) CustomTypePageFactory-&gt;initPage method has obligatory driver as 1st argument. </p>
+<ul>
+<li>transferring driver as argument should resolve invalid calls on services layer when we got too often "driver already quit..." </li>
+</ul>
 <pre><code>   return CustomTypePageFactory.initPage(PlayerPageBase.class);
    // change to
    return CustomTypePageFactory.initPage(getDriver(), PlayerPageBase.class);
 </code></pre>
 
-<h2 id="communicate-via-carina-supportqaprosoftcom-to-get-migration-support-for-free">Communicate via carina-support@qaprosoft.com to get migration support for free...</h2>
+<h3 id="communicate-via-carina-support-to-get-migration-support-for-free">Communicate via <a href="emailto:carina-support@qaprosoft.com">carina-support</a> to get migration support for free...</h3>
                 
                   
                 
