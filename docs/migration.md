@@ -43,7 +43,7 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
    WebDriver drv = getDriver();
 ```
 
-4) Cucumber functionality was completely removed in 6.0 so just remove all dependent classes if any. Inform [carina-support](emailto:carina-support@qaprosoft.com) if you want to restore cucumber module in Carina.
+4) Cucumber functionality was completely removed in 6.0 so just remove all dependent classes if any. Inform [carina-support](mailto:carina-support@qaprosoft.com) if you want to restore cucumber module in Carina.
 
 5) All TestRail updaters, interfaces etc was removed. Carina can't push at runtime data to 3rd party Reporting Tools. 
    Carina can register only TestRail related tags in Zafira Reporting Tool and real integration was moved to the qps-pipeline level with much more easier development, maintenance and support
@@ -89,4 +89,4 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
    return CustomTypePageFactory.initPage(getDriver(), PlayerPageBase.class);
 ```
 
-8) Communicate via [carina-support](emailto:carina-support@qaprosoft.com) to get migration support for free...
+8) Communicate via [carina-support](mailto:carina-support@qaprosoft.com) to get migration support for free...
