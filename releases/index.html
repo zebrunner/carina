@@ -444,12 +444,18 @@
     6.0.2 (2018-12-04)
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#migration-steps" title="Migration Steps" class="md-nav__link">
     Migration Steps
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -538,12 +544,18 @@
     6.0.2 (2018-12-04)
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#migration-steps" title="Migration Steps" class="md-nav__link">
     Migration Steps
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -619,27 +631,35 @@
 <h3 id="602-2018-12-04">6.0.2 (2018-12-04)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li>Starting from 6.0.x carina-core became a listener with unified CarinaListener class:</li>
+<li>Starting from 6.0.x carina-core became a listener with unified CarinaListener class:<ul>
 <li>most of the AbstractTest core methods moved to CarinaListener</li>
 <li>incorporated HealthCheckListener as part of CarinaListener</li>
 <li>splited initialization logic into static block and ISuiteListener-&gt;onStart(suite) method</li>
 <li>incorporated DriverPool cleanup on shutdown hook</li>
 <li><strong>Note:</strong> some changes are incompatible in comparison with 5.x.x versions and need manual updates according to the <strong>Migration Steps</strong> </li>
+</ul>
+</li>
 <li>Migrated to the latest 6.14.3 TestNG version with fully supported retry execution feature</li>
-<li>Updated build numbering structure according all qaprosoft projects:</li>
+<li>Updated build numbering structure according all qaprosoft projects:<ul>
 <li><strong>6</strong>.0.0 - core generation</li>
 <li>6.<strong>0</strong>.0 - service pack release</li>
 <li>6.0.<strong>0</strong> - cross release build number which starts from 0 in 6th generation (in 5.x.x.x release latest build number is 5.3.3.<strong>129</strong>)</li>
-<li>Finalized integration rules for Zafira integration:</li>
+</ul>
+</li>
+<li>Finalized integration rules for Zafira integration:<ul>
 <li>Add ZafiraListener in global pom.xml to inject it for all CI runs</li>
 <li>Add ZafiraListener into each TestNG suite to be able to run locally with Zafira integration</li>
 <li>Note: carina archetype updated accordingly</li>
-<li>Refactored DriverPool class and deliver it as functional IDriverPool interface</li>
+</ul>
+</li>
+<li>Refactored DriverPool class and deliver it as functional IDriverPool interface<ul>
 <li>It allowed to remove driver_mode property and calculate driver lifecycle automatically based on rules below:<ul>
 <li>All drivers started during @BeforeSuite phase are saved across all suite run</li>
 <li>All drivers started during @BeforeClass phase are saved across current test class run</li>
 <li>All drivers started during @BeforeMethod phase or inside method are saved only for current method and closed automatically</li>
 <li>To be able to keep "method mode" drivers just use dependsOnMethods property in @Test annotation.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -700,7 +720,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 <li>org.apache.pdfbox 1.8.7-&gt;1.8.16</li>
 <li>org.testng 6.8.8-&gt;6.14.3</li>
 </ul>
-<h3 id="migration-steps">Migration Steps</h3>
+<h4 id="migration-steps">Migration Steps</h4>
 <ul>
 <li>Visit <a href="http://qaprosoft.github.io/carina/migration/">Migration Steps</a> for details.</li>
 </ul>
