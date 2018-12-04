@@ -1,5 +1,88 @@
 # Release notes
 
+### 6.0.2 (2018-12-04)
+
+**Enhancements**
+
+* Starting from 6.0.x carina-core became a listener with unified CarinaListener class:
+   * most of the AbstractTest core methods moved to CarinaListener
+   * incorporated HealthCheckListener as part of CarinaListener
+   * splited initialization logic into static block and ISuiteListener->onStart(suite) method
+   * incorporated DriverPool cleanup on shutdown hook
+   * **Note:** some changes are incompatible in comparison with 5.x.x versions and need manual updates according to the **Migration Steps** 
+* Migrated to the latest 6.14.3 TestNG version with fully supported retry execution feature
+* Updated build numbering structure according all qaprosoft projects:
+   * **6**.0.0 - core generation
+   * 6.**0**.0 - service pack release
+   * 6.0.**0** - cross release build number which starts from 0 in 6th generation (in 5.x.x.x release latest build number is 5.3.3.**129**)
+* Finalized integration rules for Zafira integration:
+   * Add ZafiraListener in global pom.xml to inject it for all CI runs
+   * Add ZafiraListener into each TestNG suite to be able to run locally with Zafira integration
+   * Note: carina archetype updated accordingly
+* Refactored DriverPool class and deliver it as functional IDriverPool interface
+   * It allowed to remove driver_mode property and calculate driver lifecycle automatically based on rules below:
+      * All drivers started during @BeforeSuite phase are saved across all suite run
+      * All drivers started during @BeforeClass phase are saved across current test class run
+      * All drivers started during @BeforeMethod phase or inside method are saved only for current method and closed automatically
+      * To be able to keep "method mode" drivers just use dependsOnMethods property in @Test annotation.
+```
+Example:
+    @Test()
+    public void test1() {
+        getDriver(); //start new driver
+        ...
+    }
+    @Test(dependsOnMethods="test1")
+    public void test2() {
+        getDriver(); //get existing driver started in test1 as test2 depends on test1
+        ...
+    }
+    @Test()
+    public void test3() {
+        getDriver(); //start new driver as no dependencies detected
+        ...
+    }
+```
+* Moved unit tests into the valid modules to be able to track coverage results in Sonar: https://ci.qaprosoft.com/sonarqube/dashboard/index?did=2
+* Move some noisy log messages onto the DEBUG level
+* added possibility to redefine log level for explicit sub-modules/classes
+```
+core_log_level=DEBUG
+core_log_packages=IDriverPool,ZafiraConfigurator
+```
+* added support for Opera browser. For now both variants are ok:
+    * browser=opera
+    * browser=operablink 
+* Removed all TestRail updaters from Carina and all required dto classes. Integration with 3rd party testcase management tools will be allowed through the https://github.com/qaprosoft/zafira only!
+* Removed SMTP integration settings from Carina. All notification methods will be concentrated in Zafira Reporting Tool. Carina could only run and generate local report in ./reports/qa folder.
+* Removed completely JUnit libraries from classpath to avoid invalid asserts import inside the test classes on projects level
+* Removed cucumber integration as not used feature
+* Removed all deprecated methods in DriverHelper
+* Removed deprecated constructors in ExtendedWebElement class
+
+**Fixes**
+
+* Improved driver restart logic fixing [#364](https://github.com/qaprosoft/carina/issues/364) and [#552](https://github.com/qaprosoft/carina/issues/552).
+* removed soapui.log4j.config property 
+* reused new getConstructorOrMethod() function for getting methods instances
+* [#558](https://github.com/qaprosoft/carina/issues/558), [#546](https://github.com/qaprosoft/carina/issues/546), [#542](https://github.com/qaprosoft/carina/issues/542), [#532](https://github.com/qaprosoft/carina/issues/532), [#519](https://github.com/qaprosoft/carina/issues/519), [#512](https://github.com/qaprosoft/carina/issues/512), [#505](https://github.com/qaprosoft/carina/issues/505), [#484](https://github.com/qaprosoft/carina/issues/484), [#483](https://github.com/qaprosoft/carina/issues/483), [#480](https://github.com/qaprosoft/carina/issues/480), [#479](https://github.com/qaprosoft/carina/issues/479), [#375](https://github.com/qaprosoft/carina/issues/375), [#343](https://github.com/qaprosoft/carina/issues/343)
+
+**[DEPENDENCIES UPDATES]**
+
+TestNG 6.8.8->6.14.3
+zafira-client 3.3.37->3.3.68-SNAPSHOT (due to the changed TestNG)
+selenium-server 3.14.0->3.141.59
+selenium-java 3.14.0->3.141.59
+__due to the security alerts bumped up:__
+jackson-databind.version 2.8.9->2.8.11.1
+org.apache.pdfbox 1.8.7->1.8.16
+org.testng 6.8.8->6.14.3
+org.seleniumhq.selenium 3.12.0->3.14.0
+
+## Migration Steps
+
+* Visit [Migration Steps](http://qaprosoft.github.io/carina/migration/) for details.
+
 ### 5.3.3.129 (2018-11-21)
 
 **Enhancements**

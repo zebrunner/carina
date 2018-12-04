@@ -12,8 +12,9 @@ pages:
     - Dataproviders: dataproviders.md
     - Security: security.md
     - Contribution: contribution.md
-    - Release notes: releases.md
     - Proxy: proxy.md
+    - Migration Steps: migration.md
+    - Release Notes: releases.md
 theme:
   name: 'material'
 repo_url: https://github.com/qaprosoft/carina
