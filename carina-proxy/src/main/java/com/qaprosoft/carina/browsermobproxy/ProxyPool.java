@@ -29,7 +29,6 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExec
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
-import net.lightbody.bmp.proxy.auth.AuthType;
 
 public final class ProxyPool {
     protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
@@ -58,15 +57,17 @@ public final class ProxyPool {
             BrowserMobProxy proxy = startProxy();
             Integer port = proxy.getPort();
 
-            String currentIP = NetworkUtil.getIpAddress();
+            String currentIP = "";
+            if (!Configuration.get(Parameter.BROWSERMOB_HOST).isEmpty()) {
+            	currentIP = Configuration.get(Parameter.BROWSERMOB_HOST);
+            } else {
+            	currentIP = NetworkUtil.getIpAddress();
+            }
+            
             LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
             
             R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put("proxy_port", port.toString());
-            
-            // Setup basic authorization if selenium_host contains user:password
-            //TODO: remove hardcoded args. keep only for testing
-            proxy.autoAuthorization("", "demo", "demo", AuthType.BASIC);
             
             // [VD] do not override protocols to use http only! That's block https traffic analysis
             //R.CONFIG.put("proxy_protocols", "http");
