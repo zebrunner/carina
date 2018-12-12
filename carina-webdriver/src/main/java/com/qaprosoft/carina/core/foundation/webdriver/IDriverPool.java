@@ -291,8 +291,6 @@ public interface IDriverPool {
      *            DesiredCapabilities
      * @param seleniumHost
      *            String
-     * @param device
-     *            Device where we want to start driver
      * @return WebDriver
      */
     default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
