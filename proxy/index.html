@@ -627,6 +627,7 @@ proxy_port=NULL
 proxy_protocols=http,https,ftp
 proxy_set_to_system=true
 browsermob_proxy=false
+browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 </code></pre>
@@ -637,11 +638,14 @@ Also to enable proxy for TestNG Java process <strong>proxy_set_to_system</strong
 <h3 id="raising-inbuilt-proxy-server-browsermob">Raising inbuilt proxy-server (BrowserMob)</h3>
 <p>Also Carina can start embedded proxy to proxy/view/filter requests/responses. There is inbuilt library BrowserMobProxy in carina-proxy module. Below you can find BrowserMob proxy related parameters in your <strong>config.properties</strong> file:</p>
 <pre><code>browsermob_proxy=true
+browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 </code></pre>
 
 <p>With enabled <strong>browsermob_proxy</strong> Carina will start dedicated proxy instance on every test method. </p>
+<p><strong>browsermob_host=NULL</strong> means that Carina automatically detect IP address and put it into the capabilities etc.</p>
+<p><strong>browsermob_host=myhostname</strong> that's useful in case of running maven process inside docker container. Override hostname to be available from Selenium instance.</p>
 <p><strong>browsermob_port=0</strong> means that Carina dynamically identify free port for proxy session.</p>
 <p><strong>browsermob_disabled_mitm</strong> is disabled by default. </p>
 <p><strong>Important!</strong> If you have troubles with  SSL traffic sniffering first thing you should do - change <strong>browsermob_disabled_mitm</strong> property value!</p>
