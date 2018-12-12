@@ -7,6 +7,7 @@ proxy_port=NULL
 proxy_protocols=http,https,ftp
 proxy_set_to_system=true
 browsermob_proxy=false
+browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 ```
@@ -19,10 +20,15 @@ Note: Above settings mostly required to get public internet access through corpo
 Also Carina can start embedded proxy to proxy/view/filter requests/responses. There is inbuilt library BrowserMobProxy in carina-proxy module. Below you can find BrowserMob proxy related parameters in your **config.properties** file:
 ```
 browsermob_proxy=true
+browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 ```
 With enabled **browsermob_proxy** Carina will start dedicated proxy instance on every test method. 
+
+**browsermob_host=NULL** means that Carina automatically detect IP address and put it into the capabilities etc.
+
+**browsermob_host=myhostname** that's useful in case of running maven process inside docker container. Override hostname to be available from Selenium instance.
 
 **browsermob_port=0** means that Carina dynamically identify free port for proxy session.
 
