@@ -55,15 +55,25 @@ public final class ProxyPool {
     {
         if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
             BrowserMobProxy proxy = startProxy();
+            
+            
             Integer port = proxy.getPort();
-
-            String currentIP = NetworkUtil.getIpAddress();
-            LOGGER.debug("Set http proxy settings to use BrowserMobProxy host: " + currentIP + "; port: " + port);
+            
+            String currentIP = "";
+            if (!Configuration.get(Parameter.BROWSERMOB_HOST).isEmpty()) {
+            	// reuse "browsermob_host" to be able to share valid publicly available host. 
+            	// it is useful when java and web tests are executed absolutely in different containers/networks. 
+            	currentIP = Configuration.get(Parameter.BROWSERMOB_HOST);
+            } else {
+            	currentIP = NetworkUtil.getIpAddress();
+            }
+            
+            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
             
             R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put("proxy_port", port.toString());
-            // [VD] do not override protocols to use http only! That's block https traffic analysis
-            //R.CONFIG.put("proxy_protocols", "http");
+            
+            R.CONFIG.put("proxy_protocols", "http,https");
 
             // follow steps to configure https traffic sniffering: https://github.com/lightbody/browsermob-proxy#ssl-support
             // the most important are:
@@ -143,16 +153,6 @@ public final class ProxyPool {
         } else {
             LOGGER.info("BrowserMob proxy is already started on port " + proxy.getPort());
         }
-
-        Integer port = proxy.getPort();
-
-        String currentIP = NetworkUtil.getIpAddress();
-        LOGGER.warn("Set http/https proxy settings ONLY to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
-
-        //TODO: double check mobile proxy support
-        R.CONFIG.put("proxy_host", currentIP);
-        R.CONFIG.put("proxy_port", port.toString());
-        R.CONFIG.put("proxy_protocols", "http,https");
 
         return proxy;
     }
