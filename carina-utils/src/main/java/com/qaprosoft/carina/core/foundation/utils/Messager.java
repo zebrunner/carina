@@ -51,7 +51,7 @@ public enum Messager implements IMessager {
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
-    OPENING_URL("INFO: url '%s' is being opening..."),
+    OPENING_URL("INFO: url '%s' is being opened..."),
     
     OPEN_URL("INFO: url '%s' is opened."),
     

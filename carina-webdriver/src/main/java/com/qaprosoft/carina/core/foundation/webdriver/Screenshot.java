@@ -474,9 +474,7 @@ public class Screenshot {
 
     /**
      * Makes screenshot of visible part of the page
-     * 
-     * @param driver
-     *            - webDriver.
+     *
      * @param augmentedDriver
      *            - webDriver.
      * @exception IOException

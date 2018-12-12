@@ -396,17 +396,12 @@ public class DriverHelper {
         }
         
         try {
-    		if ("chrome".equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
-    			driver.manage().window().setSize(new Dimension(1920, 1040));
-    		} else {
-    			driver.manage().window().maximize();
-    		}
+            driver.manage().window().maximize();
         } catch (WebDriverException e) {
         	LOGGER.warn("Unable to maximize browser: " + e.getMessage());
         } catch (Exception e) {
         	LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
         }
-		
     }
 
     /**

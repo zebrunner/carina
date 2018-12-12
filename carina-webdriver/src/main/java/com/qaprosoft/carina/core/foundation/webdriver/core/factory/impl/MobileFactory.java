@@ -178,7 +178,7 @@ public class MobileFactory extends AbstractFactory {
     /**
      * Returns device information from Grid Hub using STF service.
      * 
-     * @param RemoteWebDriver
+     * @param drv
      *            - driver
      * @return remote device information
      */
