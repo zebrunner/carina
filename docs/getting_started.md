@@ -11,7 +11,7 @@ The easiest way to initialize new project is to use Carina archetype, you will g
 ```
 mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
-                       -DarchetypeVersion=1.6 \
+                       -DarchetypeVersion=1.7 \
                        -DgroupId=<your_groupId> \
                        -DartifactId=<your_artifactId> \
                        -Dname="<you_proj_name>" \
