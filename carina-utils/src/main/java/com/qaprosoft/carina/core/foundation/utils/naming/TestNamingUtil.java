@@ -49,7 +49,7 @@ public class TestNamingUtil {
         int count = 1;
         if (testName2Counter.containsKey(test)) {
             count = testName2Counter.get(test) + 1;
-            LOGGER.warn(test + " test was already registered. Incrementing invocation count to " + count);
+            LOGGER.debug(test + " test was already registered. Incrementing invocation count to " + count);
         }
         testName2Counter.put(test, count);
 
