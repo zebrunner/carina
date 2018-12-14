@@ -282,13 +282,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         if (dependedUponMethods.length == 0) {
             ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-            // 1. quit all Phase.METHOD drivers for current thread
             for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
                 CarinaDriver drv = entry.getValue();
-                if(drv.isExpired()) {
-                	LOGGER.error("We have to quit everything onBeforeConfiguration step!");
-                    quitDriver(entry.getKey());
-                }
                 
                 // all before_method drivers move into METHOD to be able to quit them on next onTestStart!
                 if (Phase.BEFORE_METHOD.equals(drv.getPhase())) {
