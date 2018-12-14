@@ -9,6 +9,7 @@ public class CarinaDriver {
 	private WebDriver driver;
 	private Phase phase;
 	private long threadId;
+	private boolean isExpired;
 	
 	public CarinaDriver(String name, WebDriver driver, Phase phase, long threadId) {
 		super();
@@ -16,6 +17,7 @@ public class CarinaDriver {
 		this.driver = driver;
 		this.phase = phase;
 		this.threadId = threadId;
+		this.isExpired = false;
 	}
 
 	public WebDriver getDriver() {
@@ -49,5 +51,13 @@ public class CarinaDriver {
 	public void setPhase(Phase phase) {
 		this.phase = phase;
 	}
-	
+
+
+	public boolean isExpired() {
+		return isExpired;
+	}
+
+	public void setExpired(boolean isExpired) {
+		this.isExpired = isExpired;
+	}
 }
