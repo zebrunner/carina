@@ -165,7 +165,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
                 while (allLoggers.hasMoreElements()) {
                     Category tmpLogger = (Category) allLoggers.nextElement();
-                    LOGGER.debug("loggerName: " + tmpLogger.getName());
+                    LOGGER.debug("loggerName: " + tmpLogger.getName() + "; level: " + tmpLogger.getLevel());
                     for (String coreLogPackage : coreLogPackages) {
                         if (tmpLogger.getName().contains(coreLogPackage.trim())) {
                             LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to " + Configuration.get(Parameter.CORE_LOG_LEVEL));
@@ -177,6 +177,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
             }
         }
+        
+        try {
+        	//disable annoying info messages:
+        	//	INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)
+        	//	Dec 14, 2018 12:31:33 PM org.openqa.selenium.remote.ErrorCodes toStatus
+        	Logger errorCodesLogger = Logger.getLogger(org.openqa.selenium.remote.ErrorCodes.class);
+        	errorCodesLogger.setLevel(Level.toLevel("ERROR"));
+        } catch (Exception e) {
+        	// do nothing
+        }        
         
         //TODO: moved into separate class/method
         LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
