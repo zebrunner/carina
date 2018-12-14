@@ -273,7 +273,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (result.getMethod().isAfterSuiteConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
             
-            //forcibly quit all drivers
+            LOGGER.info("CarinaListener->beforeConfiguration->AfterSuiteConfiguration");
+            //TODO: check how many times it is called and quite all drivers if execution is at once
+            //forcibly quite all drivers
             quitDrivers();
         }
         
@@ -826,14 +828,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 ProxyPool.stopProxy();
                 
                 try {
-                    logger.debug("Driver exiting..." + name);
+                    LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
-                    logger.debug("Driver exited..." + name);
+                    LOGGER.debug("Driver exited..." + name);
                 } catch (WebDriverException e) {
-                    logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
+                	LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
                     // do nothing
                 } catch (Exception e) {
-                    logger.debug("Error discovered during driver quit: " + e.getMessage(), e);
+                	LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
 
                     // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
                     if (!e.getMessage().contains("Session ID is null.")) {
