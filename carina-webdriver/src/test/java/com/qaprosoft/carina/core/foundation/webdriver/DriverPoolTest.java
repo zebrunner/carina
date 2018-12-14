@@ -76,7 +76,7 @@ public class DriverPoolTest implements IDriverPool {
 
 	@Test(dependsOnMethods = { "registerDefaultDriver", "registerTwiceDefaultDriver" })
 	public void deregisterDefaultDriver() {
-		deregisterDriver(IDriverPool.DEFAULT);
+		deregisterDriver(mockDriverDefault);
 		Assert.assertFalse(isDriverRegistered(IDriverPool.DEFAULT), "Default driver is not deregistered!");
 		Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
 	}
@@ -108,7 +108,7 @@ public class DriverPoolTest implements IDriverPool {
 
 	@Test(dependsOnMethods = { "reachMaxDriverCountTest" })
 	public void deregisterCustom1Driver() {
-		deregisterDriver(CUSTOM1);
+		deregisterDriver(mockDriverCustom1);
 		Assert.assertFalse(isDriverRegistered(CUSTOM1), CUSTOM1 + " driver is not deregistered!");
 		Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
 
