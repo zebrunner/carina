@@ -171,23 +171,27 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                             LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to " + Configuration.get(Parameter.CORE_LOG_LEVEL));
                             tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
                         }
+                        
+                        if(tmpLogger.getName().contains("org.openqa.selenium.remote")) {
+                        	tmpLogger.setLevel(Level.toLevel("OFF"));
+                        }
                     }
                 }
             } catch (NoSuchMethodError e) {
                 LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
             }
         }
-        
+/*        
         try {
         	//disable annoying info messages:
         	//	INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)
         	//	Dec 14, 2018 12:31:33 PM org.openqa.selenium.remote.ErrorCodes toStatus
         	Logger errorCodesLogger = Logger.getLogger(org.openqa.selenium.remote.ErrorCodes.class);
-        	errorCodesLogger.setLevel(Level.toLevel("ERROR"));
+        	errorCodesLogger.setLevel(Level.toLevel("OFF"));
         } catch (Exception e) {
         	// do nothing
         }        
-        
+        */
         //TODO: moved into separate class/method
         LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
         suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
