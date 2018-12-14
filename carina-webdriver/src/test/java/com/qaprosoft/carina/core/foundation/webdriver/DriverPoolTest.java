@@ -112,7 +112,7 @@ public class DriverPoolTest implements IDriverPool {
 		Assert.assertFalse(isDriverRegistered(CUSTOM1), CUSTOM1 + " driver is not deregistered!");
 		Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
 
-		quitDrivers();
+		deregisterDriver(mockDriverDefault);
 		Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
 	}
 
@@ -122,7 +122,7 @@ public class DriverPoolTest implements IDriverPool {
 		Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
 		registerDriver(mockDriverCustom1, CUSTOM1);
 		Assert.assertEquals(2, getDriversCount(), "Number of registered driver is not valid!");
-		quitDrivers();
+		quitAllDrivers();
 		Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
 	}
 

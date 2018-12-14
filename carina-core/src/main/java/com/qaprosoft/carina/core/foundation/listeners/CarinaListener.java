@@ -285,7 +285,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // 1. quit all Phase.METHOD drivers for current thread
             for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
                 CarinaDriver drv = entry.getValue();
-                if (Phase.METHOD.equals(drv.getPhase())) {
+                if(drv.isExpired()) {
+                	LOGGER.error("We have to quit everything onBeforeConfiguration step!");
                     quitDriver(entry.getKey());
                 }
                 
@@ -365,13 +366,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         LOGGER.info("CarinaListener->onFinish(context): " + context.getName());
         
-        // quit all drivers for current thread obligatory!
+        // mark all drivers expired for current thread obligatory!
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
         for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
             CarinaDriver drv = entry.getValue();
             if (!Phase.BEFORE_SUITE.equals(drv.getPhase())) {
-            	// keep only suite_mode drivers
-                quitDriver(entry.getKey());
+            	entry.getValue().setExpired(true);
             }
         }
 

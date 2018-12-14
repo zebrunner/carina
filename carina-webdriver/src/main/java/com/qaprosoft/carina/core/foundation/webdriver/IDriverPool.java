@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -251,23 +250,9 @@ public interface IDriverPool {
         WebDriver drv = getDriver(name);
         
         quitDriver(drv, name);
+		deregisterDriver(drv);
     }
-    
-    /**
-     * Quit all drivers registered for current thread/test
-     */
-    default public void quitDrivers() {
 
-        //ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-
-        for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-            quitDriver(entry.getKey());
-        }
-
-        // stopProxy();
-    }
-    
     /**
      * Create driver with custom capabilities
      * 
@@ -373,6 +358,26 @@ public interface IDriverPool {
         CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId);
         driversPool.add(carinaDriver);
     }
+    
+	/**
+	 * Deregister driver from the DriverPool
+	 * 
+	 * @param drv
+	 *            WebDriver driver
+	 * 
+	 */
+    default void deregisterDriver(WebDriver drv) {
+    	
+		Iterator<CarinaDriver> iter = driversPool.iterator();
+
+		while (iter.hasNext()) {
+			CarinaDriver carinaDriver = iter.next();
+
+			if (carinaDriver.getDriver().equals(drv)) {
+				iter.remove();
+			}
+		}
+    }
 
     /**
      * Verify if driver is registered in the DriverPool
@@ -453,6 +458,7 @@ public interface IDriverPool {
 			CarinaDriver carinaDriver = iter.next();
 			quitDriver(carinaDriver.getDriver(), carinaDriver.getName());
 		}
+		driversPool.clear();
 		
 		LOGGER.info("quitAllDrivers onFinish driversPool size: " + driversPool.size());
     }
@@ -460,7 +466,7 @@ public interface IDriverPool {
     /**
      * Quit expired drivers from pool
      */
-    default public void quitExpiredDrivers() {
+    default void quitExpiredDrivers() {
         LOGGER.debug("Deinitialize expired driver(s).");
 		Iterator<CarinaDriver> iter = driversPool.iterator();
 
@@ -469,7 +475,7 @@ public interface IDriverPool {
 
         	if (carinaDriver.isExpired()) {
         		quitDriver(carinaDriver.getDriver(), carinaDriver.getName());
-    	        driversPool.remove(carinaDriver);
+        		iter.remove();
         	}
 		}
 
@@ -494,7 +500,6 @@ public interface IDriverPool {
 //          since there some driver related action on deregister device step
         	DevicePool.deregisterDevice();
 
-            deregisterDriver(drv);
 	        ProxyPool.stopProxy();
 	        
             LOGGER.debug("Driver starting quit..." + name);
@@ -513,28 +518,6 @@ public interface IDriverPool {
             MDC.remove("device");
         }
         
-    }
-    
-    
-
-	/**
-	 * Deregister driver from the DriverPool
-	 * 
-	 * @param drv
-	 *            WebDriver driver
-	 * 
-	 */
-    default void deregisterDriver(WebDriver drv) {
-    	
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
-
-			if (carinaDriver.getDriver().equals(drv)) {
-				driversPool.remove(carinaDriver);
-			}
-		}
     }
     
     @Deprecated

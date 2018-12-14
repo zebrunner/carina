@@ -29,7 +29,7 @@ public class BeforeSuiteTest implements IDriverPool {
 	@Mock
 	private WebDriver mockMethodDriver;
 
-/*	@AfterClass(alwaysRun = true)
+	@AfterClass(alwaysRun = true)
 	public void afterClass() {
 		quitAllDrivers();
 	}
@@ -107,5 +107,5 @@ public class BeforeSuiteTest implements IDriverPool {
 			}
 		}
 	}
-*/
+
 }
