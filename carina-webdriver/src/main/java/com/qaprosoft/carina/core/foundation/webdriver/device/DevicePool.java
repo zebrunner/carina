@@ -49,7 +49,7 @@ public class DevicePool {
     public static void deregisterDevice() {
     	Device device = currentDevice.get();
     	if (device == null) {
-    		LOGGER.debug("Unable to deregister null device!");
+    		LOGGER.error("Unable to deregister null device!");
     		return;
     	}
     	

@@ -142,39 +142,41 @@ public interface IDriverPool {
         
     }
 
-    /**
-     * Get driver by WebElement.
-     * 
-     * @param sessionId - session id to be used for searching a desired driver
-     * 
-     * @return default WebDriver
-     */
-    public static WebDriver getDriver(SessionId sessionId) {
-    	LOGGER.debug("Detecting WebDriver by sessionId...");
-    	
-       	Iterator<CarinaDriver> iter = driversPool.iterator();
+	/**
+	 * Get driver by WebElement.
+	 * 
+	 * @param sessionId
+	 *            - session id to be used for searching a desired driver
+	 * 
+	 * @return default WebDriver
+	 */
+	public static WebDriver getDriver(SessionId sessionId) {
+		// LOGGER.debug("Detecting WebDriver by sessionId...");
 
-    	while (iter.hasNext()) {
-    		CarinaDriver carinaDriver = iter.next();
+		Iterator<CarinaDriver> iter = driversPool.iterator();
 
-    		WebDriver drv = carinaDriver.getDriver();
-    		if (drv instanceof EventFiringWebDriver) {
-    			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
-    			drv = eventFirDriver.getWrappedDriver();
-    		}
-    		
-    		SessionId drvSessionId = ((RemoteWebDriver)drv).getSessionId();
-    		
-    		LOGGER.debug("analyzing driver: " + drvSessionId.toString());
-    		if (sessionId.equals(drvSessionId)) {
-    			LOGGER.debug("Detected WebDriver by sessionId");
-    			return drv;
-    		}
-    	}
-    	
-    	throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
-    	//TODO: take a look into the replaceDriver case and how sessionId are regenerated on page objects
-    }
+		while (iter.hasNext()) {
+			CarinaDriver carinaDriver = iter.next();
+
+			WebDriver drv = carinaDriver.getDriver();
+			if (drv instanceof EventFiringWebDriver) {
+				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
+				drv = eventFirDriver.getWrappedDriver();
+			}
+
+			SessionId drvSessionId = ((RemoteWebDriver) drv).getSessionId();
+
+			// LOGGER.debug("analyzing driver: " + drvSessionId.toString());
+			if (sessionId.equals(drvSessionId)) {
+				// LOGGER.debug("Detected WebDriver by sessionId");
+				return drv;
+			}
+		}
+
+		throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
+		// TODO: take a look into the replaceDriver case and how sessionId are
+		// regenerated on page objects
+	}
 
     /**
      * Restart default driver
@@ -425,7 +427,7 @@ public interface IDriverPool {
      * @return ConcurrentHashMap of driver names and Carina WebDrivers
      * 
      */
-    default public ConcurrentHashMap<String, CarinaDriver> getDrivers() {
+    default ConcurrentHashMap<String, CarinaDriver> getDrivers() {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
         // look inside driversPool and return all before_suite drivers and drivers mounted to the current thread_id
@@ -467,13 +469,13 @@ public interface IDriverPool {
      * Quit expired drivers from pool
      */
     default void quitExpiredDrivers() {
-        LOGGER.debug("Deinitialize expired driver(s).");
 		Iterator<CarinaDriver> iter = driversPool.iterator();
 
 		while (iter.hasNext()) {
 			CarinaDriver carinaDriver = iter.next();
 
         	if (carinaDriver.isExpired()) {
+                LOGGER.debug("Deinitialize expired driver: " + carinaDriver.getName());
         		quitDriver(carinaDriver.getDriver(), carinaDriver.getName());
         		iter.remove();
         	}
@@ -494,18 +496,15 @@ public interface IDriverPool {
         // 3. register link onto the video as test artifact
         
         try {
-        	LOGGER.debug("Driver exiting..." + name);
-       	
 //          driver deregistration should be performed a bit later than device deregistration
 //          since there some driver related action on deregister device step
         	DevicePool.deregisterDevice();
 
 	        ProxyPool.stopProxy();
 	        
-            LOGGER.debug("Driver starting quit..." + name);
+            LOGGER.debug("Driver '" + name + "' starts quit");
             drv.quit();
-            LOGGER.debug("Driver finsihed quite." + name);
-            
+            LOGGER.debug("Driver '" + name + "' finsihed quit");
         } catch (Exception e) {
             LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
 
