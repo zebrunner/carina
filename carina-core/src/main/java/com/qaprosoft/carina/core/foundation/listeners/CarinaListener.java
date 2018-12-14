@@ -370,6 +370,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         LOGGER.info("CarinaListener->onFinish(context): " + context.getName());
         
+        // quit all drivers for current thread obligatory!
+        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+        for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+            CarinaDriver drv = entry.getValue();
+            if (!Phase.BEFORE_SUITE.equals(drv.getPhase())) {
+            	// keep only suite_mode drivers
+                quitDriver(entry.getKey());
+            }
+        }
+
         //TODO: refactor jira updater to make it s functional interface
         // Update JIRA
         Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
