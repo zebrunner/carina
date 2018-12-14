@@ -462,8 +462,10 @@ public interface IDriverPool {
         for (CarinaDriver drv : driversPool) {
         	if (Phase.BEFORE_SUITE.equals(drv.getPhase())) {
         		// append all existing drivers in beforeSuite mode into the current list
+        		logger.debug("Add suite_mode drivers into the getDrivers response: " + drv.getName());
         		currentDrivers.put(drv.getName(), drv);
         	} else if (threadId.equals(drv.getThreadId())) {
+        		logger.debug("Add driver into the getDrivers response: " + drv.getName() + " by threadId: " + threadId);
         		currentDrivers.put(drv.getName(), drv);
         	}
         }

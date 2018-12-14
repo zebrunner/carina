@@ -236,10 +236,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.BEFORE_METHOD);
             
             //TODO: test use-case with dependency
-            LOGGER.debug("Deinitialize unused driver(s) on before test method start.");
             ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+            LOGGER.debug("Deinitialize unused driver(s) on before test method start.");
             // 1. quit all Phase.METHOD drivers for current thread
+        	Long threadId = Thread.currentThread().getId();
+        	LOGGER.debug("ThreadId: " + threadId);
             for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+            	LOGGER.debug("Driver name: " + entry.getValue().getName());
+            	LOGGER.debug("Driver threadId: " + entry.getValue().getThreadId());
+            	LOGGER.debug("Driver phase: " + entry.getValue().getPhase());
                 CarinaDriver drv = entry.getValue();
                 if (Phase.METHOD.equals(drv.getPhase())) {
                     quitDriver(entry.getKey());
