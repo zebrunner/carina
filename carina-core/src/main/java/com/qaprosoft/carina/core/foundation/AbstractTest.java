@@ -21,6 +21,9 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -49,18 +52,34 @@ public abstract class AbstractTest implements IDriverPool, ITestCases {
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
     
+    // keep empty declaration to be able to invoke CarinaListener->beforeConfiguration for all stages
     @BeforeSuite(alwaysRun = true)
-    private void onBeforeSuite() {
+    private void onCarinaBeforeSuite() {
         //do nothing
     }
     
     @BeforeClass(alwaysRun = true)
-    private void onBeforeClass() {
+    private void onCarinaBeforeClass() {
         //do nothing
     }
     
     @BeforeMethod(alwaysRun = true)
-    private void onBeforeMethod() {
+    private void onCarinaBeforeMethod() {
+        //do nothing
+    }
+    
+    @AfterMethod(alwaysRun = true)
+    private void onCarinaAfterMethod() {
+        //do nothing
+    }
+    
+    @AfterClass(alwaysRun = true)
+    private void onCarinaAfterClass() {
+        //do nothing
+    }
+    
+    @AfterSuite(alwaysRun = true)
+    private void onCarinaAfterSuite() {
         //do nothing
     }
     
