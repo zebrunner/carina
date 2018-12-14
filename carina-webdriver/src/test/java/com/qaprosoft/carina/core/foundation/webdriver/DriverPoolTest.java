@@ -47,7 +47,7 @@ public class DriverPoolTest implements IDriverPool {
 
 	@BeforeSuite(alwaysRun = true)
 	public void beforeSuite() {
-		quitDrivers();
+		quitAllDrivers();
 		R.CONFIG.put("driver_type", "desktop");
 		R.CONFIG.put("thread_count", "1");
 		R.CONFIG.put("data_provider_thread_count", "1");

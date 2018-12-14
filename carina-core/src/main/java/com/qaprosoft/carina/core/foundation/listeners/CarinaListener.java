@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,7 +73,6 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
@@ -814,7 +814,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         private void quitAllDriversOnHook() {
             // as it is shutdown hook just try to quit all registered drivers on by one
-            for (CarinaDriver carinaDriver : IDriverPool.driversPool) {
+        	
+    		Iterator<CarinaDriver> iter = driversPool.iterator();
+
+    		while (iter.hasNext()) {
+    			CarinaDriver carinaDriver = iter.next();
+
                 //it is expected that all drivers are killed in appropriate aftermethod/class/suite blocks
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quite driver '" + name + "' on shutdown hook action!");
@@ -837,7 +842,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 } finally {
                     //do nothing
                 }
-            }
+    		}
+    		
+    		
         }
 
 
