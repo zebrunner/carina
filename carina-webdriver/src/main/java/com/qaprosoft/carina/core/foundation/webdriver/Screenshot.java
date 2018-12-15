@@ -503,8 +503,10 @@ public class Screenshot {
 			return true;
 		}
 		// disable screenshot if error message contains any of this info
+		
 		boolean disableScreenshot = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
+				|| message.contains("A session is either terminated or not started")
 				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
