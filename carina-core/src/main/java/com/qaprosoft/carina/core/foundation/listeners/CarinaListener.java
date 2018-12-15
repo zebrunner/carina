@@ -229,7 +229,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 			// TODO: quit all expired drivers here
 			// as no simple way to detect them by threadId then on
 			// afterMethod/Class and maybe suite we have to setup expiration
-            quitExpiredDrivers();
+            quitDrivers();
         }
         
         if (result.getMethod().isAfterMethodConfiguration()) {
@@ -265,13 +265,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         if (result.getMethod().isAfterSuiteConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
-            
-            LOGGER.info("CarinaListener->beforeConfiguration->AfterSuiteConfiguration");
-            //TODO: check how many times it is called and quite all drivers if execution is at once
-            //forcibly quite all drivers
-            quitAllDrivers();
+            // [VD] I see that this piece of code is never executed even when we have AfterSuite block in test!
         }
-        
     }
 
     @Override
@@ -370,7 +365,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
-        //TODO: refactor jira updater to make it s functional interface
+        //TODO: refactor jira updater to make it as functional interface
         // Update JIRA
         Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
     }

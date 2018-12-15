@@ -31,7 +31,7 @@ public class BeforeSuiteTest implements IDriverPool {
 
 	@AfterClass(alwaysRun = true)
 	public void afterClass() {
-		quitAllDrivers();
+		quitDrivers(true);
 	}
 
 	@Test

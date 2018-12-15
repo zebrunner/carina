@@ -47,7 +47,7 @@ public class DriverPoolTest implements IDriverPool {
 
 	@BeforeSuite(alwaysRun = true)
 	public void beforeSuite() {
-		quitAllDrivers();
+		quitDrivers(true);
 		R.CONFIG.put("driver_type", "desktop");
 		R.CONFIG.put("thread_count", "1");
 		R.CONFIG.put("data_provider_thread_count", "1");
@@ -122,7 +122,7 @@ public class DriverPoolTest implements IDriverPool {
 		Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
 		registerDriver(mockDriverCustom1, CUSTOM1);
 		Assert.assertEquals(2, getDriversCount(), "Number of registered driver is not valid!");
-		quitAllDrivers();
+		quitDrivers(true);
 		Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
 	}
 
