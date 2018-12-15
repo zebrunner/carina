@@ -38,7 +38,7 @@ public class DevicePool {
         // register current device to be able to transfer it into Zafira at the end of the test
         setDevice(device);
         Long threadId = Thread.currentThread().getId();
-        LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
+        LOGGER.info("register device for current threadId: " + threadId + "; device: '" + device.getName() + "'");
 
         // clear logcat log for Android devices
         device.clearSysLog();
@@ -47,9 +47,10 @@ public class DevicePool {
     }
 
     public static void deregisterDevice() {
+    	Long threadId = Thread.currentThread().getId();
     	Device device = currentDevice.get();
     	if (device == null) {
-    		LOGGER.error("Unable to deregister null device!");
+    		LOGGER.error("Unable to deregister null device for current threadId: " + threadId);
     		return;
     	}
     	
@@ -67,12 +68,12 @@ public class DevicePool {
         long threadId = Thread.currentThread().getId();
         Device device = currentDevice.get();
         if (device == null) {
-            LOGGER.debug("Current device is null for thread: " + threadId);
+            LOGGER.info("Current device is null for thread: " + threadId);
             device = nullDevice;
         } else if (device.getName().isEmpty()) {
-            LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
+            LOGGER.info("Current device name is empty! nullDevice was used for thread: " + threadId);
         } else {
-            LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
+            LOGGER.info("Current device name is '" + device.getName() + "' for thread: " + threadId);
         }
         return device;
     }
@@ -88,7 +89,7 @@ public class DevicePool {
     
     private static void setDevice(Device device) {
         long threadId = Thread.currentThread().getId();
-        LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
+        LOGGER.info("Set current device '" + device.getName() + "' to thread: " + threadId);
         currentDevice.set(device);
     }
 
