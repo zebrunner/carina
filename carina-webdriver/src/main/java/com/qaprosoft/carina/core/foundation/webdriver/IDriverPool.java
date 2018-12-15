@@ -31,8 +31,10 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
@@ -231,6 +233,7 @@ public interface IDriverPool {
     	Iterator<CarinaDriver> iter = driversPool.iterator();
     	
     	WebDriver drv = null;
+    	Device device = DevicePool.getNullDevice();
     	
     	Long threadId = Thread.currentThread().getId();
     	
@@ -239,8 +242,10 @@ public interface IDriverPool {
 
         	if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName())) {
         		drv = carinaDriver.getDriver();
+        		device = carinaDriver.getDevice();
         	} else if (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName())) {
         		drv = carinaDriver.getDriver();
+        		device = carinaDriver.getDevice();
         	} 
     	}
     	
@@ -249,7 +254,12 @@ public interface IDriverPool {
     	}
     	
         try {
-        	DevicePool.deregisterDevice();
+        	//DevicePool.deregisterDevice();
+			boolean stfEnabled = R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+			if (stfEnabled) {
+				device.disconnectRemote();
+			}
+            
 	        ProxyPool.stopProxy();
 	        
             LOGGER.debug("Driver '" + name + "' starts quit");
@@ -296,11 +306,14 @@ public interface IDriverPool {
                 
                 WebDriver drv = carinaDriver.getDriver();
                 String name = carinaDriver.getName();
+                Device device = carinaDriver.getDevice();
                 
                 try {
-//                  driver deregistration should be performed a bit later than device deregistration
-//                  since there some driver related action on deregister device step
-                	DevicePool.deregisterDevice();
+                	//DevicePool.deregisterDevice();
+        			boolean stfEnabled = R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+        			if (stfEnabled) {
+        				device.disconnectRemote();
+        			}
 
         	        ProxyPool.stopProxy();
         	        
@@ -425,8 +438,9 @@ public interface IDriverPool {
             Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
         }
 
+        Device device = DevicePool.getDevice();
         //new 6.0 approach to manipulate drivers via regular Set
-        CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId);
+        CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId, device);
         driversPool.add(carinaDriver);
     }
     
