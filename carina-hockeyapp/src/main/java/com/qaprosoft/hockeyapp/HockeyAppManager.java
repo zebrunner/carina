@@ -214,6 +214,7 @@ public class HockeyAppManager {
     private String scanAppForBuild(Map<String, String> appIds, String buildType, String version) {
 
         for (String appId : appIds.keySet()) {
+            LOGGER.info("\nHockeyApp Id: " + appId);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
             queryParams.add("page", "1");
             queryParams.add("include_build_urls", "true");
@@ -324,9 +325,11 @@ public class HockeyAppManager {
 
     private boolean checkForPattern(String nodeName, String pattern, JsonNode node) {
 
+        LOGGER.info("\nPattern to be checked: " + pattern);
         String nodeField = node.get(nodeName).asText().toLowerCase();
 
         if (nodeField.contains(pattern)) {
+            LOGGER.info("\nPattern match found!! This is the buildType to be used: " + nodeField);
             return true;
         }
 
@@ -341,6 +344,10 @@ public class HockeyAppManager {
         String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
         for (String currentPattern : patternList) {
             updatedPatternlist.add(String.format(patternToReplace, currentPattern));
+        }
+
+        for (String str : updatedPatternlist) {
+            LOGGER.info("Updated Pattern List, pattern: " + str);
         }
 
         if (patternList.length > 1 && scanningAllNotes(updatedPatternlist, nodeField)) {
