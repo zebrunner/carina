@@ -354,7 +354,9 @@ public class HockeyAppManager {
 //        if (patternList.length > 1 && scanningAllNotes(Arrays.asList(patternList), nodeField)) {
 //            return true;
 //        }
-        if (!pattern.isEmpty() && scanningAllNotes(String.format(patternToReplace, pattern), nodeField))
+        if (!pattern.isEmpty() && scanningAllNotes(String.format(patternToReplace, pattern), nodeField)){
+            return true;
+        }
 
         return false;
     }
