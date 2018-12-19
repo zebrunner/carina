@@ -22,9 +22,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +38,7 @@ import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.TestListenerAdapter;
@@ -72,7 +73,6 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
@@ -220,31 +220,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         if (result.getMethod().isBeforeClassConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_CLASS);
-            //TODO: analyze cases when AfterClass is not declared inside test java class
-            // maybe move into the BEFORE_CLASS
-            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-            // 1. quit all Phase.BEFORE_CLASS drivers for current thread as it is new configuration call/class 
-            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-                CarinaDriver drv = entry.getValue();
-                if (Phase.BEFORE_CLASS.equals(drv.getPhase())) {
-                    quitDriver(entry.getKey());
-                }
-            }
         }
         
         if (result.getMethod().isBeforeMethodConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_METHOD);
-            
-            //TODO: test use-case with dependency
-            LOGGER.debug("Deinitialize unused driver(s) on before test method start.");
-            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-            // 1. quit all Phase.METHOD drivers for current thread
-            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-                CarinaDriver drv = entry.getValue();
-                if (Phase.METHOD.equals(drv.getPhase())) {
-                    quitDriver(entry.getKey());
-                }
-            }
         }
         
         if (result.getMethod().isAfterMethodConfiguration()) {
@@ -253,48 +232,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         if (result.getMethod().isAfterClassConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_CLASS);
-            //TODO: analyze cases when AfterClass is not declared inside test java class
-            // maybe move into the BEFORE_CLASS
-            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-            // 1. quit all Phase.BEFORE_CLASS drivers for current thread as it is new configuration call/class 
-            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-                CarinaDriver drv = entry.getValue();
-                if (Phase.BEFORE_CLASS.equals(drv.getPhase())) {
-                    quitDriver(entry.getKey());
-                }
-            }
         }
         
         if (result.getMethod().isAfterSuiteConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
-            
-            //forcibly quit all drivers
-            quitDrivers();
         }
-        
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        
         TestPhase.setActivePhase(Phase.METHOD);
-        String[] dependedUponMethods = result.getMethod().getMethodsDependedUpon();
-        
-        if (dependedUponMethods.length == 0) {
-            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-            // 1. quit all Phase.METHOD drivers for current thread
-            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-                CarinaDriver drv = entry.getValue();
-                if (Phase.METHOD.equals(drv.getPhase())) {
-                    quitDriver(entry.getKey());
-                }
-                
-                // all before_method drivers move into METHOD to be able to quit them on next onTestStart!
-                if (Phase.BEFORE_METHOD.equals(drv.getPhase())) {
-                    drv.setPhase(Phase.METHOD);
-                }
-            }
-        }
         
         // handle expected skip
         Method testMethod = result.getMethod().getConstructorOrMethod().getMethod();
@@ -302,9 +249,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             skipExecution("Based on rule listed above");
         }
 
-        
         super.onTestStart(result);
-        
     }
 
     @Override
@@ -325,8 +270,29 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         super.onTestSkipped(result);        
     }
         
+    private boolean hasDependencies(ITestResult result) {
+    	String methodName = result.getMethod().getMethodName();
+    	LOGGER.info("current method: " + methodName);
+
+    	// analyze all suite methods and return true if any of them depends on existing method
+    	List<ITestNGMethod> methods = result.getTestContext().getSuite().getAllMethods();
+    	for (ITestNGMethod method : methods) {
+    		LOGGER.info("analyze method for dependency: " + method.getMethodName());
+    		if (Arrays.asList(method.getMethodsDependedUpon()).contains(methodName)) {
+    			return true;
+    		}
+    	}
+        return false;
+    }
+
+    
     private void onTestFinish(ITestResult result) {
         try {
+        	if (!hasDependencies(result)) {
+        		quitDrivers(Phase.BEFORE_METHOD);
+        		quitDrivers(Phase.METHOD);
+        	}
+        	
             // TODO: improve later removing duplicates with AbstractTestListener
             // handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
             if (result.getThrowable() != null && result.getThrowable().getMessage() != null
@@ -362,7 +328,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ITestContext context) {
         super.onFinish(context);
-        
+
+        //[VD] seems like useless after movemevt driver quite onto afterMethod phase
+        //quitDrivers(Phase.BEFORE_CLASS);
+    	
         LOGGER.info("CarinaListener->onFinish(context): " + context.getName());
         
         //TODO: refactor jira updater to make it s functional interface
@@ -373,6 +342,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ISuite suite) {
         try {
+        	//TODO: quitAllDivers forcibly
+        	
             ReportContext.removeTempDir(); // clean temp artifacts directory
             //HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
@@ -802,24 +773,28 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
         
-        private void quitAllDrivers() {
-            // as it is shutdown hook just try to quit all registered drivers on by one
-            for (CarinaDriver carinaDriver : IDriverPool.driversPool) {
+        private void quitAllDriversOnHook() {
+            // as it is shutdown hook just try to quit all registered drivers one by one
+        	
+    		Iterator<CarinaDriver> iter = driversPool.iterator();
+
+    		while (iter.hasNext()) {
+    			CarinaDriver carinaDriver = iter.next();
+    			
                 //it is expected that all drivers are killed in appropriate aftermethod/class/suite blocks
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quite driver '" + name + "' on shutdown hook action!");
                 ProxyPool.stopProxy();
                 
                 try {
-                    logger.debug("Driver exiting..." + name);
+                	LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
-                    logger.debug("Driver exited..." + name);
+                    LOGGER.debug("Driver exited..." + name);
                 } catch (WebDriverException e) {
-                    logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
+                	LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
                     // do nothing
                 } catch (Exception e) {
-                    logger.debug("Error discovered during driver quit: " + e.getMessage(), e);
-
+                	LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
                     // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
                     if (!e.getMessage().contains("Session ID is null.")) {
                         throw e;
@@ -834,7 +809,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         @Override
         public void run() {
             LOGGER.debug("Running shutdown hook");
-            quitAllDrivers();
+            quitAllDriversOnHook();
             generateMetadata();
         }
 

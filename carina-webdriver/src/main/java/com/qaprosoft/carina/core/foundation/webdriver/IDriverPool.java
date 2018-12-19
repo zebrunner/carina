@@ -16,7 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,7 +41,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public interface IDriverPool {
-    static final Logger logger = Logger.getLogger(IDriverPool.class);
+    static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
     static final String DEFAULT = "default";
 
     // unified set of Carina WebDrivers 
@@ -65,10 +65,24 @@ public interface IDriverPool {
      * 
      * @param name
      *            String driver name
-     * @return WebDriver by name
+     * @return WebDriver
      */
     default public WebDriver getDriver(String name) {
         return getDriver(name, null, null);
+    }
+    
+
+    /**
+     * Get driver by name and DesiredCapabilities.
+     * 
+     * @param name
+     *            String driver name
+     * @param capabilities
+     *            DesiredCapabilities capabilities
+     * @return WebDriver
+     */
+    default public WebDriver getDriver(String name, DesiredCapabilities capabilities) {
+        return getDriver(name, capabilities, null);
     }
 
     /**
@@ -81,7 +95,7 @@ public interface IDriverPool {
      *            DesiredCapabilities
      * @param seleniumHost
      *            String
-     * @return WebDriver by name
+     * @return WebDriver
      */
     default public WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
         WebDriver drv = null;
@@ -91,9 +105,9 @@ public interface IDriverPool {
         	CarinaDriver cdrv = currentDrivers.get(name);
             drv = cdrv.getDriver();
             if (Phase.BEFORE_SUITE.equals(cdrv.getPhase())) {
-            	logger.info("Before suite registered driver will be returned.");
+            	LOGGER.info("Before suite registered driver will be returned.");
             } else {
-            	logger.debug(cdrv.getPhase() + " registered driver will be returned.");
+            	LOGGER.debug(cdrv.getPhase() + " registered driver will be returned.");
             } 
         }
 
@@ -121,7 +135,7 @@ public interface IDriverPool {
         }*/
 
         if (drv == null) {
-            logger.debug("Starting new driver as nothing was found in the pool");
+            LOGGER.debug("Starting new driver as nothing was found in the pool");
             drv = createDriver(name, capabilities, seleniumHost);
         }
 
@@ -138,11 +152,12 @@ public interface IDriverPool {
      * @return default WebDriver
      */
     public static WebDriver getDriver(SessionId sessionId) {
-    	logger.debug("Detecting WebDriver by sessionId...");
+    	LOGGER.debug("Detecting WebDriver by sessionId...");
     	
-    	//TODO: [VD] do we need to get preliminary current drivers here to skip analysis for the drivers from different threads?
-    	for (CarinaDriver carinDriver : driversPool) {
-    		WebDriver drv = carinDriver.getDriver();
+    	Iterator<CarinaDriver> iter = driversPool.iterator();
+    	while (iter.hasNext()) {
+    		CarinaDriver carinaDriver = iter.next();
+    		WebDriver drv = carinaDriver.getDriver();
     		if (drv instanceof EventFiringWebDriver) {
     			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
     			drv = eventFirDriver.getWrappedDriver();
@@ -150,9 +165,9 @@ public interface IDriverPool {
     		
     		SessionId drvSessionId = ((RemoteWebDriver)drv).getSessionId();
     		
-    		logger.debug("analyzing driver: " + drvSessionId.toString());
+    		LOGGER.debug("analyzing driver: " + drvSessionId.toString());
     		if (sessionId.equals(drvSessionId)) {
-    			logger.debug("Detected WebDriver by sessionId");
+    			LOGGER.debug("Detected WebDriver by sessionId");
     			return drv;
     		}
     	}
@@ -183,37 +198,19 @@ public interface IDriverPool {
         DesiredCapabilities caps = new DesiredCapabilities();
         
         if (isSameDevice) {
-        	logger.debug("Get current device as driver is going to be restarted on the same device...");
             device = DevicePool.getDevice();
-            logger.debug("Current device is: " + device.getName());
-            logger.debug("Add udid: " + device.getUdid() + " to capabilities.");
+            LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
         }
 
-        try {
-            logger.debug("Driver restarting...");
-            deregisterDriver(DEFAULT);
-            if (!isSameDevice) {
-                DevicePool.deregisterDevice();
-            }
-            
-            drv.quit();
-
-            logger.debug("Driver exited during restart...");
-        } catch (WebDriverException e) {
-            logger.debug("Error message detected during driver restart: " + e.getMessage(), e);
-            // do nothing
-        } catch (Exception e) {
-            logger.debug("Error discovered during driver restart: " + e.getMessage(), e);
-
-            // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
-            if (!e.getMessage().contains("Session ID is null.")) {
-                throw e;
-            }
-
-        } finally {
-            MDC.remove("device");
-        }
+		Iterator<CarinaDriver> iter = driversPool.iterator();
+		while (iter.hasNext()) {
+			CarinaDriver carinaDriver = iter.next();
+			if (carinaDriver.getDriver().equals(drv)) {
+				quitDriver(carinaDriver.getDriver());
+				iter.remove();
+			}
+		}
 
         return createDriver(DEFAULT, caps, null);
     }
@@ -224,6 +221,9 @@ public interface IDriverPool {
     default public void quitDriver() {
         quitDriver(DEFAULT);
     }
+    
+    // TODO: Fix after migrating to java9
+    // [VD] quitDriver and quitDrivers has code duplicates as inside interface we can't create private methods!
 
     /**
      * Quit driver by name
@@ -232,54 +232,66 @@ public interface IDriverPool {
      *            String driver name
      */
     default public void quitDriver(String name) {
-        WebDriver drv = getDriver(name);
+    	Iterator<CarinaDriver> iter = driversPool.iterator();
 
-        // TODO: try to understand valid place for recorded video file to support method/class and suite mode
-        // 1. create for each driver their own video file.
-        // 2. save it using unique driver/test/thread name - maybe time in ms
-        // 3. register link onto the video as test artifact
+    	WebDriver drv = null;
+    	Long threadId = Thread.currentThread().getId();
 
-        try {
-            logger.debug("Driver exiting..." + name);
-//          driver deregistration should be performed a bit later than device deregistration
-//          since there some driver related action on method deregister device
-            DevicePool.deregisterDevice();
-            deregisterDriver(name);
-            
-            
-            logger.debug("Driver starting quit..." + name);
-            drv.quit();
-            logger.debug("Driver finsihed quite." + name);
-        } catch (WebDriverException e) {
-            logger.debug("Error message detected during driver verification: " + e.getMessage(), e);
-            // do nothing
-        } catch (Exception e) {
-            logger.debug("Error discovered during driver quit: " + e.getMessage(), e);
+    	while (iter.hasNext()) {
+    		CarinaDriver carinaDriver = iter.next();
 
-            // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
-            if (!e.getMessage().contains("Session ID is null.")) {
-                throw e;
-            }
+        	if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName())) {
+        		drv = carinaDriver.getDriver();
+        	} else if (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName())) {
+        		drv = carinaDriver.getDriver();
+        	} 
+    	}
 
-        } finally {
-            // TODO analyze how to forcibly kill session on device
-            MDC.remove("device");
-        }
+    	if (drv == null) {
+    		throw new RuntimeException("Unable to find driver '" + name + "'!");
+    	}
+    	
+		quitDriver(drv);
+        iter.remove();
     }
-
+    
     /**
-     * Quit all drivers registered for current thread/test
+     * Quit current drivers by phase
      */
-    default public void quitDrivers() {
+    default public void quitDrivers(Phase phase) {
+    	Iterator<CarinaDriver> iter = driversPool.iterator();
 
-        //ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+    	Long threadId = Thread.currentThread().getId();
+    	while (iter.hasNext()) {
+    		CarinaDriver carinaDriver = iter.next();
 
-        for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-            quitDriver(entry.getKey());
-        }
-
-        // stopProxy();
+        	if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
+        		quitDriver(carinaDriver.getDriver());
+        		iter.remove();
+        	} 
+    	}
+    }
+    
+    default void quitDriver(WebDriver drv) {
+	    try {
+	        DevicePool.deregisterDevice();
+	        ProxyPool.stopProxy();
+	        drv.quit();
+	    } catch (WebDriverException e) {
+	        LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
+	        // do nothing
+	    } catch (Exception e) {
+	        LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
+	
+	        // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be handled here as well
+	        if (!e.getMessage().contains("Session ID is null.")) {
+	            throw e;
+	        }
+	
+	    } finally {
+	        // TODO analyze how to forcibly kill session on device
+	        MDC.remove("device");
+	    }
     }
 
     /**
@@ -304,11 +316,33 @@ public interface IDriverPool {
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
         while (!init && count++ < maxCount) {
             try {
-                logger.debug("initDriver start...");
+                LOGGER.debug("initDriver start...");
 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
                 
-                registerDriver(drv, name);
+                
+                // [VD] pay attention that below piece of code is copied into the driverPoolBasetest as registerDriver method!
+                // ---------- start driver registration ----
+                Long threadId = Thread.currentThread().getId();
+                ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+
+                int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
+
+                if (currentDrivers.size() == maxDriverCount) {
+                    // TODO: after moving driver creation to DriverPoolEx need to add
+                    // such verification before driver start
+                    Assert.fail(
+                            "Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
+                }
+                if (currentDrivers.containsKey(name)) {
+                    Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
+                }
+
+                //new 6.0 approach to manipulate drivers via regular Set
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, TestPhase.getActivePhase(), threadId);
+                driversPool.add(carinaDriver);
+                // ---------- finish driver registration ----
+                
 
                 init = true;
 
@@ -337,12 +371,12 @@ public interface IDriverPool {
 					}
 				}
 
-                logger.debug("initDriver finish...");
+                LOGGER.debug("initDriver finish...");
 
             } catch (Exception e) {
                 // DevicePool.ignoreDevice();
                 DevicePool.deregisterDevice();
-				logger.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
+				LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
 						maxCount, e.getMessage()), e);
                 init_throwable = e;
                 CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
@@ -355,37 +389,6 @@ public interface IDriverPool {
         }
 
         return drv;
-    }
-
-    /**
-     * Register driver in the DriverPool
-     * 
-     * @param driver
-     *            WebDriver
-     * 
-     * @param name
-     *            String driver name
-     * 
-     */
-    default void registerDriver(WebDriver driver, String name) {
-        Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-        
-        int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
-        
-        if (currentDrivers.size() == maxDriverCount) {
-            // TODO: after moving driver creation to DriverPoolEx need to add
-            // such verification before driver start
-            Assert.fail(
-                    "Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
-        }
-        if (currentDrivers.containsKey(name)) {
-            Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
-        }
-
-        //new 6.0 approach to manipulate drivers via regular Set
-        CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId);
-        driversPool.add(carinaDriver);
     }
 
     /**
@@ -410,7 +413,7 @@ public interface IDriverPool {
     default public int getDriversCount() {
         Long threadId = Thread.currentThread().getId();
         int size = getDrivers().size();
-        logger.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+        LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
     
@@ -424,60 +427,41 @@ public interface IDriverPool {
     default public int size() {
         Long threadId = Thread.currentThread().getId();
         int size = getDrivers().size();
-        logger.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+        LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
 
 
-    /**
-     * Deregister driver by name from the DriverPool
-     * 
-     * @param name
-     *            String driver name
-     * 
-     */
-    default void deregisterDriver(String name) {
-        long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-
-        if (currentDrivers.containsKey(name)) {
-            logger.debug("Deregister '" + name + "' driver from pool for threadId: " + threadId );
-            driversPool.remove(currentDrivers.get(name));
-        } else {
-            logger.error("Unable to find '" + name + "' driver for deregistration in thread: " + threadId);
-        }
-        ProxyPool.stopProxy();
-    }
-    
     /**
      * Return all drivers registered in the DriverPool for this thread including on Before Suite/Class/Method stages 
      * 
      * @return ConcurrentHashMap of driver names and Carina WebDrivers
      * 
      */
-    default public ConcurrentHashMap<String, CarinaDriver> getDrivers() {
+    default ConcurrentHashMap<String, CarinaDriver> getDrivers() {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
-        // look inside driversPool and return all before_suite drivers and drivers mounted to the current thread_id
-        for (CarinaDriver drv : driversPool) {
-        	if (Phase.BEFORE_SUITE.equals(drv.getPhase())) {
-        		// append all existing drivers in beforeSuite mode into the current list
-        		currentDrivers.put(drv.getName(), drv);
-        	} else if (threadId.equals(drv.getThreadId())) {
-        		currentDrivers.put(drv.getName(), drv);
+        Iterator<CarinaDriver> iter = driversPool.iterator();
+    	while (iter.hasNext()) {
+    		CarinaDriver carinaDriver = iter.next();
+    		if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
+    			LOGGER.debug("Add suite_mode drivers into the getDrivers response: " + carinaDriver.getName());
+        		currentDrivers.put(carinaDriver.getName(), carinaDriver);
+        	} else if (threadId.equals(carinaDriver.getThreadId())) {
+        		LOGGER.debug("Add driver into the getDrivers response: " + carinaDriver.getName() + " by threadId: " + threadId);
+        		currentDrivers.put(carinaDriver.getName(), carinaDriver);
         	}
-        }
+    	}
         return currentDrivers;
     }
     
     @Deprecated
     public static WebDriver getDefaultDriver() {
         WebDriver drv = null;
-        String name = DEFAULT;
         ConcurrentHashMap<String, WebDriver> currentDrivers = getStaticDrivers();
 
-        if (currentDrivers.containsKey(name)) {
-            drv = currentDrivers.get(name);
+        if (currentDrivers.containsKey(DEFAULT)) {
+            drv = currentDrivers.get(DEFAULT);
         }
 
         if (drv == null) {
@@ -493,14 +477,18 @@ public interface IDriverPool {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
         // look inside driversPool and return all before_suite drivers and drivers mounted to the current thread_id
-        for (CarinaDriver drv : driversPool) {
-        	if (Phase.BEFORE_SUITE.equals(drv.getPhase())) {
-        		// append all existing drivers in beforeSuite mode into the current list
-        		currentDrivers.put(drv.getName(), drv.getDriver());
-        	} else if (threadId.equals(drv.getThreadId())) {
-        		currentDrivers.put(drv.getName(), drv.getDriver());
+		Iterator<CarinaDriver> iter = driversPool.iterator();
+
+		while (iter.hasNext()) {
+			CarinaDriver carinaDriver = iter.next();
+
+        	if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
+        		currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
+        	} else if (threadId.equals(carinaDriver.getThreadId())) {
+        		currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
         	}
         }
+		
         return currentDrivers;
     }
     
