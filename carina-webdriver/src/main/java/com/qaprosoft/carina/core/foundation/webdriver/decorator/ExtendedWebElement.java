@@ -1537,11 +1537,19 @@ public class ExtendedWebElement {
 				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
 						Messager.KEYS_NOT_CLEARED_IN_ELEMENT.getMessage(getNameWithLocator()));
 				element.clear();
+				
+				
+				if (decryptedText.equals(text)) {
+					DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage("********", getName()),
+							Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
+				} else {
+					DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(text, getName()),
+							Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
+				}
 
-				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(decryptedText, getName()),
-						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
 				element.sendKeys(decryptedText);
 			}
+
 
 			@Override
 			public void doAttachFile(String filePath) {
