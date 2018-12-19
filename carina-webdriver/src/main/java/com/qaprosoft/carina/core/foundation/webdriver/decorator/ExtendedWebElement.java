@@ -1541,7 +1541,7 @@ public class ExtendedWebElement {
 				
 				if (decryptedText.equals(text)) {
 					DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage("********", getName()),
-							Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(decryptedText, getNameWithLocator()));
+							Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage("********", getNameWithLocator()));
 				} else {
 					DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(text, getName()),
 							Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(text, getNameWithLocator()));
@@ -1554,9 +1554,14 @@ public class ExtendedWebElement {
 			@Override
 			public void doAttachFile(String filePath) {
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
-				
-				DriverListener.setMessages(Messager.FILE_ATTACHED.getMessage(decryptedText, getName()),
-						Messager.FILE_NOT_ATTACHED.getMessage(decryptedText, getNameWithLocator()));
+
+				if (decryptedText.equals(filePath)) {
+					DriverListener.setMessages(Messager.FILE_ATTACHED.getMessage("********", getName()),
+							Messager.FILE_NOT_ATTACHED.getMessage("********", getNameWithLocator()));
+				} else {
+					DriverListener.setMessages(Messager.FILE_ATTACHED.getMessage(filePath, getName()),
+							Messager.FILE_NOT_ATTACHED.getMessage(filePath, getNameWithLocator()));
+				}
 
 				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
 				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
