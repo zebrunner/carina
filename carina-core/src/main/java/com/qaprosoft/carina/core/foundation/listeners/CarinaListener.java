@@ -235,7 +235,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (result.getMethod().isAfterMethodConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_METHOD);
             
-            //TODO: mark driver as expired here based on threadId
             ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
         	Long threadId = Thread.currentThread().getId();
         	LOGGER.debug("ThreadId: " + threadId);

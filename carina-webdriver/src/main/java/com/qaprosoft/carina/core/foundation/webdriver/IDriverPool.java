@@ -190,8 +190,17 @@ public interface IDriverPool {
             DevicePool.deregisterDevice();
             
             LOGGER.debug("Driver restarting...");
+            // [VD] pay attention that copy of below block exists in driverPoolBaseTest as deregister device
+            // --------- start deregisterDriver ---------------
+    		Iterator<CarinaDriver> iter = driversPool.iterator();
+    		while (iter.hasNext()) {
+    			CarinaDriver carinaDriver = iter.next();
 
-            deregisterDriver(drv);
+    			if (carinaDriver.getDriver().equals(drv)) {
+    				iter.remove();
+    			}
+    		}
+            // --------- finish deregisterDriver ------------
             
             drv.quit();
 
@@ -277,7 +286,8 @@ public interface IDriverPool {
             MDC.remove("device");
         }
         
-		deregisterDriver(drv);
+        iter.remove();
+        
     }
     
     /**
@@ -292,7 +302,7 @@ public interface IDriverPool {
      * Quit expired/all drivers
      * 
      * @param all
-     *            Boolean remove all or only expired drivers
+     *            Boolean remove all drivers
 
      */
     default void quitDrivers(boolean all) {
@@ -363,7 +373,28 @@ public interface IDriverPool {
 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
                 
-                registerDriver(drv, name);
+                // [VD] pay attention that below piece of code is copied into the driverPoolBasetest as registerDriver method!
+                // ---------- start driver registration ----
+                Long threadId = Thread.currentThread().getId();
+                ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+                
+                int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
+                
+                if (currentDrivers.size() == maxDriverCount) {
+                    // TODO: after moving driver creation to DriverPoolEx need to add
+                    // such verification before driver start
+                    Assert.fail(
+                            "Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
+                }
+                if (currentDrivers.containsKey(name)) {
+                    Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
+                }
+
+                device = DevicePool.getDevice();
+                //new 6.0 approach to manipulate drivers via regular Set
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, TestPhase.getActivePhase(), threadId, device);
+                driversPool.add(carinaDriver);
+                // ---------- finish driver registration ----
 
                 init = true;
 
@@ -410,58 +441,6 @@ public interface IDriverPool {
         }
 
         return drv;
-    }
-
-    /**
-     * Register driver in the DriverPool
-     * 
-     * @param driver
-     *            WebDriver
-     * 
-     * @param name
-     *            String driver name
-     * 
-     */
-    default void registerDriver(WebDriver driver, String name) {
-        Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-        
-        int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
-        
-        if (currentDrivers.size() == maxDriverCount) {
-            // TODO: after moving driver creation to DriverPoolEx need to add
-            // such verification before driver start
-            Assert.fail(
-                    "Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
-        }
-        if (currentDrivers.containsKey(name)) {
-            Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
-        }
-
-        Device device = DevicePool.getDevice();
-        //new 6.0 approach to manipulate drivers via regular Set
-        CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId, device);
-        driversPool.add(carinaDriver);
-    }
-    
-	/**
-	 * Deregister driver from the DriverPool
-	 * 
-	 * @param drv
-	 *            WebDriver driver
-	 * 
-	 */
-    default void deregisterDriver(WebDriver drv) {
-    	
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
-
-			if (carinaDriver.getDriver().equals(drv)) {
-				iter.remove();
-			}
-		}
     }
 
     /**
