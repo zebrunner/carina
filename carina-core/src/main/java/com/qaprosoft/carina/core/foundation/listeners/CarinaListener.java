@@ -39,6 +39,7 @@ import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.TestListenerAdapter;
@@ -224,42 +225,36 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         if (result.getMethod().isBeforeMethodConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_METHOD);
-            //TODO: test use-case with dependency
-            
-			// TODO: quit all expired drivers here
-			// as no simple way to detect them by threadId then on
-			// afterMethod/Class and maybe suite we have to setup expiration
-            quitDrivers();
         }
         
         if (result.getMethod().isAfterMethodConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_METHOD);
             
-            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-        	Long threadId = Thread.currentThread().getId();
-        	LOGGER.debug("ThreadId: " + threadId);
-            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-                CarinaDriver drv = entry.getValue();
-				if (Phase.METHOD.equals(drv.getPhase()) || Phase.BEFORE_METHOD.equals(drv.getPhase())) {
-					drv.setExpired(true);
-				}
-            }
+//            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+//        	Long threadId = Thread.currentThread().getId();
+//        	LOGGER.debug("ThreadId: " + threadId);
+//            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+//                CarinaDriver drv = entry.getValue();
+//				if (Phase.METHOD.equals(drv.getPhase()) || Phase.BEFORE_METHOD.equals(drv.getPhase())) {
+//					drv.setExpired(true);
+//				}
+//            }
         }
         
 		if (result.getMethod().isAfterClassConfiguration()) {
 			TestPhase.setActivePhase(Phase.AFTER_CLASS);
 
 			// TODO: mark driver as expired here based on threadId
-			ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
-			Long threadId = Thread.currentThread().getId();
-			LOGGER.debug("ThreadId: " + threadId);
-			for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
-				CarinaDriver drv = entry.getValue();
-				if (Phase.METHOD.equals(drv.getPhase()) || Phase.BEFORE_METHOD.equals(drv.getPhase())
-						|| Phase.BEFORE_CLASS.equals(drv.getPhase())) {
-					drv.setExpired(true);
-				}
-			}
+//			ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+//			Long threadId = Thread.currentThread().getId();
+//			LOGGER.debug("ThreadId: " + threadId);
+//			for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+//				CarinaDriver drv = entry.getValue();
+//				if (Phase.METHOD.equals(drv.getPhase()) || Phase.BEFORE_METHOD.equals(drv.getPhase())
+//						|| Phase.BEFORE_CLASS.equals(drv.getPhase())) {
+//					drv.setExpired(true);
+//				}
+//			}
 		}
         
         if (result.getMethod().isAfterSuiteConfiguration()) {
@@ -314,8 +309,38 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         onTestFinish(result);
         super.onTestSkipped(result);        
     }
+    
+    private boolean hasDependencies(ITestResult result) {
+    	String methodName = result.getMethod().getMethodName();
+    	LOGGER.info("current method: " + methodName);
+    	
+    	// analyze all suite methods and return true if any of them depends on existing method
+    	List<ITestNGMethod> methods = result.getTestContext().getSuite().getAllMethods();
+    	for (ITestNGMethod method : methods) {
+    		LOGGER.info("analyze method for dependency: " + method.getMethodName());
+    		if (Arrays.asList(method.getMethodsDependedUpon()).contains(methodName)) {
+    			return true;
+    		}
+    	}
+        return false;
+    }
         
     private void onTestFinish(ITestResult result) {
+    	
+    	// TODO: remove drivers if no dependend methods upon this current test/method
+    	if (!hasDependencies(result)) {
+            ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
+        	Long threadId = Thread.currentThread().getId();
+        	LOGGER.debug("ThreadId: " + threadId);
+            for (Map.Entry<String, CarinaDriver> entry : currentDrivers.entrySet()) {
+                CarinaDriver drv = entry.getValue();
+				if (Phase.METHOD.equals(drv.getPhase()) || Phase.BEFORE_METHOD.equals(drv.getPhase())) {
+					drv.setExpired(true);
+				}
+            }
+            quitDrivers();
+    	}
+    	
         try {
             // TODO: improve later removing duplicates with AbstractTestListener
             // handle Zafira already passed exception for re-run and do nothing. maybe return should be enough
