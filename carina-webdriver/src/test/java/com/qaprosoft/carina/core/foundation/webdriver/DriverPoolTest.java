@@ -92,7 +92,7 @@ public class DriverPoolTest implements IDriverPool {
     @Test(dependsOnMethods = { "methodGetSuiteDriver" })
     public void quiteSuiteDriver() {
         deregisterDriver(mockDriverSuite);
-        Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
     }
 
     @Test(dependsOnMethods = { "quiteSuiteDriver" })
@@ -100,17 +100,17 @@ public class DriverPoolTest implements IDriverPool {
         R.CONFIG.put("max_driver_count", "2");
 
         registerDriver(mockDriverDefault, IDriverPool.DEFAULT);
-        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
         Assert.assertTrue(isDriverRegistered(IDriverPool.DEFAULT), "Default driver is not registered!");
 
-        Assert.assertEquals(mockDriverDefault, getDriver(), "Returned driver is not the same as registered!");
+        Assert.assertEquals(getDriver(), mockDriverDefault, "Returned driver is not the same as registered!");
     }
     
     @SuppressWarnings("deprecation")
     @Test(dependsOnMethods = { "registerDefaultDriver" })
     public void testStaticMethods() {
-        Assert.assertEquals(1, size(), "Number of registered driver is not valid!");
-        Assert.assertEquals(mockDriverDefault, IDriverPool.getDefaultDriver(), "Returned driver is not the same as registered!");
+        Assert.assertEquals(size(), 1, "Number of registered driver is not valid!");
+        Assert.assertEquals(IDriverPool.getDefaultDriver(), mockDriverDefault, "Returned driver is not the same as registered!");
     }
     
 
@@ -126,25 +126,25 @@ public class DriverPoolTest implements IDriverPool {
         deregisterDriver(mockDriverDefault);
         Assert.assertFalse(isDriverRegistered(IDriverPool.DEFAULT), "Default driver is not deregistered!");
         LOGGER.info("drivers count: " + getDriversCount());
-        Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
     }
 
     @Test(dependsOnMethods = { "deregisterDefaultDriver" })
     public void quitDriverByPhase() {
         TestPhase.setActivePhase(Phase.BEFORE_METHOD);
         registerDriver(mockDriverDefault, IDriverPool.DEFAULT);
-        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
         quitDrivers(Phase.BEFORE_METHOD);
-        Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
     }
     
     @Test(dependsOnMethods = { "quitDriverByPhase" })
     public void quitDefaultDriver() {
         TestPhase.setActivePhase(Phase.METHOD);
         registerDriver(mockDriverDefault, IDriverPool.DEFAULT);
-        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
         quitDriver();
-        Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
     }
     
     @Test(dependsOnMethods = { "quitDefaultDriver" })
@@ -160,14 +160,13 @@ public class DriverPoolTest implements IDriverPool {
     public void registerCustom1Driver() {
         registerDriver(mockDriverCustom1, CUSTOM1);
         Assert.assertTrue(isDriverRegistered(CUSTOM1), "Custom1 driver is not registered!");
-        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
 
     }
 
     @Test(dependsOnMethods = "registerCustom1Driver")
     public void getCustom1Driver() {
-        WebDriver driver = getDriver(CUSTOM1);
-        Assert.assertEquals(mockDriverCustom1, driver, "Returned driver is not the same as registered!");
+        Assert.assertEquals(getDriver(CUSTOM1), mockDriverCustom1, "Returned driver is not the same as registered!");
     }
 
     @Test(dependsOnMethods = "getCustom1Driver", expectedExceptions = {
@@ -178,30 +177,30 @@ public class DriverPoolTest implements IDriverPool {
         registerDriver(mockDriverCustom2, CUSTOM2);
         Assert.assertFalse(isDriverRegistered(CUSTOM2),
                 CUSTOM2 + " driver is registered in spite of the max_drivercount=2");
-        Assert.assertEquals(2, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 2, "Number of registered driver is not valid!");
     }
 
     @Test(dependsOnMethods = { "reachMaxDriverCountTest" })
     public void deregisterCustom1Driver() {
         deregisterDriver(mockDriverCustom1);
         Assert.assertFalse(isDriverRegistered(CUSTOM1), CUSTOM1 + " driver is not deregistered!");
-        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
 
         deregisterDriver(mockDriverDefault);
-        Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
     }
 
     @Test(dependsOnMethods = { "deregisterCustom1Driver" })
     public void deregisterAllDrivers() {
         registerDriver(mockDriverDefault, IDriverPool.DEFAULT);
-        Assert.assertEquals(1, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
         registerDriver(mockDriverCustom1, CUSTOM1);
-        Assert.assertEquals(2, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 2, "Number of registered driver is not valid!");
     }
 
 /*    @AfterSuite()
     public void afterSuite() {
-        Assert.assertEquals(0, getDriversCount(), "Number of registered driver is not valid!");
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
     }
 */     
     private void changeBeforeSuiteDriverThread() {
