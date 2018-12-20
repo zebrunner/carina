@@ -211,7 +211,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onStart(ITestContext context) {
-        LOGGER.info("CarinaListener->OnTestStart(context): " + context.getName());
+        LOGGER.debug("CarinaListener->OnTestStart(context): " + context.getName());
         super.onStart(context);
     }
 
@@ -342,7 +342,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // phase
         // quitDrivers(Phase.BEFORE_CLASS);
 
-        LOGGER.info("CarinaListener->onFinish(context): " + context.getName());
+        LOGGER.debug("CarinaListener->onFinish(context): " + context.getName());
 
         // TODO: refactor jira updater to make it as functional interface
         // Update JIRA
