@@ -22,7 +22,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
@@ -32,11 +34,70 @@ public class CapabilitiesLoader {
 
     private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoader.class);
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    /**
+     * Load capabilities and properties from external file into the global CONFIG context.
+     * capabilities.<name>=<value> will be attached to each WebDriver capabilities
+     * <name>=<value> will override appropriate configuration parameter by new <value>
+     *  
+     * @param fileName
+     *            String path to the properties file with custom capabilities and properties
+     */
     public void loadCapabilities(String fileName) {
-        // TODO: investigate howto allow access to this static method only from internal carina packages
+        LOGGER.info("Loading capabilities to global context from " + fileName);
+        Properties props = loadProperties(fileName);
 
-        LOGGER.info("Loading capabilities:");
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        Map<String, String> capabilitiesMap = new HashMap(props);
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            String value = entry.getValue();
+            String key = entry.getKey();
+            LOGGER.info("Set custom property: " + key + "; value: " + value);
+            // add each property directly into CONFIG
+            R.CONFIG.put(key, value);
+        }
+
+    }
+    
+    /**
+     * Generate DesiredCapabilities from external file.
+     * Only "capabilities.<name>=<value>" will be added to the response.
+     *  
+     * @param fileName
+     *            String path to the properties file with custom capabilities
+     */
+    public DesiredCapabilities getCapabilities(String fileName) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        
+        LOGGER.info("Generating capabilities from " + fileName);
+        Properties props = loadProperties(fileName);
+
+        final String prefix = SpecialKeywords.CAPABILITIES + ".";
+        
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        Map<String, String> capabilitiesMap = new HashMap(props);
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            if (entry.getKey().toLowerCase().startsWith(prefix)) {
+                String value = entry.getValue();
+                if (!value.isEmpty()) {
+                    String cap = entry.getKey().replaceAll(prefix, "");
+                    if ("false".equalsIgnoreCase(value)) {
+                        LOGGER.debug("Set capabilities value as boolean: false");
+                        capabilities.setCapability(cap, false);
+                    } else if ("true".equalsIgnoreCase(value)) {
+                        LOGGER.debug("Set capabilities value as boolean: true");
+                        capabilities.setCapability(cap, true);
+                    } else {
+                        LOGGER.debug("Set capabilities value as string: " + value);
+                        capabilities.setCapability(cap, value);
+                    }
+                }
+            }
+        }
+
+        return capabilities;
+    }
+    
+    private Properties loadProperties(String fileName) {
         Properties props = new Properties();
         URL baseResource = ClassLoader.getSystemResource(fileName);
         try {
@@ -50,19 +111,6 @@ public class CapabilitiesLoader {
             throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
         }
 
-        Map<String, String> capabilitiesMap = new HashMap(props);
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            // TODO: investigate effects of removing env args monitoring for extra capabilities declaration
-            // String valueFromEnv = null;
-            // valueFromEnv = System.getProperty(entry.getKey());
-            // String value = (valueFromEnv != null) ? valueFromEnv : entry.getValue();
-
-            String value = entry.getValue();
-            String key = entry.getKey();
-            LOGGER.info("Set custom property: " + key + "; value: " + value);
-            // add each property directly into CONFIG
-            R.CONFIG.put(key, value);
-        }
-
+        return props;
     }
 }

@@ -80,8 +80,6 @@ public class Configuration {
 
         CUSTOM_CAPABILITIES("custom_capabilities"),
 
-        EXTRA_CAPABILITIES("extra_capabilities"),
-
         APP_VERSION("app_version"),
 
         PROXY_HOST("proxy_host"),

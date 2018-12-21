@@ -19,7 +19,7 @@ R.TESTDATA.get("user.email")
 ```
 Default config properties can be obtained by
 ```
-Configuration.get(Parameter.EXTRA_CAPABILITIES)
+Configuration.get(Parameter.BROWSER)
 ```
 
 All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of the parameters:

@@ -120,18 +120,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
             }
 
-            // TODO: move out from AbstractTest->executeBeforeTestSuite
+            // declare global capabilities in configuration if custom_capabilities is declared 
             String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
             if (!customCapabilities.isEmpty()) {
-                // redefine core CONFIG properties using custom capabilities
-                // file
+                // redefine core CONFIG properties using global custom capabilities file
                 new CapabilitiesLoader().loadCapabilities(customCapabilities);
-            }
-
-            String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
-            if (!extraCapabilities.isEmpty()) {
-                // redefine core CONFIG properties using extra capabilities file
-                new CapabilitiesLoader().loadCapabilities(extraCapabilities);
             }
 
             updateAppPath();
