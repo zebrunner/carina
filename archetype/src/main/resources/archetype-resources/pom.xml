@@ -6,8 +6,8 @@
   <artifactId>${artifactId}</artifactId>
   <version>${version}</version>
   <packaging>jar</packaging>
-  <name>Carina Demo</name>
-  <url>http://www.qaprosoft.com/</url>
+  <name>${name}</name>
+  <url>${url}</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
