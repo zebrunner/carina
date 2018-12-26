@@ -205,7 +205,8 @@ public interface IDriverPool {
 			CarinaDriver carinaDriver = iter.next();
 			if (carinaDriver.getDriver().equals(drv)) {
 				quitDriver(carinaDriver.getDriver());
-				iter.remove();
+				//above method already removes driver from driversPool using own iterator
+				// iter.remove();
 			}
 		}
 
