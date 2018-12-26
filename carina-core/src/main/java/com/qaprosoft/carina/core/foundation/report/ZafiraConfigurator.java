@@ -40,7 +40,6 @@ import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.config.IConfigurator;
-import com.qaprosoft.zafira.models.db.TestRun.DriverMode;
 import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
@@ -155,11 +154,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public Map<String, Long> getTestMetrics(ITestResult test) {
         return Timer.readAndClear();
-    }
-
-    @Override
-    public DriverMode getDriverMode() {
-        return DriverMode.valueOf("METHOD_MODE");
     }
 
     @Override
