@@ -94,8 +94,7 @@ public class CsvDataProvider extends BaseDataProvider {
             reader = new CSVReader(new FileReader(csvFile), separator, quote);
             list = reader.readAll();
         } catch (IOException e) {
-            LOGGER.error("Unable to read data from CSV DataProvider", e.getCause());
-            e.printStackTrace();
+            LOGGER.error("Unable to read data from CSV DataProvider", e);
         }
 
         if (list.size() == 0) {

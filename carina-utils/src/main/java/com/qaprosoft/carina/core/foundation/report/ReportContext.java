@@ -392,7 +392,7 @@ public class ReportContext {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("generateHtmlReport failure", e);
         }
     }
 
@@ -655,8 +655,7 @@ public class ReportContext {
             String folder = testDir.getAbsolutePath();
             FileManager.createFileWithContent(folder + REPORT_NAME, wholeReport);
         } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("generateTestReport failure", e);
         }
     }
 

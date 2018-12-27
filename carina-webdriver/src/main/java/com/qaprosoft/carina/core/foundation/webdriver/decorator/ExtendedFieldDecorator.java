@@ -204,14 +204,13 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 			rootBy = (By) byContextField.get(locator);
 
 		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
+		    LOGGER.error("getLocatorBy->NoSuchFieldException failure", e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+	          LOGGER.error("getLocatorBy->IllegalAccessException failure", e);
 		} catch (ClassCastException e) {
-			e.printStackTrace();
-		} catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.error("Unable to get rootBy via reflection!", thr);
+		    LOGGER.error("getLocatorBy->ClassCastException failure", e);
+		} catch (Exception e) {
+			LOGGER.error("Unable to get rootBy via reflection!", e);
 		}
     	
     	return rootBy;

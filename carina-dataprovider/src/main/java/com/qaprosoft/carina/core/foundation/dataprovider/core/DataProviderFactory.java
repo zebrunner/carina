@@ -77,7 +77,7 @@ public class DataProviderFactory {
                     Constructor<?> ctor = clazz.getConstructor();
                     object = ctor.newInstance();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("DataProvider failure", e);
                 }
 
                 BaseDataProvider activeProvider = (BaseDataProvider) object;
@@ -94,8 +94,7 @@ public class DataProviderFactory {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
-                // do nothing
+                LOGGER.error("DataProvider failure", e);
             }
         }
 

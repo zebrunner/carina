@@ -71,7 +71,7 @@ public class NotificationUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("callPushService failure", e);
         }
         return null;
     }
@@ -117,7 +117,7 @@ public class NotificationUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getPushServiceResponse failure", e);
         }
         return null;
     }
@@ -161,7 +161,7 @@ public class NotificationUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getGetServiceResponse failure", e);
         }
         return null;
     }
