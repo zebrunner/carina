@@ -231,7 +231,7 @@ public class ExtendedWebElement {
 			e.printStackTrace();
 		} catch (Throwable thr) {
 			thr.printStackTrace();
-			LOGGER.error("Unable to get Driver, serachContext and By via reflection!", thr);
+			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
 		}
 		
     	if (this.searchContext == null) {
