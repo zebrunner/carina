@@ -80,9 +80,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
 
 /*
- * AbstractTest - base test for UI and API tests.
+ * CarinaListener - base carin-core TestNG Listener.
  * 
- * @author Alex Khursevich
+ * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener {
     protected static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
@@ -302,7 +302,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 return;
             }
 
-            // handle AbstractTest->SkipExecution
+            // handle CarinaListener->SkipExecution
             if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                     && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
                 // [VD] it is prohibited to release TestInfoByThread in this
@@ -323,7 +323,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Artifacts.clearArtifacts();
 
         } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterTestMethod!", e);
+            LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }
     }
 
@@ -404,7 +404,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.debug("Finish email report generation.");
 
         } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterSuite.", e);
+            LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
         } finally {
             // do nothing
         }
