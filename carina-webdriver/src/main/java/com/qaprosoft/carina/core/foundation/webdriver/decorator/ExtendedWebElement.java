@@ -78,7 +78,7 @@ public class ExtendedWebElement {
 
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 
-    private static Wait<WebDriver> wait;
+    
     
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
@@ -303,7 +303,8 @@ public class ExtendedWebElement {
 		final WebDriver drv = getDriver();
 		
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
+		
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {

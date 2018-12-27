@@ -156,7 +156,7 @@ public class CustomTypePageFactory implements IDriverPool {
     @SuppressWarnings("unchecked")
     private static <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz,
             Object... parameters) {
-        LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + parameters.toString());
+        LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
         Class<?>[] parametersTypes;
         List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
         for (Object param : parameters) {

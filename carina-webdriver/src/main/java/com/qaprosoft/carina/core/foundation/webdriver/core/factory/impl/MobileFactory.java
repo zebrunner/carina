@@ -152,7 +152,7 @@ public class MobileFactory extends AbstractFactory {
                 // 3rd party solutions like browserstack or saucelabs return not null
                 if (remoteDevice != null && remoteDevice.getName() != null) {
                     device = new Device(remoteDevice);
-                } else {
+                } else if (driver != null) {
                     device = new Device(driver.getCapabilities());
                 }
 

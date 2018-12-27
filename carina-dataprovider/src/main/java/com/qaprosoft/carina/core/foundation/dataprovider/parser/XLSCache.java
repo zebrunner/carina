@@ -34,9 +34,11 @@ public class XLSCache {
                 try {
                     wb = WorkbookFactory.create(is);
                 } finally {
-                    if (is != null) {
-                        is.close();
-                    }
+                    // [VD] code cleanup based on Sonar 
+                    is.close();
+                    // if (is != null) {
+                    //    is.close();
+                    // }
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Can't read xls: " + xlsPath);

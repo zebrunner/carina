@@ -57,7 +57,7 @@ public class MessageBuilder {
             try {
                 sw.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
         return sw.getBuffer().toString();

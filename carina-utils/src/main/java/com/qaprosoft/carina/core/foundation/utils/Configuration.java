@@ -307,12 +307,12 @@ public class Configuration {
         asString.append("\n============= Test configuration =============\n");
         for (Parameter param : Parameter.values()) {
             if (!Parameter.CRYPTO_KEY_PATH.equals(param)) {
-                asString.append(String.format("%s=%s\n", param.getKey(), Configuration.get(param)));
+                asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
         }
 
         //write into the log extra information about selenium_host together with capabilities
-        asString.append(String.format("%s=%s\n", "selenium_host", R.CONFIG.get("selenium_host")));
+        asString.append(String.format("%s=%s%n", "selenium_host", R.CONFIG.get("selenium_host")));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -320,7 +320,7 @@ public class Configuration {
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                asString.append(String.format("%s=%s\n", entry.getKey(), R.CONFIG.get(entry.getKey())));
+                asString.append(String.format("%s=%s%n", entry.getKey(), R.CONFIG.get(entry.getKey())));
             }
         }
 

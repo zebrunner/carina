@@ -141,7 +141,7 @@ public class Jira {
         int knownIssuesCount = getTickets(result).size();
 
         // [VD] QUALITY-1408 disable retry test execution if ignore_known_issues is enabled and jira ticket(s) provided
-        boolean disableRetryForKnownIssues = ignoreKnownIssue & (knownIssuesCount > 0);
+        boolean disableRetryForKnownIssues = ignoreKnownIssue && (knownIssuesCount > 0);
 
         return disableRetryForKnownIssues;
     }

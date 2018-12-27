@@ -245,7 +245,7 @@ public class L10Nparser {
             LOGGER.debug("Using default parameters because of error: " + e);
         }
         if (add_new_loc_path.toLowerCase().contains("null")
-                || add_new_loc_path.toLowerCase().contains("{must_override}") | add_new_loc_path.isEmpty()) {
+                || add_new_loc_path.toLowerCase().contains("{must_override}") || add_new_loc_path.isEmpty()) {
             add_new_loc_path = ReportContext.getArtifactsFolder().getAbsolutePath();
         }
 

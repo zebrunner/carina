@@ -184,7 +184,7 @@ public class ReportContext {
         if (metaDataDirectory == null) {
         	String absolutePath = getBaseDir().getAbsolutePath();
             try {
-                metaDataDirectory = new File(String.format("%s/%s/metadata", URLDecoder.decode(absolutePath, "utf-8")), ARTIFACTS_FOLDER);
+                metaDataDirectory = new File(String.format("%s/%s/metadata", URLDecoder.decode(absolutePath, "utf-8"), ARTIFACTS_FOLDER));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
             }

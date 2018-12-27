@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -25,7 +26,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -72,8 +72,6 @@ public class DriverHelper {
     protected static final long SHORT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 3;
 
     protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-
-    protected static Wait<WebDriver> wait;
 
     protected long timer;
 
@@ -183,7 +181,7 @@ public class DriverHelper {
             }
             ret = (elements[i].size() > 0);
             if (!ret) {
-                LOGGER.error("List of elements[" + i + "] from elements " + elements.toString() + " is empty.");
+                LOGGER.error("List of elements[" + i + "] from elements " + Arrays.toString(elements) + " is empty.");
                 return false;
             }
         }
@@ -211,25 +209,21 @@ public class DriverHelper {
      */
     public boolean isAnyElementPresent(long timeout, ExtendedWebElement... elements) {
         int index = 0;
-        boolean present = false;
         int counts = 10;
         timeout = timeout / counts;
         if (timeout < 1)
             timeout = 1;
-        while (!present && index++ < counts) {
+        while (index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = elements[i].isElementPresent(timeout);
-                if (present) {
+                if (elements[i].isElementPresent(timeout)) {
                     LOGGER.debug(elements[i].getNameWithLocator() + " is present");
                     return true;
                 }
             }
         }
-        if (!present) {
-            LOGGER.error("Unable to find any element from array: " + elements.toString());
-            return false;
-        }
-        return present;
+        
+        LOGGER.error("Unable to find any element from array: " + Arrays.toString(elements));
+        return false;
     }
 
     /**
@@ -253,15 +247,13 @@ public class DriverHelper {
      */
     public ExtendedWebElement returnAnyPresentElement(long timeout, ExtendedWebElement... elements) {
         int index = 0;
-        boolean present = false;
         int counts = 10;
         timeout = timeout / counts;
         if (timeout < 1)
             timeout = 1;
-        while (!present && index++ < counts) {
+        while (index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = elements[i].isElementPresent(timeout);
-                if (present) {
+                if (elements[i].isElementPresent(timeout)) {
                     LOGGER.debug(elements[i].getNameWithLocator() + " is present");
                     return elements[i];
                 }
@@ -269,7 +261,7 @@ public class DriverHelper {
         }
         //throw exception anyway if nothing was returned inside for cycle
         LOGGER.error("All elements are not present");
-        throw new RuntimeException("Unable to find any element from array: " + elements.toString());
+        throw new RuntimeException("Unable to find any element from array: " + Arrays.toString(elements));
     }
 
     /**
@@ -368,7 +360,7 @@ public class DriverHelper {
             }
         }
         if (!clicked) {
-            throw new RuntimeException("Unable to click onto any elements from array: " + elements.toString());
+            throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
         }
     }
 
@@ -450,7 +442,7 @@ public class DriverHelper {
         boolean result;
         final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
         final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> drv.getTitle().contains(decryptedExpectedTitle));
             result = true;
@@ -581,7 +573,7 @@ public class DriverHelper {
      */
     public void acceptAlert() {
         WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().accept();
@@ -596,7 +588,7 @@ public class DriverHelper {
      */
     public void cancelAlert() {
         WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().dismiss();
@@ -630,7 +622,7 @@ public class DriverHelper {
     public boolean isPageOpened(final AbstractPage page, long timeout) {
         boolean result;
         final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl()));
             result = true;
@@ -859,7 +851,7 @@ public class DriverHelper {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {
 			wait.until(condition);
