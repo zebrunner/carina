@@ -475,7 +475,9 @@ public class ExtendedWebElement {
 	private boolean isMobile() {
 		// TODO: investigating potential class cast exception
 		WebDriver driver = getDriver();
-		return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+		boolean res = (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+		LOGGER.debug("isMobile: " + res + "; driver class:" + driver.getClass().getName());
+		return res;
 	}
 
     /**
@@ -1416,7 +1418,7 @@ public class ExtendedWebElement {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
-			//sometime Appiuminstead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
+			//sometimes Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
 			element = refindElement();
@@ -1431,10 +1433,8 @@ public class ExtendedWebElement {
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
-		} catch (Throwable e) {
-			LOGGER.error(e);
-			// print stack trace temporary to be able to handle any problem without extra debugging 
-			e.printStackTrace();
+		} catch (Exception e) {
+		    LOGGER.error("catched undefined Exception: ", e);
 			throw e;
 		} finally {
 			Timer.stop(actionName);
