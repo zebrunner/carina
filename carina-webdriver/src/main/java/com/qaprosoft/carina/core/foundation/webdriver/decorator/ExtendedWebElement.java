@@ -794,12 +794,11 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-		// perform at once super-fast single selenium call and only if nothing
-		// found move to waitAction
-		//detectElement(); // it should do explicit findElement and reinitialize
-							// internal element member in case of success
-		if (element != null) {
+		// For web perform at once super-fast single selenium call and only if nothing found move to waitAction
+        
+		if (!isMobile() && element != null) {
 			try {
+			    // don't execute it for Appium as it generates "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)" 
 				if (element.isDisplayed()) {
 					return true;
 				}
