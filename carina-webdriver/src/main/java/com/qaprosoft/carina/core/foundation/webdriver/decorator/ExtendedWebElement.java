@@ -794,50 +794,46 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-		// For web perform at once super-fast single selenium call and only if nothing found move to waitAction
-        
-		if (!isMobile() && element != null) {
-			try {
-			    // don't execute it for Appium as it generates "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)" 
-				if (element.isDisplayed()) {
-					return true;
-				}
-			} catch (Exception e) {
-				//do nothing as element is not found as expected here
-			}
-		}
+        // For web perform at once super-fast single selenium call and only if nothing found move to waitAction
 
-    	ExpectedCondition<?> waitCondition;
-    	
-		if (element != null) {
-		    // [VD] replace conditions to make presenceOf executed first.
-		    // in case of non present elemnt in DOM there is no sense to verify it's visibility
-		    // on mobile we observe a lot of "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)"
-            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()), ExpectedConditions.visibilityOf(element));
-			boolean tmpResult = waitUntil(waitCondition, 0);
+        if (!isMobile() && element != null) {
+            try {
+                // don't execute it for Appium as it generates "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405
+                // expected)"
+                if (element.isDisplayed()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                // do nothing as element is not found as expected here
+            }
+        }
 
-			if (tmpResult) {
-				return true;
-			}
+        ExpectedCondition<?> waitCondition;
 
-			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
-				try {
-					refindElement();
-                    waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-                            ExpectedConditions.visibilityOf(element));
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-                    waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-                            ExpectedConditions.visibilityOfElementLocated(getBy()));
-				}
-			}
-		} else {
-            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-                    ExpectedConditions.visibilityOfElementLocated(getBy()));
-		}
+        // [VD] replace presenceOfElementLocated and visibilityOf conditions by single "visibilityOfElementLocated"
+        // IMPORTANT! getBy() should return only valid items now! Potentially it could produce regressions
+        // visibilityOf: Does not check for presence of the element as the error explains it.
+        // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
+        // has a height and width greater than 0.
 
-    	return waitUntil(waitCondition, timeout);
+        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+        boolean tmpResult = waitUntil(waitCondition, 0);
+
+        if (tmpResult) {
+            return true;
+        }
+
+        if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+            LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+            try {
+                refindElement();
+                waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+            } catch (NoSuchElementException e) {
+                // do nothing as element seems doesn't present and visible in reality.
+            }
+        }
+
+        return waitUntil(waitCondition, timeout);
     }
 
     /**
