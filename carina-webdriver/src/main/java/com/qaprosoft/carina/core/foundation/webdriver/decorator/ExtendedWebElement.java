@@ -1448,6 +1448,7 @@ public class ExtendedWebElement {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
+			    LOGGER.debug("doClick");
 				try {
 					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
@@ -1476,6 +1477,7 @@ public class ExtendedWebElement {
 			@Override
 			// click for mobile devices
 			public void doTap() {
+			    LOGGER.debug("doTap");
 				DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 						Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
@@ -1484,6 +1486,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doDoubleClick() {
+			    LOGGER.debug("doDoubleClick");
 				DriverListener.setMessages(Messager.ELEMENT_DOUBLE_CLICKED.getMessage(getName()),
 						Messager.ELEMENT_NOT_DOUBLE_CLICKED.getMessage(getNameWithLocator()));
 				
@@ -1494,6 +1497,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public void doHover(Integer xOffset, Integer yOffset) {
+			    LOGGER.debug("doHover");
 				DriverListener.setMessages(Messager.ELEMENT_HOVERED.getMessage(getName()),
 						Messager.ELEMENT_NOT_HOVERED.getMessage(getNameWithLocator()));
 				
@@ -1508,6 +1512,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public void doSendKeys(Keys keys) {
+			    LOGGER.debug("doSendKeys");
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(keys.toString(), getName()),
 						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(keys.toString(), getNameWithLocator()));
 				element.sendKeys(keys);
@@ -1515,6 +1520,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doType(String text) {
+			    LOGGER.debug("doType");
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 
 				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
@@ -1532,6 +1538,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doAttachFile(String filePath) {
+			    LOGGER.debug("doAttachFile");
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
 
 				String textLog = (decryptedText.equals(filePath) ? "********" : filePath);
@@ -1546,6 +1553,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetText() {
+			    LOGGER.debug("doGetText");
 				String text = element.getText();
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Text", text, getName()));
 				return text;
@@ -1553,6 +1561,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public Point doGetLocation() {
+			    LOGGER.debug("doGetLocation");
 				Point point = element.getLocation();
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Location", point.toString(), getName()));
 				return point;
@@ -1560,6 +1569,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public Dimension doGetSize() {
+			    LOGGER.debug("doGetSize");
 				Dimension dim = element.getSize();
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Size", dim.toString(), getName()));
 				return dim;
@@ -1567,6 +1577,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetAttribute(String name) {
+			    LOGGER.debug("doGetAttribute");
 				String attribute = element.getAttribute(name);
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage(name, attribute, getName()));
 				return attribute;
@@ -1574,6 +1585,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doRightClick() {
+			    LOGGER.debug("doRightClick");
 				DriverListener.setMessages(Messager.ELEMENT_RIGHT_CLICKED.getMessage(getName()),
 						Messager.ELEMENT_NOT_RIGHT_CLICKED.getMessage(getNameWithLocator()));
 				
@@ -1584,6 +1596,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doCheck() {
+			    LOGGER.debug("doCheck");
 				DriverListener.setMessages(Messager.CHECKBOX_CHECKED.getMessage(getName()), null);
 				
 				if (!element.isSelected()) {
@@ -1593,6 +1606,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doUncheck() {
+			    LOGGER.debug("doUncheck");
 				DriverListener.setMessages(Messager.CHECKBOX_UNCHECKED.getMessage(getName()), null);
 				if (element.isSelected()) {
 					click();
@@ -1601,6 +1615,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public boolean doIsChecked() {
+			    LOGGER.debug("doIsChecked");
 				
 		        boolean res = element.isSelected();
 		        if (element.getAttribute("checked") != null) {
@@ -1612,6 +1627,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public boolean doSelect(String text) {
+			    LOGGER.debug("doSelect");
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 				
 				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(decryptedSelectText, getName()),
@@ -1626,6 +1642,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectValues(String[] values) {
+			    LOGGER.debug("doSelectValues");
 				boolean result = true;
 				for (String value : values) {
 					if (!select(value)) {
@@ -1637,6 +1654,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
+			    LOGGER.debug("doSelectByMatcher");
 				
 				DriverListener.setMessages(Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.getMessage(matcher.toString(), getName()),
 						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.getMessage(matcher.toString(), getNameWithLocator()));
@@ -1656,6 +1674,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByPartialText(String partialSelectText) {
+			    LOGGER.debug("doSelectByPartialText");
 				
 				DriverListener.setMessages(
 						Messager.SELECT_BY_TEXT_PERFORMED.getMessage(partialSelectText, getName()),
@@ -1675,6 +1694,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByIndex(int index) {
+			    LOGGER.debug("doSelectByIndex");
 				DriverListener.setMessages(
 						Messager.SELECT_BY_INDEX_PERFORMED.getMessage(String.valueOf(index), getName()),
 						Messager.SELECT_BY_INDEX_NOT_PERFORMED.getMessage(String.valueOf(index), getNameWithLocator()));
@@ -1687,12 +1707,14 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetSelectedValue() {
+			    LOGGER.debug("doGetSelectedValue");
 				final Select s = new Select(element);
 				return s.getAllSelectedOptions().get(0).getText();
 			}
 
 			@Override
 			public List<String> doGetSelectedValues() {
+			    LOGGER.debug("doGetSelectedValues");
 		        final Select s = new Select(getElement());
 		        List<String> values = new ArrayList<String>();
 		        for (WebElement we : s.getAllSelectedOptions()) {
