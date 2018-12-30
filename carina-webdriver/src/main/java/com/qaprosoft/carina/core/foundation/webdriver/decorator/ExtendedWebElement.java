@@ -811,6 +811,15 @@ public class ExtendedWebElement {
     	ExpectedCondition<?> waitCondition;
     	
 		if (element != null) {
+		    ExpectedCondition<?> waitCondition2 = ExpectedConditions.visibilityOf(element);
+		    ExpectedCondition<?> waitCondition3 = ExpectedConditions.presenceOfElementLocated(getBy());
+		    boolean tmpResult2 = waitUntil(waitCondition2, 0);
+		    LOGGER.info(tmpResult2);
+		    boolean tmpResult3 = waitUntil(waitCondition3, 0);
+		    LOGGER.info(tmpResult3);
+		    
+
+	          
 			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
 					ExpectedConditions.presenceOfElementLocated(getBy()));
 			boolean tmpResult = waitUntil(waitCondition, 0);
