@@ -476,6 +476,12 @@ public class ExtendedWebElement {
 		// TODO: investigating potential class cast exception
 		WebDriver driver = getDriver();
 		boolean res = (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+		
+		if (!res) {
+		    // for use-case when driver is instanceof RemoteWebDriver
+		    res = SpecialKeywords.MOBILE.equals(Configuration.getDriverType());
+		}
+		
 		LOGGER.debug("isMobile: " + res + "; driver class:" + driver.getClass().getName());
 		return res;
 	}
