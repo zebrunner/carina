@@ -811,17 +811,10 @@ public class ExtendedWebElement {
     	ExpectedCondition<?> waitCondition;
     	
 		if (element != null) {
-		    ExpectedCondition<?> waitCondition2 = ExpectedConditions.visibilityOf(element);
-		    ExpectedCondition<?> waitCondition3 = ExpectedConditions.presenceOfElementLocated(getBy());
-		    boolean tmpResult2 = waitUntil(waitCondition2, 0);
-		    LOGGER.info(tmpResult2);
-		    boolean tmpResult3 = waitUntil(waitCondition3, 0);
-		    LOGGER.info(tmpResult3);
-		    
-
-	          
-			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.presenceOfElementLocated(getBy()));
+		    // [VD] replace conditions to make presenceOf executed first.
+		    // in case of non present elemnt in DOM there is no sense to verify it's visibility
+		    // on mobile we observe a lot of "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)"
+            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()), ExpectedConditions.visibilityOf(element));
 			boolean tmpResult = waitUntil(waitCondition, 0);
 
 			if (tmpResult) {
@@ -832,17 +825,17 @@ public class ExtendedWebElement {
 				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
 				try {
 					refindElement();
-					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-							ExpectedConditions.presenceOfElementLocated(getBy()));
+                    waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                            ExpectedConditions.visibilityOf(element));
 				} catch (NoSuchElementException e) {
 					// search element based on By if exception was thrown
-					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-							ExpectedConditions.presenceOfElementLocated(getBy()));
+                    waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                            ExpectedConditions.visibilityOfElementLocated(getBy()));
 				}
 			}
 		} else {
-			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-					ExpectedConditions.presenceOfElementLocated(getBy()));
+            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                    ExpectedConditions.visibilityOfElementLocated(getBy()));
 		}
 
     	return waitUntil(waitCondition, timeout);
@@ -1798,11 +1791,12 @@ public class ExtendedWebElement {
     	//generate the most popular wiatCondition to check if element visible or present
     	ExpectedCondition<?> waitCondition = null;
 		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.visibilityOf(element), ExpectedConditions.presenceOfElementLocated(myBy));
+            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOf(element));
 		} else {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.presenceOfElementLocated(myBy));
+            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOfElementLocated(myBy));
 		}
 		
 		return waitCondition;
