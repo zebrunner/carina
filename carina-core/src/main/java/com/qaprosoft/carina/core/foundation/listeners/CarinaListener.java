@@ -22,9 +22,11 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -345,7 +347,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ISuite suite) {
         try {
-            // TODO: quitAllDivers forcibly
+            quitAllDrivers();
 
             ReportContext.removeTempDir(); // clean temp artifacts directory
             // HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
@@ -748,6 +750,30 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         return includes;
     }
+    
+    private void quitAllDrivers() {
+        // as it is shutdown hook just try to quit all existing drivers one by one
+        Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+        Iterator<CarinaDriver> iter = tempPool.iterator();
+
+        while (iter.hasNext()) {
+            CarinaDriver carinaDriver = iter.next();
+
+            // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks
+            String name = carinaDriver.getName();
+            LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
+            DevicePool.deregisterDevice();
+            ProxyPool.stopProxy();
+
+            try {
+                LOGGER.debug("Driver exiting..." + name);
+                carinaDriver.getDriver().quit();
+                LOGGER.debug("Driver exited..." + name);
+            } catch (Exception e) {
+                // do nothing
+            }
+        }
+    }
 
     public static class ShutdownHook extends Thread {
 
@@ -784,8 +810,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         private void quitAllDriversOnHook() {
             // as it is shutdown hook just try to quit all existing drivers one by one
-
-            Iterator<CarinaDriver> iter = driversPool.iterator();
+            Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+            Iterator<CarinaDriver> iter = tempPool.iterator();
 
             while (iter.hasNext()) {
                 CarinaDriver carinaDriver = iter.next();
