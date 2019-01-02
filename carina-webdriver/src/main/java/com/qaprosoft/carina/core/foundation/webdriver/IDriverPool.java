@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,7 +44,10 @@ public interface IDriverPool {
 	static final String DEFAULT = "default";
 
 	// unified set of Carina WebDrivers
-	static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
+	static final ConcurrentHashMap<CarinaDriver, Integer> driversMap = new ConcurrentHashMap<>();
+	@SuppressWarnings("static-access")
+    static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
+	//static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
 
 	/**
 	 * Get default driver. If no default driver discovered it will be created.
