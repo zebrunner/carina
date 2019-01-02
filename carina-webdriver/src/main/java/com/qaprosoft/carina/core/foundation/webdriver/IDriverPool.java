@@ -207,6 +207,7 @@ public interface IDriverPool {
 			CarinaDriver carinaDriver = iter.next();
 			if (carinaDriver.getDriver().equals(drv)) {
 				quitDriver(carinaDriver.getDriver());
+				carinaDriver.setExpired(true);
 				//above method already removes driver from driversPool using own iterator
 				// iter.remove();
 			}
@@ -251,6 +252,7 @@ public interface IDriverPool {
 			}
 
             quitDriver(drv);
+            carinaDriver.setExpired(true);
             iter.remove();
 		}
 
@@ -272,6 +274,7 @@ public interface IDriverPool {
 
             if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
                 quitDriver(carinaDriver.getDriver());
+                carinaDriver.setExpired(true);
             }
         }
 		
@@ -454,10 +457,10 @@ public interface IDriverPool {
 		Iterator<CarinaDriver> iter = driversPool.iterator();
 		while (iter.hasNext()) {
 			CarinaDriver carinaDriver = iter.next();
-			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
+			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && !carinaDriver.isExpired()) {
 				LOGGER.debug("Add suite_mode drivers into the getDrivers response: " + carinaDriver.getName());
 				currentDrivers.put(carinaDriver.getName(), carinaDriver);
-			} else if (threadId.equals(carinaDriver.getThreadId())) {
+			} else if (threadId.equals(carinaDriver.getThreadId()) && !carinaDriver.isExpired()) {
 				LOGGER.debug("Add driver into the getDrivers response: " + carinaDriver.getName() + " by threadId: "
 						+ threadId);
 				currentDrivers.put(carinaDriver.getName(), carinaDriver);
