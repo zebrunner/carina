@@ -129,7 +129,7 @@ public abstract class AbstractFactory {
 
 		if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
 			if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
-				LOGGER.info("To optimize video recording if will be disabled for attempt {" + RetryCounter.getRunCount()
+				LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
 						+ "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
 				// disable video recording for not the final retry if
 				// "optimize_video_recording=true"
