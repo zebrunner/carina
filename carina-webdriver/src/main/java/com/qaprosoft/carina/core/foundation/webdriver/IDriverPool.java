@@ -164,9 +164,8 @@ public interface IDriverPool {
 			SessionId drvSessionId = ((RemoteWebDriver) drv).getSessionId();
 
 			if (drvSessionId != null) {
-    			LOGGER.debug("analyzing driver: " + drvSessionId.toString());
     			if (sessionId.equals(drvSessionId)) {
-    				LOGGER.debug("Detected WebDriver by sessionId");
+    				LOGGER.debug("Detected WebDriver by sessionId: " + drvSessionId.toString());
     				return drv;
     			}
 			}
