@@ -44,11 +44,11 @@ public interface IDriverPool {
 	static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
 	static final String DEFAULT = "default";
 
-	// unified set of Carina WebDrivers
-	static final ConcurrentHashMap<CarinaDriver, Integer> driversMap = new ConcurrentHashMap<>();
-	@SuppressWarnings("static-access")
+    // unified set of Carina WebDrivers
+    static final ConcurrentHashMap<CarinaDriver, Integer> driversMap = new ConcurrentHashMap<>();
+    @SuppressWarnings("static-access")
     static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
-	//static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
+    // static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
 
 	/**
 	 * Get default driver. If no default driver discovered it will be created.
