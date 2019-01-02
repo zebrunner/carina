@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -152,7 +153,8 @@ public interface IDriverPool {
 	public static WebDriver getDriver(SessionId sessionId) {
 		LOGGER.debug("Detecting WebDriver by sessionId...");
 
-		Iterator<CarinaDriver> iter = driversPool.iterator();
+		Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+		Iterator<CarinaDriver> iter = tempPool.iterator();
 		while (iter.hasNext()) {
 			CarinaDriver carinaDriver = iter.next();
 			WebDriver drv = carinaDriver.getDriver();
@@ -204,7 +206,8 @@ public interface IDriverPool {
 			caps.setCapability("udid", device.getUdid());
 		}
 
-		Iterator<CarinaDriver> iter = driversPool.iterator();
+		Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+		Iterator<CarinaDriver> iter = tempPool.iterator();
 		while (iter.hasNext()) {
 			CarinaDriver carinaDriver = iter.next();
 			if (carinaDriver.getDriver().equals(drv)) {
@@ -270,7 +273,11 @@ public interface IDriverPool {
 	default public void quitDrivers(Phase phase) {
 
 		Long threadId = Thread.currentThread().getId();
-		Iterator<CarinaDriver> iter = driversPool.iterator();
+		
+		Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+		// iterate through temp local copy to avoid ConcurrentModificationException.
+		// real Set cleanup will be performed using "removeIf" 
+		Iterator<CarinaDriver> iter = tempPool.iterator();
         while (iter.hasNext()) {
             CarinaDriver carinaDriver = iter.next();
 
@@ -456,7 +463,8 @@ public interface IDriverPool {
 	default ConcurrentHashMap<String, CarinaDriver> getDrivers() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
-		Iterator<CarinaDriver> iter = driversPool.iterator();
+		Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+		Iterator<CarinaDriver> iter = tempPool.iterator();
 		while (iter.hasNext()) {
 			CarinaDriver carinaDriver = iter.next();
 			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && !carinaDriver.isExpired()) {
@@ -491,23 +499,22 @@ public interface IDriverPool {
 
 	@Deprecated
 	public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
-		Long threadId = Thread.currentThread().getId();
-		ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-		// look inside driversPool and return all before_suite drivers and
-		// drivers mounted to the current thread_id
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
-
-			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-				currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-			} else if (threadId.equals(carinaDriver.getThreadId())) {
-				currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-			}
-		}
-
-		return currentDrivers;
+        Long threadId = Thread.currentThread().getId();
+        ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
+        Set<CarinaDriver> tempPool = new HashSet<CarinaDriver>(driversPool);
+        Iterator<CarinaDriver> iter = tempPool.iterator();
+        while (iter.hasNext()) {
+            CarinaDriver carinaDriver = iter.next();
+            if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && !carinaDriver.isExpired()) {
+                LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
+                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
+            } else if (threadId.equals(carinaDriver.getThreadId()) && !carinaDriver.isExpired()) {
+                LOGGER.debug("Add driver into the getStaticDrivers response: " + carinaDriver.getName() + " by threadId: "
+                        + threadId);
+                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
+            }
+        }
+        return currentDrivers;
 	}
 
 }
