@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 
 public class JsonSchemaValidatorTest {
 
-    @Test
+	@Test
     public void testErrorSchema4() throws IOException {
         String actualRs = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
                 "validation/schema/schema4/rs_w_schema_error.json"), Charset.forName("UTF-8"));
@@ -37,7 +37,7 @@ public class JsonSchemaValidatorTest {
 
         boolean isErrorThrown = false;
         try {
-            JsonValidator.validateJsonAgainstSchema(schema, actualRs);
+			JsonValidator.validateJsonAgainstSchema(schema, actualRs);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             isErrorThrown = true;
@@ -46,7 +46,7 @@ public class JsonSchemaValidatorTest {
         Assert.assertTrue(isErrorThrown, "Assertion Error not thrown");
     }
 
-    @Test
+	@Test
     public void testErrorSchema3() throws IOException {
         String actualRs = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
                 "validation/schema/schema3/rs_w_schema_error.json"), Charset.forName("UTF-8"));
@@ -58,6 +58,26 @@ public class JsonSchemaValidatorTest {
         boolean isErrorThrown = false;
         try {
             JsonValidator.validateJsonAgainstSchema(schema, actualRs);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            isErrorThrown = true;
+            Assert.assertEquals(normalizeSpace(e.getMessage()), normalizeSpace(expectedError), "Error message not as expected");
+        }
+        Assert.assertTrue(isErrorThrown, "Assertion Error not thrown");
+    }
+    
+	@Test
+    public void testErrorSchema7() throws IOException {
+        String actualRs = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
+                "validation/schema/schema7/rs_w_schema_error.json"), Charset.forName("UTF-8"));
+        String schema = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
+                "validation/schema/schema7/schema7.json"), Charset.forName("UTF-8"));
+        String expectedError = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
+                "validation/schema/schema7/error_schema7.json"), Charset.forName("UTF-8"));
+
+        boolean isErrorThrown = false;
+        try {
+			JsonValidator.validateJsonAgainstSchema(schema, actualRs);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             isErrorThrown = true;
