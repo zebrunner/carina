@@ -238,39 +238,45 @@ public interface IDriverPool {
 		WebDriver drv = null;
 		Long threadId = Thread.currentThread().getId();
 
-		while (iter.hasNext()) {
+		boolean found = false;
+		while (iter.hasNext() && !found) {
 			CarinaDriver carinaDriver = iter.next();
 
 			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName())) {
 				drv = carinaDriver.getDriver();
+				found = true;
 			} else if (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName())) {
 				drv = carinaDriver.getDriver();
+				found = true;
 			}
+
+            quitDriver(drv);
+            iter.remove();
 		}
 
-		if (drv == null) {
+		if (!found) {
 			throw new RuntimeException("Unable to find driver '" + name + "'!");
 		}
 
-		quitDriver(drv);
-		iter.remove();
 	}
 
 	/**
 	 * Quit current drivers by phase
 	 */
 	default public void quitDrivers(Phase phase) {
-		Iterator<CarinaDriver> iter = driversPool.iterator();
 
 		Long threadId = Thread.currentThread().getId();
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
+		Iterator<CarinaDriver> iter = driversPool.iterator();
+        while (iter.hasNext()) {
+            CarinaDriver carinaDriver = iter.next();
 
-			if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
-				quitDriver(carinaDriver.getDriver());
-				iter.remove();
-			}
-		}
+            if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
+                quitDriver(carinaDriver.getDriver());
+            }
+        }
+		
+	    // reuse safer removeIf method
+		driversPool.removeIf(carinaDriver-> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
 	}
 
 	default void quitDriver(WebDriver drv) {
