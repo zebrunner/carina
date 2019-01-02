@@ -803,6 +803,52 @@ public class ExtendedWebElement {
      */
     public boolean isElementPresent(long timeout) {
         // For web perform at once super-fast single selenium call and only if nothing found move to waitAction
+        
+        if (!isMobile() && element != null) {
+            try {
+                // don't execute it for Appium as it generates "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)" 
+                if (element.isDisplayed()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                //do nothing as element is not found as expected here
+            }
+        }
+
+        ExpectedCondition<?> waitCondition;
+        
+        if (element != null) {
+            // [VD] replace conditions to make presenceOf executed first.
+            // in case of non present elemnt in DOM there is no sense to verify it's visibility
+            // on mobile we observe a lot of "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405 expected)"
+            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()), ExpectedConditions.visibilityOf(element));
+            boolean tmpResult = waitUntil(waitCondition, 0);
+
+            if (tmpResult) {
+                return true;
+            }
+
+            if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+                LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+                try {
+                    refindElement();
+                    waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                            ExpectedConditions.visibilityOf(element));
+                } catch (NoSuchElementException e) {
+                    // search element based on By if exception was thrown
+                    waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                            ExpectedConditions.visibilityOfElementLocated(getBy()));
+                }
+            }
+        } else {
+            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                    ExpectedConditions.visibilityOfElementLocated(getBy()));
+        }
+
+        return waitUntil(waitCondition, timeout);
+    }
+/*    public boolean isElementPresent(long timeout) {
+        // For web perform at once super-fast single selenium call and only if nothing found move to waitAction
 
         if (!isMobile() && element != null) {
             try {
@@ -842,7 +888,7 @@ public class ExtendedWebElement {
         }
 
         return waitUntil(waitCondition, timeout);
-    }
+    }*/
 
     /**
      * Check that element not present and not visible within specified timeout.
@@ -897,7 +943,18 @@ public class ExtendedWebElement {
      * @return element visibility status.
      */
 	public boolean isVisible(long timeout) {
-		return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), timeout);
+        ExpectedCondition<?> waitCondition;
+
+        if (element != null) {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
+                    ExpectedConditions.visibilityOfElementLocated(getBy()));
+        } else {
+            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+        }
+
+        return waitUntil(waitCondition, timeout);
+	        
+		// return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), timeout);
 	}
 
 	
@@ -921,20 +978,28 @@ public class ExtendedWebElement {
     public boolean isElementWithTextPresent(final String text, long timeout) {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 		
-		ExpectedCondition<?> tmpCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-        boolean tmpResult = waitUntil(tmpCondition, 0);
-        
-        if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-            LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
-            try {
-                refindElement();
-            } catch (NoSuchElementException e) {
-                // do nothing
+        ExpectedCondition<Boolean> textCondition;
+        if (element != null) {
+            ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
+            boolean tmpResult = waitUntil(tmpCondition, 0);
+            
+            if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+                LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
+                try {
+                    refindElement();
+                    textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+                } catch (NoSuchElementException e) {
+                    // search element based on By if exception was thrown
+                    textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+                }
             }
+            
+            textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
+        } else {
+            textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
         }
-
-        ExpectedCondition<Boolean> textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-		return waitUntil(textCondition, timeout);
+        
+        return waitUntil(textCondition, timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
 //    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 //				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
@@ -1797,8 +1862,21 @@ public class ExtendedWebElement {
     }
     
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
-    	//generate the most popular wiatCondition to check if element present or visible
-		return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                ExpectedConditions.visibilityOfElementLocated(myBy));
+        //generate the most popular wiatCondition to check if element visible or present
+        ExpectedCondition<?> waitCondition = null;
+        if (element != null) {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOf(element));
+        } else {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOfElementLocated(myBy));
+        }
+        
+        return waitCondition;
+        
+//    	//generate the most popular wiatCondition to check if element present or visible
+//		return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+//                ExpectedConditions.visibilityOfElementLocated(myBy));
     }
 }
