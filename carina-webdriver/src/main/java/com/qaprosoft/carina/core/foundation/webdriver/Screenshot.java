@@ -518,6 +518,7 @@ public class Screenshot {
 				|| message.contains("cannot forward the request Connect to")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("was terminated due to TIMEOUT")
+				|| message.contains("was terminated due to BROWSER_TIMEOUT")
 				|| message.contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit()")
 				|| message.contains("Session timed out or not found");
