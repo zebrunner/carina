@@ -209,8 +209,7 @@ public interface IDriverPool {
 			CarinaDriver carinaDriver = iter.next();
 			if (carinaDriver.getDriver().equals(drv)) {
 				quitDriver(carinaDriver.getDriver());
-				//above method already removes driver from driversPool using own iterator
-				// iter.remove();
+				iter.remove();
 			}
 		}
 
@@ -273,11 +272,11 @@ public interface IDriverPool {
 
 			if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
 				quitDriver(carinaDriver.getDriver());
-				// iter.remove();
+				iter.remove();
 			}
 		}
 		
-        driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
+        // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
 	}
 
 	default void quitDriver(WebDriver drv) {
@@ -286,7 +285,7 @@ public interface IDriverPool {
 			ProxyPool.stopProxy();
 			drv.quit();
 		} catch (WebDriverException e) {
-			LOGGER.debug("Error message detected during driver verification: " + e.getMessage(), e);
+			LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
 			// do nothing
 		} catch (Exception e) {
 			LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
