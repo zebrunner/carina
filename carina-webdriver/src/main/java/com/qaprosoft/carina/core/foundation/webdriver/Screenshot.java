@@ -507,6 +507,7 @@ public class Screenshot {
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("A session is either terminated or not started")
 				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
+				|| message.contains("was terminated due to CLIENT_STOPPED_SESSION")
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
@@ -518,6 +519,7 @@ public class Screenshot {
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("was terminated due to TIMEOUT")
 				|| message.contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
+				|| message.contains("Session ID is null. Using WebDriver after calling quit()")
 				|| message.contains("Session timed out or not found");
 		return !disableScreenshot;
 	}
