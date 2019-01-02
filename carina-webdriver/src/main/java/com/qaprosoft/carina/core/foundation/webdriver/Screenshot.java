@@ -507,6 +507,7 @@ public class Screenshot {
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("A session is either terminated or not started")
 				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
+				|| message.contains("was terminated due to CLIENT_STOPPED_SESSION")
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
