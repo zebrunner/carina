@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,8 +43,11 @@ public interface IDriverPool {
 	static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
 	static final String DEFAULT = "default";
 
-	// unified set of Carina WebDrivers
-	static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
+    // unified set of Carina WebDrivers
+    static final ConcurrentHashMap<CarinaDriver, Integer> driversMap = new ConcurrentHashMap<>();
+    @SuppressWarnings("static-access")
+    static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
+    // static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
 
 	/**
 	 * Get default driver. If no default driver discovered it will be created.
@@ -238,13 +240,16 @@ public interface IDriverPool {
 		WebDriver drv = null;
 		Long threadId = Thread.currentThread().getId();
 
-		while (iter.hasNext()) {
+		boolean found = false;
+		while (iter.hasNext() && !found) {
 			CarinaDriver carinaDriver = iter.next();
 
 			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName())) {
 				drv = carinaDriver.getDriver();
+				found = true;
 			} else if (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName())) {
 				drv = carinaDriver.getDriver();
+				found=true;
 			}
 		}
 
@@ -268,9 +273,11 @@ public interface IDriverPool {
 
 			if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
 				quitDriver(carinaDriver.getDriver());
-				iter.remove();
+				// iter.remove();
 			}
 		}
+		
+        driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
 	}
 
 	default void quitDriver(WebDriver drv) {
@@ -480,23 +487,21 @@ public interface IDriverPool {
 
 	@Deprecated
 	public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
-		Long threadId = Thread.currentThread().getId();
-		ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-		// look inside driversPool and return all before_suite drivers and
-		// drivers mounted to the current thread_id
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
-
-			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-				currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-			} else if (threadId.equals(carinaDriver.getThreadId())) {
-				currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-			}
-		}
-
-		return currentDrivers;
+        Long threadId = Thread.currentThread().getId();
+        ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
+        Iterator<CarinaDriver> iter = driversPool.iterator();
+        while (iter.hasNext()) {
+            CarinaDriver carinaDriver = iter.next();
+            if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
+                LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
+                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
+            } else if (threadId.equals(carinaDriver.getThreadId())) {
+                LOGGER.debug("Add driver into the getStaticDrivers response: " + carinaDriver.getName() + " by threadId: "
+                        + threadId);
+                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
+            }
+        }
+        return currentDrivers;
 	}
 
 }
