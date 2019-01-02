@@ -475,7 +475,15 @@ public class ExtendedWebElement {
 	private boolean isMobile() {
 		// TODO: investigating potential class cast exception
 		WebDriver driver = getDriver();
-		return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+		boolean res = (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+		
+		if (!res) {
+		    // for use-case when driver is instanceof RemoteWebDriver
+		    res = SpecialKeywords.MOBILE.equals(Configuration.getDriverType());
+		}
+		
+		LOGGER.debug("isMobile: " + res + "; driver class:" + driver.getClass().getName());
+		return res;
 	}
 
     /**
@@ -794,49 +802,46 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-		// perform at once super-fast single selenium call and only if nothing
-		// found move to waitAction
-		//detectElement(); // it should do explicit findElement and reinitialize
-							// internal element member in case of success
-		if (element != null) {
-			try {
-				if (element.isDisplayed()) {
-					return true;
-				}
-			} catch (Exception e) {
-				//do nothing as element is not found as expected here
-			}
-		}
+        // For web perform at once super-fast single selenium call and only if nothing found move to waitAction
 
-    	ExpectedCondition<?> waitCondition;
-    	
-		if (element != null) {
-			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.presenceOfElementLocated(getBy()));
-			boolean tmpResult = waitUntil(waitCondition, 0);
+        if (!isMobile() && element != null) {
+            try {
+                // don't execute it for Appium as it generates "INFO: HTTP Status: '404' -> incorrect JSON status mapping for 'unknown method' (405
+                // expected)"
+                if (element.isDisplayed()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                // do nothing as element is not found as expected here
+            }
+        }
 
-			if (tmpResult) {
-				return true;
-			}
+        ExpectedCondition<?> waitCondition;
 
-			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
-				try {
-					refindElement();
-					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-							ExpectedConditions.presenceOfElementLocated(getBy()));
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-							ExpectedConditions.presenceOfElementLocated(getBy()));
-				}
-			}
-		} else {
-			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-					ExpectedConditions.presenceOfElementLocated(getBy()));
-		}
+        // [VD] replace presenceOfElementLocated and visibilityOf conditions by single "visibilityOfElementLocated"
+        // IMPORTANT! getBy() should return only valid items now! Potentially it could produce regressions
+        // visibilityOf: Does not check for presence of the element as the error explains it.
+        // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
+        // has a height and width greater than 0.
 
-    	return waitUntil(waitCondition, timeout);
+        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+        boolean tmpResult = waitUntil(waitCondition, 0);
+
+        if (tmpResult) {
+            return true;
+        }
+
+        if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+            LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+            try {
+                refindElement();
+                waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+            } catch (NoSuchElementException e) {
+                // do nothing as element seems doesn't present and visible in reality.
+            }
+        }
+
+        return waitUntil(waitCondition, timeout);
     }
 
     /**
@@ -892,16 +897,7 @@ public class ExtendedWebElement {
      * @return element visibility status.
      */
 	public boolean isVisible(long timeout) {
-		ExpectedCondition<?> waitCondition;
-
-		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.visibilityOfElementLocated(getBy()));
-		} else {
-			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		}
-		
-		return waitUntil(waitCondition, timeout);
+		return waitUntil(ExpectedConditions.visibilityOfElementLocated(getBy()), timeout);
 	}
 
 	
@@ -924,26 +920,20 @@ public class ExtendedWebElement {
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		ExpectedCondition<Boolean> textCondition;
-		if (element != null) {
-			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
-			boolean tmpResult = waitUntil(tmpCondition, 0);
-			
-			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
-				try {
-					refindElement();
-					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-					textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-				}
-			}
-			
-			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-		} else {
-			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-		}
+		
+		ExpectedCondition<?> tmpCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+        boolean tmpResult = waitUntil(tmpCondition, 0);
+        
+        if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+            LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
+            try {
+                refindElement();
+            } catch (NoSuchElementException e) {
+                // do nothing
+            }
+        }
+
+        ExpectedCondition<Boolean> textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
 		return waitUntil(textCondition, timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
 //    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
@@ -1434,7 +1424,7 @@ public class ExtendedWebElement {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
-			//sometime Appiuminstead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
+			//sometimes Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
 			element = refindElement();
@@ -1449,10 +1439,8 @@ public class ExtendedWebElement {
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
-		} catch (Throwable e) {
-			LOGGER.error(e);
-			// print stack trace temporary to be able to handle any problem without extra debugging 
-			e.printStackTrace();
+		} catch (Exception e) {
+		    LOGGER.error("catched undefined Exception: ", e);
 			throw e;
 		} finally {
 			Timer.stop(actionName);
@@ -1466,6 +1454,7 @@ public class ExtendedWebElement {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
+			    LOGGER.debug("doClick");
 				try {
 					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
@@ -1494,6 +1483,7 @@ public class ExtendedWebElement {
 			@Override
 			// click for mobile devices
 			public void doTap() {
+			    LOGGER.debug("doTap");
 				DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 						Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
@@ -1502,6 +1492,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doDoubleClick() {
+			    LOGGER.debug("doDoubleClick");
 				DriverListener.setMessages(Messager.ELEMENT_DOUBLE_CLICKED.getMessage(getName()),
 						Messager.ELEMENT_NOT_DOUBLE_CLICKED.getMessage(getNameWithLocator()));
 				
@@ -1512,6 +1503,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public void doHover(Integer xOffset, Integer yOffset) {
+			    LOGGER.debug("doHover");
 				DriverListener.setMessages(Messager.ELEMENT_HOVERED.getMessage(getName()),
 						Messager.ELEMENT_NOT_HOVERED.getMessage(getNameWithLocator()));
 				
@@ -1526,6 +1518,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public void doSendKeys(Keys keys) {
+			    LOGGER.debug("doSendKeys");
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(keys.toString(), getName()),
 						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(keys.toString(), getNameWithLocator()));
 				element.sendKeys(keys);
@@ -1533,6 +1526,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doType(String text) {
+			    LOGGER.debug("doType");
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 
 				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
@@ -1550,6 +1544,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doAttachFile(String filePath) {
+			    LOGGER.debug("doAttachFile");
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
 
 				String textLog = (decryptedText.equals(filePath) ? "********" : filePath);
@@ -1564,6 +1559,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetText() {
+			    LOGGER.debug("doGetText");
 				String text = element.getText();
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Text", text, getName()));
 				return text;
@@ -1571,6 +1567,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public Point doGetLocation() {
+			    LOGGER.debug("doGetLocation");
 				Point point = element.getLocation();
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Location", point.toString(), getName()));
 				return point;
@@ -1578,6 +1575,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public Dimension doGetSize() {
+			    LOGGER.debug("doGetSize");
 				Dimension dim = element.getSize();
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage("Size", dim.toString(), getName()));
 				return dim;
@@ -1585,6 +1583,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetAttribute(String name) {
+			    LOGGER.debug("doGetAttribute");
 				String attribute = element.getAttribute(name);
 				LOGGER.debug(Messager.ELEMENT_ATTRIBUTE_FOUND.getMessage(name, attribute, getName()));
 				return attribute;
@@ -1592,6 +1591,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doRightClick() {
+			    LOGGER.debug("doRightClick");
 				DriverListener.setMessages(Messager.ELEMENT_RIGHT_CLICKED.getMessage(getName()),
 						Messager.ELEMENT_NOT_RIGHT_CLICKED.getMessage(getNameWithLocator()));
 				
@@ -1602,6 +1602,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doCheck() {
+			    LOGGER.debug("doCheck");
 				DriverListener.setMessages(Messager.CHECKBOX_CHECKED.getMessage(getName()), null);
 				
 				if (!element.isSelected()) {
@@ -1611,6 +1612,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public void doUncheck() {
+			    LOGGER.debug("doUncheck");
 				DriverListener.setMessages(Messager.CHECKBOX_UNCHECKED.getMessage(getName()), null);
 				if (element.isSelected()) {
 					click();
@@ -1619,6 +1621,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public boolean doIsChecked() {
+			    LOGGER.debug("doIsChecked");
 				
 		        boolean res = element.isSelected();
 		        if (element.getAttribute("checked") != null) {
@@ -1630,6 +1633,7 @@ public class ExtendedWebElement {
 			
 			@Override
 			public boolean doSelect(String text) {
+			    LOGGER.debug("doSelect");
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 				
 				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(decryptedSelectText, getName()),
@@ -1644,6 +1648,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectValues(String[] values) {
+			    LOGGER.debug("doSelectValues");
 				boolean result = true;
 				for (String value : values) {
 					if (!select(value)) {
@@ -1655,6 +1660,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByMatcher(BaseMatcher<String> matcher) {
+			    LOGGER.debug("doSelectByMatcher");
 				
 				DriverListener.setMessages(Messager.SELECT_BY_MATCHER_TEXT_PERFORMED.getMessage(matcher.toString(), getName()),
 						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.getMessage(matcher.toString(), getNameWithLocator()));
@@ -1674,6 +1680,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByPartialText(String partialSelectText) {
+			    LOGGER.debug("doSelectByPartialText");
 				
 				DriverListener.setMessages(
 						Messager.SELECT_BY_TEXT_PERFORMED.getMessage(partialSelectText, getName()),
@@ -1693,6 +1700,7 @@ public class ExtendedWebElement {
 
 			@Override
 			public boolean doSelectByIndex(int index) {
+			    LOGGER.debug("doSelectByIndex");
 				DriverListener.setMessages(
 						Messager.SELECT_BY_INDEX_PERFORMED.getMessage(String.valueOf(index), getName()),
 						Messager.SELECT_BY_INDEX_NOT_PERFORMED.getMessage(String.valueOf(index), getNameWithLocator()));
@@ -1705,12 +1713,14 @@ public class ExtendedWebElement {
 
 			@Override
 			public String doGetSelectedValue() {
+			    LOGGER.debug("doGetSelectedValue");
 				final Select s = new Select(element);
 				return s.getAllSelectedOptions().get(0).getText();
 			}
 
 			@Override
 			public List<String> doGetSelectedValues() {
+			    LOGGER.debug("doGetSelectedValues");
 		        final Select s = new Select(getElement());
 		        List<String> values = new ArrayList<String>();
 		        for (WebElement we : s.getAllSelectedOptions()) {
@@ -1786,16 +1796,8 @@ public class ExtendedWebElement {
     }
     
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
-    	//generate the most popular wiatCondition to check if element visible or present
-    	ExpectedCondition<?> waitCondition = null;
-		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.visibilityOf(element), ExpectedConditions.presenceOfElementLocated(myBy));
-		} else {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.presenceOfElementLocated(myBy));
-		}
-		
-		return waitCondition;
+    	//generate the most popular wiatCondition to check if element present or visible
+		return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                ExpectedConditions.visibilityOfElementLocated(myBy));
     }
 }
