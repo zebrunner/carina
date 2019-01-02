@@ -1072,7 +1072,7 @@ public class ExtendedWebElement {
 
     	
     	return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
-				ExpectedConditions.invisibilityOf(element)), timeout);
+				ExpectedConditions.invisibilityOfElementLocated(getBy())), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
