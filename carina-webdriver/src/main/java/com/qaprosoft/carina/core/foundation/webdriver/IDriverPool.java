@@ -152,9 +152,7 @@ public interface IDriverPool {
 	public static WebDriver getDriver(SessionId sessionId) {
 		LOGGER.debug("Detecting WebDriver by sessionId...");
 
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
+		for (CarinaDriver carinaDriver : driversPool) {
 			WebDriver drv = carinaDriver.getDriver();
 			if (drv instanceof EventFiringWebDriver) {
 				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
@@ -203,12 +201,12 @@ public interface IDriverPool {
 			caps.setCapability("udid", device.getUdid());
 		}
 
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
+		for (CarinaDriver carinaDriver : driversPool) {
 			if (carinaDriver.getDriver().equals(drv)) {
 				quitDriver(carinaDriver.getDriver());
-				iter.remove();
+				// [VD] don't remove break or refactor moving removal out of "for" cycle
+				driversPool.remove(carinaDriver);
+				break;
 			}
 		}
 
@@ -233,22 +231,16 @@ public interface IDriverPool {
 	 *            String driver name
 	 */
 	default public void quitDriver(String name) {
-		Iterator<CarinaDriver> iter = driversPool.iterator();
 
 		WebDriver drv = null;
 		Long threadId = Thread.currentThread().getId();
 
-		boolean found = false;
-		while (iter.hasNext() && !found) {
-			CarinaDriver carinaDriver = iter.next();
-
-			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName())) {
-				drv = carinaDriver.getDriver();
-				found = true;
-			} else if (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName())) {
-				drv = carinaDriver.getDriver();
-				found=true;
-			}
+		for (CarinaDriver carinaDriver : driversPool) {
+            if ((Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName()))
+                    || (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName()))) {
+                drv = carinaDriver.getDriver();
+                break;
+            }
 		}
 
 		if (drv == null) {
@@ -256,26 +248,21 @@ public interface IDriverPool {
 		}
 
 		quitDriver(drv);
-		iter.remove();
+		driversPool.remove(drv);
 	}
 
 	/**
 	 * Quit current drivers by phase
 	 */
 	default public void quitDrivers(Phase phase) {
-		Iterator<CarinaDriver> iter = driversPool.iterator();
 
 		Long threadId = Thread.currentThread().getId();
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
-
+		for (CarinaDriver carinaDriver : driversPool) {
 			if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
 				quitDriver(carinaDriver.getDriver());
-				iter.remove();
 			}
 		}
-		
-        // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
+        driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
 	}
 
 	default void quitDriver(WebDriver drv) {
@@ -450,9 +437,7 @@ public interface IDriverPool {
 	default ConcurrentHashMap<String, CarinaDriver> getDrivers() {
 		Long threadId = Thread.currentThread().getId();
 		ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
-		Iterator<CarinaDriver> iter = driversPool.iterator();
-		while (iter.hasNext()) {
-			CarinaDriver carinaDriver = iter.next();
+		for (CarinaDriver carinaDriver : driversPool) {
 			if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
 				LOGGER.debug("Add suite_mode drivers into the getDrivers response: " + carinaDriver.getName());
 				currentDrivers.put(carinaDriver.getName(), carinaDriver);
@@ -487,9 +472,7 @@ public interface IDriverPool {
 	public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-        Iterator<CarinaDriver> iter = driversPool.iterator();
-        while (iter.hasNext()) {
-            CarinaDriver carinaDriver = iter.next();
+        for (CarinaDriver carinaDriver : driversPool) {
             if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
                 LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
                 currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
