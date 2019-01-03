@@ -798,7 +798,7 @@ public class ExtendedWebElement {
 		// found move to waitAction
 		//detectElement(); // it should do explicit findElement and reinitialize
 							// internal element member in case of success
-		if (element != null) {
+		if (!isMobile() && element != null) {
 			try {
 				if (element.isDisplayed()) {
 					return true;
@@ -810,9 +810,15 @@ public class ExtendedWebElement {
 
     	ExpectedCondition<?> waitCondition;
     	
+        // [VD] replace presenceOfElementLocated and visibilityOf conditions by single "visibilityOfElementLocated"
+        // visibilityOf: Does not check for presence of the element as the error explains it.
+        // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
+        // has a height and width greater than 0.
+    	
 		if (element != null) {
-			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.presenceOfElementLocated(getBy()));
+            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+                    ExpectedConditions.visibilityOf(element));
+            
 			boolean tmpResult = waitUntil(waitCondition, 0);
 
 			if (tmpResult) {
@@ -823,17 +829,17 @@ public class ExtendedWebElement {
 				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
 				try {
 					refindElement();
-					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element),
-							ExpectedConditions.presenceOfElementLocated(getBy()));
+					waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+					        ExpectedConditions.visibilityOf(element));
 				} catch (NoSuchElementException e) {
 					// search element based on By if exception was thrown
-					waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-							ExpectedConditions.presenceOfElementLocated(getBy()));
+					waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+					        ExpectedConditions.visibilityOfElementLocated(getBy()));
 				}
 			}
 		} else {
-			waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-					ExpectedConditions.presenceOfElementLocated(getBy()));
+			waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+			        ExpectedConditions.visibilityOfElementLocated(getBy()));
 		}
 
     	return waitUntil(waitCondition, timeout);
@@ -895,8 +901,8 @@ public class ExtendedWebElement {
 		ExpectedCondition<?> waitCondition;
 
 		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOf(element),
-					ExpectedConditions.visibilityOfElementLocated(getBy()));
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
+			        ExpectedConditions.visibilityOf(element));
 		} else {
 			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		}
@@ -1790,10 +1796,9 @@ public class ExtendedWebElement {
     	ExpectedCondition<?> waitCondition = null;
 		if (element != null) {
 			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.visibilityOf(element), ExpectedConditions.presenceOfElementLocated(myBy));
+					ExpectedConditions.visibilityOf(element));
 		} else {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.presenceOfElementLocated(myBy));
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy));
 		}
 		
 		return waitCondition;
