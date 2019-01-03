@@ -53,13 +53,7 @@ public class DevicePool {
     		return;
     	}
     	
-        boolean stfEnabled = R.CONFIG
-                .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-        if (stfEnabled) {
-            device.disconnectRemote();
-        }
-        
-    	
+        device.disconnectRemote();
         currentDevice.remove();
     }
 

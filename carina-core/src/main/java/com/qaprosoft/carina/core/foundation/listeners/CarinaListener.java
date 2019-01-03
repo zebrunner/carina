@@ -788,9 +788,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
-                DevicePool.deregisterDevice();
-/*                ProxyPool.stopProxy();
-
+                carinaDriver.getDevice().disconnectRemote();
+                ProxyPool.stopProxy();
                 try {
                     LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
@@ -798,7 +797,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 } catch (Exception e) {
                     // do nothing
                 }
-*/            }
+            }
         }
 
         @Override

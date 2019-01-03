@@ -57,11 +57,13 @@ public class Device extends RemoteDevice implements IDriverPool {
      * Store udids of devices where related apps were uninstalled
      */
     private static List<String> clearedDeviceUdids = new ArrayList<>();
+    private boolean isStfEnabled;
 
     AdbExecutor executor = new AdbExecutor();
 
     public Device() {
         this("", "", "", "", "", "");
+        this.isStfEnabled = false;
     }
 
     public Device(String name, String type, String os, String osVersion, String udid, String remoteURL) {
@@ -187,6 +189,8 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull())
             return;
 
+        isStfEnabled = true;
+        
         LOGGER.debug("adb connect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
         executor.execute(cmd);
@@ -202,6 +206,9 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     public void disconnectRemote() {
+        if (!isStfEnabled)
+            return;
+        
         if (isNull())
             return;
 

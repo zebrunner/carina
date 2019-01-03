@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -31,6 +30,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
+import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public class DriverPoolTest implements IDriverPool {
 
@@ -238,7 +238,8 @@ public class DriverPoolTest implements IDriverPool {
         }
 
         // new 6.0 approach to manipulate drivers via regular Set
-        CarinaDriver carinaDriver = new CarinaDriver(name, driver, TestPhase.getActivePhase(), threadId);
+        //TODO: cover by unit tests device pool registration for each driver
+        CarinaDriver carinaDriver = new CarinaDriver(name, driver, DevicePool.getNullDevice(), TestPhase.getActivePhase(), threadId);
         driversPool.add(carinaDriver);
     }
 

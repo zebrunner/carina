@@ -360,7 +360,7 @@ public interface IDriverPool {
                 }
 
                 // new 6.0 approach to manipulate drivers via regular Set
-                CarinaDriver carinaDriver = new CarinaDriver(name, drv, TestPhase.getActivePhase(), threadId);
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, DevicePool.getDevice(), TestPhase.getActivePhase(), threadId);
                 driversPool.add(carinaDriver);
                 // ---------- finish driver registration ----
 
