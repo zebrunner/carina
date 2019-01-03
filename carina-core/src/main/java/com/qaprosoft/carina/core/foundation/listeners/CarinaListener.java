@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -785,11 +784,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         private void quitAllDriversOnHook() {
             // as it is shutdown hook just try to quit all existing drivers one by one
 
-            Iterator<CarinaDriver> iter = driversPool.iterator();
-
-            while (iter.hasNext()) {
-                CarinaDriver carinaDriver = iter.next();
-
+            for (CarinaDriver carinaDriver : driversPool) {
                 // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
