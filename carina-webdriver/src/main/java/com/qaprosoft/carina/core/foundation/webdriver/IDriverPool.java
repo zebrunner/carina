@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -233,22 +232,25 @@ public interface IDriverPool {
 	default public void quitDriver(String name) {
 
 		WebDriver drv = null;
+		CarinaDriver carinaDrv = null;
 		Long threadId = Thread.currentThread().getId();
 
 		for (CarinaDriver carinaDriver : driversPool) {
             if ((Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName()))
                     || (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName()))) {
                 drv = carinaDriver.getDriver();
+                carinaDrv = carinaDriver;
                 break;
             }
 		}
 
-		if (drv == null) {
+		if (drv == null || carinaDrv == null) {
 			throw new RuntimeException("Unable to find driver '" + name + "'!");
 		}
+		
+        quitDriver(drv);
+        driversPool.remove(carinaDrv);
 
-		quitDriver(drv);
-		driversPool.remove(drv);
 	}
 
 	/**
