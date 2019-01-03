@@ -76,7 +76,8 @@ public class MobileFactory extends AbstractFactory {
         // use comparison for custom_capabilities here to localize as possible usage of
         // CUSTOM attribute
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty()) {
+        if (!customCapabilities.isEmpty()
+                && (customCapabilities.toLowerCase().contains("browserstack") || customCapabilities.toLowerCase().contains("saucelabs"))) {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
 
