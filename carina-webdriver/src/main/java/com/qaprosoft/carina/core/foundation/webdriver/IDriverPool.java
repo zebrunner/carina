@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -200,6 +201,7 @@ public interface IDriverPool {
 			caps.setCapability("udid", device.getUdid());
 		}
 
+		LOGGER.debug("before restartDriver: " + driversPool);
 		for (CarinaDriver carinaDriver : driversPool) {
 			if (carinaDriver.getDriver().equals(drv)) {
 				quitDriver(carinaDriver.getDriver());
@@ -208,6 +210,7 @@ public interface IDriverPool {
 				break;
 			}
 		}
+		LOGGER.debug("after restartDriver: " + driversPool);
 
 		return createDriver(DEFAULT, caps, null);
 	}
@@ -235,6 +238,7 @@ public interface IDriverPool {
 		CarinaDriver carinaDrv = null;
 		Long threadId = Thread.currentThread().getId();
 
+		LOGGER.debug("before quitDriver: " + driversPool);
 		for (CarinaDriver carinaDriver : driversPool) {
             if ((Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName()))
                     || (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName()))) {
@@ -250,6 +254,8 @@ public interface IDriverPool {
 		
         quitDriver(drv);
         driversPool.remove(carinaDrv);
+        
+        LOGGER.debug("after quitDriver: " + driversPool);
 
 	}
 
@@ -258,13 +264,21 @@ public interface IDriverPool {
 	 */
 	default public void quitDrivers(Phase phase) {
 
+	    Set<CarinaDriver> drivers4Remove = new HashSet<CarinaDriver>();
+	    
+	    LOGGER.debug("before quitDrivers: " + driversPool);
 		Long threadId = Thread.currentThread().getId();
 		for (CarinaDriver carinaDriver : driversPool) {
 			if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
 				quitDriver(carinaDriver.getDriver());
+				drivers4Remove.add(carinaDriver);
 			}
 		}
-        driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
+		driversPool.removeAll(drivers4Remove);
+		LOGGER.debug("after quitDrivers: " + driversPool);
+		
+		// don't use modern removeIf as it uses iterator!
+        // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
 	}
 
 	default void quitDriver(WebDriver drv) {
