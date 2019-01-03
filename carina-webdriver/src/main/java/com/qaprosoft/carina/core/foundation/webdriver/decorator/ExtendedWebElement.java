@@ -1602,7 +1602,7 @@ public class ExtendedWebElement {
 						Messager.KEYS_NOT_CLEARED_IN_ELEMENT.getMessage(getNameWithLocator()));
 				element.clear();
 
-				String textLog = (decryptedText.equals(text) ? "********" : text);
+				String textLog = (!decryptedText.equals(text) ? "********" : text);
 
 				DriverListener.setMessages(Messager.KEYS_SEND_TO_ELEMENT.getMessage(textLog, getName()),
 						Messager.KEYS_NOT_SEND_TO_ELEMENT.getMessage(textLog, getNameWithLocator()));
@@ -1616,7 +1616,7 @@ public class ExtendedWebElement {
 			    LOGGER.debug("doAttachFile");
 				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
 
-				String textLog = (decryptedText.equals(filePath) ? "********" : filePath);
+				String textLog = (!decryptedText.equals(filePath) ? "********" : filePath);
 
 				DriverListener.setMessages(Messager.FILE_ATTACHED.getMessage(textLog, getName()),
 						Messager.FILE_NOT_ATTACHED.getMessage(textLog, getNameWithLocator()));
