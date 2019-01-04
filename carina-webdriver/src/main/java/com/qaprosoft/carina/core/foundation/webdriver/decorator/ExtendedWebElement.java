@@ -355,13 +355,20 @@ public class ExtendedWebElement {
     			//TODO: use-case when format method is used. Need investigate howto init context in this case as well
     			element = searchContext.findElement(by);
     		} else {
+    		    LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
     			element = getDriver().findElement(by);	
     		}
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			//use available driver to research again...
 			//TODO: handle case with rootBy to be able to refind also lists etc
-    		element = getDriver().findElement(by);
+            if (searchContext != null) {
+                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
+                element = searchContext.findElement(by);
+            } else {
+                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
+                element = getDriver().findElement(by);  
+            }
     	} catch (WebDriverException e) {
     		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
     		element = getDriver().findElement(by);
@@ -1076,7 +1083,13 @@ public class ExtendedWebElement {
     	try {
         	//TODO: investigate maybe searchContext better to use here!
     		//do direct selenium/appium search without any extra validations
-    		element = getDriver().findElement(by);
+            if (searchContext != null) {
+                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
+                element = searchContext.findElement(by);
+            } else {
+                LOGGER.error("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
+                element = getDriver().findElement(by);  
+            }
     	} catch (NoSuchElementException e) {
     		//element not present so means disappear
     		return true;
@@ -1086,9 +1099,9 @@ public class ExtendedWebElement {
     		return true;
     	}
 
-    	
-    	return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
-				ExpectedConditions.invisibilityOf(element)), timeout);
+        return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
+                ExpectedConditions.invisibilityOfElementLocated(getBy()),
+                ExpectedConditions.invisibilityOf(element)), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
