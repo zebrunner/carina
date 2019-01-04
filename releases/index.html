@@ -440,6 +440,27 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#605-2019-01-04" title="6.0.5 (2019-01-04)" class="md-nav__link">
+    6.0.5 (2019-01-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#604-2018-12-27" title="6.0.4 (2018-12-27)" class="md-nav__link">
+    6.0.4 (2018-12-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#603-2018-12-21" title="6.0.3 (2018-12-21)" class="md-nav__link">
+    6.0.3 (2018-12-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#602-2018-12-04" title="6.0.2 (2018-12-04)" class="md-nav__link">
     6.0.2 (2018-12-04)
   </a>
@@ -527,6 +548,27 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#605-2019-01-04" title="6.0.5 (2019-01-04)" class="md-nav__link">
+    6.0.5 (2019-01-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#604-2018-12-27" title="6.0.4 (2018-12-27)" class="md-nav__link">
+    6.0.4 (2018-12-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#603-2018-12-21" title="6.0.3 (2018-12-21)" class="md-nav__link">
+    6.0.3 (2018-12-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#602-2018-12-04" title="6.0.2 (2018-12-04)" class="md-nav__link">
     6.0.2 (2018-12-04)
   </a>
@@ -602,6 +644,78 @@
                 
                 
                 <h1 id="release-notes">Release notes</h1>
+<h3 id="605-2019-01-04">6.0.5 (2019-01-04)</h3>
+<p><strong>Enhancements</strong></p>
+<ul>
+<li><a href="https://github.com/qaprosoft/carina/issues/565">#565</a> carina-api: api.validateResponseAgainstJSONSchema should support schema draft 7</li>
+<li>Set of improvements into the IDriverPool to make its modification threads safety</li>
+<li>Start global migration of MobileUtils to IMobileUtils interface </li>
+<li>Register device information in global driversPool for each driver session</li>
+<li>Moved drivers quit and devices disconnect onto the java shutdown hook to kill sessions even for aborted tests/jobs</li>
+<li>Saved information about integrated with STF device in Device object with automatic disconnect on finish</li>
+<li>Do not show encrypted text in logs (aka user credentials etc)</li>
+</ul>
+<p><strong>Fixes</strong></p>
+<ul>
+<li><a href="https://github.com/qaprosoft/carina/issues/594">#590</a> org.openqa.selenium.remote.RemoteWebDriver cannot be cast to io.appium.java_client.MobileDriver</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/590">#590</a> Device type is defined incorrectly in several cases for iOS/Android tests</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/588">#588</a> we still can generate ConcurrentModificationException during driver quit operation</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/574">#574</a> annoying INFO message in log for specific use-cases</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/459">#459</a> Enormous amount of logs appears in console on attempt to use element.clickIfPresent(3)</li>
+<li>Disabled screenshots capturing for two more driver failures: </li>
+<li>was terminated due to CLIENT_STOPPED_SESSION</li>
+<li>Session ID is null. Using WebDriver after calling quit()</li>
+<li>was terminated due to BROWSER_TIMEOUT</li>
+</ul>
+<p><strong>Known Issues</strong></p>
+<ul>
+<li>N/A</li>
+</ul>
+<p><strong>[DEPENDENCIES UPDATES]</strong></p>
+<ul>
+<li>N/A</li>
+</ul>
+<h3 id="604-2018-12-27">6.0.4 (2018-12-27)</h3>
+<p><strong>Fixes</strong></p>
+<ul>
+<li><a href="https://github.com/qaprosoft/carina/issues/553">#553</a> 6.0: Rebuild failures doesn't work</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/582">#582</a> Hardcoded parameters in carina archetype (-Dname and -Durl)</li>
+</ul>
+<p><strong>Known Issues</strong></p>
+<ul>
+<li>N/A</li>
+</ul>
+<p><strong>[DEPENDENCIES UPDATES]</strong></p>
+<ul>
+<li>zafira-client 3.3.47-&gt;3.3.49</li>
+</ul>
+<h3 id="603-2018-12-21">6.0.3 (2018-12-21)</h3>
+<p><strong>Enhancements</strong></p>
+<ul>
+<li><a href="https://github.com/qaprosoft/carina/issues/570">#570</a> Updated iDriverPool returning back automatic driver quit onto AfterMethod phase as it was in 5.3.x core. New approach was rejected due to the discovered regressions </li>
+<li><a href="https://github.com/qaprosoft/carina/issues/567">#567</a> Added new browsermob_host parameter to override automatically detected IP address for embedded proxy. Updated manual accordingly http://qaprosoft.github.io/carina/proxy</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/568">#568</a> Returned Chrome browser maximize to the default method removing old workaround with hardcoded dimension</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/576">576</a> Removed sensitive information from logs during onType and onAttachFile operations</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/574">#574</a> Removed invalid log4j appender and hide noisy log messages on startup</li>
+<li>Adjust custom_capabilities usage allowing not only define it globally  but generate for each driver session</li>
+</ul>
+<pre><code>  // start new driver with generated capabilities based on capabilities inside 
+  // Samsung_Galaxy_S8.properties property file
+   WebDriver drv = getDriver(&quot;name&quot;, new CapabilitiesLoader().getCapabilities(&quot;browserstack/android/Samsung_Galaxy_S8.properties&quot;))
+</code></pre>
+
+<ul>
+<li>Removed obsolete extra_capabilities configuration parameter </li>
+<li>Declared <a href="https://mvnrepository.com/repos/springio-plugins-release">Spring Plugins</a> repository in pom.xml to download from scratch monte-repack (javax.media.jai) dependency</li>
+</ul>
+<p><strong>Known Issues</strong></p>
+<ul>
+<li><a href="https://github.com/qaprosoft/carina/issues/553">#553</a> In the integration with Zafira environment rerun failures is still broke </li>
+</ul>
+<p><strong>[DEPENDENCIES UPDATES]</strong></p>
+<ul>
+<li>N/A</li>
+</ul>
 <h3 id="602-2018-12-04">6.0.2 (2018-12-04)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
