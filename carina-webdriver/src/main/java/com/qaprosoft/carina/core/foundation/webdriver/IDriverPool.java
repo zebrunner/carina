@@ -204,7 +204,7 @@ public interface IDriverPool {
         LOGGER.debug("before restartDriver: " + driversPool);
         for (CarinaDriver carinaDriver : driversPool) {
             if (carinaDriver.getDriver().equals(drv)) {
-                quitDriver(carinaDriver.getDriver());
+                quitDriver(carinaDriver);
                 // [VD] don't remove break or refactor moving removal out of "for" cycle
                 driversPool.remove(carinaDriver);
                 break;
@@ -252,7 +252,7 @@ public interface IDriverPool {
             throw new RuntimeException("Unable to find driver '" + name + "'!");
         }
 
-        quitDriver(drv);
+        quitDriver(carinaDrv);
         driversPool.remove(carinaDrv);
 
         LOGGER.debug("after quitDriver: " + driversPool);
@@ -273,7 +273,7 @@ public interface IDriverPool {
             beforeQuitDrivers += carinaDriver.getThreadId() + "-" + carinaDriver.getName() +";";
             
             if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
-                quitDriver(carinaDriver.getDriver());
+                quitDriver(carinaDriver);
                 drivers4Remove.add(carinaDriver);
             }
         }
@@ -291,11 +291,13 @@ public interface IDriverPool {
     }
 
     //TODO: [VD] make it as private after migrating to java 9+
-    default void quitDriver(WebDriver drv) {
+    default void quitDriver(CarinaDriver carinaDriver) {
         try {
-            DevicePool.deregisterDevice();
+            carinaDriver.getDevice().disconnectRemote();
+            //TODO: remove deregisterDevice later
+            DevicePool.deregisterDevice(); 
             ProxyPool.stopProxy();
-            drv.quit();
+            carinaDriver.getDriver().quit();
         } catch (WebDriverException e) {
             LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -374,10 +376,6 @@ public interface IDriverPool {
                     MDC.put("device", "[" + device.getName() + "] ");
                 }
                 
-                // new 6.0 approach to manipulate drivers via regular Set
-                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
-                driversPool.add(carinaDriver);
-
                 // moved proxy start logic here since device will be initialized
                 // here only
                 if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
@@ -394,10 +392,15 @@ public interface IDriverPool {
                         ProxyPool.startProxy(proxyPort);
                     }
                 }
+                
+                // new 6.0 approach to manipulate drivers via regular Set
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
+                driversPool.add(carinaDriver);
 
                 LOGGER.debug("initDriver finish...");
 
             } catch (Exception e) {
+                device.disconnectRemote();
                 // DevicePool.ignoreDevice();
                 DevicePool.deregisterDevice();
                 LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
