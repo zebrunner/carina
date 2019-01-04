@@ -1,0 +1,201 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "additionalProperties": false,
+  "required": [
+    "totalElements",
+    "pageNumber",
+    "pageSize",
+    "content"
+  ],
+  "properties": {
+    "totalElements": {
+      "$id": "#/properties/totalElements",
+      "type": "integer",
+      "title": "The Totalelements Schema",
+      "default": 0,
+      "examples": [
+        1017
+      ]
+    },
+    "pageNumber": {
+      "$id": "#/properties/pageNumber",
+      "type": "integer",
+      "title": "The Pagenumber Schema",
+      "default": "",
+      "examples": [
+        "1"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "pageSize": {
+      "$id": "#/properties/pageSize",
+      "type": "integer",
+      "title": "The Pagesize Schema",
+      "default": 0,
+      "examples": [
+        100
+      ]
+    },
+    "content": {
+      "$id": "#/properties/content",
+      "type": "array",
+      "title": "The Content Schema",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/properties/content/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "brand",
+          "clientName",
+          "clientDisplayName",
+          "clientFirstName",
+          "clientLastName",
+          "clientAddress",
+          "clientCity",
+          "clientState",
+          "clientZip",
+          "clientPhone",
+          "clientRegistrationDate",
+          "inPilot"
+        ],
+        "properties": {
+          "id": {
+            "$id": "#/properties/content/items/properties/id",
+            "type": "integer",
+            "title": "The Id Schema",
+            "default": 0,
+            "examples": [
+              104042
+            ]
+          },
+          "brand": {
+            "$id": "#/properties/content/items/properties/brand",
+            "type": "string",
+            "title": "The Brand Schema",
+            "default": "",
+            "examples": [
+              "ORTHO"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientName": {
+            "$id": "#/properties/content/items/properties/clientName",
+            "type": "string",
+            "title": "The Clientname Schema",
+            "default": "",
+            "examples": [
+              "Astoria Orthodontic Associates"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientDisplayName": {
+            "$id": "#/properties/content/items/properties/clientDisplayName",
+            "type": "string",
+            "title": "The Clientdisplayname Schema",
+            "default": "",
+            "examples": [
+              "Astoria Orthodontic Associates (Joseph Salierno)"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientFirstName": {
+            "$id": "#/properties/content/items/properties/clientFirstName",
+            "type": "string",
+            "title": "The Clientfirstname Schema",
+            "default": "",
+            "examples": [
+              "Joseph"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientLastName": {
+            "$id": "#/properties/content/items/properties/clientLastName",
+            "type": "string",
+            "title": "The Clientlastname Schema",
+            "default": "",
+            "examples": [
+              "Salierno"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientAddress": {
+            "$id": "#/properties/content/items/properties/clientAddress",
+            "type": "string",
+            "title": "The Clientaddress Schema",
+            "default": "",
+            "examples": [
+              "30-45 35th Street"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientCity": {
+            "$id": "#/properties/content/items/properties/clientCity",
+            "type": "string",
+            "title": "The Clientcity Schema",
+            "default": "",
+            "examples": [
+              "Astoria"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientState": {
+            "$id": "#/properties/content/items/properties/clientState",
+            "type": "string",
+            "title": "The Clientstate Schema",
+            "default": "",
+            "examples": [
+              "NY"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientZip": {
+            "$id": "#/properties/content/items/properties/clientZip",
+            "type": "string",
+            "title": "The Clientzip Schema",
+            "default": "",
+            "examples": [
+              "11103"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientPhone": {
+            "$id": "#/properties/content/items/properties/clientPhone",
+            "type": "string",
+            "title": "The Clientphone Schema",
+            "default": "",
+            "examples": [
+              "7182780808"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "clientRegistrationDate": {
+            "$id": "#/properties/content/items/properties/clientRegistrationDate",
+            "type": "string",
+            "title": "The Clientregistrationdate Schema",
+            "default": "",
+            "examples": [
+              "2012-04-09T00:00:00.000-04:00"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "inPilot": {
+            "$id": "#/properties/content/items/properties/inPilot",
+            "type": "boolean",
+            "title": "The Inpilot Schema",
+            "default": false,
+            "examples": [
+              false
+            ]
+          }
+        }
+      }
+    }
+  }
+}

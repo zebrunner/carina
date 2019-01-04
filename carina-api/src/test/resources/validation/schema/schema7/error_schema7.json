@@ -1,0 +1,6 @@
+Validation against Json schema failed: 
+
+#/pageNumber: expected type: Number, found: String
+#/content/0: required key [clientFirstName] not found
+#/content/1/clientZip: expected type: String, found: Integer
+#/content/1: extraneous key [not_exp] is not permitted
