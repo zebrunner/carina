@@ -38,7 +38,7 @@ public class JsonSchemaValidatorTest {
         boolean isErrorThrown = false;
         try {
 			JsonValidator.validateJsonAgainstSchema(schema, actualRs);
-        } catch (Exception e) {
+		} catch (AssertionError e) {
             System.out.println(e.getMessage());
             isErrorThrown = true;
             Assert.assertEquals(normalizeSpace(e.getMessage()), normalizeSpace(expectedError), "Error message not as expected");
@@ -58,7 +58,7 @@ public class JsonSchemaValidatorTest {
         boolean isErrorThrown = false;
         try {
             JsonValidator.validateJsonAgainstSchema(schema, actualRs);
-        } catch (Exception e) {
+		} catch (AssertionError e) {
             System.out.println(e.getMessage());
             isErrorThrown = true;
             Assert.assertEquals(normalizeSpace(e.getMessage()), normalizeSpace(expectedError), "Error message not as expected");
@@ -78,7 +78,7 @@ public class JsonSchemaValidatorTest {
         boolean isErrorThrown = false;
         try {
 			JsonValidator.validateJsonAgainstSchema(schema, actualRs);
-        } catch (Exception e) {
+		} catch (AssertionError e) {
             System.out.println(e.getMessage());
             isErrorThrown = true;
             Assert.assertEquals(normalizeSpace(e.getMessage()), normalizeSpace(expectedError), "Error message not as expected");

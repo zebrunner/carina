@@ -17,6 +17,8 @@ package com.qaprosoft.apitools.validation;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.everit.json.schema.Schema;
@@ -43,18 +45,24 @@ public class JsonValidator {
 		try {
 			JSONAssert.assertEquals(expectedJson, actualJson, new JsonKeywordsComparator(jsonCompareMode));
 		} catch (JSONException e) {
-			throw new RuntimeException(e);
+			throw new AssertionError(e);
 		}
 	}
 
 	public static void validateJsonAgainstSchema(String jsonSchema, String jsonData) {
-		if (jsonSchema.contains("http://json-schema.org/draft-03/schema")
-				|| jsonSchema.contains("http://json-schema.org/draft-04/schema")) {
-			LOGGER.info("JSON schema version draft-03/draft-04 was detected");
-			validateJsonAgainstSchemaV3V4(jsonSchema, jsonData);
+		Matcher m = Pattern.compile("\\d+", Pattern.MULTILINE).matcher(jsonSchema);
+		if (m.find()) {
+			int schemaVersion = Integer.valueOf(m.group());
+			if (schemaVersion <= 4) {
+				LOGGER.info("JSON schema of version below or equal to draft-04 was detected");
+				validateJsonAgainstSchemaV3V4(jsonSchema, jsonData);
+			} else {
+				LOGGER.info("JSON schema of version higher than draft-04 was detected");
+				validateJsonAgainstSchemaV6V7(jsonSchema, jsonData);
+			}
 		} else {
-			LOGGER.info("JSON schema version higher than draft-03/draft-04 was detected");
-			validateJsonAgainstSchemaV6V7(jsonSchema, jsonData);
+			LOGGER.warn("JSON schema version can not be detected");
+			validateJsonAgainstSchemaV3V4(jsonSchema, jsonData);
 		}
 	}
 
@@ -103,7 +111,7 @@ public class JsonValidator {
 				result.append(errorMsg);
 				result.append("\n");
 			}
-			throw new RuntimeException(result.toString());
+			throw new AssertionError(result.toString());
 		}
 	}
 
@@ -128,7 +136,7 @@ public class JsonValidator {
 			schema.validate(data);
 		} catch (ValidationException ex) {
 			ex.getAllMessages().stream().peek(e -> result.append("\n")).forEach(result::append);
-			throw new RuntimeException(result.toString());
+			throw new AssertionError(result.toString());
 		}
 	}
 }
