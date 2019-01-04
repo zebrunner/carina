@@ -801,10 +801,7 @@ public class ExtendedWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-		// perform at once super-fast single selenium call and only if nothing
-		// found move to waitAction
-		//detectElement(); // it should do explicit findElement and reinitialize
-							// internal element member in case of success
+		// perform at once super-fast single selenium call and only if nothing found move to waitAction
 		if (!isMobile() && element != null) {
 			try {
 				if (element.isDisplayed()) {
@@ -823,7 +820,7 @@ public class ExtendedWebElement {
         // has a height and width greater than 0.
     	
 		if (element != null) {
-            waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+            waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
                     ExpectedConditions.visibilityOf(element));
             
 			boolean tmpResult = waitUntil(waitCondition, 0);
@@ -835,18 +832,16 @@ public class ExtendedWebElement {
 			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
 				try {
-					refindElement();
-					waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-					        ExpectedConditions.visibilityOf(element));
+					element = refindElement();
+                    waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
+                            ExpectedConditions.visibilityOf(element));
 				} catch (NoSuchElementException e) {
 					// search element based on By if exception was thrown
-					waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-					        ExpectedConditions.visibilityOfElementLocated(getBy()));
+					waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 				}
 			}
 		} else {
-			waitCondition = ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-			        ExpectedConditions.visibilityOfElementLocated(getBy()));
+			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		}
 
     	return waitUntil(waitCondition, timeout);
