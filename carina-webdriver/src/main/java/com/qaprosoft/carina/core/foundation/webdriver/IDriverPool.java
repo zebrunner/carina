@@ -290,6 +290,7 @@ public interface IDriverPool {
         // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
     }
 
+    //TODO: [VD] make it as private after migrating to java 9+
     default void quitDriver(WebDriver drv) {
         try {
             DevicePool.deregisterDevice();
@@ -359,9 +360,6 @@ public interface IDriverPool {
                     Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
                 }
 
-                // new 6.0 approach to manipulate drivers via regular Set
-                CarinaDriver carinaDriver = new CarinaDriver(name, drv, DevicePool.getDevice(), TestPhase.getActivePhase(), threadId);
-                driversPool.add(carinaDriver);
                 // ---------- finish driver registration ----
 
                 init = true;
@@ -375,6 +373,10 @@ public interface IDriverPool {
                 if (!device.isNull()) {
                     MDC.put("device", "[" + device.getName() + "] ");
                 }
+                
+                // new 6.0 approach to manipulate drivers via regular Set
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
+                driversPool.add(carinaDriver);
 
                 // moved proxy start logic here since device will be initialized
                 // here only
