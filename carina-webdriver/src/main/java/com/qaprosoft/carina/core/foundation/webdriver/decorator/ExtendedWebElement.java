@@ -1087,8 +1087,8 @@ public class ExtendedWebElement {
     		return true;
     	}
 
-        return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
-                ExpectedConditions.invisibilityOfElementLocated(getBy()),
+        return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
+                ExpectedConditions.stalenessOf(element),
                 ExpectedConditions.invisibilityOf(element)), timeout);
     }
 
@@ -1793,15 +1793,8 @@ public class ExtendedWebElement {
     }
     
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
-    	//generate the most popular wiatCondition to check if element visible or present
-    	ExpectedCondition<?> waitCondition = null;
-		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.visibilityOf(element));
-		} else {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy));
-		}
-		
-		return waitCondition;
+        // generate the most popular wiatCondition to check if element visible or present
+        return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                ExpectedConditions.visibilityOfElementLocated(myBy));
     }
 }
