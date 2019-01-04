@@ -322,6 +322,10 @@ public class ExtendedWebElement {
 			LOGGER.debug("waitUntil: TimeoutException e..." + getNameWithLocator());
 			result = false;
 			originalException = e.getCause();
+		} catch (WebDriverException e) {
+            LOGGER.debug("waitUntil: WebDriverException e..." + getNameWithLocator());
+            result = false;
+            originalException = e.getCause();
 		}
 		catch (Exception e) {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
