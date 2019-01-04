@@ -322,6 +322,10 @@ public class ExtendedWebElement {
 			LOGGER.debug("waitUntil: TimeoutException e..." + getNameWithLocator());
 			result = false;
 			originalException = e.getCause();
+		} catch (WebDriverException e) {
+            LOGGER.debug("waitUntil: WebDriverException e..." + getNameWithLocator());
+            result = false;
+            originalException = e.getCause();
 		}
 		catch (Exception e) {
 			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
@@ -819,29 +823,22 @@ public class ExtendedWebElement {
         // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
         // has a height and width greater than 0.
     	
-		if (element != null) {
-            waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                    ExpectedConditions.visibilityOf(element));
-            
-			boolean tmpResult = waitUntil(waitCondition, 0);
+        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+		boolean tmpResult = waitUntil(waitCondition, 0);
 
-			if (tmpResult) {
-				return true;
-			}
+		if (tmpResult) {
+			return true;
+		}
 
-			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
-				try {
-					element = refindElement();
-                    waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                            ExpectedConditions.visibilityOf(element));
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-					waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-				}
+		if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+			LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+			try {
+				element = refindElement();
+                waitCondition = ExpectedConditions.visibilityOf(element);
+			} catch (NoSuchElementException e) {
+				// search element based on By if exception was thrown
+				waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 			}
-		} else {
-			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		}
 
     	return waitUntil(waitCondition, timeout);
@@ -1094,8 +1091,8 @@ public class ExtendedWebElement {
     		return true;
     	}
 
-        return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
-                ExpectedConditions.invisibilityOfElementLocated(getBy()),
+        return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
+                ExpectedConditions.stalenessOf(element),
                 ExpectedConditions.invisibilityOf(element)), timeout);
     }
 
@@ -1800,15 +1797,8 @@ public class ExtendedWebElement {
     }
     
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
-    	//generate the most popular wiatCondition to check if element visible or present
-    	ExpectedCondition<?> waitCondition = null;
-		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy),
-					ExpectedConditions.visibilityOf(element));
-		} else {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy));
-		}
-		
-		return waitCondition;
+        // generate the most popular wiatCondition to check if element visible or present
+        return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                ExpectedConditions.visibilityOfElementLocated(myBy));
     }
 }

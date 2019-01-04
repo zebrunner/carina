@@ -122,7 +122,7 @@ public class DriverPoolTest implements IDriverPool {
 
     @Test(dependsOnMethods = { "registerDefaultDriver", "registerTwiceDefaultDriver" })
     public void deregisterDefaultDriver() {
-        quitDriver(mockDriverDefault);
+        quitDriver();
         deregisterDriver(mockDriverDefault);
         Assert.assertFalse(isDriverRegistered(IDriverPool.DEFAULT), "Default driver is not deregistered!");
         LOGGER.info("drivers count: " + getDriversCount());
