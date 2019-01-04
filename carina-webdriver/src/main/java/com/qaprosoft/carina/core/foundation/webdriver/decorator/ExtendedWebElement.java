@@ -819,29 +819,22 @@ public class ExtendedWebElement {
         // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
         // has a height and width greater than 0.
     	
-		if (element != null) {
-            waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                    ExpectedConditions.visibilityOf(element));
-            
-			boolean tmpResult = waitUntil(waitCondition, 0);
+        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+		boolean tmpResult = waitUntil(waitCondition, 0);
 
-			if (tmpResult) {
-				return true;
-			}
+		if (tmpResult) {
+			return true;
+		}
 
-			if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
-				try {
-					element = refindElement();
-                    waitCondition = ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                            ExpectedConditions.visibilityOf(element));
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-					waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-				}
+		if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+			LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+			try {
+				element = refindElement();
+                waitCondition = ExpectedConditions.visibilityOf(element);
+			} catch (NoSuchElementException e) {
+				// search element based on By if exception was thrown
+				waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 			}
-		} else {
-			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		}
 
     	return waitUntil(waitCondition, timeout);
