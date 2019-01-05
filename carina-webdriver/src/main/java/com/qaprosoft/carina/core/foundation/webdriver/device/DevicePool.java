@@ -46,17 +46,6 @@ public class DevicePool {
         return device;
     }
 
-    public static void deregisterDevice() {
-    	Device device = currentDevice.get();
-    	if (device == null) {
-    		LOGGER.debug("Unable to deregister null device!");
-    		return;
-    	}
-    	
-        device.disconnectRemote();
-        currentDevice.remove();
-    }
-
     public static Device getDevice() {
         long threadId = Thread.currentThread().getId();
         Device device = currentDevice.get();

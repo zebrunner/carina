@@ -292,8 +292,6 @@ public interface IDriverPool {
     default void quitDriver(CarinaDriver carinaDriver) {
         try {
             carinaDriver.getDevice().disconnectRemote();
-            //TODO: remove deregisterDevice later
-            DevicePool.deregisterDevice(); 
             ProxyPool.stopProxy();
             carinaDriver.getDriver().quit();
         } catch (WebDriverException e) {
@@ -388,8 +386,8 @@ public interface IDriverPool {
 
             } catch (Exception e) {
                 device.disconnectRemote();
-                // DevicePool.ignoreDevice();
-                DevicePool.deregisterDevice();
+                //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
+                // but initially try to implement it on selenium-hub level
                 LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
                         maxCount, e.getMessage()), e);
                 init_throwable = e;
