@@ -26,6 +26,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -210,14 +211,17 @@ public class DriverPoolTest implements IDriverPool {
         
         Assert.assertEquals(getDriver(), deviceDriver, "Returned driver is not the same as registered!");
         Assert.assertEquals(getDevice(), device, "Returned device is not the same as registered!");
-        
+        quitDrivers(Phase.ALL);
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Test(dependsOnMethods = { "registerDriverWithDevice" }, expectedExceptions = {
+            DriverPoolException.class }, expectedExceptionsMessageRegExp = "no default driver detected!")
+    public void getDefaultNotExistedDriver() {
+        IDriverPool.getDefaultDriver();
     }
 
-/*    @AfterSuite()
-    public void afterSuite() {
-        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
-    }
-*/     
+   
     private void changeBeforeSuiteDriverThread() {
         for (CarinaDriver cDriver : driversPool) {
             if (Phase.BEFORE_SUITE.equals(cDriver.getPhase())) {
@@ -257,8 +261,6 @@ public class DriverPoolTest implements IDriverPool {
         int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
         if (currentDrivers.size() == maxDriverCount) {
-            // TODO: after moving driver creation to DriverPoolEx need to add
-            // such verification before driver start
             Assert.fail("Unable to register driver as you reached max number of drivers per thread: " + maxDriverCount);
         }
         if (currentDrivers.containsKey(name)) {
@@ -266,7 +268,6 @@ public class DriverPoolTest implements IDriverPool {
         }
 
         // new 6.0 approach to manipulate drivers via regular Set
-        //TODO: cover by unit tests device pool registration for each driver
         CarinaDriver carinaDriver = new CarinaDriver(name, driver, device, TestPhase.getActivePhase(), threadId);
         driversPool.add(carinaDriver);
     }
