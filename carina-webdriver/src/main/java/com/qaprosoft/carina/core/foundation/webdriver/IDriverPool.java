@@ -199,7 +199,7 @@ public interface IDriverPool {
         DesiredCapabilities caps = new DesiredCapabilities();
 
         if (isSameDevice) {
-            device = getDevice();
+            device = getDefaultDevice();
             LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
         }
@@ -359,7 +359,7 @@ public interface IDriverPool {
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
                     // the test thread
-                    device = getDevice();
+                    device = getDefaultDevice();
                 }
                 // push custom device name for log4j default messages
                 if (!device.isNull()) {
@@ -505,29 +505,66 @@ public interface IDriverPool {
         return currentDrivers;
     }
 
-    
-    public static Device registerDevice(Device device) {
+    // ------------------------ DEVICE POOL METHODS -----------------------
+    /**
+     * Get device registered to default driver. If no default driver discovered nullDevice will be returned.
+     * 
+     * @return default Device
+     */
+    default public Device getDevice() {
+        return getDevice(DEFAULT);
+    }
+
+    /**
+     * Get device registered to named driver. If no driver discovered nullDevice will be returned.
+     * 
+     * @param name
+     *            String driver name
+     * @return Device
+     */
+    default public Device getDevice(String name) {
+        if (isDriverRegistered(name)) {
+            return getDrivers().get(name).getDevice();
+        } else {
+            return nullDevice;
+        }
         
+    }
+
+    /**
+     * Register device information for current thread by MobileFactory and clear SysLog for Android only
+     * 
+     * @return Device device
+     * 
+     */
+    public static Device registerDevice(Device device) {
+
         boolean stfEnabled = R.CONFIG
                 .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
         if (stfEnabled) {
             device.connectRemote();
         }
-        
+
         // register current device to be able to transfer it into Zafira at the end of the test
         long threadId = Thread.currentThread().getId();
         LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
         currentDevice.set(device);
-        
+
         LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
         // clear logcat log for Android devices
         device.clearSysLog();
-        
+
         return device;
     }
 
-    public static Device getDevice() {
+    /**
+     * Return last registered device information for current thread.
+     * 
+     * @return Device device
+     * 
+     */
+    public static Device getDefaultDevice() {
         long threadId = Thread.currentThread().getId();
         Device device = currentDevice.get();
         if (device == null) {
@@ -541,10 +578,22 @@ public interface IDriverPool {
         return device;
     }
 
+    /**
+     * Return nullDevice object to avoid NullPointerException and tons of verification across carina-core modules.
+     * 
+     * @return Device device
+     * 
+     */
     public static Device getNullDevice() {
         return nullDevice;
     }
 
+    /**
+     * Verify if device is registered in the Pool
+     * 
+     * 
+     * @return boolean
+     */
     default public boolean isRegistered() {
         Device device = currentDevice.get();
         return device != null;

@@ -188,8 +188,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String getDeviceName() {
-        String deviceName = IDriverPool.getDevice().getName();
-        String deviceUdid = IDriverPool.getDevice().getUdid();
+        String deviceName = IDriverPool.getDefaultDevice().getName();
+        String deviceUdid = IDriverPool.getDefaultDevice().getUdid();
 
         if (!deviceName.isEmpty() && !deviceUdid.isEmpty()) {
             deviceName = deviceName + " - " + deviceUdid;
@@ -211,7 +211,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
         
         // device log
-        Device device = IDriverPool.getDevice();
+        Device device = IDriverPool.getDefaultDevice();
         if (!device.isNull()) {
             LOGGER.debug("Device isn't null additional artifacts will be extracted.");
             File sysLogFile = device.saveSysLog();

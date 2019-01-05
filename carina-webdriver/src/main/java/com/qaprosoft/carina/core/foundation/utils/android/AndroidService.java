@@ -120,7 +120,7 @@ public class AndroidService implements IDriverPool {
      * @return String command output in one line
      */
     public String executeAdbCommand(String command) {
-        String deviceName = IDriverPool.getDevice().getAdbName();
+        String deviceName = IDriverPool.getDefaultDevice().getAdbName();
         if (!deviceName.isEmpty()) {
             // add remoteURL/udid reference
             command = "-s " + deviceName + " " + command;
@@ -376,7 +376,7 @@ public class AndroidService implements IDriverPool {
      */
     public List<Notification> getNotifications(boolean withLogger) {
         String[] getNotificationsCmd = null;
-        String deviceName = IDriverPool.getDevice().getAdbName();
+        String deviceName = IDriverPool.getDefaultDevice().getAdbName();
         if (!deviceName.isEmpty()) {
             getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", deviceName, "shell", "dumpsys", "notification");
         } else {
@@ -680,7 +680,7 @@ public class AndroidService implements IDriverPool {
 
         String initLanguage = language;
 
-        String currentAndroidVersion = IDriverPool.getDevice().getOsVersion();
+        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
 
         LOGGER.info("Do not concat language for Android. Keep: " + language);
         language = language.replace("_", "-");
@@ -741,7 +741,7 @@ public class AndroidService implements IDriverPool {
                 LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
-                currentAndroidVersion = IDriverPool.getDevice().getOsVersion();
+                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
                 LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
                     LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
@@ -1052,10 +1052,10 @@ public class AndroidService implements IDriverPool {
             return true;
         }
 
-        String currentAndroidVersion = IDriverPool.getDevice().getOsVersion();
+        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
         if (currentAndroidVersion.contains("7.") ||
-                (IDriverPool.getDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
+                (IDriverPool.getDefaultDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
             LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
             workflow = ChangeTimeZoneWorkflow.APK;
         }

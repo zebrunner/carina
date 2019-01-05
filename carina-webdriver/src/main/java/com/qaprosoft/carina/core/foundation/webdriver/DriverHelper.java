@@ -89,7 +89,7 @@ public class DriverHelper {
         this.driver = driver;
 
         if (driver == null) {
-            throw new RuntimeException("[" + IDriverPool.getDevice().getName() + "] WebDriver not initialized, check log files for details!");
+            throw new RuntimeException("[" + IDriverPool.getDefaultDevice().getName() + "] WebDriver not initialized, check log files for details!");
         }
 
     }

@@ -75,7 +75,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         long threadId = Thread.currentThread().getId();
 
         // add custom arguments from current mobile device
-        Device device = IDriverPool.getDevice();
+        Device device = IDriverPool.getDefaultDevice();
         if (!device.getName().isEmpty()) {
             String deviceName = device.getName();
             String deviceOs = device.getOs();

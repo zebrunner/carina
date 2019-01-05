@@ -66,9 +66,9 @@ public class CustomTypePageFactory implements IDriverPool {
                 .getSubTypesOf(parentClass);
         LOGGER.debug("Relatives classes count:" + setClasses.size());
         Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
-        Type screenType = IDriverPool.getDevice().getDeviceType();
+        Type screenType = IDriverPool.getDefaultDevice().getDeviceType();
 
-        Device device = IDriverPool.getDevice();
+        Device device = IDriverPool.getDefaultDevice();
         // default version in case if it is desktop driver
         String deviceVersion = "1";
         if (!device.getOsVersion().isEmpty()) {

@@ -145,7 +145,7 @@ public class FakeGpsPage extends MobileAbstractPage {
         if (openSettingsButton.isElementPresent(MINIMAL_TIMEOUT)) {
             openSettingsButton.clickIfPresent(DELAY);
 
-            String currentAndroidVersion = IDriverPool.getDevice().getOsVersion();
+            String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
             LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
             if (currentAndroidVersion.contains("7.")) {
                 MobileUtils.swipe(allowMock7, devSettingsContainer);

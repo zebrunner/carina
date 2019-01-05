@@ -470,7 +470,7 @@ public interface IMobileUtils extends IDriverPool {
         double maxCoefficient = 0.6;
 
         // calculate default coefficient based on OS type
-        String os = IDriverPool.getDevice().getOs();
+        String os = IDriverPool.getDefaultDevice().getOs();
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             minCoefficient = 0.25;
             maxCoefficient = 0.5;
@@ -653,7 +653,7 @@ public interface IMobileUtils extends IDriverPool {
     default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
         try {
             String baseApp = "";
-            String os = IDriverPool.getDevice().getOs();
+            String os = IDriverPool.getDefaultDevice().getOs();
             if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
                 AndroidService androidService = AndroidService.getInstance();

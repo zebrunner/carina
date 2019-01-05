@@ -42,7 +42,7 @@ public class AppManager {
 
     public String getFullPackageByName(final String name) {
         if (!packagesByName.containsKey(name)) {
-            String resultPackage = IDriverPool.getDevice().getFullPackageByName(name);
+            String resultPackage = IDriverPool.getDefaultDevice().getFullPackageByName(name);
             packagesByName.put(name, resultPackage.replace("package:", ""));
         }
         return packagesByName.get(name);

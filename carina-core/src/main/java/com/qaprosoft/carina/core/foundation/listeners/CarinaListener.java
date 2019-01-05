@@ -413,9 +413,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (!IDriverPool.getDevice().isNull()) {
+        if (!IDriverPool.getDefaultDevice().isNull()) {
             // Samsung - Android 4.4.2; iPhone - iOS 7
-            Device device = IDriverPool.getDevice();
+            Device device = IDriverPool.getDefaultDevice();
             String deviceTemplate = "%s - %s %s";
             deviceName = String.format(deviceTemplate, device.getName(), device.getOs(), device.getOsVersion());
         }
