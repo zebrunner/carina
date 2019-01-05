@@ -19,10 +19,10 @@
 * [#588](https://github.com/qaprosoft/carina/issues/588) we still can generate ConcurrentModificationException during driver quit operation
 * [#574](https://github.com/qaprosoft/carina/issues/574) annoying INFO message in log for specific use-cases
 * [#459](https://github.com/qaprosoft/carina/issues/459) Enormous amount of logs appears in console on attempt to use element.clickIfPresent(3)
-* Disabled screenshots capturing for two more driver failures: 
-  * was terminated due to CLIENT_STOPPED_SESSION
-  * Session ID is null. Using WebDriver after calling quit()
-  * was terminated due to BROWSER_TIMEOUT
+* Disabled screenshots capturing for three more driver failures: 
+   * was terminated due to CLIENT_STOPPED_SESSION
+   * Session ID is null. Using WebDriver after calling quit()
+   * was terminated due to BROWSER_TIMEOUT
 
 **Known Issues**
 
