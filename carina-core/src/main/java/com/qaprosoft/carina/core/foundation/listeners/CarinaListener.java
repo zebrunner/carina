@@ -287,8 +287,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private void onTestFinish(ITestResult result) {
         try {
             if (!hasDependencies(result)) {
-                quitDrivers(Phase.BEFORE_METHOD);
-                quitDrivers(Phase.METHOD);
+                quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
 
             // TODO: improve later removing duplicates with AbstractTestListener

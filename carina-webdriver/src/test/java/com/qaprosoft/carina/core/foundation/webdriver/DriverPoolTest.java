@@ -30,6 +30,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public class DriverPoolTest implements IDriverPool {
 
@@ -195,6 +196,21 @@ public class DriverPoolTest implements IDriverPool {
         Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
         registerDriver(mockDriverCustom1, CUSTOM1);
         Assert.assertEquals(getDriversCount(), 2, "Number of registered driver is not valid!");
+        
+        quitDrivers(Phase.ALL);
+        Assert.assertEquals(getDriversCount(), 0, "Number of registered driver is not valid!");
+    }
+    
+    @Test(dependsOnMethods = { "deregisterAllDrivers" })
+    public void registerDriverWithDevice() {
+        WebDriver deviceDriver = mock(WebDriver.class);
+        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl");
+        registerDriver(deviceDriver, IDriverPool.DEFAULT, device);
+        Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
+        
+        Assert.assertEquals(getDriver(), deviceDriver, "Returned driver is not the same as registered!");
+        Assert.assertEquals(getDevice(), device, "Returned device is not the same as registered!");
+        
     }
 
 /*    @AfterSuite()
@@ -216,12 +232,25 @@ public class DriverPoolTest implements IDriverPool {
      * 
      * @param driver
      *            WebDriver
-     * 
      * @param name
      *            String driver name
      * 
      */
     private void registerDriver(WebDriver driver, String name) {
+        registerDriver(driver, name, IDriverPool.getNullDevice());
+    }
+    /**
+     * Register driver in the DriverPool with device
+     * 
+     * @param driver
+     *            WebDriver
+     * @param name
+     *            String driver name
+     * @param device
+     *            Device
+     * 
+     */
+    private void registerDriver(WebDriver driver, String name, Device device) {
         Long threadId = Thread.currentThread().getId();
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
 
@@ -238,7 +267,7 @@ public class DriverPoolTest implements IDriverPool {
 
         // new 6.0 approach to manipulate drivers via regular Set
         //TODO: cover by unit tests device pool registration for each driver
-        CarinaDriver carinaDriver = new CarinaDriver(name, driver, IDriverPool.getNullDevice(), TestPhase.getActivePhase(), threadId);
+        CarinaDriver carinaDriver = new CarinaDriver(name, driver, device, TestPhase.getActivePhase(), threadId);
         driversPool.add(carinaDriver);
     }
 

@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 //TODO: move into better module/package
 public class TestPhase {
     public enum Phase {
-    	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE;
+    	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
     }
 
     //TODO: organize phases verification:

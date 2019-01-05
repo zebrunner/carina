@@ -15,7 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -263,9 +265,13 @@ public interface IDriverPool {
     }
 
     /**
-     * Quit current drivers by phase
+     * Quit current drivers by phase(s). "Current" means assigned to the current test/thread.
+     * 
+     * @param phase
+     *            Comma separated driver phases to quit
      */
-    default public void quitDrivers(Phase phase) {
+    default public void quitDrivers(Phase...phase) {
+        List<Phase> phases = Arrays.asList(phase);
 
         Set<CarinaDriver> drivers4Remove = new HashSet<CarinaDriver>();
 
@@ -275,7 +281,8 @@ public interface IDriverPool {
         for (CarinaDriver carinaDriver : driversPool) {
             beforeQuitDrivers += carinaDriver.getThreadId() + "-" + carinaDriver.getName() +";";
             
-            if (phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId())) {
+            if ((phases.contains(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()))
+                    || phases.contains(Phase.ALL)) {
                 quitDriver(carinaDriver);
                 drivers4Remove.add(carinaDriver);
             }
@@ -594,8 +601,8 @@ public interface IDriverPool {
      * 
      * @return boolean
      */
-    default public boolean isRegistered() {
+    default public boolean isDeviceRegistered() {
         Device device = currentDevice.get();
-        return device != null;
+        return device != null && device != nullDevice;
     }
 }
