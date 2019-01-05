@@ -170,8 +170,6 @@ public interface IDriverPool {
         }
 
         throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
-        // TODO: take a look into the replaceDriver case and how sessionId are
-        // regenerated on page objects
     }
 
     /**
@@ -283,8 +281,8 @@ public interface IDriverPool {
             afterQuitDrivers += carinaDriver.getThreadId() + "-" + carinaDriver.getName() +";";
         }
         
-        LOGGER.info("beforeQuitDrivers: " + beforeQuitDrivers);
-        LOGGER.info("afterQuitDrivers: " + afterQuitDrivers);
+        LOGGER.debug("beforeQuitDrivers: " + beforeQuitDrivers);
+        LOGGER.debug("afterQuitDrivers: " + afterQuitDrivers);
         
         // don't use modern removeIf as it uses iterator!
         // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
@@ -302,16 +300,8 @@ public interface IDriverPool {
             LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
         } catch (Exception e) {
-            LOGGER.debug("Error discovered during driver quit: " + e.getMessage(), e);
-
-            // TODO: it seems like BROWSER_TIMEOUT or NODE_FORWARDING should be
-            // handled here as well
-            if (!e.getMessage().contains("Session ID is null.")) {
-                throw e;
-            }
-
+            LOGGER.error("Error discovered during driver quit: " + e.getMessage(), e);
         } finally {
-            // TODO analyze how to forcibly kill session on device
             MDC.remove("device");
         }
     }
@@ -352,9 +342,6 @@ public interface IDriverPool {
                 int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
                 if (currentDrivers.size() == maxDriverCount) {
-                    // TODO: after moving driver creation to DriverPoolEx need
-                    // to add
-                    // such verification before driver start
                     Assert.fail("Unable to register driver as you reached max number of drivers per thread: "
                             + maxDriverCount);
                 }
@@ -430,7 +417,7 @@ public interface IDriverPool {
         return getDrivers().containsKey(name);
     }
 
-    // TODO: think about hiding getDriversCount and removing size
+    // TODO: think about hiding getDriversCount and removing size when migration to java 9+ happens
     /**
      * Return number of registered driver per thread
      * 
