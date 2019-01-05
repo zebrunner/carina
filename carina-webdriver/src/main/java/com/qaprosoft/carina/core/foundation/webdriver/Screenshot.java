@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -47,9 +46,9 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
@@ -166,7 +165,7 @@ public class Screenshot {
         String screenName = capture(driver, true, comment, true);
 
         // XML layout extraction
-        File uiDumpFile = DevicePool.getDevice().generateUiDump(screenName);
+        File uiDumpFile = IDriverPool.getDevice().generateUiDump(screenName);
         if (uiDumpFile != null) {
             uiDumpFile.getPath().split("\\/");
         }

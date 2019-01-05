@@ -30,14 +30,15 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 public interface IDriverPool {
     static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
@@ -48,6 +49,10 @@ public interface IDriverPool {
     @SuppressWarnings("static-access")
     static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
     // static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
+    
+    //TODO: [VD] make device related param private after migrating to java 9+
+    static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
+    static final Device nullDevice = new Device();
 
     /**
      * Get default driver. If no default driver discovered it will be created.
@@ -190,11 +195,11 @@ public interface IDriverPool {
      */
     default public WebDriver restartDriver(boolean isSameDevice) {
         WebDriver drv = getDriver(DEFAULT);
-        Device device = DevicePool.getNullDevice();
+        Device device = nullDevice;
         DesiredCapabilities caps = new DesiredCapabilities();
 
         if (isSameDevice) {
-            device = DevicePool.getDevice();
+            device = getDevice();
             LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
         }
@@ -321,7 +326,7 @@ public interface IDriverPool {
         int count = 0;
         WebDriver drv = null;
         Throwable init_throwable = null;
-        Device device = DevicePool.getNullDevice();
+        Device device = nullDevice;
 
         // 1 - is default run without retry
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
@@ -354,7 +359,7 @@ public interface IDriverPool {
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
                     // the test thread
-                    device = DevicePool.getDevice();
+                    device = getDevice();
                 }
                 // push custom device name for log4j default messages
                 if (!device.isNull()) {
@@ -500,4 +505,48 @@ public interface IDriverPool {
         return currentDrivers;
     }
 
+    
+    public static Device registerDevice(Device device) {
+        
+        boolean stfEnabled = R.CONFIG
+                .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
+        if (stfEnabled) {
+            device.connectRemote();
+        }
+        
+        // register current device to be able to transfer it into Zafira at the end of the test
+        long threadId = Thread.currentThread().getId();
+        LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
+        currentDevice.set(device);
+        
+        LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
+
+        // clear logcat log for Android devices
+        device.clearSysLog();
+        
+        return device;
+    }
+
+    public static Device getDevice() {
+        long threadId = Thread.currentThread().getId();
+        Device device = currentDevice.get();
+        if (device == null) {
+            LOGGER.debug("Current device is null for thread: " + threadId);
+            device = nullDevice;
+        } else if (device.getName().isEmpty()) {
+            LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
+        } else {
+            LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
+        }
+        return device;
+    }
+
+    public static Device getNullDevice() {
+        return nullDevice;
+    }
+
+    default public boolean isRegistered() {
+        Device device = currentDevice.get();
+        return device != null;
+    }
 }

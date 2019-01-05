@@ -71,11 +71,11 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
 
 /*
@@ -413,9 +413,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (!DevicePool.getDevice().isNull()) {
+        if (!IDriverPool.getDevice().isNull()) {
             // Samsung - Android 4.4.2; iPhone - iOS 7
-            Device device = DevicePool.getDevice();
+            Device device = IDriverPool.getDevice();
             String deviceTemplate = "%s - %s %s";
             deviceName = String.format(deviceTemplate, device.getName(), device.getOs(), device.getOsVersion());
         }

@@ -32,10 +32,10 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
 
@@ -49,7 +49,6 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoType;
 import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
-import io.appium.java_client.screenrecording.ScreenRecordingUploadOptions;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -147,7 +146,7 @@ public class MobileFactory extends AbstractFactory {
                 }
             }
 
-            Device device = DevicePool.getNullDevice();
+            Device device = IDriverPool.getNullDevice();
             if (device.isNull()) {
                 RemoteDevice remoteDevice = getDeviceInfo(driver);
                 // 3rd party solutions like browserstack or saucelabs return not null
@@ -157,7 +156,7 @@ public class MobileFactory extends AbstractFactory {
                     device = new Device(driver.getCapabilities());
                 }
 
-                DevicePool.registerDevice(device);
+                IDriverPool.registerDevice(device);
             }
             // will be performed just in case uninstall_related_apps flag marked as true
             device.uninstallRelatedApps();

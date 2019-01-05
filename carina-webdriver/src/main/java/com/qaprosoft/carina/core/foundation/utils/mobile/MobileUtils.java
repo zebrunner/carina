@@ -33,7 +33,6 @@ import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
@@ -471,7 +470,7 @@ public class MobileUtils {
         double maxCoefficient = 0.6;
 
         // calculate default coefficient based on OS type
-        String os = DevicePool.getDevice().getOs();
+        String os = IDriverPool.getDevice().getOs();
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             minCoefficient = 0.25;
             maxCoefficient = 0.5;
@@ -654,7 +653,7 @@ public class MobileUtils {
     public static void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
         try {
             String baseApp = "";
-            String os = DevicePool.getDevice().getOs();
+            String os = IDriverPool.getDevice().getOs();
             if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
                 AndroidService androidService = AndroidService.getInstance();

@@ -37,8 +37,8 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership.OwnerType;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.zafira.config.IConfigurator;
 import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -75,7 +75,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         long threadId = Thread.currentThread().getId();
 
         // add custom arguments from current mobile device
-        Device device = DevicePool.getDevice();
+        Device device = IDriverPool.getDevice();
         if (!device.getName().isEmpty()) {
             String deviceName = device.getName();
             String deviceOs = device.getOs();
