@@ -136,6 +136,8 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
 
         setProxyPort(proxyPort);
+        
+        setCapabilities(capabilities);
     }
 
     public boolean isPhone() {

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.commons.models;
 
+import org.openqa.selenium.Capabilities;
+
 /**
  * RemoteDevice represents base device info used in Selenium Hub.
  * 
@@ -29,6 +31,7 @@ public class RemoteDevice {
     private String remoteURL;
     private String vnc;
     private String proxyPort;
+    private Capabilities capabilities;
 
     public String getName() {
         return name;
@@ -92,5 +95,13 @@ public class RemoteDevice {
 
     public void setProxyPort(String proxyPort) {
         this.proxyPort = proxyPort;
+    }
+    
+    public Capabilities getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(Capabilities capabilities) {
+        this.capabilities = capabilities;
     }
 }
