@@ -56,6 +56,7 @@ public class DriverPoolTest implements IDriverPool {
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite() {
+        TestPhase.setActivePhase(Phase.BEFORE_SUITE);
         R.CONFIG.put("driver_type", "desktop");
         R.CONFIG.put("thread_count", "1");
         R.CONFIG.put("data_provider_thread_count", "1");
@@ -76,6 +77,8 @@ public class DriverPoolTest implements IDriverPool {
     public void beforeClassGetSuiteDriver() {
         TestPhase.setActivePhase(Phase.BEFORE_CLASS);
         Assert.assertEquals(getDriver(BEFORE_SUITE_DRIVER_NAME), mockDriverSuite, "Incorrect driver has been returned");
+        Assert.assertTrue(getDrivers().containsKey(BEFORE_SUITE_DRIVER_NAME), "Before suite driver has not been returned by getDrivers()");
+        Assert.assertTrue(IDriverPool.getStaticDrivers().containsKey(BEFORE_SUITE_DRIVER_NAME), "Before suite driver has not been returned by getStaticDrivers()");
     }
 
     @Test(dependsOnMethods = { "beforeClassGetSuiteDriver" })

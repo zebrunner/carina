@@ -275,12 +275,8 @@ public interface IDriverPool {
 
         Set<CarinaDriver> drivers4Remove = new HashSet<CarinaDriver>();
 
-        String beforeQuitDrivers = "";
-        String afterQuitDrivers = "";
         Long threadId = Thread.currentThread().getId();
         for (CarinaDriver carinaDriver : driversPool) {
-            beforeQuitDrivers += carinaDriver.getThreadId() + "-" + carinaDriver.getName() +";";
-            
             if ((phases.contains(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()))
                     || phases.contains(Phase.ALL)) {
                 quitDriver(carinaDriver);
@@ -289,13 +285,6 @@ public interface IDriverPool {
         }
         driversPool.removeAll(drivers4Remove);
 
-        for (CarinaDriver carinaDriver : driversPool) {
-            afterQuitDrivers += carinaDriver.getThreadId() + "-" + carinaDriver.getName() +";";
-        }
-        
-        LOGGER.debug("beforeQuitDrivers: " + beforeQuitDrivers);
-        LOGGER.debug("afterQuitDrivers: " + afterQuitDrivers);
-        
         // don't use modern removeIf as it uses iterator!
         // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
     }
