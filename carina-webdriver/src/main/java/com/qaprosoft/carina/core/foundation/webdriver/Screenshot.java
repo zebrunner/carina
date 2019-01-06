@@ -407,11 +407,11 @@ public class Screenshot {
                             .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
                     LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
                 } catch (Exception e) {
-                    LOGGER.error("Can't save file to Amazon S3", e);
+                    LOGGER.debug("Can't save file to Amazon S3!", e);
                 }
             });
         } catch (Exception e) {
-            LOGGER.error("Can't save file to Amazon S3", e);
+            LOGGER.debug("Can't save file to Amazon S3!", e);
         }
     }
 
