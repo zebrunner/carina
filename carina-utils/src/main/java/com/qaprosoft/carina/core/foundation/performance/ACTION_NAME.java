@@ -42,7 +42,8 @@ public enum ACTION_NAME implements IPerformanceOperation {
     SELECT_BY_INDEX("select_by_index"),
     GET_SELECTED_VALUE("get_selected_value"),
     GET_SELECTED_VALUES("get_selected_values"),
-    CAPTURE_SCREENSHOT("capture_screenshot");
+    CAPTURE_SCREENSHOT("capture_screenshot"),
+    WEB_DRIVER("web_driver");
 
 
     private String key;

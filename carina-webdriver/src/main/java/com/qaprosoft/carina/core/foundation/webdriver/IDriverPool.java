@@ -34,6 +34,8 @@ import org.testng.Assert;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
+import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -295,6 +297,7 @@ public interface IDriverPool {
             carinaDriver.getDevice().disconnectRemote();
             ProxyPool.stopProxy();
             carinaDriver.getDriver().quit();
+            Timer.stop(ACTION_NAME.WEB_DRIVER);
         } catch (WebDriverException e) {
             LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -331,6 +334,7 @@ public interface IDriverPool {
                 LOGGER.debug("initDriver start...");
 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
+                Timer.start(ACTION_NAME.WEB_DRIVER);
 
                 // [VD] pay attention that below piece of code is copied into
                 // the driverPoolBasetest as registerDriver method!
