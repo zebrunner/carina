@@ -34,7 +34,6 @@ import org.testng.Assert;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -297,7 +296,7 @@ public interface IDriverPool {
             carinaDriver.getDevice().disconnectRemote();
             ProxyPool.stopProxy();
             carinaDriver.getDriver().quit();
-            Timer.stop(ACTION_NAME.WEB_DRIVER);
+            Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName());
         } catch (WebDriverException e) {
             LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -332,27 +331,23 @@ public interface IDriverPool {
         while (!init && count++ < maxCount) {
             try {
                 LOGGER.debug("initDriver start...");
-
-                drv = DriverFactory.create(name, capabilities, seleniumHost);
-                Timer.start(ACTION_NAME.WEB_DRIVER);
-
-                // [VD] pay attention that below piece of code is copied into
-                // the driverPoolBasetest as registerDriver method!
-                // ---------- start driver registration ----
+                
                 Long threadId = Thread.currentThread().getId();
                 ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
 
                 int maxDriverCount = Configuration.getInt(Parameter.MAX_DRIVER_COUNT);
 
                 if (currentDrivers.size() == maxDriverCount) {
-                    Assert.fail("Unable to register driver as you reached max number of drivers per thread: "
-                            + maxDriverCount);
+                    Assert.fail("Unable to create new driver as you reached max number of drivers per thread: " + maxDriverCount + "!" +
+                            " Override max_driver_count to allow more drivers per test!");
                 }
+
+                drv = DriverFactory.create(name, capabilities, seleniumHost);
+
+                // [VD] pay attention that similar piece of code is copied into the DriverPoolTest as registerDriver method!
                 if (currentDrivers.containsKey(name)) {
                     Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
                 }
-
-                // ---------- finish driver registration ----
 
                 init = true;
 
@@ -382,9 +377,11 @@ public interface IDriverPool {
                         ProxyPool.startProxy(proxyPort);
                     }
                 }
+
                 
                 // new 6.0 approach to manipulate drivers via regular Set
                 CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
+                Timer.start(device.getMetricName(), carinaDriver.getName());
                 driversPool.add(carinaDriver);
 
                 LOGGER.debug("initDriver finish...");

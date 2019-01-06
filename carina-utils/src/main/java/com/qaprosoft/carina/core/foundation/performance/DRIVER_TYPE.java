@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,14 @@ package com.qaprosoft.carina.core.foundation.performance;
 
 import com.qaprosoft.carina.core.foundation.performance.Timer.IPerformanceOperation;
 
-public enum ACTION_NAME implements IPerformanceOperation {
-    CLICK("click"),
-    TAP("tap"),
-    DOUBLE_CLICK("double_click"),
-    RIGHT_CLICK("right_click"),
-    HOVER("hover"),
-    SEND_KEYS("send_kyes"),
-    TYPE("type"),
-    ATTACH_FILE("attach_file"),
-    GET_TEXT("get_text"),
-    GET_LOCATION("get_location"),
-    GET_SIZE("get_size"),
-    GET_ATTRIBUTE("get_attribute"),
-    PAUSE("pause"),
-    WAIT("wait"),
-    CHECK("check"),
-    UNCHECK("uncheck"),
-    IS_CHECKED("is_checked"),
-    SELECT("select"),
-    SELECT_VALUES("select_values"),
-    SELECT_BY_MATCHER("select_by_matcher"),
-    SELECT_BY_PARTIAL_TEXT("select_by_partial_text"),
-    SELECT_BY_INDEX("select_by_index"),
-    GET_SELECTED_VALUE("get_selected_value"),
-    GET_SELECTED_VALUES("get_selected_values"),
-    CAPTURE_SCREENSHOT("capture_screenshot");
+public enum DRIVER_TYPE implements IPerformanceOperation {
+    WEB_DRIVER("web_driver"),
+    MOBILE_DRIVER("mobile_driver");
 
 
     private String key;
 
-    private ACTION_NAME(String key) {
+    private DRIVER_TYPE(String key) {
         this.key = key;
     }
 

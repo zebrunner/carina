@@ -37,8 +37,20 @@ public class Timer {
      *            IPerformanceOperation.
      */
     public static synchronized void start(IPerformanceOperation operation) {
+        start(operation, "");
+    }
+    
+    /**
+     * Start timer to track IPerformanceOperation action using extra key.
+     * 
+     * @param operation
+     *            IPerformanceOperation.
+     * @param key
+     *            String.
+     */
+    public static synchronized void start(IPerformanceOperation operation, String key) {
         Map<String, Long> testTimer = getTimer();
-        if (testTimer.containsKey(operation.getKey())) {
+        if (testTimer.containsKey(operation.getKey() + key)) {
             throw new RuntimeException("Operation already started: " + operation.getKey());
         }
         testTimer.put(operation.getKey(), Calendar.getInstance().getTimeInMillis());
@@ -52,6 +64,19 @@ public class Timer {
      * @return long elapsedTime from last start/stop.
      */
     public static synchronized long stop(IPerformanceOperation operation) {
+        return stop(operation, "");
+    }
+    
+    /**
+     * Stop timer and calculate summarized execution time for the action using extra key
+     * 
+     * @param operation
+     *            IPerformanceOperation.
+     * @param key
+     *            String.
+     * @return long elapsedTime from last start/stop.
+     */
+    public static synchronized long stop(IPerformanceOperation operation, String key) {
         Map<String, Long> testTimer = getTimer();
         if (!testTimer.containsKey(operation.getKey())) {
 			// TODO: current exception could stop tests execution which is
