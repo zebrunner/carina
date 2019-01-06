@@ -2,5 +2,7 @@
 
 <!--- Describe your changes in detail -->
 
-<!--- To recieve SNAPSHOT core build assign "build-snapshot" label or type it in PR label. Email notification informs you about deployed snapshot build you can use for preliminary testing -->
-<!--- For example: "build-snapshot: my PR details" -->
+<!--- To generate SNAPSHOT core build please assign "build-snapshot" label or type it in PR Title above.
+        For example: "build-snapshot: my PR details".
+        Email notification informs you about deployed snapshot build you can use for testing or about failure.
+-->
