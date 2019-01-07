@@ -681,22 +681,28 @@ public class Device extends RemoteDevice implements IDriverPool {
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
         
-        LOGGER.debug("UI dump generation...");
-        WebDriver driver = getDriver();
-        String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
-        String pageSource = driver.getPageSource();
-        pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
-                replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-        
-        File file = null;
         try {
-            file = new File(fileName);
-            FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
-        } catch (IOException e) {
-            LOGGER.warn("Error has been met during attempt to extract xml tree.", e);
+            LOGGER.debug("UI dump generation...");
+            WebDriver driver = getDriver();
+            String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
+            String pageSource = driver.getPageSource();
+            pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
+                    replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
+            
+            File file = null;
+            try {
+                file = new File(fileName);
+                FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
+            } catch (IOException e) {
+                LOGGER.warn("Error has been met during attempt to extract xml tree.", e);
+            }
+            LOGGER.debug("XML file path: ".concat(fileName));
+            return file;
+        } catch (Exception e) {
+            LOGGER.error("Undefined failure during UiDump generation for Android device!", e);
         }
-        LOGGER.debug("XML file path: ".concat(fileName));
-        return file;
+        
+        return null;
     }
     
     /**
