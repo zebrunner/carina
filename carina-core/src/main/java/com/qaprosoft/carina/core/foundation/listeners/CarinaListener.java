@@ -90,6 +90,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
+    
+    protected static boolean automaticDriversCleanup = true; 
 
     static {
         try {
@@ -286,7 +288,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private void onTestFinish(ITestResult result) {
         try {
-            if (!hasDependencies(result)) {
+            if (automaticDriversCleanup && !hasDependencies(result)) {
                 quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
 
@@ -406,6 +408,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } finally {
             // do nothing
         }
+    }
+    
+    /**
+     * Disable automatic drivers cleanup after each TestMethod and switch to controlled by tests itself.
+     * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
+     */
+    public static void disableDriversCleanup() {
+        automaticDriversCleanup = false;
     }
 
     // TODO: remove this private method
