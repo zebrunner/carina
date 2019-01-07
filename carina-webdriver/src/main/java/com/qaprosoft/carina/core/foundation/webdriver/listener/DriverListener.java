@@ -153,48 +153,50 @@ public class DriverListener implements WebDriverEventListener {
     	onBeforeAction();
     }
 
-	@Override
-	public void onException(Throwable thr, WebDriver driver) {
-		if (thr.getMessage() != null) {
-			if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")) {
-				LOGGER.error("Do not generate screenshot for invalid driver!");
-				//prevent recursive crash for onException
-				return;
-			}
-			
-			// handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
-			// Example:
+    @Override
+    public void onException(Throwable thr, WebDriver driver) {
+        // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
+        // most suspisious are capture screenshots, generating dumos etc
+        if (thr.getMessage() == null)
+            return;
 
-			// 10:25:20 2018-09-14 10:29:39 DriverListener [TestNG-31] [ERROR]
-			// [iPhone_6s] An unknown server-side error occurred while
-			// processing the command. Original error: The application under
-			// test with bundle id 'Q5AWL8WCY6.iMapMyRun' is not running,
-			// possibly crashed (WARNING: The server did not provide any
-			// stacktrace information)
-			
-			//TODO: investigate if we run @AfterMethod etc system events after this crash
-			if (thr.getMessage().contains("is not running, possibly crashed")) {
-				throw new RuntimeException(thr);
-			}
-			
-			if (thr.getMessage().contains("Method has not yet been implemented")) {
-				// do nothing
-				return;
-			}
-			
-			String urlPrefix = "";
-			try {
-				urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
-			} catch (Exception e) {
-				//do  nothing
-			}
-			
-			// handle cases which should't be captured
-			if (Screenshot.isCaptured(thr.getMessage())) {
-				captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
-			}
-		}
-	}
+        if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")) {
+            LOGGER.error("Do not generate screenshot for invalid driver!");
+            // prevent recursive crash for onException
+            return;
+        }
+
+        if (thr.getMessage().contains("Method has not yet been implemented")) {
+            // do nothing
+            return;
+        }
+
+        // handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
+        // Example:
+
+        // 10:25:20 2018-09-14 10:29:39 DriverListener [TestNG-31] [ERROR]
+        // [iPhone_6s] An unknown server-side error occurred while
+        // processing the command. Original error: The application under
+        // test with bundle id 'Q5AWL8WCY6' is not running,
+        // possibly crashed (WARNING: The server did not provide any
+        // stacktrace information)
+
+        // TODO: investigate if we run @AfterMethod etc system events after this crash
+        if (thr.getMessage().contains("is not running, possibly crashed")) {
+            throw new RuntimeException(thr);
+        }
+
+        String urlPrefix = "";
+        try {
+            urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
+            // handle cases which should't be captured
+            if (Screenshot.isCaptured(thr.getMessage())) {
+                captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Unrecognized failure detected in DriverListener->onException: " + e.getMessage(), e);
+        }
+    }
 
     /**
      * Converts char sequence to string.
@@ -230,15 +232,19 @@ public class DriverListener implements WebDriverEventListener {
             comment = getMessage(errorMessage);
         }
 
-        if (errorMessage) {
-            LOGGER.error(comment);
-            Screenshot.captureFailure(driver, comment); // in case of failure
-        } else {
-            LOGGER.info(comment);
-            Screenshot.capture(driver, comment);
+        try {
+            if (errorMessage) {
+                LOGGER.error(comment);
+                Screenshot.captureFailure(driver, comment); // in case of failure
+            } else {
+                LOGGER.info(comment);
+                Screenshot.capture(driver, comment);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot: " + e.getMessage(), e);
+        } finally {
+            resetMessages();
         }
-        
-        resetMessages();
 
     }
 
