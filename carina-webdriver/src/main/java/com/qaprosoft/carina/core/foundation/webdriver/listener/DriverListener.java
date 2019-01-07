@@ -156,7 +156,7 @@ public class DriverListener implements WebDriverEventListener {
     @Override
     public void onException(Throwable thr, WebDriver driver) {
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
-        // most suspisious are capture screenshots, generating dumos etc
+        // most suspicious are capture screenshots, generating dumps etc
         if (thr.getMessage() == null)
             return;
 
