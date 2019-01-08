@@ -155,6 +155,7 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void onException(Throwable thr, WebDriver driver) {
+        LOGGER.debug("DriverListener->onException starting...");
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
         if (thr.getMessage() == null)
@@ -196,6 +197,8 @@ public class DriverListener implements WebDriverEventListener {
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->onException: " + e.getMessage(), e);
         }
+        
+        LOGGER.debug("DriverListener->onException finished.");
     }
 
     /**
@@ -232,6 +235,7 @@ public class DriverListener implements WebDriverEventListener {
             comment = getMessage(errorMessage);
         }
 
+        LOGGER.debug("DriverListener->captureScreenshot starting...");
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
@@ -245,7 +249,7 @@ public class DriverListener implements WebDriverEventListener {
         } finally {
             resetMessages();
         }
-
+        LOGGER.debug("DriverListener->captureScreenshot finished...");
     }
 
     private void onAfterAction(String comment, WebDriver driver) {

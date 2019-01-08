@@ -162,6 +162,7 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static String captureFailure(WebDriver driver, String comment) {
+        LOGGER.debug("Screenshot->captureFailure starting...");
         String screenName = capture(driver, true, comment, true);
 
         // XML layout extraction
@@ -169,6 +170,7 @@ public class Screenshot {
         if (uiDumpFile != null) {
             uiDumpFile.getPath().split("\\/");
         }
+        LOGGER.debug("Screenshot->captureFailure finished.");
         return screenName;
     }
 
@@ -292,6 +294,8 @@ public class Screenshot {
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
+        LOGGER.debug("Screenshot->capture starting...");
+        
         if (isTakeScreenshot) {
             try {
             	if (!isCaptured(comment)) {
@@ -371,12 +375,14 @@ public class Screenshot {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
             	LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+            	e.printStackTrace();
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot due to the Exception!", e);
             } finally {
             	Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
         }
+        LOGGER.debug("Screenshot->capture finished.");
         return screenName;
     }
 
