@@ -372,14 +372,14 @@ public class DriverHelper {
      */
 	public void openURL(String url) {
 		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
-		
+
 		decryptedURL = getEnvArgURL(decryptedURL);
-		
-        WebDriver drv = getDriver();
-        
-        Messager.OPENING_URL.info(url);
-        
-        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+
+		WebDriver drv = getDriver();
+
+		Messager.OPENING_URL.info(url);
+
+		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
         
         try {
             drv.get(decryptedURL);

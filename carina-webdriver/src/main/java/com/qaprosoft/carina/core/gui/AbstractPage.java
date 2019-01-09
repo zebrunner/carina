@@ -37,9 +37,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 public abstract class AbstractPage extends AbstractUIObject {
 	protected String pageURL = getUrl();
 
-    public AbstractPage(WebDriver driver) {
-        super(driver);
-    }
+	public AbstractPage(WebDriver driver) {
+		super(driver);
+	}
 
     /**
      * Opens page according to specified in constructor URL.
