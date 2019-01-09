@@ -24,22 +24,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 public class LocatingElementListHandler implements InvocationHandler {
@@ -81,9 +70,6 @@ public class LocatingElementListHandler implements InvocationHandler {
         List<ExtendedWebElement> extendedWebElements = null;
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
-/*            for (WebElement element : elements) {
-                extendedWebElements.add(new ExtendedWebElement(element, name, by));
-            }*/
             
             int i = 1;
 			for (WebElement element : elements) {
@@ -101,8 +87,6 @@ public class LocatingElementListHandler implements InvocationHandler {
 			}
 
         }
-        
-        
 
         try {
             return method.invoke(extendedWebElements, objects);
@@ -111,39 +95,4 @@ public class LocatingElementListHandler implements InvocationHandler {
         }
     }
 
-    
-    /**
-     * Wait until any condition happens.
-     *
-     * @param condition - ExpectedCondition.
-     * @param timeout - timeout.
-     * @return true if condition happen.
-     */
-	@SuppressWarnings("unchecked")
-	private boolean waitUntil(ExpectedCondition<?> condition) {
-		boolean result;
-		
-		long timeout = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-		long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-		
-		Timer.start(ACTION_NAME.WAIT);
-		@SuppressWarnings("rawtypes")
-		Wait wait = new WebDriverWait(driver, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
-		try {
-			wait.until(condition);
-			result = true;
-			LOGGER.debug("waitUntil: finished true...");
-		} catch (NoSuchElementException | TimeoutException e) {
-			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + condition.toString());
-			result = false;
-		} catch (Exception e) {
-			LOGGER.error("waitUntil: " + condition.toString(), e);
-			result = false;
-		}
-		Timer.stop(ACTION_NAME.WAIT);
-		return result;
-	}
-	
 }

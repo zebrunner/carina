@@ -15,16 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public interface ITestRailManager extends ITestCases {
     Logger LOGGER = Logger.getLogger(ITestRailManager.class);

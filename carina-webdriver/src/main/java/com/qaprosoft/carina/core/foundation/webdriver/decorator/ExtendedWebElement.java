@@ -1061,6 +1061,9 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
+    /**
+     * @deprecated As of release 6.x, replaced by {@link #click()}. Can be used only for Web where JavascriptExecutor is supported.
+     */
     @Deprecated
     public void tapWithCoordinates(double x, double y) {
         HashMap<String, Double> tapObject = new HashMap<String, Double>();
@@ -1801,4 +1804,20 @@ public class ExtendedWebElement {
         return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                 ExpectedConditions.visibilityOfElementLocated(myBy));
     }
+    
+    // old functionality to remove completely after successfull testing
+/*    private ExpectedCondition<?> getDefaultCondition(By myBy) {
+        // generate the most popular wiatCondition to check if element visible or present
+        ExpectedCondition<?> waitCondition = null;
+        if (element != null) {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOf(element));
+        } else {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                    ExpectedConditions.visibilityOfElementLocated(myBy));
+        }
+
+        return waitCondition;
+    }*/
 }

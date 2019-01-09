@@ -15,23 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.proxy.SystemProxy;
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.proxy.CaptureType;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Map;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.proxy.SystemProxy;
+
+import net.lightbody.bmp.BrowserMobProxy;
 
 public class BrowserMobTest {
     private static String header = "my_header";

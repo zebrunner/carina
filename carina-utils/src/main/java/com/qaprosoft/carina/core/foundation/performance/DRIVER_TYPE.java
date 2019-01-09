@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver;
+package com.qaprosoft.carina.core.foundation.performance;
 
-//TODO: move into better module/package
-public class TestPhase {
-    public enum Phase {
-    	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
+import com.qaprosoft.carina.core.foundation.performance.Timer.IPerformanceOperation;
+
+public enum DRIVER_TYPE implements IPerformanceOperation {
+    WEB_DRIVER("web_driver"),
+    MOBILE_DRIVER("mobile_driver");
+
+
+    private String key;
+
+    private DRIVER_TYPE(String key) {
+        this.key = key;
     }
 
-    //TODO: organize phases verification:
-    // https://github.com/qaprosoft/carina/issues/464 "find a way to track that all required system calls are executed"
-    private static ThreadLocal<Phase> activePhase = new ThreadLocal<Phase>();
-
-	public static Phase getActivePhase() {
-		return activePhase.get();
-	}
-
-	public static void setActivePhase(Phase phase) {
-		activePhase.set(phase);
-	}
+    @Override
+    public String getKey() {
+        return this.key;
+    }
     
-
 }
-

@@ -30,7 +30,6 @@ import com.qaprosoft.carina.core.foundation.exception.RequiredCtorNotFoundExcept
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public class CustomTypePageFactory implements IDriverPool {
@@ -67,9 +66,9 @@ public class CustomTypePageFactory implements IDriverPool {
                 .getSubTypesOf(parentClass);
         LOGGER.debug("Relatives classes count:" + setClasses.size());
         Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
-        Type screenType = DevicePool.getDevice().getDeviceType();
+        Type screenType = IDriverPool.getDefaultDevice().getDeviceType();
 
-        Device device = DevicePool.getDevice();
+        Device device = IDriverPool.getDefaultDevice();
         // default version in case if it is desktop driver
         String deviceVersion = "1";
         if (!device.getOsVersion().isEmpty()) {

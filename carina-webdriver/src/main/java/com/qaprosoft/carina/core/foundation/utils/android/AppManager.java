@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
 public class AppManager {
 
@@ -42,7 +42,7 @@ public class AppManager {
 
     public String getFullPackageByName(final String name) {
         if (!packagesByName.containsKey(name)) {
-            String resultPackage = DevicePool.getDevice().getFullPackageByName(name);
+            String resultPackage = IDriverPool.getDefaultDevice().getFullPackageByName(name);
             packagesByName.put(name, resultPackage.replace("package:", ""));
         }
         return packagesByName.get(name);
