@@ -35,11 +35,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  * @author Alex Khursevich
  */
 public abstract class AbstractPage extends AbstractUIObject {
-    protected String pageURL = Configuration.get(Parameter.URL);
+	protected String pageURL = getUrl();
 
-    public AbstractPage(WebDriver driver) {
-        super(driver);
-    }
+	public AbstractPage(WebDriver driver) {
+		super(driver);
+	}
 
     /**
      * Opens page according to specified in constructor URL.
@@ -115,4 +115,14 @@ public abstract class AbstractPage extends AbstractUIObject {
     public String savePageAsPdf() throws IOException, DocumentException {
         return savePageAsPdf(true);
     }
+
+	private String getUrl() {
+		String url = "";
+		if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
+			url = Configuration.get(Parameter.URL);
+		} else {
+			url = Configuration.getEnvArg(Parameter.URL.getKey());
+		}
+		return url;
+	}
 }

@@ -369,16 +369,16 @@ public class DriverHelper {
      * @param url
      *            to open.
      */
-    public void openURL(String url) {
-        String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
-        decryptedURL = decryptedURL.contains("http:") || decryptedURL.contains("https:") ? decryptedURL
-                : Configuration
-                        .get(Parameter.URL) + decryptedURL;
-        WebDriver drv = getDriver();
-        
-        Messager.OPENING_URL.info(url);
-        
-        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+	public void openURL(String url) {
+		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+
+		decryptedURL = getEnvArgURL(decryptedURL);
+
+		WebDriver drv = getDriver();
+
+		Messager.OPENING_URL.info(url);
+
+		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
         
         try {
             drv.get(decryptedURL);
@@ -404,7 +404,9 @@ public class DriverHelper {
      */
     public boolean isUrlAsExpected(String expectedURL) {
         String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
-        decryptedURL = decryptedURL.startsWith("http") ? decryptedURL : Configuration.get(Parameter.URL) + decryptedURL;
+        
+        decryptedURL = getEnvArgURL(decryptedURL);
+        
         WebDriver drv = getDriver();
         if (LogicUtils.isURLEqual(decryptedURL, drv.getCurrentUrl())) {
             Messager.EXPECTED_URL.info(drv.getCurrentUrl());
@@ -414,6 +416,24 @@ public class DriverHelper {
             return false;
         }
     }
+    
+    
+	/**
+	 * Get full or relative URL considering Env argument
+	 * 
+	 * @param decryptedURL
+	 * @return url
+	 */
+	private String getEnvArgURL(String decryptedURL) {
+		if (!(decryptedURL.contains("http:") || decryptedURL.contains("https:"))) {
+			if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
+				decryptedURL = Configuration.get(Parameter.URL) + decryptedURL;
+			} else {
+				decryptedURL = Configuration.getEnvArg(Parameter.URL.getKey()) + decryptedURL;
+			}
+		}
+		return decryptedURL;
+	}
 
     /**
      * Pause for specified timeout.
