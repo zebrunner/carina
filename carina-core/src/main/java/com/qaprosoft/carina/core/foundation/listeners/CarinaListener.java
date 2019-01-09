@@ -71,11 +71,11 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
 
 /*
@@ -90,6 +90,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
+    
+    protected static boolean automaticDriversCleanup = true; 
 
     static {
         try {
@@ -270,14 +272,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private boolean hasDependencies(ITestResult result) {
         String methodName = result.getMethod().getMethodName();
-        LOGGER.debug("current method: " + methodName);
+        String className = result.getMethod().getTestClass().getName();
+        LOGGER.debug("current method: " + className + "." + methodName);
 
         // analyze all suite methods and return true if any of them depends on
         // existing method
         List<ITestNGMethod> methods = result.getTestContext().getSuite().getAllMethods();
         for (ITestNGMethod method : methods) {
             LOGGER.debug("analyze method for dependency: " + method.getMethodName());
-            if (Arrays.asList(method.getMethodsDependedUpon()).contains(methodName)) {
+            
+            List<String> dependencies = Arrays.asList(method.getMethodsDependedUpon());
+
+            if (dependencies.contains(methodName) ||
+                    dependencies.contains(className + "." + methodName)) {
                 return true;
             }
         }
@@ -286,9 +293,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private void onTestFinish(ITestResult result) {
         try {
-            if (!hasDependencies(result)) {
-                quitDrivers(Phase.BEFORE_METHOD);
-                quitDrivers(Phase.METHOD);
+            if (automaticDriversCleanup && !hasDependencies(result)) {
+                quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
 
             // TODO: improve later removing duplicates with AbstractTestListener
@@ -408,14 +414,22 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // do nothing
         }
     }
+    
+    /**
+     * Disable automatic drivers cleanup after each TestMethod and switch to controlled by tests itself.
+     * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
+     */
+    public static void disableDriversCleanup() {
+        automaticDriversCleanup = false;
+    }
 
     // TODO: remove this private method
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (!DevicePool.getDevice().isNull()) {
+        if (!IDriverPool.getDefaultDevice().isNull()) {
             // Samsung - Android 4.4.2; iPhone - iOS 7
-            Device device = DevicePool.getDevice();
+            Device device = IDriverPool.getDefaultDevice();
             String deviceTemplate = "%s - %s %s";
             deviceName = String.format(deviceTemplate, device.getName(), device.getOs(), device.getOsVersion());
         }

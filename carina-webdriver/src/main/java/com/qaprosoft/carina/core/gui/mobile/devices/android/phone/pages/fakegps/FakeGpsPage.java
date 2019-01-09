@@ -22,8 +22,8 @@ import org.openqa.selenium.support.FindBy;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 import io.appium.java_client.android.AndroidKeyCode;
@@ -145,7 +145,7 @@ public class FakeGpsPage extends MobileAbstractPage {
         if (openSettingsButton.isElementPresent(MINIMAL_TIMEOUT)) {
             openSettingsButton.clickIfPresent(DELAY);
 
-            String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+            String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
             LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
             if (currentAndroidVersion.contains("7.")) {
                 MobileUtils.swipe(allowMock7, devSettingsContainer);
