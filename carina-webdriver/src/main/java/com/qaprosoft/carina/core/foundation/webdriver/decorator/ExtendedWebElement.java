@@ -1061,6 +1061,9 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
+    /**
+     * @deprecated As of release 6.x, replaced by {@link #click()}. Can be used only for Web where JavascriptExecutor is supported.
+     */
     @Deprecated
     public void tapWithCoordinates(double x, double y) {
         HashMap<String, Double> tapObject = new HashMap<String, Double>();
