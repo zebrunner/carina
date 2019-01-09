@@ -168,4 +168,11 @@ public class SpecialKeywords {
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
     public static final String QTEST_PROJECT_ID = "qTestProjectId";
+
+
+    // ------------- TEST EXECUTION FILTERS CONSTANTS ---------------
+    public static final String RULE_FILTER_VALUE_SPLITTER = "=>";
+    public static final String RULE_FILTER_SPLITTER = ";;";
+    public static final String RULE_FILTER_AND_CONDITION = "&&";
+
 }
