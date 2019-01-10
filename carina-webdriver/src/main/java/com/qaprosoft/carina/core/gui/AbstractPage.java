@@ -26,6 +26,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -34,7 +35,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  * 
  * @author Alex Khursevich
  */
-public abstract class AbstractPage extends AbstractUIObject {
+public abstract class AbstractPage extends AbstractUIObject implements ICustomTypePageFactory {
 	protected String pageURL = getUrl();
 
 	public AbstractPage(WebDriver driver) {

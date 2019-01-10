@@ -850,7 +850,7 @@ public class DriverHelper {
         this.driver = driver;
     }
 
-    protected WebDriver getDriver() {
+    public WebDriver getDriver() {
         if (driver == null) {
             long currentThreadId = Thread.currentThread().getId();
             LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
