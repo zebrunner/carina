@@ -214,6 +214,7 @@ public class HockeyAppManager {
     private String scanAppForBuild(Map<String, String> appIds, String buildType, String version) {
 
         for (String appId : appIds.keySet()) {
+            LOGGER.info("\nHockeyApp Id: " + appId);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
             queryParams.add("page", "1");
             queryParams.add("include_build_urls", "true");
@@ -324,26 +325,36 @@ public class HockeyAppManager {
 
     private boolean checkForPattern(String nodeName, String pattern, JsonNode node) {
 
+        LOGGER.info("\nPattern to be checked: " + pattern);
         String nodeField = node.get(nodeName).asText().toLowerCase();
 
         if (nodeField.contains(pattern)) {
+            LOGGER.info("\nPattern match found!! This is the buildType to be used: " + nodeField);
             return true;
         }
 
-        String[] patternList = pattern.split("[^\\w']+");
+//        String[] patternList = pattern.split("[^\\w']+");
 
-        if (patternList.length <= 1) {
-            throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
-        }
+//        if (patternList.length <= 1) {
+//            throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
+//        }
 
-        List<String> updatedPatternlist = new ArrayList<>();
+//        List<String> updatedPatternlist = new ArrayList<>();
 
+//        String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
+//        for (String currentPattern : patternList) {
+//            updatedPatternlist.add(String.format(patternToReplace, currentPattern));
+//        }
+
+//        for (String str : updatedPatternlist) {
+//            LOGGER.info("Updated Pattern List, pattern: " + str);
+//        }
         String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
-        for (String currentPattern : patternList) {
-            updatedPatternlist.add(String.format(patternToReplace, currentPattern));
-        }
 
-        if (patternList.length > 1 && scanningAllNotes(updatedPatternlist, nodeField)) {
+//        if (patternList.length > 1 && scanningAllNotes(Arrays.asList(patternList), nodeField)) {
+//            return true;
+//        }
+        if (!pattern.isEmpty() && scanningAllNotes(String.format(patternToReplace, pattern), nodeField)){
             return true;
         }
 
@@ -357,14 +368,15 @@ public class HockeyAppManager {
         return m.find();
     }
 
-    private boolean scanningAllNotes(List<String> patternList, String noteField) {
-        boolean foundMessages = true;
+    private boolean scanningAllNotes(String pattern, String noteField) {
+        boolean foundMessages = false;
 
-        LOGGER.debug(String.format("Message to Scan: %s", noteField));
-        for (String pattern : patternList) {
-            foundMessages &= searchFieldsForString(pattern, noteField);
-            LOGGER.debug(String.format("Checking Found Messages for (%s).  Initial Result (%s), Full Reset (%s)", pattern, searchFieldsForString(pattern, noteField), foundMessages));
-        }
+//        LOGGER.debug(String.format("Message to Scan: %s", noteField));
+//        for (String pattern : patternList) {
+//            foundMessages &= searchFieldsForString(pattern, noteField);
+//            LOGGER.debug(String.format("Checking Found Messages for (%s).  Initial Result (%s), Full Reset (%s)", pattern, searchFieldsForString(pattern, noteField), foundMessages));
+//        }
+        foundMessages = searchFieldsForString(pattern, noteField);
 
         return foundMessages;
     }
