@@ -247,7 +247,11 @@ public class Configuration {
 
         DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
 
-        DEFAULT_DEVICE_LANGUAGE("default_device_language");
+        DEFAULT_DEVICE_LANGUAGE("default_device_language"),
+
+        // Test Execution Filter rules
+        TEST_RUN_RULES("test_run_rules");
+
 
         private final String key;
 
