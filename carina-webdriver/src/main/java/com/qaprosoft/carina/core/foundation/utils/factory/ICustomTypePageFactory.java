@@ -33,7 +33,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
 
     Reflections REFLECTIONS = new Reflections("");
 
-    Logger LOGGER = Logger.getLogger(CustomTypePageFactory.class);
+    Logger LOG = Logger.getLogger(CustomTypePageFactory.class);
 
     public default <T extends AbstractPage> T initPage(Class<T> parentClass, Object... parameters) {
         return initPage(getDriver(), parentClass, parameters);
@@ -42,12 +42,12 @@ public interface ICustomTypePageFactory extends IDriverPool {
     public default <T extends AbstractPage> T initPage(WebDriver driver, Class<T> parentClass, Object... parameters) {
 
         if (driver == null) {
-            LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
+            LOG.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
             throw new RuntimeException("Page isn't created. Driver isn't initialized.");
         }
 
         Set<Class<? extends T>> setClasses = REFLECTIONS.getSubTypesOf(parentClass);
-        LOGGER.debug("Relatives classes count:" + setClasses.size());
+        LOG.debug("Relatives classes count:" + setClasses.size());
         Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
         Type screenType = IDriverPool.getDefaultDevice().getDeviceType();
 
@@ -58,20 +58,20 @@ public interface ICustomTypePageFactory extends IDriverPool {
             deviceVersion = device.getOsVersion();
         }
         String majorVersionNumber = deviceVersion.split(VERSION_SPLITTER)[0];
-        LOGGER.debug("Major version of device OS: " + majorVersionNumber);
+        LOG.debug("Major version of device OS: " + majorVersionNumber);
         for (Class<? extends T> clazz : setClasses) {
             if (clazz.getAnnotation(DeviceType.class) == null || clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
-                LOGGER.debug(String.format("Removing as parentClass (%s) is not satisfied or due to absence of @DeviceType annotation on class: %s",
+                LOG.debug(String.format("Removing as parentClass (%s) is not satisfied or due to absence of @DeviceType annotation on class: %s",
                         parentClass.getName(), clazz.getName()));
                 continue;
             }
             DeviceType dt = clazz.getAnnotation(DeviceType.class);
 
-            LOGGER.debug(String.format("Expected screenType: %s, Actual screenType: %s", screenType, dt.pageType()));
+            LOG.debug(String.format("Expected screenType: %s, Actual screenType: %s", screenType, dt.pageType()));
             if (dt.pageType().equals(screenType)) {
                 if (Arrays.asList(dt.version()).contains(deviceVersion)) {
-                    LOGGER.debug("Expected version: " + deviceVersion);
-                    LOGGER.debug("Actual versions: " + dt.version());
+                    LOG.debug("Expected version: " + deviceVersion);
+                    LOG.debug("Actual versions: " + dt.version());
                     versionClass = clazz;
                     break;
                 }
@@ -79,7 +79,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
                 for (String version : dt.version()) {
                     if (version.split(VERSION_SPLITTER)[0].equals(majorVersionNumber)) {
                         majorVersionClass = clazz;
-                        LOGGER.debug("Class was chosen by major version number of device");
+                        LOG.debug("Class was chosen by major version number of device");
                         break;
                     }
                 }
@@ -88,23 +88,23 @@ public interface ICustomTypePageFactory extends IDriverPool {
                 continue;
             }
             if (dt.pageType().getFamily().equals(screenType.getFamily())) {
-                LOGGER.debug(String.format("Family class '%s' correspond to required page.", screenType.getFamily()));
+                LOG.debug(String.format("Family class '%s' correspond to required page.", screenType.getFamily()));
                 familyClass = clazz;
             }
 
         }
         try {
             if (versionClass != null) {
-                LOGGER.debug("Instance by version and platform will be created.");
+                LOG.debug("Instance by version and platform will be created.");
                 requiredClass = versionClass;
             } else if (majorVersionClass != null) {
-                LOGGER.debug("Instance by major version and platform will be created.");
+                LOG.debug("Instance by major version and platform will be created.");
                 requiredClass = majorVersionClass;
             } else if (deviceClass != null) {
-                LOGGER.debug("Instance by platform will be created.");
+                LOG.debug("Instance by platform will be created.");
                 requiredClass = deviceClass;
             } else if (familyClass != null) {
-                LOGGER.debug("Instance by family will be created.");
+                LOG.debug("Instance by family will be created.");
                 requiredClass = familyClass;
             } else {
                 throw new RuntimeException(
@@ -115,12 +115,12 @@ public interface ICustomTypePageFactory extends IDriverPool {
             if (parameters.length == 0) {
                 parameters = new Object[] { driver };
             }
-            LOGGER.debug("Invoking constructor for " + requiredClass);
+            LOG.debug("Invoking constructor for " + requiredClass);
             Constructor<? extends T> requiredCtor = getConstructorByParams(requiredClass, parameters);
 
             return requiredCtor.newInstance(parameters);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-            LOGGER.debug(
+            LOG.debug(
                     "Discovered one of the InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException");
             throw new RuntimeException("Unable to instantiate page!", e);
         }
@@ -137,7 +137,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
-        LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
+        LOG.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
         Class<?>[] parametersTypes;
         List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
         for (Object param : parameters) {
@@ -146,9 +146,9 @@ public interface ICustomTypePageFactory extends IDriverPool {
         parametersTypes = parametersTypesList.toArray(new Class<?>[parametersTypesList.size()]);
         Constructor<?> requiredCtor = null;
         Constructor<?>[] ctors = clazz.getDeclaredConstructors();
-        LOGGER.debug(String.format("Class %s contains %d ctors ", clazz.toString(), ctors.length));
+        LOG.debug(String.format("Class %s contains %d ctors ", clazz.toString(), ctors.length));
         for (Constructor<?> constructor : ctors) {
-            LOGGER.debug("Constructor: ".concat(constructor.toString()));
+            LOG.debug("Constructor: ".concat(constructor.toString()));
         }
         for (Constructor<?> constructor : ctors) {
             Class<?>[] ctorTypes = constructor.getParameterTypes();
@@ -156,7 +156,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
             // Check if passed parameters quantity satisfy to constructor's
             // parameters size
             if (parametersTypes.length != ctorTypes.length) {
-                LOGGER.debug(String.format("Ctors quantity doesn't satisfy to requirements. " + "Expected: %d. Actual: %d", parametersTypes.length,
+                LOG.debug(String.format("Ctors quantity doesn't satisfy to requirements. " + "Expected: %d. Actual: %d", parametersTypes.length,
                         ctorTypes.length));
                 continue;
             }
