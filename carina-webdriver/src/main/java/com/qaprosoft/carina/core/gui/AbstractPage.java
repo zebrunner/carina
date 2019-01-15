@@ -19,9 +19,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
-import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -36,6 +41,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  * @author Alex Khursevich
  */
 public abstract class AbstractPage extends AbstractUIObject implements ICustomTypePageFactory {
+    protected static final Logger LOGGER = Logger.getLogger(AbstractPage.class);
+    
 	protected String pageURL = getUrl();
 
 	public AbstractPage(WebDriver driver) {
