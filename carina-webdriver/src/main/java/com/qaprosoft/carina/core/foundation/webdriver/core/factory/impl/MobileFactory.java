@@ -87,10 +87,10 @@ public class MobileFactory extends AbstractFactory {
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
-        	String udid = capabilities.getCapability("udid").toString();
-        	capabilities = getCapabilities(name);
-        	capabilities.setCapability("udid", udid);
-        	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            	String udid = capabilities.getCapability("udid").toString();
+            	capabilities = getCapabilities(name);
+            	capabilities.setCapability("udid", udid);
+            	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
         try {
@@ -146,28 +146,39 @@ public class MobileFactory extends AbstractFactory {
                 }
             }
 
-            Device device = IDriverPool.getNullDevice();
-            if (device.isNull()) {
-                RemoteDevice remoteDevice = getDeviceInfo(driver);
-                // 3rd party solutions like browserstack or saucelabs return not null
-                if (remoteDevice != null && remoteDevice.getName() != null) {
-                    device = new Device(remoteDevice);
-                } else if (driver != null) {
-                    device = new Device(driver.getCapabilities());
-                }
-
-                IDriverPool.registerDevice(device);
-            }
-            // will be performed just in case uninstall_related_apps flag marked as true
-            device.uninstallRelatedApps();
         } catch (MalformedURLException e) {
             LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.info("Error during driver creation:".concat(e.getMessage()));
+            LOGGER.info(e);
         }
 
+        // verification whether driver was created or not.
         if (driver == null) {
-            Assert.fail("Unable to initialize driver: " + name + "!");
+            Map<String, Object> capabilitiesMap = capabilities.asMap();
+            LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
+            Device device = new Device(getDeviceInfo(capabilitiesMap));
+            IDriverPool.registerDevice(device);
+            Assert.fail(String.format("Unable to initialize driver: %s! \nCapabilities: %s.", name, capabilitiesMap.toString()));
         }
 
+        Device device = IDriverPool.getNullDevice();
+        if (device.isNull()) {
+            RemoteDevice remoteDevice = getDeviceInfo(driver);
+            // 3rd party solutions like browserstack or saucelabs return not
+            // null
+            if (remoteDevice != null && remoteDevice.getName() != null) {
+                device = new Device(remoteDevice);
+            } else if (driver != null) {
+                device = new Device(driver.getCapabilities());
+            }
+
+            IDriverPool.registerDevice(device);
+        }
+        // will be performed just in case uninstall_related_apps flag marked as
+        // true
+        device.uninstallRelatedApps();
+        
         return driver;
     }
 
@@ -182,51 +193,61 @@ public class MobileFactory extends AbstractFactory {
      *            - driver
      * @return remote device information
      */
-	private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
-		RemoteDevice remoteDevice = new RemoteDevice();
-		try {
-
-			@SuppressWarnings("unchecked")
-			Map<String, Object> cap = (Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES);
-			if (cap != null && cap.containsKey("udid")) {
-
-				// restore device information from custom slotCapabilities map
-				/*
-				 * {deviceType=Phone, proxy_port=9000,
-				 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
-				 * seleniumProtocol=WebDriver, adb_port=5038,
-				 * vnc=wss://stage.qaprosoft.com:7410/websockify,
-				 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
-				 * platformVersion=8.1.0, automationName=uiautomator2,
-				 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
-				 * udid=PL2GAR9822804910}
-				 */
-
-				// TODO: remove code duplicates with carina-grid DeviceInfo
-				remoteDevice.setName((String) cap.get("deviceName"));
-				remoteDevice.setOs((String) cap.get("platformName"));
-				remoteDevice.setOsVersion((String) cap.get("platformVersion"));
-				remoteDevice.setType((String) cap.get("deviceType"));
-				remoteDevice.setUdid((String) cap.get("udid"));
-				if (cap.containsKey("vnc")) {
-					remoteDevice.setVnc((String) cap.get("vnc"));
-				}
-				if (cap.containsKey("proxy_port")) {
-					remoteDevice.setProxyPort(String.valueOf(cap.get("proxy_port")));
-				}
-				
-				if (cap.containsKey("remoteURL")) {
-					remoteDevice.setRemoteURL(String.valueOf(cap.get("remoteURL")));
-				}
-				
-				remoteDevice.setCapabilities(drv.getCapabilities());
-			}
-
-		} catch (Exception e) {
-			LOGGER.error("Unable to get device info!", e);
-		}
-		return remoteDevice;
+	@SuppressWarnings("unchecked")
+    private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
+		return getDeviceInfo((Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES));
 	}
+	
+	/**
+     * Returns device information from Grid Hub using STF service.
+     * 
+     * @param caps
+     *            - capabilities
+     * @return remote device information
+     */
+    private RemoteDevice getDeviceInfo(Map<String, Object> cap) {
+        RemoteDevice remoteDevice = new RemoteDevice();
+        try {
+
+            if (cap != null && cap.containsKey("udid")) {
+
+                // restore device information from custom slotCapabilities map
+                /*
+                 * {deviceType=Phone, proxy_port=9000,
+                 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
+                 * seleniumProtocol=WebDriver, adb_port=5038,
+                 * vnc=wss://stage.qaprosoft.com:7410/websockify,
+                 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
+                 * platformVersion=8.1.0, automationName=uiautomator2,
+                 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
+                 * udid=PL2GAR9822804910}
+                 */
+
+                // TODO: remove code duplicates with carina-grid DeviceInfo
+                remoteDevice.setName((String) cap.get("deviceName"));
+                remoteDevice.setOs((String) cap.get("platformName"));
+                remoteDevice.setOsVersion((String) cap.get("platformVersion"));
+                remoteDevice.setType((String) cap.get("deviceType"));
+                remoteDevice.setUdid((String) cap.get("udid"));
+                if (cap.containsKey("vnc")) {
+                    remoteDevice.setVnc((String) cap.get("vnc"));
+                }
+                if (cap.containsKey("proxy_port")) {
+                    remoteDevice.setProxyPort(String.valueOf(cap.get("proxy_port")));
+                }
+                
+                if (cap.containsKey("remoteURL")) {
+                    remoteDevice.setRemoteURL(String.valueOf(cap.get("remoteURL")));
+                }
+                
+                remoteDevice.setCapabilities(new DesiredCapabilities(cap));
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Unable to get device info!", e);
+        }
+        return remoteDevice;
+    }
 
     @Override
     public String getVncURL(WebDriver driver) {
