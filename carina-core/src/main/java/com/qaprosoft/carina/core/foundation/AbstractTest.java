@@ -34,8 +34,8 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -43,7 +43,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
  * @author Alex Khursevich
  */
 @Listeners({ CarinaListener.class })
-public abstract class AbstractTest implements IDriverPool, ITestCases {
+public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
