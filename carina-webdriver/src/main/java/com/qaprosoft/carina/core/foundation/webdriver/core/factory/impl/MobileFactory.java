@@ -155,10 +155,11 @@ public class MobileFactory extends AbstractFactory {
 
         // verification whether driver was created or not.
         if (driver == null) {
-            Device device = new Device(getDeviceInfo(capabilities.asMap()));
+            Map<String, Object> capabilitiesMap = capabilities.asMap();
+            LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
+            Device device = new Device(getDeviceInfo(capabilitiesMap));
             IDriverPool.registerDevice(device);
-            Assert.fail(String.format("Unable to initialize driver: %s! \nudid: %s.\ndevice: %s.", name, capabilities.getCapability("udid").toString(),
-                    capabilities.getCapability("deviceName").toString()));
+            Assert.fail(String.format("Unable to initialize driver: %s! \nCapabilities: %s.", name, capabilitiesMap.toString()));
         }
 
         Device device = IDriverPool.getNullDevice();
