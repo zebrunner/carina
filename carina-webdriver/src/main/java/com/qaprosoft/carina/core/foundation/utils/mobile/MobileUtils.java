@@ -743,7 +743,7 @@ public class MobileUtils {
             multiTouch.add(tAction0).add(tAction1);
             multiTouch.perform(); 
         } catch (Exception e) {
-            LOGGER.info("Error during zooming", e);
+            LOGGER.error("Error during zooming", e);
         }
         LOGGER.info("Zoom has been performed");
     }
