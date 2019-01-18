@@ -47,7 +47,6 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoType;
 import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 
 /**
@@ -128,7 +127,8 @@ public class MobileFactory extends AbstractFactory {
                         
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
                                 .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality")))
-                                .withVideoType(VideoType.H264)
+                                // TODO [nkrasnik]: appium_client 7.0.0 requirments https://github.com/appium/java-client/releases/tag/v7.0.0
+                                .withVideoType(R.CONFIG.get("screen_record_ios_codec"))
                                 .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
