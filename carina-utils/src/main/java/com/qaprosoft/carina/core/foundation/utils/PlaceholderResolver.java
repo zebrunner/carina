@@ -55,9 +55,9 @@ public class PlaceholderResolver {
                 }
             }
         } else {
-            if (!key.startsWith(SpecialKeywords.CAPABILITIES)) {
-                LOGGER.warn("Value not resolved by key: " + key);
-            }
+			if (!key.startsWith(SpecialKeywords.CAPABILITIES) && !key.endsWith(Configuration.Parameter.URL.getKey())) {
+				LOGGER.warn("Value not resolved by key: " + key);
+			}
         }
         return value;
     }
