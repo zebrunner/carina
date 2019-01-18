@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public class DataProviderFactory {
                     Constructor<?> ctor = clazz.getConstructor();
                     object = ctor.newInstance();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("DataProvider failure", e);
                 }
 
                 BaseDataProvider activeProvider = (BaseDataProvider) object;
@@ -94,8 +94,7 @@ public class DataProviderFactory {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
-                // do nothing
+                LOGGER.error("DataProvider failure", e);
             }
         }
 

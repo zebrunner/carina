@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public abstract class AbstractFactory {
 
 		if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
 			if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
-				LOGGER.info("To optimize video recording if will be disabled for attempt {" + RetryCounter.getRunCount()
+				LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
 						+ "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
 				// disable video recording for not the final retry if
 				// "optimize_video_recording=true"

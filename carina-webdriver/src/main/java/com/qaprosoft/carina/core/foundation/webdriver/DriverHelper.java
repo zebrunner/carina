@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -25,7 +26,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -54,7 +54,6 @@ import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
@@ -73,8 +72,6 @@ public class DriverHelper {
 
     protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 
-    protected static Wait<WebDriver> wait;
-
     protected long timer;
 
     protected WebDriver driver;
@@ -92,7 +89,7 @@ public class DriverHelper {
         this.driver = driver;
 
         if (driver == null) {
-            throw new RuntimeException("[" + DevicePool.getDevice().getName() + "] WebDriver not initialized, check log files for details!");
+            throw new RuntimeException("[" + IDriverPool.getDefaultDevice().getName() + "] WebDriver not initialized, check log files for details!");
         }
 
     }
@@ -183,7 +180,7 @@ public class DriverHelper {
             }
             ret = (elements[i].size() > 0);
             if (!ret) {
-                LOGGER.error("List of elements[" + i + "] from elements " + elements.toString() + " is empty.");
+                LOGGER.error("List of elements[" + i + "] from elements " + Arrays.toString(elements) + " is empty.");
                 return false;
             }
         }
@@ -211,25 +208,21 @@ public class DriverHelper {
      */
     public boolean isAnyElementPresent(long timeout, ExtendedWebElement... elements) {
         int index = 0;
-        boolean present = false;
         int counts = 10;
         timeout = timeout / counts;
         if (timeout < 1)
             timeout = 1;
-        while (!present && index++ < counts) {
+        while (index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = elements[i].isElementPresent(timeout);
-                if (present) {
+                if (elements[i].isElementPresent(timeout)) {
                     LOGGER.debug(elements[i].getNameWithLocator() + " is present");
                     return true;
                 }
             }
         }
-        if (!present) {
-            LOGGER.error("Unable to find any element from array: " + elements.toString());
-            return false;
-        }
-        return present;
+        
+        LOGGER.error("Unable to find any element from array: " + Arrays.toString(elements));
+        return false;
     }
 
     /**
@@ -253,15 +246,13 @@ public class DriverHelper {
      */
     public ExtendedWebElement returnAnyPresentElement(long timeout, ExtendedWebElement... elements) {
         int index = 0;
-        boolean present = false;
         int counts = 10;
         timeout = timeout / counts;
         if (timeout < 1)
             timeout = 1;
-        while (!present && index++ < counts) {
+        while (index++ < counts) {
             for (int i = 0; i < elements.length; i++) {
-                present = elements[i].isElementPresent(timeout);
-                if (present) {
+                if (elements[i].isElementPresent(timeout)) {
                     LOGGER.debug(elements[i].getNameWithLocator() + " is present");
                     return elements[i];
                 }
@@ -269,7 +260,7 @@ public class DriverHelper {
         }
         //throw exception anyway if nothing was returned inside for cycle
         LOGGER.error("All elements are not present");
-        throw new RuntimeException("Unable to find any element from array: " + elements.toString());
+        throw new RuntimeException("Unable to find any element from array: " + Arrays.toString(elements));
     }
 
     /**
@@ -368,7 +359,7 @@ public class DriverHelper {
             }
         }
         if (!clicked) {
-            throw new RuntimeException("Unable to click onto any elements from array: " + elements.toString());
+            throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
         }
     }
 
@@ -378,16 +369,16 @@ public class DriverHelper {
      * @param url
      *            to open.
      */
-    public void openURL(String url) {
-        String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
-        decryptedURL = decryptedURL.contains("http:") || decryptedURL.contains("https:") ? decryptedURL
-                : Configuration
-                        .get(Parameter.URL) + decryptedURL;
-        WebDriver drv = getDriver();
-        
-        Messager.OPENING_URL.info(url);
-        
-        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+	public void openURL(String url) {
+		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+
+		decryptedURL = getEnvArgURL(decryptedURL);
+
+		WebDriver drv = getDriver();
+
+		Messager.OPENING_URL.info(url);
+
+		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
         
         try {
             drv.get(decryptedURL);
@@ -413,7 +404,9 @@ public class DriverHelper {
      */
     public boolean isUrlAsExpected(String expectedURL) {
         String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
-        decryptedURL = decryptedURL.startsWith("http") ? decryptedURL : Configuration.get(Parameter.URL) + decryptedURL;
+        
+        decryptedURL = getEnvArgURL(decryptedURL);
+        
         WebDriver drv = getDriver();
         if (LogicUtils.isURLEqual(decryptedURL, drv.getCurrentUrl())) {
             Messager.EXPECTED_URL.info(drv.getCurrentUrl());
@@ -423,6 +416,24 @@ public class DriverHelper {
             return false;
         }
     }
+    
+    
+	/**
+	 * Get full or relative URL considering Env argument
+	 * 
+	 * @param decryptedURL
+	 * @return url
+	 */
+	private String getEnvArgURL(String decryptedURL) {
+		if (!(decryptedURL.contains("http:") || decryptedURL.contains("https:"))) {
+			if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
+				decryptedURL = Configuration.get(Parameter.URL) + decryptedURL;
+			} else {
+				decryptedURL = Configuration.getEnvArg(Parameter.URL.getKey()) + decryptedURL;
+			}
+		}
+		return decryptedURL;
+	}
 
     /**
      * Pause for specified timeout.
@@ -450,7 +461,7 @@ public class DriverHelper {
         boolean result;
         final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
         final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> drv.getTitle().contains(decryptedExpectedTitle));
             result = true;
@@ -581,7 +592,7 @@ public class DriverHelper {
      */
     public void acceptAlert() {
         WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().accept();
@@ -596,7 +607,7 @@ public class DriverHelper {
      */
     public void cancelAlert() {
         WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().dismiss();
@@ -630,7 +641,7 @@ public class DriverHelper {
     public boolean isPageOpened(final AbstractPage page, long timeout) {
         boolean result;
         final WebDriver drv = getDriver();
-        wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
         try {
             wait.until((Function<WebDriver, Object>) dr -> LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl()));
             result = true;
@@ -839,7 +850,7 @@ public class DriverHelper {
         this.driver = driver;
     }
 
-    protected WebDriver getDriver() {
+    public WebDriver getDriver() {
         if (driver == null) {
             long currentThreadId = Thread.currentThread().getId();
             LOGGER.error("There is no any initialized driver for thread: " + currentThreadId);
@@ -859,7 +870,7 @@ public class DriverHelper {
 		boolean result;
 		final WebDriver drv = getDriver();
 		Timer.start(ACTION_NAME.WAIT);
-		wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {
 			wait.until(condition);

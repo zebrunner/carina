@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ public class NotificationUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("callPushService failure", e);
         }
         return null;
     }
@@ -117,7 +117,7 @@ public class NotificationUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getPushServiceResponse failure", e);
         }
         return null;
     }
@@ -161,7 +161,7 @@ public class NotificationUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getGetServiceResponse failure", e);
         }
         return null;
     }

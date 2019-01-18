@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,4 +168,11 @@ public class SpecialKeywords {
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
     public static final String QTEST_PROJECT_ID = "qTestProjectId";
+
+
+    // ------------- TEST EXECUTION FILTERS CONSTANTS ---------------
+    public static final String RULE_FILTER_VALUE_SPLITTER = "=>";
+    public static final String RULE_FILTER_SPLITTER = ";;";
+    public static final String RULE_FILTER_AND_CONDITION = "&&";
+
 }

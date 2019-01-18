@@ -1,5 +1,79 @@
 # Release notes
 
+### 6.0.5 (2019-01-04)
+
+**Enhancements**
+
+* [#565](https://github.com/qaprosoft/carina/issues/565) carina-api: api.validateResponseAgainstJSONSchema should support schema draft 7
+* Set of improvements into the IDriverPool to make its modification threads safety
+* Start global migration of MobileUtils to IMobileUtils interface 
+* Register device information in global driversPool for each driver session
+* Moved drivers quit and devices disconnect onto the java shutdown hook to kill sessions even for aborted tests/jobs
+* Saved information about integrated with STF device in Device object with automatic disconnect on finish
+* Do not show encrypted text in logs (aka user credentials etc)
+
+**Fixes**
+
+* [#590](https://github.com/qaprosoft/carina/issues/594) org.openqa.selenium.remote.RemoteWebDriver cannot be cast to io.appium.java_client.MobileDriver
+* [#590](https://github.com/qaprosoft/carina/issues/590) Device type is defined incorrectly in several cases for iOS/Android tests
+* [#588](https://github.com/qaprosoft/carina/issues/588) we still can generate ConcurrentModificationException during driver quit operation
+* [#574](https://github.com/qaprosoft/carina/issues/574) annoying INFO message in log for specific use-cases
+* [#459](https://github.com/qaprosoft/carina/issues/459) Enormous amount of logs appears in console on attempt to use element.clickIfPresent(3)
+* Disabled screenshots capturing for three more driver failures: 
+   * was terminated due to CLIENT_STOPPED_SESSION
+   * Session ID is null. Using WebDriver after calling quit()
+   * was terminated due to BROWSER_TIMEOUT
+
+**Known Issues**
+
+* N/A
+
+**[DEPENDENCIES UPDATES]**
+
+* N/A
+
+### 6.0.4 (2018-12-27)
+
+**Fixes**
+
+* [#553](https://github.com/qaprosoft/carina/issues/553) 6.0: Rebuild failures doesn't work
+* [#582](https://github.com/qaprosoft/carina/issues/582) Hardcoded parameters in carina archetype (-Dname and -Durl)
+
+**Known Issues**
+
+* N/A
+
+**[DEPENDENCIES UPDATES]**
+
+* zafira-client 3.3.47->3.3.49
+
+
+### 6.0.3 (2018-12-21)
+
+**Enhancements**
+
+* [#570](https://github.com/qaprosoft/carina/issues/570) Updated iDriverPool returning back automatic driver quit onto AfterMethod phase as it was in 5.3.x core. New approach was rejected due to the discovered regressions 
+* [#567](https://github.com/qaprosoft/carina/issues/567) Added new browsermob_host parameter to override automatically detected IP address for embedded proxy. Updated manual accordingly http://qaprosoft.github.io/carina/proxy
+* [#568](https://github.com/qaprosoft/carina/issues/568) Returned Chrome browser maximize to the default method removing old workaround with hardcoded dimension
+* [576](https://github.com/qaprosoft/carina/issues/576) Removed sensitive information from logs during onType and onAttachFile operations
+* [#574](https://github.com/qaprosoft/carina/issues/574) Removed invalid log4j appender and hide noisy log messages on startup
+* Adjust custom_capabilities usage allowing not only define it globally  but generate for each driver session
+```
+  // start new driver with generated capabilities based on capabilities inside 
+  // Samsung_Galaxy_S8.properties property file
+   WebDriver drv = getDriver("name", new CapabilitiesLoader().getCapabilities("browserstack/android/Samsung_Galaxy_S8.properties"))
+```
+* Removed obsolete extra_capabilities configuration parameter 
+* Declared [Spring Plugins](https://mvnrepository.com/repos/springio-plugins-release) repository in pom.xml to download from scratch monte-repack (javax.media.jai) dependency
+
+**Known Issues**
+
+* [#553](https://github.com/qaprosoft/carina/issues/553) In the integration with Zafira environment rerun failures is still broke 
+
+**[DEPENDENCIES UPDATES]**
+
+* N/A
+
 ### 6.0.2 (2018-12-04)
 
 **Enhancements**

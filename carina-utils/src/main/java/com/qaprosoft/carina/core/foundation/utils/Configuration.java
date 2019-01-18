@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,7 +247,11 @@ public class Configuration {
 
         DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
 
-        DEFAULT_DEVICE_LANGUAGE("default_device_language");
+        DEFAULT_DEVICE_LANGUAGE("default_device_language"),
+
+        // Test Execution Filter rules
+        TEST_RUN_RULES("test_run_rules");
+
 
         private final String key;
 
@@ -307,12 +311,12 @@ public class Configuration {
         asString.append("\n============= Test configuration =============\n");
         for (Parameter param : Parameter.values()) {
             if (!Parameter.CRYPTO_KEY_PATH.equals(param)) {
-                asString.append(String.format("%s=%s\n", param.getKey(), Configuration.get(param)));
+                asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
         }
 
         //write into the log extra information about selenium_host together with capabilities
-        asString.append(String.format("%s=%s\n", "selenium_host", R.CONFIG.get("selenium_host")));
+        asString.append(String.format("%s=%s%n", "selenium_host", R.CONFIG.get("selenium_host")));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -320,7 +324,7 @@ public class Configuration {
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                asString.append(String.format("%s=%s\n", entry.getKey(), R.CONFIG.get(entry.getKey())));
+                asString.append(String.format("%s=%s%n", entry.getKey(), R.CONFIG.get(entry.getKey())));
             }
         }
 

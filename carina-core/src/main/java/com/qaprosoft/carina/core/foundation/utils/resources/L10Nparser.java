@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ public class L10Nparser {
             LOGGER.debug("Using default parameters because of error: " + e);
         }
         if (add_new_loc_path.toLowerCase().contains("null")
-                || add_new_loc_path.toLowerCase().contains("{must_override}") | add_new_loc_path.isEmpty()) {
+                || add_new_loc_path.toLowerCase().contains("{must_override}") || add_new_loc_path.isEmpty()) {
             add_new_loc_path = ReportContext.getArtifactsFolder().getAbsolutePath();
         }
 

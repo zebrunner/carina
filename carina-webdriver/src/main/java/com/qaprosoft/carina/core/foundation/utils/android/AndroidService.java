@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps.FakeGpsPage;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
@@ -121,7 +120,7 @@ public class AndroidService implements IDriverPool {
      * @return String command output in one line
      */
     public String executeAdbCommand(String command) {
-        String deviceName = DevicePool.getDevice().getAdbName();
+        String deviceName = IDriverPool.getDefaultDevice().getAdbName();
         if (!deviceName.isEmpty()) {
             // add remoteURL/udid reference
             command = "-s " + deviceName + " " + command;
@@ -377,7 +376,7 @@ public class AndroidService implements IDriverPool {
      */
     public List<Notification> getNotifications(boolean withLogger) {
         String[] getNotificationsCmd = null;
-        String deviceName = DevicePool.getDevice().getAdbName();
+        String deviceName = IDriverPool.getDefaultDevice().getAdbName();
         if (!deviceName.isEmpty()) {
             getNotificationsCmd = CmdLine.insertCommandsAfter(baseInitCmd, "-s", deviceName, "shell", "dumpsys", "notification");
         } else {
@@ -681,7 +680,7 @@ public class AndroidService implements IDriverPool {
 
         String initLanguage = language;
 
-        String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
 
         LOGGER.info("Do not concat language for Android. Keep: " + language);
         language = language.replace("_", "-");
@@ -742,7 +741,7 @@ public class AndroidService implements IDriverPool {
                 LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
-                currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
                 LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
                     LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
@@ -1053,10 +1052,10 @@ public class AndroidService implements IDriverPool {
             return true;
         }
 
-        String currentAndroidVersion = DevicePool.getDevice().getOsVersion();
+        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
         if (currentAndroidVersion.contains("7.") ||
-                (DevicePool.getDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
+                (IDriverPool.getDefaultDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
             LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
             workflow = ChangeTimeZoneWorkflow.APK;
         }

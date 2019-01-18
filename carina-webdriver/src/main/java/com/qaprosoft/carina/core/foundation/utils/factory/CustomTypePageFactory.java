@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import com.qaprosoft.carina.core.foundation.exception.RequiredCtorNotFoundExcept
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public class CustomTypePageFactory implements IDriverPool {
@@ -55,6 +54,16 @@ public class CustomTypePageFactory implements IDriverPool {
     protected static final Logger LOGGER = Logger
             .getLogger(CustomTypePageFactory.class);
 
+    /**
+     * DEPRECATED: Actual functionality was moved to ICustomTypePageFactory that extends IDriverPool.
+     * Each page should extend AbstractPage which implements ICustomTypePageFactory
+     * 
+     * @param driver
+     * @param parentClass
+     * @param parameters
+     * @return class instance
+     */
+    @Deprecated
     public static <T extends AbstractPage> T initPage(WebDriver driver,
             Class<T> parentClass, Object... parameters) {
 
@@ -67,9 +76,9 @@ public class CustomTypePageFactory implements IDriverPool {
                 .getSubTypesOf(parentClass);
         LOGGER.debug("Relatives classes count:" + setClasses.size());
         Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
-        Type screenType = DevicePool.getDevice().getDeviceType();
+        Type screenType = IDriverPool.getDefaultDevice().getDeviceType();
 
-        Device device = DevicePool.getDevice();
+        Device device = IDriverPool.getDefaultDevice();
         // default version in case if it is desktop driver
         String deviceVersion = "1";
         if (!device.getOsVersion().isEmpty()) {
@@ -156,7 +165,7 @@ public class CustomTypePageFactory implements IDriverPool {
     @SuppressWarnings("unchecked")
     private static <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz,
             Object... parameters) {
-        LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + parameters.toString());
+        LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
         Class<?>[] parametersTypes;
         List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
         for (Object param : parameters) {

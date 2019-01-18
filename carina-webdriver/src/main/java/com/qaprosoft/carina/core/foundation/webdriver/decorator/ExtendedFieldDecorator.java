@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,14 +204,13 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 			rootBy = (By) byContextField.get(locator);
 
 		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
+		    LOGGER.error("getLocatorBy->NoSuchFieldException failure", e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+	          LOGGER.error("getLocatorBy->IllegalAccessException failure", e);
 		} catch (ClassCastException e) {
-			e.printStackTrace();
-		} catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.error("Unable to get rootBy via reflection!", thr);
+		    LOGGER.error("getLocatorBy->ClassCastException failure", e);
+		} catch (Exception e) {
+			LOGGER.error("Unable to get rootBy via reflection!", e);
 		}
     	
     	return rootBy;

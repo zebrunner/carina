@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,10 @@ public class AdbExecutor {
     private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
 
     // private static final String REMOTE_ADB_EXECUTION_CMD = "ssh %s@%s %s";
-
     private static String[] cmdInit;
 
     public AdbExecutor() {
-        initDefaultCmd();
+        cmdInit = "adb".split(" ");
     }
 
     /**
@@ -50,32 +49,6 @@ public class AdbExecutor {
      */
     public String[] getDefaultCmd() {
         return cmdInit;
-    }
-
-    private void initDefaultCmd() {
-        String tempCmd = "";
-        /*
-         * String adbPath = "adb";
-         * if (!Configuration.get(Parameter.ADB_PATH).isEmpty()) {
-         * adbPath = Configuration.get(Parameter.ADB_PATH);
-         * }
-         * 
-         * if (DevicePool.isSystemDistributed()) {
-         * // check if device server value equals to IP of the PC where tests were launched.
-         * // adb can be executed locally in this case.
-         * String currentIP = HttpClient.getIpAddress();
-         * LOGGER.debug("Local IP: ".concat(currentIP));
-         * String remoteServer = DevicePool.getServer();
-         * if (!remoteServer.equals(currentIP)) {
-         * String login = Configuration.get(Parameter.SSH_USERNAME);
-         * tempCmd = String.format(REMOTE_ADB_EXECUTION_CMD, login, remoteServer, adbPath);
-         * }
-         * }
-         */
-
-        // TODO: it can be slightly modified
-        // when issues with remote adb execution will be resolved: "concat("-H ADB_HOST -P ADB_PORT")"
-        cmdInit = tempCmd.concat("adb").split(" ");
     }
 
     @Deprecated

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -72,17 +71,17 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
 
 /*
- * AbstractTest - base test for UI and API tests.
+ * CarinaListener - base carin-core TestNG Listener.
  * 
- * @author Alex Khursevich
+ * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener {
     protected static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
@@ -91,6 +90,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
+    
+    protected static boolean automaticDriversCleanup = true; 
 
     static {
         try {
@@ -271,14 +272,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private boolean hasDependencies(ITestResult result) {
         String methodName = result.getMethod().getMethodName();
-        LOGGER.debug("current method: " + methodName);
+        String className = result.getMethod().getTestClass().getName();
+        LOGGER.debug("current method: " + className + "." + methodName);
 
         // analyze all suite methods and return true if any of them depends on
         // existing method
         List<ITestNGMethod> methods = result.getTestContext().getSuite().getAllMethods();
         for (ITestNGMethod method : methods) {
             LOGGER.debug("analyze method for dependency: " + method.getMethodName());
-            if (Arrays.asList(method.getMethodsDependedUpon()).contains(methodName)) {
+            
+            List<String> dependencies = Arrays.asList(method.getMethodsDependedUpon());
+
+            if (dependencies.contains(methodName) ||
+                    dependencies.contains(className + "." + methodName)) {
                 return true;
             }
         }
@@ -287,9 +293,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private void onTestFinish(ITestResult result) {
         try {
-            if (!hasDependencies(result)) {
-                quitDrivers(Phase.BEFORE_METHOD);
-                quitDrivers(Phase.METHOD);
+            if (automaticDriversCleanup && !hasDependencies(result)) {
+                quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
 
             // TODO: improve later removing duplicates with AbstractTestListener
@@ -302,7 +307,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 return;
             }
 
-            // handle AbstractTest->SkipExecution
+            // handle CarinaListener->SkipExecution
             if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                     && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
                 // [VD] it is prohibited to release TestInfoByThread in this
@@ -323,7 +328,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Artifacts.clearArtifacts();
 
         } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterTestMethod!", e);
+            LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }
     }
 
@@ -404,19 +409,27 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.debug("Finish email report generation.");
 
         } catch (Exception e) {
-            LOGGER.error("Exception in AbstractTest->executeAfterSuite.", e);
+            LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
         } finally {
             // do nothing
         }
+    }
+    
+    /**
+     * Disable automatic drivers cleanup after each TestMethod and switch to controlled by tests itself.
+     * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
+     */
+    public static void disableDriversCleanup() {
+        automaticDriversCleanup = false;
     }
 
     // TODO: remove this private method
     private String getDeviceName() {
         String deviceName = "Desktop";
 
-        if (!DevicePool.getDevice().isNull()) {
+        if (!IDriverPool.getDefaultDevice().isNull()) {
             // Samsung - Android 4.4.2; iPhone - iOS 7
-            Device device = DevicePool.getDevice();
+            Device device = IDriverPool.getDefaultDevice();
             String deviceTemplate = "%s - %s %s";
             deviceName = String.format(deviceTemplate, device.getName(), device.getOs(), device.getOsVersion());
         }
@@ -785,16 +798,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         private void quitAllDriversOnHook() {
             // as it is shutdown hook just try to quit all existing drivers one by one
 
-            Iterator<CarinaDriver> iter = driversPool.iterator();
-
-            while (iter.hasNext()) {
-                CarinaDriver carinaDriver = iter.next();
-
+            for (CarinaDriver carinaDriver : driversPool) {
                 // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks
                 String name = carinaDriver.getName();
-                LOGGER.warn("Trying to quite driver '" + name + "' on shutdown hook action!");
+                LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
+                carinaDriver.getDevice().disconnectRemote();
                 ProxyPool.stopProxy();
-
                 try {
                     LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();

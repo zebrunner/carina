@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,19 +75,19 @@ public enum Messager implements IMessager {
 
     ELEMENT_PRESENT("PASS: element '%s' presents."),
 
-    ELEMENT_NOT_PRESENT("FAIL: element '%s' does not present!"),
+    ELEMENT_NOT_PRESENT("FAIL: element '%s' is not present!"),
     
     ELEMENT_CONDITION_NOT_VERIFIED("FAIL: %s - waitCondition for element '%s' not satisfied!"),
 
-    ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' does not present"),
+    ELEMENT_NOT_PRESENT_PASS("PASS: element '%s' is not present"),
 
     ELEMENT_WITH_ATTRIBUTE_PRESENT("PASS: element '%s' with attribute '%s' = '%s' presents."),
 
-    ELEMENT_WITH_ATTRIBUTE_NOT_PRESENT("FAIL: element '%s' with attribute '%s' = '%s' does not present!"),
+    ELEMENT_WITH_ATTRIBUTE_NOT_PRESENT("FAIL: element '%s' with attribute '%s' = '%s' is not present!"),
 
     ELEMENT_WITH_TEXT_PRESENT("PASS: element '%s' with text '%s' presents."),
 
-    ELEMENT_WITH_TEXT_NOT_PRESENT("FAIL: element '%s' with text: '%s' does not present!"),
+    ELEMENT_WITH_TEXT_NOT_PRESENT("FAIL: element '%s' with text: '%s' is not present!"),
 
     UNEXPECTED_ELEMENT_PRESENT("FAIL: unexpected element '%s' present!"),
 

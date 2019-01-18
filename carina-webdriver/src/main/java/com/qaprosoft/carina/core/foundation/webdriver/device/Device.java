@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.performance.DRIVER_TYPE;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -57,11 +58,13 @@ public class Device extends RemoteDevice implements IDriverPool {
      * Store udids of devices where related apps were uninstalled
      */
     private static List<String> clearedDeviceUdids = new ArrayList<>();
+    private boolean isStfEnabled;
 
     AdbExecutor executor = new AdbExecutor();
 
     public Device() {
         this("", "", "", "", "", "");
+        this.isStfEnabled = false;
     }
 
     public Device(String name, String type, String os, String osVersion, String udid, String remoteURL) {
@@ -134,6 +137,8 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
 
         setProxyPort(proxyPort);
+        
+        setCapabilities(capabilities);
     }
 
     public boolean isPhone() {
@@ -187,6 +192,8 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull())
             return;
 
+        isStfEnabled = true;
+        
         LOGGER.debug("adb connect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
         executor.execute(cmd);
@@ -202,6 +209,9 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     public void disconnectRemote() {
+        if (!isStfEnabled)
+            return;
+        
         if (isNull())
             return;
 
@@ -671,22 +681,44 @@ public class Device extends RemoteDevice implements IDriverPool {
         // TODO: investigate how to connect screenshot with xml dump: screenshot
         // return File -> Zip png and uix or move this logic to zafira
         
-        LOGGER.debug("UI dump generation...");
-        WebDriver driver = getDriver();
-        String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
-        String pageSource = driver.getPageSource();
-        pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
-                replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
-        
-        File file = null;
         try {
-            file = new File(fileName);
-            FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
-        } catch (IOException e) {
-            LOGGER.warn("Error has been met during attempt to extract xml tree.", e);
+            LOGGER.debug("UI dump generation...");
+            WebDriver driver = getDriver();
+            String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
+            String pageSource = driver.getPageSource();
+            pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
+                    replaceAll(SpecialKeywords.ANDROID_END_NODE, SpecialKeywords.ANDROID_END_UIX_NODE);
+            
+            File file = null;
+            try {
+                file = new File(fileName);
+                FileUtils.writeStringToFile(file, pageSource, Charset.forName("ASCII"));
+            } catch (IOException e) {
+                LOGGER.warn("Error has been met during attempt to extract xml tree.", e);
+            }
+            LOGGER.debug("XML file path: ".concat(fileName));
+            return file;
+        } catch (Exception e) {
+            LOGGER.error("Undefined failure during UiDump generation for Android device!", e);
         }
-        LOGGER.debug("XML file path: ".concat(fileName));
-        return file;
+        
+        return null;
+    }
+    
+    /**
+     * return unique ACTION_NAME for driver to measure selenium slave usage 
+     * @return WEB_DRIVER or MOBILE_DRIVER
+     */
+    public DRIVER_TYPE getMetricName() {
+        DRIVER_TYPE metricName = DRIVER_TYPE.WEB_DRIVER;
+        if (isMobile()) {
+            metricName = DRIVER_TYPE.MOBILE_DRIVER;
+        }
+        return metricName;
+    }
+    
+    private boolean isMobile() {
+        return SpecialKeywords.ANDROID.equalsIgnoreCase(getOs()) || SpecialKeywords.IOS.equalsIgnoreCase(getOs());
     }
 
     private boolean isConnected() {

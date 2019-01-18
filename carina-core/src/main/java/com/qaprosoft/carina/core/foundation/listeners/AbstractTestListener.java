@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
@@ -189,8 +188,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String getDeviceName() {
-        String deviceName = DevicePool.getDevice().getName();
-        String deviceUdid = DevicePool.getDevice().getUdid();
+        String deviceName = IDriverPool.getDefaultDevice().getName();
+        String deviceUdid = IDriverPool.getDefaultDevice().getUdid();
 
         if (!deviceName.isEmpty() && !deviceUdid.isEmpty()) {
             deviceName = deviceName + " - " + deviceUdid;
@@ -212,7 +211,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
         
         // device log
-        Device device = DevicePool.getDevice();
+        Device device = IDriverPool.getDefaultDevice();
         if (!device.isNull()) {
             LOGGER.debug("Device isn't null additional artifacts will be extracted.");
             File sysLogFile = device.saveSysLog();

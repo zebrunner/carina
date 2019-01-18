@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@ import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -37,8 +34,8 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -46,7 +43,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
  * @author Alex Khursevich
  */
 @Listeners({ CarinaListener.class })
-public abstract class AbstractTest implements IDriverPool, ITestCases {
+public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);

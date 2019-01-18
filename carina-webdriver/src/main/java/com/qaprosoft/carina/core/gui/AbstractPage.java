@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
-import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
@@ -34,12 +40,14 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  * 
  * @author Alex Khursevich
  */
-public abstract class AbstractPage extends AbstractUIObject {
-    protected String pageURL = Configuration.get(Parameter.URL);
+public abstract class AbstractPage extends AbstractUIObject implements ICustomTypePageFactory {
+    protected static final Logger LOGGER = Logger.getLogger(AbstractPage.class);
+    
+	protected String pageURL = getUrl();
 
-    public AbstractPage(WebDriver driver) {
-        super(driver);
-    }
+	public AbstractPage(WebDriver driver) {
+		super(driver);
+	}
 
     /**
      * Opens page according to specified in constructor URL.
@@ -115,4 +123,14 @@ public abstract class AbstractPage extends AbstractUIObject {
     public String savePageAsPdf() throws IOException, DocumentException {
         return savePageAsPdf(true);
     }
+
+	private String getUrl() {
+		String url = "";
+		if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
+			url = Configuration.get(Parameter.URL);
+		} else {
+			url = Configuration.getEnvArg(Parameter.URL.getKey());
+		}
+		return url;
+	}
 }

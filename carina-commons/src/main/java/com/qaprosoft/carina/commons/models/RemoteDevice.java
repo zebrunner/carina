@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.commons.models;
 
+import org.openqa.selenium.Capabilities;
+
 /**
  * RemoteDevice represents base device info used in Selenium Hub.
  * 
@@ -29,6 +31,7 @@ public class RemoteDevice {
     private String remoteURL;
     private String vnc;
     private String proxyPort;
+    private Capabilities capabilities;
 
     public String getName() {
         return name;
@@ -92,5 +95,13 @@ public class RemoteDevice {
 
     public void setProxyPort(String proxyPort) {
         this.proxyPort = proxyPort;
+    }
+    
+    public Capabilities getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(Capabilities capabilities) {
+        this.capabilities = capabilities;
     }
 }

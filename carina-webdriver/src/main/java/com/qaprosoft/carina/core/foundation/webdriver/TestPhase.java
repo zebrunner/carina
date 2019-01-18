@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 //TODO: move into better module/package
 public class TestPhase {
     public enum Phase {
-    	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE;
+    	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
     }
 
     //TODO: organize phases verification:

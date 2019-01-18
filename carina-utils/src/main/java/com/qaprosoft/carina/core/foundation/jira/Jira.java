@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ public class Jira {
         int knownIssuesCount = getTickets(result).size();
 
         // [VD] QUALITY-1408 disable retry test execution if ignore_known_issues is enabled and jira ticket(s) provided
-        boolean disableRetryForKnownIssues = ignoreKnownIssue & (knownIssuesCount > 0);
+        boolean disableRetryForKnownIssues = ignoreKnownIssue && (knownIssuesCount > 0);
 
         return disableRetryForKnownIssues;
     }

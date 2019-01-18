@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class CommonUtils {
             long timeoutLong = timeoutFloat.longValue();
             Thread.sleep(timeoutLong);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // do nothing
         }
         LOGGER.debug("Pause is overed. Keep going..");
         Timer.stop(ACTION_NAME.PAUSE);

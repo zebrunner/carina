@@ -76,8 +76,7 @@ public interface IMessager {
             }
             message = String.format(getPattern(), (Object[]) args);
         } catch (Exception e) {
-            getLogger().error("Report message creation error!");
-            e.printStackTrace();
+            getLogger().error("Report message creation error!", e);
         }
         return message;
     }

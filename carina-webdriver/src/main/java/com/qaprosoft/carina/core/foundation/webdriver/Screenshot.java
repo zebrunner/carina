@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2018 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -47,9 +46,9 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
@@ -163,13 +162,15 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static String captureFailure(WebDriver driver, String comment) {
+        LOGGER.debug("Screenshot->captureFailure starting...");
         String screenName = capture(driver, true, comment, true);
 
         // XML layout extraction
-        File uiDumpFile = DevicePool.getDevice().generateUiDump(screenName);
+        File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
         if (uiDumpFile != null) {
             uiDumpFile.getPath().split("\\/");
         }
+        LOGGER.debug("Screenshot->captureFailure finished.");
         return screenName;
     }
 
@@ -293,6 +294,8 @@ public class Screenshot {
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
+        LOGGER.debug("Screenshot->capture starting...");
+        
         if (isTakeScreenshot) {
             try {
             	if (!isCaptured(comment)) {
@@ -372,12 +375,14 @@ public class Screenshot {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
             	LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+            	e.printStackTrace();
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot due to the Exception!", e);
             } finally {
             	Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
         }
+        LOGGER.debug("Screenshot->capture finished.");
         return screenName;
     }
 
@@ -408,11 +413,11 @@ public class Screenshot {
                             .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
                     LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
                 } catch (Exception e) {
-                    LOGGER.error("Can't save file to Amazon S3", e);
+                    LOGGER.debug("Can't save file to Amazon S3!", e);
                 }
             });
         } catch (Exception e) {
-            LOGGER.error("Can't save file to Amazon S3", e);
+            LOGGER.debug("Can't save file to Amazon S3!", e);
         }
     }
 
@@ -507,6 +512,7 @@ public class Screenshot {
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("A session is either terminated or not started")
 				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
+				|| message.contains("was terminated due to CLIENT_STOPPED_SESSION")
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
@@ -517,7 +523,9 @@ public class Screenshot {
 				|| message.contains("cannot forward the request Connect to")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("was terminated due to TIMEOUT")
+				|| message.contains("was terminated due to BROWSER_TIMEOUT")
 				|| message.contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
+				|| message.contains("Session ID is null. Using WebDriver after calling quit()")
 				|| message.contains("Session timed out or not found");
 		return !disableScreenshot;
 	}
