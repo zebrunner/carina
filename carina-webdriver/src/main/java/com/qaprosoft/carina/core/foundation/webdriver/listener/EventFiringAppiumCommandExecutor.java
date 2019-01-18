@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
@@ -54,6 +55,8 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
+    
+    private static final Logger LOGGER = Logger.getLogger(EventFiringAppiumCommandExecutor.class.getName());
 
     private final Optional<DriverService> serviceOptional;
 
@@ -147,6 +150,9 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                 listener.beforeEvent(command);
             }
 
+            if (command.getName().equals("newSession")) {
+                LOGGER.info("New session request. Parameters: ".concat(command.getParameters().toString()));
+            }
             response = super.execute(command);
 
             for (IDriverCommandListener listener : listeners) {
