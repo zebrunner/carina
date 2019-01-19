@@ -200,8 +200,11 @@ public interface IDriverPool {
         WebDriver drv = getDriver(DEFAULT);
         Device device = nullDevice;
         DesiredCapabilities caps = new DesiredCapabilities();
+        
+        boolean keepProxy = false;
 
         if (isSameDevice) {
+            keepProxy = true;
             device = getDefaultDevice();
             LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
@@ -210,7 +213,7 @@ public interface IDriverPool {
         LOGGER.debug("before restartDriver: " + driversPool);
         for (CarinaDriver carinaDriver : driversPool) {
             if (carinaDriver.getDriver().equals(drv)) {
-                quitDriver(carinaDriver);
+                quitDriver(carinaDriver, keepProxy);
                 // [VD] don't remove break or refactor moving removal out of "for" cycle
                 driversPool.remove(carinaDriver);
                 break;
@@ -258,7 +261,7 @@ public interface IDriverPool {
             throw new RuntimeException("Unable to find driver '" + name + "'!");
         }
 
-        quitDriver(carinaDrv);
+        quitDriver(carinaDrv, false);
         driversPool.remove(carinaDrv);
 
         LOGGER.debug("after quitDriver: " + driversPool);
@@ -280,7 +283,7 @@ public interface IDriverPool {
         for (CarinaDriver carinaDriver : driversPool) {
             if ((phases.contains(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()))
                     || phases.contains(Phase.ALL)) {
-                quitDriver(carinaDriver);
+                quitDriver(carinaDriver, false);
                 drivers4Remove.add(carinaDriver);
             }
         }
@@ -291,10 +294,12 @@ public interface IDriverPool {
     }
 
     //TODO: [VD] make it as private after migrating to java 9+
-    default void quitDriver(CarinaDriver carinaDriver) {
+    default void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
         try {
             carinaDriver.getDevice().disconnectRemote();
-            ProxyPool.stopProxy();
+            if (!keepProxyDuring) {
+                ProxyPool.stopProxy();
+            }
             carinaDriver.getDriver().quit();
             Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName());
         } catch (WebDriverException e) {
