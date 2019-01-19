@@ -29,7 +29,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.Zoom;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
