@@ -168,8 +168,10 @@ public class MobileFactory extends AbstractFactory {
                 String debugInfo = getDebugInfo(exceptionMsg);
                 if (!debugInfo.isEmpty()) {
                     String udid = getUdidFromDebugInfo(debugInfo);
+                    String deviceName = getParamFromDebugInfo(debugInfo, "name");
                     device = new Device();
                     device.setUdid(udid);
+                    device.setName(deviceName);
                 }
             } else {
                 LOGGER.info("Debug info will be extracted from capabilities.");
@@ -302,6 +304,12 @@ public class MobileFactory extends AbstractFactory {
         }
     }
     
+    /**
+     * Method to extract debug info in case exception has been thrown during app installation
+     * 
+     * @param exceptionMsg
+     * @return debug info
+     */
     private String getDebugInfo(String exceptionMsg) {
         String debugInfoPattern = "\\[\\[\\[(.*)\\]\\]\\]";
 
@@ -318,18 +326,31 @@ public class MobileFactory extends AbstractFactory {
     }
 
     private String getUdidFromDebugInfo(String debugInfo) {
-        String udidPattern = "-s ([^\\s]*)";
+        return getParamFromDebugInfo(debugInfo, "-s");
+    }
+    
+    /**
+     * Method to extract specific parameter from debug info in case STF enabled
+     * Debug info example: [[[DEBUG info: adb -P 5037 -s 42002363960cb400 -name Samsung_Galaxy_J3 -udid 42002363960cb400]]]
+     * Example: -{paramName} {paramValue}
+     * 
+     * @param debugInfo
+     * @param paramName
+     * @return paramValue
+     */
+    private String getParamFromDebugInfo(String debugInfo, String paramName) {
+        String paramPattern = String.format("-%s ([^\\s]*)", paramName);
 
-        Pattern p = Pattern.compile(udidPattern);
+        Pattern p = Pattern.compile(paramPattern);
         Matcher m = p.matcher(debugInfo);
-        String deviceUdid = "";
+        String paramValue = "";
         if (m.find()) {
-            deviceUdid = m.group(1);
-            LOGGER.info("Found udid: ".concat(deviceUdid));
+            paramValue = m.group(1);
+            LOGGER.info(String.format("Found udid: %s", paramName).concat(paramValue));
         } else {
-            LOGGER.info("Device UDID hasn'been found");
+            LOGGER.info(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
         }
 
-        return deviceUdid;
+        return paramValue;
     }
 }
