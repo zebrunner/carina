@@ -326,7 +326,7 @@ public class MobileFactory extends AbstractFactory {
     }
 
     private String getUdidFromDebugInfo(String debugInfo) {
-        return getParamFromDebugInfo(debugInfo, "-s");
+        return getParamFromDebugInfo(debugInfo, "udid");
     }
     
     /**
@@ -346,7 +346,7 @@ public class MobileFactory extends AbstractFactory {
         String paramValue = "";
         if (m.find()) {
             paramValue = m.group(1);
-            LOGGER.info(String.format("Found udid: %s", paramName).concat(paramValue));
+            LOGGER.info(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
         } else {
             LOGGER.info(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
         }
