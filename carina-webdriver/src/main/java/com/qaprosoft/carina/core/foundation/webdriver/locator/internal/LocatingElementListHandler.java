@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -81,6 +83,9 @@ public class LocatingElementListHandler implements InvocationHandler {
 				}
 
 				ExtendedWebElement tempElement = new ExtendedWebElement(element, tempName, by);
+				Field searchContextField = locator.getClass().getDeclaredField("searchContext");
+				searchContextField.setAccessible(true);
+				tempElement.setSearchContext((SearchContext) searchContextField.get(locator));
 //				tempElement.setBy(tempElement.generateByForList(by, i));
 				extendedWebElements.add(tempElement);
 				i++;

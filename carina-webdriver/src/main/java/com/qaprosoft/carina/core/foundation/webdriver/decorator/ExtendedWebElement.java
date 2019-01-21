@@ -409,7 +409,11 @@ public class ExtendedWebElement {
         this.by = by;
     }
 
-    @Override
+	public void setSearchContext(SearchContext searchContext) {
+		this.searchContext = searchContext;
+	}
+
+	@Override
     public String toString() {
         return name;
     }
@@ -1024,7 +1028,11 @@ public class ExtendedWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-        	return new ExtendedWebElement(getElement().findElement(by), name, by);
+			try {
+				return new ExtendedWebElement(getCachedElement().findElement(by), name, by);
+			} catch (StaleElementReferenceException e) {
+				return new ExtendedWebElement(getElement().findElement(by), name, by);
+			}
         } else {
         	throw new NoSuchElementException("Unable to find dynamic element using By: " + by.toString());
         }
@@ -1039,7 +1047,11 @@ public class ExtendedWebElement {
         List<WebElement> webElements = new ArrayList<WebElement>();
         
         if (isPresent(by, timeout)) {
-        	webElements = getElement().findElements(by);
+			try {
+				webElements = getCachedElement().findElements(by);
+			} catch (StaleElementReferenceException e) {
+				webElements = getElement().findElements(by);
+			}
         } else {
         	throw new NoSuchElementException("Unable to find dynamic elements using By: " + by.toString());
         }
@@ -1799,14 +1811,14 @@ public class ExtendedWebElement {
         return resBy;
     }
     
-    private ExpectedCondition<?> getDefaultCondition(By myBy) {
+/*	private ExpectedCondition<?> getDefaultCondition(By myBy) {
         // generate the most popular wiatCondition to check if element visible or present
         return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                 ExpectedConditions.visibilityOfElementLocated(myBy));
-    }
-    
+    }*/
+
     // old functionality to remove completely after successfull testing
-/*    private ExpectedCondition<?> getDefaultCondition(By myBy) {
+    private ExpectedCondition<?> getDefaultCondition(By myBy) {
         // generate the most popular wiatCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
         if (element != null) {
@@ -1819,5 +1831,5 @@ public class ExtendedWebElement {
         }
 
         return waitCondition;
-    }*/
+    }
 }
