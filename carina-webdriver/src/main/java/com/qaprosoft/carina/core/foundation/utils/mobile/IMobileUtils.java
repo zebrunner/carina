@@ -719,9 +719,9 @@ public interface IMobileUtils extends IDriverPool {
         int width = scrSize.getWidth();
         LOGGER.debug("Screen height : " + height);
         LOGGER.debug("Screen width : " + width);
-        Point point1 = new Point(width / 2, height / 2 - 20);
+        Point point1 = new Point(width / 2, height / 2 - 30);
         Point point2 = new Point(width / 2, height / 10 * 3);
-        Point point3 = new Point(width / 2, height / 2 + 20);
+        Point point3 = new Point(width / 2, height / 2 + 30);
         Point point4 = new Point(width / 2, (7 * height) / 10);
         switch (type) {
         case OUT:
@@ -755,11 +755,9 @@ public interface IMobileUtils extends IDriverPool {
             tAction1.press(startPoint2).waitAction(waitOptions).moveTo(endPoint2).release();
             multiTouch.add(tAction0).add(tAction1);
             multiTouch.perform(); 
+            LOGGER.info("Zoom has been performed");
         } catch (Exception e) {
             LOGGER.error("Error during zooming", e);
         }
-        LOGGER.info("Zoom has been performed");
     }
-
-
 }
