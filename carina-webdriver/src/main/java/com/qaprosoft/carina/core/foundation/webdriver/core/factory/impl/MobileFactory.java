@@ -20,6 +20,8 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -93,6 +95,7 @@ public class MobileFactory extends AbstractFactory {
             	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
+        String exceptionMsg = "";
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
@@ -149,7 +152,8 @@ public class MobileFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
         } catch (Exception e) {
-            LOGGER.info("Error during driver creation:".concat(e.getMessage()));
+            exceptionMsg = e.getMessage();
+            LOGGER.info("Error during driver creation:".concat(exceptionMsg));
             LOGGER.info(e);
         }
 
@@ -157,7 +161,20 @@ public class MobileFactory extends AbstractFactory {
         if (driver == null) {
             Map<String, Object> capabilitiesMap = capabilities.asMap();
             LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
-            Device device = new Device(getDeviceInfo(capabilitiesMap));
+
+            Device device = null;
+            if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
+                LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
+                String debugInfo = getDebugInfo(exceptionMsg);
+                if (!debugInfo.isEmpty()) {
+                    String udid = getUdidFromDebugInfo(debugInfo);
+                    device = new Device();
+                    device.setUdid(udid);
+                }
+            } else {
+                LOGGER.info("Debug info will be extracted from capabilities.");
+                device = new Device(getDeviceInfo(capabilitiesMap));
+            }
             IDriverPool.registerDevice(device);
             Assert.fail(String.format("Unable to initialize driver: %s! \nCapabilities: %s.", name, capabilitiesMap.toString()));
         }
@@ -283,5 +300,36 @@ public class MobileFactory extends AbstractFactory {
         default:
             return 1;
         }
+    }
+    
+    private String getDebugInfo(String exceptionMsg) {
+        String debugInfoPattern = "\\[\\[\\[(.*)\\]\\]\\]";
+
+        Pattern p = Pattern.compile(debugInfoPattern);
+        Matcher m = p.matcher(exceptionMsg);
+        String debugInfo = "";
+        if (m.find()) {
+            debugInfo = m.group(1);
+            LOGGER.info("Extracted debug info: ".concat(debugInfo));
+        } else {
+            LOGGER.info("Debug info hasn'been found");
+        }
+        return debugInfo;
+    }
+
+    private String getUdidFromDebugInfo(String debugInfo) {
+        String udidPattern = "-s ([^\\s]*)";
+
+        Pattern p = Pattern.compile(udidPattern);
+        Matcher m = p.matcher(debugInfo);
+        String deviceUdid = "";
+        if (m.find()) {
+            deviceUdid = m.group(1);
+            LOGGER.info("Found udid: ".concat(deviceUdid));
+        } else {
+            LOGGER.info("Device UDID hasn'been found");
+        }
+
+        return deviceUdid;
     }
 }
