@@ -178,7 +178,7 @@ public class MobileFactory extends AbstractFactory {
                 device = new Device(getDeviceInfo(capabilitiesMap));
             }
             IDriverPool.registerDevice(device);
-            Assert.fail(String.format("Unable to initialize driver: %s! \nCapabilities: %s.", name, capabilitiesMap.toString()));
+            Assert.fail(String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid()));
         }
 
         Device device = IDriverPool.getNullDevice();
