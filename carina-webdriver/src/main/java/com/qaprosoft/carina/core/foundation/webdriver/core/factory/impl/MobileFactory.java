@@ -20,6 +20,8 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -93,6 +95,7 @@ public class MobileFactory extends AbstractFactory {
             	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
+        String exceptionMsg = "";
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
@@ -149,7 +152,8 @@ public class MobileFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
         } catch (Exception e) {
-            LOGGER.info("Error during driver creation:".concat(e.getMessage()));
+            exceptionMsg = e.getMessage();
+            LOGGER.info("Error during driver creation:".concat(exceptionMsg));
             LOGGER.info(e);
         }
 
@@ -157,9 +161,24 @@ public class MobileFactory extends AbstractFactory {
         if (driver == null) {
             Map<String, Object> capabilitiesMap = capabilities.asMap();
             LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
-            Device device = new Device(getDeviceInfo(capabilitiesMap));
+
+            Device device = null;
+            if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
+                LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
+                String debugInfo = getDebugInfo(exceptionMsg);
+                if (!debugInfo.isEmpty()) {
+                    String udid = getUdidFromDebugInfo(debugInfo);
+                    String deviceName = getParamFromDebugInfo(debugInfo, "name");
+                    device = new Device();
+                    device.setUdid(udid);
+                    device.setName(deviceName);
+                }
+            } else {
+                LOGGER.info("Debug info will be extracted from capabilities.");
+                device = new Device(getDeviceInfo(capabilitiesMap));
+            }
             IDriverPool.registerDevice(device);
-            Assert.fail(String.format("Unable to initialize driver: %s! \nCapabilities: %s.", name, capabilitiesMap.toString()));
+            Assert.fail(String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid()));
         }
 
         Device device = IDriverPool.getNullDevice();
@@ -283,5 +302,55 @@ public class MobileFactory extends AbstractFactory {
         default:
             return 1;
         }
+    }
+    
+    /**
+     * Method to extract debug info in case exception has been thrown during app installation
+     * 
+     * @param exceptionMsg
+     * @return debug info
+     */
+    private String getDebugInfo(String exceptionMsg) {
+        String debugInfoPattern = "\\[\\[\\[(.*)\\]\\]\\]";
+
+        Pattern p = Pattern.compile(debugInfoPattern);
+        Matcher m = p.matcher(exceptionMsg);
+        String debugInfo = "";
+        if (m.find()) {
+            debugInfo = m.group(1);
+            LOGGER.info("Extracted debug info: ".concat(debugInfo));
+        } else {
+            LOGGER.info("Debug info hasn'been found");
+        }
+        return debugInfo;
+    }
+
+    private String getUdidFromDebugInfo(String debugInfo) {
+        return getParamFromDebugInfo(debugInfo, "udid");
+    }
+    
+    /**
+     * Method to extract specific parameter from debug info in case STF enabled
+     * Debug info example: [[[DEBUG info: adb -P 5037 -s 42002363960cb400 -name Samsung_Galaxy_J3 -udid 42002363960cb400]]]
+     * Example: -{paramName} {paramValue}
+     * 
+     * @param debugInfo
+     * @param paramName
+     * @return paramValue
+     */
+    private String getParamFromDebugInfo(String debugInfo, String paramName) {
+        String paramPattern = String.format("-%s ([^\\s]*)", paramName);
+
+        Pattern p = Pattern.compile(paramPattern);
+        Matcher m = p.matcher(debugInfo);
+        String paramValue = "";
+        if (m.find()) {
+            paramValue = m.group(1);
+            LOGGER.info(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
+        } else {
+            LOGGER.info(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
+        }
+
+        return paramValue;
     }
 }
