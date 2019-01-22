@@ -527,6 +527,7 @@ public class Screenshot {
 				|| message.contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit()")
 				|| message.contains("Unable to find elements by Selenium")
+				|| message.contains("Unable to locate element")
 				|| message.contains("Session timed out or not found");
 		return !disableScreenshot;
 	}
