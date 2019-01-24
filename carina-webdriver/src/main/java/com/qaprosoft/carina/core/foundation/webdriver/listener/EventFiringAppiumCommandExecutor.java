@@ -54,7 +54,7 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
-
+    
     private final Optional<DriverService> serviceOptional;
 
     private List<IDriverCommandListener> listeners = new ArrayList<>();

@@ -91,9 +91,10 @@ public class MobileRemoteProxy extends DefaultRemoteProxy {
         }
         
         if (!StringUtils.isEmpty(udid)) {
-        	// this is our mobile Android or iOS device
-        	session.getRequestedCapabilities().put("slotCapabilities", getSlotCapabilities(session, udid));
+            	// this is our mobile Android or iOS device
+            	session.getRequestedCapabilities().put("slotCapabilities", getSlotCapabilities(session, udid));
         }
+        
     }
 
     @Override

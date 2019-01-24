@@ -20,6 +20,8 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
@@ -86,12 +88,13 @@ public class MobileFactory extends AbstractFactory {
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
-        	String udid = capabilities.getCapability("udid").toString();
-        	capabilities = getCapabilities(name);
-        	capabilities.setCapability("udid", udid);
-        	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            	String udid = capabilities.getCapability("udid").toString();
+            	capabilities = getCapabilities(name);
+            	capabilities.setCapability("udid", udid);
+            	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
+        String exceptionMsg = "";
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
@@ -146,28 +149,55 @@ public class MobileFactory extends AbstractFactory {
                 }
             }
 
-            Device device = IDriverPool.getNullDevice();
-            if (device.isNull()) {
-                RemoteDevice remoteDevice = getDeviceInfo(driver);
-                // 3rd party solutions like browserstack or saucelabs return not null
-                if (remoteDevice != null && remoteDevice.getName() != null) {
-                    device = new Device(remoteDevice);
-                } else if (driver != null) {
-                    device = new Device(driver.getCapabilities());
-                }
-
-                IDriverPool.registerDevice(device);
-            }
-            // will be performed just in case uninstall_related_apps flag marked as true
-            device.uninstallRelatedApps();
         } catch (MalformedURLException e) {
             LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
+        } catch (Exception e) {
+            exceptionMsg = e.getMessage();
+            LOGGER.info("Error during driver creation:".concat(exceptionMsg));
+            LOGGER.info(e);
         }
 
+        // verification whether driver was created or not.
         if (driver == null) {
-            Assert.fail("Unable to initialize driver: " + name + "!");
+            Map<String, Object> capabilitiesMap = capabilities.asMap();
+            LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
+
+            Device device = null;
+            if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
+                LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
+                String debugInfo = getDebugInfo(exceptionMsg);
+                if (!debugInfo.isEmpty()) {
+                    String udid = getUdidFromDebugInfo(debugInfo);
+                    String deviceName = getParamFromDebugInfo(debugInfo, "name");
+                    device = new Device();
+                    device.setUdid(udid);
+                    device.setName(deviceName);
+                }
+            } else {
+                LOGGER.info("Debug info will be extracted from capabilities.");
+                device = new Device(getDeviceInfo(capabilitiesMap));
+            }
+            IDriverPool.registerDevice(device);
+            Assert.fail(String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid()));
         }
 
+        Device device = IDriverPool.getNullDevice();
+        if (device.isNull()) {
+            RemoteDevice remoteDevice = getDeviceInfo(driver);
+            // 3rd party solutions like browserstack or saucelabs return not
+            // null
+            if (remoteDevice != null && remoteDevice.getName() != null) {
+                device = new Device(remoteDevice);
+            } else if (driver != null) {
+                device = new Device(driver.getCapabilities());
+            }
+
+            IDriverPool.registerDevice(device);
+        }
+        // will be performed just in case uninstall_related_apps flag marked as
+        // true
+        device.uninstallRelatedApps();
+        
         return driver;
     }
 
@@ -182,51 +212,61 @@ public class MobileFactory extends AbstractFactory {
      *            - driver
      * @return remote device information
      */
-	private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
-		RemoteDevice remoteDevice = new RemoteDevice();
-		try {
-
-			@SuppressWarnings("unchecked")
-			Map<String, Object> cap = (Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES);
-			if (cap != null && cap.containsKey("udid")) {
-
-				// restore device information from custom slotCapabilities map
-				/*
-				 * {deviceType=Phone, proxy_port=9000,
-				 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
-				 * seleniumProtocol=WebDriver, adb_port=5038,
-				 * vnc=wss://stage.qaprosoft.com:7410/websockify,
-				 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
-				 * platformVersion=8.1.0, automationName=uiautomator2,
-				 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
-				 * udid=PL2GAR9822804910}
-				 */
-
-				// TODO: remove code duplicates with carina-grid DeviceInfo
-				remoteDevice.setName((String) cap.get("deviceName"));
-				remoteDevice.setOs((String) cap.get("platformName"));
-				remoteDevice.setOsVersion((String) cap.get("platformVersion"));
-				remoteDevice.setType((String) cap.get("deviceType"));
-				remoteDevice.setUdid((String) cap.get("udid"));
-				if (cap.containsKey("vnc")) {
-					remoteDevice.setVnc((String) cap.get("vnc"));
-				}
-				if (cap.containsKey("proxy_port")) {
-					remoteDevice.setProxyPort(String.valueOf(cap.get("proxy_port")));
-				}
-				
-				if (cap.containsKey("remoteURL")) {
-					remoteDevice.setRemoteURL(String.valueOf(cap.get("remoteURL")));
-				}
-				
-				remoteDevice.setCapabilities(drv.getCapabilities());
-			}
-
-		} catch (Exception e) {
-			LOGGER.error("Unable to get device info!", e);
-		}
-		return remoteDevice;
+	@SuppressWarnings("unchecked")
+    private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
+		return getDeviceInfo((Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES));
 	}
+	
+	/**
+     * Returns device information from Grid Hub using STF service.
+     * 
+     * @param caps
+     *            - capabilities
+     * @return remote device information
+     */
+    private RemoteDevice getDeviceInfo(Map<String, Object> cap) {
+        RemoteDevice remoteDevice = new RemoteDevice();
+        try {
+
+            if (cap != null && cap.containsKey("udid")) {
+
+                // restore device information from custom slotCapabilities map
+                /*
+                 * {deviceType=Phone, proxy_port=9000,
+                 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
+                 * seleniumProtocol=WebDriver, adb_port=5038,
+                 * vnc=wss://stage.qaprosoft.com:7410/websockify,
+                 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
+                 * platformVersion=8.1.0, automationName=uiautomator2,
+                 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
+                 * udid=PL2GAR9822804910}
+                 */
+
+                // TODO: remove code duplicates with carina-grid DeviceInfo
+                remoteDevice.setName((String) cap.get("deviceName"));
+                remoteDevice.setOs((String) cap.get("platformName"));
+                remoteDevice.setOsVersion((String) cap.get("platformVersion"));
+                remoteDevice.setType((String) cap.get("deviceType"));
+                remoteDevice.setUdid((String) cap.get("udid"));
+                if (cap.containsKey("vnc")) {
+                    remoteDevice.setVnc((String) cap.get("vnc"));
+                }
+                if (cap.containsKey("proxy_port")) {
+                    remoteDevice.setProxyPort(String.valueOf(cap.get("proxy_port")));
+                }
+                
+                if (cap.containsKey("remoteURL")) {
+                    remoteDevice.setRemoteURL(String.valueOf(cap.get("remoteURL")));
+                }
+                
+                remoteDevice.setCapabilities(new DesiredCapabilities(cap));
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Unable to get device info!", e);
+        }
+        return remoteDevice;
+    }
 
     @Override
     public String getVncURL(WebDriver driver) {
@@ -262,5 +302,55 @@ public class MobileFactory extends AbstractFactory {
         default:
             return 1;
         }
+    }
+    
+    /**
+     * Method to extract debug info in case exception has been thrown during app installation
+     * 
+     * @param exceptionMsg
+     * @return debug info
+     */
+    private String getDebugInfo(String exceptionMsg) {
+        String debugInfoPattern = "\\[\\[\\[(.*)\\]\\]\\]";
+
+        Pattern p = Pattern.compile(debugInfoPattern);
+        Matcher m = p.matcher(exceptionMsg);
+        String debugInfo = "";
+        if (m.find()) {
+            debugInfo = m.group(1);
+            LOGGER.info("Extracted debug info: ".concat(debugInfo));
+        } else {
+            LOGGER.info("Debug info hasn'been found");
+        }
+        return debugInfo;
+    }
+
+    private String getUdidFromDebugInfo(String debugInfo) {
+        return getParamFromDebugInfo(debugInfo, "udid");
+    }
+    
+    /**
+     * Method to extract specific parameter from debug info in case STF enabled
+     * Debug info example: [[[DEBUG info: adb -P 5037 -s 42002363960cb400 -name Samsung_Galaxy_J3 -udid 42002363960cb400]]]
+     * Example: -{paramName} {paramValue}
+     * 
+     * @param debugInfo
+     * @param paramName
+     * @return paramValue
+     */
+    private String getParamFromDebugInfo(String debugInfo, String paramName) {
+        String paramPattern = String.format("-%s ([^\\s]*)", paramName);
+
+        Pattern p = Pattern.compile(paramPattern);
+        Matcher m = p.matcher(debugInfo);
+        String paramValue = "";
+        if (m.find()) {
+            paramValue = m.group(1);
+            LOGGER.info(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
+        } else {
+            LOGGER.info(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
+        }
+
+        return paramValue;
     }
 }
