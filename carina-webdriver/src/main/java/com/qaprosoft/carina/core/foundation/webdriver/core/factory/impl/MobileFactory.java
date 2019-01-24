@@ -161,7 +161,7 @@ public class MobileFactory extends AbstractFactory {
                         if (StringUtils.isNotBlank(fpsSt)) {
                             try {
                                 int fps = Integer.parseInt(fpsSt);
-                                LOGGER.debug("Screen recording bit rate will be set to : " + fps);
+                                LOGGER.debug("Screen recording fps value will be set to : " + fps);
                                 o1.withFps(fps);
                             } catch (Exception e) {
                                 LOGGER.error("Screen recording fps value should be integer between 1..60", e);
