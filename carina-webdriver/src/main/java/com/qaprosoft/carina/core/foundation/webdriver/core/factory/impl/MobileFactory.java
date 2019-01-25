@@ -106,10 +106,10 @@ public class MobileFactory extends AbstractFactory {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
-                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
+                                .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
                         boolean enableBugReport = false;
                         try {
-                            enableBugReport = Boolean.parseBoolean(R.CONFIG.get("android_enable_bug_report"));
+                            enableBugReport = Configuration.getBoolean(Parameter.ANDROID_ENABLE_BUG_REPORT);
                         } catch (Exception e) {
                             LOGGER.error("Enable bug report value should be boolean.", e);
                         }
@@ -117,13 +117,13 @@ public class MobileFactory extends AbstractFactory {
                             LOGGER.debug("Bug report will be enabled.");
                             o1.enableBugReport();
                         }
-                        String videoSize = R.CONFIG.get("android_screen_record_size");
-                        if (StringUtils.isNotBlank(videoSize)) {
+                        String videoSize = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_SIZE);
+                        if (!videoSize.isEmpty()) {
                             LOGGER.debug("Screen recording size will be set to : " + videoSize);
                             o1.withVideoSize(videoSize);
                         }
-                        String bitRateSt = R.CONFIG.get("android_screen_record_bitrate");
-                        if (StringUtils.isNotBlank(bitRateSt)) {
+                        String bitRateSt = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_BITRATE);
+                        if (!bitRateSt.isEmpty()) {
                             try {
                                 int bitRate = Integer.parseInt(bitRateSt);
                                 LOGGER.debug("Screen recording bit rate will be set to : " + bitRate);
@@ -153,12 +153,12 @@ public class MobileFactory extends AbstractFactory {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
-                                .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("ios_screen_record_quality")))
-                                .withVideoType(R.CONFIG.get("ios_screen_record_codec"))
-                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
+                                .withVideoQuality(VideoQuality.valueOf(Configuration.get(Parameter.IOS_SCREEN_RECORDING_QUALITY)))
+                                .withVideoType(Configuration.get(Parameter.IOS_SCREEN_RECORDING_CODEC))
+                                .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
                         
-                        String fpsSt = R.CONFIG.get("ios_screen_record_fps");
-                        if (StringUtils.isNotBlank(fpsSt)) {
+                        String fpsSt = Configuration.get(Parameter.IOS_SCREEN_RECORDING_FPS);
+                        if (!fpsSt.isEmpty()) {
                             try {
                                 int fps = Integer.parseInt(fpsSt);
                                 LOGGER.debug("Screen recording fps value will be set to : " + fps);
