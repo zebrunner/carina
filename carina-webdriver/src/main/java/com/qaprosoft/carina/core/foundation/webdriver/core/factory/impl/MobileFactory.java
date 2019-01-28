@@ -105,19 +105,44 @@ public class MobileFactory extends AbstractFactory {
                     if (isVideoEnabled()) {
                         
                         final String videoName = UUID.randomUUID().toString();
-                        
-                        AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
-                                .withVideoSize(R.CONFIG.get("screen_record_size"))
-                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")))
-                                .withBitRate(getBitrate(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality"))));
 
+                        // Details about available parameters
+                        // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
+                        AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
+                                .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
+                        boolean enableBugReport = false;
+                        try {
+                            enableBugReport = Configuration.getBoolean(Parameter.ANDROID_ENABLE_BUG_REPORT);
+                        } catch (Exception e) {
+                            LOGGER.error("Enable bug report value should be boolean.", e);
+                        }
+                        if (enableBugReport) {
+                            LOGGER.debug("Bug report will be enabled.");
+                            o1.enableBugReport();
+                        }
+                        String videoSize = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_SIZE);
+                        if (!videoSize.isEmpty()) {
+                            LOGGER.debug("Screen recording size will be set to : " + videoSize);
+                            o1.withVideoSize(videoSize);
+                        }
+                        String bitRateSt = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_BITRATE);
+                        if (!bitRateSt.isEmpty()) {
+                            try {
+                                int bitRate = Integer.parseInt(bitRateSt);
+                                LOGGER.debug("Screen recording bit rate will be set to : " + bitRate);
+                                o1.withBitRate(bitRate);
+                            } catch (Exception e) {
+                                LOGGER.error("Screen record bitrate value should be integer.", e);
+                            }
+                        }
                         AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions();
-//                                .withUploadOptions(new ScreenRecordingUploadOptions()
-//                                        .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
-//                                        .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
+                        // .withUploadOptions(new ScreenRecordingUploadOptions()
+                        // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
+                        // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         ce.getListeners()
-                                .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
+                                .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2,
+                                        initVideoArtifact(videoName)));
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
@@ -128,11 +153,23 @@ public class MobileFactory extends AbstractFactory {
                         
                         final String videoName = UUID.randomUUID().toString();
                         
+                        // Details about available parameters
+                        // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
-                                .withVideoQuality(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality")))
-                                // TODO [nkrasnik]: appium_client 7.0.0 requirments https://github.com/appium/java-client/releases/tag/v7.0.0
-                                .withVideoType(R.CONFIG.get("screen_record_ios_codec"))
-                                .withTimeLimit(Duration.ofSeconds(R.CONFIG.getInt("screen_record_duration")));
+                                .withVideoQuality(VideoQuality.valueOf(Configuration.get(Parameter.IOS_SCREEN_RECORDING_QUALITY)))
+                                .withVideoType(Configuration.get(Parameter.IOS_SCREEN_RECORDING_CODEC))
+                                .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
+                        
+                        String fpsSt = Configuration.get(Parameter.IOS_SCREEN_RECORDING_FPS);
+                        if (!fpsSt.isEmpty()) {
+                            try {
+                                int fps = Integer.parseInt(fpsSt);
+                                LOGGER.debug("Screen recording fps value will be set to : " + fps);
+                                o1.withFps(fps);
+                            } catch (Exception e) {
+                                LOGGER.error("Screen recording fps value should be integer between 1..60", e);
+                            }
+                        }
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
 
