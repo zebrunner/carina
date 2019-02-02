@@ -69,7 +69,7 @@ public class DesktopFactory extends AbstractFactory {
             if (isVideoEnabled()) {
                 final String videoName = UUID.randomUUID().toString();
                 capabilities.setCapability("videoName", videoName + ".mp4");
-                capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("screen_record_quality"))));
+                capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
             }
             
