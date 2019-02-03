@@ -467,6 +467,11 @@ public class Screenshot {
         } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             // Mobile web
             screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+        } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            // Mac OS web
+            ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
+                    .shootingStrategy(ShootingStrategies.viewportRetina(100, 0, 0, 2)).takeScreenshot(augmentedDriver);
+            screenShot = screenshot.getImage();
         } else {
             // regular web
             ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
