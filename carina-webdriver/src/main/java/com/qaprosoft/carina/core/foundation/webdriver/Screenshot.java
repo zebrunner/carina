@@ -390,7 +390,7 @@ public class Screenshot {
      * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
-    private static void uploadToAmazonS3(File screenshot) {
+    public static void uploadToAmazonS3(File screenshot) {
         if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return;
@@ -467,17 +467,17 @@ public class Screenshot {
         } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             // Mobile web
             screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
-        } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-            // Mac OS web
-            ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
-                    .shootingStrategy(ShootingStrategies.viewportRetina(100, 0, 0, 2)).takeScreenshot(augmentedDriver);
-            screenShot = screenshot.getImage();
+        } else {
+            ru.yandex.qatools.ashot.Screenshot screenshot;
+	    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            	screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportRetina(100, 0, 0, 2.0F)).takeScreenshot(augmentedDriver);
+           	screenShot = screenshot.getImage();
         } else {
             // regular web
-            ru.yandex.qatools.ashot.Screenshot screenshot = new AShot()
-                    .shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
+            screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
             screenShot = screenshot.getImage();
         }
+    }
 
         return screenShot;
     }
