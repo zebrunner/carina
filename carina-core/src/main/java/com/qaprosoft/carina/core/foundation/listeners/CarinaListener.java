@@ -338,7 +338,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // [VD] seems like useless after movemevt driver quite onto afterMethod
         // phase
-        // quitDrivers(Phase.BEFORE_CLASS);
+        quitDrivers(Phase.BEFORE_CLASS);
 
         LOGGER.debug("CarinaListener->onFinish(context): " + context.getName());
 
