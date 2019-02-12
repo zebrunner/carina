@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -58,6 +59,8 @@ import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.comparison.ImageDiff;
+import ru.yandex.qatools.ashot.comparison.ImageDiffer;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
 /**
@@ -183,8 +186,75 @@ public class Screenshot {
      * @param comment String
      * @return screenshot name.
      */
-    public static String captureFullSize(WebDriver driver, String comment) {
-        return capture(driver, true /* explicitly make full size screenshot */, comment, true);
+    public static BufferedImage captureFullSize(WebDriver driver, String comment) {
+        String screenName = "";
+        BufferedImage screen = null;
+
+        LOGGER.debug("Screenshot->capture starting...");
+
+            try {
+                if (!isCaptured(comment)) {
+                    LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+                    return null;
+                }
+
+                Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+                // Define test screenshot root
+                File testScreenRootDir = ReportContext.getTestDir();
+
+                // Capture full page screenshot and resize
+                screenName = System.currentTimeMillis() + ".png";
+                String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+
+                WebDriver augmentedDriver = driver;
+
+                if (!driver.toString().contains("AppiumNativeDriver")) {
+                    // do not augment for Appium 1.x anymore
+                    augmentedDriver = new DriverAugmenter().augment(driver);
+                }
+
+                screen = takeFullScreenshot(driver, augmentedDriver);
+
+                if (screen == null) {
+                    //do nothing and return empty
+                    return null;
+                }
+                BufferedImage thumbScreen = screen;
+
+                if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                        && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+                }
+
+                File screenshot = new File(screenPath);
+
+                ImageIO.write(screen, "PNG", screenshot);
+
+                // Create screenshot thumbnail
+                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+                ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+                resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
+                        Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
+
+                // Uploading screenshot to Amazon S3
+                uploadToAmazonS3(screenshot);
+
+                // add screenshot comment to collector
+                ReportContext.addScreenshotComment(screenName, comment);
+                return screen;
+            } catch (IOException e) {
+                LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+            } catch (WebDriverException e) {
+                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+                e.printStackTrace();
+            } catch (Exception e) {
+                LOGGER.error("Unable to capture screenshot due to the Exception!", e);
+            } finally {
+                Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+            }
+        LOGGER.debug("Screenshot->capture finished.");
+        return screen;
     }
 
     /**
@@ -466,18 +536,67 @@ public class Screenshot {
             screenShot = ImageIO.read(screenshot);
         } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
             // Mobile web
-            screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            // screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            ru.yandex.qatools.ashot.Screenshot screenshot;
+            if (Configuration.getPlatform().equals("ANDROID")) {
+                String pixelRatio = String.valueOf(IDriverPool.getDefaultDevice().getCapabilities().getCapability("pixelRatio"));
+                // float dpr = Float.parseFloat(pixelRatio);
+                Float dpr = Float.valueOf(pixelRatio);
+                screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                        .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER, dpr))
+                        .takeScreenshot(augmentedDriver);
+                screenShot = screenshot.getImage();
+            } else {
+                int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
+                switch (deviceWidth) {
+                case SpecialKeywords.DEFAULT_PLUS_WIDTH: {
+                    screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
+                            SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_PLUS_DPR)).takeScreenshot(augmentedDriver);
+                    screenShot = screenshot.getImage();
+                    break;
+                }
+                case SpecialKeywords.DEFAULT_IPAD_WIDTH: {
+                    screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_IPAD_HEADER,
+                            SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                    screenShot = screenshot.getImage();
+                    break;
+                }
+                case SpecialKeywords.DEFAULT_SE_WIDTH: {
+                    screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_SE_HEADER,
+                            SpecialKeywords.DEFAULT_IOS_SE_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                    screenShot = screenshot.getImage();
+                    break;
+                }
+                default: {
+                    int height = augmentedDriver.manage().window().getSize().getHeight();
+                    if (height == SpecialKeywords.DEFAULT_IOS_X_HEIGHT) {
+                        screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_X_HEADER,
+                                SpecialKeywords.DEFAULT_IOS_X_FOOTER, SpecialKeywords.IPHONE_X_DPR)).takeScreenshot(augmentedDriver);
+                        screenShot = screenshot.getImage();
+                        break;
+                    } else {
+                        screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
+                                SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                        screenShot = screenshot.getImage();
+                        break;
+                    }
+                }
+                }
+            }
         } else {
             ru.yandex.qatools.ashot.Screenshot screenshot;
-	    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-            	screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportRetina(100, 0, 0, 2.0F)).takeScreenshot(augmentedDriver);
-           	screenShot = screenshot.getImage();
-        } else {
-            // regular web
-            screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(100)).takeScreenshot(augmentedDriver);
-            screenShot = screenshot.getImage();
+            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                        .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
+                                SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                screenShot = screenshot.getImage();
+            } else {
+                // regular web
+                screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
+                        .takeScreenshot(augmentedDriver);
+                screenShot = screenshot.getImage();
+            }
         }
-    }
 
         return screenShot;
     }
@@ -536,4 +655,56 @@ public class Screenshot {
 				|| message.contains("Session timed out or not found");
 		return !disableScreenshot;
 	}
+
+	/**
+     * Compares two different screenshots
+     *
+     *
+     * @param bufferedImageExpected
+     *                      - old image
+     * @param bufferedImageActual
+     *                      - new image
+     *
+     * @return boolean
+     * */
+    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual) throws IOException {
+        String screenName;
+        BufferedImage screen;
+
+        ImageDiffer imageDiff = new ImageDiffer();
+        ImageDiff diff = imageDiff.makeDiff(bufferedImageExpected, bufferedImageActual);
+        if (diff.hasDiff()) {
+            screen = diff.getMarkedImage();
+            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+            // Define test screenshot root
+            File testScreenRootDir = ReportContext.getTestDir();
+
+            // Capture full page screenshot and resize
+            screenName = System.currentTimeMillis() + ".png";
+            String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+
+            BufferedImage thumbScreen = screen;
+
+            if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                    && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                        Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+            }
+
+            File screenshot = new File(screenPath);
+            FileUtils.touch(screenshot);
+            ImageIO.write(screen, "PNG", screenshot);
+
+            // Create screenshot thumbnail
+            String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+            ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+            resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
+                    Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
+
+            // Uploading screenshot to Amazon S3
+            uploadToAmazonS3(screenshot);
+            return true;
+        }
+        return false;
+    }
 }
