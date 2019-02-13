@@ -187,7 +187,7 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static BufferedImage captureFullSize(WebDriver driver, String comment) {
-        String screenName = "";
+        String screenName;
         BufferedImage screen = null;
 
         LOGGER.debug("Screenshot->capture starting...");
@@ -540,8 +540,7 @@ public class Screenshot {
             ru.yandex.qatools.ashot.Screenshot screenshot;
             if (Configuration.getPlatform().equals("ANDROID")) {
                 String pixelRatio = String.valueOf(IDriverPool.getDefaultDevice().getCapabilities().getCapability("pixelRatio"));
-                // float dpr = Float.parseFloat(pixelRatio);
-                Float dpr = Float.valueOf(pixelRatio);
+                float dpr = Float.parseFloat(pixelRatio);
                 screenshot = (new AShot()).shootingStrategy(ShootingStrategies
                         .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER, dpr))
                         .takeScreenshot(augmentedDriver);
@@ -550,33 +549,38 @@ public class Screenshot {
                 int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
                 switch (deviceWidth) {
                 case SpecialKeywords.DEFAULT_PLUS_WIDTH: {
-                    screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
-                            SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_PLUS_DPR)).takeScreenshot(augmentedDriver);
+                    screenshot = new AShot().shootingStrategy(
+                            ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
+                                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_PLUS_DPR)).takeScreenshot(augmentedDriver);
                     screenShot = screenshot.getImage();
                     break;
                 }
                 case SpecialKeywords.DEFAULT_IPAD_WIDTH: {
-                    screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_IPAD_HEADER,
-                            SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                    screenshot = new AShot().shootingStrategy(
+                            ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_IPAD_HEADER,
+                                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
                     screenShot = screenshot.getImage();
                     break;
                 }
                 case SpecialKeywords.DEFAULT_SE_WIDTH: {
-                    screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_SE_HEADER,
-                            SpecialKeywords.DEFAULT_IOS_SE_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                    screenshot = new AShot().shootingStrategy(
+                            ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_SE_HEADER,
+                                    SpecialKeywords.DEFAULT_IOS_SE_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
                     screenShot = screenshot.getImage();
                     break;
                 }
                 default: {
                     int height = augmentedDriver.manage().window().getSize().getHeight();
                     if (height == SpecialKeywords.DEFAULT_IOS_X_HEIGHT) {
-                        screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_X_HEADER,
-                                SpecialKeywords.DEFAULT_IOS_X_FOOTER, SpecialKeywords.IPHONE_X_DPR)).takeScreenshot(augmentedDriver);
+                        screenshot = new AShot().shootingStrategy(
+                                ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_X_HEADER,
+                                        SpecialKeywords.DEFAULT_IOS_X_FOOTER, SpecialKeywords.IPHONE_X_DPR)).takeScreenshot(augmentedDriver);
                         screenShot = screenshot.getImage();
                         break;
                     } else {
-                        screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
-                                SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                        screenshot = new AShot().shootingStrategy(
+                                ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
+                                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
                         screenShot = screenshot.getImage();
                         break;
                     }
@@ -656,55 +660,64 @@ public class Screenshot {
 		return !disableScreenshot;
 	}
 
-	/**
+    /**
      * Compares two different screenshots
      *
-     *
-     * @param bufferedImageExpected
-     *                      - old image
-     * @param bufferedImageActual
-     *                      - new image
-     *
+     * @param bufferedImageExpected - old image
+     * @param bufferedImageActual   - new image
      * @return boolean
-     * */
-    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual) throws IOException {
+     */
+    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual) {
         String screenName;
         BufferedImage screen;
+        try {
+            ImageDiffer imageDiff = new ImageDiffer();
+            ImageDiff diff = imageDiff.makeDiff(bufferedImageExpected, bufferedImageActual);
+            if (diff.hasDiff()) {
+                screen = diff.getMarkedImage();
+                Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+                // Define test screenshot root
+                File testScreenRootDir = ReportContext.getTestDir();
 
-        ImageDiffer imageDiff = new ImageDiffer();
-        ImageDiff diff = imageDiff.makeDiff(bufferedImageExpected, bufferedImageActual);
-        if (diff.hasDiff()) {
-            screen = diff.getMarkedImage();
-            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
-            // Define test screenshot root
-            File testScreenRootDir = ReportContext.getTestDir();
+                screenName = System.currentTimeMillis() + ".png";
+                String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
-            // Capture full page screenshot and resize
-            screenName = System.currentTimeMillis() + ".png";
-            String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+                BufferedImage thumbScreen = screen;
 
-            BufferedImage thumbScreen = screen;
+                if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                        && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+                }
 
-            if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
-                    && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
-                resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-                        Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+                File screenshot = new File(screenPath);
+                FileUtils.touch(screenshot);
+                ImageIO.write(screen, "PNG", screenshot);
+
+                // Create comparative screenshot thumbnail
+                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+                ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+                resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
+                        Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
+
+                // Uploading comparative screenshot to Amazon S3
+                uploadToAmazonS3(screenshot);
             }
-
-            File screenshot = new File(screenPath);
-            FileUtils.touch(screenshot);
-            ImageIO.write(screen, "PNG", screenshot);
-
-            // Create screenshot thumbnail
-            String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-            ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
-            resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-                    Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
-            // Uploading screenshot to Amazon S3
-            uploadToAmazonS3(screenshot);
-            return true;
+            else {
+                LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");
+                return false;
+            }
+        } catch (IOException exception) {
+            LOGGER.error("Unable to compare screenshots due to the I/O issues!", exception);
+        } catch (NullPointerException exception) {
+            LOGGER.error("Unable to compare screenshots due to NullPointerException", exception);
+        } catch (WebDriverException exception) {
+            LOGGER.error("Unable to compare screenshots due to the WebDriverException!", exception);
+        } catch (Exception exception) {
+            LOGGER.error("Unable to compare screenshots!", exception);
+        } finally {
+            Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
         }
-        return false;
+        return true;
     }
 }
