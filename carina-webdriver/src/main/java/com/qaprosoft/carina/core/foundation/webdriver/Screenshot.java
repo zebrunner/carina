@@ -40,6 +40,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
@@ -50,6 +51,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
@@ -539,7 +541,8 @@ public class Screenshot {
             // screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
             ru.yandex.qatools.ashot.Screenshot screenshot;
             if (Configuration.getPlatform().equals("ANDROID")) {
-                String pixelRatio = String.valueOf(IDriverPool.getDefaultDevice().getCapabilities().getCapability("pixelRatio"));
+                String pixelRatio = String.valueOf(((EventFiringWebDriver)augmentedDriver).getCapabilities().getCapability("pixelRatio"));
+                //                String pixelRatio = String.valueOf(IDriverPool.getDefaultDevice().getCapabilities().getCapability("pixelRatio"));
                 float dpr = Float.parseFloat(pixelRatio);
                 screenshot = (new AShot()).shootingStrategy(ShootingStrategies
                         .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER, dpr))
@@ -709,10 +712,10 @@ public class Screenshot {
             }
         } catch (IOException exception) {
             LOGGER.error("Unable to compare screenshots due to the I/O issues!", exception);
-        } catch (NullPointerException exception) {
-            LOGGER.error("Unable to compare screenshots due to NullPointerException", exception);
         } catch (WebDriverException exception) {
             LOGGER.error("Unable to compare screenshots due to the WebDriverException!", exception);
+        } catch (NullPointerException exception) {
+            LOGGER.error("Unable to compare screenshots due to the NullPointerException", exception);
         } catch (Exception exception) {
             LOGGER.error("Unable to compare screenshots!", exception);
         } finally {
