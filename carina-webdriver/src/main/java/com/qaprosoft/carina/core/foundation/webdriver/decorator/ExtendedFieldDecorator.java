@@ -38,6 +38,7 @@ import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedFindBy;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingElementListHandler;
@@ -56,11 +57,12 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     }
 
     public Object decorate(ClassLoader loader, Field field) {
-        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(FindByAI.class)) /*
-                                                                                                      * Enable field decorator logic only in case of
-                                                                                                      * presence the FindBy/FindByAI annotation in the
-                                                                                                      * field
-                                                                                                      */ ||
+        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class) && !field.isAnnotationPresent(FindByAI.class))
+                /*
+                 * Enable field decorator logic only in case of
+                 * presence the FindBy/FindByCarina/FindByAI annotation in the
+                 * field
+                 */ ||
                 !(ExtendedWebElement.class.isAssignableFrom(field.getType()) || AbstractUIObject.class.isAssignableFrom(field.getType())
                         || isDecoratableList(field)) /*
                                                       * also verify that it is ExtendedWebElement or derived from AbstractUIObject or DecoratableList
@@ -129,7 +131,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
         return new ExtendedWebElement(proxy, field.getName(),
-                field.isAnnotationPresent(FindBy.class) ? new LocalizedAnnotations(field).buildBy() : null);
+                field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field).buildBy() : null);
     }
 
     @SuppressWarnings("unchecked")

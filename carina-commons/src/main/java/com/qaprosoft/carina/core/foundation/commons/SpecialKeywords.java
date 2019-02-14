@@ -175,4 +175,7 @@ public class SpecialKeywords {
     public static final String RULE_FILTER_SPLITTER = ";;";
     public static final String RULE_FILTER_AND_CONDITION = "&&";
 
+    // ------------- ELEMENT LOCATORS ---------------------------------
+    public static final String FORMAT_ELEMENT_SYMBOL = "%s";
+
 }
