@@ -336,9 +336,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onFinish(ITestContext context) {
         super.onFinish(context);
 
-        // [VD] seems like useless after movemevt driver quite onto afterMethod
-        // phase
-        // quitDrivers(Phase.BEFORE_CLASS);
+        // [SZ] it's still needed to close driver from BeforeClass stage.
+        // Otherwise it could be potentially used in other test classes 
+        quitDrivers(Phase.BEFORE_CLASS);
 
         LOGGER.debug("CarinaListener->onFinish(context): " + context.getName());
 
