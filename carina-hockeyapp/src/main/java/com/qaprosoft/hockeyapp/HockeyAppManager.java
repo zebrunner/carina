@@ -325,7 +325,7 @@ public class HockeyAppManager {
 
     private boolean checkForPattern(String nodeName, String pattern, JsonNode node) {
 
-        LOGGER.info("\nPattern to be checked: " + pattern);
+        LOGGER.debug("\nPattern to be checked: " + pattern);
         String nodeField = node.get(nodeName).asText().toLowerCase();
 
         if (nodeField.contains(pattern)) {
