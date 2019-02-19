@@ -425,6 +425,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-use-find-by-image-strategy" title="How to use Find by image strategy" class="md-nav__link">
+    How to use Find by image strategy
+  </a>
+  
+</li>
+      
       
       
       
@@ -616,6 +623,13 @@
         <li class="md-nav__item">
   <a href="#how-to-use-customtypepagefactory" title="How to use CustomTypePageFactory" class="md-nav__link">
     How to use CustomTypePageFactory
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-use-find-by-image-strategy" title="How to use Find by image strategy" class="md-nav__link">
+    How to use Find by image strategy
   </a>
   
 </li>
@@ -981,6 +995,18 @@ public class HomePage extends HomePageBase {
 <pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8.1”, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 </code></pre>
+
+<h3 id="how-to-use-find-by-image-strategy">How to use Find by image strategy</h3>
+<p>Find by image strategy is based on <a href="https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md">appium implementation</a>. Be sure you have openCV libraries installed to <a href="https://github.com/justadudewhohacks/opencv4nodejs">your system</a>.
+Find by image logic is covered by <code>@ExtendedFindBy</code> annotation. </p>
+<p><strong>Example:</strong></p>
+<pre><code>@ExtendedFindBy(image = &quot;images/singUp6.png&quot;)
+private ExtendedWebElement signUpBtn;
+</code></pre>
+
+<p>Available list of actions with image elements and related driver settings are listed <a href="http://appium.io/docs/en/advanced-concepts/image-elements/">here</a>.</p>
+<p>Basically all you need is to create image template of the element in .png format and place it to your project. We suggest to use <code>src/main/resources/</code> folder to store images. 
+Be sure your image size less then real screen size. Real iOS screen sizes are listed <a href="https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html">here</a> in 'UIKit Size (Points)' column. </p>
                 
                   
                 
