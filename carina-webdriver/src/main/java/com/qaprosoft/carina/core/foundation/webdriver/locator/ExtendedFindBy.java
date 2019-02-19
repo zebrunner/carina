@@ -22,6 +22,12 @@ public @interface ExtendedFindBy {
 
     String accessibilityId() default "";
     
+    // Images in automation:
+    // https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md
+    // How to adjust parameters: 
+    // http://appium.io/docs/en/advanced-concepts/image-elements/
+    // Real screen sizes for iOS:
+    // https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html
     String image() default "";
     
     String text() default "";
