@@ -73,7 +73,11 @@ public class FtpUtils {
 			LOGGER.debug("User has been successfully logged in.");
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			try {
-			    ftp.enterLocalPassiveMode();
+			    ftp.enterRemotePassiveMode();
+			    LOGGER.debug("Passive host : " + ftp.getPassiveHost() + " Passive port : " + ftp.getPassivePort());
+			    LOGGER.debug("Default port : " + ftp.getDefaultPort());
+			    LOGGER.debug("Local port : " + ftp.getLocalPort());
+			    LOGGER.debug("Remote port : " + ftp.getRemotePort());
 				if (ftp.storeFile(fileName, is)) {
 				    long finish = System.currentTimeMillis();
                     LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
