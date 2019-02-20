@@ -15,9 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +70,7 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.sun.jersey.core.util.Base64;
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
@@ -1159,6 +1164,21 @@ public class ExtendedWebElement {
 
         if (locator.startsWith("By.AccessibilityId: ")) {
             by = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
+        }
+        
+        if (locator.startsWith("By.Image: ")) {
+            String formattedLocator = String.format(StringUtils.remove(locator, "By.Image: "), objects);
+            Path path = Paths.get(formattedLocator);
+            LOGGER.debug("Formatted locator is : " + formattedLocator);
+            String base64image;
+            try {
+                base64image = new String(Base64.encode(Files.readAllBytes(path)));
+            } catch (IOException e) {
+                throw new RuntimeException(
+                        "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
+            }
+            LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
+            by = MobileBy.image(base64image);
         }
         return new ExtendedWebElement(by, name, getDriver());
     }

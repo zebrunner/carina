@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
 
@@ -32,6 +33,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Pred
 import io.appium.java_client.MobileBy;
 
 public class LocalizedAnnotations extends Annotations {
+    private static final Logger LOGGER = Logger.getLogger(LocalizedAnnotations.class);
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
     public LocalizedAnnotations(Field field) {
@@ -64,6 +66,8 @@ public class LocalizedAnnotations extends Annotations {
         } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
             param = StringUtils.remove(param, "By.name: ");
             by = MobileBy.AccessibilityId(param);
+        } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
+            LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : " + by);
         } else {
             by = createBy(param);
         }
