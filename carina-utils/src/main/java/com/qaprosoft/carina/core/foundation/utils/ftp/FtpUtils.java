@@ -73,7 +73,7 @@ public class FtpUtils {
 			LOGGER.debug("User has been successfully logged in.");
 			ftp.setFileType(FTP.BINARY_FILE_TYPE);
 			try {
-			    ftp.enterRemotePassiveMode();
+			    ftp.enterLocalPassiveMode();
 			    LOGGER.debug("Passive host : " + ftp.getPassiveHost() + " Passive port : " + ftp.getPassivePort());
 			    LOGGER.debug("Default port : " + ftp.getDefaultPort());
 			    LOGGER.debug("Local port : " + ftp.getLocalPort());
