@@ -403,7 +403,7 @@ public class Screenshot {
                     .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
             executorService.execute(() -> {
                 try {
-                    int expiresIn = R.CONFIG.getInt("artifacts_expiration_seconds");
+                    int expiresIn = Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
                 	LOGGER.debug("Uploading to AWS: " + screenshot.getName() + ". Expires in " + expiresIn + " seconds.");
                     String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, expiresIn, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
                     LOGGER.debug("Uploaded to AWS: " + screenshot.getName());

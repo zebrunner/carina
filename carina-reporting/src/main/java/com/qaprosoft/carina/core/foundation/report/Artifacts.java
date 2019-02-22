@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -42,7 +43,7 @@ final public class Artifacts {
 	}
 
 	public static void add(String name, String link) {
-		add(name, link, R.CONFIG.getInt("artifacts_expiration_seconds"));
+		add(name, link, Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
 	}
 
 	/**

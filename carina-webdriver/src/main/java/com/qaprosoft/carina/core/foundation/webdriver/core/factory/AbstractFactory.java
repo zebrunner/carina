@@ -120,7 +120,7 @@ public abstract class AbstractFactory {
         	artifact.setTestId((Long) res.getAttribute("ztid"));
         }
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
-        artifact.setExpiresIn(R.CONFIG.getInt("artifacts_expiration_seconds"));
+        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
     
