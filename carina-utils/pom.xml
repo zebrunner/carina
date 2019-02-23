@@ -26,6 +26,7 @@
 
 		<pdfbox.version>1.8.16</pdfbox.version>
 		<jackson-databind.version>2.9.8</jackson-databind.version>
+		<jackson-annotations.version>2.9.8</jackson-annotations.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
 
@@ -95,6 +96,12 @@
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
 		    <version>${jackson-databind.version}</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-annotations</artifactId>
+		    <version>${jackson-annotations.version}</version>
 		</dependency>
 
 		<dependency>
