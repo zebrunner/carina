@@ -325,8 +325,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // clear jira tickets to be sure that next test is not affected.
             Jira.clearTickets();
 
-            Artifacts.clearArtifacts();
-
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }
