@@ -1581,9 +1581,11 @@ public class ExtendedWebElement {
 			public void doType(String text) {
 				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 
-				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
-						Messager.KEYS_NOT_CLEARED_IN_ELEMENT.getMessage(getNameWithLocator()));
-				element.clear();
+				if (!element.getText().isEmpty()) {
+    				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
+    						Messager.KEYS_NOT_CLEARED_IN_ELEMENT.getMessage(getNameWithLocator()));
+    				element.clear();
+				}
 
 				String textLog = (!decryptedText.equals(text) ? "********" : text);
 
