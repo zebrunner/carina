@@ -71,7 +71,7 @@ public class ExtendedElementLocator implements ElementLocator {
     public ExtendedElementLocator(SearchContext searchContext, Field field) {
         this.searchContext = searchContext;
 
-        if (field.isAnnotationPresent(FindBy.class)) {
+        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.shouldCache = true;
             this.caseInsensitive = false;

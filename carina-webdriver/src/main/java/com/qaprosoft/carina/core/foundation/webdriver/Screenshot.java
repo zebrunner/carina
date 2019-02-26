@@ -21,19 +21,17 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -42,22 +40,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
+import com.qaprosoft.amazon.client.AmazonS3Client;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
-import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -74,12 +71,6 @@ public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
-
-    private static ExecutorService executorService = Executors.newFixedThreadPool(50);
-    
-    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/";
-    
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
     
     private Screenshot() {
     	//hide default constructor
@@ -140,7 +131,7 @@ public class Screenshot {
                 break;
             }
         }
-        return capture(driver, isTakeScreenshotRules, comment, false);
+        return capture(driver, isTakeScreenshotRules, comment, false, false);
     }
 
     /**
@@ -168,7 +159,7 @@ public class Screenshot {
      */
     public static String captureFailure(WebDriver driver, String comment) {
         LOGGER.debug("Screenshot->captureFailure starting...");
-        String screenName = capture(driver, true, comment, true);
+        String screenName = capture(driver, true, comment, true, false);
 
         // XML layout extraction
         File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
@@ -188,75 +179,79 @@ public class Screenshot {
      * @param comment String
      * @return screenshot name.
      */
-    public static BufferedImage captureFullSize(WebDriver driver, String comment) {
+    public static BufferedImage captureFullSize(WebDriver driver, String comment, boolean artifact) {
         String screenName;
         BufferedImage screen = null;
 
         LOGGER.debug("Screenshot->capture starting...");
 
-            try {
-                if (!isCaptured(comment)) {
-                    LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
-                    return null;
-                }
-
-                Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
-                // Define test screenshot root
-                File testScreenRootDir = ReportContext.getTestDir();
-
-                // Capture full page screenshot and resize
-                screenName = System.currentTimeMillis() + ".png";
-                String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
-
-                WebDriver augmentedDriver = driver;
-
-                if (!driver.toString().contains("AppiumNativeDriver")) {
-                    // do not augment for Appium 1.x anymore
-                    augmentedDriver = new DriverAugmenter().augment(driver);
-                }
-
-                screen = takeFullScreenshot(driver, augmentedDriver);
-
-                if (screen == null) {
-                    //do nothing and return empty
-                    return null;
-                }
-                BufferedImage thumbScreen = screen;
-
-                if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
-                        && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
-                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
-                }
-
-                File screenshot = new File(screenPath);
-
-                ImageIO.write(screen, "PNG", screenshot);
-
-                // Create screenshot thumbnail
-                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-                ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
-                resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-                        Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
-                // Uploading screenshot to Amazon S3
-                uploadToAmazonS3(screenshot);
-
-                // add screenshot comment to collector
-                ReportContext.addScreenshotComment(screenName, comment);
-                return screen;
-            } catch (IOException e) {
-                LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-            } catch (WebDriverException e) {
-                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
-                e.printStackTrace();
-            } catch (Exception e) {
-                LOGGER.error("Unable to capture screenshot due to the Exception!", e);
-            } finally {
-                Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+        try {
+            if (!isCaptured(comment)) {
+                LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+                return null;
             }
+
+            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+            // Define test screenshot root
+            File testScreenRootDir = ReportContext.getTestDir();
+
+            // Capture full page screenshot and resize
+            screenName = System.currentTimeMillis() + ".png";
+            String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
+
+            WebDriver augmentedDriver = driver;
+
+            if (!driver.toString().contains("AppiumNativeDriver")) {
+                // do not augment for Appium 1.x anymore
+                augmentedDriver = new DriverAugmenter().augment(driver);
+            }
+
+            screen = takeFullScreenshot(driver, augmentedDriver);
+
+            if (screen == null) {
+                //do nothing and return empty
+                return null;
+            }
+            BufferedImage thumbScreen = screen;
+
+            if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                    && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                        Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+            }
+
+            File screenshot = new File(screenPath);
+
+            ImageIO.write(screen, "PNG", screenshot);
+
+            // Create screenshot thumbnail
+            String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+            ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+            resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
+                    Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
+
+            // Uploading screenshot to Amazon S3
+            uploadToAmazonS3(screenshot, comment, artifact);
+
+            // add screenshot comment to collector
+            ReportContext.addScreenshotComment(screenName, comment);
+            return screen;
+        } catch (IOException e) {
+            LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+        } catch (WebDriverException e) {
+            LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Unable to capture screenshot due to the Exception!", e);
+        } finally {
+            Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+        }
         LOGGER.debug("Screenshot->capture finished.");
         return screen;
+    }
+
+    public static BufferedImage captureFullSize(WebDriver driver, String comment) {
+        return captureFullSize(driver, comment, false);
     }
 
     /**
@@ -268,8 +263,12 @@ public class Screenshot {
      * @param comment String
      * @return screenshot name.
      */
+    public static String capture(WebDriver driver, String comment, boolean artifact) {
+        return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false, artifact);
+    }
+
     public static String capture(WebDriver driver, String comment) {
-        return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false);
+        return capture(driver, comment, false);
     }
 
     /**
@@ -285,7 +284,7 @@ public class Screenshot {
      */
     @Deprecated
     public static String capture(WebDriver driver, boolean isTakeScreenshot) {
-        return capture(driver, isTakeScreenshot, "", false);
+        return capture(driver, isTakeScreenshot, "", false, false);
 
     }
 
@@ -304,7 +303,7 @@ public class Screenshot {
      */
     @Deprecated
     public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment) {
-        return capture(driver, isTakeScreenshot, comment, false);
+        return capture(driver, isTakeScreenshot, comment, false, false);
     }
 
     /**
@@ -360,7 +359,7 @@ public class Screenshot {
      * @return screenshot name.
      */
 
-    private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
+    private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize, boolean artifact) {
         String screenName = "";
 
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
@@ -439,7 +438,7 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-                uploadToAmazonS3(screenshot);
+                uploadToAmazonS3(screenshot, comment, artifact);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -462,34 +461,19 @@ public class Screenshot {
      * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
-    public static void uploadToAmazonS3(File screenshot) {
-        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
-            LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
-            return;
-        }
+    private static void uploadToAmazonS3(File screenshot, String comment, boolean artifact) {
         final String correlationId = UUID.randomUUID().toString();
         final String ciTestId = ZafiraListener.getThreadCiTestId();
-        try {
-            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                    .addHeader("AMAZON_PATH", null)
-                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
-            executorService.execute(() -> {
-                try {
-                    int expiresIn = R.CONFIG.getInt("artifacts_expiration_seconds");
-                	LOGGER.debug("Uploading to AWS: " + screenshot.getName() + ". Expires in " + expiresIn + " seconds.");
-                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, expiresIn, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
-                    LOGGER.debug("Uploaded to AWS: " + screenshot.getName());
-                    ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                            .addHeader("AMAZON_PATH", url)
-                            .addHeader("CI_TEST_ID", ciTestId)
-                            .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
-                    LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
-                } catch (Exception e) {
-                    LOGGER.debug("Can't save file to Amazon S3!", e);
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.debug("Can't save file to Amazon S3!", e);
+        Optional<CompletableFuture<String>> urlFuture = AmazonS3Client.upload(screenshot,
+                () -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                .addHeader("AMAZON_PATH", null)
+                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
+                url -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                                .addHeader("AMAZON_PATH", url)
+                                .addHeader("CI_TEST_ID", ciTestId)
+                                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)));
+        if(artifact) {
+            urlFuture.ifPresent(uf -> Artifacts.add(uf, comment));
         }
     }
 
@@ -670,7 +654,7 @@ public class Screenshot {
      * @param bufferedImageActual   - new image
      * @return boolean
      */
-    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual) {
+    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {
         String screenName;
         BufferedImage screen;
         try {
@@ -704,7 +688,7 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading comparative screenshot to Amazon S3
-                uploadToAmazonS3(screenshot);
+                uploadToAmazonS3(screenshot, comment, artifact);
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");

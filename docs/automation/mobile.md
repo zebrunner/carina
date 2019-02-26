@@ -363,3 +363,20 @@ Or for specific version
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8.1”, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 ```
+
+### How to use Find by image strategy
+
+Find by image strategy is based on [appium implementation](https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md). Be sure you have openCV libraries installed to [your system](https://github.com/justadudewhohacks/opencv4nodejs).
+Find by image logic is covered by ```@ExtendedFindBy``` annotation. 
+
+**Example:**
+```
+@ExtendedFindBy(image = "images/singUp6.png")
+private ExtendedWebElement signUpBtn;
+```
+Available list of actions with image elements and related driver settings are listed [here](http://appium.io/docs/en/advanced-concepts/image-elements/).
+
+Basically all you need is to create image template of the element in .png format and place it to your project. We suggest to use ```src/main/resources/``` folder to store images. 
+Be sure your image size less then real screen size. Real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. 
+
+
