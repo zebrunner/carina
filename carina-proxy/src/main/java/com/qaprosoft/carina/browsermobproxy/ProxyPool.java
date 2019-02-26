@@ -130,6 +130,7 @@ public final class ProxyPool {
     }
     
     public static BrowserMobProxy startProxy(int proxyPort) {
+        LOGGER.info(String.format("BrowserMob proxy is now attempting to start on Port (%s)...", proxyPort));
         if (!Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
             LOGGER.debug("Proxy is disabled.");
             return null;
@@ -154,6 +155,7 @@ public final class ProxyPool {
         if (!proxy.isStarted()) {
             LOGGER.info("Starting BrowserMob proxy...");
         	// TODO: [VD] confirmed with MB that restart was added just in case. Maybe comment/remove?
+            LOGGER.info(String.format("BrowserMob Proxy is attempting to start on port (%s), proxy has port (%s) set", proxyPort, proxy.getPort()));
             killProcessByPort(proxyPort);
             proxy.start(proxyPort);
         } else {
