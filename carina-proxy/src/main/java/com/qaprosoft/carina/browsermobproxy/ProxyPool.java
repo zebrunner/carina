@@ -139,11 +139,14 @@ public final class ProxyPool {
         long threadId = Thread.currentThread().getId();
         if (proxies.containsKey(threadId)) {
             proxy = proxies.get(threadId);
-        } 
-        
+        }
+
+        if (proxyPortsByThread.containsKey(threadId)) {
+            proxyPort = proxyPortsByThread.get(threadId);
+        }
+
         // case when proxy was already instantiated but port doesn't correspond to current device
-        //if (null == proxy || proxy.getPort() != proxyPort) {
-        if (null == proxy || proxy.getPort() != proxyPortsByThread.get(threadId)) {
+        if (null == proxy || proxy.getPort() != proxyPort) {
             proxy = ProxyPool.createProxy();
             proxies.put(Thread.currentThread().getId(), proxy);
         }
