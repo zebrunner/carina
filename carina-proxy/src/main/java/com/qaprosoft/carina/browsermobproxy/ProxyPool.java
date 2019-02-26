@@ -156,8 +156,6 @@ public final class ProxyPool {
         if (!proxy.isStarted()) {
             LOGGER.info("Starting BrowserMob proxy...");
         	// TODO: [VD] confirmed with MB that restart was added just in case. Maybe comment/remove?
-            LOGGER.info(String.format("BrowserMob Proxy is attempting to start on port (%s), proxy has port (%s) set", proxyPort, proxy.getPort()));
-            LOGGER.info("Printing out Proxy Map: " + proxyPortsByThread.toString());
             killProcessByPort(proxyPort);
             proxy.start(proxyPort);
         } else {
@@ -215,7 +213,7 @@ public final class ProxyPool {
                 }
             }
             proxies.remove(threadId);
-            proxyPortsByThread.remove(threadId);
+            //proxyPortsByThread.remove(threadId);
         }
         LOGGER.debug("stopProxy finished...");
     }
@@ -232,7 +230,7 @@ public final class ProxyPool {
         if (proxies.containsKey(threadId)) {
             proxy = proxies.get(threadId);
         } else {
-            Assert.fail("There is not registered BrowserMobProxy for thread: " + threadId);
+            Assert.fail("There is not a registered BrowserMobProxy for thread: " + threadId);
         }
         return proxy;
     }
@@ -269,9 +267,13 @@ public final class ProxyPool {
     public static void registerProxy(BrowserMobProxy proxy) {
         long threadId = Thread.currentThread().getId();
         if (proxies.containsKey(threadId)) {
-            LOGGER.warn("Existing proxy is detected and will be overriten");
+            LOGGER.warn("Existing proxy is detected and will be overrwitten");
             // No sense to stop as it is not supported
             proxies.remove(threadId);
+        }
+        if (proxyPortsByThread.containsKey(threadId)) {
+            LOGGER.warn("Existing proxyPort is detected and will be overwritten");
+            proxyPortsByThread.remove(threadId);
         }
         
         LOGGER.info("Register custom proxy with thread: " + threadId);
