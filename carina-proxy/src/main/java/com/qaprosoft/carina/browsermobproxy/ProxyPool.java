@@ -32,8 +32,8 @@ import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
     protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
-    protected static Integer assignedPortForProxy = 0;
-    
+    private static ConcurrentHashMap<Long, Integer> proxyPortsByThread = new ConcurrentHashMap<Long, Integer>();
+
     // ------------------------- BOWSERMOB PROXY ---------------------
     // TODO: investigate possibility to return interface to support JettyProxy
     /**
@@ -56,10 +56,10 @@ public final class ProxyPool {
     {
         if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
             BrowserMobProxy proxy = startProxy();
-            
-            
+
             Integer port = proxy.getPort();
-            assignedPortForProxy = proxy.getPort();
+            long threadId = Thread.currentThread().getId();
+            proxyPortsByThread.put(threadId, port);
             
             String currentIP = "";
             if (!Configuration.get(Parameter.BROWSERMOB_HOST).isEmpty()) {
@@ -70,7 +70,7 @@ public final class ProxyPool {
             	currentIP = NetworkUtil.getIpAddress();
             }
             
-            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + assignedPortForProxy);
+            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + proxyPortsByThread.get(threadId));
             
             R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put("proxy_port", port.toString());
@@ -117,7 +117,7 @@ public final class ProxyPool {
     // ------------------------- BOWSERMOB PROXY ---------------------
     
     private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
-    
+
     // TODO: investigate possibility to return interface to support JettyProxy
     /**
      * start BrowserMobProxy Server
@@ -127,7 +127,8 @@ public final class ProxyPool {
      */
     public static BrowserMobProxy startProxy() {
         //return startProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
-        return startProxy(assignedPortForProxy);
+        long threadId = Thread.currentThread().getId();
+        return startProxy(proxyPortsByThread.get(threadId));
     }
     
     public static BrowserMobProxy startProxy(int proxyPort) {
@@ -208,6 +209,7 @@ public final class ProxyPool {
                 }
             }
             proxies.remove(threadId);
+            proxyPortsByThread.remove(threadId);
         }
         LOGGER.debug("stopProxy finished...");
     }
@@ -277,5 +279,4 @@ public final class ProxyPool {
         	//do nothing
         }
     }
-
 }
