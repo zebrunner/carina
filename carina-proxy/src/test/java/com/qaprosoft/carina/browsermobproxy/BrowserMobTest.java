@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.net.ssl.SSLContext;
@@ -117,6 +118,21 @@ public class BrowserMobTest {
         Assert.assertNotNull(proxy.getHar(), "Har is unexpectedly null!");
         Assert.assertEquals(content.size(), 1,"Filtered response number is not as expected!");
         Assert.assertTrue(content.get(0).contains(filterKey), "Response doesn't contain expected key!");
+    }
+
+    @DataProvider(parallel = true)
+    public static Object[][] dataProviderForMultiThreadProxy() {
+        return new Object[][] {
+                { "Test1" },
+                { "Test2" } };
+    }
+
+    @Test(dataProvider = "dataProviderForMultiThreadProxy")
+    public void testMultipleProxies(String arg) {
+        R.CONFIG.put("proxy_set_to_system", "false");
+        ProxyPool.setupBrowserMobProxy();
+        LOGGER.info("Port: " + ProxyPool.getProxy().getPort());
+        Assert.assertEquals(ProxyPool.getProxy().getPort(), ProxyPool.getProxyPort(), "Proxy Ports don't match on current thread");
     }
 
     private void initialize() {

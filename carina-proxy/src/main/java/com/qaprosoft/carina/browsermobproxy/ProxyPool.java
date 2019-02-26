@@ -55,10 +55,10 @@ public final class ProxyPool {
     public static void setupBrowserMobProxy()
     {
         if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+            long threadId = Thread.currentThread().getId();
             BrowserMobProxy proxy = startProxy();
 
             Integer port = proxy.getPort();
-            long threadId = Thread.currentThread().getId();
             proxyPortsByThread.put(threadId, port);
             
             String currentIP = "";
@@ -126,9 +126,7 @@ public final class ProxyPool {
      * 
      */
     public static BrowserMobProxy startProxy() {
-        //return startProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
-        long threadId = Thread.currentThread().getId();
-        return startProxy(proxyPortsByThread.get(threadId));
+        return startProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
     }
     
     public static BrowserMobProxy startProxy(int proxyPort) {
@@ -144,7 +142,8 @@ public final class ProxyPool {
         } 
         
         // case when proxy was already instantiated but port doesn't correspond to current device
-        if (null == proxy || proxy.getPort() != proxyPort) {
+        //if (null == proxy || proxy.getPort() != proxyPort) {
+        if (null == proxy || proxy.getPort() != proxyPortsByThread.get(threadId)) {
             proxy = ProxyPool.createProxy();
             proxies.put(Thread.currentThread().getId(), proxy);
         }
@@ -229,6 +228,17 @@ public final class ProxyPool {
             Assert.fail("There is not registered BrowserMobProxy for thread: " + threadId);
         }
         return proxy;
+    }
+
+    public static int getProxyPort() {
+        int port = 0;
+        long threadId = Thread.currentThread().getId();
+        if (proxyPortsByThread.containsKey(threadId)) {
+            port = proxyPortsByThread.get(threadId);
+        } else {
+            Assert.fail("There is not a registered BrowserMobProxy Port for thread: " + threadId);
+        }
+        return port;
     }
     
     /**
