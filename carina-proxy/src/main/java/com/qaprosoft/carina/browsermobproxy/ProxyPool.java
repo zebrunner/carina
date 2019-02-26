@@ -32,6 +32,7 @@ import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
     protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
+    protected static Integer assignedPortForProxy = 0;
     
     // ------------------------- BOWSERMOB PROXY ---------------------
     // TODO: investigate possibility to return interface to support JettyProxy
@@ -58,6 +59,7 @@ public final class ProxyPool {
             
             
             Integer port = proxy.getPort();
+            assignedPortForProxy = proxy.getPort();
             
             String currentIP = "";
             if (!Configuration.get(Parameter.BROWSERMOB_HOST).isEmpty()) {
@@ -68,7 +70,7 @@ public final class ProxyPool {
             	currentIP = NetworkUtil.getIpAddress();
             }
             
-            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
+            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + assignedPortForProxy);
             
             R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put("proxy_port", port.toString());
@@ -124,7 +126,8 @@ public final class ProxyPool {
      * 
      */
     public static BrowserMobProxy startProxy() {
-        return startProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
+        //return startProxy(Configuration.getInt(Parameter.BROWSERMOB_PORT));
+        return startProxy(assignedPortForProxy);
     }
     
     public static BrowserMobProxy startProxy(int proxyPort) {
@@ -274,5 +277,5 @@ public final class ProxyPool {
         	//do nothing
         }
     }
-    
+
 }
