@@ -143,6 +143,7 @@ public final class ProxyPool {
         }
 
         if (proxyPortsByThread.containsKey(threadId)) {
+            LOGGER.info("Proxy Port Found by Thread...");
             proxyPort = proxyPortsByThread.get(threadId);
         }
 
@@ -156,6 +157,7 @@ public final class ProxyPool {
             LOGGER.info("Starting BrowserMob proxy...");
         	// TODO: [VD] confirmed with MB that restart was added just in case. Maybe comment/remove?
             LOGGER.info(String.format("BrowserMob Proxy is attempting to start on port (%s), proxy has port (%s) set", proxyPort, proxy.getPort()));
+            LOGGER.info("Printing out Proxy Map: " + proxyPortsByThread.toString());
             killProcessByPort(proxyPort);
             proxy.start(proxyPort);
         } else {
