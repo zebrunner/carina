@@ -127,12 +127,27 @@ public class BrowserMobTest {
                 { "Test2" } };
     }
 
-    @Test(dataProvider = "dataProviderForMultiThreadProxy")
+    @Test(dataProvider = "dataProviderForMultiThreadProxy", enabled = false)
     public void testMultipleProxies(String arg) {
         R.CONFIG.put("proxy_set_to_system", "false");
         ProxyPool.setupBrowserMobProxy();
         LOGGER.info("Port: " + ProxyPool.getProxy().getPort());
         Assert.assertEquals(ProxyPool.getProxy().getPort(), ProxyPool.getProxyPort(), "Proxy Ports don't match on current thread");
+    }
+
+    @Test(dataProvider = "dataProviderForMultiThreadProxy")
+    public void testRegisterProxy(String arg) {
+        ProxyPool.setupBrowserMobProxy();
+        int tempPort = ProxyPool.getProxy().getPort();
+        ProxyPool.stopProxy();
+        BrowserMobProxy proxy = ProxyPool.createProxy();
+        proxy.setTrustAllServers(true);
+        proxy.setMitmDisabled(false);
+        ProxyPool.registerProxy(proxy);
+
+        ProxyPool.startProxy(tempPort);
+        LOGGER.info(String.format("Checking Ports Before (%s) After (%s)", tempPort, ProxyPool.getProxy().getPort()));
+        Assert.assertEquals(tempPort, ProxyPool.getProxy().getPort(), "Proxy Port before, after do not match on current thread");
     }
 
     private void initialize() {
