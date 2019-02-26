@@ -98,7 +98,8 @@ public abstract class AbstractCapabilities {
         SystemProxy.setupProxy();
         
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);
-        String proxyPort = Configuration.get(Parameter.PROXY_PORT);
+        //String proxyPort = Configuration.get(Parameter.PROXY_PORT);
+        String proxyPort = Integer.toString(ProxyPool.getProxyPort());
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 
 
