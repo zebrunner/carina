@@ -170,6 +170,11 @@ public class MobileFactory extends AbstractFactory {
                                 LOGGER.error("Screen recording fps value should be integer between 1..60", e);
                             }
                         }
+                        
+                        if (!Configuration.get(Parameter.VIDEO_SCALE).isEmpty()) {
+                            LOGGER.debug("Video scale option will be set to " + Configuration.get(Parameter.VIDEO_SCALE));
+                            o1.withVideoScale(Configuration.get(Parameter.VIDEO_SCALE));
+                        }
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
 
