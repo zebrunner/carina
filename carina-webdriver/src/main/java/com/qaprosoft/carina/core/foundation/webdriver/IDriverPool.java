@@ -379,7 +379,6 @@ public interface IDriverPool {
                             // of capabilities
                             proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
                         }
-                        LOGGER.info("Debug...does Proxy Port exist yet? " + ProxyPool.getProxyPort());
                         ProxyPool.startProxy(proxyPort);
                     }
                 }

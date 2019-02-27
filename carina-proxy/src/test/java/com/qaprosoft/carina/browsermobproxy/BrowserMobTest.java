@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,14 +126,6 @@ public class BrowserMobTest {
         return new Object[][] {
                 { "Test1" },
                 { "Test2" } };
-    }
-
-    @Test(dataProvider = "dataProviderForMultiThreadProxy", enabled = false)
-    public void testMultipleProxies(String arg) {
-        R.CONFIG.put("proxy_set_to_system", "false");
-        ProxyPool.setupBrowserMobProxy();
-        LOGGER.info("Port: " + ProxyPool.getProxy().getPort());
-        Assert.assertEquals(ProxyPool.getProxy().getPort(), ProxyPool.getProxyPort(), "Proxy Ports don't match on current thread");
     }
 
     @Test(dataProvider = "dataProviderForMultiThreadProxy")

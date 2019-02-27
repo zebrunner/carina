@@ -98,11 +98,9 @@ public abstract class AbstractCapabilities {
         SystemProxy.setupProxy();
         
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);
-        //String proxyPort = Configuration.get(Parameter.PROXY_PORT);
         String proxyPort = Integer.toString(ProxyPool.getProxyPort());
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
-
-
+        
         if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
 
             org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();

@@ -130,7 +130,6 @@ public final class ProxyPool {
     }
     
     public static BrowserMobProxy startProxy(int proxyPort) {
-        LOGGER.info(String.format("BrowserMob proxy is now attempting to start on Port (%s)...", proxyPort));
         if (!Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
             LOGGER.debug("Proxy is disabled.");
             return null;
@@ -143,7 +142,6 @@ public final class ProxyPool {
         }
 
         if (proxyPortsByThread.containsKey(threadId)) {
-            LOGGER.info("Proxy Port Found by Thread...");
             proxyPort = proxyPortsByThread.get(threadId);
         }
 
