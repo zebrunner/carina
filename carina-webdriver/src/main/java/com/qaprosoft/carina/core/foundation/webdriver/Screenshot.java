@@ -526,7 +526,6 @@ public class Screenshot {
             ru.yandex.qatools.ashot.Screenshot screenshot;
             if (Configuration.getPlatform().equals("ANDROID")) {
                 String pixelRatio = String.valueOf(((EventFiringWebDriver)augmentedDriver).getCapabilities().getCapability("pixelRatio"));
-                //                String pixelRatio = String.valueOf(IDriverPool.getDefaultDevice().getCapabilities().getCapability("pixelRatio"));
                 float dpr = Float.parseFloat(pixelRatio);
                 screenshot = (new AShot()).shootingStrategy(ShootingStrategies
                         .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER, dpr))
@@ -576,17 +575,16 @@ public class Screenshot {
             }
         } else {
             ru.yandex.qatools.ashot.Screenshot screenshot;
-            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                        .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
-                                SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
-                screenShot = screenshot.getImage();
-            } else {
-                // regular web
-                screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
-                        .takeScreenshot(augmentedDriver);
-                screenShot = screenshot.getImage();
-            }
+            //            if (driver.manage().window().getSize().getWidth() < 1920) {
+            //                screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
+            //                                SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+            //                screenShot = screenshot.getImage();
+            //            } else {
+            // regular web
+            screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
+                    .takeScreenshot(augmentedDriver);
+            screenShot = screenshot.getImage();
+            //            }
         }
 
         return screenShot;
