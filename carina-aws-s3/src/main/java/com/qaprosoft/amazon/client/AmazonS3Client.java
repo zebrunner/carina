@@ -51,8 +51,8 @@ public class AmazonS3Client {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return Optional.empty();
         }
+        preparedAction.run();
         return Optional.ofNullable(CompletableFuture.supplyAsync(() -> {
-            preparedAction.run();
             String url = null;
             try {
                 int expiresIn = Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
