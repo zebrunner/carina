@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -220,7 +219,12 @@ public class MobileFactory extends AbstractFactory {
                 device = new Device(getDeviceInfo(capabilitiesMap));
             }
             IDriverPool.registerDevice(device);
-            Assert.fail(String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid()));
+            
+            String msg = "Unable to initialize driver!";
+            if (!device.getName().isEmpty()) {
+                msg = String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid());
+            }
+            throw new RuntimeException(msg);
         }
 
         Device device = IDriverPool.getNullDevice();
