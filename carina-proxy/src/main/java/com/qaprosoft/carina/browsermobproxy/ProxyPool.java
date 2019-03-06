@@ -110,8 +110,6 @@ public final class ProxyPool {
     
     // ------------------------- BOWSERMOB PROXY ---------------------
     
-    //private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
-    
     // TODO: investigate possibility to return interface to support JettyProxy
     /**
      * start BrowserMobProxy Server
