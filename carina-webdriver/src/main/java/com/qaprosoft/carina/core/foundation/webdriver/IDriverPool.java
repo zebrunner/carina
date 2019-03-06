@@ -43,6 +43,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
+import net.lightbody.bmp.BrowserMobProxy;
+
 public interface IDriverPool {
     static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
     static final String DEFAULT = "default";
@@ -297,9 +299,12 @@ public interface IDriverPool {
     default void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
         try {
             carinaDriver.getDevice().disconnectRemote();
-            if (!keepProxyDuring) {
-                ProxyPool.stopProxy();
-            }
+            
+            //TODO: 3 rows below should be refactored
+			if (carinaDriver.getProxy() != null) {
+				carinaDriver.getProxy().stop();
+			}
+			
             carinaDriver.getDriver().quit();
             Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName());
         } catch (WebDriverException e) {
@@ -368,6 +373,7 @@ public interface IDriverPool {
                 
                 // moved proxy start logic here since device will be initialized
                 // here only
+                BrowserMobProxy proxy = null;
                 if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
                     int proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
                     if (!device.isNull()) {
@@ -379,13 +385,13 @@ public interface IDriverPool {
                             // of capabilities
                             proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
                         }
-                        ProxyPool.startProxy(proxyPort);
+                        proxy = ProxyPool.startProxy(proxyPort);
                     }
                 }
 
                 
                 // new 6.0 approach to manipulate drivers via regular Set
-                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId, proxy);
                 Timer.start(device.getMetricName(), carinaDriver.getName());
                 driversPool.add(carinaDriver);
 
@@ -506,6 +512,34 @@ public interface IDriverPool {
         }
         return currentDrivers;
     }
+
+	// ------------------------ PROXY POOL METHODS -----------------------
+	/**
+	 * Get proxy registered to default driver. If no default proxy discovered null
+	 * will be returned.
+	 * 
+	 * @return default BrowserMobProxy
+	 */
+	default public BrowserMobProxy getProxy() {
+		return getProxy(DEFAULT);
+	}
+
+	/**
+	 * Get proxy registered to named driver. If no proxy discovered null will be
+	 * returned.
+	 * 
+	 * @param name
+	 *            String driver name
+	 * @return BrowserMobProxy
+	 */
+	default public BrowserMobProxy getProxy(String name) {
+		if (isDriverRegistered(name)) {
+			return getDrivers().get(name).getProxy();
+		} else {
+			return null;
+		}
+
+	}
 
     // ------------------------ DEVICE POOL METHODS -----------------------
     /**

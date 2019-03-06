@@ -271,7 +271,7 @@ public class DriverPoolTest implements IDriverPool {
         }
 
         // new 6.0 approach to manipulate drivers via regular Set
-        CarinaDriver carinaDriver = new CarinaDriver(name, driver, device, TestPhase.getActivePhase(), threadId);
+        CarinaDriver carinaDriver = new CarinaDriver(name, driver, device, TestPhase.getActivePhase(), threadId, null);
         driversPool.add(carinaDriver);
     }
 

@@ -4,6 +4,7 @@ import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import net.lightbody.bmp.BrowserMobProxy;
 
 public class CarinaDriver {
 	private String name;
@@ -11,14 +12,16 @@ public class CarinaDriver {
 	private Device device;
 	private Phase phase;
 	private long threadId;
+	private BrowserMobProxy proxy;
 	
-    public CarinaDriver(String name, WebDriver driver, Device device, Phase phase, long threadId) {
+    public CarinaDriver(String name, WebDriver driver, Device device, Phase phase, long threadId, BrowserMobProxy proxy) {
 		super();
 		this.name = name;
 		this.driver = driver;
 		this.device = device;
 		this.phase = phase;
 		this.threadId = threadId;
+		this.proxy = proxy;
 	}
 
 	public WebDriver getDriver() {
@@ -39,6 +42,10 @@ public class CarinaDriver {
 
 	public Phase getPhase() {
 		return phase;
+	}
+	
+	public BrowserMobProxy getProxy() {
+		return proxy;
 	}
 
     protected void setThreadId(long threadId) {

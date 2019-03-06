@@ -803,7 +803,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
                 carinaDriver.getDevice().disconnectRemote();
-                ProxyPool.stopProxy();
+                ProxyPool.stopProxy(carinaDriver.getProxy());
                 try {
                     LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
