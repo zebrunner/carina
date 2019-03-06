@@ -29,6 +29,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
  * 
@@ -189,7 +192,9 @@ public class DriverListener implements WebDriverEventListener {
 
         String urlPrefix = "";
         try {
-            urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
+            if (!isMobile(driver)) {
+                urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
+            }
             // handle cases which should't be captured
             if (Screenshot.isCaptured(thr.getMessage())) {
                 captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
@@ -292,6 +297,10 @@ public class DriverListener implements WebDriverEventListener {
         currentNegativeMessage.remove();
     }
 
+    private boolean isMobile(WebDriver driver) {
+        return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
+    }
+    
 	@Override
 	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
 		// do nothing
