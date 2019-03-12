@@ -61,24 +61,25 @@ import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.comparison.ImageDiff;
 import ru.yandex.qatools.ashot.comparison.ImageDiffer;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
 
 /**
  * Screenshot manager for operation with screenshot capturing, resizing and removing of old screenshot folders.
- * 
+ *
  * @author Alex Khursevich
  */
 public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
-    
+
     private Screenshot() {
     	//hide default constructor
     }
 
     /**
      * Adds screenshot rule
-     * 
+     *
      * @param rule IScreenshotRule
      * @return list of existing rules
      */
@@ -91,7 +92,7 @@ public class Screenshot {
 
     /**
      * Adds screenshot rules
-     * 
+     *
      * @param rulesList - list of new rules
      * @return list of existing rules
      */
@@ -106,7 +107,7 @@ public class Screenshot {
 
     /**
      * Deletes rule
-     * 
+     *
      * @param rule IScreenshotRule
      * @return list of existing rules
      */
@@ -136,9 +137,9 @@ public class Screenshot {
 
     /**
      * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
-     * 
+     *
      * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @return screenshot name.
@@ -151,7 +152,7 @@ public class Screenshot {
     /**
      * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
      * location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param comment String
@@ -173,7 +174,7 @@ public class Screenshot {
     /**
      * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
      * location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param comment String
@@ -196,7 +197,7 @@ public class Screenshot {
             File testScreenRootDir = ReportContext.getTestDir();
 
             // Capture full page screenshot and resize
-            screenName = System.currentTimeMillis() + ".png";
+            screenName = comment + ".png";
             String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
             WebDriver augmentedDriver = driver;
@@ -257,7 +258,7 @@ public class Screenshot {
     /**
      * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
      * location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param comment String
@@ -273,9 +274,9 @@ public class Screenshot {
 
     /**
      * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
-     * 
+     *
      * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param isTakeScreenshot
@@ -290,9 +291,9 @@ public class Screenshot {
 
     /**
      * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
-     * 
+     *
      * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param isTakeScreenshot
@@ -308,7 +309,7 @@ public class Screenshot {
 
     /**
      * Captures driver screenshot for Alice-AI metadata and put it to appropriate metadata location
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param screenName
@@ -347,7 +348,7 @@ public class Screenshot {
 
     /**
      * Captures application screenshot, creates thumbnail and copies both images to specified screenshots location.
-     * 
+     *
      * @param driver
      *            instance used for capturing.
      * @param isTakeScreenshot
@@ -366,14 +367,14 @@ public class Screenshot {
         // For the rest of cases returned previous implementation
 
         LOGGER.debug("Screenshot->capture starting...");
-        
+
         if (isTakeScreenshot) {
             try {
             	if (!isCaptured(comment)) {
             		LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
             		return screenName;
             	}
-            	
+
             	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
@@ -383,8 +384,8 @@ public class Screenshot {
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
                 WebDriver augmentedDriver = driver;
-                
-                
+
+
                 //hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
     				try {
@@ -394,13 +395,13 @@ public class Screenshot {
         				// wrap into try/catch to make sure we don't affect test execution
         				Field locatorField = innerProxy.getClass().getDeclaredField("arg$2");
         				locatorField.setAccessible(true);
-        				
-        				augmentedDriver = driver = (WebDriver) locatorField.get(innerProxy); 
+
+        				augmentedDriver = driver = (WebDriver) locatorField.get(innerProxy);
     				} catch (Exception e) {
     					//do nothing and receive augmenting warning in the logs
     				}
                 }
-    				
+
                 if (!driver.toString().contains("AppiumNativeDriver")) {
                     // do not augment for Appium 1.x anymore
                     augmentedDriver = new DriverAugmenter().augment(driver);
@@ -416,7 +417,7 @@ public class Screenshot {
                 }
 
                 if (screen == null) {
-                	//do nothing and return empty 
+                	//do nothing and return empty
                 	return "";
                 }
                 BufferedImage thumbScreen = screen;
@@ -479,7 +480,7 @@ public class Screenshot {
 
     /**
      * Resizes image according to specified dimensions.
-     * 
+     *
      * @param bufferedImage
      *            - image to resize.
      * @param width
@@ -505,13 +506,13 @@ public class Screenshot {
     /**
      * Makes fullsize screenshot using javascript (May not work properly with
      * popups and active js-elements on the page)
-     * 
+     *
      * @param driver
      *            - webDriver.
      * @param augmentedDriver
      *            - webDriver.
      * @exception IOException
-     * 
+     *
      * @return screenshot image
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
@@ -521,70 +522,42 @@ public class Screenshot {
             File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
             screenShot = ImageIO.read(screenshot);
         } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-            // Mobile web
-            // screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
             ru.yandex.qatools.ashot.Screenshot screenshot;
             if (Configuration.getPlatform().equals("ANDROID")) {
-                String pixelRatio = String.valueOf(((EventFiringWebDriver)augmentedDriver).getCapabilities().getCapability("pixelRatio"));
-                float dpr = Float.parseFloat(pixelRatio);
-                screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                        .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER, dpr))
-                        .takeScreenshot(augmentedDriver);
-                screenShot = screenshot.getImage();
+                String pixelRatio = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
+                if (!pixelRatio.equals("null")) {
+                    float dpr = Float.parseFloat(pixelRatio);
+                    screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
+                                    dpr))
+                            .takeScreenshot(augmentedDriver);
+                    screenShot = screenshot.getImage();
+                } else {
+                    screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
+                                    SpecialKeywords.ANDROID_DEFAULT_DPR))
+                            .takeScreenshot(augmentedDriver);
+                    screenShot = screenshot.getImage();
+                }
             } else {
                 int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
-                switch (deviceWidth) {
-                case SpecialKeywords.DEFAULT_PLUS_WIDTH: {
-                    screenshot = new AShot().shootingStrategy(
-                            ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
-                                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_PLUS_DPR)).takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
-                    break;
-                }
-                case SpecialKeywords.DEFAULT_IPAD_WIDTH: {
-                    screenshot = new AShot().shootingStrategy(
-                            ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_IPAD_HEADER,
-                                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
-                    break;
-                }
-                case SpecialKeywords.DEFAULT_SE_WIDTH: {
-                    screenshot = new AShot().shootingStrategy(
-                            ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_SE_HEADER,
-                                    SpecialKeywords.DEFAULT_IOS_SE_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
-                    break;
-                }
-                default: {
-                    int height = augmentedDriver.manage().window().getSize().getHeight();
-                    if (height == SpecialKeywords.DEFAULT_IOS_X_HEIGHT) {
-                        screenshot = new AShot().shootingStrategy(
-                                ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_X_HEADER,
-                                        SpecialKeywords.DEFAULT_IOS_X_FOOTER, SpecialKeywords.IPHONE_X_DPR)).takeScreenshot(augmentedDriver);
-                        screenShot = screenshot.getImage();
-                        break;
-                    } else {
-                        screenshot = new AShot().shootingStrategy(
-                                ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
-                                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
-                        screenShot = screenshot.getImage();
-                        break;
-                    }
-                }
-                }
+                String deviceName = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
+                screenshot = new AShot().shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName)).takeScreenshot(augmentedDriver);
+                screenShot = screenshot.getImage();
             }
         } else {
-            ru.yandex.qatools.ashot.Screenshot screenshot;
-            //            if (driver.manage().window().getSize().getWidth() < 1920) {
-            //                screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
-            //                                SpecialKeywords.IPHONE_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
-            //                screenShot = screenshot.getImage();
-            //            } else {
             // regular web
-            screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
-                    .takeScreenshot(augmentedDriver);
-            screenShot = screenshot.getImage();
-            //            }
+            ru.yandex.qatools.ashot.Screenshot screenshot;
+            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                        .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
+                                SpecialKeywords.IOS_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
+                screenShot = screenshot.getImage();
+            } else {
+                screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
+                        .takeScreenshot(augmentedDriver);
+                screenShot = screenshot.getImage();
+            }
         }
 
         return screenShot;
@@ -596,24 +569,24 @@ public class Screenshot {
      * @param augmentedDriver
      *            - webDriver.
      * @exception IOException
-     * 
+     *
      * @return screenshot image
      */
     private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
     	return ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
     }
-    
+
 
 	/**
 	 * Analyze if screenshot can be captured using the most common reason when
 	 * driver is died etc.
-	 * 
+	 *
 	 * @param message
 	 *            - error message (stacktrace).
-	 * 
+	 *
 	 * @return boolean
 	 */
-	public static boolean isCaptured(String message) {
+	public static boolean isCaptured(String message){
 		// [VD] do not use below line as it is too common!
 		// || message.contains("timeout")
 		if (message == null) {
@@ -664,7 +637,7 @@ public class Screenshot {
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
-                screenName = System.currentTimeMillis() + ".png";
+                screenName = comment + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
                 BufferedImage thumbScreen = screen;
@@ -704,5 +677,35 @@ public class Screenshot {
             Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
         }
         return true;
+    }
+
+    private static ShootingStrategy getScreenshotShuttingStrategy(int deviceWidth, String deviceName) {
+        switch (deviceWidth) {
+        case SpecialKeywords.DEFAULT_WIDTH:
+            if (deviceName.contains("X")) {
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
+                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_X_DPR);
+            } else {
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
+                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+            }
+        case SpecialKeywords.DEFAULT_PLUS_WIDTH:
+            if (deviceName.contains("XR")) {
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
+                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+            } else {
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
+                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_X_DPR);
+            }
+        case SpecialKeywords.DEFAULT_IPAD_WIDTH:
+            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_IPAD_HEADER,
+                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+        case SpecialKeywords.DEFAULT_SE_WIDTH:
+            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_SE_HEADER,
+                    SpecialKeywords.DEFAULT_IOS_SE_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+        default:
+            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
+                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+        }
     }
 }
