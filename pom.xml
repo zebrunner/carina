@@ -105,11 +105,11 @@
             <name>Qaprosoft Thirdparty</name>
             <url>https://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
         </repository>
-        <repository>
+        <!--repository>
             <id>springio-plugins-release</id>
             <name>Spring Plugins</name>
             <url>http://repo.spring.io/plugins-release/</url>
-        </repository>
+        </repository-->
     </repositories>
     <profiles>
         <profile>
