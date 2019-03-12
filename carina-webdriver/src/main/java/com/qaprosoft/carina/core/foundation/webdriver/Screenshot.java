@@ -21,18 +21,17 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.amazon.client.AmazonS3Client;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -46,15 +45,12 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
-import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -69,12 +65,6 @@ public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
-
-    private static ExecutorService executorService = Executors.newFixedThreadPool(50);
-    
-    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/";
-    
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
     
     private Screenshot() {
     	//hide default constructor
@@ -135,7 +125,7 @@ public class Screenshot {
                 break;
             }
         }
-        return capture(driver, isTakeScreenshotRules, comment, false);
+        return capture(driver, isTakeScreenshotRules, comment, false, false);
     }
 
     /**
@@ -163,7 +153,7 @@ public class Screenshot {
      */
     public static String captureFailure(WebDriver driver, String comment) {
         LOGGER.debug("Screenshot->captureFailure starting...");
-        String screenName = capture(driver, true, comment, true);
+        String screenName = capture(driver, true, comment, true, false);
 
         // XML layout extraction
         File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
@@ -183,8 +173,12 @@ public class Screenshot {
      * @param comment String
      * @return screenshot name.
      */
+    public static String captureFullSize(WebDriver driver, String comment, boolean artifact) {
+        return capture(driver, true /* explicitly make full size screenshot */, comment, true, artifact);
+    }
+
     public static String captureFullSize(WebDriver driver, String comment) {
-        return capture(driver, true /* explicitly make full size screenshot */, comment, true);
+        return captureFullSize(driver, comment, false);
     }
 
     /**
@@ -196,8 +190,12 @@ public class Screenshot {
      * @param comment String
      * @return screenshot name.
      */
+    public static String capture(WebDriver driver, String comment, boolean artifact) {
+        return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false, artifact);
+    }
+
     public static String capture(WebDriver driver, String comment) {
-        return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false);
+        return capture(driver, comment, false);
     }
 
     /**
@@ -213,7 +211,7 @@ public class Screenshot {
      */
     @Deprecated
     public static String capture(WebDriver driver, boolean isTakeScreenshot) {
-        return capture(driver, isTakeScreenshot, "", false);
+        return capture(driver, isTakeScreenshot, "", false, false);
 
     }
 
@@ -232,7 +230,7 @@ public class Screenshot {
      */
     @Deprecated
     public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment) {
-        return capture(driver, isTakeScreenshot, comment, false);
+        return capture(driver, isTakeScreenshot, comment, false, false);
     }
 
     /**
@@ -288,7 +286,7 @@ public class Screenshot {
      * @return screenshot name.
      */
 
-    private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
+    private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize, boolean artifact) {
         String screenName = "";
 
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
@@ -367,7 +365,7 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-                uploadToAmazonS3(screenshot);
+                uploadToAmazonS3(screenshot, comment, artifact);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -390,34 +388,19 @@ public class Screenshot {
      * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
-    private static void uploadToAmazonS3(File screenshot) {
-        if (!Configuration.getBoolean(Parameter.S3_SAVE_SCREENSHOTS)) {
-            LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
-            return;
-        }
+    private static void uploadToAmazonS3(File screenshot, String comment, boolean artifact) {
         final String correlationId = UUID.randomUUID().toString();
         final String ciTestId = ZafiraListener.getThreadCiTestId();
-        try {
-            ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                    .addHeader("AMAZON_PATH", null)
-                    .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
-            executorService.execute(() -> {
-                try {
-                    int expiresIn = Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
-                	LOGGER.debug("Uploading to AWS: " + screenshot.getName() + ". Expires in " + expiresIn + " seconds.");
-                    String url = ZafiraSingleton.INSTANCE.getClient().uploadFile(screenshot, expiresIn, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
-                    LOGGER.debug("Uploaded to AWS: " + screenshot.getName());
-                    ZafiraMessager.<MetaInfoMessage>custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                            .addHeader("AMAZON_PATH", url)
-                            .addHeader("CI_TEST_ID", ciTestId)
-                            .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId));
-                    LOGGER.debug("Updated AWS metadata: " + screenshot.getName());
-                } catch (Exception e) {
-                    LOGGER.debug("Can't save file to Amazon S3!", e);
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.debug("Can't save file to Amazon S3!", e);
+        Optional<CompletableFuture<String>> urlFuture = AmazonS3Client.upload(screenshot,
+                () -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                .addHeader("AMAZON_PATH", null)
+                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
+                url -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
+                                .addHeader("AMAZON_PATH", url)
+                                .addHeader("CI_TEST_ID", ciTestId)
+                                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)));
+        if(artifact) {
+            urlFuture.ifPresent(uf -> Artifacts.add(uf, comment));
         }
     }
 

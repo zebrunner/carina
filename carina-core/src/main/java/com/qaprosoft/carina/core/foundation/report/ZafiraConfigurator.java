@@ -195,6 +195,10 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         return Artifacts.getArtifacts();
     }
 
+    @Override
+    public void clearArtifacts() {
+        Artifacts.clearArtifacts();
+    }
 
     //Moved them separately for future easier reusing if getTestTags will be overridden.
     //TODO: Should we make them public or protected?
