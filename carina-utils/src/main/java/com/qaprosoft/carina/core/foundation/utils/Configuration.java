@@ -268,6 +268,9 @@ public class Configuration {
         
         VIDEO_SCALE("video_scale"),
 
+        // Ignore SSL
+        IGNORE_SSL("ignore_ssl"),
+
         // Test Execution Filter rules
         TEST_RUN_RULES("test_run_rules");
 
