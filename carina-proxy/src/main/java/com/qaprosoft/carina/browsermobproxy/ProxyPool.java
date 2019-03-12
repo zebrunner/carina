@@ -239,8 +239,7 @@ public final class ProxyPool {
         if (proxyPortsByThread.containsKey(threadId)) {
             port = proxyPortsByThread.get(threadId);
         } else {
-            port = Configuration.getInt(Parameter.PROXY_PORT);
-            LOGGER.warn("Proxy Not Started, defaulting to browsermob_port value: " + port);
+            Assert.fail("This is not a register BrowserMobProxy Port for thread: " + threadId);
         }
         return port;
     }
