@@ -548,16 +548,9 @@ public class Screenshot {
         } else {
             // regular web
             ru.yandex.qatools.ashot.Screenshot screenshot;
-            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                        .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
-                                SpecialKeywords.IOS_DEFAULT_DPR)).takeScreenshot(augmentedDriver);
-                screenShot = screenshot.getImage();
-            } else {
                 screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
                         .takeScreenshot(augmentedDriver);
                 screenShot = screenshot.getImage();
-            }
         }
 
         return screenShot;
