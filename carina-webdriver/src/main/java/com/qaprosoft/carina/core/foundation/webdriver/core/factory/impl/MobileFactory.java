@@ -203,7 +203,7 @@ public class MobileFactory extends AbstractFactory {
             Map<String, Object> capabilitiesMap = capabilities.asMap();
             LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
 
-            Device device = null;
+            Device device = IDriverPool.nullDevice;
             if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
                 LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
                 String debugInfo = getDebugInfo(exceptionMsg);
