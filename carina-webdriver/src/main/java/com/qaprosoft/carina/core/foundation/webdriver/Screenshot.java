@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -388,17 +390,23 @@ public class Screenshot {
     private static void uploadToAmazonS3(File screenshot, File screenshotThumb, String comment, boolean artifact) {
         final String correlationId = UUID.randomUUID().toString();
         final String ciTestId = ZafiraListener.getThreadCiTestId();
-        uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, artifact, false);
-        uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, artifact, true);
+        Optional<CompletableFuture<String>> originalScreenshotFuture = uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, false);
+        Optional<CompletableFuture<String>> thumbFuture = uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, true);
+        if(artifact) {
+            originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
+                List<CompletableFuture<String>> urlFutures = Stream.of(of, tf).collect(Collectors.toList());
+                Artifacts.add(urlFutures, comment);
+            }));
+        }
     }
 
     /**
      * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
-    private static void uploadToAmazonS3(File screenshot, String comment, String correlationId, String ciTestId, boolean artifact, boolean thumb) {
+    private static Optional<CompletableFuture<String>> uploadToAmazonS3(File screenshot, String comment, String correlationId, String ciTestId, boolean thumb) {
         final String pathHeader = thumb ? "THUMB_AMAZON_PATH" : "AMAZON_PATH";
-        Optional<CompletableFuture<String>> urlFuture = AmazonS3Client.upload(screenshot,
+        return AmazonS3Client.upload(screenshot,
                 () -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                 .addHeader(pathHeader, null)
                 .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
@@ -406,9 +414,6 @@ public class Screenshot {
                                 .addHeader(pathHeader, url)
                                 .addHeader("CI_TEST_ID", ciTestId)
                                 .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)));
-        if(artifact) {
-            urlFuture.ifPresent(uf -> Artifacts.add(uf, comment, correlationId));
-        }
     }
 
     /**
