@@ -265,6 +265,11 @@ public class Configuration {
         IOS_SCREEN_RECORDING_FPS("ios_screen_record_fps"),
         
         SCREEN_RECORD_DURATION("screen_record_duration"),
+        
+        VIDEO_SCALE("video_scale"),
+
+        // Ignore SSL
+        IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
         TEST_RUN_RULES("test_run_rules");

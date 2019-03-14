@@ -46,11 +46,20 @@ public class AmazonS3Client {
         return upload(file, () -> {}, callback);
     }
 
+    /**
+     * Uploads file to amazon S3
+     * @param file - file to upload
+     * @param preparedAction - action will be execute in the same thread before uploading starting
+     * @param callback - triggers on operaion finish
+     * @return Optional<CompleatableFuture<url>> if success, Optional<null> on S3_SAVE_SCREENSHOTS is false or
+     *  Optional<CompleatableFuture<null>> if there are any problems on async uploading stage
+     */
     public static Optional<CompletableFuture<String>> upload(File file, Runnable preparedAction, Consumer<String> callback) {
         if (!Configuration.getBoolean(Configuration.Parameter.S3_SAVE_SCREENSHOTS)) {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return Optional.empty();
         }
+
         preparedAction.run();
         return Optional.ofNullable(CompletableFuture.supplyAsync(() -> {
             String url = null;

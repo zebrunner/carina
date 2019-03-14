@@ -182,7 +182,7 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     public boolean isNull() {
-        if (getName() == null) {
+        if (StringUtils.isEmpty(getName())) {
             return true;
         }
         return getName().isEmpty();

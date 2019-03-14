@@ -38,7 +38,7 @@ public class RemoteDevice {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = (null == name) ? "" : name;
     }
 
     public String getOs() {
@@ -62,7 +62,7 @@ public class RemoteDevice {
     }
 
     public void setUdid(String udid) {
-        this.udid = udid;
+        this.udid = (null == udid) ? "" : udid;
     }
 
     public String getRemoteURL() {

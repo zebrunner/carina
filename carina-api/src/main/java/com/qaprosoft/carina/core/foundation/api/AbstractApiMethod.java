@@ -62,6 +62,7 @@ public abstract class AbstractApiMethod extends HttpClient {
     public RequestSpecification request;
     private boolean logRequest = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
     private boolean logResponse = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
+    private boolean ignoreSSL = Configuration.getBoolean(Parameter.IGNORE_SSL);
 
     public AbstractApiMethod() {
         init(getClass());
@@ -176,6 +177,11 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     public Response callAPI() {
+
+        if(ignoreSSL) {
+            ignoreSSLCerts();
+        }
+
         if (bodyContent.length() != 0)
             request.body(bodyContent.toString());
 

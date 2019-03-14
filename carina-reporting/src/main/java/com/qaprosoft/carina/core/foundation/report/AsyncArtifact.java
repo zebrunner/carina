@@ -23,7 +23,7 @@ class AsyncArtifact {
     private String name;
     private Integer expiresIn;
 
-    public AsyncArtifact(CompletableFuture<String> urlFuture, String name, Integer expiresIn) {
+    AsyncArtifact(CompletableFuture<String> urlFuture, String name, Integer expiresIn) {
         this.urlFuture = urlFuture;
         this.name = name;
         this.expiresIn = expiresIn;
