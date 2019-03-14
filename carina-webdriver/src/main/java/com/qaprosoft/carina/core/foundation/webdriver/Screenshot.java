@@ -434,12 +434,13 @@ public class Screenshot {
 
                 // Create screenshot thumbnail
                 String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-                ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+                File screenshotThumb = new File(thumbScreenPath);
+                ImageIO.write(thumbScreen, "PNG", screenshotThumb);
                 resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-                uploadToAmazonS3(screenshot, comment, artifact);
+                uploadToAmazonS3(screenshot, screenshotThumb, comment, artifact);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -458,23 +459,29 @@ public class Screenshot {
         return screenName;
     }
 
+    private static void uploadToAmazonS3(File screenshot, File screenshotThumb, String comment, boolean artifact) {
+        final String correlationId = UUID.randomUUID().toString();
+        final String ciTestId = ZafiraListener.getThreadCiTestId();
+        uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, artifact, false);
+        uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, artifact, true);
+    }
+
     /**
      * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
-    private static void uploadToAmazonS3(File screenshot, String comment, boolean artifact) {
-        final String correlationId = UUID.randomUUID().toString();
-        final String ciTestId = ZafiraListener.getThreadCiTestId();
+    private static void uploadToAmazonS3(File screenshot, String comment, String correlationId, String ciTestId, boolean artifact, boolean thumb) {
+        final String pathHeader = thumb ? "THUMB_AMAZON_PATH" : "AMAZON_PATH";
         Optional<CompletableFuture<String>> urlFuture = AmazonS3Client.upload(screenshot,
                 () -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                .addHeader("AMAZON_PATH", null)
+                .addHeader(pathHeader, null)
                 .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
                 url -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                                .addHeader("AMAZON_PATH", url)
+                                .addHeader(pathHeader, url)
                                 .addHeader("CI_TEST_ID", ciTestId)
                                 .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)));
         if(artifact) {
-            urlFuture.ifPresent(uf -> Artifacts.add(uf, comment));
+            urlFuture.ifPresent(uf -> Artifacts.add(uf, comment, correlationId));
         }
     }
 
