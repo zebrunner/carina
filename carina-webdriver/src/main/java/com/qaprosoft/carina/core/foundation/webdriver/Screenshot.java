@@ -229,12 +229,14 @@ public class Screenshot {
 
             // Create screenshot thumbnail
             String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-            ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+            File screenshotThumb = new File(thumbScreenPath);
+            ImageIO.write(thumbScreen, "PNG", screenshotThumb);
+
             resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
                     Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
             // Uploading screenshot to Amazon S3
-            uploadToAmazonS3(screenshot, comment, artifact);
+            uploadToAmazonS3(screenshot, screenshotThumb, comment, artifact);
 
             // add screenshot comment to collector
             ReportContext.addScreenshotComment(screenName, comment);
@@ -660,12 +662,13 @@ public class Screenshot {
 
                 // Create comparative screenshot thumbnail
                 String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-                ImageIO.write(thumbScreen, "PNG", new File(thumbScreenPath));
+                File screenshotThumb = new File(thumbScreenPath);
+                ImageIO.write(thumbScreen, "PNG", screenshotThumb);
                 resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading comparative screenshot to Amazon S3
-                uploadToAmazonS3(screenshot, comment, artifact);
+                uploadToAmazonS3(screenshot, screenshotThumb, comment, artifact);
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");
