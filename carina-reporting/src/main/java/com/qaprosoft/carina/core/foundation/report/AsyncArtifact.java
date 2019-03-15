@@ -15,22 +15,23 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 class AsyncArtifact {
 
-    private CompletableFuture<String> urlFuture;
+    private List<CompletableFuture<String>> urlFutures;
     private String name;
     private Integer expiresIn;
 
-    AsyncArtifact(CompletableFuture<String> urlFuture, String name, Integer expiresIn) {
-        this.urlFuture = urlFuture;
+    AsyncArtifact(List<CompletableFuture<String>> urlFutures, String name, Integer expiresIn) {
+        this.urlFutures = urlFutures;
         this.name = name;
         this.expiresIn = expiresIn;
     }
 
-    public CompletableFuture<String> getUrlFuture() {
-        return urlFuture;
+    public List<CompletableFuture<String>> getUrlFutures() {
+        return urlFutures;
     }
 
     public String getName() {
