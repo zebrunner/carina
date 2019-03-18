@@ -68,4 +68,11 @@ public class HttpMethodTypeTest {
         Assert.assertEquals(type.getCode(), 6);
         Assert.assertEquals(type.getName(), "PATCH");
     }
+    
+    @Test
+    public void testOptionsMethod() {
+        HttpMethodType type = HttpMethodType.OPTIONS;
+        Assert.assertEquals(type.getCode(), 7);
+        Assert.assertEquals(type.getName(), "OPTIONS");
+    }
 }
