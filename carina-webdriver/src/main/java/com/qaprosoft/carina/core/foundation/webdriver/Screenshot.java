@@ -293,6 +293,7 @@ public class Screenshot {
         // For the rest of cases returned previous implementation
 
         LOGGER.debug("Screenshot->capture starting...");
+        Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
         
         if (isTakeScreenshot) {
             try {
@@ -301,7 +302,6 @@ public class Screenshot {
             		return screenName;
             	}
             	
-            	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
