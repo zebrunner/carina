@@ -293,9 +293,9 @@ public class Screenshot {
         // For the rest of cases returned previous implementation
 
         LOGGER.debug("Screenshot->capture starting...");
-        Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
         
         if (isTakeScreenshot) {
+            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
             try {
             	if (!isCaptured(comment)) {
             		LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
