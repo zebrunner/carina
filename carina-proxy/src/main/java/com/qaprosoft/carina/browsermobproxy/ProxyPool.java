@@ -32,7 +32,8 @@ import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
     protected static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
-    
+    private static ConcurrentHashMap<Long, Integer> proxyPortsByThread = new ConcurrentHashMap<Long, Integer>();
+
     // ------------------------- BOWSERMOB PROXY ---------------------
     // TODO: investigate possibility to return interface to support JettyProxy
     /**
@@ -54,10 +55,11 @@ public final class ProxyPool {
     public static void setupBrowserMobProxy()
     {
         if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+            long threadId = Thread.currentThread().getId();
             BrowserMobProxy proxy = startProxy();
-            
-            
+
             Integer port = proxy.getPort();
+            proxyPortsByThread.put(threadId, port);
             
             String currentIP = "";
             if (!Configuration.get(Parameter.BROWSERMOB_HOST).isEmpty()) {
@@ -68,7 +70,7 @@ public final class ProxyPool {
             	currentIP = NetworkUtil.getIpAddress();
             }
             
-            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + port);
+            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + proxyPortsByThread.get(threadId));
             
             R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put("proxy_port", port.toString());
@@ -115,7 +117,7 @@ public final class ProxyPool {
     // ------------------------- BOWSERMOB PROXY ---------------------
     
     private static final ConcurrentHashMap<Long, BrowserMobProxy> proxies = new ConcurrentHashMap<Long, BrowserMobProxy>();
-    
+
     // TODO: investigate possibility to return interface to support JettyProxy
     /**
      * start BrowserMobProxy Server
@@ -137,8 +139,12 @@ public final class ProxyPool {
         long threadId = Thread.currentThread().getId();
         if (proxies.containsKey(threadId)) {
             proxy = proxies.get(threadId);
-        } 
-        
+        }
+
+        if (proxyPortsByThread.containsKey(threadId)) {
+            proxyPort = proxyPortsByThread.get(threadId);
+        }
+
         // case when proxy was already instantiated but port doesn't correspond to current device
         if (null == proxy || proxy.getPort() != proxyPort) {
             proxy = ProxyPool.createProxy();
@@ -205,6 +211,7 @@ public final class ProxyPool {
                 }
             }
             proxies.remove(threadId);
+            //proxyPortsByThread.remove(threadId);
         }
         LOGGER.debug("stopProxy finished...");
     }
@@ -221,9 +228,20 @@ public final class ProxyPool {
         if (proxies.containsKey(threadId)) {
             proxy = proxies.get(threadId);
         } else {
-            Assert.fail("There is not registered BrowserMobProxy for thread: " + threadId);
+            Assert.fail("There is not a registered BrowserMobProxy for thread: " + threadId);
         }
         return proxy;
+    }
+
+    public static int getProxyPort() {
+        int port = 0;
+        long threadId = Thread.currentThread().getId();
+        if (proxyPortsByThread.containsKey(threadId)) {
+            port = proxyPortsByThread.get(threadId);
+        } else {
+            Assert.fail("This is not a register BrowserMobProxy Port for thread: " + threadId);
+        }
+        return port;
     }
     
     /**
@@ -247,9 +265,13 @@ public final class ProxyPool {
     public static void registerProxy(BrowserMobProxy proxy) {
         long threadId = Thread.currentThread().getId();
         if (proxies.containsKey(threadId)) {
-            LOGGER.warn("Existing proxy is detected and will be overriten");
+            LOGGER.warn("Existing proxy is detected and will be overrwitten");
             // No sense to stop as it is not supported
             proxies.remove(threadId);
+        }
+        if (proxyPortsByThread.containsKey(threadId)) {
+            LOGGER.warn("Existing proxyPort is detected and will be overwritten");
+            proxyPortsByThread.remove(threadId);
         }
         
         LOGGER.info("Register custom proxy with thread: " + threadId);
@@ -274,5 +296,4 @@ public final class ProxyPool {
         	//do nothing
         }
     }
-    
 }

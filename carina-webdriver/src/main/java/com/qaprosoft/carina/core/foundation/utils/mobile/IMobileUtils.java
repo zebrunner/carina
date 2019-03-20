@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -123,7 +124,7 @@ public interface IMobileUtils extends IDriverPool {
     default public boolean longPress(ExtendedWebElement element) {
     	//TODO: SZ migrate to FluentWaits
         try {
-            WebDriver driver = getDriver();
+            WebDriver driver = castDriver();
             @SuppressWarnings("rawtypes")
 			TouchAction<?> action = new TouchAction((MobileDriver<?>) driver);
             LongPressOptions options = LongPressOptions.longPressOptions().withElement(ElementOption.element(element.getElement()));
@@ -146,7 +147,7 @@ public interface IMobileUtils extends IDriverPool {
         //TODO: add Screenshot.capture()
         try {
             @SuppressWarnings("rawtypes")
-            TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) getDriver());
+            TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) castDriver());
             PointOption<?> startPoint = PointOption.point(startx, starty);
             WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
 
@@ -394,7 +395,7 @@ public interface IMobileUtils extends IDriverPool {
     @SuppressWarnings("rawtypes")
 	default public void swipe(int startx, int starty, int endx, int endy, int duration) {
         LOGGER.debug("Starting swipe...");
-        WebDriver drv = getDriver();
+        WebDriver drv = castDriver();
 
         LOGGER.debug("Getting driver dimension size...");
         Dimension scrSize = helper.performIgnoreException(() -> drv.manage().window().getSize());
@@ -460,7 +461,7 @@ public interface IMobileUtils extends IDriverPool {
         
 		if (container == null) {
 			// whole screen/driver is a container!
-			WebDriver driver = getDriver();
+			WebDriver driver = castDriver();
 			elementLocation = new Point(0, 0); // initial left corner for that case
 
 			elementDimensions = helper.performIgnoreException(() -> driver.manage().window().getSize());
@@ -703,7 +704,7 @@ public interface IMobileUtils extends IDriverPool {
 	 */
 	default public void hideKeyboard() {
 		try {
-			((MobileDriver<?>) getDriver()).hideKeyboard();
+			((MobileDriver<?>) castDriver()).hideKeyboard();
 		} catch (Exception e) {
 			if (!e.getMessage().contains("Soft keyboard not present, cannot hide keyboard")) {
 				LOGGER.error("Exception appears during hideKeyboard: " + e);
@@ -713,7 +714,7 @@ public interface IMobileUtils extends IDriverPool {
 	
 	default public void zoom(Zoom type) {
         LOGGER.info("Zoom will be performed :" + type);
-        MobileDriver<?> driver = (MobileDriver<?>) getDriver();
+        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
         Dimension scrSize = helper.performIgnoreException(() -> driver.manage().window().getSize());
         int height = scrSize.getHeight();
         int width = scrSize.getWidth();
@@ -739,7 +740,7 @@ public interface IMobileUtils extends IDriverPool {
         LOGGER.debug(String.format(
                 "Zoom action will be performed with parameters : startX1 : %s ;  startY1: %s ; endX1: %s ; endY1: %s; startX2 : %s ;  startY2: %s ; endX2: %s ; endY2: %s",
                 startx1, starty1, endx1, endy1, startx2, starty2, endx2, endy2));
-        MobileDriver<?> driver = (MobileDriver<?>) getDriver();
+        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
         try {
             MultiTouchAction multiTouch = new MultiTouchAction(driver);
             TouchAction<?> tAction0 = new TouchAction(driver);
@@ -759,5 +760,14 @@ public interface IMobileUtils extends IDriverPool {
         } catch (Exception e) {
             LOGGER.error("Error during zooming", e);
         }
+    }
+    
+    default public WebDriver castDriver() {
+        WebDriver drv = getDriver();
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        }
+
+        return drv;
     }
 }

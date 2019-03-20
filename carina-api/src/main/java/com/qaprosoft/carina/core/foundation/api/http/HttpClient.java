@@ -51,6 +51,9 @@ public class HttpClient {
         case PATCH:
             response = request.patch(methodPath);
             break;
+        case OPTIONS:
+        		response = request.options(methodPath);
+        		break;
         default:
             throw new RuntimeException("MethodType is not specified for the API method: " + methodPath);
         }
