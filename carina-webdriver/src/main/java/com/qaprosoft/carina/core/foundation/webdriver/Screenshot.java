@@ -295,13 +295,13 @@ public class Screenshot {
         LOGGER.debug("Screenshot->capture starting...");
         
         if (isTakeScreenshot) {
+            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
             try {
             	if (!isCaptured(comment)) {
             		LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
             		return screenName;
             	}
             	
-            	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
