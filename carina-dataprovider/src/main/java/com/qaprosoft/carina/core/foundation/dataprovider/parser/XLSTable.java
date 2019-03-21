@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
 import java.util.*;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -50,14 +51,29 @@ public class XLSTable {
         }
     }
 
+    public void setHeaders(Collection<String> row) {
+        headers.clear();
+        headers.addAll(row);
+    }
+
     public void addDataRow(Row row, Workbook wb, Sheet sheet) {
         if (row == null) {
             // don't add any data row if it is null. It seems like there is empty row in xls file
             return;
         }
+        addDataRow(rowIndex -> XLSParser.getCellValue(row.getCell(rowIndex)), row, wb, sheet);
+    }
 
-        if (executeColumn != null && executeValue != null && row != null && headers.contains(executeColumn)) {
-            if (!executeValue.equalsIgnoreCase(XLSParser.getCellValue(row.getCell(headers.indexOf(executeColumn))))) {
+    public void addDataRow(List<String> row) {
+        if (row == null) {
+            return;
+        }
+        addDataRow(index -> row.size() > index ?  row.get(index) : null, null, null, null);
+    }
+
+    private void addDataRow(Function<Integer, String> cellValueGetter, Row row, Workbook wb, Sheet sheet) {
+        if (executeColumn != null && executeValue != null && headers.contains(executeColumn)) {
+            if (!executeValue.equalsIgnoreCase(cellValueGetter.apply(headers.indexOf(executeColumn)))) {
                 return;
             }
         }
@@ -69,16 +85,32 @@ public class XLSTable {
         for (int i = 0; i < headers.size(); i++) {
             String header = headers.get(i);
             if (header.startsWith(FK_PREFIX)) {
-                childRow = XLSParser.parseCellLinks(row.getCell(i), wb, sheet);
+                if(row != null && wb != null && sheet != null) {
+                    childRow = XLSParser.parseCellLinks(row.getCell(i), wb, sheet);
+                } else {
+                    // TODO: 2019-03-20 implement logic to use fk prefix for spreadsheets
+                    LOGGER.warn("FK_LINK_ prefix is not currently supported for spreadsheets");
+                }
             }
 
             synchronized (dataMap) {
-                dataMap.put(header, XLSParser.getCellValue(row.getCell(i)));
+                dataMap.put(header, cellValueGetter.apply(i));
             }
             LOGGER.debug(header + ": " + dataMap.get(header));
         }
 
         // If row has foreign key than merge headers and data
+        merge(childRow, dataMap);
+
+        LOGGER.debug("Merged row: ");
+        for (int i = 0; i < headers.size(); i++) {
+            LOGGER.debug(headers.get(i) + ": " + dataMap.get(headers.get(i)));
+        }
+
+        dataRows.add(dataMap);
+    }
+
+    private void merge(XLSChildTable childRow, Map<String, String> dataMap) {
         if (childRow != null) {
             LOGGER.debug("Loading data from child row: ");
             for (int i = 0; i < childRow.getHeaders().size(); i++) {
@@ -97,13 +129,6 @@ public class XLSTable {
                 LOGGER.debug(currentHeader + ": " + childRow.getDataRows().get(0).get(currentHeader));
             }
         }
-
-        LOGGER.debug("Merged row: ");
-        for (int i = 0; i < headers.size(); i++) {
-            LOGGER.debug(headers.get(i) + ": " + dataMap.get(headers.get(i)));
-        }
-
-        dataRows.add(dataMap);
     }
 
     public List<String> getHeaders() {
