@@ -62,7 +62,7 @@
         <selenium-server.version>3.141.59</selenium-server.version>
         <appium.version>7.0.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>3.3.51</zafira-client.version>
+        <zafira-client.version>3.3.76-SNAPSHOT</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
@@ -513,28 +513,28 @@
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>zafira-client</artifactId>
                 <version>${zafira-client.version}</version>
-		<exclusions>
-			<exclusion>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-			</exclusion>
-		</exclusions>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- For ZafiraListener -->
             <dependency>
