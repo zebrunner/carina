@@ -566,6 +566,39 @@ public class DriverHelper {
     }
 
     /**
+     * Drags and drops element to specified place. Elements Need To have an id.
+     *
+     * @param from
+     *            - the element to drag.
+     * @param to
+     *            - the element to drop to.
+     */
+    public void dragAndDropHtml5(final ExtendedWebElement from, final ExtendedWebElement to) throws IOException {
+        String source = "#" + from.getAttribute("id");
+        String target = "#" + to.getAttribute("id");
+        if (source.isEmpty() || target.isEmpty()) {
+            Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(), to.getNameWithLocator());
+        } else {
+            jQuerify(driver);
+            String javaScript = "(function($){$.fn.simulateDragDrop=function(options){returnthis.each(function(){new$.simulateDragDrop(this,options);});};$.simulateDragDrop=function(elem,options){this.options=options;this.simulateEvent(elem,options);};$.extend($.simulateDragDrop.prototype,{simulateEvent:function(elem,options){/*Simulatingdragstart*/vartype='dragstart';varevent=this.createEvent(type);this.dispatchEvent(elem,type,event);/*Simulatingdrop*/type='drop';vardropEvent=this.createEvent(type,{});dropEvent.dataTransfer=event.dataTransfer;this.dispatchEvent($(options.dropTarget)[0],type,dropEvent);/*Simulatingdragend*/type='dragend';vardragEndEvent=this.createEvent(type,{});dragEndEvent.dataTransfer=event.dataTransfer;this.dispatchEvent(elem,type,dragEndEvent);},createEvent:function(type){varevent=document.createEvent(\"CustomEvent\");event.initCustomEvent(type,true,true,null);event.dataTransfer={data:{},setData:function(type,val){this.data[type]=val;},getData:function(type){returnthis.data[type];}};returnevent;},dispatchEvent:function(elem,type,event){if(elem.dispatchEvent){elem.dispatchEvent(event);}elseif(elem.fireEvent){elem.fireEvent(\"on\"+type,event);}}});})(jQuery);";
+            ((JavascriptExecutor)driver)
+                    .executeScript(javaScript + "$('" + source + "')" +
+                            ".simulateDragDrop({ dropTarget: '" + target + "'});");
+            Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
+        }
+
+    }
+
+    private static void jQuerify(WebDriver driver) {
+        String jQueryLoader = "(function(jqueryUrl,callback){if(typeofjqueryUrl!='string'){jqueryUrl='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js';}if(typeofjQuery=='undefined'){varscript=document.createElement('script');varhead=document.getElementsByTagName('head')[0];vardone=false;script.onload=script.onreadystatechange=(function(){if(!done&&(!this.readyState||this.readyState=='loaded'||this.readyState=='complete')){done=true;script.onload=script.onreadystatechange=null;head.removeChild(script);callback();}});script.src=jqueryUrl;head.appendChild(script);}else{callback();}})(arguments[0],arguments[arguments.length-1]);";
+        // give jQuery time to load asynchronously
+        driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeAsyncScript(jQueryLoader);
+    }
+
+
+    /**
      * Performs slider move for specified offset.
      * 
      * @param slider
