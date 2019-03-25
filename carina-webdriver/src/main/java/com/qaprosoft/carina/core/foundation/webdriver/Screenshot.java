@@ -297,13 +297,13 @@ public class Screenshot {
         LOGGER.debug("Screenshot->capture starting...");
         
         if (isTakeScreenshot) {
+            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
             try {
             	if (!isCaptured(comment)) {
             		LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
             		return screenName;
             	}
             	
-            	Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
@@ -506,6 +506,7 @@ public class Screenshot {
 		boolean disableScreenshot = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("A session is either terminated or not started")
+				|| message.contains("cannot forward the request unexpected end of stream")
 				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
 				|| message.contains("was terminated due to CLIENT_STOPPED_SESSION")
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")

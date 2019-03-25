@@ -301,7 +301,8 @@ public interface IDriverPool {
                 ProxyPool.stopProxy();
             }
             carinaDriver.getDriver().quit();
-            Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName());
+            // stop timer to be able to track mobile app session time. It should be started on createDriver!
+            Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
         } catch (WebDriverException e) {
             LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -386,7 +387,9 @@ public interface IDriverPool {
                 
                 // new 6.0 approach to manipulate drivers via regular Set
                 CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
-                Timer.start(device.getMetricName(), carinaDriver.getName());
+                
+                //start timer to be able to track mobile app session time. It should be stopped on quitDriver!
+                Timer.start(device.getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
                 driversPool.add(carinaDriver);
 
                 LOGGER.debug("initDriver finish...");

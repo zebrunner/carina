@@ -25,11 +25,13 @@ import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +119,29 @@ public class BrowserMobTest {
         Assert.assertNotNull(proxy.getHar(), "Har is unexpectedly null!");
         Assert.assertEquals(content.size(), 1,"Filtered response number is not as expected!");
         Assert.assertTrue(content.get(0).contains(filterKey), "Response doesn't contain expected key!");
+    }
+
+    @DataProvider(parallel = true)
+    public static Object[][] dataProviderForMultiThreadProxy() {
+        return new Object[][] {
+                { "Test1" },
+                { "Test2" } };
+    }
+
+    @Test(dataProvider = "dataProviderForMultiThreadProxy")
+    public void testRegisterProxy(String arg) {
+        ProxyPool.setupBrowserMobProxy();
+        int tempPort = ProxyPool.getProxy().getPort();
+        ProxyPool.stopProxy();
+        BrowserMobProxy proxy = ProxyPool.createProxy();
+        proxy.setTrustAllServers(true);
+        proxy.setMitmDisabled(false);
+        ProxyPool.registerProxy(proxy);
+
+        ProxyPool.startProxy(tempPort);
+        int actualPort = ProxyPool.getProxy().getPort();
+        LOGGER.info(String.format("Checking Ports Before (%s) After (%s)", tempPort, actualPort));
+        Assert.assertEquals(tempPort, actualPort, "Proxy Port before, after do not match on current thread");
     }
 
     private void initialize() {

@@ -26,7 +26,8 @@ public enum HttpMethodType {
     PUT(3, "PUT"),
     POST(4, "POST"),
     DELETE(5, "DELETE"),
-    PATCH(6, "PATCH");
+    PATCH(6, "PATCH"),
+	OPTIONS(7, "OPTIONS");
 
     private int code;
     private String name;

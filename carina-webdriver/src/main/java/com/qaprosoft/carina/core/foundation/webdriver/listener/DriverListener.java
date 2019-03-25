@@ -195,12 +195,19 @@ public class DriverListener implements WebDriverEventListener {
             if (!isMobile(driver)) {
                 urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
             }
+            // 1. if you see mess with afterTest carina actions and Timer startup failure you should follow steps #2+ to determine root cause.
+            //      Driver initialization 'default' FAILED! Retry 1 of 1 time - Operation already started: mobile_driverdefault
+            // 2. carefully track all preliminary exception for the same thread to detect 1st problematic exception
+            // 3. 99% those root exception means that we should prohibit screenshot generation for such use-case
+            // 4. if 3rd one is true just update Screenshot.isCaptured() adding part of the exception to the list
             // handle cases which should't be captured
             if (Screenshot.isCaptured(thr.getMessage())) {
                 captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
             }
         } catch (Exception e) {
-            LOGGER.debug("Unrecognized failure detected in DriverListener->onException: " + e.getMessage(), e);
+            LOGGER.error("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
+        } catch (Throwable e) {
+            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured(). " + e.getMessage(), e);
         }
         
         LOGGER.debug("DriverListener->onException finished.");
