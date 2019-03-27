@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -564,6 +565,61 @@ public class DriverHelper {
             Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(), to.getNameWithLocator());
         }
     }
+
+    /**
+     * Drags and drops element to specified place. Elements Need To have an id.
+     *
+     * @param from
+     *            - the element to drag.
+     * @param to
+     *            - the element to drop to.
+     */
+    public void dragAndDropHtml5(final ExtendedWebElement from, final ExtendedWebElement to) {
+        String source = "#" + from.getAttribute("id");
+        String target = "#" + to.getAttribute("id");
+        if (source.isEmpty() || target.isEmpty()) {
+            Messager.ELEMENTS_NOT_DRAGGED_AND_DROPPED.error(from.getNameWithLocator(), to.getNameWithLocator());
+        } else {
+            jQuerify(driver);
+            String javaScript = "(function( $ ) {        $.fn.simulateDragDrop = function(options) {                return this.each(function() {                        new $.simulateDragDrop(this, options);                });        };        $.simulateDragDrop = function(elem, options) {                this.options = options;                this.simulateEvent(elem, options);        };        $.extend($.simulateDragDrop.prototype, {                simulateEvent: function(elem, options) {                        /*Simulating drag start*/                        var type = 'dragstart';                        var event = this.createEvent(type);                        this.dispatchEvent(elem, type, event);                        /*Simulating drop*/                        type = 'drop';                        var dropEvent = this.createEvent(type, {});                        dropEvent.dataTransfer = event.dataTransfer;                        this.dispatchEvent($(options.dropTarget)[0], type, dropEvent);                        /*Simulating drag end*/                        type = 'dragend';                        var dragEndEvent = this.createEvent(type, {});                        dragEndEvent.dataTransfer = event.dataTransfer;                        this.dispatchEvent(elem, type, dragEndEvent);                },                createEvent: function(type) {                        var event = document.createEvent(\"CustomEvent\");                        event.initCustomEvent(type, true, true, null);                        event.dataTransfer = {                                data: {                                },                                setData: function(type, val){                                        this.data[type] = val;                                },                                getData: function(type){                                        return this.data[type];                                }                        };                        return event;                },                dispatchEvent: function(elem, type, event) {                        if(elem.dispatchEvent) {                                elem.dispatchEvent(event);                        }else if( elem.fireEvent ) {                                elem.fireEvent(\"on\"+type, event);                        }                }        });})(jQuery);";;
+            ((JavascriptExecutor)driver)
+                    .executeScript(javaScript + "$('" + source + "')" +
+                            ".simulateDragDrop({ dropTarget: '" + target + "'});");
+            Messager.ELEMENTS_DRAGGED_AND_DROPPED.info(from.getName(), to.getName());
+        }
+
+    }
+
+    private static void jQuerify(WebDriver driver) {
+        String jQueryLoader = "(function(jqueryUrl, callback) {\n" +
+                "    if (typeof jqueryUrl != 'string') {\n" +
+                "        jqueryUrl = 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js';\n" +
+                "    }\n" +
+                "    if (typeof jQuery == 'undefined') {\n" +
+                "        var script = document.createElement('script');\n" +
+                "        var head = document.getElementsByTagName('head')[0];\n" +
+                "        var done = false;\n" +
+                "        script.onload = script.onreadystatechange = (function() {\n" +
+                "            if (!done && (!this.readyState || this.readyState == 'loaded'\n" +
+                "                    || this.readyState == 'complete')) {\n" +
+                "                done = true;\n" +
+                "                script.onload = script.onreadystatechange = null;\n" +
+                "                head.removeChild(script);\n" +
+                "                callback();\n" +
+                "            }\n" +
+                "        });\n" +
+                "        script.src = jqueryUrl;\n" +
+                "        head.appendChild(script);\n" +
+                "    }\n" +
+                "    else {\n" +
+                "        callback();\n" +
+                "    }\n" +
+                "})(arguments[0], arguments[arguments.length - 1]);";
+        driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeAsyncScript(jQueryLoader);
+    }
+
 
     /**
      * Performs slider move for specified offset.
