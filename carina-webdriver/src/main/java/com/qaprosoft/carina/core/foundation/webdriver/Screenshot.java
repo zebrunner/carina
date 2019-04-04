@@ -34,6 +34,7 @@ import javax.imageio.ImageIO;
 
 import com.qaprosoft.amazon.client.AmazonS3Client;
 import com.qaprosoft.carina.core.foundation.report.Artifacts;
+import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -392,12 +393,14 @@ public class Screenshot {
         final String ciTestId = ZafiraListener.getThreadCiTestId();
         Optional<CompletableFuture<String>> originalScreenshotFuture = uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, false);
         Optional<CompletableFuture<String>> thumbFuture = uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, true);
-        if(artifact) {
-            originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
+        originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
+            if(artifact) {
                 List<CompletableFuture<String>> urlFutures = Stream.of(of, tf).collect(Collectors.toList());
                 Artifacts.add(urlFutures, comment);
-            }));
-        }
+            } else {
+                AsyncOperation.add(of, tf);
+            }
+        }));
     }
 
     /**

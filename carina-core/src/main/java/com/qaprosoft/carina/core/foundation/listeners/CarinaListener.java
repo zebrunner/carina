@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Category;
 import org.apache.log4j.Level;
@@ -409,7 +410,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
         } finally {
-            // do nothing
+            // wait until all async artifacts uploading are finished
+            AsyncOperation.waitUntilFinish(30);
         }
     }
     
