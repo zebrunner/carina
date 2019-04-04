@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,9 +35,11 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory.HubType;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.MoonRecordingListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -103,7 +104,8 @@ public class MobileFactory extends AbstractFactory {
 
                     if (isVideoEnabled()) {
                         
-                        final String videoName = UUID.randomUUID().toString();
+                    	final String videoName = getVideoName();
+                    	capabilities.setCapability("videoName", videoName);
 
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
@@ -139,9 +141,16 @@ public class MobileFactory extends AbstractFactory {
                         // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        ce.getListeners()
-                                .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2,
-                                        initVideoArtifact(videoName)));
+                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+        				case SELENIUM:
+        					ce.getListeners()
+                            	.add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2,
+                                    initVideoArtifact(videoName)));
+        					break;
+        				case MOON:
+        					ce.getListeners().add(new MoonRecordingListener(initVideoArtifact("%s/" + videoName)));
+        					break;
+        				}
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
@@ -150,7 +159,8 @@ public class MobileFactory extends AbstractFactory {
 
                     if (isVideoEnabled()) {
                         
-                        final String videoName = UUID.randomUUID().toString();
+                    	final String videoName = getVideoName();
+                    	capabilities.setCapability("videoName", videoName);
                         
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
@@ -176,8 +186,15 @@ public class MobileFactory extends AbstractFactory {
                         }
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
-
-                        ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
+                        
+                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+        				case SELENIUM:
+        					ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
+        					break;
+        				case MOON:
+        					LOGGER.info("Video recording is not supported in Moon iOS");
+        					break;
+        				}
                     }
 
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
