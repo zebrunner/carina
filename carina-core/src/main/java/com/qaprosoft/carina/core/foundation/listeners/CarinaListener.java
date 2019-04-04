@@ -410,7 +410,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
         } finally {
-            // wait until all async artifacts uploading are finished
+            // wait until all async  operations (i.e. artifacts uploading) are finished
             AsyncOperation.waitUntilFinish(30);
         }
     }
