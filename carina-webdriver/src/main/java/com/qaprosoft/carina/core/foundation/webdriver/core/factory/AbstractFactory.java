@@ -119,7 +119,7 @@ public abstract class AbstractFactory {
         if (res != null) {
         	artifact.setTestId((Long) res.getAttribute("ztid"));
         }
-        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
+        artifact.setLink(videoName);
         artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
@@ -138,4 +138,5 @@ public abstract class AbstractFactory {
 		}
 		return isEnabled;
 	}
+
 }

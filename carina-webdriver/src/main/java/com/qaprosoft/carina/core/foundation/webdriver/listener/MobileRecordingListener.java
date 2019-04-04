@@ -19,10 +19,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.factory.MoonUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -53,6 +56,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 
 	private O2 stopRecordingOpt;
 
+	private String mobilePlatformName;
+
 	private boolean recording = false;
 
 	private TestArtifactType videoArtifact;
@@ -65,11 +70,17 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		this.videoArtifact = artifact;
 	}
 
+	public MobileRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt, String mobilePlatformName,
+								   TestArtifactType artifact) {
+		this(commandExecutor, startRecordingOpt, stopRecordingOpt, artifact);
+		this.mobilePlatformName = mobilePlatformName;
+	}
+
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
 			if (DriverCommand.QUIT.equals(command.getName())) {
-				onBeforeEvent();
+				onBeforeEvent(command.getSessionId());
 				try {
 					String data = commandExecutor
 							.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
@@ -79,7 +90,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 					LOGGER.debug("Video will be uploaded to ftp. Test thread ID : " + Thread.currentThread().getId());
 					CompletableFuture.runAsync(() -> {uploadToFTP(data);});
 					if (ZafiraSingleton.INSTANCE.isRunning()) {
-						ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+						addVideoArtifact(command.getSessionId().toString());
 					}
 				} catch (Throwable e) {
 					LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
@@ -102,7 +113,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 	}
 
-	private void onBeforeEvent() {
+	private void onBeforeEvent(SessionId sessionId) {
 		// 4a. if "tzid" not exist inside videoArtifact and exists in Reporter ->
 		// register new videoArtifact in Zafira.
 		// 4b. if "tzid" already exists in current artifact but in Reporter there is
@@ -115,8 +126,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			Long ztid = (Long) res.getAttribute("ztid");
 			if (ztid != videoArtifact.getTestId()) {
 				videoArtifact.setTestId(ztid);
-				LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+				addVideoArtifact(sessionId.toString());
 			}
 		}
 	}
@@ -147,5 +157,14 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		} else {
 			LOGGER.error("The video won't be uploaded due to incorrect ftp or video recording parameters");
 		}
+	}
+
+	private void addVideoArtifact(String sessionId) {
+		String link = SpecialKeywords.ANDROID.equalsIgnoreCase(mobilePlatformName) ?
+				MoonUtils.getVideoLink(sessionId, videoArtifact.getLink()) :
+				String.format(R.CONFIG.get("screen_record_host"), videoArtifact.getLink());
+		videoArtifact.setLink(link);
+		LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
+		ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
 	}
 }

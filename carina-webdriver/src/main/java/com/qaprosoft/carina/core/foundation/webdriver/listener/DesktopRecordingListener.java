@@ -15,9 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
+import com.qaprosoft.carina.core.foundation.utils.factory.MoonUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -44,11 +46,11 @@ public class DesktopRecordingListener implements IDriverCommandListener {
     @Override
     public void beforeEvent(Command command) {
     	if (recording) {
-    		onBeforeEvent(); 
+    		onBeforeEvent(command.getSessionId());
     		
             if (DriverCommand.QUIT.equals(command.getName())) {
                 if (ZafiraSingleton.INSTANCE.isRunning()) {
-                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+                    addVideoArtifact(command.getSessionId().toString());
                 }
             }
     	}
@@ -61,7 +63,7 @@ public class DesktopRecordingListener implements IDriverCommandListener {
         }
     }
     
-	private void onBeforeEvent() {
+	private void onBeforeEvent(SessionId sessionId) {
 		// 4a. if "tzid" not exist inside videoArtifact and exists in Reporter -> register new videoArtifact in Zafira.
 		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
 		// driver across different tests
@@ -71,9 +73,16 @@ public class DesktopRecordingListener implements IDriverCommandListener {
 			Long ztid = (Long) res.getAttribute("ztid");
 			if (ztid != videoArtifact.getTestId()) {
 				videoArtifact.setTestId(ztid);
-				LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+                addVideoArtifact(sessionId.toString());
 			}
 		}
 	}
+
+	private void addVideoArtifact(String sessionId) {
+        String link = MoonUtils.getVideoLink(sessionId, videoArtifact.getLink());
+        videoArtifact.setLink(link);
+        LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
+        ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+    }
+
 }

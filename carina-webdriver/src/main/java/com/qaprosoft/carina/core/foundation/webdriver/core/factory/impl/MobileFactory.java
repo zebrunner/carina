@@ -140,7 +140,7 @@ public class MobileFactory extends AbstractFactory {
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         ce.getListeners()
-                                .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2,
+                                .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2, SpecialKeywords.ANDROID,
                                         initVideoArtifact(videoName)));
                     }
 
@@ -266,7 +266,7 @@ public class MobileFactory extends AbstractFactory {
 	/**
      * Returns device information from Grid Hub using STF service.
      * 
-     * @param caps
+     * @param cap
      *            - capabilities
      * @return remote device information
      */

@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
+import com.qaprosoft.carina.core.foundation.utils.factory.MoonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -68,7 +69,7 @@ public class DesktopFactory extends AbstractFactory {
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
             if (isVideoEnabled()) {
                 final String videoName = UUID.randomUUID().toString();
-                capabilities.setCapability("videoName", videoName + ".mp4");
+                capabilities.setCapability("videoName", MoonUtils.buildVideoName(videoName));
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
             }
@@ -162,4 +163,5 @@ public class DesktopFactory extends AbstractFactory {
         }
         return browser_version;
     }
+
 }
