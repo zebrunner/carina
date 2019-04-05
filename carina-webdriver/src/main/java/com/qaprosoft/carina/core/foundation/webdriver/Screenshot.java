@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
@@ -50,9 +49,9 @@ import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
@@ -467,12 +466,14 @@ public class Screenshot {
         final String ciTestId = ZafiraListener.getThreadCiTestId();
         Optional<CompletableFuture<String>> originalScreenshotFuture = uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, false);
         Optional<CompletableFuture<String>> thumbFuture = uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, true);
-        if(artifact) {
-            originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
+        originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
+            if(artifact) {
                 List<CompletableFuture<String>> urlFutures = Stream.of(of, tf).collect(Collectors.toList());
                 Artifacts.add(urlFutures, comment);
-            }));
-        }
+            } else {
+                AsyncOperation.add(of, tf);
+            }
+        }));
     }
 
     /**
