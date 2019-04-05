@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.async;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -29,26 +30,40 @@ public class AsyncOperation {
 
     private static final Logger LOGGER = Logger.getLogger(AsyncOperation.class);
 
-    private static final ThreadLocal<Set<CompletableFuture<?>>> asyncOperation = ThreadLocal.withInitial(HashSet::new);
+    private static Set<CompletableFuture<?>> asyncOperations;
 
     public static void add(CompletableFuture<?>... completableFutures) {
         LOGGER.debug("Async operations adding");
-        asyncOperation.get().addAll(Arrays.asList(completableFutures));
+        get().addAll(Arrays.asList(completableFutures));
     }
 
     public static void add(CompletableFuture<?> completableFuture) {
         LOGGER.debug("Async operation adding");
-        asyncOperation.get().add(completableFuture);
+        get().add(completableFuture);
     }
 
     public static void waitUntilFinish(long timeout) {
         try {
-            CompletableFuture.allOf(asyncOperation.get().toArray(new CompletableFuture[0])).get(timeout, TimeUnit.SECONDS);
+            if(asyncOperations != null && ! asyncOperations.isEmpty()) {
+                CompletableFuture.allOf(get().toArray(new CompletableFuture[0])).get(timeout, TimeUnit.SECONDS);
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
-            asyncOperation.remove();
+            clear();
         }
     }
 
+    private static Set<CompletableFuture<?>> get() {
+        if(asyncOperations == null) {
+            asyncOperations = Collections.synchronizedSet(new HashSet<>());
+        }
+        return asyncOperations;
+    }
+
+    private static void clear() {
+        if(asyncOperations != null) {
+            asyncOperations = null;
+        }
+    }
 }
