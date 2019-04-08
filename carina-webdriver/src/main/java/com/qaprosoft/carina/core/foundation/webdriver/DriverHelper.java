@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.appium.java_client.AppiumDriver;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -40,6 +41,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
@@ -66,6 +68,8 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
  */
 public class DriverHelper {
     protected static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
+
+    private static boolean isModifiedContext = false;
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
@@ -965,5 +969,30 @@ public class DriverHelper {
         }
         
     }
-	
+
+    public static void changeToWebViewContext(WebDriver driver) {
+        WebDriver wrappedDriver = ((EventFiringWebDriver) driver).getWrappedDriver();
+        if (wrappedDriver instanceof AppiumDriver){
+            isModifiedContext = true;
+            Set contextNames = ((AppiumDriver) wrappedDriver).getContextHandles();
+            ((AppiumDriver) wrappedDriver).context(contextNames.toArray()[1].toString());
+        } else {
+            throw new ClassCastException("AppiumDriver can not be casted from the actual driver.");
+        }
+    }
+
+    public static void changeToNativeAppContext(WebDriver driver) {
+        WebDriver wrappedDriver = ((EventFiringWebDriver) driver).getWrappedDriver();
+        isModifiedContext = false;
+        if (wrappedDriver instanceof AppiumDriver){
+            ((AppiumDriver) wrappedDriver).context("NATIVE_APP");
+        } else {
+            throw new ClassCastException("AppiumDriver can not be casted from the actual driver.");
+        }
+    }
+
+    public static boolean isIsModifiedContext(){
+	    return isModifiedContext;
+    }
+
 }

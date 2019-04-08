@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -254,6 +255,9 @@ public class DriverListener implements WebDriverEventListener {
                 Screenshot.captureFailure(driver, comment); // in case of failure
             } else {
                 LOGGER.info(comment);
+                if (DriverHelper.isIsModifiedContext()){
+                    DriverHelper.changeToNativeAppContext(driver);
+                }
                 Screenshot.capture(driver, comment);
             }
         } catch (Exception e) {
