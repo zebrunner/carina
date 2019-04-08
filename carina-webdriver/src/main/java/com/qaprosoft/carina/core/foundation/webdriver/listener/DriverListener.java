@@ -255,10 +255,12 @@ public class DriverListener implements WebDriverEventListener {
                 Screenshot.captureFailure(driver, comment); // in case of failure
             } else {
                 LOGGER.info(comment);
-                if (DriverHelper.isIsModifiedContext()){
+                if (DriverHelper.isInWebViewContext()){
                     DriverHelper.changeToNativeAppContext(driver);
+                    Screenshot.captureFullSize(driver,comment);
+                } else {
+                    Screenshot.capture(driver, comment);
                 }
-                Screenshot.capture(driver, comment);
             }
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot: " + e.getMessage(), e);

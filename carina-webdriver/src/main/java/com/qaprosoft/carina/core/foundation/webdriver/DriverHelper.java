@@ -27,18 +27,7 @@ import java.util.regex.Pattern;
 
 import io.appium.java_client.AppiumDriver;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -63,7 +52,7 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
  * contains some complex operations with UI.
- * 
+ *
  * @author Alex Khursevich
  */
 public class DriverHelper {
@@ -72,7 +61,7 @@ public class DriverHelper {
     private static boolean isModifiedContext = false;
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-    
+
     protected static final long SHORT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 3;
 
     protected static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
@@ -225,7 +214,7 @@ public class DriverHelper {
                 }
             }
         }
-        
+
         LOGGER.error("Unable to find any element from array: " + Arrays.toString(elements));
         return false;
     }
@@ -270,7 +259,7 @@ public class DriverHelper {
 
     /**
      * Check that element with text present.
-     * 
+     *
      * @param extWebElement to check if element with text is present
      * @param text
      *            of element to check.
@@ -282,7 +271,7 @@ public class DriverHelper {
 
     /**
      * Check that element with text present.
-     * 
+     *
      * @param extWebElement to check if element with text is present
      * @param text
      *            of element to check.
@@ -295,9 +284,9 @@ public class DriverHelper {
 
     /**
      * Check that element not present on page.
-     * 
+     *
      * @param extWebElement to check if element is not present
-     * 
+     *
      * @return element non-existence status.
      */
     public boolean isElementNotPresent(final ExtendedWebElement extWebElement) {
@@ -306,10 +295,10 @@ public class DriverHelper {
 
     /**
      * Check that element not present on page.
-     * 
+     *
      * @param extWebElement to check if element is not present
      * @param timeout to wait
-     * 
+     *
      * @return element non-existence status.
      */
 
@@ -319,10 +308,10 @@ public class DriverHelper {
 
     /**
      * Check that element not present on page.
-     * 
+     *
      * @param element to check if element is not present
      * @param controlInfo String
-     * 
+     *
      * @return element non-existence status.
      */
 
@@ -332,7 +321,7 @@ public class DriverHelper {
 
     /**
      * Clicks on element.
-     * 
+     *
      * @param elements ExtendedWebElements to click
      *
      */
@@ -343,7 +332,7 @@ public class DriverHelper {
 
     /**
      * Clicks on element.
-     * 
+     *
      * @param elements ExtendedWebElements to click
      * @param timeout to wait
      *
@@ -364,13 +353,13 @@ public class DriverHelper {
             }
         }
         if (!clicked) {
-            throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
+            throw new NotFoundException("Unable to click onto any elements from array: " + Arrays.toString(elements));
         }
     }
 
     /**
      * Opens full or relative URL.
-     * 
+     *
      * @param url
      *            to open.
      */
@@ -384,13 +373,13 @@ public class DriverHelper {
 		Messager.OPENING_URL.info(url);
 
 		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
-        
+
         try {
             drv.get(decryptedURL);
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
         }
-        
+
         try {
             driver.manage().window().maximize();
         } catch (WebDriverException e) {
@@ -402,16 +391,16 @@ public class DriverHelper {
 
     /**
      * Checks that current URL is as expected.
-     * 
+     *
      * @param expectedURL
      *            Expected Url
      * @return validation result.
      */
     public boolean isUrlAsExpected(String expectedURL) {
         String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
-        
+
         decryptedURL = getEnvArgURL(decryptedURL);
-        
+
         WebDriver drv = getDriver();
         if (LogicUtils.isURLEqual(decryptedURL, drv.getCurrentUrl())) {
             Messager.EXPECTED_URL.info(drv.getCurrentUrl());
@@ -421,11 +410,11 @@ public class DriverHelper {
             return false;
         }
     }
-    
-    
+
+
 	/**
 	 * Get full or relative URL considering Env argument
-	 * 
+	 *
 	 * @param decryptedURL
 	 * @return url
 	 */
@@ -442,7 +431,7 @@ public class DriverHelper {
 
     /**
      * Pause for specified timeout.
-     * 
+     *
      * @param timeout
      *            in seconds.
      */
@@ -457,7 +446,7 @@ public class DriverHelper {
 
     /**
      * Checks that page title is as expected.
-     * 
+     *
      * @param expectedTitle
      *            Expected title
      * @return validation result.
@@ -480,7 +469,7 @@ public class DriverHelper {
 
     /**
      * Checks that page suites to expected pattern.
-     * 
+     *
      * @param expectedPattern
      *            Expected Pattern
      * @return validation result.
@@ -520,7 +509,7 @@ public class DriverHelper {
 
     /**
      * Refresh browser after timeout.
-     * 
+     *
      * @param timeout
      *            before refresh.
      */
@@ -537,7 +526,7 @@ public class DriverHelper {
 
     /**
      * Drags and drops element to specified place.
-     * 
+     *
      * @param from
      *            - element to drag.
      * @param to
@@ -627,7 +616,7 @@ public class DriverHelper {
 
     /**
      * Performs slider move for specified offset.
-     * 
+     *
      * @param slider
      *            slider
      * @param moveX
@@ -679,7 +668,7 @@ public class DriverHelper {
 
     /**
      * Checks that alert modal is shown.
-     * 
+     *
      * @return whether the alert modal present.
      */
     public boolean isAlertPresent() {
@@ -717,10 +706,10 @@ public class DriverHelper {
 
     /**
      * Executes a script on an element
-     * 
+     *
      * Really should only be used when the web driver is sucking at exposing
      * functionality natively
-     * 
+     *
      * @param script
      *            The script to execute
      * @param element
@@ -732,13 +721,13 @@ public class DriverHelper {
 
     /**
      * Executes a script
-     * 
+     *
      * Really should only be used when the web driver is sucking at exposing
      * functionality natively
-     * 
+     *
      * @param script
      *            The script to execute
-     * 
+     *
      * @return Object
      */
     public Object trigger(String script) {
@@ -747,7 +736,7 @@ public class DriverHelper {
 
     /**
      * Opens a new tab for the given URL
-     * 
+     *
      * @param url
      *            The URL to
      * @throws RuntimeException
@@ -799,10 +788,10 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Helpers
     // --------------------------------------------------------------------------
-    
+
     /**
      * Find Extended Web Element on page using By.
-     * 
+     *
      * @param by
      *            Selenium By locator
      * @return ExtendedWebElement if exists otherwise null.
@@ -813,7 +802,7 @@ public class DriverHelper {
 
     /**
      * Find Extended Web Element on page using By.
-     * 
+     *
      * @param by
      *            Selenium By locator
      * @param timeout to wait
@@ -825,7 +814,7 @@ public class DriverHelper {
 
     /**
      * Find Extended Web Element on page using By.
-     * 
+     *
      * @param by
      *            Selenium By locator
      * @param name
@@ -838,7 +827,7 @@ public class DriverHelper {
 
     /**
      * Find Extended Web Element on page using By.
-     * 
+     *
      * @param by
      *            Selenium By locator
      * @param name
@@ -850,7 +839,7 @@ public class DriverHelper {
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
 				Messager.ELEMENT_NOT_FOUND.getMessage(name));
-    	
+
     	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
     		Messager.ELEMENT_NOT_FOUND.error(name);
     		return null;
@@ -861,7 +850,7 @@ public class DriverHelper {
 
     /**
      * Find List of Extended Web Elements on page using By and explicit timeout.
-     * 
+     *
      * @param by
      *            Selenium By locator
      * @return List of ExtendedWebElement.
@@ -872,7 +861,7 @@ public class DriverHelper {
 
     /**
      * Find List of Extended Web Elements on page using By.
-     * 
+     *
      * @param by
      *            Selenium By locator
      * @param timeout
@@ -888,7 +877,7 @@ public class DriverHelper {
     		Messager.ELEMENT_NOT_FOUND.info(name);
     		return extendedWebElements;
     	}
-    	
+
     	webElements = getDriver().findElements(by);
     	int i = 1;
         for (WebElement element : webElements) {
@@ -900,7 +889,7 @@ public class DriverHelper {
 
             ExtendedWebElement tempElement = new ExtendedWebElement(element, name);
             tempElement.setBy(tempElement.generateByForList(by, i));
-            extendedWebElements.add(tempElement);          
+            extendedWebElements.add(tempElement);
             i++;
         }
         return extendedWebElements;
@@ -918,7 +907,7 @@ public class DriverHelper {
         }
         return driver;
     }
-    
+
     /**
      * Wait until any condition happens.
      *
@@ -947,15 +936,15 @@ public class DriverHelper {
 		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
-	
+
 	//TODO: uncomment javadoc when T could be described correctly
 	/*
 	 * Method to handle SocketException due to okhttp factory initialization (java client 6.*).
 	 * Second execution of the same function works as expected.
-	 *  
+	 *
 	 * @param T The expected class of the supplier.
-	 * @param supplier Object 
-	 * @return result Object 
+	 * @param supplier Object
+	 * @return result Object
 	 */
 	public <T> T performIgnoreException(Supplier<T> supplier) {
         try {
@@ -967,15 +956,19 @@ public class DriverHelper {
             LOGGER.info(e);
             return supplier.get();
         }
-        
     }
 
     public static void changeToWebViewContext(WebDriver driver) {
         WebDriver wrappedDriver = ((EventFiringWebDriver) driver).getWrappedDriver();
-        if (wrappedDriver instanceof AppiumDriver){
-            isModifiedContext = true;
+        if (wrappedDriver instanceof AppiumDriver) {
             Set contextNames = ((AppiumDriver) wrappedDriver).getContextHandles();
-            ((AppiumDriver) wrappedDriver).context(contextNames.toArray()[1].toString());
+            if (contextNames.stream().anyMatch(context -> ((String) context).contains("WEBVIEW"))) {
+                isModifiedContext = true;
+                ((AppiumDriver) wrappedDriver).context(contextNames.toArray()[1].toString());
+            } else {
+                contextNames.forEach(System.out::println);
+                throw new NotFoundException("The webview context is not found");
+            }
         } else {
             throw new ClassCastException("AppiumDriver can not be casted from the actual driver.");
         }
@@ -991,7 +984,7 @@ public class DriverHelper {
         }
     }
 
-    public static boolean isIsModifiedContext(){
+    public static boolean isInWebViewContext(){
 	    return isModifiedContext;
     }
 
