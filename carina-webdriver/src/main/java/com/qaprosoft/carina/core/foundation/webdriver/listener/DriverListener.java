@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
+import io.appium.java_client.AppiumDriver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -32,6 +33,10 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
@@ -256,8 +261,11 @@ public class DriverListener implements WebDriverEventListener {
             } else {
                 LOGGER.info(comment);
                 if (DriverHelper.isInWebViewContext()){
-                    DriverHelper.changeToNativeAppContext(driver);
-                    Screenshot.captureFullSize(driver,comment);
+                    AppiumDriver appiumDriver =getAppiumDriverFromProxy(driver);
+                    String context = appiumDriver.getContext();
+                    DriverHelper.changeToNativeAppContext(appiumDriver);
+                    Screenshot.capture(driver, comment);
+                    appiumDriver.context(context);
                 } else {
                     Screenshot.capture(driver, comment);
                 }
@@ -268,6 +276,29 @@ public class DriverListener implements WebDriverEventListener {
             resetMessages();
         }
         LOGGER.debug("DriverListener->captureScreenshot finished...");
+    }
+
+    private AppiumDriver getAppiumDriverFromProxy(WebDriver driver){
+        InvocationHandler innerProxy = Proxy.getInvocationHandler(driver);
+        Field locatorField = null;
+        try {
+            locatorField = innerProxy.getClass().getDeclaredField("arg$2");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        locatorField.setAccessible(true);
+
+        WebDriver appiumDriver = null;
+        try {
+            appiumDriver = (WebDriver) locatorField.get(innerProxy);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        if (appiumDriver instanceof AppiumDriver){
+            return (AppiumDriver) driver;
+        } else {
+            throw new RuntimeException("The driver is not a mobile one");
+        }
     }
 
     private void onAfterAction(String comment, WebDriver driver) {
