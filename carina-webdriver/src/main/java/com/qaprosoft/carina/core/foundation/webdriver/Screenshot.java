@@ -542,14 +542,14 @@ public class Screenshot {
                 if (!pixelRatio.equals("null")) {
                     float dpr = Float.parseFloat(pixelRatio);
                     screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
+                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
                                     dpr))
                             .takeScreenshot(augmentedDriver);
                     screenShot = screenshot.getImage();
                 } else {
                     screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_HEADER, SpecialKeywords.DEFAULT_FOOTER,
-                                    SpecialKeywords.ANDROID_DEFAULT_DPR))
+                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
+                                    SpecialKeywords.DEFAULT_DPR))
                             .takeScreenshot(augmentedDriver);
                     screenShot = screenshot.getImage();
                 }
@@ -692,29 +692,29 @@ public class Screenshot {
         switch (deviceWidth) {
         case SpecialKeywords.DEFAULT_WIDTH:
             if (deviceName.contains("X")) {
-                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_X_HEADER,
-                        SpecialKeywords.DEFAULT_IOS_X_FOOTER, SpecialKeywords.IPHONE_X_DPR);
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.IPHONE_X_HEADER,
+                        SpecialKeywords.ALTERNATIVE_IOS_FOOTER, SpecialKeywords.IPHONE_X_DPR);
             } else {
                 return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
-                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+                        SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_DPR);
             }
         case SpecialKeywords.DEFAULT_PLUS_WIDTH:
             if (deviceName.contains("XR")) {
-                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
-                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.IPHONE_X_HEADER,
+                        SpecialKeywords.ALTERNATIVE_IOS_FOOTER, SpecialKeywords.DEFAULT_DPR);
             } else {
-                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_PLUS_HEADER,
-                        SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IPHONE_X_DPR);
+                return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.IPHONE_PLUS_HEADER,
+                        SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.IPHONE_X_DPR);
             }
         case SpecialKeywords.DEFAULT_IPAD_WIDTH:
-            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_IPAD_HEADER,
-                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.IPAD_HEADER,
+                    SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_DPR);
         case SpecialKeywords.DEFAULT_SE_WIDTH:
-            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_SE_HEADER,
-                    SpecialKeywords.DEFAULT_IOS_SE_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+            return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
+                    SpecialKeywords.ALTERNATIVE_IOS_FOOTER, SpecialKeywords.DEFAULT_DPR);
         default:
             return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
-                    SpecialKeywords.DEFAULT_FOOTER, SpecialKeywords.IOS_DEFAULT_DPR);
+                    SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_DPR);
         }
     }
 }

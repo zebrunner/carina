@@ -178,18 +178,14 @@ public class SpecialKeywords {
 
     // ------------- Mobile screenshots cutting strategies configuration  ---------------
     public static final int DEFAULT_SCROLL_TIMEOUT = 100;
-    public static final int DEFAULT_HEADER = 0;
-    public static final int DEFAULT_FOOTER = 0;
-    public static final int DEFAULT_IOS_HEADER = 72;
-    public static final int DEFAULT_IOS_IPAD_HEADER = 102;
-    public static final int DEFAULT_IOS_X_HEADER = 92;
-    public static final int DEFAULT_IOS_PLUS_HEADER = 82;
-    public static final int DEFAULT_IOS_SE_HEADER = 52;
-    public static final int DEFAULT_IOS_SE_FOOTER = 38;
-    public static final int DEFAULT_IOS_X_FOOTER = 42;
-    public static final float IOS_DEFAULT_DPR= 2.0F;
+    public static final int DEFAULT_BLOCK = 0;
+    public static final int DEFAULT_IOS_HEADER = 74;
+    public static final int IPAD_HEADER = 102;
+    public static final int IPHONE_X_HEADER = 95;
+    public static final int IPHONE_PLUS_HEADER = 82;
+    public static final int ALTERNATIVE_IOS_FOOTER = 42;
+    public static final float DEFAULT_DPR= 2.0F;
     public static final float IPHONE_X_DPR= 3.0F;
-    public static final float ANDROID_DEFAULT_DPR= 2.0F;
     public static final int DEFAULT_WIDTH= 375;
     public static final int DEFAULT_PLUS_WIDTH= 414;
     public static final int DEFAULT_IPAD_WIDTH= 768;
