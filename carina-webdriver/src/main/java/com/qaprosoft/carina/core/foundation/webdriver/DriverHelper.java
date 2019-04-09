@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,12 +27,21 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.appium.java_client.AppiumDriver;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
@@ -57,8 +68,6 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
  */
 public class DriverHelper {
     protected static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
-
-    private static boolean isModifiedContext = false;
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -353,7 +362,7 @@ public class DriverHelper {
             }
         }
         if (!clicked) {
-            throw new NotFoundException("Unable to click onto any elements from array: " + Arrays.toString(elements));
+            throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
         }
     }
 
@@ -363,16 +372,16 @@ public class DriverHelper {
      * @param url
      *            to open.
      */
-	public void openURL(String url) {
-		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+    public void openURL(String url) {
+        String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
 
-		decryptedURL = getEnvArgURL(decryptedURL);
+        decryptedURL = getEnvArgURL(decryptedURL);
 
-		WebDriver drv = getDriver();
+        WebDriver drv = getDriver();
 
-		Messager.OPENING_URL.info(url);
+        Messager.OPENING_URL.info(url);
 
-		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
 
         try {
             drv.get(decryptedURL);
@@ -383,9 +392,9 @@ public class DriverHelper {
         try {
             driver.manage().window().maximize();
         } catch (WebDriverException e) {
-        	LOGGER.warn("Unable to maximize browser: " + e.getMessage());
+            LOGGER.warn("Unable to maximize browser: " + e.getMessage());
         } catch (Exception e) {
-        	LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
+            LOGGER.error("Unable to maximize browser: " + e.getMessage(), e);
         }
     }
 
@@ -412,22 +421,22 @@ public class DriverHelper {
     }
 
 
-	/**
-	 * Get full or relative URL considering Env argument
-	 *
-	 * @param decryptedURL
-	 * @return url
-	 */
-	private String getEnvArgURL(String decryptedURL) {
-		if (!(decryptedURL.contains("http:") || decryptedURL.contains("https:"))) {
-			if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
-				decryptedURL = Configuration.get(Parameter.URL) + decryptedURL;
-			} else {
-				decryptedURL = Configuration.getEnvArg(Parameter.URL.getKey()) + decryptedURL;
-			}
-		}
-		return decryptedURL;
-	}
+    /**
+     * Get full or relative URL considering Env argument
+     *
+     * @param decryptedURL
+     * @return url
+     */
+    private String getEnvArgURL(String decryptedURL) {
+        if (!(decryptedURL.contains("http:") || decryptedURL.contains("https:"))) {
+            if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
+                decryptedURL = Configuration.get(Parameter.URL) + decryptedURL;
+            } else {
+                decryptedURL = Configuration.getEnvArg(Parameter.URL.getKey()) + decryptedURL;
+            }
+        }
+        return decryptedURL;
+    }
 
     /**
      * Pause for specified timeout.
@@ -567,7 +576,7 @@ public class DriverHelper {
      * @param to
      *            - the element to drop to.
      */
-    public void dragAndDropHtml5(final ExtendedWebElement from, final ExtendedWebElement to) {
+    public void dragAndDropHtml5(final ExtendedWebElement from, final ExtendedWebElement to) throws IOException {
         String source = "#" + from.getAttribute("id");
         String target = "#" + to.getAttribute("id");
         if (source.isEmpty() || target.isEmpty()) {
@@ -608,6 +617,7 @@ public class DriverHelper {
                 "        callback();\n" +
                 "    }\n" +
                 "})(arguments[0], arguments[arguments.length - 1]);";
+        // give jQuery time to load asynchronously
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeAsyncScript(jQueryLoader);
@@ -625,12 +635,12 @@ public class DriverHelper {
      *            move y
      */
     public void slide(ExtendedWebElement slider, int moveX, int moveY) {
-    	//TODO: SZ migrate to FluentWaits
+        //TODO: SZ migrate to FluentWaits
         if (slider.isElementPresent()) {
             WebDriver drv = getDriver();
             (new Actions(drv)).moveToElement(slider.getElement()).dragAndDropBy(slider.getElement(), moveX, moveY)
                     .build().perform();
-			Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
+            Messager.SLIDER_MOVED.info(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
         } else {
             Messager.SLIDER_NOT_MOVED.error(slider.getNameWithLocator(), String.valueOf(moveX), String.valueOf(moveY));
         }
@@ -837,15 +847,15 @@ public class DriverHelper {
      * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
-				Messager.ELEMENT_NOT_FOUND.getMessage(name));
+        DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
+                Messager.ELEMENT_NOT_FOUND.getMessage(name));
 
-    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		Messager.ELEMENT_NOT_FOUND.error(name);
-    		return null;
-    	}
+        if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+            Messager.ELEMENT_NOT_FOUND.error(name);
+            return null;
+        }
 
-    	return new ExtendedWebElement(by, name, getDriver());
+        return new ExtendedWebElement(by, name, getDriver());
     }
 
     /**
@@ -873,18 +883,18 @@ public class DriverHelper {
         List<WebElement> webElements = new ArrayList<WebElement>();
 
         String name = "undefined";
-    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		Messager.ELEMENT_NOT_FOUND.info(name);
-    		return extendedWebElements;
-    	}
+        if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+            Messager.ELEMENT_NOT_FOUND.info(name);
+            return extendedWebElements;
+        }
 
-    	webElements = getDriver().findElements(by);
-    	int i = 1;
+        webElements = getDriver().findElements(by);
+        int i = 1;
         for (WebElement element : webElements) {
             try {
                 name = element.getText();
             } catch (Exception e) {
-            	/* do nothing and keep 'undefined' for control name */
+                /* do nothing and keep 'undefined' for control name */
             }
 
             ExtendedWebElement tempElement = new ExtendedWebElement(element, name);
@@ -915,38 +925,38 @@ public class DriverHelper {
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-		boolean result;
-		final WebDriver drv = getDriver();
-		Timer.start(ACTION_NAME.WAIT);
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
-		try {
-			wait.until(condition);
-			result = true;
-			LOGGER.debug("waitUntil: finished true...");
-		} catch (NoSuchElementException | TimeoutException e) {
-			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + condition.toString());
-			result = false;
-		} catch (Exception e) {
-			LOGGER.error("waitUntil: " + condition.toString(), e);
-			result = false;
-		}
-		Timer.stop(ACTION_NAME.WAIT);
-		return result;
-	}
+    public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
+        boolean result;
+        final WebDriver drv = getDriver();
+        Timer.start(ACTION_NAME.WAIT);
+        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
+                .ignoring(NoSuchSessionException.class);
+        try {
+            wait.until(condition);
+            result = true;
+            LOGGER.debug("waitUntil: finished true...");
+        } catch (NoSuchElementException | TimeoutException e) {
+            // don't write exception even in debug mode
+            LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + condition.toString());
+            result = false;
+        } catch (Exception e) {
+            LOGGER.error("waitUntil: " + condition.toString(), e);
+            result = false;
+        }
+        Timer.stop(ACTION_NAME.WAIT);
+        return result;
+    }
 
-	//TODO: uncomment javadoc when T could be described correctly
-	/*
-	 * Method to handle SocketException due to okhttp factory initialization (java client 6.*).
-	 * Second execution of the same function works as expected.
-	 *
-	 * @param T The expected class of the supplier.
-	 * @param supplier Object
-	 * @return result Object
-	 */
-	public <T> T performIgnoreException(Supplier<T> supplier) {
+    //TODO: uncomment javadoc when T could be described correctly
+    /*
+     * Method to handle SocketException due to okhttp factory initialization (java client 6.*).
+     * Second execution of the same function works as expected.
+     *
+     * @param T The expected class of the supplier.
+     * @param supplier Object
+     * @return result Object
+     */
+    public <T> T performIgnoreException(Supplier<T> supplier) {
         try {
             LOGGER.info("Command will be performed with the exception ignoring");
             return supplier.get();
@@ -956,36 +966,7 @@ public class DriverHelper {
             LOGGER.info(e);
             return supplier.get();
         }
-    }
 
-    public static void changeToWebViewContext(WebDriver driver) {
-        WebDriver wrappedDriver = ((EventFiringWebDriver) driver).getWrappedDriver();
-        if (wrappedDriver instanceof AppiumDriver) {
-            Set contextNames = ((AppiumDriver) wrappedDriver).getContextHandles();
-            if (contextNames.stream().anyMatch(context -> ((String) context).contains("WEBVIEW"))) {
-                isModifiedContext = true;
-                ((AppiumDriver) wrappedDriver).context(contextNames.toArray()[1].toString());
-            } else {
-                contextNames.forEach(System.out::println);
-                throw new NotFoundException("The webview context is not found");
-            }
-        } else {
-            throw new ClassCastException("AppiumDriver can not be casted from the actual driver.");
-        }
-    }
-
-    public static void changeToNativeAppContext(WebDriver driver) {
-        WebDriver wrappedDriver = ((EventFiringWebDriver) driver).getWrappedDriver();
-        isModifiedContext = false;
-        if (wrappedDriver instanceof AppiumDriver){
-            ((AppiumDriver) wrappedDriver).context("NATIVE_APP");
-        } else {
-            throw new ClassCastException("AppiumDriver can not be casted from the actual driver.");
-        }
-    }
-
-    public static boolean isInWebViewContext(){
-	    return isModifiedContext;
     }
 
 }
