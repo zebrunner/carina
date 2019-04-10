@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.io.*;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -576,7 +574,7 @@ public class DriverHelper {
      * @param to
      *            - the element to drop to.
      */
-    public void dragAndDropHtml5(final ExtendedWebElement from, final ExtendedWebElement to) throws IOException {
+    public void dragAndDropHtml5(final ExtendedWebElement from, final ExtendedWebElement to) {
         String source = "#" + from.getAttribute("id");
         String target = "#" + to.getAttribute("id");
         if (source.isEmpty() || target.isEmpty()) {
@@ -617,7 +615,6 @@ public class DriverHelper {
                 "        callback();\n" +
                 "    }\n" +
                 "})(arguments[0], arguments[arguments.length - 1]);";
-        // give jQuery time to load asynchronously
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeAsyncScript(jQueryLoader);
