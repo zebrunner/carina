@@ -29,13 +29,13 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
  * Artifacts - represented by logs, screenshots, videos recorder by tests.
- * 
+ *
  * @author akhursevich
  */
 final public class Artifacts {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(Artifacts.class);
-	
+
 	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 	private static final ThreadLocal<Set<AsyncArtifact>> testArtifactsAsync = ThreadLocal.withInitial(HashSet::new);
 
@@ -50,18 +50,13 @@ final public class Artifacts {
 		return artifacts;
 	}
 
-	private synchronized static Set<TestArtifactType> getArtifactsAsync() {
-		return testArtifactsAsync.get().stream().map(asyncArtifact -> {
-			String url = null;
-			try {
-				boolean ok = asyncArtifact.getUrlFuture().isDone();
-				url = asyncArtifact.getUrlFuture().get();
-			} catch (InterruptedException | ExecutionException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-			return new TestArtifactType(asyncArtifact.getName(), url, asyncArtifact.getExpiresIn());
-		}).collect(Collectors.toSet());
-	}
+    private synchronized static Set<TestArtifactType> getArtifactsAsync() {
+        Set<AsyncArtifact> asyncArtifacts = testArtifactsAsync.get();
+        return asyncArtifacts.stream().map(asyncArtifact -> {
+        	String url = retrieveUrl(asyncArtifact);
+        	return new TestArtifactType(asyncArtifact.getName(), url, asyncArtifact.getExpiresIn());
+		}).filter(testArtifact -> ! testArtifact.getLink().isEmpty()).collect(Collectors.toSet());
+    }
 
 	public static void add(String name, String link) {
 		add(name, link, getArtifactExpirationSeconds());
@@ -69,7 +64,7 @@ final public class Artifacts {
 
 	/**
 	 * Adds new artifact to test context.
-	 * 
+	 *
 	 * @param name - artifact name: Log, Demo
 	 * @param link - URL to the artifact
 	 * @param expiresIn - expiration in seconds
@@ -93,23 +88,34 @@ final public class Artifacts {
 	}
 
 	public static void add(String name, File file, Integer expiresIn) {
-		AmazonS3Client.upload(file).ifPresent(urlFuture -> add(urlFuture, name, expiresIn));
+		AmazonS3Client.upload(file).ifPresent(urlFuture -> add(Collections.singletonList(urlFuture), name, expiresIn));
 	}
 
 	private static int getArtifactExpirationSeconds() {
 		return Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
 	}
 
-	public static void add(CompletableFuture<String> urlFuture, String name) {
-		add(urlFuture, name, getArtifactExpirationSeconds());
+	public static void add(List<CompletableFuture<String>> urlFutures, String name) {
+		add(urlFutures, name, getArtifactExpirationSeconds());
 	}
 
-	private static void add(CompletableFuture<String> urlFuture, String name, Integer expiresIn) {
-		add(new AsyncArtifact(urlFuture, name, expiresIn));
+	private static void add(List<CompletableFuture<String>> urlFutures, String name, Integer expiresIn) {
+		add(new AsyncArtifact(urlFutures, name, expiresIn));
 	}
 
 	private static void add(AsyncArtifact asyncArtifact) {
 		LOGGER.debug("Adding async artifact");
 		testArtifactsAsync.get().add(asyncArtifact);
+	}
+
+	private static String retrieveUrl(AsyncArtifact asyncArtifact) {
+		return asyncArtifact.getUrlFutures().stream().map(uf -> {
+			try {
+				return uf.get();
+			} catch (InterruptedException | ExecutionException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+			return null;
+		}).filter(Objects::nonNull).collect(Collectors.joining(" "));
 	}
 }
