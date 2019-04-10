@@ -220,12 +220,12 @@ protected ExtendedWebElement developerText;
 Starting from Carina version 6.0.12 it's recommended to use @ExtendedFindBy() annotation
 Example:
 ```
-@ExtendedFindBy(classChain = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
+@ExtendedFindBy(iosClassChain = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
 protected ExtendedWebElement developerText;
 ```
 or 
 ```
-@ExtendedFindBy(predicate = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
+@ExtendedFindBy(iosPredicate = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
 protected ExtendedWebElement developerText;
 ```
 
