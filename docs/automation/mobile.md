@@ -235,6 +235,9 @@ Carina framework uses TestNG for test organization. In general, test represents 
 ```
 public class SampleTest extends AbstractTest {
 
+	String name = "My name";
+	String carName = "Mercedes";
+
     @Test()
     public void sendName() {
     	FirstPage  firstPage = new FirstPage(getDriver());
