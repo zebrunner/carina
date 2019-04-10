@@ -175,4 +175,19 @@ public class SpecialKeywords {
     public static final String RULE_FILTER_SPLITTER = ";;";
     public static final String RULE_FILTER_AND_CONDITION = "&&";
 
+
+    // ------------- Mobile screenshots cutting strategies configuration  ---------------
+    public static final int DEFAULT_SCROLL_TIMEOUT = 100;
+    public static final int DEFAULT_BLOCK = 0;
+    public static final int DEFAULT_IOS_HEADER = 74;
+    public static final int IPAD_HEADER = 102;
+    public static final int IPHONE_X_HEADER = 95;
+    public static final int IPHONE_PLUS_HEADER = 82;
+    public static final int ALTERNATIVE_IOS_FOOTER = 42;
+    public static final float DEFAULT_DPR= 2.0F;
+    public static final float IPHONE_X_DPR= 3.0F;
+    public static final int DEFAULT_WIDTH= 375;
+    public static final int DEFAULT_PLUS_WIDTH= 414;
+    public static final int DEFAULT_IPAD_WIDTH= 768;
+    public static final int DEFAULT_SE_WIDTH= 320;
 }

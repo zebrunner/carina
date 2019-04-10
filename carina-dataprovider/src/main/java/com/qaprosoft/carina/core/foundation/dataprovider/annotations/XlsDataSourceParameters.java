@@ -25,7 +25,15 @@ import java.lang.annotation.Target;
 public @interface XlsDataSourceParameters {
     String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.XlsDataProvider";
 
+    /**
+     * Is mutually exclusive with spreadsheetId
+     */
     String path() default "";
+
+    /**
+     * Is mutually exclusive with path
+     */
+    String spreadsheetId() default "";
 
     String sheet() default "";
 
