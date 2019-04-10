@@ -225,7 +225,7 @@ protected ExtendedWebElement developerText;
 ```
 or 
 ```
-@ExtendedFindBy(iosPredicate = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
+@ExtendedFindBy(iosPredicate = "name = 'DONE'")
 protected ExtendedWebElement developerText;
 ```
 
