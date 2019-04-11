@@ -13,32 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report;
+package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+abstract class AbstractXLSParser {
 
-class AsyncArtifact {
-
-    private List<CompletableFuture<String>> urlFutures;
-    private String name;
-    private Integer expiresIn;
-
-    AsyncArtifact(List<CompletableFuture<String>> urlFutures, String name, Integer expiresIn) {
-        this.urlFutures = urlFutures;
-        this.name = name;
-        this.expiresIn = expiresIn;
-    }
-
-    public List<CompletableFuture<String>> getUrlFutures() {
-        return urlFutures;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Integer getExpiresIn() {
-        return expiresIn;
+    protected static XLSTable prepareDataTable(String executeColumn, String executeValue) {
+        return executeColumn != null && executeValue != null ? new XLSTable(executeColumn, executeValue) : new XLSTable();
     }
 }

@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
@@ -38,8 +37,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory.HubType;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.MoonRecordingListener;
 
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
@@ -67,10 +68,18 @@ public class DesktopFactory extends AbstractFactory {
             
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
             if (isVideoEnabled()) {
-                final String videoName = UUID.randomUUID().toString();
-                capabilities.setCapability("videoName", videoName + ".mp4");
+            	final String videoName = getVideoName();
+            	capabilities.setCapability("videoName", videoName);
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-                ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+            	
+                switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+				case SELENIUM:
+					ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+					break;
+				case MOON:
+					ce.getListeners().add(new MoonRecordingListener(initVideoArtifact("%s/" + videoName)));
+					break;
+				}
             }
             
             driver = new RemoteWebDriver(ce, capabilities);

@@ -139,8 +139,9 @@ public class BrowserMobTest {
         ProxyPool.registerProxy(proxy);
 
         ProxyPool.startProxy(tempPort);
-        LOGGER.info(String.format("Checking Ports Before (%s) After (%s)", tempPort, ProxyPool.getProxy().getPort()));
-        Assert.assertEquals(tempPort, ProxyPool.getProxy().getPort(), "Proxy Port before, after do not match on current thread");
+        int actualPort = ProxyPool.getProxy().getPort();
+        LOGGER.info(String.format("Checking Ports Before (%s) After (%s)", tempPort, actualPort));
+        Assert.assertEquals(tempPort, actualPort, "Proxy Port before, after do not match on current thread");
     }
 
     private void initialize() {

@@ -209,11 +209,23 @@ Example:
 @Predicate
 protected ExtendedWebElement doneButton;
 ```
-Another possibility to find the element is to use @ClassShain annotation.
+Another possibility to find the element is to use @ClassChain annotation.
 Example:
 ```
 @FindBy(xpath = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
 @ClassChain
+protected ExtendedWebElement developerText;
+```
+
+Starting from Carina version 6.0.12 it's recommended to use @ExtendedFindBy() annotation
+Example:
+```
+@ExtendedFindBy(iosClassChain = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
+protected ExtendedWebElement developerText;
+```
+or 
+```
+@ExtendedFindBy(iosPredicate = "name = 'DONE'")
 protected ExtendedWebElement developerText;
 ```
 
@@ -222,10 +234,9 @@ Carina framework uses TestNG for test organization. In general, test represents 
 
 ```
 public class SampleTest extends AbstractTest {
-	
+
 	String name = "My name";
 	String carName = "Mercedes";
-	
 
     @Test()
     public void sendName() {

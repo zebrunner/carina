@@ -272,8 +272,9 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules");
-
+        TEST_RUN_RULES("test_run_rules"),
+        
+        HUB_MODE("hub_mode");
 
         private final String key;
 

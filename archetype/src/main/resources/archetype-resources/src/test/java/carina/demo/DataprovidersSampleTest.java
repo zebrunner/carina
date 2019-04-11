@@ -26,9 +26,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import ${package}.carina.core.foundation.AbstractTest;
-import ${package}.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import ${package}.carina.core.foundation.utils.ownership.MethodOwner;
+import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 
 /**
  * This sample shows how to use data-providers.
