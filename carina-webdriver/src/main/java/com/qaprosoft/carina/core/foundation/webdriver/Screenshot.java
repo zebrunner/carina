@@ -399,7 +399,7 @@ public class Screenshot {
                                 .addHeader("AMAZON_PATH", url)
                                 .addHeader("CI_TEST_ID", ciTestId)
                                 .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)));
-        if(artifact) {
+        if (artifact) {
             urlFuture.ifPresent(uf -> Artifacts.add(uf, comment));
         }
     }
