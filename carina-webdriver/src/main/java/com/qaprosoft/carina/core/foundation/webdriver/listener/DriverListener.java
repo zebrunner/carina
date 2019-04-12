@@ -252,10 +252,12 @@ public class DriverListener implements WebDriverEventListener {
                 Screenshot.captureFailure(driver, comment); // in case of failure
             } else {
                 LOGGER.info(comment);
-                if (MobileContextHelper.isInWebViewContext()) {
-                    MobileContextHelper.backUpContext(driver);
+                MobileContextHelper contextHelper = new MobileContextHelper();
+                if (contextHelper.isInWebViewContext(driver)) {
+                    String context = contextHelper.getContext(driver);
+                    contextHelper.changeToNativeAppContext(driver);
                     Screenshot.capture(driver, comment);
-                    MobileContextHelper.restoreContext(driver);
+                    contextHelper.setContext(context, driver);
                 } else {
                     Screenshot.capture(driver, comment);
                 }

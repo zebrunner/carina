@@ -15,27 +15,6 @@ public class MobileContextHelper {
 
     protected static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
 
-    private static boolean isModifiedContext = false;
-
-    private static String storedContext;
-
-    public static void changeToWebViewContext(WebDriver driver) {
-        AppiumDriver appiumDriver = getDriverSafe(driver);
-        Set contextNames = appiumDriver.getContextHandles();
-        if (contextNames.stream().anyMatch(context -> ((String) context).contains("WEBVIEW"))) {
-            isModifiedContext = true;
-            appiumDriver.context(contextNames.toArray()[1].toString());
-        } else {
-            contextNames.forEach(t -> LOGGER.info(t));
-            throw new NotFoundException("The webView context is not found");
-        }
-    }
-
-    public static void changeToNativeAppContext(WebDriver driver) {
-        isModifiedContext = false;
-        getDriverSafe(driver).context("NATIVE_APP");
-    }
-
     private static AppiumDriver getDriverSafe(WebDriver driver) {
         if (driver instanceof EventFiringWebDriver) {
             driver = ((EventFiringWebDriver) driver).getWrappedDriver();
@@ -49,31 +28,50 @@ public class MobileContextHelper {
             try {
                 locatorField = innerProxy.getClass().getDeclaredField("arg$2");
             } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
-            locatorField.setAccessible(true);
-            WebDriver appiumDriver = null;
-            try {
-                appiumDriver = (WebDriver) locatorField.get(innerProxy);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            if (appiumDriver instanceof AppiumDriver) {
-                return (AppiumDriver) driver;
+            if (locatorField!=null) {
+                locatorField.setAccessible(true);
+                WebDriver appiumDriver = null;
+                try {
+                    appiumDriver = (WebDriver) locatorField.get(innerProxy);
+                } catch (IllegalAccessException e) {
+                    LOGGER.error(e.getMessage());
+                }
+                if (appiumDriver instanceof AppiumDriver) {
+                    return (AppiumDriver) appiumDriver;
+                }
             }
         }
         throw new ClassCastException("Appium Driver can not be casted from the actual driver.");
     }
 
-    public static void backUpContext(WebDriver driver) {
-        storedContext = getDriverSafe(driver).getContext();
+    public void changeToWebViewContext(WebDriver driver) {
+        AppiumDriver appiumDriver = getDriverSafe(driver);
+        Set<String> contextNames = appiumDriver.getContextHandles();
+        if (contextNames.stream().anyMatch(context -> context.contains("WEBVIEW"))) {
+            appiumDriver.context(contextNames.toArray()[1].toString());
+        } else {
+            for (String context : contextNames) {
+                LOGGER.info(context);
+            }
+            throw new NotFoundException("The webView context is not found");
+        }
     }
 
-    public static void restoreContext(WebDriver driver) {
-        getDriverSafe(driver).context(storedContext);
+    public void changeToNativeAppContext(WebDriver driver) {
+        getDriverSafe(driver).context("NATIVE_APP");
     }
 
-    public static boolean isInWebViewContext() {
-        return isModifiedContext;
+    public String getContext(WebDriver driver) {
+        return getDriverSafe(driver).getContext();
+    }
+
+    public void setContext(String context, WebDriver driver) {
+        getDriverSafe(driver).context(context);
+    }
+
+    public boolean isInWebViewContext(WebDriver driver) {
+        return getContext(driver).contains("WEBVIEW");
     }
 }
