@@ -67,7 +67,7 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
             requestedCapability.put(DEVICE_NAME, requestedCapability.get(DEVICE_POOL));
         }
         
-        // If devicebrowser is found in requested capabilities then convert it to browserName on our selenium grid
+        // If deviceBrowser is found in requested capabilities then convert it to browserName on our selenium grid
         if (requestedCapability.containsKey(DEVICE_BROWSER)) {
             requestedCapability.put(BROWSER_NAME, requestedCapability.get(DEVICE_BROWSER));
         }
