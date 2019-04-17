@@ -1,5 +1,5 @@
-[
-  {
+{
+  "0": {
     "id": 1,
     <#if name??>"name": "${name}",</#if>
     <#if username??>"username": "${username}",</#if>
@@ -22,4 +22,4 @@
       "bs": "harness real-time e-markets"
     }
   }
-]
+}
