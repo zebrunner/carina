@@ -106,12 +106,12 @@ public class Timer {
     }
 
 
-    //TODO: investigate if this caal from ZafiraConfigurator could remove "ACTION_NAME.RUN_SUITE" data 
+    //TODO: investigate if this call from ZafiraConfigurator could remove "ACTION_NAME.RUN_SUITE" data 
     public static synchronized Map<String, Long> readAndClear() {
         Map<String, Long> testTimer = getTimer();
         for (String key : testTimer.keySet()) {
             // timer not stopped
-            LOGGER.error("Timer not stopped for operation: " + key);
+            LOGGER.debug("Timer not stopped for operation: " + key);
         }
 
         Map<String, Long> testMertrics = getMetrics();
