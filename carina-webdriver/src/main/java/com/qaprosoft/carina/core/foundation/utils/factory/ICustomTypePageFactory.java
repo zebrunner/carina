@@ -33,7 +33,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
 
     Reflections REFLECTIONS = new Reflections("");
 
-    Logger LOG = Logger.getLogger(CustomTypePageFactory.class);
+    Logger LOG = Logger.getLogger(ICustomTypePageFactory.class);
 
     public default <T extends AbstractPage> T initPage(Class<T> parentClass, Object... parameters) {
         return initPage(getDriver(), parentClass, parameters);
