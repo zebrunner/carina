@@ -39,6 +39,8 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
     private static final String APP_PACKAGE = "appPackage";
     private static final String APP_ACTIVITY = "appActivity";
     
+    private static final String BUNDLE_ID = "bundleId";
+    
     
     private static final String UDID = "udid";
 
@@ -84,6 +86,11 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
                     requestedCapability.put(APP_PACKAGE, "org.mozilla.firefox");
                     requestedCapability.put(APP_ACTIVITY, ".App");
                     break;
+                case BrowserType.SAFARI:
+                    // Safari mobile browser on iOS 
+                    //TODO: analyzed do we need to test on Safari for android and identify valid app_package and app-activity!
+                    requestedCapability.put(BUNDLE_ID, "com.apple.mobilesafari");
+                    break;                    
                 case BrowserType.EDGE:
                     // MS mobile Edge browser 
                     requestedCapability.put(APP_PACKAGE, "com.microsoft.emmx");
@@ -107,13 +114,11 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
                     // Yandex mobile browser 
                     requestedCapability.put(APP_PACKAGE, "ru.yandex.searchplugin");
                     requestedCapability.put(APP_ACTIVITY, ".MainActivity");
-                    break;                    
+                    break;
                 default:
-                    // use-case for Safari
-                    requestedCapability.put(BROWSER_NAME, requestedCapability.get(DEVICE_BROWSER));
+                    // unsupported mobile browser for startup
+                    return false;
             }
-            
-            
         }
     	
         for (String key : requestedCapability.keySet()) {
