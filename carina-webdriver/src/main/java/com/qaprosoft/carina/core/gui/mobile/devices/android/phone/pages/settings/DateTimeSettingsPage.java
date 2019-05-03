@@ -29,7 +29,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
     protected static final Logger LOGGER = Logger.getLogger(DateTimeSettingsPage.class);
 
-    @FindBy(xpath = "//*[@resource-id = 'com.android.settings:id/date_time_settings_fragment' or @resource-id = 'com.android.systemui:id/latestItems']")
+    @FindBy(xpath = "//android.widget.TextView[@text = 'Date & time']")
     protected ExtendedWebElement title;
 
     public DateTimeSettingsPage(WebDriver driver) {

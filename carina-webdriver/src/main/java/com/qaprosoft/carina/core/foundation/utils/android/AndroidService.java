@@ -1213,10 +1213,10 @@ public class AndroidService implements IDriverPool {
                 LOGGER.error("Not on '.Settings$DateTimeSettingsActivity' page");
             }
             DateTimeSettingsPage dtSettingsPage = new DateTimeSettingsPage(getDriver());
-            if (!dtSettingsPage.isOpened(3)) {
+            if (!dtSettingsPage.isOpened()) {
                 openDateTimeSettingsSetupWizard(true, timeFormat);
             }
-            if (dtSettingsPage.isOpened(3)) {
+            if (dtSettingsPage.isOpened()) {
                 LOGGER.info("Date Time Settings page was open.");
             } else {
                 LOGGER.error("Date Time Settings page should be open.");
