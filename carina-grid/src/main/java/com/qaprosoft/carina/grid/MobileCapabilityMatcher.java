@@ -84,11 +84,30 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
                     requestedCapability.put(APP_PACKAGE, "org.mozilla.firefox");
                     requestedCapability.put(APP_ACTIVITY, ".App");
                     break;
+                case BrowserType.EDGE:
+                    // MS mobile Edge browser 
+                    requestedCapability.put(APP_PACKAGE, "com.microsoft.emmx");
+                    requestedCapability.put(APP_ACTIVITY, "com.microsoft.ruby.Main");
+                    break;
+                case BrowserType.OPERA:
+                case BrowserType.OPERA_BLINK:
+                    requestedCapability.put(APP_PACKAGE, "com.opera.browser");
+                    requestedCapability.put(APP_ACTIVITY, "com.opera.Opera");
+                    break;
+                case "opera_mini":
+                    requestedCapability.put(APP_PACKAGE, "com.opera.mini.native");
+                    requestedCapability.put(APP_ACTIVITY, "com.opera.mini.android.Browser");
+                    break;                    
                 case "sbrowser":
                     // Native Samsung Browser
                     requestedCapability.put(APP_PACKAGE, "com.sec.android.app.sbrowser");
                     requestedCapability.put(APP_ACTIVITY, ".SBrowserMainActivity");
-                    break;
+                    break;                    
+                case "yandex":
+                    // Yandex mobile browser 
+                    requestedCapability.put(APP_PACKAGE, "ru.yandex.searchplugin");
+                    requestedCapability.put(APP_ACTIVITY, ".MainActivity");
+                    break;                    
                 default:
                     // use-case for Safari
                     requestedCapability.put(BROWSER_NAME, requestedCapability.get(DEVICE_BROWSER));
