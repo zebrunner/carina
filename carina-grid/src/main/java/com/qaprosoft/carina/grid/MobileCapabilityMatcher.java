@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.grid.internal.utils.DefaultCapabilityMatcher;
+import org.openqa.selenium.remote.BrowserType;
 
 /**
  * Custom selenium capability matcher for mobile grid.
@@ -35,6 +36,10 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
     private static final String DEVICE_POOL = "devicePool";
     private static final String DEVICE_BROWSER = "deviceBrowser";
     private static final String BROWSER_NAME = "browserName";
+    private static final String APP_PACKAGE = "appPackage";
+    private static final String APP_ACTIVITY = "appActivity";
+    
+    
     private static final String UDID = "udid";
 
     @Override
@@ -69,7 +74,27 @@ public class MobileCapabilityMatcher extends DefaultCapabilityMatcher {
         
         // If deviceBrowser is found in requested capabilities then convert it to browserName on our selenium grid
         if (requestedCapability.containsKey(DEVICE_BROWSER)) {
-            requestedCapability.put(BROWSER_NAME, requestedCapability.get(DEVICE_BROWSER));
+            String deviceBrowser = requestedCapability.get(DEVICE_BROWSER).toString().toLowerCase();
+            switch (deviceBrowser) {
+                case BrowserType.CHROME:
+                    requestedCapability.put(APP_PACKAGE, "com.android.chrome");
+                    requestedCapability.put(APP_ACTIVITY, "com.google.android.apps.chrome.Main");
+                    break;
+                case BrowserType.FIREFOX:
+                    requestedCapability.put(APP_PACKAGE, "org.mozilla.firefox");
+                    requestedCapability.put(APP_ACTIVITY, ".App");
+                    break;
+                case "sbrowser":
+                    // Native Samsung Browser
+                    requestedCapability.put(APP_PACKAGE, "com.sec.android.app.sbrowser");
+                    requestedCapability.put(APP_ACTIVITY, ".SBrowserMainActivity");
+                    break;
+                default:
+                    // use-case for Safari
+                    requestedCapability.put(BROWSER_NAME, requestedCapability.get(DEVICE_BROWSER));
+            }
+            
+            
         }
     	
         for (String key : requestedCapability.keySet()) {
