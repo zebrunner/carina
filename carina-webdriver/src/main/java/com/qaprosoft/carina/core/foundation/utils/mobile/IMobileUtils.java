@@ -18,9 +18,11 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 import java.time.Duration;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 
@@ -760,6 +762,20 @@ public interface IMobileUtils extends IDriverPool {
         } catch (Exception e) {
             LOGGER.error("Error during zooming", e);
         }
+    }
+
+    default boolean isAppRunning() {
+        String os = IDriverPool.getDefaultDevice().getOs();
+        if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            AndroidService androidService = AndroidService.getInstance();
+            String currentFocusedApp = androidService.getCurrentFocusedApkDetails();
+            Capabilities capabilities = ((RemoteWebDriver) getDriver()).getCapabilities();
+            String appUnderTest = String.valueOf(capabilities.getCapability("appPackage"));
+            return currentFocusedApp.contains(appUnderTest);
+        } else {
+            LOGGER.info(String.format("Current OS is %s. But we can know if the app is running only for Android.", os));
+        }
+        return false;
     }
     
     default public WebDriver castDriver() {
