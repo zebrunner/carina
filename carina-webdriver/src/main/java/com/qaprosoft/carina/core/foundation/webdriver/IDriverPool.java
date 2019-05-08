@@ -15,7 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
