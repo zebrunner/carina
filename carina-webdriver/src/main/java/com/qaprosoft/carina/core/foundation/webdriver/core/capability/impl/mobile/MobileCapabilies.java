@@ -30,23 +30,6 @@ public class MobileCapabilies extends AbstractCapabilities {
 
         // add capabilities based on dynamic _config.properties variables
         capabilities = initCapabilities(capabilities);
-
-        if (R.CONFIG.getBoolean(SpecialKeywords.FULL_RESET_BEFORE_SUITE) && !R.CONFIG.get(SpecialKeywords.FULL_RESET_BEFORE_SUITE).isEmpty()) {
-            LOGGER.info("Will be execute 'fullResetBeforeSuite'!");
-            executeFullResetBeforeSuite(capabilities);
-        }
-
         return capabilities;
-    }
-
-    private void executeFullResetBeforeSuite(DesiredCapabilities caps) {
-        if (!caps.getCapability("udid").toString().isEmpty()) {
-            String udid = caps.getCapability("udid").toString();
-            if (IDriverPool.resetDeviceStatus.isEmpty() || !IDriverPool.resetDeviceStatus.containsKey(udid)) {
-                IDriverPool.resetDeviceStatus.put(udid, false);
-                caps.setCapability("fullReset", true);
-                LOGGER.info("Application will be reset.");
-            }
-        }
     }
 }

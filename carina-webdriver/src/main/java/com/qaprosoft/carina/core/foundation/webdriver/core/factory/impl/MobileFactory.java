@@ -153,6 +153,11 @@ public class MobileFactory extends AbstractFactory {
         				}
                     }
 
+                    if (R.CONFIG.getBoolean(SpecialKeywords.FULL_RESET_BEFORE_SUITE)) {
+                        LOGGER.debug("Will be execute 'fullResetBeforeSuite'!");
+                        executeFullResetBeforeSuite(capabilities);
+                    }
+
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
 
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)) {
@@ -262,6 +267,17 @@ public class MobileFactory extends AbstractFactory {
         device.uninstallRelatedApps();
         
         return driver;
+    }
+
+    private void executeFullResetBeforeSuite(DesiredCapabilities caps) {
+        if (!caps.getCapability("udid").toString().isEmpty()) {
+            String udid = caps.getCapability("udid").toString();
+            if (IDriverPool.resetDeviceStatus.isEmpty() || !IDriverPool.resetDeviceStatus.containsKey(udid)) {
+                IDriverPool.resetDeviceStatus.put(udid, false);
+                caps.setCapability("fullReset", true);
+                LOGGER.debug("Application will be reset.");
+            }
+        }
     }
 
     private DesiredCapabilities getCapabilities(String name) {
