@@ -42,7 +42,6 @@ public class MobileCapabilies extends AbstractCapabilities {
     private void executeFullResetBeforeSuite(DesiredCapabilities caps) {
         if (!caps.getCapability("udid").toString().isEmpty()) {
             String udid = caps.getCapability("udid").toString();
-
             if (IDriverPool.resetDeviceStatus.isEmpty() || !IDriverPool.resetDeviceStatus.containsKey(udid)) {
                 IDriverPool.resetDeviceStatus.put(udid, false);
                 caps.setCapability("fullReset", true);
