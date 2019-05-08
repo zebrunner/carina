@@ -158,6 +158,8 @@ public class SpecialKeywords {
     
     public static final String  SLOT_CAPABILITIES = "slotCapabilities";
 
+    public static final String FULL_RESET_BEFORE_SUITE = "capabilities.fullResetBeforeSuite";
+
 
     // ------------- STF PROPERTIES ---------------------------------
     public static final String STF_ENABLED = "STF_ENABLED";

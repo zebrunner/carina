@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
@@ -27,7 +30,24 @@ public class MobileCapabilies extends AbstractCapabilities {
 
         // add capabilities based on dynamic _config.properties variables
         capabilities = initCapabilities(capabilities);
+
+        if (R.CONFIG.getBoolean(SpecialKeywords.FULL_RESET_BEFORE_SUITE) && !R.CONFIG.get(SpecialKeywords.FULL_RESET_BEFORE_SUITE).isEmpty()) {
+            LOGGER.info("Will be execute 'fullResetBeforeSuite'!");
+            executeFullResetBeforeSuite(capabilities);
+        }
+
         return capabilities;
     }
 
+    private void executeFullResetBeforeSuite(DesiredCapabilities caps) {
+        if (!caps.getCapability("udid").toString().isEmpty()) {
+            String udid = caps.getCapability("udid").toString();
+
+            if (IDriverPool.concurrentHashMap.isEmpty() || !IDriverPool.concurrentHashMap.containsKey(udid)) {
+                IDriverPool.concurrentHashMap.put(udid, false);
+                caps.setCapability("fullReset", true);
+                LOGGER.info("Application will be reset.");
+            }
+        }
+    }
 }
