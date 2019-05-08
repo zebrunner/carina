@@ -95,7 +95,9 @@ public class TagManager {
      * @param tags - Map of tags/values
      */
     public static void add(HashMap<String, String> tags) {
-        testTags.set(tags);
+        HashMap<String, String> curTags = testTags.get();
+        curTags.putAll(tags);
+        testTags.set(curTags);
     }
     
     /**
@@ -105,7 +107,8 @@ public class TagManager {
      * @param value - String
      */
     public static void add(String name, String value) {
-        HashMap<String, String> tags = new HashMap<String, String>();
+        HashMap<String, String> tags = testTags.get();
+        // append to existing map
         tags.put(name,  value);
         testTags.set(tags);
     }    
