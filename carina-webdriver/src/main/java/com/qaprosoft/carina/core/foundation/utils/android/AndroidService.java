@@ -1015,7 +1015,7 @@ public class AndroidService implements IDriverPool {
      * @return boolean
      */
     public boolean setDeviceTimeZone(String timeZone, TimeFormat timeFormat) {
-        return setDeviceTimeZone(timeZone, "", timeFormat, ChangeTimeZoneWorkflow.APK);
+        return setDeviceTimeZone(timeZone, "", timeFormat, "", ChangeTimeZoneWorkflow.APK);
     }
 
     /**
@@ -1028,7 +1028,7 @@ public class AndroidService implements IDriverPool {
      * @return boolean
      */
     public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat) {
-        return setDeviceTimeZone(timeZone, settingsTZ, timeFormat, ChangeTimeZoneWorkflow.ALL);
+        return setDeviceTimeZone(timeZone, settingsTZ, timeFormat, "", ChangeTimeZoneWorkflow.ALL);
     }
 
     /**
@@ -1040,7 +1040,7 @@ public class AndroidService implements IDriverPool {
      * @param workflow ChangeTimeZoneWorkflow
      * @return boolean
      */
-    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, ChangeTimeZoneWorkflow workflow) {
+    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, String gmtStamp, ChangeTimeZoneWorkflow workflow) {
         boolean changed = false;
 
         getDriver(); // start driver in before class to assign it for particular
@@ -1071,7 +1071,7 @@ public class AndroidService implements IDriverPool {
         // Note 3, S6, S5).
         if (!changed && ChangeTimeZoneWorkflow.SETTINGS.isSupported(workflow)) {
             LOGGER.info("Try to change TimeZone by Device Settings");
-            setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat);
+            setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat, gmtStamp);
             changed = applyTZChanges(ChangeTimeZoneWorkflow.SETTINGS, timeZone);
         }
 
@@ -1191,7 +1191,7 @@ public class AndroidService implements IDriverPool {
      * @param settingsTZ String
      * @param timeFormat TimeFormat
      */
-    private void setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat) {
+    private void setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat, String gmtStamp) {
 
         String actualTZ = getDeviceActualTimeZone();
 
@@ -1222,7 +1222,7 @@ public class AndroidService implements IDriverPool {
                 LOGGER.error("Date Time Settings page should be open.");
             }
             dtSettingsPage.openTimeZoneSetting();
-            dtSettingsPage.selectTimeZone(tz, settingsTZ);
+            dtSettingsPage.selectTimeZone(tz, settingsTZ, gmtStamp);
             dtSettingsPage.clickNextButton();
 
         } catch (Exception e) {

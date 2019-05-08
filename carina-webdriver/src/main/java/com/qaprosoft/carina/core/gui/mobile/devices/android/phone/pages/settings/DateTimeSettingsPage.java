@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.setting
 import java.util.List;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -30,7 +31,19 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     protected static final Logger LOGGER = Logger.getLogger(DateTimeSettingsPage.class);
 
     @FindBy(xpath = "//android.widget.TextView[@text = 'Date & time']")
-    protected ExtendedWebElement title;
+    protected ExtendedWebElement dateAndTimeScreenHeaderTitle;
+
+    @FindBy(xpath = "//android.widget.TextView[@text = 'Time zone']")
+    protected ExtendedWebElement timeZoneOption;
+
+    @FindBy(xpath = "//android.widget.TextView[@text = 'Region']")
+    protected ExtendedWebElement timeZoneRegionOption;
+
+    @FindBy(id = "android:id/search_src_text")
+    protected ExtendedWebElement timeZoneRegionSearchInputField;
+
+    @FindBy(xpath = "//android.widget.TextView[contains(@text,'%s')]")
+    protected ExtendedWebElement timeZoneRegionSearchResult;
 
     public DateTimeSettingsPage(WebDriver driver) {
         super(driver);
@@ -43,6 +56,9 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     @FindBy(xpath = "//android.widget.ListView")
     protected ExtendedWebElement scrollableContainer;
 
+    @FindBy(id = "com.android.settings:id/recycler_view")
+    protected ExtendedWebElement scrollableContainerInVersion8_1;
+
     @FindBy(className = "android.widget.ListView")
     protected ExtendedWebElement scrollableContainerByClassName;
 
@@ -52,7 +68,6 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     @FindBy(id = "com.android.settings:id/next_button")
     protected ExtendedWebElement nextButton;
 
-    protected static final String TIMEZONE_TEXT_BASE = "//android.widget.TextView[contains(@text,'%s')]";
     protected static final String SELECT_TIME_ZONE_TEXT = "Select time zone";
 
     /**
@@ -79,102 +94,71 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @param timezone String
      * @return boolean
      */
-    public boolean selectTimeZone(String tz, String timezone) {
-        int defaultSwipeTime = 15;
-        boolean multiTimezoneText = false;
-        String baseTimezoneText = timezone;
+    public boolean selectTimeZone(String tz, String timezone, String tzGMT) {
+        boolean located = false;
         boolean selected = false;
 
-        LOGGER.info("Searching for tz: " + tz);
-        // TODO: Think how to cover GMT+3:00 instead of GMT+03:00 on some devices.
-        if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
-            LOGGER.info("Scrollable container present.");
-            boolean scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
-                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
-            if (!scrolled) {
-                LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
-                defaultSwipeTime = 30;
-                scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
-                        AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
-            }
-            if (scrolled) {
-                if (timezone.isEmpty()) {
-                    LOGGER.info("Select timezone by GMT: " + tz);
-                    tzSelectionBase.format(tz).click();
-                    selected = true;
-                } else {
-                    LOGGER.info("Check that timezone by GMT '" + tz + "' is unique.");
-                    if (baseTimezoneText.contains(",")) {
-                        LOGGER.info("Looks like we have few possible variants for timezone text: " + timezone);
-                        multiTimezoneText = true;
-                    }
-                    if (!multiTimezoneText) {
-                        LOGGER.info("Searching for " + timezone);
-                        scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
-                                AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
-                        if (scrolled) {
-                            List<ExtendedWebElement> elements = findExtendedWebElements(By.xpath(String.format(TIMEZONE_TEXT_BASE, tz)), 1);
-                            LOGGER.info("Found '" + tz + "' " + elements.size() + " times.");
+        //Adding extra step required to get to TimeZone screen on devices running versions > 8
+        int deviceOsVersion = Integer.valueOf(IDriverPool.getDefaultDevice().getOsVersion().split(".")[0]);
+        if (deviceOsVersion > 8) {
+            LOGGER.info("Detected Android version 8 or above, selecting country region for 'Time Zone' option..");
+            timeZoneOption.clickIfPresent();
+            timeZoneRegionOption.clickIfPresent();
+            timeZoneRegionSearchInputField.type(timezone);
+            timeZoneRegionSearchResult.format(timezone).click();
+        }
 
-                            LOGGER.info("Select timezone by TimeZone text: " + timezone);
-                            tzSelectionBase.format(timezone).click();
-                            selected = true;
-                        } else {
-                            LOGGER.error("Did not find timezone by timezone text: " + timezone);
-                            scrolled = AndroidUtils.scroll(tz, scrollableContainerByClassName,
-                                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
-                            if (scrolled) {
-                                LOGGER.info("Select timezone by GMT: " + tz);
-                                tzSelectionBase.format(tz).click();
-                                selected = true;
-                            }
-                        }
-                    } else {
-                        String[] listTZ = baseTimezoneText.split(",");
-                        for (String oneOfTz : listTZ) {
-                            LOGGER.info("Searching for " + oneOfTz);
-                            if (selectTimezoneByText(oneOfTz.trim(), 3)) {
-                                LOGGER.info("Successful select timezone by TimeZone text: " + oneOfTz);
-                                return true;
-                            } else {
-                                LOGGER.error("TimeZone text '" + oneOfTz + "'  was not found in the list. ");
-                            }
-                        }
-                    }
+        //locating timeZone by City
+        if (!tz.isEmpty() && locateTimeZoneByCity(tz, deviceOsVersion)) {
+            tzSelectionBase.format(tz).click();
+            selected = true;
+        }
 
-                }
-
-            } else {
-                LOGGER.error("TimeZone '" + tz + "' was not found in the list. Let's try to find by TimeZone text: " + timezone);
-                if (baseTimezoneText.contains(",")) {
-                    LOGGER.info("Looks like we have few possible variants for timezone text: " + timezone);
-                    multiTimezoneText = true;
-                }
-                if (!multiTimezoneText) {
-                    if (selectTimezoneByText(timezone, defaultSwipeTime)) {
-                        LOGGER.info("Successful select timezone by TimeZone text: " + timezone);
-                        selected = true;
-                    } else {
-                        LOGGER.error("TimeZone '" + tz + "' and TimeZone text: " + timezone + "  were not found in the list. ");
-                    }
-                } else {
-                    String[] listTZ = baseTimezoneText.split(",");
-                    for (String oneOfTz : listTZ) {
-                        LOGGER.info("Searching for " + oneOfTz);
-                        if (selectTimezoneByText(oneOfTz.trim(), defaultSwipeTime)) {
-                            LOGGER.info("Successful select timezone by TimeZone text: " + oneOfTz);
-                            return true;
-                        } else {
-                            LOGGER.error("TimeZone text '" + oneOfTz + "'  was not found in the list. ");
-                        }
-                    }
-                }
-            }
-
+        //locating timeZone by GMT
+        if (!selected && locateTimeZoneByGMT(tzGMT, deviceOsVersion)) {
+            selected = true;
         }
 
         return selected;
     }
+
+    /**
+     * selectTimezoneByGMT
+     *
+     * @param tzGMT         String
+     * @return boolean
+     */
+    private boolean locateTimeZoneByGMT(String tzGMT, int deviceOsVersion){
+        LOGGER.info("Searching for tz by GTM: " + tzGMT);
+
+        if (deviceOsVersion > 8) {
+            return AndroidUtils.scroll(tzGMT, scrollableContainerInVersion8_1,
+                    AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT).isElementPresent();
+        } else {
+            return AndroidUtils.scroll(tzGMT, scrollableContainerByClassName,
+                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
+        }
+    }
+
+    /**
+     * selectTimezoneByCity
+     *
+     * @param tz         String
+     * @return boolean
+     */
+    private boolean locateTimeZoneByCity(String tz, int deviceOsVersion){
+        boolean selected = false;
+        LOGGER.info("Searching for tz by City: " + tz);
+
+        if (deviceOsVersion > 8) {
+            return  AndroidUtils.scroll(tz.split("/")[1], scrollableContainerInVersion8_1,
+                    AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT).isElementPresent();
+        } else {
+            return AndroidUtils.scroll(tz.split("/")[1], scrollableContainerByClassName,
+                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
+        }
+    }
+
 
     /**
      * selectTimezoneByText
@@ -211,7 +195,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @return boolean
      */
     public boolean isOpened(long timeout) {
-        return title.isElementPresent(timeout);
+        return dateAndTimeScreenHeaderTitle.isElementPresent(timeout);
     }
 
     @Override
