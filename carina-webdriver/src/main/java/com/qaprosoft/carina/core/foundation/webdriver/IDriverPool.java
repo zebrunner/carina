@@ -53,7 +53,7 @@ public interface IDriverPool {
     //TODO: [VD] make device related param private after migrating to java 9+
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
     static final Device nullDevice = new Device();
-    static Map<String, Boolean> concurrentHashMap = new ConcurrentHashMap<>();
+    static Map<String, Boolean> resetDeviceStatus = new ConcurrentHashMap<>();
 
     /**
      * Get default driver. If no default driver discovered it will be created.

@@ -43,8 +43,8 @@ public class MobileCapabilies extends AbstractCapabilities {
         if (!caps.getCapability("udid").toString().isEmpty()) {
             String udid = caps.getCapability("udid").toString();
 
-            if (IDriverPool.concurrentHashMap.isEmpty() || !IDriverPool.concurrentHashMap.containsKey(udid)) {
-                IDriverPool.concurrentHashMap.put(udid, false);
+            if (IDriverPool.resetDeviceStatus.isEmpty() || !IDriverPool.resetDeviceStatus.containsKey(udid)) {
+                IDriverPool.resetDeviceStatus.put(udid, false);
                 caps.setCapability("fullReset", true);
                 LOGGER.info("Application will be reset.");
             }
