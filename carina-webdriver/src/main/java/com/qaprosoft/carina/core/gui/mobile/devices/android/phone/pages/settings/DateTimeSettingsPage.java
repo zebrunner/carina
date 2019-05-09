@@ -42,7 +42,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     @FindBy(id = "android:id/search_src_text")
     protected ExtendedWebElement timeZoneRegionSearchInputField;
 
-    @FindBy(xpath = "//android.widget.TextView[contains(@text,'%s')]")
+    @FindBy(xpath = "//*[@resource-id='com.android.settings:id/recycler_view']//android.widget.TextView[contains(@text,'%s')]")
     protected ExtendedWebElement timeZoneRegionSearchResult;
 
     public DateTimeSettingsPage(WebDriver driver) {
@@ -97,16 +97,18 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     public boolean selectTimeZone(String tz, String timezone, String tzGMT) {
         boolean located = false;
         boolean selected = false;
+        String deviceOsFullVersion = IDriverPool.getDefaultDevice().getOsVersion();
+        int deviceOsVersion;
 
         //Adding extra step required to get to TimeZone screen on devices running versions > 8
-        int deviceOsVersion = Integer.valueOf(IDriverPool.getDefaultDevice().getOsVersion().split(".")[0]);
-        if (deviceOsVersion > 8) {
-            LOGGER.info("Detected Android version 8 or above, selecting country region for 'Time Zone' option..");
-            timeZoneOption.clickIfPresent();
-            timeZoneRegionOption.clickIfPresent();
-            timeZoneRegionSearchInputField.type(timezone);
-            timeZoneRegionSearchResult.format(timezone).click();
+        if (deviceOsFullVersion.contains(".")) {
+            deviceOsVersion = Integer.valueOf(deviceOsFullVersion.split(".")[0]);
+        } else {
+            deviceOsVersion = Integer.valueOf(deviceOsFullVersion);
         }
+
+        //if device OS version > 8, we have to set Country Region
+        setupTimezoneRegion(timezone, deviceOsVersion);
 
         //locating timeZone by City
         if (!tz.isEmpty() && locateTimeZoneByCity(tz, deviceOsVersion)) {
@@ -116,6 +118,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
         //locating timeZone by GMT
         if (!selected && locateTimeZoneByGMT(tzGMT, deviceOsVersion)) {
+            tzSelectionBase.format(tzGMT).click();
             selected = true;
         }
 
@@ -123,9 +126,25 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     }
 
     /**
+     * setup timezone region (this method is responsible for setting up timezone region, req. for OS version > 8)
+     *
+     * @param timezoneRegion         String
+     * @param deviceOsVersion  int
+     */
+    private void setupTimezoneRegion(String timezoneRegion, int deviceOsVersion){
+        if (deviceOsVersion > 8) {
+            LOGGER.info("Detected Android version 8 or above, selecting country region for 'Time Zone' option..");
+            timeZoneRegionOption.clickIfPresent();
+            timeZoneRegionSearchInputField.type(timezoneRegion);
+            timeZoneRegionSearchResult.format(timezoneRegion).click();
+        }
+    }
+
+    /**
      * selectTimezoneByGMT
      *
      * @param tzGMT         String
+     * @param deviceOsVersion  int
      * @return boolean
      */
     private boolean locateTimeZoneByGMT(String tzGMT, int deviceOsVersion){
@@ -133,10 +152,10 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
         if (deviceOsVersion > 8) {
             return AndroidUtils.scroll(tzGMT, scrollableContainerInVersion8_1,
-                    AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT).isElementPresent();
+                    AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
         } else {
             return AndroidUtils.scroll(tzGMT, scrollableContainerByClassName,
-                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
+                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
         }
     }
 
@@ -144,6 +163,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * selectTimezoneByCity
      *
      * @param tz         String
+     * @param deviceOsVersion  int
      * @return boolean
      */
     private boolean locateTimeZoneByCity(String tz, int deviceOsVersion){
