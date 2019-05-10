@@ -29,4 +29,5 @@ public class MobileCapabilies extends AbstractCapabilities {
         capabilities = initCapabilities(capabilities);
         return capabilities;
     }
+    
 }

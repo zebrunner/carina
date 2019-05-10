@@ -94,7 +94,6 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
-
         String exceptionMsg = "";
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
@@ -260,7 +259,6 @@ public class MobileFactory extends AbstractFactory {
         }
         // will be performed just in case uninstall_related_apps flag marked as
         // true
-
         device.uninstallRelatedApps();
         
         return driver;
