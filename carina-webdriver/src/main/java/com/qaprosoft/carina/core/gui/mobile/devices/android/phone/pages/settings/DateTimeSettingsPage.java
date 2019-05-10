@@ -106,8 +106,9 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
             deviceOsVersion = Integer.valueOf(deviceOsFullVersion);
         }
 
-        //if device OS version > 8, we have to set Country Region
+        //if device OS version > 8, we have to set Country Region and obtain city from timeZone
         setupTimezoneRegion(timezone, deviceOsVersion);
+        tz = tz.split("/")[1].replace("_", " ");
 
         //locating timeZone by City
         if (!tz.isEmpty() && locateTimeZoneByCity(tz, deviceOsVersion)) {
@@ -170,10 +171,10 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         LOGGER.info("Searching for tz by City: " + tz);
 
         if (deviceOsVersion > 8) {
-            return  AndroidUtils.scroll(tz.split("/")[1].replace("_", " "), scrollableContainerInVersion8_1,
+            return  AndroidUtils.scroll(tz, scrollableContainerInVersion8_1,
                     AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT).isElementPresent();
         } else {
-            return AndroidUtils.scroll(tz.split("/")[1].replace("_", " "), scrollableContainerByClassName,
+            return AndroidUtils.scroll(tz, scrollableContainerByClassName,
                     AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
         }
     }
