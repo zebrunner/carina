@@ -1054,11 +1054,11 @@ public class AndroidService implements IDriverPool {
 
         String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
         LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
-//        if (currentAndroidVersion.contains("7.") ||
-//                (IDriverPool.getDefaultDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
-//            LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
-//            workflow = ChangeTimeZoneWorkflow.APK;
-//        }
+        if (currentAndroidVersion.contains("7.") ||
+                (IDriverPool.getDefaultDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET && !currentAndroidVersion.contains("8."))) {
+            LOGGER.info("TimeZone changing for Android 7+ and tablets works only by TimeZone changer apk.");
+            workflow = ChangeTimeZoneWorkflow.APK;
+        }
 
         // Solution for ADB timezone changing.
         if (ChangeTimeZoneWorkflow.ADB.isSupported(workflow)) {

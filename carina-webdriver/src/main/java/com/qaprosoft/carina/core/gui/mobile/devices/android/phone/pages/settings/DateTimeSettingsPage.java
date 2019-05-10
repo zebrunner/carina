@@ -101,12 +101,12 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
         //Adding extra step required to get to TimeZone screen on devices running versions > 8
         if (deviceOsFullVersion.contains(".")) {
-            deviceOsVersion = Integer.valueOf(deviceOsFullVersion.split(".")[0]);
+            deviceOsVersion = Integer.valueOf(deviceOsFullVersion.split("\\.")[0]);
         } else {
             deviceOsVersion = Integer.valueOf(deviceOsFullVersion);
         }
 
-        //if device OS version > 8, we have to set Country Region and obtain city from timeZone
+        //if device OS version >= 9, we have to set Country Region and obtain city from timeZone
         setupTimezoneRegion(timezone, deviceOsVersion);
         tz = tz.split("/")[1].replace("_", " ");
 
@@ -132,7 +132,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @param deviceOsVersion  int
      */
     private void setupTimezoneRegion(String timezoneRegion, int deviceOsVersion){
-        if (deviceOsVersion > 8) {
+        if (deviceOsVersion >= 9) {
             LOGGER.info("Detected Android version 8 or above, selecting country region for 'Time Zone' option..");
             timeZoneRegionOption.clickIfPresent();
             timeZoneRegionSearchInputField.type(timezoneRegion);
