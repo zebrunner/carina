@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -57,7 +56,6 @@ public interface IDriverPool {
     //TODO: [VD] make device related param private after migrating to java 9+
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
     static final Device nullDevice = new Device();
-    static Map<String, Set> clearedDevicesMap = new ConcurrentHashMap<>();
 
     /**
      * Get default driver. If no default driver discovered it will be created.

@@ -62,7 +62,6 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 public class MobileFactory extends AbstractFactory {
 	
 	private final static String vnc_mobile = "vnc_mobile";
-	private static Set<String> clearedDevices = new HashSet<>();
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -98,7 +97,6 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
-        clearedDevices.add(capabilities.getCapability("udid").toString());
 
         String exceptionMsg = "";
         try {
@@ -262,17 +260,6 @@ public class MobileFactory extends AbstractFactory {
             }
 
             IDriverPool.registerDevice(device);
-        }
-        if (R.CONFIG.getBoolean(SpecialKeywords.FULL_RESET_BEFORE_SUITE) && capabilities.getCapability("carinaTestRunId")
-                .equals(SpecialKeywords.TEST_RUN_ID)) {
-            LOGGER.debug("Will be execute 'fullResetBeforeSuite'!");
-            if (!IDriverPool.clearedDevicesMap.containsValue(device.getUdid())) {
-                IDriverPool.clearedDevicesMap.put(capabilities.getCapability("carinaTestRunId").toString(), clearedDevices);
-                capabilities.setCapability("fullReset", true);
-                LOGGER.debug("Application will be reset.");
-            } else {
-                capabilities.setCapability("fullReset", false);
-            }
         }
         // will be performed just in case uninstall_related_apps flag marked as
         // true
