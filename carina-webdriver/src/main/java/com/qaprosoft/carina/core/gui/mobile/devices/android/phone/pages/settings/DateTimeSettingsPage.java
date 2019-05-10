@@ -170,10 +170,10 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         LOGGER.info("Searching for tz by City: " + tz);
 
         if (deviceOsVersion > 8) {
-            return  AndroidUtils.scroll(tz.split("/")[1], scrollableContainerInVersion8_1,
+            return  AndroidUtils.scroll(tz.split("/")[1].replace("_", " "), scrollableContainerInVersion8_1,
                     AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT).isElementPresent();
         } else {
-            return AndroidUtils.scroll(tz.split("/")[1], scrollableContainerByClassName,
+            return AndroidUtils.scroll(tz.split("/")[1].replace("_", " "), scrollableContainerByClassName,
                     AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
         }
     }
