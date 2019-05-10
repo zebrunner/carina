@@ -21,6 +21,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -149,14 +150,27 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      */
     private boolean locateTimeZoneByGMT(String tzGMT, int deviceOsVersion){
         LOGGER.info("Searching for tz by GTM: " + tzGMT);
+        boolean result = false;
 
         if (deviceOsVersion > 8) {
-            return AndroidUtils.scroll(tzGMT, scrollableContainerInVersion8_1,
-                    AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+            try {
+                result = AndroidUtils.scroll(tzGMT, scrollableContainerInVersion8_1,
+                        AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+            } catch (NoSuchElementException e){
+                e.printStackTrace();
+                result = false;
+            }
         } else {
-            return AndroidUtils.scroll(tzGMT, scrollableContainerByClassName,
-                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+            try {
+                result = AndroidUtils.scroll(tzGMT, scrollableContainerByClassName,
+                        AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+            } catch (NoSuchElementException e){
+                e.printStackTrace();
+                result = false;
+            }
         }
+
+        return result;
     }
 
     /**
@@ -167,16 +181,28 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @return boolean
      */
     private boolean locateTimeZoneByCity(String tz, int deviceOsVersion){
-        boolean selected = false;
         LOGGER.info("Searching for tz by City: " + tz);
+        boolean result = false;
 
         if (deviceOsVersion > 8) {
-            return  AndroidUtils.scroll(tz, scrollableContainerInVersion8_1,
-                    AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT).isElementPresent();
+            try {
+                result = AndroidUtils.scroll(tz, scrollableContainerInVersion8_1,
+                        AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+            } catch (NoSuchElementException e){
+                e.printStackTrace();
+                result = false;
+            }
         } else {
-            return AndroidUtils.scroll(tz, scrollableContainerByClassName,
-                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
+            try {
+                result = AndroidUtils.scroll(tz, scrollableContainerByClassName,
+                        AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+            } catch (NoSuchElementException e){
+                e.printStackTrace();
+                result = false;
+            }
         }
+
+        return result;
     }
 
 
