@@ -95,7 +95,6 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      * @return boolean
      */
     public boolean selectTimeZone(String tz, String timezone, String tzGMT) {
-        boolean located = false;
         boolean selected = false;
         String deviceOsFullVersion = IDriverPool.getDefaultDevice().getOsVersion();
         int deviceOsVersion;
