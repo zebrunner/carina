@@ -18,7 +18,10 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +62,8 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 public class MobileFactory extends AbstractFactory {
 	
 	private final static String vnc_mobile = "vnc_mobile";
-    
+	private static Set<String> clearedDevices = new HashSet<>();
+
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
 
@@ -88,11 +92,13 @@ public class MobileFactory extends AbstractFactory {
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
-            	String udid = capabilities.getCapability("udid").toString();
-            	capabilities = getCapabilities(name);
-            	capabilities.setCapability("udid", udid);
-            	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            String udid = capabilities.getCapability("udid").toString();
+            capabilities = getCapabilities(name);
+            capabilities.setCapability("udid", udid);
+            LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
+
+        clearedDevices.add(capabilities.getCapability("udid").toString());
 
         String exceptionMsg = "";
         try {
@@ -151,11 +157,6 @@ public class MobileFactory extends AbstractFactory {
         					ce.getListeners().add(new MoonRecordingListener(initVideoArtifact("%s/" + videoName)));
         					break;
         				}
-                    }
-
-                    if (R.CONFIG.getBoolean(SpecialKeywords.FULL_RESET_BEFORE_SUITE)) {
-                        LOGGER.debug("Will be execute 'fullResetBeforeSuite'!");
-                        executeFullResetBeforeSuite(capabilities);
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
@@ -262,22 +263,23 @@ public class MobileFactory extends AbstractFactory {
 
             IDriverPool.registerDevice(device);
         }
+        if (R.CONFIG.getBoolean(SpecialKeywords.FULL_RESET_BEFORE_SUITE) && capabilities.getCapability("carinaTestRunId")
+                .equals(SpecialKeywords.TEST_RUN_ID)) {
+            LOGGER.debug("Will be execute 'fullResetBeforeSuite'!");
+            if (!IDriverPool.clearedDevicesMap.containsValue(device.getUdid())) {
+                IDriverPool.clearedDevicesMap.put(capabilities.getCapability("carinaTestRunId").toString(), clearedDevices);
+                capabilities.setCapability("fullReset", true);
+                LOGGER.debug("Application will be reset.");
+            } else {
+                capabilities.setCapability("fullReset", false);
+            }
+        }
         // will be performed just in case uninstall_related_apps flag marked as
         // true
+
         device.uninstallRelatedApps();
         
         return driver;
-    }
-
-    private void executeFullResetBeforeSuite(DesiredCapabilities caps) {
-        if (!caps.getCapability("udid").toString().isEmpty()) {
-            String udid = caps.getCapability("udid").toString();
-            if (IDriverPool.resetDeviceStatus.isEmpty() || !IDriverPool.resetDeviceStatus.containsKey(udid)) {
-                IDriverPool.resetDeviceStatus.put(udid, false);
-                caps.setCapability("fullReset", true);
-                LOGGER.debug("Application will be reset.");
-            }
-        }
     }
 
     private DesiredCapabilities getCapabilities(String name) {
