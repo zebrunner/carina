@@ -59,7 +59,7 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 public class MobileFactory extends AbstractFactory {
 	
 	private final static String vnc_mobile = "vnc_mobile";
-    
+
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
 
@@ -88,10 +88,10 @@ public class MobileFactory extends AbstractFactory {
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
-            	String udid = capabilities.getCapability("udid").toString();
-            	capabilities = getCapabilities(name);
-            	capabilities.setCapability("udid", udid);
-            	LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            String udid = capabilities.getCapability("udid").toString();
+            capabilities = getCapabilities(name);
+            capabilities.setCapability("udid", udid);
+            LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
         String exceptionMsg = "";

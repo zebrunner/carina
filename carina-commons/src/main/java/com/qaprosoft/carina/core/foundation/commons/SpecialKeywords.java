@@ -15,12 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.commons;
 
+import java.util.UUID;
+
 /**
  * Special keywords used in framework.
  * 
  * @author Alex Khursevich
  */
 public class SpecialKeywords {
+    public static final String TEST_RUN_ID = java.util.UUID.randomUUID().toString();
     public static final String IGNORE = "$ignore";
     public static final String GENERATE = "\\{generate:\\d*\\}";
     public static final String GENERATE_UUID = "\\{generate_uuid\\}";

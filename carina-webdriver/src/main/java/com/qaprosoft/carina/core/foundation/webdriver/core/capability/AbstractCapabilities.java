@@ -89,7 +89,7 @@ public abstract class AbstractCapabilities {
                 }
             }
         }
-
+        capabilities.setCapability("carinaTestRunId", SpecialKeywords.TEST_RUN_ID);
         return capabilities;
     }
 
