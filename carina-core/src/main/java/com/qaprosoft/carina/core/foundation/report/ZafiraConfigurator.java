@@ -170,10 +170,10 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         }
 
         Map<String, String> testTags = TagManager.getTags(test);
-        testTags.entrySet().stream().forEach((entry) -> {
+        testTags.forEach((name, value) -> {
             TagType tagEntry = new TagType();
-            tagEntry.setName(entry.getKey());
-            tagEntry.setValue(entry.getValue());
+            tagEntry.setName(name);
+            tagEntry.setValue(value);
             tags.add(tagEntry);
         });
 
