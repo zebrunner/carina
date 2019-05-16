@@ -109,7 +109,7 @@ public interface IMobileUtils extends IDriverPool {
         int x = elem.getLocation().getX() + width / 2;
         int y = elem.getLocation().getY() + height / 2;
         try {
-            MobileUtils.swipe(x, y, x, y, 2500);
+            swipe(x, y, x, y, 2500);
         } catch (Exception e) {
             LOGGER.error("Exception: " + e);
         }

@@ -17,25 +17,22 @@ package com.qaprosoft.carina.core.foundation.utils.ios;
 
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 
 import io.appium.java_client.ios.IOSDriver;
 
-/**
- * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.ios.IIosUtils()} instead.
- */
-public class IosUtils extends MobileUtils {
-
-    private static final Logger LOGGER = Logger.getLogger(IosUtils.class);
+public interface IIosUtils extends IMobileUtils {
+    
+    static final Logger LOGGER = Logger.getLogger(IIosUtils.class);
 
     /**
      * Hide Keyboard
      * Use com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.hideKeyboard()
      */
     @Deprecated
-    public static void hideKeyboard() {
+    default public void hideKeyboard() {
         try {
-            ((IOSDriver<?>) getDriver()).hideKeyboard();
+            ((IOSDriver<?>) castDriver()).hideKeyboard();
         } catch (Exception e) {
             LOGGER.info("Keyboard was already hided");
         }
