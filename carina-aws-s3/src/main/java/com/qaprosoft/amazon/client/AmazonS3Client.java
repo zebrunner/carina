@@ -15,11 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.amazon.client;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
-import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,20 +25,29 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import org.apache.log4j.Logger;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.zafira.client.ZafiraSingleton;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType.Type;
+
 public class AmazonS3Client {
 
     private static final Logger LOGGER = Logger.getLogger(AmazonS3Client.class);
 
     private static final ExecutorService executorService = Executors.newFixedThreadPool(50);
-    private static final String AMAZON_KEY_FORMAT = FileUploadType.Type.SCREENSHOTS.getPath() + "/%s/";
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
 
     public static Optional<CompletableFuture<String>> upload(File file) {
-        return upload(file, () -> {}, link -> {});
+        return upload(file, () -> {}, link -> {}, Type.COMMON);
+    }
+    
+    public static Optional<CompletableFuture<String>> upload(File file, Type fileType) {
+        return upload(file, () -> {}, link -> {}, fileType);
     }
 
-    public static Optional<CompletableFuture<String>> upload(File file, Consumer<String> callback) {
-        return upload(file, () -> {}, callback);
+    public static Optional<CompletableFuture<String>> upload(File file, Consumer<String> callback, Type fileType) {
+        return upload(file, () -> {}, callback, fileType);
     }
 
     /**
@@ -54,7 +58,12 @@ public class AmazonS3Client {
      * @return Optional<CompleatableFuture<url>> if success, Optional<null> on S3_UPLOAD_ENABLE is false or
      *  Optional<CompleatableFuture<null>> if there are any problems on async uploading stage
      */
+    
     public static Optional<CompletableFuture<String>> upload(File file, Runnable preparedAction, Consumer<String> callback) {
+        return upload(file, preparedAction, callback, Type.COMMON);
+    }
+    
+    public static Optional<CompletableFuture<String>> upload(File file, Runnable preparedAction, Consumer<String> callback, Type fileType) {
         if (!Configuration.getBoolean(Configuration.Parameter.S3_UPLOAD_ENABLE)) {
             LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
             return Optional.empty();
@@ -66,7 +75,7 @@ public class AmazonS3Client {
             try {
                 int expiresIn = Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
                 LOGGER.debug("Uploading to AWS: " + file.getName() + ". Expires in " + expiresIn + " seconds.");
-                url = ZafiraSingleton.INSTANCE.getClient().uploadFile(file, expiresIn, String.format(AMAZON_KEY_FORMAT, DATE_FORMAT.format(new Date())));
+                url = ZafiraSingleton.INSTANCE.getClient().uploadFile(file, expiresIn, String.format(fileType.getPath() + "/%s/", DATE_FORMAT.format(new Date())));
                 LOGGER.debug("Uploaded to AWS: " + file.getName());
                 callback.accept(url);
                 LOGGER.debug("Updated AWS metadata: " + file.getName());

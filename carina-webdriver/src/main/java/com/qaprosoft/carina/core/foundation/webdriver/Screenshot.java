@@ -56,6 +56,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule
 import com.qaprosoft.zafira.listener.ZafiraListener;
 import com.qaprosoft.zafira.log.MetaInfoLevel;
 import com.qaprosoft.zafira.log.MetaInfoMessage;
+import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -491,7 +492,8 @@ public class Screenshot {
                 url -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
                                 .addHeader(pathHeader, url)
                                 .addHeader("CI_TEST_ID", ciTestId)
-                                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)));
+                                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
+                FileUploadType.Type.SCREENSHOTS);
     }
 
     /**
