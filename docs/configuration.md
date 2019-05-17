@@ -375,8 +375,8 @@ All project configuration properties are located in **_config.properties** file.
 		<td>./s3</td>
 	</tr>
 		<tr>
-		<td>s3_save_screenshots</td>
-		<td>If enabled screenshots would be saved on S3 Amamzon</td>
+		<td>s3_upload_enable</td>
+		<td>If enabled artifacts would be saved on S3 Amamzon</td>
 		<td>false, true</td>
 	</tr>
 		<tr>
