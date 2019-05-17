@@ -166,10 +166,11 @@ public class Screenshot {
 
         // XML layout extraction
         File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
-        LOGGER.debug("Dump file will be uploaded to amazon S3.");
-        Artifacts.add("Failure UI dump report", uiDumpFile);
         if (uiDumpFile != null) {
-            uiDumpFile.getPath().split("\\/");
+            LOGGER.debug("Dump file will be uploaded to amazon S3. File name is : " + uiDumpFile.getName());
+            Artifacts.add("Failure UI dump report", uiDumpFile);
+        } else {
+            LOGGER.debug("Dump file is empty.");
         }
         LOGGER.debug("Screenshot->captureFailure finished.");
         return screenName;
