@@ -483,16 +483,17 @@ public class Screenshot {
      * Upload screenshot file to Amazon S3 using Zafira Client
      * @param screenshot - existing screenshot {@link File}
      */
-    private static Optional<CompletableFuture<String>> uploadToAmazonS3(File screenshot, String comment, String correlationId, String ciTestId, boolean thumb) {
+    private static Optional<CompletableFuture<String>> uploadToAmazonS3(File screenshot, String comment, String correlationId, String ciTestId,
+            boolean thumb) {
         final String pathHeader = thumb ? "THUMB_AMAZON_PATH" : "AMAZON_PATH";
         return AmazonS3Client.upload(screenshot,
                 () -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                .addHeader(pathHeader, null)
-                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
+                        .addHeader(pathHeader, null)
+                        .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
                 url -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                                .addHeader(pathHeader, url)
-                                .addHeader("CI_TEST_ID", ciTestId)
-                                .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
+                        .addHeader(pathHeader, url)
+                        .addHeader("CI_TEST_ID", ciTestId)
+                        .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
                 FileUploadType.Type.SCREENSHOTS);
     }
 
