@@ -16,8 +16,10 @@
 package com.qaprosoft.carina.core.foundation.utils.tag;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,53 +42,29 @@ public class TagManager {
      * @return Map of tags
      */
     public static Map<String, String> getTags(ITestResult result) {
-
-        // Get a handle to the class and method
-        Class<?> testClass;
         //get custom tags which are set via code
-        HashMap<String, String> tag = testTags.get();
-        
+        Map<String, String> tags = testTags.get();
         // append tags from annotations if any
         try {
-            testClass = Class.forName(result.getMethod().getTestClass().getName());
+            Class<?> testClass = Class.forName(result.getMethod().getTestClass().getName());
 
             // We can't use getMethod() because we may have parameterized tests
             // for which we won't know the matching signature
             String methodName = result.getMethod().getMethodName();
-            Method testMethod = null;
             Method[] possibleMethods = testClass.getMethods();
-            for (Method possibleMethod : possibleMethods) {
-                if (possibleMethod.getName().equals(methodName)) {
-                    testMethod = possibleMethod;
-                    break;
-                }
-            }
-
-            if (testMethod != null) {
-                if (testMethod.isAnnotationPresent(TestTag.class)) {
-                    TestTag methodAnnotation = testMethod.getAnnotation(TestTag.class);
-                    if (isValid(methodAnnotation.name())) {
-                        tag.put(methodAnnotation.name(), methodAnnotation.value());
-                        LOGGER.debug("Method '" + testMethod + "' tag pair: " + methodAnnotation.name() + " : " + methodAnnotation.value());
-                    }
-                }
-                if (testMethod.isAnnotationPresent(TestTag.List.class)) {
-                    TestTag.List methodAnnotation = testMethod.getAnnotation(TestTag.List.class);
-                    for (TestTag tagLocal : methodAnnotation.value()) {
-                        if (isValid(tagLocal.name())) {
-                            tag.put(tagLocal.name(), tagLocal.value());
-                            LOGGER.debug("Method '" + testMethod + "' tag pair: " + tagLocal.name() + " : " + tagLocal.value());
-                        }
-                    }
-                }
-            }
+            Map<String, String> declarativeTags = Arrays.stream(possibleMethods)
+                         .filter(possibleMethod -> possibleMethod.getName().equals(methodName))
+                         .findFirst()
+                         .map(retrieveTags())
+                         .orElse(new HashMap<>());
+            declarativeTags.forEach(tags::putIfAbsent);
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         } finally {
             // remove all tags from current thread as information put to zafira by current method
             testTags.remove();
         }
-        return tag;
+        return tags;
     }
 
     /**
@@ -95,11 +73,9 @@ public class TagManager {
      * @param tags - Map of tags/values
      */
     public static void add(HashMap<String, String> tags) {
-        HashMap<String, String> curTags = testTags.get();
-        curTags.putAll(tags);
-        testTags.set(curTags);
+        testTags.get().putAll(tags);
     }
-    
+
     /**
      * Add tag via code to current Method/Thread.
      *
@@ -107,17 +83,37 @@ public class TagManager {
      * @param value - String
      */
     public static void add(String name, String value) {
-        HashMap<String, String> tags = testTags.get();
-        // append to existing map
-        tags.put(name,  value);
-        testTags.set(tags);
-    }    
+        testTags.get().put(name, value);
+    }
+
+    private static Function<Method, Map<String, String>> retrieveTags() {
+        return testMethod -> {
+            HashMap<String, String> tags = new HashMap<>();
+            if (testMethod.isAnnotationPresent(TestTag.class)) {
+                TestTag methodAnnotation = testMethod.getAnnotation(TestTag.class);
+                if (isValid(methodAnnotation.name())) {
+                    tags.put(methodAnnotation.name(), methodAnnotation.value());
+                    LOGGER.debug("Method '" + testMethod + "' tag pair: " + methodAnnotation.name() + " : " + methodAnnotation.value());
+                }
+            }
+            if (testMethod.isAnnotationPresent(TestTag.List.class)) {
+                TestTag.List methodAnnotation = testMethod.getAnnotation(TestTag.List.class);
+                for (TestTag tagLocal : methodAnnotation.value()) {
+                    if (isValid(tagLocal.name())) {
+                        tags.put(tagLocal.name(), tagLocal.value());
+                        LOGGER.debug("Method '" + testMethod + "' tag pair: " + tagLocal.name() + " : " + tagLocal.value());
+                    }
+                }
+            }
+            return tags;
+        };
+    }
 
     private static boolean isValid(String content) {
         Pattern pattern = Pattern.compile(FORBIDDEN_TAG_NAMES);
         if (content != null) {
             Matcher matcher = pattern.matcher(content);
-            while (matcher.find()) {
+            if (matcher.find()) {
                 LOGGER.error("TestTag name contains one of the forbidden tag names: " + content);
                 return false;
             }
