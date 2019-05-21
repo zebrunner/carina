@@ -856,10 +856,21 @@ Example:</p>
 protected ExtendedWebElement doneButton;
 </code></pre>
 
-<p>Another possibility to find the element is to use @ClassShain annotation.
+<p>Another possibility to find the element is to use @ClassChain annotation.
 Example:</p>
 <pre><code>@FindBy(xpath = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
 @ClassChain
+protected ExtendedWebElement developerText;
+</code></pre>
+
+<p>Starting from Carina version 6.0.12 it's recommended to use @ExtendedFindBy() annotation
+Example:</p>
+<pre><code>@ExtendedFindBy(iosClassChain = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
+protected ExtendedWebElement developerText;
+</code></pre>
+
+<p>or </p>
+<pre><code>@ExtendedFindBy(iosPredicate = &quot;name = 'DONE'&quot;)
 protected ExtendedWebElement developerText;
 </code></pre>
 
@@ -869,7 +880,6 @@ protected ExtendedWebElement developerText;
 
     String name = &quot;My name&quot;;
     String carName = &quot;Mercedes&quot;;
-
 
     @Test()
     public void sendName() {
