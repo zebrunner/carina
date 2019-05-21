@@ -52,9 +52,10 @@ public class AmazonS3Client {
 
     /**
      * Uploads file to amazon S3
-     * @param file - file to upload
+     * 
+     * @param file           - file to upload
      * @param preparedAction - action will be execute in the same thread before uploading starting
-     * @param callback - triggers on operaion finish
+     * @param callback       - triggers on operaion finish
      * @return Optional<CompleatableFuture<url>> if success, Optional<CompleatableFuture<null>> if there are any problems on async uploading stage
      */
     
