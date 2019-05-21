@@ -217,9 +217,6 @@ public class Configuration {
 
         S3_LOCAL_STORAGE("s3_local_storage"),
 
-        // Amazon-Screenshot
-        S3_UPLOAD_ENABLE("s3_upload_enable"),
-
         // HockeyApp token
         HOCKEYAPP_TOKEN("hockeyapp_token"),
 

@@ -55,7 +55,7 @@ public class AmazonS3Client {
      * @param file - file to upload
      * @param preparedAction - action will be execute in the same thread before uploading starting
      * @param callback - triggers on operaion finish
-     * @return Optional<CompleatableFuture<url>> if success, Optional<null> on S3_UPLOAD_ENABLE is false or
+     * @return Optional<CompleatableFuture<url>> if success, Optional<null> if
      *  Optional<CompleatableFuture<null>> if there are any problems on async uploading stage
      */
     
@@ -64,11 +64,6 @@ public class AmazonS3Client {
     }
     
     public static Optional<CompletableFuture<String>> upload(File file, Runnable preparedAction, Consumer<String> callback, Type fileType) {
-        if (!Configuration.getBoolean(Configuration.Parameter.S3_UPLOAD_ENABLE)) {
-            LOGGER.debug("there is no sense to continue as saving artifacts onto S3 is disabled.");
-            return Optional.empty();
-        }
-
         preparedAction.run();
         return Optional.ofNullable(CompletableFuture.supplyAsync(() -> {
             String url = null;
