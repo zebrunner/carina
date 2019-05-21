@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileBy;
@@ -51,6 +55,8 @@ public interface IAndroidUtils extends IMobileUtils {
     static final Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
+    AdbExecutor executor = new AdbExecutor();
+    String[] baseInitCmd = executor.getDefaultCmd();
 
 
     /**
@@ -610,6 +616,52 @@ public interface IAndroidUtils extends IMobileUtils {
             LOGGER.error("Not expected apk '" + apk + "' is in focus. Actual result is: " + res);
             return false;
         }
+    }
+    
+    /**
+     * getCurrentDeviceFocus - get actual device apk in focus
+     *
+     * @return String
+     */
+    default public String getCurrentDeviceFocus() {
+        String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
+        return result;
+    }
+    
+    /**
+     * executeAbdCommand
+     *
+     * @param command String
+     * @return String command output in one line
+     */
+    default public String executeAdbCommand(String command) {
+        String deviceName = getDevice().getAdbName();
+        if (!deviceName.isEmpty()) {
+            // add remoteURL/udid reference
+            command = "-s " + deviceName + " " + command;
+        } else {
+            LOGGER.warn("nullDevice detected fot current thread!");
+        }
+
+        String result = "";
+        LOGGER.info("Command: " + command);
+        String[] listOfCommands = command.split(" ");
+
+        String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
+
+        try {
+            LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
+            List<String> execOutput = executor.execute(execCmd);
+            LOGGER.info("Output after execution ADB command: " + execOutput);
+
+            result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
+
+            LOGGER.info("Returning Output: " + result);
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+
+        return result;
     }
 
 }
