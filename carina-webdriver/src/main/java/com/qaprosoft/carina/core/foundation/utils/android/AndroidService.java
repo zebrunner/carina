@@ -214,6 +214,9 @@ public class AndroidService implements IDriverPool {
      * @param apk String
      * @return boolean
      */
+    /**
+     * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#isAppRunning(String apk)} instead.
+     */
     public boolean checkCurrentDeviceFocus(String apk) {
         String res = getCurrentDeviceFocus();
         if (res.contains(apk)) {
