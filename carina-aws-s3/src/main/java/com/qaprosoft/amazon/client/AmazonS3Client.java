@@ -65,7 +65,7 @@ public class AmazonS3Client {
     
     public static Optional<CompletableFuture<String>> upload(File file, Runnable preparedAction, Consumer<String> callback, Type fileType) {
         if (!Configuration.getBoolean(Configuration.Parameter.S3_UPLOAD_ENABLE)) {
-            LOGGER.debug("there is no sense to continue as saving screenshots onto S3 is disabled.");
+            LOGGER.debug("there is no sense to continue as saving artifacts onto S3 is disabled.");
             return Optional.empty();
         }
 
