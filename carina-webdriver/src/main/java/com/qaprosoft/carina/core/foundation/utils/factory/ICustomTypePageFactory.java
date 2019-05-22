@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 
 import com.qaprosoft.carina.core.foundation.exception.RequiredCtorNotFoundException;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
@@ -31,7 +32,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
     String DOUBLE_OBJ_STR = "class java.lang.Double";
     String DOUBLE_STR = "double";
 
-    Reflections REFLECTIONS = new Reflections("");
+    Reflections REFLECTIONS = new Reflections("", new SubTypesScanner());
 
     Logger LOG = Logger.getLogger(ICustomTypePageFactory.class);
 
