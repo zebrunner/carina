@@ -262,6 +262,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestFailure(ITestResult result) {
         onTestFinish(result);
+        quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
         super.onTestFailure(result);
     }
 
