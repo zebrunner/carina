@@ -132,7 +132,7 @@ public class DesktopFactory extends AbstractFactory {
 		    String protocol = R.CONFIG.get(vnc_protocol);
 			String host = R.CONFIG.get(vnc_host);
 			String port = R.CONFIG.get(vnc_port); 
-			// If VNC host/port not set user them from Selenim
+			// If VNC host/port not set user them from Selenium
 			if(StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
 			    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
 			    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
