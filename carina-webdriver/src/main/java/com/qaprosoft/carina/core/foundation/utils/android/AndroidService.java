@@ -37,7 +37,6 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExec
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -48,7 +47,7 @@ import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchange
 
 import io.appium.java_client.android.AndroidDriver;
 
-public class AndroidService implements IDriverPool {
+public class AndroidService implements IDriverPool, IAndroidUtils {
 
     private static final Logger LOGGER = Logger.getLogger(AndroidService.class);
 
@@ -67,10 +66,6 @@ public class AndroidService implements IDriverPool {
     private final String FAKE_GPS_APP_PATH = "app/FakeGPSLocation.apk";
     private final String FAKE_GPS_APP_ACTIVITY = "com.lexa.fakegps/com.lexa.fakegps.ui.Main";
     private final String FAKE_GPS_APP_PACKAGE = "com.lexa.fakegps";
-
-    private String[] baseInitCmd;
-
-    private AdbExecutor executor;
 
     public enum ChangeTimeZoneWorkflow {
         ADB(1), // 0b001
@@ -94,11 +89,6 @@ public class AndroidService implements IDriverPool {
 
     private static AndroidService instance;
 
-    private AndroidService() {
-        executor = new AdbExecutor();
-        baseInitCmd = executor.getDefaultCmd();
-    }
-
     static {
         try {
             instance = new AndroidService();
@@ -112,42 +102,6 @@ public class AndroidService implements IDriverPool {
     }
 
     // Common methods
-
-    /**
-     * executeAbdCommand
-     *
-     * @param command String
-     * @return String command output in one line
-     */
-    public String executeAdbCommand(String command) {
-        String deviceName = IDriverPool.getDefaultDevice().getAdbName();
-        if (!deviceName.isEmpty()) {
-            // add remoteURL/udid reference
-            command = "-s " + deviceName + " " + command;
-        } else {
-            LOGGER.warn("nullDevice detected fot current thread!");
-        }
-
-        String result = "";
-        LOGGER.info("Command: " + command);
-        String[] listOfCommands = command.split(" ");
-
-        String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
-
-        try {
-            LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
-            List<String> execOutput = executor.execute(execCmd);
-            LOGGER.info("Output after execution ADB command: " + execOutput);
-
-            result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
-
-            LOGGER.info("Returning Output: " + result);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-
-        return result;
-    }
 
     /**
      * press Home button to open home screen
@@ -214,6 +168,9 @@ public class AndroidService implements IDriverPool {
      * @param apk String
      * @return boolean
      */
+    /**
+     * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#isAppRunning(String apk)} instead.
+     */
     public boolean checkCurrentDeviceFocus(String apk) {
         String res = getCurrentDeviceFocus();
         if (res.contains(apk)) {
@@ -223,16 +180,6 @@ public class AndroidService implements IDriverPool {
             LOGGER.error("Not expected apk '" + apk + "' is in focus. Actual result is: " + res);
             return false;
         }
-    }
-
-    /**
-     * getCurrentDeviceFocus - get actual device apk in focus
-     *
-     * @return String
-     */
-    public String getCurrentDeviceFocus() {
-        String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
-        return result;
     }
 
     /**
@@ -804,7 +751,7 @@ public class AndroidService implements IDriverPool {
             res = fakeGpsPage.locationSearch(location);
             if (res) {
                 LOGGER.info("Set Fake GPS locale: " + location);
-                MobileUtils.hideKeyboard();
+                hideKeyboard();
                 fakeGpsPage.clickSetLocation();
             }
             res = true;
