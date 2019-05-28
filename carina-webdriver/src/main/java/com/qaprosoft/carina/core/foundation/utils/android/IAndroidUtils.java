@@ -607,8 +607,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return boolean
      */
     default boolean isAppRunning(String apk) {
-        AndroidService androidService = AndroidService.getInstance();
-        String res = androidService.getCurrentDeviceFocus();
+        String res = getCurrentDeviceFocus();
         if (res.contains(apk)) {
             LOGGER.info("Actual device focus is as expected and contains package or activity: '" + apk + "'.");
             return true;
