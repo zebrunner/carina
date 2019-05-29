@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -36,7 +34,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileBy;
@@ -47,7 +44,6 @@ import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.touch.offset.PointOption;
-import io.appium.java_client.windows.PressesKeyCode;
 
 public interface IAndroidUtils extends IMobileUtils {
     
@@ -57,23 +53,6 @@ public interface IAndroidUtils extends IMobileUtils {
     static final long SCROLL_TIMEOUT = 300;
     AdbExecutor executor = new AdbExecutor();
     String[] baseInitCmd = executor.getDefaultCmd();
-
-    /**
-     * press Key Code
-     *
-     * @param keyCode int
-     * @return boolean
-     */
-    default public boolean pressKeyCode(int keyCode) {
-        try {
-            LOGGER.info("Press key code: " + keyCode);
-            ((PressesKeyCode) castDriver()).pressKeyCode(keyCode);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Exception during pressKeyCode:", e);
-        }
-        return false;
-    }
     
     default public void pressKeyboardKey(AndroidKey key) {
         ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(key)
