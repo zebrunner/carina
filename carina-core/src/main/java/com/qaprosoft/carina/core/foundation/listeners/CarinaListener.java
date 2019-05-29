@@ -294,8 +294,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private void onTestFinish(ITestResult result) {
         try {
             LOGGER.debug("Test result is : " + result.getStatus());
-            // result status == 2 means failure. We need to quit driver anyway for failure
-            if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2) {
+            // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
+            if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
                 quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
 
