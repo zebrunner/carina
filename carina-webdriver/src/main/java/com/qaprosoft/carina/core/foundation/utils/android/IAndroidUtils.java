@@ -81,6 +81,8 @@ public interface IAndroidUtils extends IMobileUtils {
         pressBottomRightKey();
     }
 
+    
+    //TODO Update this method using findByImage strategy
     /**
      * Pressing bottom right button on the keyboard by coordinates: "search",
      * "ok", "next", etc. - various keys appear at this position. Tested at
