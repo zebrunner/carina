@@ -99,29 +99,6 @@ public interface IAndroidUtils extends IMobileUtils {
         PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue());
         new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
     }
-
-    /**
-     * wait Until Element Not Present
-     *
-     * @param locator By
-     * @param timeout long
-     * @param pollingTime long
-     */
-    @Deprecated
-    default public void waitUntilElementNotPresent(final By locator, final long timeout, final long pollingTime) {
-        LOGGER.info(String.format("Wait until element %s disappear", locator.toString()));
-        WebDriver driver = castDriver();
-        try {
-            if (new WebDriverWait(driver, timeout, pollingTime).until(ExpectedConditions.invisibilityOfElementLocated(locator))) {
-                LOGGER.info(String.format("Element located by: %s not present.", locator.toString()));
-            } else {
-                LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
-            }
-        } catch (TimeoutException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
-        }
-    }
     
     /**
      * change Android Device Language
