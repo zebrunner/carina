@@ -139,9 +139,8 @@ public interface IAndroidUtils extends IMobileUtils {
         }
     }
     
-    @SuppressWarnings("deprecation")
     default public void pressBack() {
-        ((AndroidDriver<?>) castDriver()).pressKeyCode(AndroidKeyCode.BACK);
+        ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
