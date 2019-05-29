@@ -58,21 +58,6 @@ public interface IAndroidUtils extends IMobileUtils {
     AdbExecutor executor = new AdbExecutor();
     String[] baseInitCmd = executor.getDefaultCmd();
 
-
-    /**
-     * execute Key Event
-     *
-     * @param keyCode int
-     */
-    default public void executeKeyEvent(int keyCode) {
-        WebDriver driver = castDriver();
-        LOGGER.info("Execute key event: " + keyCode);
-        HashMap<String, Integer> keyCodeMap = new HashMap<String, Integer>();
-        keyCodeMap.put("keycode", keyCode);
-        ((JavascriptExecutor) driver).executeScript("mobile: keyevent", keyCodeMap);
-
-    }
-
     /**
      * press Key Code
      *
@@ -86,12 +71,6 @@ public interface IAndroidUtils extends IMobileUtils {
             return true;
         } catch (Exception e) {
             LOGGER.error("Exception during pressKeyCode:", e);
-            try {
-                LOGGER.info("Press key code by javaScript: " + keyCode);
-                executeKeyEvent(keyCode);
-            } catch (Exception err2) {
-                LOGGER.error("Exception during pressKeyCode with JavaScript:", err2);
-            }
         }
         return false;
     }
