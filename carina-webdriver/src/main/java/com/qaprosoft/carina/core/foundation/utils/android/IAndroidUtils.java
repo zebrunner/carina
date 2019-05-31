@@ -27,12 +27,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -611,33 +609,6 @@ public interface IAndroidUtils extends IMobileUtils {
 
         if (elapsed > SCROLL_TIMEOUT) {
             throw new NoSuchElementException("Scroll timeout has been reached..");
-        }
-    }
-    
-    /**
-     * Check running apk by appPackage or appActivity from Capabilities
-     *
-     * @return boolean
-     */
-    default boolean isAppRunning() {
-        Capabilities capabilities = ((RemoteWebDriver) castDriver()).getCapabilities();
-        return isAppRunning(String.valueOf(capabilities.getCapability("appPackage"))) || isAppRunning(String.valueOf(capabilities.getCapability("appActivity")));
-    }
-    
-    /**
-     * Check running apk 
-     *
-     * @param apk String
-     * @return boolean
-     */
-    default boolean isAppRunning(String apk) {
-        String res = getCurrentDeviceFocus();
-        if (res.contains(apk)) {
-            LOGGER.info("Actual device focus is as expected and contains package or activity: '" + apk + "'.");
-            return true;
-        } else {
-            LOGGER.error("Not expected apk '" + apk + "' is in focus. Actual result is: " + res);
-            return false;
         }
     }
     
