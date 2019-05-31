@@ -15,26 +15,28 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -42,148 +44,28 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidKeyCode;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.touch.offset.PointOption;
-import io.appium.java_client.windows.PressesKeyCode;
 
 public interface IAndroidUtils extends IMobileUtils {
     
     //TODO: review carefully and remove duplicates and migrate completely to fluent waits
-    static final Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
+    static  Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
     AdbExecutor executor = new AdbExecutor();
     String[] baseInitCmd = executor.getDefaultCmd();
-
-
-    /**
-     * execute Key Event
-     *
-     * @param keyCode int
-     */
-    default public void executeKeyEvent(int keyCode) {
-        WebDriver driver = castDriver();
-        LOGGER.info("Execute key event: " + keyCode);
-        HashMap<String, Integer> keyCodeMap = new HashMap<String, Integer>();
-        keyCodeMap.put("keycode", keyCode);
-        ((JavascriptExecutor) driver).executeScript("mobile: keyevent", keyCodeMap);
-
-    }
-
-    /**
-     * press Key Code
-     *
-     * @param keyCode int
-     * @return boolean
-     */
-    default public boolean pressKeyCode(int keyCode) {
-        try {
-            LOGGER.info("Press key code: " + keyCode);
-            ((PressesKeyCode) castDriver()).pressKeyCode(keyCode);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Exception during pressKeyCode:", e);
-            try {
-                LOGGER.info("Press key code by javaScript: " + keyCode);
-                executeKeyEvent(keyCode);
-            } catch (Exception err2) {
-                LOGGER.error("Exception during pressKeyCode with JavaScript:", err2);
-            }
-        }
-        return false;
-    }
+    static final String LANGUAGE_CHANGE_APP_PATH = "app/ADB_Change_Language.apk";
     
     default public void pressKeyboardKey(AndroidKey key) {
         ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(key)
                 .withFlag(KeyEventFlag.SOFT_KEYBOARD).withFlag(KeyEventFlag.KEEP_TOUCH_MODE).withFlag(KeyEventFlag.EDITOR_ACTION));
     }
-
-    /**
-     * swipe In Container
-     *
-     * @param elem - scrollable container
-     * @param times - swipe times
-     * @param direction -Direction {LEFT, RIGHT, UP, DOWN}
-     * @param duration - duration in msec.
-     */
-    @Deprecated
-    default public void swipeInContainer(ExtendedWebElement elem, int times, Direction direction, int duration) {
-
-        // Default direction left
-        double directMultX1 = 0.9;
-        double directMultX2 = 0.1;
-        double directMultY1 = 0.5;
-        double directMultY2 = 0.5;
-
-        WebDriver driver = castDriver();
-
-        if (direction.equals(Direction.RIGHT)) {
-            directMultX1 = 0.2;
-            directMultX2 = 0.9;
-            directMultY1 = 0.5;
-            directMultY2 = 0.5;
-            LOGGER.info("Swipe right");
-        } else if (direction.equals(Direction.LEFT)) {
-            directMultX1 = 0.9;
-            directMultX2 = 0.2;
-            directMultY1 = 0.5;
-            directMultY2 = 0.5;
-            LOGGER.info("Swipe left");
-        } else if (direction.equals(Direction.UP)) {
-            directMultX1 = 0.1;
-            directMultX2 = 0.1;
-            directMultY1 = 0.2;
-            directMultY2 = 0.9;
-            LOGGER.info("Swipe up");
-        } else if (direction.equals(Direction.DOWN)) {
-            directMultX1 = 0.1;
-            directMultX2 = 0.1;
-            directMultY1 = 0.9;
-            directMultY2 = 0.2;
-            LOGGER.info("Swipe down");
-        } else if (direction.equals(Direction.VERTICAL) || direction.equals(Direction.HORIZONTAL)
-                || direction.equals(Direction.HORIZONTAL_RIGHT_FIRST) || direction.equals(Direction.VERTICAL_DOWN_FIRST)) {
-            LOGGER.info("Incorrect swipe direction: " + direction.toString());
-            return;
-        }
-
-        int x = elem.getElement().getLocation().getX();
-        int y = elem.getElement().getLocation().getY();
-        
-        Dimension size = helper.performIgnoreException(() -> elem.getElement().getSize());
-        int width = size.getWidth();
-        int height = size.getHeight();
-        
-        
-        size = helper.performIgnoreException(() -> driver.manage().window().getSize());
-        int screen_size_x = size.getWidth();
-        int screen_size_y = size.getHeight();
-
-        LOGGER.debug("x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", screen width=" + screen_size_x + ", screen height="
-                + screen_size_y);
-        LOGGER.info("Swiping in container:" + elem.getNameWithLocator());
-        for (int i = 0; i <= times; i++) {
-            int pointX1 = (int) (x + (width * directMultX1));
-            int pointY1 = (int) (y + (height * directMultY1));
-            int pointX2 = (int) (x + (width * directMultX2));
-            int pointY2 = (int) (y + (height * directMultY2));
-
-            LOGGER.debug(
-                    "Direction:" + direction + ". Try #" + i + ". Points: X1Y1=" + pointX1 + ", " + pointY1 + ", X2Y2=" + pointX2 + ", " + pointY2);
-            try {
-                swipe(pointX1, pointY1, pointX2, pointY2, duration);
-            } catch (Exception e) {
-                LOGGER.error("Exception: " + e);
-            }
-        }
-    }
     
-    @SuppressWarnings("deprecation")
     default public void pressBack() {
-        ((AndroidDriver<?>) castDriver()).pressKeyCode(AndroidKeyCode.BACK);
+        ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
@@ -204,6 +86,8 @@ public interface IAndroidUtils extends IMobileUtils {
         pressBottomRightKey();
     }
 
+    
+    //TODO Update this method using findByImage strategy
     /**
      * Pressing bottom right button on the keyboard by coordinates: "search",
      * "ok", "next", etc. - various keys appear at this position. Tested at
@@ -220,29 +104,8 @@ public interface IAndroidUtils extends IMobileUtils {
         PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue());
         new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
     }
-
-    /**
-     * wait Until Element Not Present
-     *
-     * @param locator By
-     * @param timeout long
-     * @param pollingTime long
-     */
-    @Deprecated
-    default public void waitUntilElementNotPresent(final By locator, final long timeout, final long pollingTime) {
-        LOGGER.info(String.format("Wait until element %s disappear", locator.toString()));
-        WebDriver driver = castDriver();
-        try {
-            if (new WebDriverWait(driver, timeout, pollingTime).until(ExpectedConditions.invisibilityOfElementLocated(locator))) {
-                LOGGER.info(String.format("Element located by: %s not present.", locator.toString()));
-            } else {
-                LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
-            }
-        } catch (TimeoutException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
-        }
-    }
+    
+    // Change Device Language section
     
     /**
      * change Android Device Language
@@ -269,12 +132,171 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return boolean
      */
     default public boolean setDeviceLanguage(String language) {
-
-        AndroidService executor = AndroidService.getInstance();
-
-        boolean status = executor.setDeviceLanguage(language);
-
+        boolean status = setDeviceLanguage(language, true, 20);
         return status;
+    }
+    
+    /**
+     * change Android Device Language
+     * <p>
+     * Url: <a href=
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * ADBChangeLanguage apk </a> Change locale (language) of your device via
+     * ADB (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to
+     * root your device! With ADB (Android Debug Bridge) on your computer, you
+     * can fast switch the device locale to see how your application UI looks on
+     * different languages. Usage: - install this app - setup adb connection to
+     * your device (http://developer.android.com/tools/help/adb.html) - Android
+     * OS 4.2 onwards (tip: you can copy the command here and paste it to your
+     * command console): adb shell pm grant net.sanapeli.adbchangelanguage
+     * android.permission.CHANGE_CONFIGURATION
+     * <p>
+     * English: adb shell am start -n
+     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en Russian:
+     * adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage
+     * -e language ru Spanish: adb shell am start -n
+     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
+     *
+     * @param language to set. Can be es, en, etc.
+     * @param changeConfig boolean if true - update config locale and language
+     *            params
+     * @param waitTime int wait in seconds before device refresh.
+     * @return boolean
+     */
+    default public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
+        boolean status = false;
+
+        String initLanguage = language;
+
+        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
+
+        LOGGER.info("Do not concat language for Android. Keep: " + language);
+        language = language.replace("_", "-");
+        LOGGER.info("Refactor language to : " + language);
+
+        String actualDeviceLanguage = getDeviceLanguage();
+
+        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
+            LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
+            return true;
+        }
+
+        String setLocalizationChangePermissionCmd = "shell pm grant net.sanapeli.adbchangelanguage android.permission.CHANGE_CONFIGURATION";
+
+        String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language " + language;
+
+        LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
+        String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
+
+        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
+            LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
+            installApk(LANGUAGE_CHANGE_APP_PATH, true);
+            expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
+        }
+
+        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
+
+        LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
+        String changeLocaleOutput = executeAdbCommand(setLocalizationCmd);
+        LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : " + changeLocaleOutput);
+
+        if (waitTime > 0) {
+            LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
+            CommonUtils.pause(waitTime);
+        }
+
+        if (changeConfig) {
+            String loc;
+            String lang;
+            if (initLanguage.contains("_")) {
+                lang = initLanguage.split("_")[0];
+                loc = initLanguage.split("_")[1];
+            } else {
+                lang = initLanguage;
+                loc = initLanguage;
+            }
+            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
+            R.CONFIG.put("locale", loc);
+            R.CONFIG.put("language", lang);
+        }
+
+        actualDeviceLanguage = getDeviceLanguage();
+        LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
+        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
+            status = true;
+        } else {
+            if (getDeviceLanguage().isEmpty()) {
+                LOGGER.info("Adb return empty response without errors.");
+                status = true;
+            } else {
+                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
+                LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
+                if (currentAndroidVersion.contains("7.")) {
+                    LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
+                    status = !getDeviceLanguage().toLowerCase().contains("error");
+                }
+            }
+        }
+        return status;
+    }
+    
+    /**
+     * getDeviceLanguage
+     *
+     * @return String
+     */
+    default public String getDeviceLanguage() {
+        String locale = executeAdbCommand("shell getprop persist.sys.language");
+        if (locale.isEmpty()) {
+            locale = executeAdbCommand("shell getprop persist.sys.locale");
+        }
+        return locale;
+    }
+    
+    // End Language Change section
+    
+    /**
+     * install android Apk by path to apk file.
+     *
+     * @param apkPath String
+     */
+    default public void installApk(final String apkPath) {
+        installApk(apkPath, false);
+    }
+
+    /**
+     * install android Apk by path to apk or by name in classpath.
+     *
+     * @param apkPath String
+     * @param inClasspath boolean
+     */
+    default public void installApk(final String apkPath, boolean inClasspath) {
+
+        String filePath = apkPath;
+        if (inClasspath) {
+            URL baseResource = ClassLoader.getSystemResource(apkPath);
+            if (baseResource == null) {
+                throw new RuntimeException("Unable to get resource from classpath: " + apkPath);
+            } else {
+                LOGGER.debug("Resource was found: " + baseResource.getPath());
+            }
+
+            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." + FilenameUtils.getExtension(baseResource.getPath());
+            // make temporary copy of resource in artifacts folder
+            filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
+
+            File file = new File(filePath);
+            if (!file.exists()) {
+                InputStream link = (ClassLoader.getSystemResourceAsStream(apkPath));
+                try {
+                    Files.copy(link, file.getAbsoluteFile().toPath());
+                } catch (IOException e) {
+                    LOGGER.error("Unable to extract resource from ClassLoader!", e);
+                }
+            }
+        }
+
+        executeAdbCommand("install " + filePath);
     }
     
     default public boolean isChecked(final ExtendedWebElement element) {
@@ -587,33 +609,6 @@ public interface IAndroidUtils extends IMobileUtils {
 
         if (elapsed > SCROLL_TIMEOUT) {
             throw new NoSuchElementException("Scroll timeout has been reached..");
-        }
-    }
-    
-    /**
-     * Check running apk by appPackage or appActivity from Capabilities
-     *
-     * @return boolean
-     */
-    default boolean isAppRunning() {
-        Capabilities capabilities = ((RemoteWebDriver) castDriver()).getCapabilities();
-        return isAppRunning(String.valueOf(capabilities.getCapability("appPackage"))) || isAppRunning(String.valueOf(capabilities.getCapability("appActivity")));
-    }
-    
-    /**
-     * Check running apk 
-     *
-     * @param apk String
-     * @return boolean
-     */
-    default boolean isAppRunning(String apk) {
-        String res = getCurrentDeviceFocus();
-        if (res.contains(apk)) {
-            LOGGER.info("Actual device focus is as expected and contains package or activity: '" + apk + "'.");
-            return true;
-        } else {
-            LOGGER.error("Not expected apk '" + apk + "' is in focus. Actual result is: " + res);
-            return false;
         }
     }
     
