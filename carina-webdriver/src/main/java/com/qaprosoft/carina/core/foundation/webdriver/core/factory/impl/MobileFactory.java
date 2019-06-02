@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
@@ -331,27 +332,44 @@ public class MobileFactory extends AbstractFactory {
         return remoteDevice;
     }
 
-    @Override
-    public String getVncURL(WebDriver driver) {
-        String vncURL = null;
-        if (driver instanceof RemoteWebDriver) {
-            final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-			RemoteDevice rd = getDeviceInfo(rwd);
-            if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
-                if (rd.getVnc().matches(".+:\\d+")) {
-                    // host:port format
-                    final String protocol = R.CONFIG.get(vnc_protocol);
-                    final String host = rd.getVnc().split(":")[0];
-                    final String port = rd.getVnc().split(":")[1];
-                    vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port);
-                } else {
-                    // ws://host:port/websockify format
-                    vncURL = rd.getVnc();
-                }
-            }
-        }
-        return vncURL;
-    }
+	@Override
+	public String getVncURL(WebDriver driver) {
+		String vncURL = null;
+
+		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
+			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
+
+			switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+			case SELENIUM:
+				RemoteDevice rd = getDeviceInfo(rwd);
+				if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
+					if (rd.getVnc().matches(".+:\\d+")) {
+						// host:port format
+						final String protocol = R.CONFIG.get(vnc_protocol);
+						final String host = rd.getVnc().split(":")[0];
+						final String port = rd.getVnc().split(":")[1];
+						vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port);
+					} else {
+						// ws://host:port/websockify format
+						vncURL = rd.getVnc();
+					}
+				}
+				break;
+			case MOON:
+				String protocol = R.CONFIG.get(vnc_protocol);
+				String host = R.CONFIG.get(vnc_host);
+				String port = R.CONFIG.get(vnc_port); 
+				// If VNC host/port not set user them from Selenium
+				if(StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
+				    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
+				    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
+				}
+				vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port, rwd.getSessionId().toString());
+				break;
+			}
+		}
+		return vncURL;
+	}
     
     @Override
     protected int getBitrate(VideoQuality quality) {
