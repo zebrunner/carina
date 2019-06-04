@@ -23,19 +23,19 @@ import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
- * MoonRecordingListener - saves moon video artifact link before driver is closed.
+ * ZebrunnerRecordingListener - saves video artifact link before driver is closed.
  * 
  * @author akhursevich
  */
-public class MoonRecordingListener implements IDriverCommandListener {
+public class ZebrunnerRecordingListener implements IDriverCommandListener {
 
-	protected static final Logger LOGGER = Logger.getLogger(MoonRecordingListener.class);
+	protected static final Logger LOGGER = Logger.getLogger(ZebrunnerRecordingListener.class);
 
 	private TestArtifactType videoArtifact;
 	
 	private boolean recording = false;
 
-	public MoonRecordingListener(TestArtifactType videoArtifact) {
+	public ZebrunnerRecordingListener(TestArtifactType videoArtifact) {
 		this.videoArtifact = videoArtifact;
 	}
 

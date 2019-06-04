@@ -40,7 +40,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory.HubType;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.MoonRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
 
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
@@ -73,11 +73,11 @@ public class DesktopFactory extends AbstractFactory {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
             	
                 switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-				case SELENIUM:
+				case DEFAULT:
 					ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
 					break;
-				case MOON:
-					ce.getListeners().add(new MoonRecordingListener(initVideoArtifact("%s/" + videoName)));
+				case ZEBRUNNER:
+					ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
 					break;
 				}
             }

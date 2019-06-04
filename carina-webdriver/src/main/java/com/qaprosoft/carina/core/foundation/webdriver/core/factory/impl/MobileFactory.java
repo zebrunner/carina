@@ -40,7 +40,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.MoonRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -143,13 +143,13 @@ public class MobileFactory extends AbstractFactory {
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-        				case SELENIUM:
+        				case DEFAULT:
         					ce.getListeners()
                             	.add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2,
                                     initVideoArtifact(videoName)));
         					break;
-        				case MOON:
-        					ce.getListeners().add(new MoonRecordingListener(initVideoArtifact("%s/" + videoName)));
+        				case ZEBRUNNER:
+        					ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
         					break;
         				}
                     }
@@ -189,11 +189,11 @@ public class MobileFactory extends AbstractFactory {
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
                         
                         switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-        				case SELENIUM:
+        				case DEFAULT:
         					ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
         					break;
-        				case MOON:
-        					LOGGER.info("Video recording is not supported in Moon iOS");
+        				case ZEBRUNNER:
+        					LOGGER.info("Video recording is not supported in Zebrunner for iOS");
         					break;
         				}
                     }
@@ -340,7 +340,7 @@ public class MobileFactory extends AbstractFactory {
 			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 
 			switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-			case SELENIUM:
+			case DEFAULT:
 				RemoteDevice rd = getDeviceInfo(rwd);
 				if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
 					if (rd.getVnc().matches(".+:\\d+")) {
@@ -355,7 +355,7 @@ public class MobileFactory extends AbstractFactory {
 					}
 				}
 				break;
-			case MOON:
+			case ZEBRUNNER:
 				String protocol = R.CONFIG.get(vnc_protocol);
 				String host = R.CONFIG.get(vnc_host);
 				String port = R.CONFIG.get(vnc_port); 
