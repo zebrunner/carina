@@ -15,36 +15,31 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
-import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
+
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 
 /**
  * Tests for {@link Ownership}
  */
 public class MethodOwnerTest {
 
-    private static final String OWNER = "testowner";
-    private static final String SECONDARY_OWNER = "testSecondOwner";
+    private static final String ANDROID_OWNER = "androidTestOwner";
+    private static final String IOS_OWNER = "iosTestOwner";
 
     @Test
-    @MethodOwner(owner = OWNER)
+    @MethodOwner(owner = ANDROID_OWNER, platform = SpecialKeywords.ANDROID)
+    @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
     public void testMethodOwner() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PRIMARY);
-        Assert.assertEquals(ownerName, OWNER);
-    }
-
-    @Test
-    @MethodOwner(owner = OWNER, secondaryOwner = SECONDARY_OWNER)
-    public void testMethodSecondaryOwner() {
-        ITestResult result = Reporter.getCurrentTestResult();
-        String ownerName = Ownership.getMethodOwner(result, Ownership.OwnerType.PRIMARY);
-        Assert.assertEquals(ownerName, OWNER);
-        String secondOwnerName = Ownership.getMethodOwner(result, Ownership.OwnerType.SECONDARY);
-        Assert.assertEquals(secondOwnerName, SECONDARY_OWNER);
+        String ownerName = Ownership.getMethodOwner(result, SpecialKeywords.ANDROID);
+        Assert.assertEquals(ownerName, ANDROID_OWNER);
+        String secondOwnerName = Ownership.getMethodOwner(result, SpecialKeywords.IOS);
+        Assert.assertEquals(secondOwnerName, IOS_OWNER);
     }
 }

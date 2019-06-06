@@ -34,7 +34,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
-import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership.OwnerType;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
@@ -107,18 +106,20 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         return owner != null ? owner : "";
     }
 
+    //TODO need to update this method in com.qaprosoft.zafira.config.IConfigurator on getAndroidOwner
     @Override
     public String getPrimaryOwner(ITestResult test) {
         // TODO: re-factor that
-        String primaryOwner = Ownership.getMethodOwner(test, OwnerType.PRIMARY); 
+        String primaryOwner = Ownership.getMethodOwner(test, SpecialKeywords.ANDROID); 
         LOGGER.debug("primaryOwner: " + primaryOwner);
         return primaryOwner;
     }
 
+    //TODO need to update this method in com.qaprosoft.zafira.config.IConfigurator on getIosOwner
     @Override
     public String getSecondaryOwner(ITestResult test) {
         // TODO: re-factor that
-        String secondaryOwner = Ownership.getMethodOwner(test, OwnerType.SECONDARY);
+        String secondaryOwner = Ownership.getMethodOwner(test, SpecialKeywords.IOS);
         LOGGER.debug("secondaryOwner: " + secondaryOwner);
         return secondaryOwner;
     }
