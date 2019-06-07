@@ -119,6 +119,10 @@ public class CryptoTool {
                 content = StringUtils.replace(content, group, decrypt(crypt));
             }
         }
+        if (content == null) {
+            // fix potential null pointer exception in doType
+            content = "";
+        }
         return content;
     }
 

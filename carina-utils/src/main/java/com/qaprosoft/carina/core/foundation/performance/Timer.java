@@ -52,9 +52,11 @@ public class Timer {
         String operationKey =  operation.getKey() + key;
         Map<String, Long> testTimer = getTimer();
         if (testTimer.containsKey(operationKey)) {
-            throw new RuntimeException("Operation already started: " + operationKey);
+            // do not put new time as the same operation already started.
+            LOGGER.error("Operation already started: " + operationKey);
+        } else {
+            testTimer.put(operationKey, Calendar.getInstance().getTimeInMillis());
         }
-        testTimer.put(operationKey, Calendar.getInstance().getTimeInMillis());
     }
 
     /**
