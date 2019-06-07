@@ -90,7 +90,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String test = TestNamingUtil.getCanonicalTestName(result);
 
         String errorMessage = getFailureReason(result);
-
+        
+        //TODO: think about this step. We don't have alive driver here
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
 
         String deviceName = getDeviceName();
@@ -622,7 +623,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         configFailures.set(resultItem);
     }
 
-    private String takeScreenshot(ITestResult result, String msg) {
+    protected String takeScreenshot(ITestResult result, String msg) {
         String screenId = "";
 
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
