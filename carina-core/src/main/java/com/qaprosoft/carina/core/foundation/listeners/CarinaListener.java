@@ -260,6 +260,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestFailure(ITestResult result) {
+        String errorMessage = getFailureReason(result);
+        takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestFailure(result);
     }
