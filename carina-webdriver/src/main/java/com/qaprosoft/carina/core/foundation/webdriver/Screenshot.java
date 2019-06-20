@@ -169,8 +169,11 @@ public class Screenshot {
      * location.
      * 
      * @param driver
-     *            instance used for capturing.
-     * @param comment String
+     *          instance used for capturing.
+     * @param comment 
+     * 			String comment
+     * @param artifact
+     * 			boolean artifact
      * @return screenshot name.
      */
     public static String captureFullSize(WebDriver driver, String comment, boolean artifact) {
@@ -187,7 +190,10 @@ public class Screenshot {
      * 
      * @param driver
      *            instance used for capturing.
-     * @param comment String
+     * @param comment 
+     * 			String comment
+   	 * @param artifact
+     * 			boolean artifact
      * @return screenshot name.
      */
     public static String capture(WebDriver driver, String comment, boolean artifact) {

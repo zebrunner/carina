@@ -59,8 +59,11 @@ public class CustomTypePageFactory implements IDriverPool {
      * Each page should extend AbstractPage which implements ICustomTypePageFactory
      * 
      * @param driver
+     * 			WebDriver driver
      * @param parentClass
+     * 			Class parentClass
      * @param parameters
+     * 			Object... parameters
      * @return class instance
      */
     @Deprecated

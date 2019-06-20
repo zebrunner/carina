@@ -539,6 +539,9 @@ public interface IDriverPool {
     /**
      * Register device information for current thread by MobileFactory and clear SysLog for Android only
      * 
+     * @param device
+     *            String Device device
+     * 
      * @return Device device
      * 
      */
