@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report;
+package com.qaprosoft.carina.core.foundation.utils.ios;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import org.apache.log4j.Logger;
 
-class AsyncArtifact {
+import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 
-    private List<CompletableFuture<String>> urlFutures;
-    private String name;
-    private Integer expiresIn;
+import io.appium.java_client.ios.IOSDriver;
 
-    AsyncArtifact(List<CompletableFuture<String>> urlFutures, String name, Integer expiresIn) {
-        this.urlFutures = urlFutures;
-        this.name = name;
-        this.expiresIn = expiresIn;
+public interface IIosUtils extends IMobileUtils {
+    
+    static final Logger LOGGER = Logger.getLogger(IIosUtils.class);
+
+    /**
+     * Hide Keyboard
+     * Use com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.hideKeyboard()
+     */
+    @Deprecated
+    default public void hideKeyboard() {
+        try {
+            ((IOSDriver<?>) castDriver()).hideKeyboard();
+        } catch (Exception e) {
+            LOGGER.info("Keyboard was already hided");
+        }
     }
 
-    public List<CompletableFuture<String>> getUrlFutures() {
-        return urlFutures;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Integer getExpiresIn() {
-        return expiresIn;
-    }
 }

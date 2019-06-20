@@ -121,7 +121,7 @@ public class BrowserMobTest {
         Assert.assertTrue(content.get(0).contains(filterKey), "Response doesn't contain expected key!");
     }
 
-    @DataProvider(parallel = true)
+    @DataProvider(parallel = false)
     public static Object[][] dataProviderForMultiThreadProxy() {
         return new Object[][] {
                 { "Test1" },

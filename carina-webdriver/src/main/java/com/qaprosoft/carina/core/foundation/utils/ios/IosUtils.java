@@ -22,9 +22,7 @@ import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import io.appium.java_client.ios.IOSDriver;
 
 /**
- * Useful iOS utilities. For usage: import
- * com.qaprosoft.carina.core.foundation.utils.ios.IosUtils;
- *
+ * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.ios.IIosUtils()} instead.
  */
 public class IosUtils extends MobileUtils {
 

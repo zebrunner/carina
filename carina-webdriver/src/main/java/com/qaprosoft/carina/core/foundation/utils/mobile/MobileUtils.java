@@ -42,6 +42,10 @@ import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
 
+/**
+ * @deprecated use {@link #IMobileutils()} instead.
+ */
+@Deprecated
 public class MobileUtils {
     protected static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
 

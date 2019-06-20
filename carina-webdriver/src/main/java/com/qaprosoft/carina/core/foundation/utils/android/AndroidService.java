@@ -15,11 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,17 +22,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -48,7 +38,7 @@ import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchange
 
 import io.appium.java_client.android.AndroidDriver;
 
-public class AndroidService implements IDriverPool {
+public class AndroidService implements IDriverPool, IAndroidUtils {
 
     private static final Logger LOGGER = Logger.getLogger(AndroidService.class);
 
@@ -62,15 +52,9 @@ public class AndroidService implements IDriverPool {
     private final String TZ_CHANGE_APP_ACTIVITY = "com.futurek.android.tzc/com.futurek.android.tzc.MainActivity";
     private final String TZ_CHANGE_APP_PACKAGE = "com.futurek.android.tzc";
 
-    private final String LANGUAGE_CHANGE_APP_PATH = "app/ADB_Change_Language.apk";
-
     private final String FAKE_GPS_APP_PATH = "app/FakeGPSLocation.apk";
     private final String FAKE_GPS_APP_ACTIVITY = "com.lexa.fakegps/com.lexa.fakegps.ui.Main";
     private final String FAKE_GPS_APP_PACKAGE = "com.lexa.fakegps";
-
-    private String[] baseInitCmd;
-
-    private AdbExecutor executor;
 
     public enum ChangeTimeZoneWorkflow {
         ADB(1), // 0b001
@@ -94,11 +78,6 @@ public class AndroidService implements IDriverPool {
 
     private static AndroidService instance;
 
-    private AndroidService() {
-        executor = new AdbExecutor();
-        baseInitCmd = executor.getDefaultCmd();
-    }
-
     static {
         try {
             instance = new AndroidService();
@@ -112,42 +91,6 @@ public class AndroidService implements IDriverPool {
     }
 
     // Common methods
-
-    /**
-     * executeAbdCommand
-     *
-     * @param command String
-     * @return String command output in one line
-     */
-    public String executeAdbCommand(String command) {
-        String deviceName = IDriverPool.getDefaultDevice().getAdbName();
-        if (!deviceName.isEmpty()) {
-            // add remoteURL/udid reference
-            command = "-s " + deviceName + " " + command;
-        } else {
-            LOGGER.warn("nullDevice detected fot current thread!");
-        }
-
-        String result = "";
-        LOGGER.info("Command: " + command);
-        String[] listOfCommands = command.split(" ");
-
-        String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
-
-        try {
-            LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
-            List<String> execOutput = executor.execute(execCmd);
-            LOGGER.info("Output after execution ADB command: " + execOutput);
-
-            result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
-
-            LOGGER.info("Returning Output: " + result);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-
-        return result;
-    }
 
     /**
      * press Home button to open home screen
@@ -214,6 +157,9 @@ public class AndroidService implements IDriverPool {
      * @param apk String
      * @return boolean
      */
+    /**
+     * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#isAppRunning(String apk)} instead.
+     */
     public boolean checkCurrentDeviceFocus(String apk) {
         String res = getCurrentDeviceFocus();
         if (res.contains(apk)) {
@@ -223,16 +169,6 @@ public class AndroidService implements IDriverPool {
             LOGGER.error("Not expected apk '" + apk + "' is in focus. Actual result is: " + res);
             return false;
         }
-    }
-
-    /**
-     * getCurrentDeviceFocus - get actual device apk in focus
-     *
-     * @return String
-     */
-    public String getCurrentDeviceFocus() {
-        String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
-        return result;
     }
 
     /**
@@ -287,49 +223,7 @@ public class AndroidService implements IDriverPool {
         }
     }
 
-    /**
-     * install android Apk by path to apk file.
-     *
-     * @param apkPath String
-     */
-    public void installApk(final String apkPath) {
-        installApk(apkPath, false);
-    }
-
-    /**
-     * install android Apk by path to apk or by name in classpath.
-     *
-     * @param apkPath String
-     * @param inClasspath boolean
-     */
-    public void installApk(final String apkPath, boolean inClasspath) {
-
-        String filePath = apkPath;
-        if (inClasspath) {
-            URL baseResource = ClassLoader.getSystemResource(apkPath);
-            if (baseResource == null) {
-                throw new RuntimeException("Unable to get resource from classpath: " + apkPath);
-            } else {
-                LOGGER.debug("Resource was found: " + baseResource.getPath());
-            }
-
-            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." + FilenameUtils.getExtension(baseResource.getPath());
-            // make temporary copy of resource in artifacts folder
-            filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
-
-            File file = new File(filePath);
-            if (!file.exists()) {
-                InputStream link = (ClassLoader.getSystemResourceAsStream(apkPath));
-                try {
-                    Files.copy(link, file.getAbsoluteFile().toPath());
-                } catch (IOException e) {
-                    LOGGER.error("Unable to extract resource from ClassLoader!", e);
-                }
-            }
-        }
-
-        executeAdbCommand("install " + filePath);
-    }
+   
 
     /**
      * Open Development Settings on device
@@ -636,136 +530,6 @@ public class AndroidService implements IDriverPool {
 
     // End of Notification section
 
-    // Change Device Language section
-
-    /**
-     * change Android Device Language with default parameters
-     *
-     * @param language String
-     * @return boolean
-     */
-    public boolean setDeviceLanguage(String language) {
-        return setDeviceLanguage(language, true, 20);
-    }
-
-    /**
-     * change Android Device Language
-     * <p>
-     * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
-     * ADBChangeLanguage apk </a> Change locale (language) of your device via
-     * ADB (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to
-     * root your device! With ADB (Android Debug Bridge) on your computer, you
-     * can fast switch the device locale to see how your application UI looks on
-     * different languages. Usage: - install this app - setup adb connection to
-     * your device (http://developer.android.com/tools/help/adb.html) - Android
-     * OS 4.2 onwards (tip: you can copy the command here and paste it to your
-     * command console): adb shell pm grant net.sanapeli.adbchangelanguage
-     * android.permission.CHANGE_CONFIGURATION
-     * <p>
-     * English: adb shell am start -n
-     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en Russian:
-     * adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage
-     * -e language ru Spanish: adb shell am start -n
-     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
-     *
-     * @param language to set. Can be es, en, etc.
-     * @param changeConfig boolean if true - update config locale and language
-     *            params
-     * @param waitTime int wait in seconds before device refresh.
-     * @return boolean
-     */
-    public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
-        boolean status = false;
-
-        String initLanguage = language;
-
-        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
-
-        LOGGER.info("Do not concat language for Android. Keep: " + language);
-        language = language.replace("_", "-");
-        LOGGER.info("Refactor language to : " + language);
-
-        String actualDeviceLanguage = getDeviceLanguage();
-
-        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
-            LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
-            return true;
-        }
-
-        String setLocalizationChangePermissionCmd = "shell pm grant net.sanapeli.adbchangelanguage android.permission.CHANGE_CONFIGURATION";
-
-        String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language " + language;
-
-        LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
-        String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
-
-        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
-            LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
-            installApk(LANGUAGE_CHANGE_APP_PATH, true);
-            expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
-        }
-
-        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
-
-        LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
-        String changeLocaleOutput = executeAdbCommand(setLocalizationCmd);
-        LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : " + changeLocaleOutput);
-
-        if (waitTime > 0) {
-            LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
-            CommonUtils.pause(waitTime);
-        }
-
-        if (changeConfig) {
-            String loc;
-            String lang;
-            if (initLanguage.contains("_")) {
-                lang = initLanguage.split("_")[0];
-                loc = initLanguage.split("_")[1];
-            } else {
-                lang = initLanguage;
-                loc = initLanguage;
-            }
-            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
-            R.CONFIG.put("locale", loc);
-            R.CONFIG.put("language", lang);
-        }
-
-        actualDeviceLanguage = getDeviceLanguage();
-        LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
-        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
-            status = true;
-        } else {
-            if (getDeviceLanguage().isEmpty()) {
-                LOGGER.info("Adb return empty response without errors.");
-                status = true;
-            } else {
-                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
-                LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
-                if (currentAndroidVersion.contains("7.")) {
-                    LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
-                    status = !getDeviceLanguage().toLowerCase().contains("error");
-                }
-            }
-        }
-        return status;
-    }
-
-    /**
-     * getDeviceLanguage
-     *
-     * @return String
-     */
-    public String getDeviceLanguage() {
-        String locale = executeAdbCommand("shell getprop persist.sys.language");
-        if (locale.isEmpty()) {
-            locale = executeAdbCommand("shell getprop persist.sys.locale");
-        }
-        return locale;
-    }
-    // End Language Change section
-
     // Fake GPS section
 
     /**
@@ -804,7 +568,7 @@ public class AndroidService implements IDriverPool {
             res = fakeGpsPage.locationSearch(location);
             if (res) {
                 LOGGER.info("Set Fake GPS locale: " + location);
-                MobileUtils.hideKeyboard();
+                hideKeyboard();
                 fakeGpsPage.clickSetLocation();
             }
             res = true;
@@ -1015,7 +779,7 @@ public class AndroidService implements IDriverPool {
      * @return boolean
      */
     public boolean setDeviceTimeZone(String timeZone, TimeFormat timeFormat) {
-        return setDeviceTimeZone(timeZone, "", timeFormat, ChangeTimeZoneWorkflow.APK);
+        return setDeviceTimeZone(timeZone, "", timeFormat, "", ChangeTimeZoneWorkflow.APK);
     }
 
     /**
@@ -1028,7 +792,7 @@ public class AndroidService implements IDriverPool {
      * @return boolean
      */
     public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat) {
-        return setDeviceTimeZone(timeZone, settingsTZ, timeFormat, ChangeTimeZoneWorkflow.ALL);
+        return setDeviceTimeZone(timeZone, settingsTZ, timeFormat, "", ChangeTimeZoneWorkflow.ALL);
     }
 
     /**
@@ -1040,7 +804,7 @@ public class AndroidService implements IDriverPool {
      * @param workflow ChangeTimeZoneWorkflow
      * @return boolean
      */
-    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, ChangeTimeZoneWorkflow workflow) {
+    public boolean setDeviceTimeZone(String timeZone, String settingsTZ, TimeFormat timeFormat, String gmtStamp, ChangeTimeZoneWorkflow workflow) {
         boolean changed = false;
 
         getDriver(); // start driver in before class to assign it for particular
@@ -1071,7 +835,7 @@ public class AndroidService implements IDriverPool {
         // Note 3, S6, S5).
         if (!changed && ChangeTimeZoneWorkflow.SETTINGS.isSupported(workflow)) {
             LOGGER.info("Try to change TimeZone by Device Settings");
-            setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat);
+            setDeviceTimeZoneBySetting(timeZone, settingsTZ, timeFormat, gmtStamp);
             changed = applyTZChanges(ChangeTimeZoneWorkflow.SETTINGS, timeZone);
         }
 
@@ -1191,7 +955,7 @@ public class AndroidService implements IDriverPool {
      * @param settingsTZ String
      * @param timeFormat TimeFormat
      */
-    private void setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat) {
+    private void setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat, String gmtStamp) {
 
         String actualTZ = getDeviceActualTimeZone();
 
@@ -1213,16 +977,16 @@ public class AndroidService implements IDriverPool {
                 LOGGER.error("Not on '.Settings$DateTimeSettingsActivity' page");
             }
             DateTimeSettingsPage dtSettingsPage = new DateTimeSettingsPage(getDriver());
-            if (!dtSettingsPage.isOpened(3)) {
+            if (!dtSettingsPage.isOpened()) {
                 openDateTimeSettingsSetupWizard(true, timeFormat);
             }
-            if (dtSettingsPage.isOpened(3)) {
+            if (dtSettingsPage.isOpened()) {
                 LOGGER.info("Date Time Settings page was open.");
             } else {
                 LOGGER.error("Date Time Settings page should be open.");
             }
             dtSettingsPage.openTimeZoneSetting();
-            dtSettingsPage.selectTimeZone(tz, settingsTZ);
+            dtSettingsPage.selectTimeZone(timeZone, settingsTZ, gmtStamp);
             dtSettingsPage.clickNextButton();
 
         } catch (Exception e) {

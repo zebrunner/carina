@@ -670,6 +670,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         
 //        TODO: investigate with iOS: how does it work with iOS
 		if (!isConnected()) {
+		    LOGGER.debug("Device isConnected() returned false. Dump file won't be generated.");
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}

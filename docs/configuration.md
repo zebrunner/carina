@@ -355,11 +355,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>asignee_user@yuorcompany.com</td>
 	</tr>
 		<tr>
-		<td>s3_bucket_name</td>
-		<td>Bucket name on S3 Amazon from which you suppose to download artifacts</td>
-		<td>some bucket</td>
-	</tr>
-		<tr>
 		<td>access_key_id</td>
 		<td>Acces key id for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
@@ -373,11 +368,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>s3_local_storage</td>
 		<td>Directory for downloading artefacts</td>
 		<td>./s3</td>
-	</tr>
-		<tr>
-		<td>s3_save_screenshots</td>
-		<td>If enabled screenshots would be saved on S3 Amamzon</td>
-		<td>false, true</td>
 	</tr>
 		<tr>
 		<td>hockeyapp_token</td>

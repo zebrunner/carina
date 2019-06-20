@@ -15,6 +15,12 @@
         <requiredProperty key="zafira_access_token">
             <defaultValue>changeit</defaultValue>
         </requiredProperty>
+        <requiredProperty key="name">
+            <defaultValue>CarinaDemo</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="url">
+            <defaultValue>https://qaprosoft.com</defaultValue>
+        </requiredProperty>
   </requiredProperties>
   <fileSets>
     <fileSet filtered="true" packaged="true" encoding="UTF-8">

@@ -15,178 +15,57 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
+import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidKeyCode;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.touch.offset.PointOption;
-import io.appium.java_client.windows.PressesKeyCode;
 
-/**
- * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils()} instead.
- */
-public class AndroidUtils extends MobileUtils {
-
-	//TODO: review carefully and remove duplicates and migrate completely to fluent waits
-    protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
-    private static final int SCROLL_MAX_SEARCH_SWIPES = 55;
-    private static final long SCROLL_TIMEOUT = 300;
-
-
-    /**
-     * execute Key Event
-     *
-     * @param keyCode int
-     */
-    public static void executeKeyEvent(int keyCode) {
-        WebDriver driver = getDriver();
-        LOGGER.info("Execute key event: " + keyCode);
-        HashMap<String, Integer> keyCodeMap = new HashMap<String, Integer>();
-        keyCodeMap.put("keycode", keyCode);
-        ((JavascriptExecutor) driver).executeScript("mobile: keyevent", keyCodeMap);
-
-    }
-
-    /**
-     * press Key Code
-     *
-     * @param keyCode int
-     * @return boolean
-     */
-    public static boolean pressKeyCode(int keyCode) {
-        try {
-            LOGGER.info("Press key code: " + keyCode);
-            ((PressesKeyCode) getDriver()).pressKeyCode(keyCode);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Exception during pressKeyCode:", e);
-            try {
-                LOGGER.info("Press key code by javaScript: " + keyCode);
-                executeKeyEvent(keyCode);
-            } catch (Exception err2) {
-                LOGGER.error("Exception during pressKeyCode with JavaScript:", err2);
-            }
-        }
-        return false;
-    }
+public interface IAndroidUtils extends IMobileUtils {
     
-    public static void pressKeyboardKey(AndroidKey key) {
-        ((AndroidDriver<?>) getDriver()).pressKey(new KeyEvent(key)
+    //TODO: review carefully and remove duplicates and migrate completely to fluent waits
+    static  Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
+    static final int SCROLL_MAX_SEARCH_SWIPES = 55;
+    static final long SCROLL_TIMEOUT = 300;
+    AdbExecutor executor = new AdbExecutor();
+    String[] baseInitCmd = executor.getDefaultCmd();
+    static final String LANGUAGE_CHANGE_APP_PATH = "app/ADB_Change_Language.apk";
+    
+    default public void pressKeyboardKey(AndroidKey key) {
+        ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(key)
                 .withFlag(KeyEventFlag.SOFT_KEYBOARD).withFlag(KeyEventFlag.KEEP_TOUCH_MODE).withFlag(KeyEventFlag.EDITOR_ACTION));
     }
-
-    /**
-     * swipe In Container
-     *
-     * @param elem - scrollable container
-     * @param times - swipe times
-     * @param direction -Direction {LEFT, RIGHT, UP, DOWN}
-     * @param duration - duration in msec.
-     */
-    @Deprecated
-    public static void swipeInContainer(ExtendedWebElement elem, int times, Direction direction, int duration) {
-
-        // Default direction left
-        double directMultX1 = 0.9;
-        double directMultX2 = 0.1;
-        double directMultY1 = 0.5;
-        double directMultY2 = 0.5;
-
-        WebDriver driver = getDriver();
-
-        if (direction.equals(Direction.RIGHT)) {
-            directMultX1 = 0.2;
-            directMultX2 = 0.9;
-            directMultY1 = 0.5;
-            directMultY2 = 0.5;
-            LOGGER.info("Swipe right");
-        } else if (direction.equals(Direction.LEFT)) {
-            directMultX1 = 0.9;
-            directMultX2 = 0.2;
-            directMultY1 = 0.5;
-            directMultY2 = 0.5;
-            LOGGER.info("Swipe left");
-        } else if (direction.equals(Direction.UP)) {
-            directMultX1 = 0.1;
-            directMultX2 = 0.1;
-            directMultY1 = 0.2;
-            directMultY2 = 0.9;
-            LOGGER.info("Swipe up");
-        } else if (direction.equals(Direction.DOWN)) {
-            directMultX1 = 0.1;
-            directMultX2 = 0.1;
-            directMultY1 = 0.9;
-            directMultY2 = 0.2;
-            LOGGER.info("Swipe down");
-        } else if (direction.equals(Direction.VERTICAL) || direction.equals(Direction.HORIZONTAL)
-                || direction.equals(Direction.HORIZONTAL_RIGHT_FIRST) || direction.equals(Direction.VERTICAL_DOWN_FIRST)) {
-            LOGGER.info("Incorrect swipe direction: " + direction.toString());
-            return;
-        }
-
-        int x = elem.getElement().getLocation().getX();
-        int y = elem.getElement().getLocation().getY();
-        
-        Dimension size = helper.performIgnoreException(() -> elem.getElement().getSize());
-        int width = size.getWidth();
-        int height = size.getHeight();
-        
-        
-        size = helper.performIgnoreException(() -> driver.manage().window().getSize());
-        int screen_size_x = size.getWidth();
-        int screen_size_y = size.getHeight();
-
-        LOGGER.debug("x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", screen width=" + screen_size_x + ", screen height="
-                + screen_size_y);
-        LOGGER.info("Swiping in container:" + elem.getNameWithLocator());
-        for (int i = 0; i <= times; i++) {
-            int pointX1 = (int) (x + (width * directMultX1));
-            int pointY1 = (int) (y + (height * directMultY1));
-            int pointX2 = (int) (x + (width * directMultX2));
-            int pointY2 = (int) (y + (height * directMultY2));
-
-            LOGGER.debug(
-                    "Direction:" + direction + ". Try #" + i + ". Points: X1Y1=" + pointX1 + ", " + pointY1 + ", X2Y2=" + pointX2 + ", " + pointY2);
-            try {
-                swipe(pointX1, pointY1, pointX2, pointY2, duration);
-            } catch (Exception e) {
-                LOGGER.error("Exception: " + e);
-            }
-        }
-    }
-
-    /**
-     * Hide keyboard if needed
-     */
-    @Deprecated
-    public static void hideKeyboard() {
-        MobileUtils.hideKeyboard();
-    }
     
-    @SuppressWarnings("deprecation")
-	public static void pressBack() {
-        ((AndroidDriver<?>) getDriver()).pressKeyCode(AndroidKeyCode.BACK);
+    default public void pressBack() {
+        ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
@@ -199,14 +78,16 @@ public class AndroidUtils extends MobileUtils {
      * AndroidDriver.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH); 2.
      * searchEditText.sendKeys("textToSearch" + "\n")
      */
-    public static void pressSearchKey() {
+    default public void pressSearchKey() {
         pressBottomRightKey();
     }
 
-    public static void pressNextKey() {
+    default public void pressNextKey() {
         pressBottomRightKey();
     }
 
+    
+    //TODO Update this method using findByImage strategy
     /**
      * Pressing bottom right button on the keyboard by coordinates: "search",
      * "ok", "next", etc. - various keys appear at this position. Tested at
@@ -214,38 +95,17 @@ public class AndroidUtils extends MobileUtils {
      * other devices and custom keyboards could be different.
      */
     @SuppressWarnings("rawtypes")
-	public static void pressBottomRightKey() {
-    	WebDriver driver = getDriver();
-    	Dimension size = helper.performIgnoreException(() -> driver.manage().window().getSize());
+    default public void pressBottomRightKey() {
+        WebDriver driver = castDriver();
+        Dimension size = helper.performIgnoreException(() -> driver.manage().window().getSize());
         int height =  size.getHeight();
         int width = size.getWidth();
 
-		PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue());
-        new TouchAction((AndroidDriver<?>) driver).tap(option).perform();
+        PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(), Double.valueOf(height * 0.945).intValue());
+        new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
     }
-
-    /**
-     * wait Until Element Not Present
-     *
-     * @param locator By
-     * @param timeout long
-     * @param pollingTime long
-     */
-    @Deprecated
-    public static void waitUntilElementNotPresent(final By locator, final long timeout, final long pollingTime) {
-        LOGGER.info(String.format("Wait until element %s disappear", locator.toString()));
-        WebDriver driver = getDriver();
-        try {
-            if (new WebDriverWait(driver, timeout, pollingTime).until(ExpectedConditions.invisibilityOfElementLocated(locator))) {
-                LOGGER.info(String.format("Element located by: %s not present.", locator.toString()));
-            } else {
-                LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
-            }
-        } catch (TimeoutException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.info(String.format("Element located by: %s is still present.", locator.toString()));
-        }
-    }
+    
+    // Change Device Language section
     
     /**
      * change Android Device Language
@@ -271,19 +131,178 @@ public class AndroidUtils extends MobileUtils {
      * @param language to set. Can be es, en, etc.
      * @return boolean
      */
-    public static boolean setDeviceLanguage(String language) {
-
-        AndroidService executor = AndroidService.getInstance();
-
-        boolean status = executor.setDeviceLanguage(language);
-
+    default public boolean setDeviceLanguage(String language) {
+        boolean status = setDeviceLanguage(language, true, 20);
         return status;
     }
     
-    public static boolean isChecked(final ExtendedWebElement element) {
-    	//TODO: SZ migrate to FluentWaits
-		return element.isElementPresent(5)
-				&& (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
+    /**
+     * change Android Device Language
+     * <p>
+     * Url: <a href=
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * ADBChangeLanguage apk </a> Change locale (language) of your device via
+     * ADB (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to
+     * root your device! With ADB (Android Debug Bridge) on your computer, you
+     * can fast switch the device locale to see how your application UI looks on
+     * different languages. Usage: - install this app - setup adb connection to
+     * your device (http://developer.android.com/tools/help/adb.html) - Android
+     * OS 4.2 onwards (tip: you can copy the command here and paste it to your
+     * command console): adb shell pm grant net.sanapeli.adbchangelanguage
+     * android.permission.CHANGE_CONFIGURATION
+     * <p>
+     * English: adb shell am start -n
+     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en Russian:
+     * adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage
+     * -e language ru Spanish: adb shell am start -n
+     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
+     *
+     * @param language to set. Can be es, en, etc.
+     * @param changeConfig boolean if true - update config locale and language
+     *            params
+     * @param waitTime int wait in seconds before device refresh.
+     * @return boolean
+     */
+    default public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
+        boolean status = false;
+
+        String initLanguage = language;
+
+        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
+
+        LOGGER.info("Do not concat language for Android. Keep: " + language);
+        language = language.replace("_", "-");
+        LOGGER.info("Refactor language to : " + language);
+
+        String actualDeviceLanguage = getDeviceLanguage();
+
+        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
+            LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
+            return true;
+        }
+
+        String setLocalizationChangePermissionCmd = "shell pm grant net.sanapeli.adbchangelanguage android.permission.CHANGE_CONFIGURATION";
+
+        String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language " + language;
+
+        LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
+        String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
+
+        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
+            LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
+            installApk(LANGUAGE_CHANGE_APP_PATH, true);
+            expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
+        }
+
+        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
+
+        LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
+        String changeLocaleOutput = executeAdbCommand(setLocalizationCmd);
+        LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : " + changeLocaleOutput);
+
+        if (waitTime > 0) {
+            LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
+            CommonUtils.pause(waitTime);
+        }
+
+        if (changeConfig) {
+            String loc;
+            String lang;
+            if (initLanguage.contains("_")) {
+                lang = initLanguage.split("_")[0];
+                loc = initLanguage.split("_")[1];
+            } else {
+                lang = initLanguage;
+                loc = initLanguage;
+            }
+            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
+            R.CONFIG.put("locale", loc);
+            R.CONFIG.put("language", lang);
+        }
+
+        actualDeviceLanguage = getDeviceLanguage();
+        LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
+        if (language.contains(actualDeviceLanguage.toLowerCase()) || actualDeviceLanguage.toLowerCase().contains(language)) {
+            status = true;
+        } else {
+            if (getDeviceLanguage().isEmpty()) {
+                LOGGER.info("Adb return empty response without errors.");
+                status = true;
+            } else {
+                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
+                LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
+                if (currentAndroidVersion.contains("7.")) {
+                    LOGGER.info("Adb return language command do not work on some Android 7+ devices." + " Check that there are no error.");
+                    status = !getDeviceLanguage().toLowerCase().contains("error");
+                }
+            }
+        }
+        return status;
+    }
+    
+    /**
+     * getDeviceLanguage
+     *
+     * @return String
+     */
+    default public String getDeviceLanguage() {
+        String locale = executeAdbCommand("shell getprop persist.sys.language");
+        if (locale.isEmpty()) {
+            locale = executeAdbCommand("shell getprop persist.sys.locale");
+        }
+        return locale;
+    }
+    
+    // End Language Change section
+    
+    /**
+     * install android Apk by path to apk file.
+     *
+     * @param apkPath String
+     */
+    default public void installApk(final String apkPath) {
+        installApk(apkPath, false);
+    }
+
+    /**
+     * install android Apk by path to apk or by name in classpath.
+     *
+     * @param apkPath String
+     * @param inClasspath boolean
+     */
+    default public void installApk(final String apkPath, boolean inClasspath) {
+
+        String filePath = apkPath;
+        if (inClasspath) {
+            URL baseResource = ClassLoader.getSystemResource(apkPath);
+            if (baseResource == null) {
+                throw new RuntimeException("Unable to get resource from classpath: " + apkPath);
+            } else {
+                LOGGER.debug("Resource was found: " + baseResource.getPath());
+            }
+
+            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." + FilenameUtils.getExtension(baseResource.getPath());
+            // make temporary copy of resource in artifacts folder
+            filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
+
+            File file = new File(filePath);
+            if (!file.exists()) {
+                InputStream link = (ClassLoader.getSystemResourceAsStream(apkPath));
+                try {
+                    Files.copy(link, file.getAbsoluteFile().toPath());
+                } catch (IOException e) {
+                    LOGGER.error("Unable to extract resource from ClassLoader!", e);
+                }
+            }
+        }
+
+        executeAdbCommand("install " + filePath);
+    }
+    
+    default public boolean isChecked(final ExtendedWebElement element) {
+        //TODO: SZ migrate to FluentWaits
+        return element.isElementPresent(5)
+                && (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }
 
     public enum SelectorType {
@@ -300,7 +319,7 @@ public class AndroidUtils extends MobileUtils {
      * example of usage:
      * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer);
      **/
-    public static ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
+    default public ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
         return scroll(scrollToElement, container, SelectorType.ID, SelectorType.TEXT);
     }
 
@@ -318,12 +337,12 @@ public class AndroidUtils extends MobileUtils {
      * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME, 1,
      *                          AndroidUtils.SelectorType.TEXT);
      **/
-    public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+    default public ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType) {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-		// TODO: support multi threaded WebDriver's removing DriverPool usage
-		WebDriver drv = getDriver();
+        // TODO: support multi threaded WebDriver's removing DriverPool usage
+        WebDriver drv = castDriver();
 
         //workaorund for appium issue: https://github.com/appium/appium/issues/10159
         if (scrollToEle.contains(",")) {
@@ -337,12 +356,12 @@ public class AndroidUtils extends MobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-				By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
-						+ getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
-						+ containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
-						+ ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
+                By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+                        + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
+                        + containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
+                        + ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
                 
-				WebElement ele = drv.findElement(scrollBy);
+                WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
                     extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
@@ -379,12 +398,12 @@ public class AndroidUtils extends MobileUtils {
      * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME, 1,
      *                          AndroidUtils.SelectorType.TEXT, 2);
      **/
-    public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+    default public ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           int containerInstance, SelectorType eleSelectorType, int eleSelectorInstance) {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-		// TODO: support multi threaded WebDriver's removing DriverPool usage
-		WebDriver drv = getDriver();
+        // TODO: support multi threaded WebDriver's removing DriverPool usage
+        WebDriver drv = castDriver();
 
         //workaorund for appium issue: https://github.com/appium/appium/issues/10159
         if (scrollToEle.contains(",")) {
@@ -398,12 +417,12 @@ public class AndroidUtils extends MobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-				By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
-						+ getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
-						+ containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
-						+ ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance("
-						+ eleSelectorInstance + "))");
-				
+                By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+                        + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
+                        + containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
+                        + ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance("
+                        + eleSelectorInstance + "))");
+                
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
@@ -439,12 +458,12 @@ public class AndroidUtils extends MobileUtils {
      * ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME,
      *                          AndroidUtils.SelectorType.TEXT);
      **/
-    public static ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+    default public ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
                           SelectorType eleSelectorType){
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-		// TODO: support multi threaded WebDriver's removing DriverPool usage
-		WebDriver drv = getDriver();
+        // TODO: support multi threaded WebDriver's removing DriverPool usage
+        WebDriver drv = castDriver();
 
         //workaorund for appium issue: https://github.com/appium/appium/issues/10159
         if (scrollToEle.contains(",")) {
@@ -458,11 +477,11 @@ public class AndroidUtils extends MobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-				By scrollBy = MobileBy.AndroidUIAutomator(
-						"new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
-								+ ")" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView("
-								+ getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
-				
+                By scrollBy = MobileBy.AndroidUIAutomator(
+                        "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
+                                + ")" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView("
+                                + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
+                
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     LOGGER.info("Element found!!!");
@@ -490,7 +509,7 @@ public class AndroidUtils extends MobileUtils {
      * @return boolean
      * <p>
      **/
-    private static String getScrollContainerSelector(ExtendedWebElement scrollableContainer, SelectorType containerSelectorType){
+    default String getScrollContainerSelector(ExtendedWebElement scrollableContainer, SelectorType containerSelectorType){
         LOGGER.debug(scrollableContainer.getBy().toString());
         String scrollableContainerBy;
         String scrollViewContainerFinder = "";
@@ -546,7 +565,7 @@ public class AndroidUtils extends MobileUtils {
      * @return String
      * <p>
      **/
-    private static String getScrollToElementSelector(String scrollToEle, SelectorType eleSelectorType){
+    default String getScrollToElementSelector(String scrollToEle, SelectorType eleSelectorType){
         String neededElementFinder = "";
         String scrollToEleTrimmed;
 
@@ -585,12 +604,58 @@ public class AndroidUtils extends MobileUtils {
     /** Scroll Timeout check
      * @param startTime - Long initial time for timeout count down
      **/
-    public static void checkTimeout(long startTime){
+    default public void checkTimeout(long startTime){
         long elapsed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())-startTime;
 
         if (elapsed > SCROLL_TIMEOUT) {
             throw new NoSuchElementException("Scroll timeout has been reached..");
         }
+    }
+    
+    /**
+     * getCurrentDeviceFocus - get actual device apk in focus
+     *
+     * @return String
+     */
+    default public String getCurrentDeviceFocus() {
+        String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
+        return result;
+    }
+    
+    /**
+     * executeAbdCommand
+     *
+     * @param command String
+     * @return String command output in one line
+     */
+    default public String executeAdbCommand(String command) {
+        String deviceName = getDevice().getAdbName();
+        if (!deviceName.isEmpty()) {
+            // add remoteURL/udid reference
+            command = "-s " + deviceName + " " + command;
+        } else {
+            LOGGER.warn("nullDevice detected fot current thread!");
+        }
+
+        String result = "";
+        LOGGER.info("Command: " + command);
+        String[] listOfCommands = command.split(" ");
+
+        String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
+
+        try {
+            LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
+            List<String> execOutput = executor.execute(execCmd);
+            LOGGER.info("Output after execution ADB command: " + execOutput);
+
+            result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
+
+            LOGGER.info("Returning Output: " + result);
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+
+        return result;
     }
 
 }

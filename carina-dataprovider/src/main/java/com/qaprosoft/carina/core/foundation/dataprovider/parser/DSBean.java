@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
@@ -38,6 +39,8 @@ public class DSBean {
 
     private String executeColumn;
     private String executeValue;
+
+    private boolean spreadsheet;
 
     @Deprecated
     public DSBean(ITestContext context) {
@@ -87,8 +90,14 @@ public class DSBean {
 
         if (parameters != null) {
             // reinitialize parameters from annotation if any
+            if (!parameters.path().isEmpty() && !parameters.spreadsheetId().isEmpty())
+                throw new InvalidArgsException("Spreadsheet id and path parameters are mutually exclusive");
             if (!parameters.path().isEmpty())
                 xlsFile = parameters.path();
+            if (!parameters.spreadsheetId().isEmpty()) {
+                xlsFile = parameters.spreadsheetId();
+                this.spreadsheet = true;
+            }
 
             if (!parameters.sheet().isEmpty())
                 xlsSheet = parameters.sheet();
@@ -297,5 +306,9 @@ public class DSBean {
 
     public String getExecuteValue() {
         return executeValue;
+    }
+
+    public boolean isSpreadsheet() {
+        return spreadsheet;
     }
 }

@@ -64,7 +64,7 @@
 	<plugin>
 		<groupId>org.jacoco</groupId>
 		<artifactId>jacoco-maven-plugin</artifactId>
-		<version>0.7.9</version>
+		<version>0.8.4</version>
 		<executions>
 			<execution>
 				<goals>
@@ -83,8 +83,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
+        <version>3.0.0-M3</version>
         <configuration>
+          <useSystemClassLoader>false</useSystemClassLoader>
           <suiteXmlFiles>
             <suiteXmlFile>${project.build.directory}/test-classes/testng_suites/${suite}.xml</suiteXmlFile>
           </suiteXmlFiles>

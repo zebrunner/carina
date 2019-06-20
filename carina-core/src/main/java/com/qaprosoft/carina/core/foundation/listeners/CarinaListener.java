@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,8 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
@@ -52,7 +55,6 @@ import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -65,6 +67,7 @@ import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
@@ -72,6 +75,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
@@ -238,6 +242,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
         }
     }
+    
+    @Override
+    public void onConfigurationFailure(ITestResult result) {
+        String errorMessage = getFailureReason(result);
+        takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
+
+        super.onConfigurationFailure(result);
+    }
 
     @Override
     public void onTestStart(ITestResult result) {
@@ -260,12 +272,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestFailure(ITestResult result) {
+        String errorMessage = getFailureReason(result);
+        takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        
         onTestFinish(result);
         super.onTestFailure(result);
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        String errorMessage = getFailureReason(result);
+        takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -293,7 +311,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private void onTestFinish(ITestResult result) {
         try {
-            if (automaticDriversCleanup && !hasDependencies(result)) {
+            LOGGER.debug("Test result is : " + result.getStatus());
+            // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
+            if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
                 quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
 
@@ -409,7 +429,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
         } finally {
-            // do nothing
+            // wait until all async  operations (i.e. artifacts uploading) are finished
+            AsyncOperation.waitUntilFinish(30);
         }
     }
     
@@ -758,6 +779,24 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             includes.add(new XmlInclude(eachMethod));
         }
         return includes;
+    }
+    
+    private String takeScreenshot(ITestResult result, String msg) {
+        String screenId = "";
+
+        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
+
+        for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
+            String driverName = entry.getKey();
+            WebDriver drv = entry.getValue().getDriver();
+
+            if (drv instanceof EventFiringWebDriver) {
+                drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+            }
+            
+            screenId = Screenshot.captureFailure(drv, driverName + ": " + msg); // in case of failure
+        }
+        return screenId;
     }
 
     public static class ShutdownHook extends Thread {

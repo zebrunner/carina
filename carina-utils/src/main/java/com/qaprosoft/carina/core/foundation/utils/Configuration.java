@@ -217,9 +217,6 @@ public class Configuration {
 
         S3_LOCAL_STORAGE("s3_local_storage"),
 
-        // Amazon-Screenshot
-        S3_SAVE_SCREENSHOTS("s3_save_screenshots"),
-
         // HockeyApp token
         HOCKEYAPP_TOKEN("hockeyapp_token"),
 
@@ -272,8 +269,9 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules");
-
+        TEST_RUN_RULES("test_run_rules"),
+        
+        HUB_MODE("hub_mode");
 
         private final String key;
 

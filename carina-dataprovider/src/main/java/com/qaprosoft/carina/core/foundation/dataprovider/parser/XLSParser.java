@@ -31,7 +31,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
-public class XLSParser {
+public class XLSParser extends AbstractXLSParser {
     protected static final Logger LOGGER = Logger.getLogger(XLSParser.class);
     private static DataFormatter df;
     private static FormulaEvaluator evaluator;
@@ -41,7 +41,7 @@ public class XLSParser {
     }
 
     public static String parseValue(String locatorKey, String xlsPath, Locale locale) {
-        String value = null;
+        String value;
 
         Workbook wb = XLSCache.getWorkbook(xlsPath);
         Sheet sheet = wb.getSheetAt(0);
@@ -117,12 +117,7 @@ public class XLSParser {
     }
 
     public static XLSTable parseSpreadSheet(String xls, String sheetName, String executeColumn, String executeValue) {
-        XLSTable dataTable;
-        if (executeColumn != null && executeValue != null) {
-            dataTable = new XLSTable(executeColumn, executeValue);
-        } else {
-            dataTable = new XLSTable();
-        }
+        XLSTable dataTable = prepareDataTable(executeColumn, executeValue);
 
         Workbook wb = XLSCache.getWorkbook(xls);
         evaluator = wb.getCreationHelper().createFormulaEvaluator();

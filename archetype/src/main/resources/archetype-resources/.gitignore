@@ -1,0 +1,10 @@
+# Do not check in following files
+reports
+target
+test-output
+.classpath
+.settings
+.project
+.idea
+sql.log
+application.log
