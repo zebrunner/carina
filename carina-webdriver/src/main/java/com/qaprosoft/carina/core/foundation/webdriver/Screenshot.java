@@ -643,6 +643,8 @@ public class Screenshot {
      *
      * @param bufferedImageExpected - old image
      * @param bufferedImageActual   - new image
+     * @param comment  - String
+     * @param artifact  - boolean
      * @return boolean
      */
     public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {

@@ -150,16 +150,18 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
         }
     }
 
-    /**
-     * checkCurrentDeviceFocus - return actual device focused apk and compare
-     * with expected.
-     *
-     * @param apk String
-     * @return boolean
-     */
-    /**
-     * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#isAppRunning(String apk)} instead.
-     */
+	/**
+	 * checkCurrentDeviceFocus - return actual device focused apk and compare with
+	 * expected.
+	 *
+	 * @param apk
+	 *            String
+	 * @return boolean
+	 * 
+	 * @deprecated use
+	 *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#isAppRunning(String apk)}
+	 *             instead.
+	 */
     public boolean checkCurrentDeviceFocus(String apk) {
         String res = getCurrentDeviceFocus();
         if (res.contains(apk)) {
@@ -800,6 +802,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      *
      * @param timeZone String required timeZone
      * @param timeFormat String 12 or 24
+     * @param gmtStamp String
      * @param settingsTZ TimeFormat
      * @param workflow ChangeTimeZoneWorkflow
      * @return boolean

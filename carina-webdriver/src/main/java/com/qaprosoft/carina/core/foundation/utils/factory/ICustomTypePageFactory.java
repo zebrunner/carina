@@ -130,13 +130,15 @@ public interface ICustomTypePageFactory extends IDriverPool {
     /**
      * Get constructor from clazz that satisfy specific range of parameters
      * (using Reflection)
-     *
+     * 
+     * @param <T> This is the type parameter
+     * 
      * @param clazz
-     * 			Class T clazz
+     * 			Class clazz
      * @param parameters
      * 			Object... parameters
      * @return constructor
-     * 			constructor
+     * 			
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {

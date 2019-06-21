@@ -43,7 +43,9 @@ import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
 
 /**
- * @deprecated use {@link #IMobileutils()} instead.
+ * @deprecated use 
+ * 				{@link com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils}
+ * 				instead.
  */
 @Deprecated
 public class MobileUtils {
