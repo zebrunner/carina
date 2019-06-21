@@ -44,7 +44,9 @@ import io.appium.java_client.touch.offset.PointOption;
 import io.appium.java_client.windows.PressesKeyCode;
 
 /**
- * @deprecated use {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils()} instead.
+ * @deprecated use 
+ * 			{@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils} 
+ * 			instead.
  */
 public class AndroidUtils extends MobileUtils {
 

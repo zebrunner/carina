@@ -131,9 +131,14 @@ public interface ICustomTypePageFactory extends IDriverPool {
      * Get constructor from clazz that satisfy specific range of parameters
      * (using Reflection)
      * 
+     * @param <T> This is the type parameter
+     * 
      * @param clazz
+     * 			Class clazz
      * @param parameters
+     * 			Object... parameters
      * @return constructor
+     * 			
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
@@ -195,8 +200,11 @@ public interface ICustomTypePageFactory extends IDriverPool {
      * Method to compare primitives with corresponding wrappers
      * 
      * @param obj1
+     * 			Object obj1
      * @param obj2
-     * @return
+     * 			Object obj2
+     * @return boolean
+     * 			boolean result
      */
     default boolean comparePrimitives(Object obj1, Object obj2) {
 

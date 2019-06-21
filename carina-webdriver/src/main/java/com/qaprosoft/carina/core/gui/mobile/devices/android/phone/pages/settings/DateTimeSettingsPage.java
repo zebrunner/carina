@@ -93,6 +93,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
      *
      * @param tz       String
      * @param timezone String
+     * @param tzGMT    String
      * @return boolean
      */
     public boolean selectTimeZone(String tz, String timezone, String tzGMT) {

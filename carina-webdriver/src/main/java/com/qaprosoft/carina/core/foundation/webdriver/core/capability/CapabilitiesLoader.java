@@ -36,8 +36,8 @@ public class CapabilitiesLoader {
 
     /**
      * Load capabilities and properties from external file into the global CONFIG context.
-     * capabilities.<name>=<value> will be attached to each WebDriver capabilities
-     * <name>=<value> will override appropriate configuration parameter by new <value>
+     * {@code capabilities.<name>=<value> will be attached to each WebDriver capabilities
+     * <name>=<value> will override appropriate configuration parameter by new <value>}
      *  
      * @param fileName
      *            String path to the properties file with custom capabilities and properties
@@ -60,10 +60,13 @@ public class CapabilitiesLoader {
     
     /**
      * Generate DesiredCapabilities from external file.
-     * Only "capabilities.<name>=<value>" will be added to the response.
+     * Only "capabilities.name=value" will be added to the response.
      *  
      * @param fileName
      *            String path to the properties file with custom capabilities
+     *            
+     * @return desiredCapabilities
+     * 			DesiredCapabilities y
      */
     public DesiredCapabilities getCapabilities(String fileName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();

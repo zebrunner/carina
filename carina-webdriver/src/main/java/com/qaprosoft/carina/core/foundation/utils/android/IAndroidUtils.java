@@ -506,8 +506,8 @@ public interface IAndroidUtils extends IMobileUtils {
     /** Scrolls into view in specified container
      * @param scrollableContainer - ExtendedWebElement type
      * @param containerSelectorType - Selector type: has to be id, text, contentDesc or className
-     * @return boolean
-     * <p>
+     * @return scrollViewContainerFinder String	
+     *
      **/
     default String getScrollContainerSelector(ExtendedWebElement scrollableContainer, SelectorType containerSelectorType){
         LOGGER.debug(scrollableContainer.getBy().toString());
@@ -563,7 +563,6 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param scrollToEle - String type
      * @param eleSelectorType - Selector type: has to be id, text, contentDesc or className
      * @return String
-     * <p>
      **/
     default String getScrollToElementSelector(String scrollToEle, SelectorType eleSelectorType){
         String neededElementFinder = "";

@@ -1080,6 +1080,11 @@ public class ExtendedWebElement {
 
     /**
      * @deprecated As of release 6.x, replaced by {@link #click()}. Can be used only for Web where JavascriptExecutor is supported.
+     * 
+     * @param x
+     * 			double x
+     * @param y
+     * 			double y
      */
     @Deprecated
     public void tapWithCoordinates(double x, double y) {

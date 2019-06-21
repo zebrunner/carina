@@ -181,8 +181,11 @@ public class Screenshot {
      * location.
      *
      * @param driver
-     *            instance used for capturing.
-     * @param comment String
+     *          instance used for capturing.
+     * @param comment 
+     * 			String comment
+     * @param artifact
+     * 			boolean artifact
      * @return screenshot name.
      */
     public static BufferedImage captureFullSize(WebDriver driver, String comment, boolean artifact) {
@@ -268,7 +271,10 @@ public class Screenshot {
      *
      * @param driver
      *            instance used for capturing.
-     * @param comment String
+     * @param comment 
+     * 			String comment
+   	 * @param artifact
+     * 			boolean artifact
      * @return screenshot name.
      */
     public static String capture(WebDriver driver, String comment, boolean artifact) {
@@ -637,6 +643,8 @@ public class Screenshot {
      *
      * @param bufferedImageExpected - old image
      * @param bufferedImageActual   - new image
+     * @param comment  - String
+     * @param artifact  - boolean
      * @return boolean
      */
     public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {
