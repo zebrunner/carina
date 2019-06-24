@@ -70,6 +70,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
+import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
@@ -257,6 +258,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // handle expected skip
         Method testMethod = result.getMethod().getConstructorOrMethod().getMethod();
+        String test = TestNamingUtil.getCanonicalTestName(result);
+        ReportContext.setTestDir(test);
         if (ExpectedSkipManager.getInstance().isSkip(testMethod, result.getTestContext())) {
             skipExecution("Based on rule listed above");
         }

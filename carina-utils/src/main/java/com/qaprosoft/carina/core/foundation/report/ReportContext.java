@@ -280,6 +280,18 @@ public class ReportContext {
         testDirectory.set(testDir);
         return testDir;
     }
+    
+    public static File setTestDir(String dirName) {
+        String directory = String.format("%s/%s", getBaseDir(), dirName);
+        LOGGER.debug("Test directory will be set to : " + directory);
+        File testDir = new File(directory);
+        File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
+        if (!thumbDir.mkdirs()) {
+            throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath() + " and/or " + thumbDir.getAbsolutePath());
+        }
+        testDirectory.set(testDir);
+        return testDir;
+    }
 
     /**
      * Rename test directory from unique number to valid human readable content using test method name.
