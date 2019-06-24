@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.BrowserType;
@@ -39,11 +40,18 @@ public class ChromeCapabilities extends AbstractCapabilities {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("test-type");
         
-        //update browser language
-        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
-        if (!browserLocale.isEmpty()) {
-        	LOGGER.info("Set Chrome lanaguage to: " + browserLocale);
-        	options.addArguments("--lang=" + browserLocale);
+        // update browser language
+        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE);
+        if (!browserLang.isEmpty()) {
+            LOGGER.info("Set Chrome lanaguage to: " + browserLang);
+
+            // keep both variants via prefs and arg due to the below issue:
+            // https://stackoverflow.com/questions/18645205/set-chromes-language-using-selenium-chromedriver
+            Map<String, Object> prefs = new HashMap<String, Object>();
+            prefs.put("intl.accept_languages", browserLang);
+            options.setExperimentalOption("prefs", prefs);
+
+            options.addArguments("--lang=" + browserLang);
         }
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
