@@ -258,8 +258,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // handle expected skip
         Method testMethod = result.getMethod().getConstructorOrMethod().getMethod();
-        String test = TestNamingUtil.getCanonicalTestName(result);
-        ReportContext.setTestDir(test);
         if (ExpectedSkipManager.getInstance().isSkip(testMethod, result.getTestContext())) {
             skipExecution("Based on rule listed above");
         }
