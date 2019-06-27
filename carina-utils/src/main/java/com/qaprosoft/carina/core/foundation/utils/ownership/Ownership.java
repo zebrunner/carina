@@ -25,7 +25,6 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class Ownership {
     protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
