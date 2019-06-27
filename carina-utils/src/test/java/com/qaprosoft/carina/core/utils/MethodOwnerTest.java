@@ -21,6 +21,7 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 
@@ -31,15 +32,37 @@ public class MethodOwnerTest {
 
     private static final String ANDROID_OWNER = "androidTestOwner";
     private static final String IOS_OWNER = "iosTestOwner";
+    private static final String DEFAULT_OWNER = "defaultOwner";
 
     @Test
+    @MethodOwner(owner = DEFAULT_OWNER)
     @MethodOwner(owner = ANDROID_OWNER, platform = SpecialKeywords.ANDROID)
     @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
-    public void testMethodOwner() {
+    public void testDefaultMethodOwner() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String ownerName = Ownership.getMethodOwner(result, SpecialKeywords.ANDROID);
+        String ownerName = Ownership.getMethodOwner(result);
+        Assert.assertEquals(ownerName, DEFAULT_OWNER);
+    }
+    
+    @Test(dependsOnMethods="testDefaultMethodOwner")
+    @MethodOwner(owner = ANDROID_OWNER, platform = SpecialKeywords.ANDROID)
+    @MethodOwner(owner = DEFAULT_OWNER)
+    @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
+    public void testAndroidMethodOwner() {
+    	R.CONFIG.put("platform", "android");
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result);
         Assert.assertEquals(ownerName, ANDROID_OWNER);
-        String secondOwnerName = Ownership.getMethodOwner(result, SpecialKeywords.IOS);
-        Assert.assertEquals(secondOwnerName, IOS_OWNER);
+    }
+    
+    @Test(dependsOnMethods="testAndroidMethodOwner")
+    @MethodOwner(owner = ANDROID_OWNER, platform = SpecialKeywords.ANDROID)
+    @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
+    @MethodOwner(owner = DEFAULT_OWNER)
+    public void testIOSMethodOwner() {
+    	R.CONFIG.put("platform", "ios");
+        ITestResult result = Reporter.getCurrentTestResult();
+        String ownerName = Ownership.getMethodOwner(result);
+        Assert.assertEquals(ownerName, IOS_OWNER);
     }
 }

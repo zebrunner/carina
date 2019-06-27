@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.commons;
 
-import java.util.UUID;
-
 /**
  * Special keywords used in framework.
  * 

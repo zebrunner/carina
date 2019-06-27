@@ -106,20 +106,19 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         return owner != null ? owner : "";
     }
 
-    //TODO need to update this method in com.qaprosoft.zafira.config.IConfigurator on getAndroidOwner
     @Override
     public String getPrimaryOwner(ITestResult test) {
         // TODO: re-factor that
-        String primaryOwner = Ownership.getMethodOwner(test, SpecialKeywords.ANDROID); 
+        String primaryOwner = Ownership.getMethodOwner(test); 
         LOGGER.debug("primaryOwner: " + primaryOwner);
         return primaryOwner;
     }
 
-    //TODO need to update this method in com.qaprosoft.zafira.config.IConfigurator on getIosOwner
+    //TODO need to remove this method from com.qaprosoft.zafira.config.IConfigurator
     @Override
     public String getSecondaryOwner(ITestResult test) {
         // TODO: re-factor that
-        String secondaryOwner = Ownership.getMethodOwner(test, SpecialKeywords.IOS);
+        String secondaryOwner = Ownership.getMethodOwner(test);
         LOGGER.debug("secondaryOwner: " + secondaryOwner);
         return secondaryOwner;
     }

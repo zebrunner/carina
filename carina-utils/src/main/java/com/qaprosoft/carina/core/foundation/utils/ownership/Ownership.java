@@ -24,6 +24,8 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class Ownership {
     protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
@@ -31,7 +33,7 @@ public class Ownership {
     private Ownership() {
     }
 
-    public static String getMethodOwner(ITestResult result, String expectedPlatform) {
+    public static String getMethodOwner(ITestResult result) {
 
         @SuppressWarnings("unchecked")
         Map<Object[], String> testMethodOwnerArgsMap = (Map<Object[], String>) result.getTestContext()
@@ -61,16 +63,30 @@ public class Ownership {
                 }
             }
             
+            // scan all MethiodOwner annotations to find default ownership without any platform
             if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
             	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
                 for (MethodOwner methodOwner : methodAnnotation.value()) {
 
                     String actualPlatform = methodOwner.platform();
-                    if (isValidPlatform(actualPlatform, expectedPlatform)) {
+                    if (actualPlatform.isEmpty()) {
                     	owner = methodOwner.owner();
-                    }
-    
+                    	break;
+                    }            
+                }
+            }
+            
+            //do one more scan using platform ownership filter if any to override default owner value
+            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
+            	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
+                for (MethodOwner methodOwner : methodAnnotation.value()) {
+
+                    String actualPlatform = methodOwner.platform();
+                    String expectedPlatform = Configuration.getPlatform();
                     
+                    if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
+                    	owner = methodOwner.owner();
+                    }               
                 }
             }
         } catch (ClassNotFoundException e) {
