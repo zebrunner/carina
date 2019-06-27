@@ -86,10 +86,6 @@ public class ReportContext {
     // Collects screenshot comments. Screenshot comments are associated using screenshot file name.
     private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 
-    static {
-        isCustomTestDirName.set(Boolean.FALSE);
-    }
-
     public static long getRootID() {
         return rootID;
     }
@@ -333,6 +329,7 @@ public class ReportContext {
 
     public static File renameTestDir(String test) {
         File testDir = testDirectory.get();
+        initIsCustomTestDir();
         if (testDir != null && !isCustomTestDirName.get()) {
             File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 
@@ -348,6 +345,12 @@ public class ReportContext {
         }
         
         return testDir;
+    }
+    
+    private static void initIsCustomTestDir() {
+        if (isCustomTestDirName.get() == null) {
+            isCustomTestDirName.set(Boolean.FALSE);
+        };
     }
 
     /**
