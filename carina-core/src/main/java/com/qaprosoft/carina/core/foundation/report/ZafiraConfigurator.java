@@ -34,7 +34,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
-import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership.OwnerType;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
@@ -110,15 +109,16 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public String getPrimaryOwner(ITestResult test) {
         // TODO: re-factor that
-        String primaryOwner = Ownership.getMethodOwner(test, OwnerType.PRIMARY); 
+        String primaryOwner = Ownership.getMethodOwner(test); 
         LOGGER.debug("primaryOwner: " + primaryOwner);
         return primaryOwner;
     }
 
+    //TODO need to remove this method from com.qaprosoft.zafira.config.IConfigurator
     @Override
     public String getSecondaryOwner(ITestResult test) {
         // TODO: re-factor that
-        String secondaryOwner = Ownership.getMethodOwner(test, OwnerType.SECONDARY);
+        String secondaryOwner = Ownership.getMethodOwner(test);
         LOGGER.debug("secondaryOwner: " + secondaryOwner);
         return secondaryOwner;
     }

@@ -15,27 +15,25 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.ownership;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
+
 public class Ownership {
     protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
-
-    public enum OwnerType {
-        PRIMARY,
-        SECONDARY
-    }
 
     private Ownership() {
     }
 
-    public static String getMethodOwner(ITestResult result, OwnerType type) {
+    public static String getMethodOwner(ITestResult result) {
 
         @SuppressWarnings("unchecked")
         Map<Object[], String> testMethodOwnerArgsMap = (Map<Object[], String>) result.getTestContext()
@@ -64,25 +62,41 @@ public class Ownership {
                     break;
                 }
             }
+            
+            // scan all MethiodOwner annotations to find default ownership without any platform
+            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
+            	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
+                for (MethodOwner methodOwner : methodAnnotation.value()) {
 
-            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
-                MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-                switch (type) {
-                    case PRIMARY:
-                        owner = methodAnnotation.owner();
-                        LOGGER.debug("Method '" + testMethod + "' primary owner is: " + owner);
-                        break;
+                    String actualPlatform = methodOwner.platform();
+                    if (actualPlatform.isEmpty()) {
+                    	owner = methodOwner.owner();
+                    	break;
+                    }            
+                }
+            }
+            
+            //do one more scan using platform ownership filter if any to override default owner value
+            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
+            	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
+                for (MethodOwner methodOwner : methodAnnotation.value()) {
 
-                    case SECONDARY:
-                        owner = methodAnnotation.secondaryOwner();
-                        LOGGER.debug("Method '" + testMethod + "' secondary owner is: " + owner);
-                        break;
+                    String actualPlatform = methodOwner.platform();
+                    String expectedPlatform = Configuration.getPlatform();
+                    
+                    if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
+                    	owner = methodOwner.owner();
+                    }               
                 }
             }
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         }
         return owner;
+    }
+    
+    private static boolean isValidPlatform(String actualPlatform, String expectedPlatform) {
+        return actualPlatform.equalsIgnoreCase(expectedPlatform);
     }
 
     public static String getSuiteOwner(ITestContext context) {
