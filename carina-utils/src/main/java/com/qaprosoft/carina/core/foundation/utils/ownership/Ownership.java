@@ -62,11 +62,16 @@ public class Ownership {
                 }
             }
             
-            // scan all MethiodOwner annotations to find default ownership without any platform
+            // do a scan for single Methodowner annotation as well)
+            if (testMethod.isAnnotationPresent(MethodOwner.class)) {
+                MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
+                owner = methodAnnotation.owner();
+            }
+            
+            // scan all MethodOwner annotations to find default ownership without any platform
             if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
             	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
                 for (MethodOwner methodOwner : methodAnnotation.value()) {
-
                     String actualPlatform = methodOwner.platform();
                     if (actualPlatform.isEmpty()) {
                     	owner = methodOwner.owner();
