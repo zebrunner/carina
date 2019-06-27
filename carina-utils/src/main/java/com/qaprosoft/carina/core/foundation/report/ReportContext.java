@@ -79,12 +79,12 @@ public class ReportContext {
     private static long rootID;
 
     private static final ThreadLocal<File> testDirectory = new ThreadLocal<File>();
+    private static final ThreadLocal<Boolean> isCustomTestDirName = new ThreadLocal<Boolean>();
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
     
     // Collects screenshot comments. Screenshot comments are associated using screenshot file name.
     private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
-
 
     public static long getRootID() {
         return rootID;
@@ -262,10 +262,16 @@ public class ReportContext {
      * @return test log/screenshot folder.
      */
     public static File getTestDir() {
+        return getTestDir(StringUtils.EMPTY);
+    }
+    
+    public static File getTestDir(String dirName) {
         File testDir = testDirectory.get();
         if (testDir == null) {
             String uniqueDirName = UUID.randomUUID().toString();
-
+            if (!dirName.isEmpty()) {
+                uniqueDirName = dirName;
+            }
             String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
             // System.out.println("First request for test dir. Just generate unique folder: " + directory);
 
@@ -280,44 +286,71 @@ public class ReportContext {
         testDirectory.set(testDir);
         return testDir;
     }
-
+    
     /**
-     * Rename test directory from unique number to valid human readable content using test method name.
+     * Rename test directory from unique number to custom name.
      * 
-     * @param test
-     *            name
+     * @param dirName
      * 
-     * @return test log/screenshot folder.
+     * @return test report dir
      */
+    public synchronized static File setCustomTestDirName(String dirName) {
+        isCustomTestDirName.set(Boolean.FALSE);
+        File testDir = testDirectory.get();
+        if(testDir == null) {
+            LOGGER.debug("Test dir will be created.");
+            testDir = getTestDir(dirName);
+        } else {
+            LOGGER.debug("Test dir will be renamed to custom name.");
+            renameTestDir(dirName);
+        }
+        isCustomTestDirName.set(Boolean.TRUE);
+        return testDir;
+    }
+    
+    public static void emptyTestDirData() {
+        LOGGER.debug("testDir and isCustomTestDirName variables will be empty.");
+        testDirectory.remove();
+        isCustomTestDirName.set(Boolean.FALSE);
+        closeThreadLogAppender();
+    }
+    
+    private static void closeThreadLogAppender() {
+        try {
+            ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+            if (tla != null) {
+                tla.close();
+            }
+
+        } catch (NoSuchMethodError e) {
+            LOGGER.error("Exception while closing thread log appender.");
+        }
+    }
+
     public static File renameTestDir(String test) {
         File testDir = testDirectory.get();
-        if (testDir != null) {
-            // remove info about old directory to register new one for the next
-            // test. Extra after method/class/suite custom messages will be
-            // logged into the next test.log file
-            testDirectory.remove();
-
+        initIsCustomTestDir();
+        if (testDir != null && !isCustomTestDirName.get()) {
             File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 
             if (!newTestDir.exists()) {
                 // close ThreadLogAppender resources before renaming
-                try {
-                    ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-                    if (tla != null) {
-                        tla.close();
-                    }
-
-                } catch (NoSuchMethodError e) {
-                    LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-                }
+                closeThreadLogAppender();
                 testDir.renameTo(newTestDir);
-                generateTestReport(newTestDir);
+                LOGGER.debug("Test directory will be set to : " + newTestDir);
+                testDirectory.set(newTestDir);            
             }
         } else {
             LOGGER.error("Unexpected case with absence of test.log for '" + test + "'");
         }
         
         return testDir;
+    }
+    
+    private static void initIsCustomTestDir() {
+        if (isCustomTestDirName.get() == null) {
+            isCustomTestDirName.set(Boolean.FALSE);
+        };
     }
 
     /**
@@ -618,8 +651,8 @@ public class ReportContext {
         }
     }
 
-    
-    private static void generateTestReport(File testDir) {
+    public static void generateTestReport() {
+        File testDir = testDirectory.get();
         List<File> images = FileManager.getFilesInDir(testDir);
         try {
             List<String> imgNames = new ArrayList<String>();
