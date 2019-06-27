@@ -291,7 +291,14 @@ public class ReportContext {
         return testDir;
     }
     
-    public static File setCustomTestDirName(String dirName) {
+    /**
+     * Rename test directory from unique number to custom name.
+     * 
+     * @param dirName
+     * 
+     * @return test report dir
+     */
+    public synchronized static File setCustomTestDirName(String dirName) {
         isCustomTestDirName.set(Boolean.FALSE);
         File testDir = testDirectory.get();
         if(testDir == null) {
@@ -324,14 +331,6 @@ public class ReportContext {
         }
     }
 
-    /**
-     * Rename test directory from unique number to valid human readable content using test method name.
-     * 
-     * @param test
-     *            name
-     * 
-     * @return test log/screenshot folder.
-     */
     public static File renameTestDir(String test) {
         File testDir = testDirectory.get();
         if (testDir != null && !isCustomTestDirName.get()) {
