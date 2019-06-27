@@ -120,7 +120,7 @@ All project configuration properties are located in **_config.properties** file.
 		<td>"8.0", "52.1"</td>
 	</tr>
 		<tr>
-		<td>browser_locale</td>
+		<td>browser_language</td>
 		<td>Browser language or nothing to use default English version. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
 		<td>"es", "fr"</td>
 	</tr>

@@ -40,10 +40,10 @@ public class ChromeCapabilities extends AbstractCapabilities {
         options.addArguments("test-type");
         
         //update browser language
-        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
-        if (!browserLocale.isEmpty()) {
-        	LOGGER.info("Set Chrome lanaguage to: " + browserLocale);
-        	options.addArguments("--lang=" + browserLocale);
+        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
+        if (!browserLang.isEmpty()) {
+        	LOGGER.info("Set Chrome lanaguage to: " + browserLang);
+        	options.addArguments("--lang=" + browserLang);
         }
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
