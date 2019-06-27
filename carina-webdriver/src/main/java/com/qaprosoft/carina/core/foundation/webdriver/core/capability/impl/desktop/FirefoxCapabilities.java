@@ -53,10 +53,10 @@ public class FirefoxCapabilities extends AbstractCapabilities {
         FirefoxProfile profile = new FirefoxProfile();
         
         //update browser language
-        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
-        if (!browserLocale.isEmpty()) {
-        	LOGGER.info("Set Firefox lanaguage to: " + browserLocale);
-        	profile.setPreference("intl.accept_languages", browserLocale);
+        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
+        if (!browserLang.isEmpty()) {
+        	LOGGER.info("Set Firefox lanaguage to: " + browserLang);
+        	profile.setPreference("intl.accept_languages", browserLang);
         }
 
         boolean generated = false;

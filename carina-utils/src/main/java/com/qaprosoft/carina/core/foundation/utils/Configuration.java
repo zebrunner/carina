@@ -70,7 +70,7 @@ public class Configuration {
 
         BROWSER_VERSION("browser_version"),
         
-        BROWSER_LOCALE("browser_locale"),
+        BROWSER_LANGUAGE("browser_language"),
 
         SELENIUM_HOST("selenium_host"),
 

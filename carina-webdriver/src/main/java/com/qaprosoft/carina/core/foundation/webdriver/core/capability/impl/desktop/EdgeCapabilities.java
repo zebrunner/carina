@@ -32,9 +32,9 @@ public class EdgeCapabilities extends AbstractCapabilities {
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
         
         //update browser language
-        String browserLocale = Configuration.get(Parameter.BROWSER_LOCALE); 
-        if (!browserLocale.isEmpty()) {
-        	Assert.fail("Unable to change Edge locale via selenium! (" + browserLocale + ")");
+        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
+        if (!browserLang.isEmpty()) {
+        	Assert.fail("Unable to change Edge locale via selenium! (" + browserLang + ")");
         }
         return capabilities;
     }
