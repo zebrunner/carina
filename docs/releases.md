@@ -228,12 +228,12 @@ Also disabled proxy_set_to_system=false property by default. It should be enable
 
 ## Enhancements
 * [#614](https://github.com/qaprosoft/carina/issues/614) refactor CustomTypePageFactory to interface 
-<b>Note:</b> CustomTypePageFactory.initPage(….) should be replaced by initPage(…)
-also we again return initPage(…) method without driver as argument
+<b>Note:</b> CustomTypePageFactory.initPage(...) should be replaced by initPage(...)
+also we again return initPage(...) method without driver as argument
 ```
-CustomTypePageFactory.initPage(….); 
+CustomTypePageFactory.initPage(...); 
 // it should be replaced in most cases by
-initPage(…);
+initPage(...);
 ```
 * [#608](https://github.com/qaprosoft/carina/issues/608)  update copyright info using 2019
 
