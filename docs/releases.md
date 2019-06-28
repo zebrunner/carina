@@ -2,110 +2,132 @@
 
 ### 6.1.22 (2019-06-29)
 
-## Enhancements
-* #736 Updated <b>@MethodOwner</b> annotation. <b>secondaryOwner</b> parameter no longer exists, instead of this parameter added platform filter where neccessary:
+**Enhancements**
+
+* [#736](https://github.com/qaprosoft/carina/issues/736) Updated <b>@MethodOwner</b> annotation. <b>secondaryOwner</b> parameter no longer exists, instead of this parameter added platform filter where neccessary:
 Note: previous single @MethodOwner annotation without platform works as well
 ```
 @MethodOwner(owner = "user1", platform = "android")
 @MethodOwner(owner = "user2", platform = "ios")
 ``` 
-* #749 Added ability to set custom test data directory name. This functionality is available via <b>  ReportContext.setCustomTestDirName("customName") </b> method.
-* #751 provided anonymous access to carina CI jobs: https://ci.qaprosoft.com/jenkins/job/carina
-* #752 Added generation of JavaDoc  and provided read access to carina CI jobs for anonymous users, for example: https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/javadoc/
-* #754 Renamed <i>browser_locale</i> property to <i>browser_language</i>
+* [#749](https://github.com/qaprosoft/carina/issues/749) Added ability to set custom test data directory name. This functionality is available via <b>  ReportContext.setCustomTestDirName("customName") </b> method.
+* [#751](https://github.com/qaprosoft/carina/issues/751) provided anonymous access to carina CI jobs: https://ci.qaprosoft.com/jenkins/job/carina
+* [#752](https://github.com/qaprosoft/carina/issues/752) Added generation of JavaDoc  and provided read access to carina CI jobs for anonymous users, for example: https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/javadoc/
+* [#754](https://github.com/qaprosoft/carina/issues/754) Renamed <i>browser_locale</i> property to <i>browser_language</i>
 Note: make sure to update your project  _config.properties accordingly to be able to override browser language!
 * Added release and snapshot build job statuses to https://github.com/qaprosoft/carina
 ![image](https://user-images.githubusercontent.com/4551455/60375087-3de3bc00-9a10-11e9-828c-7cdcf561a5a3.png)
 
-## Fixes
+**Fixes**
+
 * Browser resize moved to DesktopFactory only to minimize erros in mobile web tests. Browser window resolution sets according to <b>capabilites.resolution</b> values otherwise maximizes window using old functionality.
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * zafira-client 4.0.56 -> 4.0.57
 
-## Migration Steps
+**Migration Steps**
+
 * Remove all occurrences of <b>secondaryOwner</b> parameter for <i>@MethodOwner</i> annotation. Use platform filter based on information above instead
 * To complete migration replace in your _config.properties all occurrences of <i>browser_locale</i> to <i>browser_lang</i>
 
 
+
 ### 6.1.21 (2019-06-09)
 
-## Enhancements
+**Enhancements**
+
 * Added full integration with [ZebRunner](https://zebrunner.com/) (Super Fast Test Automation Cloud Solution)
 * Cleaned up Carina archetype in accordance with the latest changes (dependencies, removal of obsolete files, etc.)
 * Released 6.1.21 archetype and updated "Getting started" document accordingly
-* Redesigned integration with S3 in scope of #703 reusing valid functionality from ZafiraClient and removing obsolete Amazon properties from config.properties
-* #720 Migrate AndroidUtils and IOSUtils to functional interfaces enhancement:
+* Redesigned integration with S3 in scope of [#703](https://github.com/qaprosoft/carina/issues/703) reusing valid functionality from ZafiraClient and removing obsolete Amazon properties from config.properties
+* [#720](https://github.com/qaprosoft/carina/issues/720) Migrate AndroidUtils and IOSUtils to functional interfaces enhancement:
   1) platform independent IMobileUtils->isAppRunning() implemented
   2) AndroidService->checkCurrentDeviceFocus() deprecated
   3) removed already deprecated executeKeyEvent, pressKeyCode, pressBack, swipeInContainer, waitUntilElementNotPresent from IAndroidUtils
 
-## Fixes
-* #745 Bump up com.fasterxml.jackson.core:jackson-databind to 2.9.9 bug
-* #744 Upgrade jacoc-maven-plugin to 0.8.4 in carina and carina-archetype
-* #740 Unable to take a screenshot on a test failure bug
-* #731 Rerun failures and logic onTestFailure doesn't work for the tests with dependsOnMethods
-* #727 Unable to deploy fresh documentation using upgraded pipeline to v 4.0
-* #703 UI dump report for mobile runs should be published to S3 as an artifact bug
+**Fixes**
+
+* [#745](https://github.com/qaprosoft/carina/issues/745) Bump up com.fasterxml.jackson.core:jackson-databind to 2.9.9 bug
+* [#744](https://github.com/qaprosoft/carina/issues/744) Upgrade jacoc-maven-plugin to 0.8.4 in carina and carina-archetype
+* [#740](https://github.com/qaprosoft/carina/issues/740) Unable to take a screenshot on a test failure bug
+* [#731](https://github.com/qaprosoft/carina/issues/731) Rerun failures and logic onTestFailure doesn't work for the tests with dependsOnMethods
+* [#727](https://github.com/qaprosoft/carina/issues/727) Unable to deploy fresh documentation using upgraded pipeline to v 4.0
+* [#703](https://github.com/qaprosoft/carina/issues/703) UI dump report for mobile runs should be published to S3 as an artifact bug
 * fixed NPE in type method when null was provided as an argument
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * maven-surefire-plugin 3.0.0-M3
 * jacoco-maven-plugin 0.8.2 -> 0.8.4
 * jackson-databind 2.8.8 -> 2.8.9
 
 
+
 ### 6.1.20 (2019-05-17)
 
-## Enhancements
+**Enhancements**
+
 * integrated with <b>4.0.53</b> Zafira Server and <b>4.0.56</b> Zafira Client!
 <b>Important: </b> Please, don't migrate to this core version without upgrading Zafira Reporting Tool.
-* #715 Bump up to 4.0.56 zafira-client with fixes for dynamic tags registration (#701)
-* #461 Added support for web mobile execution on real devices using embedded QPS-HUB:
+* [#715](https://github.com/qaprosoft/carina/issues/715) Bump up to 4.0.56 zafira-client with fixes for dynamic tags registration (#701)
+* [#461](https://github.com/qaprosoft/carina/issues/461) Added support for web mobile execution on real devices using embedded QPS-HUB:
 - Chrome, Firefox
 Also coming soon:
 - Samsung Native browser, Edge, Opera, Opera Mini and Yandex mobile browsers
 * Added localized date&time settings support for Android 9
-* #722 Deprecated com.qaprosoft.carina.core.foundation.utils.android.Androidutils and com.qaprosoft.carina.core.foundation.utils.ios.IosUtils. Functional IAndroidUtils and IIosUtils added instead
-* #621 Removed CustomTypePageFactory
+* [#722](https://github.com/qaprosoft/carina/issues/722) Deprecated com.qaprosoft.carina.core.foundation.utils.android.Androidutils and com.qaprosoft.carina.core.foundation.utils.ios.IosUtils. Functional IAndroidUtils and IIosUtils added instead
+* [#621](https://github.com/qaprosoft/carina/issues/621) Removed CustomTypePageFactory
 <b>Note:</b> Reuse ICustomTypePageFactory functional interface updating imports and removing static calls
 
-## Fixes
-* #711  Fixed Maven compiler source and target argument using 1.8 Java for both
+**Fixes**
+
+* [#711](https://github.com/qaprosoft/carina/issues/711)  Fixed Maven compiler source and target argument using 1.8 Java for both
 * Hid "Timer not stopped for operation: .." to debug level as it is not so important
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * zafira-client 3.4.55 -> 4.0.56
+
 
 
 ### 6.0.19 (2019-05-01)
 
-## Enhancements
+**Enhancements**
+
 * integrated with <b>4.0.52</b> Zafira Server! Please, don't migrate to this core version without upgrading Zafira Reporting Tool.
 * Bump up to 3.4.55 zafira-client which support ZAFIRA_ARTIFACTS_USE_PROXY feature for permanent artifacts storing in AS S3
 
-## Fixes
+**Fixes**
+
 * N/A
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * zafira-client 3.4.54 -> 3.4.55
+
 
 
 ### 6.0.18 (2019-04-15)
 
-## Enhancements
+**Enhancements**
+
 * integrated with <b>3.4.51</b> Zafira Server! Please, don't migrate to this core version without upgrading Zafira Reporting Tool.
 * Finished with artifacts uploading improvements to S3 including asynchronous uploading
 * Add Google spreadsheet data provider
@@ -117,91 +139,117 @@ public void test(String TUID, String ARG1, String ARG2)
 * added support for mobile web tests execution against QPS-HUB in qps-infra
 * Published howto article about @ExtendedFindBy() usage for mobile elements
 
-## Fixes
+**Fixes**
 
-## Known Issues
 * N/A
 
-## Dependencies Updates
+**Known Issues**
+
+* N/A
+
+**[DEPENDENCIES UPDATES]**
+
 * maven-surefire-plugin 2.22.1 -> 3.0.0-M3
 * zafira-client 3.3.51 -> 3.4.54
 
 
+
 ### 6.0.16 (2019-03-15)
 
-## Enhancements
+**Enhancements**
+
 * integrated with <b>3.3.48</b> Zafira Server! Please, don't migrate to it's core version without upgrading Zafira Reporting Tool.
 * Improved artifacts uploading to amazon S3. Updated existing screenshots capturing with ability to register important screenshots as test artifacts
 * introduced new "ignore_ssl=false" property for carina-api module. If enabled api tests ignore handshake exception during tests run
 
-## Fixes
+**Fixes**
+
 * Hopefully  [permanent fix](https://github.com/qaprosoft/carina/commit/6916aa54ccf47795f278f6ff088f34ac4590eeb3) delivered for a mess with capturing screenshots over the died driver
 Note: in case of any exception in child thread TestNG crash execution of it's logic and do not execute after methods/classes etc.  Our DriverListener is a child thread.
 * [#673](https://github.com/qaprosoft/carina/issues/673) Fixed extra places with potential NPE
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * zafira-client 3.3.49 -> 3.3.51
+
 
 
 ### 6.0.12 (2019-02-25)
 
-## Enhancements
+**Enhancements**
+
 * [#648](https://github.com/qaprosoft/carina/issues/648) Implement findByImage strategy
 * Added instructions "How to use Find by image strategy": http://qaprosoft.github.io/carina/automation/mobile/
 * Avoid input field clearing for empty control
 
-## Fixes
+**Fixes**
+
 * closing BEFORE_CLASS drivers during "onFinish(ITestContext context)"
 * Added extra debug logging messages for FtpUtils to simplify failures debugging
 * declared ARTIFACTS_EXPIRATION_SECONDS as configuration parameter to see it's value in log
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * jackson-databind 2.8.11.3 -> 2.9.8
 * jackson-annotations 2.9.8
 
 
+
 ### 6.0.11 (2019-02-05)
 
-## Enhancements
-N/A
+**Enhancements**
 
-## Fixes
+* N/A
+
+**Fixes**
+
 * [#652](https://github.com/qaprosoft/carina/issues/652) web video quality property is missed
 
-## Known Issues
-N/A
+**Known Issues**
 
-## Dependencies Updates
 * N/A
+
+**[DEPENDENCIES UPDATES]**
+
+* N/A
+
 
 
 ### 6.0.10 (2019-01-29)
 
-## Enhancements
+**Enhancements**
+
 * [#566](https://github.com/qaprosoft/carina/issues/566) Add new parameters for video recording to match appium 1.10 implementation
 * Prepared MobileSampleTest for iOS/Android and internal application in carina-demo
 
-## Fixes
+**Fixes**
+
 * ExtendedWebElement.scrollTo() refactored using up to date Locatable class
 
-## Known Issues
+**Known Issues**
+
 * [#637](https://github.com/qaprosoft/carina/issues/637) Abnormal behavior when swiping left or right
 More information requested
 * [#652](https://github.com/qaprosoft/carina/issues/652) web video quality property is missed
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * N/A
+
 
 
 ### 6.0.9 (2019-01-22)
 
-## Enhancements
+**Enhancements**
+
 * [#618](https://github.com/qaprosoft/carina/issues/618) Update appium java client to the latest version (7.0.0)
 * [#622](https://github.com/qaprosoft/carina/issues/622) Create Zoom in/out in MobileUtils/IMobileUtils
 * [#534](https://github.com/qaprosoft/carina/issues/534), [#563](https://github.com/qaprosoft/carina/issues/563) Improved BrowserMob proxy coverage by unit tests including example for secure traffic sniffer.
@@ -211,22 +259,27 @@ Also disabled proxy_set_to_system=false property by default. It should be enable
 * [#436](https://github.com/qaprosoft/carina/issues/436), [#326](https://github.com/qaprosoft/carina/issues/326)  Registering device information for unsuccessful driver start. Available only in scope of https://www.qps-infra.io and https://mobiletesting.farm
 <B>Note:</B> Appium should be patched to incorporate custom details into the exception (system-calls.js)
 
-## Fixes
+**Fixes**
+
 * [#625](https://github.com/qaprosoft/carina/issues/625) AbstractTest doesn't implement ICustomTypePageFactory
 * [#629](https://github.com/qaprosoft/carina/issues/629) Annoying INFO message: Value not resolved by key: PRODUCTION.url
 * [#636](https://github.com/qaprosoft/carina/issues/636) operations with relative elements in AbstractUiObject are broken
 * [#634](https://github.com/qaprosoft/carina/issues/634) do not restart proxy during driver restart on the same device
 
-## Known Issues
+**Known Issues**
+
 * [#637](https://github.com/qaprosoft/carina/issues/637) Abnormal behavior when swiping left or right
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * io.appium.java-client 6.1.0 -> 7.0.0
+
 
 
 ### 6.0.8 (2019-01-15)
 
-## Enhancements
+**Enhancements**
+
 * [#614](https://github.com/qaprosoft/carina/issues/614) refactor CustomTypePageFactory to interface 
 <b>Note:</b> CustomTypePageFactory.initPage(...) should be replaced by initPage(...)
 also we again return initPage(...) method without driver as argument
@@ -254,7 +307,8 @@ Listener should be added in pom.xml or in required suite
 <listener class-name="com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener" /> 
 ```
 
-## Fixes
+**Fixes**
+
 * [#533](https://github.com/qaprosoft/carina/issues/533) Default url parameter is not detected by envLoader
 * [#613](https://github.com/qaprosoft/carina/issues/613) openURL functionality refactoring
 * Improved hasDependencies logic using short and full qualified class/method names
@@ -262,11 +316,14 @@ Listener should be added in pom.xml or in required suite
 * Added deprecation javadoc for DriverHelper.tapWithCoordinates(double x, double y)
 * [#623](https://github.com/qaprosoft/carina/issues/623) LOGGER is not being recognized correctly in 6.0.7
 
-## Known Issues
+**Known Issues**
+
 * N/A
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * N/A 
+
 
 
 ### 6.0.6 (2019-01-07)
@@ -297,18 +354,22 @@ CarinaListener.disableDriversCleanup();
 * [#581](https://github.com/qaprosoft/carina/issues/581) Agreed to avoid drivers keep for depenent groups. In case you need it please disable automatic drivers quit according to the step above and organize quit using your own logic.
 * [#599](https://github.com/qaprosoft/carina/issues/599) Upgrade com.fasterxml.jackson.core:jackson-databind to version 2.8.11.3 or later
 
-## Fixes
+**Fixes**
+
 * Fixed potential recursive loops in DriverListener during failures detection
 * [#605](https://github.com/qaprosoft/carina/issues/605) review and complete IDriverPool TODO's
 * [#609](https://github.com/qaprosoft/carina/issues/609) hide "Can't save file to Amazon S3!" error message stack-trace
 * [#604](https://github.com/qaprosoft/carina/issues/604) device name for the test is not registered in Zafira
 * [#584](https://github.com/qaprosoft/carina/issues/584) DevicePool.getDevice() returns different objects of the same device
 
-## Known Issues
+**Known Issues**
+
 * N/A 
 
-## Dependencies Updates
+**[DEPENDENCIES UPDATES]**
+
 * com.fasterxml.jackson.core: jackson-databind 2.8.11.1->2.8.11.3
+
 
 
 ### 6.0.5 (2019-01-04)
@@ -344,7 +405,12 @@ CarinaListener.disableDriversCleanup();
 * N/A
 
 
+
 ### 6.0.4 (2018-12-27)
+
+**Enhancements**
+
+* N/A
 
 **Fixes**
 
@@ -358,6 +424,7 @@ CarinaListener.disableDriversCleanup();
 **[DEPENDENCIES UPDATES]**
 
 * zafira-client 3.3.47->3.3.49
+
 
 
 ### 6.0.3 (2018-12-21)
@@ -385,6 +452,7 @@ CarinaListener.disableDriversCleanup();
 **[DEPENDENCIES UPDATES]**
 
 * N/A
+
 
 
 ### 6.0.2 (2018-12-04)
@@ -470,6 +538,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 * Visit [Migration Steps](http://qaprosoft.github.io/carina/migration/) for details.
 
 
+
 ### 5.3.3.129 (2018-11-21)
 
 **Enhancements**
@@ -491,6 +560,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 * exclude out-of-date 1.38 org.bouncycastle dependency
 
 
+
 ### 5.3.2.127 (2018-11-07)
 
 **Enhancements**
@@ -509,6 +579,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 * com.qaprosoft.zafira-client updated to 3.3.47
 
 
+
 ### 5.3.1.125 (2018-10-16)
 
 **Enhancements**
@@ -522,7 +593,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 
 **Fixes**
 
-N/A
+* N/A
 
 **[DEPENDENCIES UPDATES]**
 
@@ -532,6 +603,7 @@ N/A
 * maven-assembly-plugin 2.4.1 -> 3.1.0
 * maven-source-plugin 2.4 -> 3.0.1
 * com.qaprosoft.zafira-client updated to 3.3.46
+
 
 
 ### 5.3.0.124 (2018-10-08)
@@ -591,6 +663,7 @@ N/A
 * com.qaprosoft.zafira-client updated to 3.0.43
 
 
+
 ### 5.2.4.111 (2018-07-24)
 
 **Enhancements**
@@ -620,6 +693,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 * Improved integration with qps-pipeline to support demo screenshots publishing to CI for aborted testruns as well
 
 **Fixes**
+
 * minor adjustments in UI operations for invisible elements on browsers
 * fixed integration with ZafiraClient to specify default expiration for test artifacts (30 days)
 * Resolve issues with default Timer operations (error messages instead of RuntimeException)
@@ -635,6 +709,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 * io.appium:java-client was updated to official 6.1.0 release
 * org.seleniumhq.selenium:selenium-java updated to 3.12.0
 * com.qaprosoft.zafira-client updated to 3.0.40
+
 
 
 ### 5.2.4.97 (2018-06-02)
