@@ -11,11 +11,11 @@ Note: previous single @MethodOwner annotation without platform works as well
 @MethodOwner(owner = "user2", platform = "ios")
 ``` 
 * [#749](https://github.com/qaprosoft/carina/issues/749) Added ability to set custom test data directory name. This functionality is available via <b>  ReportContext.setCustomTestDirName("customName") </b> method.
-* [#751](https://github.com/qaprosoft/carina/issues/751) provided anonymous access to carina CI jobs: https://ci.qaprosoft.com/jenkins/job/carina
-* [#752](https://github.com/qaprosoft/carina/issues/752) Added generation of JavaDoc  and provided read access to carina CI jobs for anonymous users, for example: https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/javadoc/
+* [#751](https://github.com/qaprosoft/carina/issues/751) provided anonymous access to carina [CI jobs](https://ci.qaprosoft.com/jenkins/job/carina)
+* [#752](https://github.com/qaprosoft/carina/issues/752) Added generation of [JavaDoc](https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/javadoc/)
 * [#754](https://github.com/qaprosoft/carina/issues/754) Renamed <i>browser_locale</i> property to <i>browser_language</i><br>
 <b>Note:</b> make sure to update your project  _config.properties accordingly to be able to override browser language!
-* Added release and snapshot build job statuses to https://github.com/qaprosoft/carina
+* Added release and snapshot build job statuses to [carina github](https://github.com/qaprosoft/carina)
 ![image](https://user-images.githubusercontent.com/4551455/60375087-3de3bc00-9a10-11e9-828c-7cdcf561a5a3.png)
 
 **Fixes**
@@ -183,7 +183,7 @@ Note: in case of any exception in child thread TestNG crash execution of it's lo
 **Enhancements**
 
 * [#648](https://github.com/qaprosoft/carina/issues/648) Implement findByImage strategy
-* Added instructions "How to use Find by image strategy": http://qaprosoft.github.io/carina/automation/mobile/
+* Added [instructions](http://qaprosoft.github.io/carina/automation/mobile/) "How to use Find by image strategy".
 * Avoid input field clearing for empty control
 
 **Fixes**
@@ -498,7 +498,7 @@ Example:
         ...
     }
 ```
-* Moved unit tests into the valid modules to be able to track coverage results in Sonar: https://ci.qaprosoft.com/sonarqube/dashboard/index?did=2
+* Moved unit tests into the valid modules to be able to track coverage results in [Sonar](https://ci.qaprosoft.com/sonarqube/dashboard/index?did=2)
 * Move some noisy log messages onto the DEBUG level
 * added possibility to redefine log level for explicit sub-modules/classes
 ```
@@ -508,7 +508,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 * added support for Opera browser. For now both variants are ok:
     * browser=opera
     * browser=operablink 
-* Removed all TestRail updaters from Carina and all required dto classes. Integration with 3rd party testcase management tools will be allowed through the https://github.com/qaprosoft/zafira only!
+* Removed all TestRail updaters from Carina and all required dto classes. Integration with 3rd party testcase management tools will be allowed through the [zafira](https://github.com/qaprosoft/zafira) only!
 * Removed SMTP integration settings from Carina. All notification methods will be concentrated in Zafira Reporting Tool. Carina could only run and generate local report in ./reports/qa folder.
 * Removed completely JUnit libraries from classpath to avoid invalid asserts import inside the test classes on projects level
 * Removed cucumber integration as not used feature
@@ -646,7 +646,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 
 * Disabled live screenshots appender into the Zafira Reporting Tool due to the performance degradation of elasticsearch
 * Improved custom capabilities transfer between carina and custom mobile selenium-hub
-* Added documentationabout CustomTypePageFactory usage to generate unified Desktop/Android/iOS test classes: http://qaprosoft.github.io/carina/automation/mobile/
+* Added [documentation](http://qaprosoft.github.io/carina/automation/mobile/) about CustomTypePageFactory usage to generate unified Desktop/Android/iOS test classes.
 * Added live VNC streaming support for drivers started in before suite/class/method actions
 * Added new public static method DevicePool.isRegistered()
 * Updated carina default archetype
@@ -654,7 +654,7 @@ core_log_packages=IDriverPool,ZafiraConfigurator
 **Fixes**
 
 * Updated copyright info
-* Workaround applied for appium issue: https://github.com/appium/appium/issues/10159
+* Workaround applied for appium [issue](https://github.com/appium/appium/issues/10159)
 * Hide some stacktrace messages during browser maximize as warning (mostly for the executing web tests on mobile devices/browsers)
 * Cleanup in DesktopFactory removing obsolete functionality
 
