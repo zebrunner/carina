@@ -846,7 +846,7 @@ Note: previous single @MethodOwner annotation without platform works as well</li
 <p><strong>Migration Steps</strong></p>
 <ul>
 <li>Remove all occurrences of <b>secondaryOwner</b> parameter for <i>@MethodOwner</i> annotation. Use platform filter based on information above instead</li>
-<li>To complete migration replace in your _config.properties all occurrences of <i>browser_locale</i> to <i>browser_lang</i></li>
+<li>To complete migration replace in your _config.properties all occurrences of <i>browser_locale</i> to <i>browser_language</i></li>
 </ul>
 <h3 id="6121-2019-06-09">6.1.21 (2019-06-09)</h3>
 <p><strong>Enhancements</strong></p>
@@ -855,10 +855,10 @@ Note: previous single @MethodOwner annotation without platform works as well</li
 <li>Cleaned up Carina archetype in accordance with the latest changes (dependencies, removal of obsolete files, etc.)</li>
 <li>Released 6.1.21 archetype and updated "Getting started" document accordingly</li>
 <li>Redesigned integration with S3 in scope of <a href="https://github.com/qaprosoft/carina/issues/703">#703</a> reusing valid functionality from ZafiraClient and removing obsolete Amazon properties from config.properties</li>
-<li><a href="https://github.com/qaprosoft/carina/issues/720">#720</a> Migrate AndroidUtils and IOSUtils to functional interfaces enhancement:
-  1) platform independent IMobileUtils-&gt;isAppRunning() implemented
-  2) AndroidService-&gt;checkCurrentDeviceFocus() deprecated
-  3) removed already deprecated executeKeyEvent, pressKeyCode, pressBack, swipeInContainer, waitUntilElementNotPresent from IAndroidUtils</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/720">#720</a> Migrate AndroidUtils and IOSUtils to functional interfaces enhancement:</li>
+<li>platform independent IMobileUtils-&gt;isAppRunning() implemented</li>
+<li>AndroidService-&gt;checkCurrentDeviceFocus() deprecated</li>
+<li>removed already deprecated executeKeyEvent, pressKeyCode, pressBack, swipeInContainer, waitUntilElementNotPresent from IAndroidUtils</li>
 </ul>
 <p><strong>Fixes</strong></p>
 <ul>
@@ -886,12 +886,14 @@ Note: previous single @MethodOwner annotation without platform works as well</li
 <li>integrated with <b>4.0.53</b> Zafira Server and <b>4.0.56</b> Zafira Client!<br>
 <b>Important: </b> Please, don't migrate to this core version without upgrading Zafira Reporting Tool.</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/715">#715</a> Bump up to 4.0.56 zafira-client with fixes for dynamic tags registration (#701)</li>
-<li><a href="https://github.com/qaprosoft/carina/issues/461">#461</a> Added support for web mobile execution on real devices using embedded QPS-HUB:</li>
-<li>Chrome, Firefox
-Also coming soon:</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/461">#461</a> Added support for web mobile execution on real devices using embedded QPS-HUB: Chrome, Firefox</li>
+<li>Also coming soon:<ul>
 <li>Samsung Native browser, Edge, Opera, Opera Mini and Yandex mobile browsers</li>
-<li>Added localized date&amp;time settings support for Android 9</li>
-<li><a href="https://github.com/qaprosoft/carina/issues/722">#722</a> Deprecated com.qaprosoft.carina.core.foundation.utils.android.Androidutils and com.qaprosoft.carina.core.foundation.utils.ios.IosUtils. Functional IAndroidUtils and IIosUtils added instead</li>
+</ul>
+</li>
+<li>Added localized date and time settings support for Android 9</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/722">#722</a> Deprecated com.qaprosoft.carina.core.foundation.utils.android.Androidutils and com.qaprosoft.carina.core.foundation.utils.ios.IosUtils.<br>
+Functional IAndroidUtils and IIosUtils added instead</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/621">#621</a> Removed CustomTypePageFactory<br>
 <b>Note:</b> Reuse ICustomTypePageFactory functional interface updating imports and removing static calls</li>
 </ul>
@@ -911,8 +913,9 @@ Also coming soon:</li>
 <h3 id="6019-2019-05-01">6.0.19 (2019-05-01)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li>integrated with <b>4.0.52</b> Zafira Server! Please, don't migrate to this core version without upgrading Zafira Reporting Tool.</li>
-<li>Bump up to 3.4.55 zafira-client which support ZAFIRA_ARTIFACTS_USE_PROXY feature for permanent artifacts storing in AS S3</li>
+<li>integrated with <b>4.0.52</b> Zafira Server!<br>
+<b>Important: </b>Please, don't migrate to this core version without upgrading Zafira Reporting Tool.</li>
+<li>Bump up to 3.4.55 zafira-client which support ZAFIRA_ARTIFACTS_USE_PROXY feature for permanent artifacts storing in AWS S3</li>
 </ul>
 <p><strong>Fixes</strong></p>
 <ul>
@@ -929,7 +932,8 @@ Also coming soon:</li>
 <h3 id="6018-2019-04-15">6.0.18 (2019-04-15)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li>integrated with <b>3.4.51</b> Zafira Server! Please, don't migrate to this core version without upgrading Zafira Reporting Tool.</li>
+<li>integrated with <b>3.4.51</b> Zafira Server!<br>
+<b>Important: </b>Please, don't migrate to this core version without upgrading Zafira Reporting Tool.</li>
 <li>Finished with artifacts uploading improvements to S3 including asynchronous uploading</li>
 <li>Add Google spreadsheet data provider</li>
 </ul>
@@ -958,7 +962,8 @@ public void test(String TUID, String ARG1, String ARG2)
 <h3 id="6016-2019-03-15">6.0.16 (2019-03-15)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li>integrated with <b>3.3.48</b> Zafira Server! Please, don't migrate to it's core version without upgrading Zafira Reporting Tool.</li>
+<li>integrated with <b>3.3.48</b> Zafira Server!<br>
+<b>Important: </b>Please, don't migrate to it's core version without upgrading Zafira Reporting Tool.</li>
 <li>Improved artifacts uploading to amazon S3. Updated existing screenshots capturing with ability to register important screenshots as test artifacts</li>
 <li>introduced new "ignore_ssl=false" property for carina-api module. If enabled api tests ignore handshake exception during tests run</li>
 </ul>
@@ -1046,7 +1051,7 @@ Take a <a href="https://github.com/qaprosoft/carina/blob/e723fbdc5adce0447d47b5b
 Also disabled proxy_set_to_system=false property by default. It should be enabled only if you have to use your internal corporate proxy to have access to internet.</p>
 </li>
 <li>
-<p><a href="https://github.com/qaprosoft/carina/issues/436">#436</a>, <a href="https://github.com/qaprosoft/carina/issues/326">#326</a>  Registering device information for unsuccessful driver start. Available only in scope of https://www.qps-infra.io and https://mobiletesting.farm
+<p><a href="https://github.com/qaprosoft/carina/issues/436">#436</a>, <a href="https://github.com/qaprosoft/carina/issues/326">#326</a>  Registering device information for unsuccessful driver start. Available only in scope of https://www.qps-infra.io and https://mobiletesting.farm<br>
 <B>Note:</B> Appium should be patched to incorporate custom details into the exception (system-calls.js)</p>
 </li>
 </ul>
@@ -1068,7 +1073,7 @@ Also disabled proxy_set_to_system=false property by default. It should be enable
 <h3 id="608-2019-01-15">6.0.8 (2019-01-15)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li><a href="https://github.com/qaprosoft/carina/issues/614">#614</a> refactor CustomTypePageFactory to interface 
+<li><a href="https://github.com/qaprosoft/carina/issues/614">#614</a> refactor CustomTypePageFactory to interface<br>
 <b>Note:</b> CustomTypePageFactory.initPage(...) should be replaced by initPage(...)
 also we again return initPage(...) method without driver as argument</li>
 </ul>
@@ -1083,21 +1088,19 @@ initPage(...);
 </li>
 <li>
 <p><a href="https://github.com/qaprosoft/carina/issues/612">#612</a> Test execution by filter rules. 
-Annotations for future filtering can be set in tests in following way: </p>
+Annotations for future filtering can be set in tests in following way for test method and inside <b>config.properties</b>: </p>
 </li>
 </ul>
 <pre><code>    @TestPriority(Priority.P1)
     @MethodOwner(owner = &quot;owner&quot;)
     @TestTag(name = &quot;feature&quot;, value = &quot;reg&quot;)
-</code></pre>
 
-<p>And setup in <b>config.properties</b> </p>
-<pre><code>test_run_rules=PRIORITY=&gt;P1&amp;amp;&amp;amp;P2;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp&amp;amp;&amp;amp;feature=reg
-rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...
-</code></pre>
+    // _config.properties:
+    test_run_rules=PRIORITY=&gt;P1&amp;amp;&amp;amp;P2;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp&amp;amp;&amp;amp;feature=reg
+    rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...
 
-<p>Listener should be added in pom.xml or in required suite</p>
-<pre><code>&lt;listener class-name=&quot;com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener&quot; /&gt; 
+    //Listener should be added in pom.xml or in required suite
+    &lt;listener class-name=&quot;com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener&quot; /&gt; 
 </code></pre>
 
 <p><strong>Fixes</strong></p>
@@ -1120,7 +1123,7 @@ rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VA
 <h3 id="606-2019-01-07">6.0.6 (2019-01-07)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li><a href="https://github.com/qaprosoft/carina/issues/607">#607</a> refactor DevicePool logic integrating it completely into DriverPool
+<li><a href="https://github.com/qaprosoft/carina/issues/607">#607</a> refactor DevicePool logic integrating it completely into DriverPool<br>
 <b>Note:</b> Due to the removed DevicePool class some code refactoring on project level needed. 
 Mostly for devicePool.getDevice() which is not available anymore:</li>
 </ul>
