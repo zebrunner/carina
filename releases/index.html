@@ -815,7 +815,7 @@
 <h3 id="6122-2019-06-29">6.1.22 (2019-06-29)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li><a href="https://github.com/qaprosoft/carina/issues/736">#736</a> Updated <b>@MethodOwner</b> annotation. <b>secondaryOwner</b> parameter no longer exists, instead of this parameter added platform filter where neccessary:
+<li><a href="https://github.com/qaprosoft/carina/issues/736">#736</a> Updated <b>@MethodOwner</b> annotation. <b>secondaryOwner</b> parameter no longer exists, instead of this parameter added platform filter where neccessary:<br>
 Note: previous single @MethodOwner annotation without platform works as well</li>
 </ul>
 <pre><code>@MethodOwner(owner = &quot;user1&quot;, platform = &quot;android&quot;)
@@ -826,8 +826,8 @@ Note: previous single @MethodOwner annotation without platform works as well</li
 <li><a href="https://github.com/qaprosoft/carina/issues/749">#749</a> Added ability to set custom test data directory name. This functionality is available via <b>  ReportContext.setCustomTestDirName("customName") </b> method.</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/751">#751</a> provided anonymous access to carina CI jobs: https://ci.qaprosoft.com/jenkins/job/carina</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/752">#752</a> Added generation of JavaDoc  and provided read access to carina CI jobs for anonymous users, for example: https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/javadoc/</li>
-<li><a href="https://github.com/qaprosoft/carina/issues/754">#754</a> Renamed <i>browser_locale</i> property to <i>browser_language</i>
-Note: make sure to update your project  _config.properties accordingly to be able to override browser language!</li>
+<li><a href="https://github.com/qaprosoft/carina/issues/754">#754</a> Renamed <i>browser_locale</i> property to <i>browser_language</i><br>
+<b>Note:</b> make sure to update your project  _config.properties accordingly to be able to override browser language!</li>
 <li>Added release and snapshot build job statuses to https://github.com/qaprosoft/carina
 <img alt="image" src="https://user-images.githubusercontent.com/4551455/60375087-3de3bc00-9a10-11e9-828c-7cdcf561a5a3.png" /></li>
 </ul>
@@ -883,7 +883,7 @@ Note: make sure to update your project  _config.properties accordingly to be abl
 <h3 id="6120-2019-05-17">6.1.20 (2019-05-17)</h3>
 <p><strong>Enhancements</strong></p>
 <ul>
-<li>integrated with <b>4.0.53</b> Zafira Server and <b>4.0.56</b> Zafira Client!
+<li>integrated with <b>4.0.53</b> Zafira Server and <b>4.0.56</b> Zafira Client!<br>
 <b>Important: </b> Please, don't migrate to this core version without upgrading Zafira Reporting Tool.</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/715">#715</a> Bump up to 4.0.56 zafira-client with fixes for dynamic tags registration (#701)</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/461">#461</a> Added support for web mobile execution on real devices using embedded QPS-HUB:</li>
@@ -892,13 +892,13 @@ Also coming soon:</li>
 <li>Samsung Native browser, Edge, Opera, Opera Mini and Yandex mobile browsers</li>
 <li>Added localized date&amp;time settings support for Android 9</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/722">#722</a> Deprecated com.qaprosoft.carina.core.foundation.utils.android.Androidutils and com.qaprosoft.carina.core.foundation.utils.ios.IosUtils. Functional IAndroidUtils and IIosUtils added instead</li>
-<li><a href="https://github.com/qaprosoft/carina/issues/621">#621</a> Removed CustomTypePageFactory
+<li><a href="https://github.com/qaprosoft/carina/issues/621">#621</a> Removed CustomTypePageFactory<br>
 <b>Note:</b> Reuse ICustomTypePageFactory functional interface updating imports and removing static calls</li>
 </ul>
 <p><strong>Fixes</strong></p>
 <ul>
 <li><a href="https://github.com/qaprosoft/carina/issues/711">#711</a>  Fixed Maven compiler source and target argument using 1.8 Java for both</li>
-<li>Hid "Timer not stopped for operation: .." to debug level as it is not so important</li>
+<li>Hide "Timer not stopped for operation: .." to debug level as it is not so important</li>
 </ul>
 <p><strong>Known Issues</strong></p>
 <ul>
@@ -964,8 +964,8 @@ public void test(String TUID, String ARG1, String ARG2)
 </ul>
 <p><strong>Fixes</strong></p>
 <ul>
-<li>Hopefully  <a href="https://github.com/qaprosoft/carina/commit/6916aa54ccf47795f278f6ff088f34ac4590eeb3">permanent fix</a> delivered for a mess with capturing screenshots over the died driver
-Note: in case of any exception in child thread TestNG crash execution of it's logic and do not execute after methods/classes etc.  Our DriverListener is a child thread.</li>
+<li>Hopefully  <a href="https://github.com/qaprosoft/carina/commit/6916aa54ccf47795f278f6ff088f34ac4590eeb3">permanent fix</a> delivered for a mess with capturing screenshots over the died driver<br>
+Note: in case of any exception in child thread TestNG crash execution of it's logic and do not execute after methods/classes etc. Our DriverListener is a child thread.</li>
 <li><a href="https://github.com/qaprosoft/carina/issues/673">#673</a> Fixed extra places with potential NPE</li>
 </ul>
 <p><strong>Known Issues</strong></p>
@@ -1467,7 +1467,7 @@ http://qaprosoft.github.io/carina/automation/mobile/</p>
 <p>Split click operation for separated Web and Mobile actions to minimize negative side-effects</p>
 </li>
 <li>
-<p>MobileUtils - migrated tap etc operations onto the TouchOptions etc
+<p>MobileUtils - migrated tap etc operations onto the TouchOptions etc<br>
 Note: if in your code thera direct references onto the TouchActions-&gt;tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.
 Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005bad3f48b41711</p>
 </li>
@@ -1510,7 +1510,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 http://qaprosoft.github.io/carina/automation/api/</p>
 </li>
 <li>
-<p>MobileUtils - migrated tap etc operations onto the TouchOptions etc
+<p>MobileUtils - migrated tap etc operations onto the TouchOptions etc<br>
 Note: if in your code thera direct references onto the TouchActions-&gt;tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.
 Example: 859d1f0</p>
 </li>
