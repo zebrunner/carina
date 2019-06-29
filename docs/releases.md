@@ -4,7 +4,7 @@
 
 **Enhancements**
 
-* [#736](https://github.com/qaprosoft/carina/issues/736) Updated <b>@MethodOwner</b> annotation. <b>secondaryOwner</b> parameter no longer exists, instead of this parameter added platform filter where neccessary:
+* [#736](https://github.com/qaprosoft/carina/issues/736) Updated <b>@MethodOwner</b> annotation. <b>secondaryOwner</b> parameter no longer exists, instead of this parameter added platform filter where neccessary:<br>
 Note: previous single @MethodOwner annotation without platform works as well
 ```
 @MethodOwner(owner = "user1", platform = "android")
@@ -13,8 +13,8 @@ Note: previous single @MethodOwner annotation without platform works as well
 * [#749](https://github.com/qaprosoft/carina/issues/749) Added ability to set custom test data directory name. This functionality is available via <b>  ReportContext.setCustomTestDirName("customName") </b> method.
 * [#751](https://github.com/qaprosoft/carina/issues/751) provided anonymous access to carina CI jobs: https://ci.qaprosoft.com/jenkins/job/carina
 * [#752](https://github.com/qaprosoft/carina/issues/752) Added generation of JavaDoc  and provided read access to carina CI jobs for anonymous users, for example: https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/javadoc/
-* [#754](https://github.com/qaprosoft/carina/issues/754) Renamed <i>browser_locale</i> property to <i>browser_language</i>
-Note: make sure to update your project  _config.properties accordingly to be able to override browser language!
+* [#754](https://github.com/qaprosoft/carina/issues/754) Renamed <i>browser_locale</i> property to <i>browser_language</i><br>
+<b>Note:</b> make sure to update your project  _config.properties accordingly to be able to override browser language!
 * Added release and snapshot build job statuses to https://github.com/qaprosoft/carina
 ![image](https://user-images.githubusercontent.com/4551455/60375087-3de3bc00-9a10-11e9-828c-7cdcf561a5a3.png)
 
@@ -76,7 +76,7 @@ Note: make sure to update your project  _config.properties accordingly to be abl
 
 **Enhancements**
 
-* integrated with <b>4.0.53</b> Zafira Server and <b>4.0.56</b> Zafira Client!
+* integrated with <b>4.0.53</b> Zafira Server and <b>4.0.56</b> Zafira Client!<br>
 <b>Important: </b> Please, don't migrate to this core version without upgrading Zafira Reporting Tool.
 * [#715](https://github.com/qaprosoft/carina/issues/715) Bump up to 4.0.56 zafira-client with fixes for dynamic tags registration (#701)
 * [#461](https://github.com/qaprosoft/carina/issues/461) Added support for web mobile execution on real devices using embedded QPS-HUB:
@@ -85,13 +85,13 @@ Also coming soon:
 - Samsung Native browser, Edge, Opera, Opera Mini and Yandex mobile browsers
 * Added localized date&time settings support for Android 9
 * [#722](https://github.com/qaprosoft/carina/issues/722) Deprecated com.qaprosoft.carina.core.foundation.utils.android.Androidutils and com.qaprosoft.carina.core.foundation.utils.ios.IosUtils. Functional IAndroidUtils and IIosUtils added instead
-* [#621](https://github.com/qaprosoft/carina/issues/621) Removed CustomTypePageFactory
+* [#621](https://github.com/qaprosoft/carina/issues/621) Removed CustomTypePageFactory<br>
 <b>Note:</b> Reuse ICustomTypePageFactory functional interface updating imports and removing static calls
 
 **Fixes**
 
 * [#711](https://github.com/qaprosoft/carina/issues/711)  Fixed Maven compiler source and target argument using 1.8 Java for both
-* Hid "Timer not stopped for operation: .." to debug level as it is not so important
+* Hide "Timer not stopped for operation: .." to debug level as it is not so important
 
 **Known Issues**
 
@@ -164,8 +164,8 @@ public void test(String TUID, String ARG1, String ARG2)
 
 **Fixes**
 
-* Hopefully  [permanent fix](https://github.com/qaprosoft/carina/commit/6916aa54ccf47795f278f6ff088f34ac4590eeb3) delivered for a mess with capturing screenshots over the died driver
-Note: in case of any exception in child thread TestNG crash execution of it's logic and do not execute after methods/classes etc.  Our DriverListener is a child thread.
+* Hopefully  [permanent fix](https://github.com/qaprosoft/carina/commit/6916aa54ccf47795f278f6ff088f34ac4590eeb3) delivered for a mess with capturing screenshots over the died driver<br>
+Note: in case of any exception in child thread TestNG crash execution of it's logic and do not execute after methods/classes etc. Our DriverListener is a child thread.
 * [#673](https://github.com/qaprosoft/carina/issues/673) Fixed extra places with potential NPE
 
 **Known Issues**
@@ -680,7 +680,7 @@ http://qaprosoft.github.io/carina/automation/mobile/
 
 * Split click operation for separated Web and Mobile actions to minimize negative side-effects
 
-* MobileUtils - migrated tap etc operations onto the TouchOptions etc
+* MobileUtils - migrated tap etc operations onto the TouchOptions etc<br>
 Note: if in your code thera direct references onto the TouchActions->tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.
 Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005bad3f48b41711
 
@@ -719,7 +719,7 @@ Example: https://github.com/qaprosoft/carina/commit/859d1f0d284462733e2c2ddf005b
 * Published new article for API automation approach:
 http://qaprosoft.github.io/carina/automation/api/
 
-* MobileUtils - migrated tap etc operations onto the TouchOptions etc
+* MobileUtils - migrated tap etc operations onto the TouchOptions etc<br>
 Note: if in your code thera direct references onto the TouchActions->tap operations you should update them as well because in 6.0.0 java appium client deprecated methods were removed.
 Example: 859d1f0
 
