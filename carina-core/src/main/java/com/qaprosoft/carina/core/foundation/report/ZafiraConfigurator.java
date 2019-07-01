@@ -58,6 +58,8 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         ConfigurationType conf = new ConfigurationType();
         
         String platform = Configuration.getPlatform();
+        LOGGER.info("platformRUN: " + platform);
+        
         // override platform to register correctly on Zafira         
         R.CONFIG.put(Parameter.PLATFORM.name(), platform);
         
