@@ -384,15 +384,11 @@ public class Configuration {
         // redefine platform if capabilities.platform is available
         if (!R.CONFIG.get("capabilities.platform").isEmpty()) {
             platform = R.CONFIG.get("capabilities.platform");
-            // override default platform as well
-            R.CONFIG.put(Parameter.PLATFORM.name(), platform);
         }
 
         // redefine platform if mobile.platformName is available
         if (!R.CONFIG.get("capabilities.platformName").isEmpty()) {
             platform = R.CONFIG.get("capabilities.platformName");
-            // override default platform as well
-            R.CONFIG.put(Parameter.PLATFORM.name(), platform);
         }
         return platform;
     }
