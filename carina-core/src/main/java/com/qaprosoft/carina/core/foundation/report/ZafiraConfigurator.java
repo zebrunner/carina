@@ -58,7 +58,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         ConfigurationType conf = new ConfigurationType();
         
         String platform = Configuration.getPlatform();
-        LOGGER.info("platformRUN: " + platform);
         
         // override platform to register correctly on Zafira         
         R.CONFIG.put(Parameter.PLATFORM.getKey(), platform);
@@ -66,11 +65,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         for (Parameter parameter : Parameter.values()) {
             conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
         }
-
-        LOGGER.info("platformRUN2: " + Configuration.get(Parameter.PLATFORM));
-        LOGGER.info("platformRUN3: " + R.CONFIG.get(Parameter.PLATFORM.getKey()));
-        LOGGER.info("platformRUN4: " + R.CONFIG.get("platform"));
-        
 
         if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
             // update browser_version in returned config to register real value instead of * of matcher
