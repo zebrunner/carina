@@ -102,10 +102,12 @@ public class HockeyAppManager {
             File file = new File(folder);
             File[] listOfFiles = file.listFiles();
 
-            for(int i = 0; i < listOfFiles.length; ++i){
-                if(listOfFiles[i].isFile() && listOfFiles[i].getName().contains(fileName)){
-                    LOGGER.info("File has been Located Locally.  File path is: " + listOfFiles[i].getAbsolutePath());
-                    fileToLocate = listOfFiles[i];
+            if (file.list() != null) {
+                for (int i = 0; i < listOfFiles.length; ++i) {
+                    if (listOfFiles[i].isFile() && fileName.contains(listOfFiles[i].getName())) {
+                        LOGGER.info("File has been Located Locally.  File path is: " + listOfFiles[i].getAbsolutePath());
+                        fileToLocate = listOfFiles[i];
+                    }
                 }
             }
         } catch (Exception ex) {
