@@ -392,6 +392,20 @@ public class Configuration {
         }
         return platform;
     }
+    
+    public static String getBrowser() {
+        String browser = "";
+        if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
+            // default "browser=value" should be used to determine current browser
+            browser = Configuration.get(Parameter.BROWSER);
+        }
+
+        // redefine browser if capabilities.browserName is available
+        if (!R.CONFIG.get("capabilities.browserName").isEmpty()) {
+            browser = R.CONFIG.get("capabilities.browserName");
+        }
+        return browser;
+    }
 
     public static String getDriverType() {
 

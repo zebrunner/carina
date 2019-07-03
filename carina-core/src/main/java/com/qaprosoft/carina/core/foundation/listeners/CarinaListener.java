@@ -457,12 +457,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     protected String getBrowser() {
-        String browser = "";
-        if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
-            browser = Configuration.get(Parameter.BROWSER);
-        }
-
-        return browser;
+        return Configuration.getBrowser();
     }
 
     protected String getTitle(XmlSuite suite) {

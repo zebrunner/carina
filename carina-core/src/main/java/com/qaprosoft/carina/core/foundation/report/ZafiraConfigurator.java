@@ -58,9 +58,12 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         ConfigurationType conf = new ConfigurationType();
         
         String platform = Configuration.getPlatform();
-        
-        // override platform to register correctly on Zafira         
+        // override platform to register correctly on Zafira based on capabilities.platform and platformName
         R.CONFIG.put(Parameter.PLATFORM.getKey(), platform);
+        
+        String browser = Configuration.getBrowser();
+        // override browser to register correctly on Zafira based on capabilities.browserName as well
+        R.CONFIG.put(Parameter.BROWSER.getKey(), browser);
         
         for (Parameter parameter : Parameter.values()) {
             conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));

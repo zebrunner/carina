@@ -97,7 +97,7 @@ public class DesktopFactory extends AbstractFactory {
 
     @SuppressWarnings("deprecation")
 	public DesiredCapabilities getCapabilities(String name) {
-        String browser = Configuration.get(Parameter.BROWSER);
+        String browser = Configuration.getBrowser();
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
