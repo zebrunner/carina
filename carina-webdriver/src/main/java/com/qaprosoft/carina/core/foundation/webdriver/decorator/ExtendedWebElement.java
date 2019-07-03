@@ -587,7 +587,6 @@ public class ExtendedWebElement {
     public boolean clickIfPresent(long timeout) {
         boolean present = isElementPresent(timeout);
         if (present) {
-            captureElements();
             click();
         }
 
@@ -1188,122 +1187,6 @@ public class ExtendedWebElement {
         return new ExtendedWebElement(by, name, getDriver());
     }
 
-    private void captureElements() {
-    	//TODO: take a look again when we need this functionality again
-    	return;
-
-/*        if (!Configuration.getBoolean(Parameter.SMART_SCREENSHOT)) {
-            return;
-        }
-
-        if (!BrowserType.CHROME.equalsIgnoreCase(Configuration.get(Parameter.BROWSER))) {
-            return;
-        }
-
-        String currentUrl;
-        if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
-            currentUrl = driver.getCurrentUrl();
-        } else {
-            // change for XBox and looks like mobile part
-            currentUrl = driver.getTitle();
-        }
-
-        String cache = getUrlWithoutParameters(currentUrl);
-        if (!MetadataCollector.getAllCollectedData().containsKey(cache)) {
-            try {
-
-                ElementsInfo elementsInfo = new ElementsInfo();
-                elementsInfo.setCurrentURL(currentUrl);
-
-                String metadataScreenPath = Screenshot.captureMetadata(getDriver(), String.valueOf(cache.hashCode()));
-                // TODO: double check that file exist because due to the
-                // different reason screenshot can miss
-                File newPlace = new File(metadataScreenPath);
-
-                ScreenShootInfo screenShootInfo = new ScreenShootInfo();
-                screenShootInfo.setScreenshotPath(newPlace.getAbsolutePath());
-                BufferedImage bimg = ImageIO.read(newPlace);
-
-                screenShootInfo.setWidth(bimg.getWidth());
-                screenShootInfo.setHeight(bimg.getHeight());
-                elementsInfo.setScreenshot(screenShootInfo);
-
-                List<WebElement> all = driver.findElements(By.xpath("//*"));
-
-                List<WebElement> control = driver.findElements(
-                        By.xpath("//input[not(contains(@type,'hidden'))] | //button | .//*[contains(@class, 'btn') and not(self::span)] | //select"));
-
-                for (WebElement webElement : control) {
-                    ElementInfo elementInfo = getElementInfo(new ExtendedWebElement(webElement, driver));
-
-                    int elementPosition = all.indexOf(webElement);
-                    for (int i = 1; i < 5; i++) {
-                        if (elementPosition - i < 0) {
-                            break;
-                        }
-
-                        if (control.indexOf(all.get(elementPosition - i)) > 0) {
-                            break;
-                        }
-                        if (!all.get(elementPosition - i).isDisplayed()) {
-                            continue;
-                        }
-                        String sti = all.get(elementPosition - i).getText();
-                        if (sti == null || sti.isEmpty() || control.get(0).getText().equals(sti)) {
-                            continue;
-                        } else {
-                            elementInfo.setTextInfo(getElementInfo(new ExtendedWebElement(all.get(elementPosition - i), driver)));
-                            break;
-                        }
-                    }
-                    elementsInfo.addElement(elementInfo);
-                    MetadataCollector.putPageInfo(cache, elementsInfo);
-                }
-
-            } catch (IOException e) {
-                LOGGER.error("Unable to capture elements metadata!", e);
-            } catch (Exception e) {
-                LOGGER.error("Unable to capture elements metadata!", e);
-            } catch (Throwable thr) {
-                LOGGER.error("Unable to capture elements metadata!", thr);
-            }
-        }*/
-    }
-
-    /*    private String getUrlWithoutParameters(String url) {
-
-        try {
-            URI uri = new URI(url);
-            return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, uri.getFragment()).toString();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return url;
-    }
-
-    @SuppressWarnings("unchecked")
-    private ElementInfo getElementInfo(ExtendedWebElement extendedWebElement) {
-        ElementInfo elementInfo = new ElementInfo();
-        if (extendedWebElement.isElementPresent(1)) {
-            Point location = extendedWebElement.getElement().getLocation();
-            Dimension size = extendedWebElement.getElement().getSize();
-            elementInfo.setRect(new Rect(location.getX(), location.getY(), size.getWidth(), size.getHeight()));
-            elementInfo.setElementsAttributes(
-                    (Map<String, String>) ((RemoteWebDriver) driver).executeScript(ATTRIBUTE_JS, extendedWebElement.getElement()));
-
-            try {
-                elementInfo.setText(extendedWebElement.getText());
-            } catch (Exception e) {
-                elementInfo.setText("");
-            }
-
-            return elementInfo;
-        } else {
-            return null;
-        }
-
-    }
-*/
     /**
      * Pause for specified timeout.
      * 

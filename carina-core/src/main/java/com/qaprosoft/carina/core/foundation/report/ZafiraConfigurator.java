@@ -30,6 +30,7 @@ import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
@@ -55,6 +56,15 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public ConfigurationType getConfiguration() {
         ConfigurationType conf = new ConfigurationType();
+        
+        String platform = Configuration.getPlatform();
+        // override platform to register correctly on Zafira based on capabilities.platform and platformName
+        R.CONFIG.put(Parameter.PLATFORM.getKey(), platform);
+        
+        String browser = Configuration.getBrowser();
+        // override browser to register correctly on Zafira based on capabilities.browserName as well
+        R.CONFIG.put(Parameter.BROWSER.getKey(), browser);
+        
         for (Parameter parameter : Parameter.values()) {
             conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
         }
