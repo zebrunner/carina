@@ -1,4 +1,4 @@
-FROM selenium/base:3.12.0
+FROM selenium/base:3.141.59
 LABEL authors=Qaprosoft
 
 USER seluser
