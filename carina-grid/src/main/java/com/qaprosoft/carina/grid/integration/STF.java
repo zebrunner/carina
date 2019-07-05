@@ -19,13 +19,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.qaprosoft.zafira.client.impl.STFClientImpl;
+import com.qaprosoft.zafira.util.http.HttpClient;
 import org.apache.commons.lang3.StringUtils;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.grid.Platform;
 import com.qaprosoft.zafira.client.STFClient;
 import com.qaprosoft.zafira.models.stf.Devices;
-import com.qaprosoft.zafira.models.stf.Response;
 import com.qaprosoft.zafira.models.stf.STFDevice;
 
 /**
@@ -50,7 +51,7 @@ public class STF {
         LOGGER.info("*********************************");
         LOGGER.info("Credentials for STF: " + serviceURL + " / " + authToken);
         if (!StringUtils.isEmpty(serviceURL) && !StringUtils.isEmpty(authToken)) {
-            this.client = new STFClient(serviceURL, authToken);
+            this.client = new STFClientImpl(serviceURL, authToken);
             if (this.client.getAllDevices().getStatus() == 200) {
                 running = true;
                 LOGGER.info("STF connection established");
@@ -78,7 +79,7 @@ public class STF {
         boolean available = false;
         if (isRunning()) {
             try {
-                Response<Devices> rs = INSTANCE.client.getAllDevices();
+                HttpClient.Response<Devices> rs = INSTANCE.client.getAllDevices();
                 if (rs.getStatus() == 200) {
                     for (STFDevice device : rs.getObject().getDevices()) {
                         if (udid.equals(device.getSerial())) {
@@ -108,7 +109,7 @@ public class STF {
         STFDevice device = null;
         if (isRunning()) {
             try {
-                Response<STFDevice> rs = INSTANCE.client.getDevice(udid);
+                HttpClient.Response<STFDevice> rs = INSTANCE.client.getDevice(udid);
                 if (rs.getStatus() == 200) {
                     device = rs.getObject();
                 }
