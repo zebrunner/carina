@@ -164,13 +164,16 @@ public class Screenshot {
         LOGGER.debug("Screenshot->captureFailure starting...");
         String screenName = capture(driver, true, comment, true, false);
 
-        // XML layout extraction
-        File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
-        if (uiDumpFile != null) {
-            LOGGER.debug("Dump file will be uploaded to amazon S3. File name is : " + uiDumpFile.getName());
-            Artifacts.add("Failure UI dump report", uiDumpFile);
-        } else {
-            LOGGER.debug("Dump file is empty.");
+        //do not generate UI dump if no screenshot 
+        if (!screenName.isEmpty()) {
+            // XML layout extraction
+            File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
+            if (uiDumpFile != null) {
+                LOGGER.debug("Dump file will be uploaded to amazon S3. File name is : " + uiDumpFile.getName());
+                Artifacts.add("Failure UI dump report", uiDumpFile);
+            } else {
+                LOGGER.debug("Dump file is empty.");
+            }
         }
         LOGGER.debug("Screenshot->captureFailure finished.");
         return screenName;
@@ -630,10 +633,11 @@ public class Screenshot {
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("was terminated due to TIMEOUT")
 				|| message.contains("was terminated due to BROWSER_TIMEOUT")
-				|| message.contains("Could not proxy command to remote server. Original error: Error: read ECONNRESET")
+				|| message.contains("Could not proxy command to remote server. Original error:") // Error: socket hang up, Error: read ECONNRESET etc				
 				|| message.contains("Session ID is null. Using WebDriver after calling quit()")
 				|| message.contains("Unable to find elements by Selenium")
 				|| message.contains("Unable to locate element")
+				|| message.contains("generateUiDump") //do not generate screenshot if getPageSource is invalid				
 				|| message.contains("Session timed out or not found");
 		return !disableScreenshot;
 	}
