@@ -202,10 +202,6 @@ public class Device extends RemoteDevice implements IDriverPool {
         String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
         executor.execute(cmd2);
 
-        // TODO: add several attempt of connect until device appear among connected devices
-        // quick workaround to do double connect...
-        executor.execute(cmd);
-        executor.execute(cmd2);
     }
 
     public void disconnectRemote() {
