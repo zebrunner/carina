@@ -116,7 +116,9 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			if (ztid != videoArtifact.getTestId()) {
 				videoArtifact.setTestId(ztid);
 				LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+				if (ZafiraSingleton.INSTANCE.isRunning()) {
+					ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+				}
 			}
 		}
 	}

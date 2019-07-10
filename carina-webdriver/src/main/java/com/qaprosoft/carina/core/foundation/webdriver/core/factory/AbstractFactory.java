@@ -29,8 +29,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
-import org.testng.ITestResult;
-import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
@@ -117,10 +115,11 @@ public abstract class AbstractFactory {
     protected TestArtifactType initVideoArtifact(String videoName) {
         TestArtifactType artifact = new TestArtifactType();
         artifact.setName("Video " + SDF.format(new Date()));
-        ITestResult res = Reporter.getCurrentTestResult();
-        if (res != null) {
-        	artifact.setTestId((Long) res.getAttribute("ztid"));
-        }
+        // do not uncomment below steps with "tzid" otherwise each odd (1, 3, 5...) test lost video artifact
+//        ITestResult res = Reporter.getCurrentTestResult();
+//        if (res != null) {
+//        	artifact.setTestId((Long) res.getAttribute("ztid"));
+//        }
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
         artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
