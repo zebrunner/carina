@@ -68,8 +68,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
+			onBeforeEvent();
 			if (DriverCommand.QUIT.equals(command.getName())) {
-				onBeforeEvent();
 				try {
 					String data = commandExecutor
 							.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
