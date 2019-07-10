@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.zafira.listener.impl.ZafiraListenerImpl;
+import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.log.domain.MetaInfoMessage;
 import com.qaprosoft.zafira.log.log4j.level.MetaInfoLevel;
 import org.apache.commons.io.FileUtils;
@@ -473,7 +473,7 @@ public class Screenshot {
 
     private static void uploadToAmazonS3(File screenshot, File screenshotThumb, String comment, boolean artifact) {
         final String correlationId = UUID.randomUUID().toString();
-        final String ciTestId = ZafiraListenerImpl.getThreadCiTestId();
+        final String ciTestId = ZafiraEventRegistrar.getThreadCiTestId();
         Optional<CompletableFuture<String>> originalScreenshotFuture = uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, false);
         Optional<CompletableFuture<String>> thumbFuture = uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, true);
         originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
