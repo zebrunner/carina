@@ -23,12 +23,9 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DriverCommand;
-import org.testng.ITestResult;
-import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.MobileCommand;
@@ -68,7 +65,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
-			onBeforeEvent();
+			registerVideoArtifact(command, videoArtifact);
+
 			if (DriverCommand.QUIT.equals(command.getName())) {
 				try {
 					String data = commandExecutor
@@ -78,9 +76,6 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 							.getValue().toString();
 					LOGGER.debug("Video will be uploaded to ftp. Test thread ID : " + Thread.currentThread().getId());
 					CompletableFuture.runAsync(() -> {uploadToFTP(data);});
-					if (ZafiraSingleton.INSTANCE.isRunning()) {
-						ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
-					}
 				} catch (Throwable e) {
 					LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
 				}
@@ -88,40 +83,19 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 		}
 	}
 
-	@Override
-	public void afterEvent(Command command) {
-		if (!recording && command.getSessionId() != null) {
-			try {
-				recording = true;
-				commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
-						MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)
-								.getValue()));
-			} catch (Exception e) {
-				LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
-			}
-		}
-	}
-
-	private void onBeforeEvent() {
-		// 4a. if "tzid" not exist inside videoArtifact and exists in Reporter ->
-		// register new videoArtifact in Zafira.
-		// 4b. if "tzid" already exists in current artifact but in Reporter there is
-		// another value. Then this is use case for class/suite mode when we share the
-		// same
-		// driver across different tests
-
-		ITestResult res = Reporter.getCurrentTestResult();
-		if (res != null && res.getAttribute("ztid") != null) {
-			Long ztid = (Long) res.getAttribute("ztid");
-			if (ztid != videoArtifact.getTestId()) {
-				videoArtifact.setTestId(ztid);
-				LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
-				if (ZafiraSingleton.INSTANCE.isRunning()) {
-					ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
-				}
-			}
-		}
-	}
+    @Override
+    public void afterEvent(Command command) {
+        if (!recording && command.getSessionId() != null) {
+            try {
+                recording = true;
+                commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
+                        MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)
+                                .getValue()));
+            } catch (Exception e) {
+                LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
+            }
+        }
+    }
 
 	// To get host address for video uploading we have to use screen_record_ftp parameter. 
 	// To generate file name we have to extract it from video artifact link.
