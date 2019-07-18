@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
+import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestResult;
@@ -110,15 +112,17 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     }
 
     @Override
-    public String getOwner(ISuite suite) {
+    public String getOwner(SuiteAdapter suiteAdapter) {
+        ISuite suite = (ISuite) suiteAdapter.getSuite();
         String owner = suite.getParameter("suiteOwner");
         LOGGER.debug("owner: " + owner);
         return owner != null ? owner : "";
     }
 
     @Override
-    public String getPrimaryOwner(ITestResult test) {
+    public String getPrimaryOwner(TestResultAdapter testResultAdapter) {
         // TODO: re-factor that
+        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         String primaryOwner = Ownership.getMethodOwner(test); 
         LOGGER.debug("primaryOwner: " + primaryOwner);
         return primaryOwner;
@@ -126,49 +130,54 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     //TODO need to remove this method from com.qaprosoft.zafira.config.IConfigurator
     @Override
-    public String getSecondaryOwner(ITestResult test) {
+    public String getSecondaryOwner(TestResultAdapter testResultAdapter) {
         // TODO: re-factor that
+        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         String secondaryOwner = Ownership.getMethodOwner(test);
         LOGGER.debug("secondaryOwner: " + secondaryOwner);
         return secondaryOwner;
     }
 
     @Override
-    public String getTestName(ITestResult test) {
+    public String getTestName(TestResultAdapter testResultAdapter) {
         // TODO: avoid TestNamingUtil
+        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         String testName = TestNamingUtil.getCanonicalTestName(test);
         LOGGER.debug("testName: " + testName);
         return testName;
     }
 
     @Override
-    public String getTestMethodName(ITestResult test) {
+    public String getTestMethodName(TestResultAdapter testResultAdapter) {
         // TODO: avoid TestNamingUtil
+        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         String testMethodName = TestNamingUtil.getCanonicalTestMethodName(test);
         LOGGER.debug("testMethodName: " + testMethodName);
         return testMethodName;
     }
 
     @Override
-    public List<String> getTestWorkItems(ITestResult test) {
+    public List<String> getTestWorkItems(TestResultAdapter testResultAdapter) {
+        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         return Jira.getTickets(test);
     }
 
     @Override
-    public int getRunCount(ITestResult test) {
+    public int getRunCount(TestResultAdapter testResultAdapter) {
         int runCount = RetryCounter.getRunCount();
         LOGGER.debug("runCount: " + runCount);
         return runCount;
     }
 
     @Override
-    public Map<String, Long> getTestMetrics(ITestResult test) {
+    public Map<String, Long> getTestMetrics(TestResultAdapter testResultAdapter) {
         return Timer.readAndClear();
     }
 
     @Override
-    public Set<TagType> getTestTags(ITestResult test) {
+    public Set<TagType> getTestTags(TestResultAdapter testResultAdapter) {
         LOGGER.debug("Collecting TestTags...");
+        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         Set<TagType> tags = new HashSet<TagType>();
 
         String testPriority = PriorityManager.getPriority(test);
@@ -199,7 +208,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     }
 
     @Override
-    public Set<TestArtifactType> getArtifacts(ITestResult test) {
+    public Set<TestArtifactType> getArtifacts(TestResultAdapter testResultAdapter) {
         LOGGER.debug("Collecting artifacts...");
         // Generate additional artifacts links on test run
         return Artifacts.getArtifacts();
