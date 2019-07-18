@@ -947,7 +947,7 @@ public class DriverHelper {
 	 */
 	public <T> T performIgnoreException(Supplier<T> supplier) {
         try {
-            LOGGER.info("Command will be performed with the exception ignoring");
+            LOGGER.debug("Command will be performed with the exception ignoring");
             return supplier.get();
         } catch (WebDriverException e) {
             LOGGER.info("Webdriver exception has been fired. One more attempt to execute action.");

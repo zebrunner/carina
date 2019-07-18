@@ -412,8 +412,8 @@ public class MobileFactory extends AbstractFactory {
     
     /**
      * Method to extract specific parameter from debug info in case STF enabled
-     * Debug info example: [[[DEBUG info: adb -P 5037 -s 42002363960cb400 -name Samsung_Galaxy_J3 -udid 42002363960cb400]]]
-     * Example: -{paramName} {paramValue}
+     * Debug info example: [[[DEBUG info: /opt/android-sdk-linux/platform-tools/adb -P 5037 -s 4d002c7f5b328095 shell pm install -r /data/local/tmp/appium_cache/642637a49a85a430df0f3c4c1b2dd36022c83df4.apk --udid 4d002c7f5b328095 --name Samsung_Galaxy_Note3]]]
+     * Example: --{paramName} {paramValue}
      * 
      * @param debugInfo
      * @param paramName

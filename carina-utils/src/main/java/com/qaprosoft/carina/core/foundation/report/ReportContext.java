@@ -337,8 +337,8 @@ public class ReportContext {
                 // close ThreadLogAppender resources before renaming
                 closeThreadLogAppender();
                 testDir.renameTo(newTestDir);
-                LOGGER.debug("Test directory will be set to : " + newTestDir);
-                testDirectory.set(newTestDir);            
+                testDirectory.set(newTestDir);    
+                LOGGER.debug("Test directory is set to : " + newTestDir);
             }
         } else {
             LOGGER.error("Unexpected case with absence of test.log for '" + test + "'");

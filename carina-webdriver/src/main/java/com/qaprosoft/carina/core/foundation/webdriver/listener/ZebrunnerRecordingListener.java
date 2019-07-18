@@ -17,9 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.DriverCommand;
 
-import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
@@ -39,20 +37,19 @@ public class ZebrunnerRecordingListener implements IDriverCommandListener {
 		this.videoArtifact = videoArtifact;
 	}
 
-	@Override
-	public void beforeEvent(Command command) {
-		if (DriverCommand.QUIT.equals(command.getName())) {
-			if (ZafiraSingleton.INSTANCE.isRunning()) {
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
-			}
-		}
-	}
+    @Override
+    public void beforeEvent(Command command) {
+        if (recording) {
+            registerVideoArtifact(command, videoArtifact);
+        }
+    }
+	
+    @Override
+    public void afterEvent(Command command) {
+        if (!recording && command.getSessionId() != null) {
+            videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
+            recording = true;
+        }
+    }
 
-	@Override
-	public void afterEvent(Command command) {
-		if (!recording && command.getSessionId() != null) {
-			videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
-			recording = true;
-		}
-	}
 }

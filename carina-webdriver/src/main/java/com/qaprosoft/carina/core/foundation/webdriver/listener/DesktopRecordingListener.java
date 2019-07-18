@@ -15,13 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.DriverCommand;
-import org.testng.ITestResult;
-import org.testng.Reporter;
 
-import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
@@ -31,8 +26,6 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  */
 public class DesktopRecordingListener implements IDriverCommandListener {
 
-	private static final Logger LOGGER = Logger.getLogger(DesktopRecordingListener.class);
-	
     private boolean recording = false;
     
     private TestArtifactType videoArtifact;
@@ -43,15 +36,9 @@ public class DesktopRecordingListener implements IDriverCommandListener {
 
     @Override
     public void beforeEvent(Command command) {
-    	if (recording) {
-    		onBeforeEvent(); 
-    		
-            if (DriverCommand.QUIT.equals(command.getName())) {
-                if (ZafiraSingleton.INSTANCE.isRunning()) {
-                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
-                }
-            }
-    	}
+        if (recording) {
+            registerVideoArtifact(command, videoArtifact);
+        }
     }
 
     @Override
@@ -60,20 +47,5 @@ public class DesktopRecordingListener implements IDriverCommandListener {
             recording = true;
         }
     }
-    
-	private void onBeforeEvent() {
-		// 4a. if "tzid" not exist inside videoArtifact and exists in Reporter -> register new videoArtifact in Zafira.
-		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
-		// driver across different tests
-		
-		ITestResult res = Reporter.getCurrentTestResult();
-		if (res != null && res.getAttribute("ztid") != null) {
-			Long ztid = (Long) res.getAttribute("ztid");
-			if (ztid != videoArtifact.getTestId()) {
-				videoArtifact.setTestId(ztid);
-				LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
-			}
-		}
-	}
+
 }
