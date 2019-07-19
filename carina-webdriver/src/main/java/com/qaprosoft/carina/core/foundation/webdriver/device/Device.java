@@ -640,7 +640,7 @@ public class Device extends RemoteDevice implements IDriverPool {
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}
-		LOGGER.debug("STF is enabled. Sys log will be extracted...");
+		LOGGER.debug("Sys log will be extracted...");
         String fileName = ReportContext.getTestDir() + "/logcat.log";
         String log = getSysLog();
         if (log.isEmpty()) {
