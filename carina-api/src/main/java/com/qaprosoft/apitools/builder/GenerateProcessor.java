@@ -65,12 +65,4 @@ public class GenerateProcessor implements PropertiesProcessor {
         }
         return out;
     }
-    // public static void main(String[] args) {
-    // Properties p = new Properties();
-    // p.put("word", "generate_word(7)");
-    // p.put("date", "generate_date(yyyy-MM-dd;5)");
-    // p = new GenerateProcessor().process(p);
-    // System.out.println(p.getProperty("word"));
-    // System.out.println(p.getProperty("date"));
-    // }
 }

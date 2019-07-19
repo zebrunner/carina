@@ -20,15 +20,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.qaprosoft.zafira.client.impl.ZafiraClientImpl;
-import com.qaprosoft.zafira.util.http.HttpClient;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.zafira.client.ZafiraClient;
-import com.qaprosoft.zafira.models.db.TestRun.Initiator;
-import com.qaprosoft.zafira.models.dto.*;
+import com.qaprosoft.zafira.client.impl.ZafiraClientImpl;
+import com.qaprosoft.zafira.models.db.Initiator;
+import com.qaprosoft.zafira.models.dto.JobType;
+import com.qaprosoft.zafira.models.dto.TestCaseType;
+import com.qaprosoft.zafira.models.dto.TestRunType;
+import com.qaprosoft.zafira.models.dto.TestSuiteType;
+import com.qaprosoft.zafira.models.dto.TestType;
 import com.qaprosoft.zafira.models.dto.user.UserType;
+import com.qaprosoft.zafira.util.http.HttpClient;
 
 public class ZafiraClientTest {
     private static final boolean ENABLED = false;

@@ -19,15 +19,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.qaprosoft.zafira.client.impl.STFClientImpl;
-import com.qaprosoft.zafira.util.http.HttpClient;
 import org.apache.commons.lang3.StringUtils;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.grid.Platform;
 import com.qaprosoft.zafira.client.STFClient;
+import com.qaprosoft.zafira.client.impl.STFClientImpl;
 import com.qaprosoft.zafira.models.stf.Devices;
 import com.qaprosoft.zafira.models.stf.STFDevice;
+import com.qaprosoft.zafira.util.http.HttpClient;
 
 /**
  * Singleton for STF client.
