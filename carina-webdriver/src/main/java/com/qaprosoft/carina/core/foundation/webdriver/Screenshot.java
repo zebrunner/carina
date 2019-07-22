@@ -618,27 +618,24 @@ public class Screenshot {
 		// disable screenshot if error message contains any of this info
 		boolean disableScreenshot = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
+				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
+				|| message.contains("Session timed out or not found")
 				|| message.contains("cannot forward the request unexpected end of stream")
-				|| message.contains("was terminated due to FORWARDING_TO_NODE_FAILED")
-				|| message.contains("was terminated due to CLIENT_STOPPED_SESSION")
+				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
 				|| message.contains("An element could not be located on the page using the given search parameters")
 				|| message.contains("current view have 'secure' flag set")
 				|| message.contains("Error communicating with the remote browser. It may have died")
-				|| message.contains("unexpected alert open") || message.contains("chrome not reachable")
+				|| message.contains("unexpected alert open") 
+				|| message.contains("chrome not reachable")
 				|| message.contains("cannot forward the request Connect to")
-				|| message.contains("Session ID is null. Using WebDriver after calling quit")
-				|| message.contains("was terminated due to TIMEOUT")
-				|| message.contains("was terminated due to BROWSER_TIMEOUT")
 				|| message.contains("Could not proxy command to remote server. Original error:") // Error: socket hang up, Error: read ECONNRESET etc				
-				|| message.contains("Session ID is null. Using WebDriver after calling quit()")
 				|| message.contains("Unable to find elements by Selenium")
-				|| message.contains("Unable to locate element")
-				|| message.contains("generateUiDump") //do not generate screenshot if getPageSource is invalid				
-				|| message.contains("Session timed out or not found");
+				|| message.contains("generateUiDump") //do not generate screenshot if getPageSource is invalid
+				|| message.contains("Unable to locate element");
 		return !disableScreenshot;
 	}
 
