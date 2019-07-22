@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
  * PDFUtil - utility for PDF file parsing.
@@ -43,11 +44,13 @@ public class PDFUtil {
         PDFTextStripper pdfStripper = null;
         PDDocument pdDoc = null;
         COSDocument cosDoc = null;
+        RandomAccessBufferedFileInputStream randomAccessBufferedFileInputStream = null;
         if (inputStream == null) {
             throw new RuntimeException("Input stream not opened");
         }
         try {
-            PDFParser parser = new PDFParser(inputStream);
+        	randomAccessBufferedFileInputStream = new RandomAccessBufferedFileInputStream(inputStream);
+            PDFParser parser = new PDFParser(randomAccessBufferedFileInputStream);
             parser.parse();
             cosDoc = parser.getDocument();
             pdfStripper = new PDFTextStripper();
@@ -68,6 +71,9 @@ public class PDFUtil {
                 }
                 if (inputStream != null) {
                     inputStream.close();
+                }
+                if (randomAccessBufferedFileInputStream != null) {
+                	randomAccessBufferedFileInputStream.close();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -24,7 +24,7 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<pdfbox.version>1.8.16</pdfbox.version>
+		<pdfbox.version>2.0.15</pdfbox.version>
 		<jackson-databind.version>2.9.8</jackson-databind.version>
 		<jackson-annotations.version>2.9.8</jackson-annotations.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
