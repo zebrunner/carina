@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.email;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -75,6 +77,9 @@ public class EmailReportGenerator {
     private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
     private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
     private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
+    
+    // Cucumber section
+    private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
 
     private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
     private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
@@ -101,6 +106,9 @@ public class EmailReportGenerator {
         emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
         emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
         emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
+        
+        // Cucumber section
+        emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResults());
     }
 
     public String getEmailBody() {
@@ -339,4 +347,42 @@ public class EmailReportGenerator {
         return reasonText;
     }
 
+    private String getCucumberResults() {
+        String result = "";
+
+        if (isCucumberReportFolderExists()) {
+
+            String link = ReportContext.getCucumberReportLink();
+            LOGGER.debug("Cucumber Report link: " + link);
+            result = String.format("<br/><b><a href='%s' style='color: green;' target='_blank'> Open Cucumber Report in new Window </a></b><br/>",
+                    link);
+            LOGGER.debug("Cucumber result: " + result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Check that CucumberReport Folder exists.
+     * 
+     * @return boolean
+     */
+    private boolean isCucumberReportFolderExists() {
+        try {
+            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getArtifactsFolder(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
+            if (reportOutputDirectory.exists() && reportOutputDirectory.isDirectory()) {
+                if (reportOutputDirectory.list().length > 0) {
+                    LOGGER.debug("Cucumber Report Folder is not empty!");
+                    return true;
+                } else {
+                    LOGGER.error("Cucumber Report Folder is empty!");
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Error happen during checking that CucumberReport Folder exists or not. Error: " + e.getMessage());
+        }
+        return false;
+    }
+    
 }
