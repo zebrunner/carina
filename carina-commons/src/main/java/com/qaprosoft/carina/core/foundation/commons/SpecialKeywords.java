@@ -194,4 +194,8 @@ public class SpecialKeywords {
     public static final int DEFAULT_PLUS_WIDTH= 414;
     public static final int DEFAULT_IPAD_WIDTH= 768;
     public static final int DEFAULT_SE_WIDTH= 320;
+    
+    // ------------- Cucumber configuration  ---------------
+    public static final String CUCUMBER_REPORT_FOLDER = "CucumberReport";
+    public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
 }
