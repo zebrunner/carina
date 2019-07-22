@@ -617,7 +617,7 @@ public class Device extends RemoteDevice implements IDriverPool {
             return;
         }
 
-		if (!isConnected()) {
+		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
 			//do not use new features if execution is not inside approved cloud
 			return;
 		}
@@ -636,7 +636,7 @@ public class Device extends RemoteDevice implements IDriverPool {
      * @return saved file
      */
     public File saveSysLog() {
-		if (!isConnected()) {
+		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
 			//do not use new features if execution is not inside approved cloud
 			return null;
 		}
