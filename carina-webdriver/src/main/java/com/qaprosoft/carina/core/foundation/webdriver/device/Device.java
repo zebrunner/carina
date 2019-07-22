@@ -611,11 +611,6 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull()) {
             return;
         }
-        
-        if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
-            LOGGER.debug("Logcat log won't be cleared since device is not Android");
-            return;
-        }
 
 		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
 			//do not use new features if execution is not inside approved cloud
