@@ -205,7 +205,8 @@ public class DriverListener implements WebDriverEventListener {
                 captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
             }
         } catch (Exception e) {
-            if (!e.getMessage().isEmpty() && e.getMessage().contains("Method has not yet been implemented")) {
+            if (!e.getMessage().isEmpty()
+                    && (e.getMessage().contains("Method has not yet been implemented") || (e.getMessage().contains("Method is not implemented")))) {
                 LOGGER.debug("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
             } else {
                 LOGGER.error("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
