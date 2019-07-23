@@ -485,7 +485,7 @@
             </dependency>
             <dependency>
                 <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk</artifactId>
+                <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-java-sdk.version}</version>
 		<exclusions>
 			<exclusion>
@@ -541,6 +541,10 @@
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
+                    </exclusion>
+                     <exclusion>
+                        <groupId>com.amazonaws</groupId>
+						<artifactId>aws-java-sdk</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
