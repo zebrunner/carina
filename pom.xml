@@ -492,6 +492,14 @@
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
 			</exclusion>
+			<exclusion>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-kms</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>jmespath-java</artifactId>
+			</exclusion>
 		</exclusions>
             </dependency>
             <!-- Test utilities -->
@@ -542,7 +550,7 @@
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
-                     <exclusion>
+                    <exclusion>
                         <groupId>com.amazonaws</groupId>
 						<artifactId>aws-java-sdk</artifactId>
                     </exclusion>
