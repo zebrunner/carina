@@ -485,12 +485,20 @@
             </dependency>
             <dependency>
                 <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk</artifactId>
+                <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-java-sdk.version}</version>
 		<exclusions>
 			<exclusion>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
+			</exclusion>
+			<exclusion>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-kms</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>jmespath-java</artifactId>
 			</exclusion>
 		</exclusions>
             </dependency>
@@ -541,6 +549,10 @@
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.amazonaws</groupId>
+						<artifactId>aws-java-sdk</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
