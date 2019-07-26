@@ -29,11 +29,6 @@
 
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-crypto</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-aws-s3</artifactId>
 		</dependency>
 
