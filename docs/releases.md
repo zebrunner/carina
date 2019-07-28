@@ -1,4 +1,4 @@
-# Release notes (deprecated)
+# Release notes
 
 ### 6.1.25 (2019-07-29)
 https://github.com/qaprosoft/carina/releases/tag/6.1.25
