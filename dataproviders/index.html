@@ -400,6 +400,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dataprovider-with-huge-number-of-columns" title="DataProvider with huge number of columns" class="md-nav__link">
+    DataProvider with huge number of columns
+  </a>
+  
+</li>
+      
       
       
       
@@ -512,6 +519,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dataprovider-with-huge-number-of-columns" title="DataProvider with huge number of columns" class="md-nav__link">
+    DataProvider with huge number of columns
+  </a>
+  
+</li>
+      
       
       
       
@@ -619,6 +633,18 @@ After that, you can specify data providers tests as follows.</p>
 <p>Here you can look at the spreadsheet as a data provider example for your further tests:</p>
 <p><img alt="XLS file - Data Provider - screenshot" src="../img/xlsscreen.png" /></p>
 <p>In TUID column you should specify some unique test identifier that will be set at the beginning of test name in test results report. In next columns you can specify arguments for a test and their values in lower rows. They will be used as parameters in <code>@XlsDataSourceParameters</code>. In this example values of a,b,c arguments were defined in 3 sets of values with different TUID.</p>
+<h2 id="dataprovider-with-huge-number-of-columns">DataProvider with huge number of columns</h2>
+<p>In some cases we have to provide 10+ columns into the test. In that case there is one tricky point. Just removing dsArgs dataprovider parameter will collect all rows into the single HashMap<String, String> object so you could dynamically get any column in the test using column name</p>
+<pre><code class="java">public class DataprovidersSampleTest extends AbstractTest {
+    @Test(dataProvider = &quot;DataProvider&quot;)
+    @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;)
+    public void testSumOperation(HashMap&lt;String, String&gt; args) {
+        int actual = Integer.valueOf(args.get(&quot;a&quot;)) + Integer.valueOf(args.get(&quot;b&quot;));
+        int expected = Integer.valueOf(args.get(&quot;c&quot;));
+        Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
+    }
+}
+</code></pre>
                 
                   
                 
