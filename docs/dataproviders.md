@@ -89,3 +89,17 @@ Here you can look at the spreadsheet as a data provider example for your further
 ![XLS file - Data Provider - screenshot](./img/xlsscreen.png)
 
 In TUID column you should specify some unique test identifier that will be set at the beginning of test name in test results report. In next columns you can specify arguments for a test and their values in lower rows. They will be used as parameters in `@XlsDataSourceParameters`. In this example values of a,b,c arguments were defined in 3 sets of values with different TUID.
+
+## DataProvider with huge number of columns
+In some cases we have to provide 10+ columns into the test. In that case there is one tricky point. Just removing dsArgs dataprovider parameter will collect all rows into the single HashMap<String, String> object so you could dynamically get any column in the test using column name
+```java
+public class DataprovidersSampleTest extends AbstractTest {
+	@Test(dataProvider = "DataProvider")
+	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID")
+	public void testSumOperation(HashMap<String, String> args) {
+		int actual = Integer.valueOf(args.get("a")) + Integer.valueOf(args.get("b"));
+		int expected = Integer.valueOf(args.get("c"));
+		Assert.assertEquals(actual, expected, "Invalid sum result!");
+	}
+}
+```
