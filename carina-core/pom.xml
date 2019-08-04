@@ -44,6 +44,10 @@
 			<artifactId>carina-hockeyapp</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
