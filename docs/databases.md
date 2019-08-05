@@ -143,6 +143,101 @@ Next step is MyBatis mappers implementation, read [official documentation](http:
 </mapper>
 ```
 
+Now we have to implement DB domain object [User class](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java), that reflects DB table structure:
+```java
+package com.qaprosoft.carina.demo.db.models;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class User {
+
+	private Long id;
+	private String username;
+	private String password;
+	private String email;
+	private String firstName;
+	private String lastName;
+	private Status status;
+	private List<UserPreference> preferences = new ArrayList<>();
+
+	public User() {
+	}
+
+	public enum Status {
+		ACTIVE, INACTIVE
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public List<UserPreference> getPreferences() {
+		return preferences;
+	}
+
+	public void setPreferences(List<UserPreference> preferences) {
+		this.preferences = preferences;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+}
+```
+
+
+
+
+
 ## Configuration
 First of all we need to place DB credentials into **src/main/resources/_database.properties**:
 ```
