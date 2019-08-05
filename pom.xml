@@ -63,7 +63,7 @@
         <selenium-server.version>3.141.59</selenium-server.version>
         <appium.version>7.0.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>4.0.14-SNAPSHOT</zafira-client.version>
+        <zafira-client.version>4.0.18-SNAPSHOT</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
