@@ -1,5 +1,8 @@
 # Database usage
 
+Here is simple DB schema that will be used for that sample:
+![db_schema](img/database-usage-1.png)
+
 ## Dependencies
 For integration with DB we recommend to use [MyBatis](http://www.mybatis.org/mybatis-3) ORM framework. MyBatis is a first class persistence framework with support for custom SQL, stored procedures and advanced mappings. To start with, let's add required dependencies into Maven pom.xml:
 ```xml
@@ -234,9 +237,28 @@ public class User {
 }
 ```
 
+Also we have to describe mapper interface, [UserMapper interface](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java):
 
+```java
+package com.qaprosoft.carina.demo.db.mappers;
 
+import com.qaprosoft.carina.demo.db.models.User;
 
+public interface UserMapper {
+
+	void create(User user);
+
+	User findById(long id);
+
+	User findByUserName(String username);
+
+	void update(User user);
+
+	void delete(User user);
+
+}
+
+```
 
 ## Configuration
 First of all we need to place DB credentials into **src/main/resources/_database.properties**:
@@ -254,3 +276,74 @@ db.pass=postgres
 #db.user=mysql
 #db.pass=mysql
 ```
+
+All the mappers and the reference to _database.properties should be specified in **src/main/resources/mybatis-config.xml**:
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="_database.properties" />
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${db.driver}" />
+				<property name="url" value="${db.url}" />
+				<property name="username" value="${db.user}" />
+				<property name="password" value="${db.pass}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="mappers/UserMapper.xml" />
+		<mapper resource="mappers/UserPreferenceMapper.xml" />
+	</mappers>
+</configuration>
+```
+
+## Connection factory
+Connection factory is responsible for MyBatis context initializtion and creation of mapper instances, take a look at sample implementation of [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java):
+```java
+package com.qaprosoft.carina.demo.utils;
+
+import java.io.IOException;
+import java.io.Reader;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import com.qaprosoft.carina.demo.db.mappers.UserMapper;
+import com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper;
+
+public class ConnectionFactory {
+	private static SqlSessionFactory factory;
+
+	static {
+		Reader reader = null;
+		try {
+			reader = Resources.getResourceAsReader("mybatis-config.xml");
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+		factory = new SqlSessionFactoryBuilder().build(reader);
+	}
+
+	public static SqlSessionFactory getSqlSessionFactory() {
+		return factory;
+	}
+
+	public static UserMapper getUserMapper() {
+		return ConnectionFactory.getSqlSessionFactory().openSession(true).getMapper(UserMapper.class);
+	}
+
+	public static UserPreferenceMapper getUserPreferenceMapperMapper() {
+		return ConnectionFactory.getSqlSessionFactory().openSession(true).getMapper(UserPreferenceMapper.class);
+	}
+}
+```
+
