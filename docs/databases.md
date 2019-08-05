@@ -2,6 +2,7 @@
 
 Here is simple DB schema that will be used for that sample:
 ![db_schema](img/database-usage-1.png)
+We will implement mapping for Users and UserPreferences tables.
 
 ## Dependencies
 For integration with DB we recommend to use [MyBatis](http://www.mybatis.org/mybatis-3) ORM framework. MyBatis is a first class persistence framework with support for custom SQL, stored procedures and advanced mappings. To start with, let's add required dependencies into Maven pom.xml:
@@ -347,3 +348,53 @@ public class ConnectionFactory {
 }
 ```
 
+## Usage sample
+Finally [DBSampleTest](https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java) illustrates usage of MyBatis in tests:
+```java
+package com.qaprosoft.carina.demo;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+
+import org.apache.ibatis.session.SqlSession;
+import org.testng.annotations.Test;
+import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.demo.db.mappers.UserMapper;
+import com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper;
+import com.qaprosoft.carina.demo.db.models.User;
+import com.qaprosoft.carina.demo.db.models.User.Status;
+import com.qaprosoft.carina.demo.utils.ConnectionFactory;
+import com.qaprosoft.carina.demo.db.models.UserPreference;
+
+/**
+ * This sample shows how create DB test.
+ * 
+ * @author qpsdemo
+ */
+public class DBSampleTest extends AbstractTest {
+
+	...
+
+	@Test
+	public void createUser() {
+		try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
+			UserMapper userMapper = session.getMapper(UserMapper.class);
+			userMapper.create(USER);
+			checkUser(userMapper.findById(USER.getId()));
+		}
+	}
+
+	@Test(dependsOnMethods = "createUser")
+	public void createUserPreference() {
+		try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
+			UserMapper userMapper = session.getMapper(UserMapper.class);
+			UserPreferenceMapper userPreferenceMapper = session.getMapper(UserPreferenceMapper.class);
+			USER_PREFERENCE.setUserId(USER.getId());
+			userPreferenceMapper.create(USER_PREFERENCE);
+			checkUserPreference(userMapper.findById(USER.getId()).getPreferences().get(0));
+		}
+	}
+
+	...
+}
+```
