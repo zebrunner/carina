@@ -90,7 +90,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="../#databases" tabindex="1" class="md-skip">
+      <a href="../#database-usage" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -392,8 +392,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#java-data-provider" title="Java data-provider" class="md-nav__link">
-    Java data-provider
+  <a href="#dependencies" title="Dependencies" class="md-nav__link">
+    Dependencies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mappers" title="Mappers" class="md-nav__link">
+    Mappers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" title="Configuration" class="md-nav__link">
+    Configuration
   </a>
   
 </li>
@@ -490,8 +504,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#java-data-provider" title="Java data-provider" class="md-nav__link">
-    Java data-provider
+  <a href="#dependencies" title="Dependencies" class="md-nav__link">
+    Dependencies
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mappers" title="Mappers" class="md-nav__link">
+    Mappers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" title="Configuration" class="md-nav__link">
+    Configuration
   </a>
   
 </li>
@@ -515,33 +543,162 @@
                   <a href="https://github.com/qaprosoft/carina/edit/master/docs/databases.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="databases">Databases</h1>
-<p>Modern test automation frameworks should support data-driven testing, when you are capable to verify a variety of edge cases providing test data sets into the tests using external data sources. Carina is not an exclusion, framework supports multiple ways of tests parametrization (see <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java">samples</a>):</p>
-<ul>
-<li>Java data-providers</li>
-<li>XML parametrization</li>
-<li>XLS data-providers</li>
-<li>CSV data-providers</li>
-</ul>
-<h2 id="java-data-provider">Java data-provider</h2>
-<p>As far as Carina is based on TestNG framework you are able to use well known Java data-providers that returns matrix of Objects and passed to appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement method annotated with <code>@DataProvider</code> that will return <code>Object[][]</code> as test data set:</p>
-<pre><code class="java">@Test(dataProvider = &quot;DP1&quot;)
-public void testMuliplyOperation(int a, int b, int c)
-{
-    int actual = a * b;
-    int expected = c;
-    Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
-}
+                <h1 id="database-usage">Database usage</h1>
+<h2 id="dependencies">Dependencies</h2>
+<p>For integration with DB we recommend to use <a href="http://www.mybatis.org/mybatis-3">MyBatis</a> ORM framework. MyBatis is a first class persistence framework with support for custom SQL, stored procedures and advanced mappings. To start with, let's add required dependencies into Maven pom.xml:</p>
+<pre><code class="xml">&lt;dependency&gt;
+   &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+   &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+   &lt;version&gt;3.5.2&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- Postgres driver --&gt;
+&lt;dependency&gt; 
+   &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+   &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+   &lt;version&gt;42.2.6&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- MySQL driver --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;mysql&lt;/groupId&gt;
+   &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+   &lt;version&gt;8.0.17&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
 
-@DataProvider(parallel = false, name = &quot;DP1&quot;)
-public static Object[][] dataprovider()
-{
-    return new Object[][] {
-        { 2, 3, 6 },
-        { 6, 6, 36 },
-        { 5, 8, 40 } 
-    };
-}
+<h2 id="mappers">Mappers</h2>
+<p>Next step is MyBatis mappers implementation, read <a href="http://www.mybatis.org/mybatis-3/sqlmap-xml.html">official documentation</a> to understand all the details. Let's place all the mappers into <strong>src/main/resources/mappers</strong>. Here is <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml">UserMapper.xml</a> sample:</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.qaprosoft.carina.demo.db.mappers.UserMapper&quot;&gt;
+
+    &lt;insert id=&quot;create&quot; useGeneratedKeys=&quot;true&quot; keyProperty=&quot;id&quot;&gt;
+        &lt;![CDATA[
+            INSERT INTO carina.USERS (USERNAME, PASSWORD, FIRST_NAME, LAST_NAME, EMAIL, STATUS)
+            VALUES (
+                #{username},
+                #{password},
+                #{firstName},
+                #{lastName},
+                #{email},
+                #{status}
+            )
+        ]]&gt;
+    &lt;/insert&gt;
+
+    &lt;sql id=&quot;getUser&quot;&gt;
+        &lt;![CDATA[
+            SELECT
+                U.ID AS USER_ID,
+                U.USERNAME AS USER_USERNAME,
+                U.PASSWORD AS USER_PASSWORD,
+                U.FIRST_NAME AS USER_FIRST_NAME,
+                U.LAST_NAME AS USER_LAST_NAME,
+                U.EMAIL AS USER_EMAIL,
+                U.STATUS AS USER_STATUS,
+                UP.ID AS USER_PREFERENCE_ID,
+                UP.NAME AS USER_PREFERENCE_NAME,
+                UP.VALUE AS USER_PREFERENCE_VALUE,
+                UP.USER_ID AS USER_PREFERENCE_USER_ID
+            FROM
+                carina.USERS U
+            LEFT JOIN
+                carina.USER_PREFERENCES UP
+            ON
+                UP.USER_ID = U.ID
+        ]]&gt;
+    &lt;/sql&gt;
+
+    &lt;select id=&quot;findById&quot; resultMap=&quot;UserResultMap&quot;&gt;
+        &lt;include refid=&quot;getUser&quot; /&gt;
+        &lt;![CDATA[
+            WHERE U.ID = #{id};
+        ]]&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;findByUserName&quot; resultMap=&quot;UserResultMap&quot;&gt;
+        &lt;include refid=&quot;getUser&quot; /&gt;
+        &lt;![CDATA[
+            WHERE U.USERNAME = #{username};
+        ]]&gt;
+    &lt;/select&gt;
+
+    &lt;update id=&quot;update&quot;&gt;
+        &lt;![CDATA[
+            UPDATE
+                carina.USERS
+        ]]&gt;
+        &lt;set&gt;
+            &lt;if test=&quot;null != firstName&quot;&gt;
+                    &lt;![CDATA[
+                       FIRST_NAME = #{firstName},
+                    ]]&gt;
+            &lt;/if&gt;
+            &lt;if test=&quot;null != lastName&quot;&gt;
+                    &lt;![CDATA[
+                       LAST_NAME = #{lastName},
+                    ]]&gt;
+            &lt;/if&gt;
+            &lt;if test=&quot;null != email&quot;&gt;
+                    &lt;![CDATA[
+                       EMAIL = #{email},
+                    ]]&gt;
+            &lt;/if&gt;
+            &lt;if test=&quot;null != username&quot;&gt;
+                    &lt;![CDATA[
+                       USERNAME = #{username},  
+                    ]]&gt;
+            &lt;/if&gt;
+            &lt;if test=&quot;null != password&quot;&gt;
+                    &lt;![CDATA[
+                       PASSWORD = #{password},  
+                    ]]&gt;
+            &lt;/if&gt;
+        &lt;/set&gt;
+        &lt;![CDATA[
+            WHERE
+                ID = #{id}
+        ]]&gt;
+    &lt;/update&gt;
+
+    &lt;delete id=&quot;delete&quot;&gt;
+        &lt;![CDATA[
+            DELETE FROM carina.USERS
+            WHERE ID = #{id}
+        ]]&gt;
+    &lt;/delete&gt;
+
+    &lt;resultMap type=&quot;com.qaprosoft.carina.demo.db.models.User&quot;
+        id=&quot;UserResultMap&quot; autoMapping=&quot;false&quot;&gt;
+        &lt;id column=&quot;USER_ID&quot; property=&quot;id&quot; /&gt;
+        &lt;result column=&quot;USER_USERNAME&quot; property=&quot;username&quot; /&gt;
+        &lt;result column=&quot;USER_PASSWORD&quot; property=&quot;password&quot; /&gt;
+        &lt;result column=&quot;USER_FIRST_NAME&quot; property=&quot;firstName&quot; /&gt;
+        &lt;result column=&quot;USER_LAST_NAME&quot; property=&quot;lastName&quot; /&gt;
+        &lt;result column=&quot;USER_EMAIL&quot; property=&quot;email&quot; /&gt;
+        &lt;result column=&quot;USER_STATUS&quot; property=&quot;status&quot; /&gt;
+        &lt;collection property=&quot;preferences&quot;
+            ofType=&quot;com.qaprosoft.carina.demo.db.models.UserPreference&quot;
+            resultMap=&quot;com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper.UserPreferenceResultMap&quot; /&gt;
+    &lt;/resultMap&gt;
+
+&lt;/mapper&gt;
+</code></pre>
+
+<h2 id="configuration">Configuration</h2>
+<p>First of all we need to place DB credentials into <strong>src/main/resources/_database.properties</strong>:</p>
+<pre><code>#===============================================================#
+#================== Database configuration ====================#
+#===============================================================#
+db.url=jdbc:postgresql://localhost:5432/postgres
+db.driver=org.postgresql.Driver
+db.user=postgres
+db.pass=postgres
+
+#db.url=jdbc:mysql://localhost:3306/mysql
+#db.driver=com.mysql.jdbc.Driver
+#db.user=mysql
+#db.pass=mysql
 </code></pre>
                 
                   
