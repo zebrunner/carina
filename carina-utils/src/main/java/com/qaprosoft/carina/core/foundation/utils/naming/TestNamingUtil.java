@@ -104,12 +104,12 @@ public class TestNamingUtil {
 
         Stack<String> stack = threadId2TestName.get(threadId);
         if (stack == null) {
-            LOGGER.warn("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
+            LOGGER.debug("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
             return null;
         }
 
         if (stack.size() == 0) {
-            LOGGER.warn("Unable to find registered test name for threadId from empty stack: " + threadId);
+            LOGGER.debug("Unable to find registered test name for threadId from empty stack: " + threadId);
             return null;
         }
 
