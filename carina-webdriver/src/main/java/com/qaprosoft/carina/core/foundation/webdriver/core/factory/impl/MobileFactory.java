@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
@@ -58,6 +59,7 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
+    protected static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
 	
 	private final static String vnc_mobile = "vnc_mobile";
 
@@ -209,7 +211,7 @@ public class MobileFactory extends AbstractFactory {
             }
 
         } catch (MalformedURLException e) {
-            LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
+            LOGGER.error("Malformed selenium URL!", e);
         } catch (Exception e) {
             exception = e;
             LOGGER.error("Error during driver creation!", e);
