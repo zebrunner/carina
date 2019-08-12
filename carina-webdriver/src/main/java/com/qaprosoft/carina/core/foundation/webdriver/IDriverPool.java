@@ -300,7 +300,9 @@ public interface IDriverPool {
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
             }
+            LOGGER.debug("start driver quit: " + carinaDriver.getName());
             carinaDriver.getDriver().quit();
+            LOGGER.debug("finished driver quit: " + carinaDriver.getName());
             // stop timer to be able to track mobile app session time. It should be started on createDriver!
             Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
         } catch (WebDriverException e) {
