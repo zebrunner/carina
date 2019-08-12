@@ -95,7 +95,7 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
-        String exceptionMsg = "";
+        Exception exception = null;
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
@@ -211,9 +211,8 @@ public class MobileFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
         } catch (Exception e) {
-            exceptionMsg = e.getMessage();
-            LOGGER.info("Error during driver creation:".concat(exceptionMsg));
-            LOGGER.info(e);
+            exception = e;
+            LOGGER.error("Error during driver creation!", e);
         }
 
         // verification whether driver was created or not.
@@ -224,13 +223,15 @@ public class MobileFactory extends AbstractFactory {
             Device device = IDriverPool.nullDevice;
             if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
                 LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
-                String debugInfo = getDebugInfo(exceptionMsg);
-                if (!debugInfo.isEmpty()) {
-                    String udid = getUdidFromDebugInfo(debugInfo);
-                    String deviceName = getParamFromDebugInfo(debugInfo, "name");
-                    device = new Device();
-                    device.setUdid(udid);
-                    device.setName(deviceName);
+                if (exception != null) {
+                    String debugInfo = getDebugInfo(exception.getMessage());
+                    if (!debugInfo.isEmpty()) {
+                        String udid = getUdidFromDebugInfo(debugInfo);
+                        String deviceName = getParamFromDebugInfo(debugInfo, "name");
+                        device = new Device();
+                        device.setUdid(udid);
+                        device.setName(deviceName);
+                    }
                 }
             } else {
                 LOGGER.info("Debug info will be extracted from capabilities.");
@@ -242,7 +243,7 @@ public class MobileFactory extends AbstractFactory {
             if (!device.getName().isEmpty()) {
                 msg = String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid());
             }
-            throw new RuntimeException(msg);
+            throw new RuntimeException(msg, exception);
         }
 
         Device device = IDriverPool.getNullDevice();
