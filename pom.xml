@@ -63,7 +63,7 @@
         <selenium-server.version>3.141.59</selenium-server.version>
         <appium.version>7.0.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>4.0.18-SNAPSHOT</zafira-client.version>
+        <zafira-client.version>4.1.62</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
@@ -440,24 +440,24 @@
                 <groupId>io.appium</groupId>
                 <artifactId>java-client</artifactId>
                 <version>${appium.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.gson</groupId>
-                        <artifactId>gson</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.seleniumhq.selenium</groupId>
-                        <artifactId>selenium-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.seleniumhq.selenium</groupId>
-                        <artifactId>selenium-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.seleniumhq.selenium</groupId>
-                        <artifactId>selenium-support</artifactId>
-                    </exclusion>
-                </exclusions>
+		<exclusions>
+			<exclusion>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-api</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-java</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-support</artifactId>
+			</exclusion>
+		</exclusions>
             </dependency>
             <dependency>
                 <groupId>com.amazonaws</groupId>

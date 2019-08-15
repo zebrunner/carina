@@ -10,6 +10,7 @@ pages:
       - Mobile automation: automation/mobile.md
       - API automation: automation/api.md
     - Dataproviders: dataproviders.md
+    - Database usage: databases.md
     - Security: security.md
     - Contribution: contribution.md
     - Proxy: proxy.md

@@ -1,5 +1,13 @@
 # Release notes
 
+### 6.1.25 (2019-07-29)
+[6.1.25](https://github.com/qaprosoft/carina/releases/tag/6.1.25)
+
+### 6.1.24 (2019-07-14)
+[6.1.24](https://github.com/qaprosoft/carina/releases/tag/6.1.24)
+
+### Starting from now release notes will be published only on Github!
+
 ### 6.1.22 (2019-06-29)
 
 **Enhancements**
