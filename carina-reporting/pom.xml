@@ -29,23 +29,12 @@
 
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-crypto</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-aws-s3</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-		</dependency>
-
-		<!-- carina-reporting only dependencies -->
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
 		</dependency>
 
 		<!-- Zafira -->
@@ -58,16 +47,6 @@
 		<dependency>
 			<groupId>com.pojosontheweb</groupId>
 			<artifactId>monte-repack</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
 		</dependency>
 
 		<dependency>

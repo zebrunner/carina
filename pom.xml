@@ -63,14 +63,13 @@
         <selenium-server.version>3.141.59</selenium-server.version>
         <appium.version>7.0.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>4.1.59</zafira-client.version>
+        <zafira-client.version>4.1.62</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- HTTP and SMPT -->
         <javax-mail.version>1.4</javax-mail.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
         <monte-repack.version>1.0</monte-repack.version>
-        <json-simple.version>1.1</json-simple.version>
         <rest-assured.version>2.9.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
 	    <commons-beanutils.version>1.9.2</commons-beanutils.version>
@@ -325,9 +324,7 @@
             </build>
         </profile>
     </profiles>
-    <dependencies>
-        <!-- Dependencies that are expected to be shared across modules; define them here -->
-    </dependencies>
+
     <dependencyManagement>
         <dependencies>
             <!-- Project Level Dependencies: Manage them here at one place; pull specific
@@ -400,16 +397,6 @@
                 <version>${log4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-text</artifactId>
-                <version>${commons-text.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
@@ -433,17 +420,6 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commons-codec.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-configuration2</artifactId>
-                <version>${commons-configuration2.version}</version>
-		<exclusions>
-			<exclusion>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-			</exclusion>
-		</exclusions>
             </dependency>
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
@@ -487,20 +463,20 @@
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-java-sdk.version}</version>
-		<exclusions>
-			<exclusion>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-			</exclusion>
-			<exclusion>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-kms</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>com.amazonaws</groupId>
-				<artifactId>jmespath-java</artifactId>
-			</exclusion>
-		</exclusions>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.amazonaws</groupId>
+                        <artifactId>aws-java-sdk-kms</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.amazonaws</groupId>
+                        <artifactId>jmespath-java</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Test utilities -->
             <dependency>
@@ -514,16 +490,16 @@
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>alice-client</artifactId>
                 <version>${alice-client.version}</version>
-		<exclusions>
-			<exclusion>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>org.testng</groupId>
-				<artifactId>testng</artifactId>
-			</exclusion>
-		</exclusions>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.testng</groupId>
+                        <artifactId>testng</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
@@ -552,7 +528,7 @@
                     </exclusion>
                     <exclusion>
                         <groupId>com.amazonaws</groupId>
-						<artifactId>aws-java-sdk</artifactId>
+                        <artifactId>aws-java-sdk</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -561,32 +537,17 @@
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>${commons-beanutils.version}</version>
-		<exclusions>
-			<exclusion>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-			</exclusion>
-		</exclusions>
-            </dependency>
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>${javax-mail.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.pojosontheweb</groupId>
                 <artifactId>monte-repack</artifactId>
                 <version>${monte-repack.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.googlecode.json-simple</groupId>
-                <artifactId>json-simple</artifactId>
-                <version>${json-simple.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${httpclient.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jayway.restassured</groupId>
@@ -615,6 +576,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <distributionManagement>
         <repository>
             <id>QPS_Nexus</id>
