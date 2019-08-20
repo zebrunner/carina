@@ -45,7 +45,7 @@ public final class ProxyPool {
 		if (!Configuration.get(Parameter.BROWSERMOB_PORTS_RANGE).isEmpty()) {
 			try {
 				String[] ports = Configuration.get(Parameter.BROWSERMOB_PORTS_RANGE).split(":");
-				for (int i = Integer.valueOf(ports[0]); i < Integer.valueOf(ports[1]); i++) {
+				for (int i = Integer.valueOf(ports[0]); i <= Integer.valueOf(ports[1]); i++) {
 					proxyPortsFromRange.put(i, true);
 				}
 			} catch (Exception e) {
@@ -205,9 +205,12 @@ public final class ProxyPool {
     }
     
     private static void setProxyPortToAvailable(long threadId) {
-    	if(proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) != null) {
-    		proxyPortsFromRange.put(proxyPortsByThread.get(threadId), true);
-    	}
+		if (proxyPortsByThread.get(threadId) != null) {
+			if (proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) != null) {
+				proxyPortsFromRange.put(proxyPortsByThread.get(threadId), true);
+				LOGGER.info("BrowserMob proxy port " + proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) + " was set to available state");
+			}
+		}
     }
 
     // https://github.com/lightbody/browsermob-proxy/issues/264 'started' flag is not set to false after stopping BrowserMobProxyServer

@@ -64,6 +64,15 @@ public class BrowserMobTest {
         initialize();
         Assert.assertTrue(ProxyPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
     }
+    
+    @Test
+    public void testPortsRange() {
+        R.CONFIG.put("proxy_set_to_system", "false");
+        R.CONFIG.put("browsermob_port", "NULL");
+        R.CONFIG.put("browsermob_ports_range", "0:0");
+        initialize();
+        Assert.assertTrue(ProxyPool.getProxy().isStarted(), "BrowserMobProxy is not started!");
+    }
 
     @Test
     public void testBrowserModProxySystemIntegration() {
