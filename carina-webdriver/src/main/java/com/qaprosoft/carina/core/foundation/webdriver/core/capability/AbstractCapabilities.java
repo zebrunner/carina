@@ -100,7 +100,7 @@ public abstract class AbstractCapabilities {
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);
         String proxyPort = Configuration.get(Parameter.PROXY_PORT);
         if (Configuration.get(Parameter.BROWSERMOB_PROXY).equals("true")) {
-            proxyPort = Integer.toString(ProxyPool.getProxyPort());
+            proxyPort = Integer.toString(ProxyPool.getProxyPortFromThread());
         }
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 

@@ -132,8 +132,8 @@ public class Device extends RemoteDevice implements IDriverPool {
         setUdid(deviceUdid);
         
         String proxyPort = R.CONFIG.get(SpecialKeywords.MOBILE_PROXY_PORT);
-        if (capabilities.getCapability("proxy_port") != null) {
-            proxyPort = capabilities.getCapability("proxy_port").toString();
+        if (capabilities.getCapability(Parameter.PROXY_PORT.getKey()) != null) {
+            proxyPort = capabilities.getCapability(Parameter.PROXY_PORT.getKey()).toString();
         }
 
         setProxyPort(proxyPort);
