@@ -370,15 +370,15 @@ public interface IDriverPool {
                 // moved proxy start logic here since device will be initialized
                 // here only
                 if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
-                    int proxyPort = ProxyPool.getProxyPortFromConfig();
                     if (!device.isNull()) {
+                    	int proxyPort;
                         try {
                             proxyPort = Integer.parseInt(device.getProxyPort());
                         } catch (NumberFormatException e) {
                             // use default from _config.properties. Use-case for
                             // iOS devices which doesn't have proxy_port as part
                             // of capabilities
-//                            proxyPort = Configuration.getInt(Parameter.BROWSERMOB_PORT);
+                            proxyPort = ProxyPool.getProxyPortFromConfig();
                         }
                         ProxyPool.startProxy(proxyPort);
                     }
