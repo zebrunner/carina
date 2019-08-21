@@ -209,6 +209,7 @@ public final class ProxyPool {
 		if (proxyPortsByThread.get(threadId) != null) {
 			if (proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) != null) {
 				proxyPortsFromRange.put(proxyPortsByThread.get(threadId), true);
+				proxyPortsByThread.remove(threadId);
 				LOGGER.info("BrowserMob proxy port " + proxyPortsByThread.get(threadId) + " was set to available state");
 			}
 		}
