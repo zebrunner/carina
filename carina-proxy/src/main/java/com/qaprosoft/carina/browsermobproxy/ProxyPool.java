@@ -148,6 +148,7 @@ public final class ProxyPool {
 		else if (!Configuration.get(Parameter.BROWSERMOB_PORTS_RANGE).isEmpty()) {
 			for (Map.Entry<Integer, Boolean> pair : proxyPortsFromRange.entrySet()) {
 				if (pair.getValue()) {
+					LOGGER.info("Making BrowserMob proxy port busy: " + pair.getKey());
 					pair.setValue(false);
 					return pair.getKey().intValue();
 				}
@@ -166,11 +167,11 @@ public final class ProxyPool {
      * @return BrowserMobProxy
      * 
      */
-    public static BrowserMobProxy startProxy() {
+    public static synchronized BrowserMobProxy startProxy() {
         return startProxy(getProxyPortFromConfig());
     }
     
-    public static BrowserMobProxy startProxy(int proxyPort) {
+    public static synchronized BrowserMobProxy startProxy(int proxyPort) {
         if (!Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
             LOGGER.debug("Proxy is disabled.");
             return null;
@@ -208,7 +209,7 @@ public final class ProxyPool {
 		if (proxyPortsByThread.get(threadId) != null) {
 			if (proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) != null) {
 				proxyPortsFromRange.put(proxyPortsByThread.get(threadId), true);
-				LOGGER.info("BrowserMob proxy port " + proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) + " was set to available state");
+				LOGGER.info("BrowserMob proxy port " + proxyPortsByThread.get(threadId) + " was set to available state");
 			}
 		}
     }
