@@ -94,16 +94,20 @@ public class FtpUtils {
 		}
 	}
 
-	public static void ftpDisconnect(FTPClient ftp) {
-		if (ftp.isConnected()) {
-			try {
-				ftp.logout();
-				ftp.disconnect();
-			} catch (Exception ioe) {
-				LOGGER.error("Exception while disconnecting ftp", ioe);
-			}
-		}
-		LOGGER.debug("FTP has been successfully disconnected.");
-	}
+    public static void ftpDisconnect(FTPClient ftp) {
+        try {
+            if (ftp.isConnected()) {
+                try {
+                    ftp.logout();
+                    ftp.disconnect();
+                } catch (Exception ioe) {
+                    LOGGER.error("Exception while disconnecting ftp", ioe);
+                }
+            }
+        } catch (Throwable thr) {
+            LOGGER.error("Throwable while disconnecting ftp", thr);
+        }
+        LOGGER.debug("FTP has been successfully disconnected.");
+    }
 
 }
