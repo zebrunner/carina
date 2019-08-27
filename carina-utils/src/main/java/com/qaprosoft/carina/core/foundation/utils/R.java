@@ -116,6 +116,12 @@ public enum R {
         this.resourceFile = resourceKey;
     }
 
+    /**
+     * Put and update globally value for properties context.
+     * 
+     * @param key String
+     * @param value String
+     */
     public void put(String key, String value) {
         propertiesHolder.get(resourceFile).put(key, value);
     }
