@@ -215,7 +215,7 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.error("Malformed selenium URL!", e);
         } catch (Exception e) {
             exception = e;
-            LOGGER.error("Error during driver creation!", e);
+            //LOGGER.error("Error during driver creation!", e);
         }
 
         // verification whether driver was created or not.
