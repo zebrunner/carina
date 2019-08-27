@@ -397,11 +397,11 @@ public interface IDriverPool {
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
                 // but initially try to implement it on selenium-hub level
-                //e.printStackTrace();
                 String msg = String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
                         maxCount, e.getMessage());
+                LOGGER.error(msg, e); //TODO: test how 2 messages are displayed in logs and zafira
                 if (count == maxCount) {
-                    throw new WebDriverException(msg, e);
+                    throw e;
                 }
                 CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
             }
