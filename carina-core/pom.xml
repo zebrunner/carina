@@ -33,6 +33,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 		<dependency>
@@ -42,6 +46,10 @@
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-hockeyapp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
