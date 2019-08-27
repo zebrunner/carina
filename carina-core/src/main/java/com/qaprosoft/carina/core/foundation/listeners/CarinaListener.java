@@ -781,15 +781,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
-        for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
-            String driverName = entry.getKey();
-            WebDriver drv = entry.getValue().getDriver();
-
-            if (drv instanceof EventFiringWebDriver) {
-                drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        try {
+            for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
+                String driverName = entry.getKey();
+                WebDriver drv = entry.getValue().getDriver();
+    
+                if (drv instanceof EventFiringWebDriver) {
+                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+                }
+                
+                screenId = Screenshot.captureFailure(drv, driverName + ": " + msg); // in case of failure
             }
-            
-            screenId = Screenshot.captureFailure(drv, driverName + ": " + msg); // in case of failure
+        } catch (Throwable thr) {
+            LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
         }
         return screenId;
     }

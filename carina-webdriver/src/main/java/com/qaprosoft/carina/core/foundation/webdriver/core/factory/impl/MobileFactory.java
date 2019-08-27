@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
@@ -58,6 +59,7 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
+    protected static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
 	
 	private final static String vnc_mobile = "vnc_mobile";
 
@@ -95,7 +97,6 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
-        String exceptionMsg = "";
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
@@ -207,42 +208,30 @@ public class MobileFactory extends AbstractFactory {
                     throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
                 }
             }
-
         } catch (MalformedURLException e) {
-            LOGGER.error("Malformed selenium URL! " + e.getMessage(), e);
+            throw new RuntimeException("Malformed selenium URL!", e); 
         } catch (Exception e) {
-            exceptionMsg = e.getMessage();
-            LOGGER.info("Error during driver creation:".concat(exceptionMsg));
-            LOGGER.info(e);
-        }
-
-        // verification whether driver was created or not.
-        if (driver == null) {
             Map<String, Object> capabilitiesMap = capabilities.asMap();
-            LOGGER.info("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
+            LOGGER.debug("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
 
             Device device = IDriverPool.nullDevice;
             if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
                 LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
-                String debugInfo = getDebugInfo(exceptionMsg);
-                if (!debugInfo.isEmpty()) {
-                    String udid = getUdidFromDebugInfo(debugInfo);
-                    String deviceName = getParamFromDebugInfo(debugInfo, "name");
-                    device = new Device();
-                    device.setUdid(udid);
-                    device.setName(deviceName);
+                if (e != null) {
+                    String debugInfo = getDebugInfo(e.getMessage());
+                    if (!debugInfo.isEmpty()) {
+                        String udid = getUdidFromDebugInfo(debugInfo);
+                        String deviceName = getParamFromDebugInfo(debugInfo, "name");
+                        device = new Device();
+                        device.setUdid(udid);
+                        device.setName(deviceName);
+                    }
                 }
             } else {
-                LOGGER.info("Debug info will be extracted from capabilities.");
                 device = new Device(getDeviceInfo(capabilitiesMap));
             }
             IDriverPool.registerDevice(device);
-            
-            String msg = "Unable to initialize driver!";
-            if (!device.getName().isEmpty()) {
-                msg = String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid());
-            }
-            throw new RuntimeException(msg);
+            throw e; 
         }
 
         Device device = IDriverPool.getNullDevice();
