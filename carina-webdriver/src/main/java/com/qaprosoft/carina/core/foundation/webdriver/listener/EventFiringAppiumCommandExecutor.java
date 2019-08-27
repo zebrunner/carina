@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandCodec;
@@ -55,7 +54,6 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
-    protected static final Logger LOGGER = Logger.getLogger(EventFiringAppiumCommandExecutor.class);
     
     private final Optional<DriverService> serviceOptional;
 
@@ -149,14 +147,12 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                 listener.beforeEvent(command);
             }
 
-            LOGGER.info("command: " + command.getName());
             response = super.execute(command);
 
             for (IDriverCommandListener listener : listeners) {
                 listener.afterEvent(command);
             }
         } catch (Throwable t) {
-            LOGGER.error("command: " + command.getName());
             Throwable rootCause = Throwables.getRootCause(t);
             if (rootCause instanceof ConnectException
                     && rootCause.getMessage().contains("Connection refused")) {

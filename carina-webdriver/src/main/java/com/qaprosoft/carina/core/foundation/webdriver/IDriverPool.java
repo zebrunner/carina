@@ -328,15 +328,13 @@ public interface IDriverPool {
      */
     default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
         // TODO: meake current method as private after migrating to java 9+
-        boolean init = false;
         int count = 0;
         WebDriver drv = null;
-        Throwable init_throwable = null;
         Device device = nullDevice;
 
         // 1 - is default run without retry
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
-        while (!init && count++ < maxCount) {
+        while (count++ < maxCount) { //TODO: maybe do while?
             try {
                 LOGGER.debug("initDriver start...");
                 
@@ -356,8 +354,6 @@ public interface IDriverPool {
                 if (currentDrivers.containsKey(name)) {
                     Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
                 }
-
-                init = true;
 
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
@@ -401,16 +397,17 @@ public interface IDriverPool {
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
                 // but initially try to implement it on selenium-hub level
-                LOGGER.error(String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
-                        maxCount, e.getMessage()), e);
-                init_throwable = e;
+                String msg = String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
+                        maxCount, e.getMessage());
+                if (count == maxCount) {
+                    throw new WebDriverException(msg, e);
+                }
                 CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
             }
         }
-
-        if (!init) {
-            // TODO: think about this runtime exception
-            throw new RuntimeException(init_throwable);
+        
+        if (drv == null) {
+            throw new RuntimeException("Undefined exception detected!");
         }
 
         return drv;

@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -245,7 +246,8 @@ public class MobileFactory extends AbstractFactory {
             if (!device.getName().isEmpty()) {
                 msg = String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid());
             }
-            throw new RuntimeException(msg, exception);
+            
+            throw new WebDriverException(msg, exception);
         }
 
         Device device = IDriverPool.getNullDevice();
