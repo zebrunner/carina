@@ -94,6 +94,8 @@ public class Configuration {
 
         BROWSERMOB_PORT("browsermob_port"),
         
+        BROWSERMOB_PORTS_RANGE("browsermob_ports_range"),
+        
         BROWSERMOB_MITM("browsermob_disabled_mitm"),
 
         PROXY_SET_TO_SYSTEM("proxy_set_to_system"),

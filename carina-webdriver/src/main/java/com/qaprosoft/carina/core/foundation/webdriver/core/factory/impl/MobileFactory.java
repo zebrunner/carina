@@ -315,8 +315,8 @@ public class MobileFactory extends AbstractFactory {
                 if (cap.containsKey("vnc")) {
                     remoteDevice.setVnc((String) cap.get("vnc"));
                 }
-                if (cap.containsKey("proxy_port")) {
-                    remoteDevice.setProxyPort(String.valueOf(cap.get("proxy_port")));
+                if (cap.containsKey(Parameter.PROXY_PORT.getKey())) {
+                    remoteDevice.setProxyPort(String.valueOf(cap.get(Parameter.PROXY_PORT.getKey())));
                 }
                 
                 if (cap.containsKey("remoteURL")) {

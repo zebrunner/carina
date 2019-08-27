@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class SystemProxyTest {
@@ -33,7 +34,7 @@ public class SystemProxyTest {
         R.CONFIG.put("browsermob_proxy", "false");
         R.CONFIG.put("proxy_set_to_system", "true");
         R.CONFIG.put("proxy_host", host);
-        R.CONFIG.put("proxy_port", port);
+        R.CONFIG.put(Parameter.PROXY_PORT.getKey(), port);
 
     }
 
