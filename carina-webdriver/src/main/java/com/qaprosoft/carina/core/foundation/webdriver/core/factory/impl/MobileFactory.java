@@ -208,12 +208,9 @@ public class MobileFactory extends AbstractFactory {
                     throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
                 }
             }
-
         } catch (MalformedURLException e) {
-            LOGGER.error("Malformed selenium URL!", e);
+            throw new RuntimeException("Malformed selenium URL!", e); 
         } catch (Exception e) {
-            //LOGGER.error("Error during driver creation!", e);
-
             Map<String, Object> capabilitiesMap = capabilities.asMap();
             LOGGER.debug("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
 
@@ -231,18 +228,9 @@ public class MobileFactory extends AbstractFactory {
                     }
                 }
             } else {
-                LOGGER.info("Debug info will be extracted from capabilities.");
                 device = new Device(getDeviceInfo(capabilitiesMap));
             }
             IDriverPool.registerDevice(device);
-            
-/*            String msg = "Unable to initialize driver!";
-            if (!device.getName().isEmpty()) {
-                msg = String.format("Unable to initialize driver: %s! \nUDID: %s.", device.getName(), device.getUdid());
-            }
-            
-            LOGGER.error(msg);
-*/
             throw e; 
         }
 
