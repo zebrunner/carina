@@ -393,7 +393,6 @@ public interface IDriverPool {
                 LOGGER.debug("initDriver finish...");
 
             } catch (Exception e) {
-                LOGGER.debug("initDriver finish with exception!");
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
                 // but initially try to implement it on selenium-hub level
@@ -408,7 +407,7 @@ public interface IDriverPool {
         }
         
         if (drv == null) {
-            throw new RuntimeException("Undefined exception detected!");
+            throw new RuntimeException("Undefined exception detected! Analyze above logs for details.");
         }
 
         return drv;
