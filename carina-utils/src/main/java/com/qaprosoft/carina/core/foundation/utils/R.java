@@ -54,8 +54,13 @@ public enum R {
 
     private String resourceFile;
 
-    private static Map<String, Properties> propertiesHolder = new HashMap<String, Properties>();
+    // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
+    private static ThreadLocal<Properties> testProperties = new ThreadLocal<Properties>();
 
+    // permanent global configuration map 
+    private static Map<String, Properties> propertiesHolder = new HashMap<String, Properties>();
+    
+    // init global configuration map statically
     static {
         for (R resource : values()) {
             try {
@@ -74,12 +79,6 @@ public enum R {
                     LOGGER.info("Override properties loaded: " + resourceName);
                     resourceName = OVERRIDE_SIGN + resourceName;
                 }
-
-                // TODO: may we skip the validation?
-                // if(CONFIG.equals(resource) && !PlaceholderResolver.isValid(properties))
-                // {
-                // throw new PlaceholderResolverException();
-                // }
 
                 // Overrides properties by systems values
                 for (Object key : properties.keySet()) {
@@ -111,22 +110,33 @@ public enum R {
             }
         }
     }
-
+    
     R(String resourceKey) {
         this.resourceFile = resourceKey;
     }
 
     public void put(String key, String value) {
-        propertiesHolder.get(resourceFile).put(key, value);
+        put(key, value, false);
+    }
+
+    public void put(String key, String value, boolean currentTestOnly) {
+        if (currentTestOnly) {
+            //declare temporary property key
+            LOGGER.warn("Override property for current test '" + key + "=" + value + "'!");
+            getTestProperties().put(key, value);
+        } else {
+            // override globally configuration map property 
+            propertiesHolder.get(resourceFile).put(key, value);
+        }
     }
     
     /**
      * Verify if key is declared in data map.
+     * 
      * @return boolean
      */
     public boolean containsKey(String key) {
-    	return CONFIG.resourceFile.equals(resourceFile) ? propertiesHolder.get(resourceFile).containsKey(key)
-                : propertiesHolder.get(resourceFile).containsKey(key);
+        return propertiesHolder.get(resourceFile).containsKey(key) || getTestProperties().containsKey(key);
     }
 
     /**
@@ -138,7 +148,13 @@ public enum R {
      * @return config value
      */
     public String get(String key) {
-        String value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
+        String value = getTestProperties().getProperty(key);
+        if (value != null) {
+            LOGGER.warn("Overriden '" + key + "=" + value + "' property will be used for current test!");
+            return value;
+        }
+        
+        value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
                 : propertiesHolder.get(resourceFile).getProperty(key);
         // TODO: why we return empty instead of null?
         // [VD] as designed empty MUST be returned
@@ -170,6 +186,21 @@ public enum R {
 
     public Properties getProperties() {
         return propertiesHolder.get(resourceFile);
+    }
+    
+    public void clearTestProperties() {
+        LOGGER.debug("Cler temporary test properties.");
+        testProperties.remove();
+    }
+    
+    public Properties getTestProperties() {
+        if (testProperties.get() == null) {
+            // init temporary properties at first call
+            Properties properties = new Properties();
+            testProperties.set(properties);
+        }
+        
+        return testProperties.get();
     }
 
 }

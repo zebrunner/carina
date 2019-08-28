@@ -45,6 +45,11 @@ public class RTest {
     public void testPlaceholders() {
         Assert.assertEquals(R.CONFIG.get("url"), "http://localhost:8081");
     }
+    
+    @Test
+    public void testGetEmptyTestProperties() {
+        Assert.assertTrue(R.CONFIG.getTestProperties().isEmpty(), "Default temp test properties object should be empty!");
+    }
 
     /*
      * @Test
