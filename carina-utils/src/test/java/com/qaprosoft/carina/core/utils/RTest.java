@@ -42,6 +42,32 @@ public class RTest {
     }
 
     @Test
+    public void testGetInt() {
+        Assert.assertEquals(R.CONFIG.getInt("port"), 8081);
+    }
+    
+    @Test
+    public void testGetLong() {
+        Assert.assertEquals(R.CONFIG.getLong("port"), 8081L);
+    }
+    
+    @Test
+    public void testGetDouble() {
+        Double doubleValue = 3.14;
+        Assert.assertEquals(R.CONFIG.getDouble("double"), doubleValue);
+    }
+    
+    @Test
+    public void testGetBoolean() {
+        Assert.assertEquals(R.CONFIG.getBoolean("boolean"), true);
+    }
+    
+    @Test
+    public void testGetProperties() {
+        Assert.assertEquals(R.CONFIG.getProperties().getProperty("port"), "8081");
+    }  
+    
+    @Test
     public void testPlaceholders() {
         Assert.assertEquals(R.CONFIG.get("url"), "http://localhost:8081");
     }
@@ -50,7 +76,27 @@ public class RTest {
     public void testGetEmptyTestProperties() {
         Assert.assertTrue(R.CONFIG.getTestProperties().isEmpty(), "Default temp test properties object should be empty!");
     }
+    
+    @Test
+    public void testOverrideTempProperty() {
+        Assert.assertEquals(R.CONFIG.get("key1"), "");
+        R.CONFIG.put("key1", "value1", true);
+        Assert.assertEquals(R.CONFIG.get("key1"), "value1");
+        R.CONFIG.clearTestProperties();
+        Assert.assertEquals(R.CONFIG.get("key1"), "");
+    }
 
+    @Test
+    public void testContainsKey() {
+        Assert.assertEquals(R.CONFIG.containsKey("boolean"), true);
+    }
+    
+    @Test
+    public void testContainsTempKey() {
+        R.CONFIG.put("key1", "value1", true);
+        Assert.assertEquals(R.CONFIG.containsKey("key1"), true);
+    }
+    
     /*
      * @Test
      * public void testEncryption()
