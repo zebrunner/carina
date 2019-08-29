@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 
 public class CapabilitiesLoaderTest {
 
@@ -41,6 +40,15 @@ public class CapabilitiesLoaderTest {
     private final static String coreValue = "coreValue";
 
     /*
+     * Test that loadCapabilities() raise exception if no properties file detected on classpath
+     */
+    @Test(expectedExceptions = {
+            RuntimeException.class }, expectedExceptionsMessageRegExp = "Unable to find custom capabilities file 'unexisting_file'!")
+    public void loadCapabilitiesFromNonExistingFileTest() {
+        new CapabilitiesLoader().loadCapabilities("unexisting_file");
+    }
+
+    /*
      * Test that getCapabilities() return valid DesiredCapabilities values only for "capabilities.name=value" properties
      */
     @Test()
@@ -57,14 +65,27 @@ public class CapabilitiesLoaderTest {
 
         // verify that param without "capabilities." prefix is not loaded here
         Assert.assertNull(caps.getCapability(coreParam), coreParam + " is present among capabilities mistakenly!");
-
     }
-
+    
     /*
-     * Test that loadCapabilities() load into the R.CONFIG all properties
+     * Test that loadCapabilities(file, true) load into the R.CONFIG all properties for current thread only!
      */
     @Test(dependsOnMethods = { "getCapabilitiesTest" })
-    public void loadCapabilitiesTest() {
+    public void loadTempCapabilitiesTest() {
+        new CapabilitiesLoader().loadCapabilities(customCapabilities, true);
+
+        Assert.assertEquals(R.CONFIG.get("capabilities." + stringParam), stringValue, "Returned capability value is not valid!");
+        Assert.assertTrue(R.CONFIG.getBoolean("capabilities." + booleanParamTrue), "Returned capability value is not valid!");
+        Assert.assertFalse(R.CONFIG.getBoolean("capabilities." + booleanParamFalse), "Returned capability value is not valid!");
+
+        Assert.assertEquals(R.CONFIG.get(coreParam), coreValue, "Returned property value is not valid!");
+    }
+    
+    /*
+     * Test that loadCapabilities() load into the R.CONFIG all properties globally
+     */
+    @Test(dependsOnMethods = { "loadTempCapabilitiesTest" })
+    public void loadGlobalCapabilitiesTest() {
         new CapabilitiesLoader().loadCapabilities(customCapabilities);
 
         Assert.assertEquals(R.CONFIG.get("capabilities." + stringParam), stringValue, "Returned capability value is not valid!");
@@ -73,4 +94,6 @@ public class CapabilitiesLoaderTest {
 
         Assert.assertEquals(R.CONFIG.get(coreParam), coreValue, "Returned property value is not valid!");
     }
+    
+
 }
