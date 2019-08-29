@@ -115,10 +115,23 @@ public enum R {
         this.resourceFile = resourceKey;
     }
 
+    /**
+     * Put and update globally value for properties context.
+     * 
+     * @param key String
+     * @param value String
+     */
     public void put(String key, String value) {
         put(key, value, false);
     }
 
+    /**
+     * Put and update globally or for current test only value for properties context.
+     * 
+     * @param key String
+     * @param value String
+     * @param currentTestOnly boolean
+     */
     public void put(String key, String value, boolean currentTestOnly) {
         if (currentTestOnly) {
             //declare temporary property key
