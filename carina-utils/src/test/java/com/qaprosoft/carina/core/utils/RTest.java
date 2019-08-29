@@ -74,11 +74,13 @@ public class RTest {
     
     @Test
     public void testGetEmptyTestProperties() {
+        R.CONFIG.clearTestProperties();
         Assert.assertTrue(R.CONFIG.getTestProperties().isEmpty(), "Default temp test properties object should be empty!");
     }
     
     @Test
     public void testOverrideTempProperty() {
+        R.CONFIG.clearTestProperties();
         Assert.assertEquals(R.CONFIG.get("key1"), "");
         R.CONFIG.put("key1", "value1", true);
         Assert.assertEquals(R.CONFIG.get("key1"), "value1");
@@ -119,6 +121,7 @@ public class RTest {
 
     @Test
     public void testOverride() {
+        R.CONFIG.clearTestProperties();
         Assert.assertEquals(R.TESTDATA.get("key1"), "3");
         Assert.assertEquals(R.TESTDATA.get("key2"), "2");
         Assert.assertEquals(R.TESTDATA.get("key3"), "1");
