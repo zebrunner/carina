@@ -89,7 +89,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         // TODO: remove hard-coded text
         if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
-            messager.info(deviceName, test, DateUtils.now(), errorMessage);
+            messager.error(deviceName, test, DateUtils.now(), errorMessage);
             if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null
                     && result.getThrowable().getMessage() != null
                     && !StringUtils.isEmpty(result.getThrowable().getMessage())) {
