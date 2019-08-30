@@ -311,6 +311,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private void onTestFinish(ITestResult result) {
         try {
+            // clear all kind of temporary properties
+            R.CONFIG.clearTestProperties();
+            R.TESTDATA.clearTestProperties();
+            R.DATABASE.clearTestProperties();
+            R.EMAIL.clearTestProperties();
+            R.REPORT.clearTestProperties();
+            R.ZAFIRA.clearTestProperties();
+            
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
