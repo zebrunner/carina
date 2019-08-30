@@ -19,7 +19,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
@@ -27,7 +28,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 public class Ownership {
-    protected static final Logger LOGGER = Logger.getLogger(Ownership.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ownership.class);
 
     private Ownership() {
     }
@@ -94,7 +95,7 @@ public class Ownership {
                 }
             }
         } catch (ClassNotFoundException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
         return owner;
     }

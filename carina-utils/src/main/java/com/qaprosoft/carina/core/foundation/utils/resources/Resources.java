@@ -24,11 +24,12 @@ import java.security.CodeSource;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Resources {
 
-    protected static final Logger LOGGER = Logger.getLogger(Resources.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resources.class);
 
     private static void collectURL(ResourceURLFilter f, Set<URL> s, URL u) {
         if (f == null || f.accept(u)) {
@@ -47,7 +48,7 @@ public class Resources {
                 try {
                     collectURL(f, s, file.toURI().toURL());
                 } catch (MalformedURLException e) {
-                    LOGGER.debug(e);
+                    LOGGER.debug(e.getMessage(), e);
                 }
             }
         }
@@ -79,7 +80,7 @@ public class Resources {
 			try {
 				iterateEntry(new File(url.toURI()), filter, collectedURLs);
 			} catch (URISyntaxException e) {
-				LOGGER.debug(e);
+				LOGGER.debug(e.getMessage(), e);
 			}
         }
         return collectedURLs;
@@ -94,7 +95,7 @@ public class Resources {
             iterateEntry(new File(src.getLocation().toURI()), filter,
                     collectedURLs);
         } catch (URISyntaxException e) {
-            LOGGER.debug(e);
+            LOGGER.debug(e.getMessage(), e);
         }
         return collectedURLs;
     }

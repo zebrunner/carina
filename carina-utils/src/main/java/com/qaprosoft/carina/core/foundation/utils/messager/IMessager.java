@@ -1,12 +1,13 @@
 package com.qaprosoft.carina.core.foundation.utils.messager;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.Reporter;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 /**
  * ReportMessage is used for reporting informational and error messages both

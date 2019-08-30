@@ -15,15 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZipManager {
-    protected static final Logger LOGGER = Logger.getLogger(ZipManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
 
     @SuppressWarnings("rawtypes")
     public static void unzip(String zip, String extractTo) {
@@ -67,14 +73,14 @@ public class ZipManager {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         } finally {
             try {
                 if (zipFile != null) {
                     zipFile.close();
                 }
             } catch (IOException e) {
-                LOGGER.error(e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }

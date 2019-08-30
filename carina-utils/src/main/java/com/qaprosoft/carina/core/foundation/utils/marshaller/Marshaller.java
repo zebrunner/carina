@@ -15,7 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.marshaller;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +28,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class Marshaller {
 
@@ -35,7 +40,7 @@ class Marshaller {
     /**
      * Class Logger
      */
-    private static final Logger LOGGER = Logger.getLogger(Marshaller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Marshaller.class);
 
     private Marshaller() {
 
@@ -69,7 +74,7 @@ class Marshaller {
             }
             return contextCache.get(clazz);
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -89,7 +94,7 @@ class Marshaller {
             return marshaller;
 
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -110,7 +115,7 @@ class Marshaller {
             return unmarshaller;
 
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -121,7 +126,7 @@ class Marshaller {
 
             return (T) getUnmarshaller(resultClazz).unmarshal(source);
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -132,7 +137,7 @@ class Marshaller {
 
             return (T) getUnmarshaller(resultClazz).unmarshal(new ByteArrayInputStream(string.getBytes()));
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -142,7 +147,7 @@ class Marshaller {
         try {
             return (T) getUnmarshaller(resultClazz).unmarshal(file);
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -152,7 +157,7 @@ class Marshaller {
         try {
             return (T) getUnmarshaller(resultClazz).unmarshal(is);
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -162,7 +167,7 @@ class Marshaller {
             getMarshaller(jaxbElement.getClass()).marshal(jaxbElement,
                     paramResult);
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
@@ -172,7 +177,7 @@ class Marshaller {
         try {
             getMarshaller(jaxbElement.getClass()).marshal(jaxbElement, writer);
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
@@ -184,7 +189,7 @@ class Marshaller {
             getMarshaller(jaxbElement.getClass()).marshal(jaxbElement, w);
             return w.toString();
         } catch (JAXBException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
 

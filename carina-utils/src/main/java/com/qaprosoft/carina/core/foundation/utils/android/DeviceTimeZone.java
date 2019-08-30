@@ -19,12 +19,13 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeviceTimeZone {
 
-    private static final Logger LOGGER = Logger.getLogger(DeviceTimeZone.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceTimeZone.class);
 
     private boolean auto_time;
     private boolean auto_timezone;
@@ -278,7 +279,7 @@ public class DeviceTimeZone {
         try {
             return DateTimeZone.forID(tz).toTimeZone().observesDaylightTime();
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             return false;
         }
     }
@@ -287,7 +288,7 @@ public class DeviceTimeZone {
         try {
             return getTimezoneOffset(DateTimeZone.forID(tz).toTimeZone());
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             return "";
         }
     }

@@ -48,7 +48,7 @@
         <testng.version>6.14.3</testng.version>
         <!-- Logging and commons -->
         <log4j.version>1.2.17</log4j.version>
-        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons-text.version>1.7</commons-text.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <commons-logging.version>1.2</commons-logging.version>
@@ -395,6 +395,11 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

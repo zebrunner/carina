@@ -21,7 +21,8 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
@@ -35,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
  * @author Aliaksei_Khursevich (hursevich@gmail.com)
  */
 public class TestNamingUtil {
-    private static final Logger LOGGER = Logger.getLogger(TestNamingUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestNamingUtil.class);
 
     private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
 

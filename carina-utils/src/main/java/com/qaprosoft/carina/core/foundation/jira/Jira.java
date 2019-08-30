@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
@@ -43,7 +44,7 @@ import net.rcarz.jiraclient.JiraClient;
  * @author Alex Khursevich
  */
 public class Jira {
-    private static final Logger LOG = Logger.getLogger(Jira.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Jira.class);
     private static IJiraUpdater updater;
     private static JiraClient jira;
     private static boolean isInitialized = false;

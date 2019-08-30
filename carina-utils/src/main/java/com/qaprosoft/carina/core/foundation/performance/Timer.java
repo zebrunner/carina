@@ -19,10 +19,11 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Timer {
-    private static final Logger LOGGER = Logger.getLogger(Timer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Timer.class);
 
     //data structure to collect summarized/combined datetime  
     private static ThreadLocal<ConcurrentHashMap<String, Long>> metrics = new ThreadLocal<ConcurrentHashMap<String, Long>>();

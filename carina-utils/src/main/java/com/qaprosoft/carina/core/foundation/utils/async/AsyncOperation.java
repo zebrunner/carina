@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.async;
 
-import org.apache.log4j.Logger;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,9 +24,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AsyncOperation {
 
-    private static final Logger LOGGER = Logger.getLogger(AsyncOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncOperation.class);
 
     private static Set<CompletableFuture<?>> asyncOperations;
 
