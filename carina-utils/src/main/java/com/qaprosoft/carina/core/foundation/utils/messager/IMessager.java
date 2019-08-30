@@ -54,6 +54,20 @@ public interface IMessager {
         getLogger().error(message);
         return message;
     }
+    
+    /**
+     * Logs warn message and adds message to TestNG report.
+     *
+     * @param args
+     *            for insert into patterns
+     * @return generated message
+     */
+    default String warn(String... args) {
+        String message = create(args);
+        Reporter.log(message);
+        getLogger().warn(message);
+        return message;
+    }    
 
     /**
      * Generates error message using message pattern and incoming parameters.

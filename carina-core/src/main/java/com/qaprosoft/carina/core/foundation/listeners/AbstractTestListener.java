@@ -112,7 +112,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         String deviceName = getDeviceName();
 
-        messager.info(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
+        messager.error(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
 
         result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
         return errorMessage;
@@ -162,7 +162,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         String deviceName = getDeviceName();
 
-        messager.info(deviceName, test, DateUtils.now(), errorMessage);
+        messager.warn(deviceName, test, DateUtils.now(), errorMessage);
 
         EmailReportItemCollector
                 .push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
@@ -380,7 +380,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
                     + result.getMethod().getMethodName());
         } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_RETRY_FAILED, count - 1, maxCount);
+            failRetryItem(result, Messager.RETRY_FAILED, count - 1, maxCount);
             //TODO: try to change current result->method status to failed
             result.setStatus(2);
             afterTest(result);
