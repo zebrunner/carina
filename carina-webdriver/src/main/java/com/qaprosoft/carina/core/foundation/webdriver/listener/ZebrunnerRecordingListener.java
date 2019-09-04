@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -26,8 +25,6 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * @author akhursevich
  */
 public class ZebrunnerRecordingListener implements IDriverCommandListener {
-
-	protected static final Logger LOGGER = Logger.getLogger(ZebrunnerRecordingListener.class);
 
 	private TestArtifactType videoArtifact;
 	

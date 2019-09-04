@@ -17,7 +17,8 @@ package com.qaprosoft.carina.browsermobproxy;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -27,7 +28,7 @@ import java.net.URL;
 import java.security.KeyStore;
 
 public class LocalTrustStoreBuilder {
-    private static final Logger LOGGER = Logger.getLogger(LocalTrustStoreBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalTrustStoreBuilder.class);
 
     public static final String TC_CONF_DIR_PATH = "keysecure/";
 

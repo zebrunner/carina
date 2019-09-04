@@ -15,9 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
@@ -33,6 +34,7 @@ import io.appium.java_client.android.AndroidKeyCode;
  */
 
 public class FakeGpsPage extends MobileAbstractPage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FakeGpsPage.class);
 
     @FindBy(id = "com.lexa.fakegps:id/buttonStart")
     private ExtendedWebElement setLocationButton;
@@ -91,8 +93,6 @@ public class FakeGpsPage extends MobileAbstractPage {
     public FakeGpsPage(WebDriver driver) {
         super(driver);
     }
-
-    protected static final Logger LOGGER = Logger.getLogger(FakeGpsPage.class);
 
     public void clickSetLocation() {
         if (setLocationStart.isElementPresent(DELAY)) {

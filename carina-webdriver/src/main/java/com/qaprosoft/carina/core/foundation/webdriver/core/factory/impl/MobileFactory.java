@@ -23,7 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
@@ -59,7 +60,7 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
-    protected static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MobileFactory.class);
 	
 	private final static String vnc_mobile = "vnc_mobile";
 

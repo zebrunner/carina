@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
@@ -34,7 +35,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 public abstract class AbstractCapabilities {
-    protected static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCapabilities.class);
 
     public abstract DesiredCapabilities getCapability(String testName);
 

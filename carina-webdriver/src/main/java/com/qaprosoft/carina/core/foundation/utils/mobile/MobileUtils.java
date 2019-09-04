@@ -17,7 +17,8 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 
 import java.time.Duration;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -49,7 +50,7 @@ import io.appium.java_client.touch.offset.PointOption;
  */
 @Deprecated
 public class MobileUtils {
-    protected static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MobileUtils.class);
 
     public enum Direction {
         LEFT,
@@ -700,7 +701,7 @@ public class MobileUtils {
                 LOGGER.info(String.format("Current OS is %s. But we can set default TimeZone and Language only for Android.", os));
             }
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
     

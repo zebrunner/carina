@@ -20,7 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
 
@@ -33,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Pred
 import io.appium.java_client.MobileBy;
 
 public class LocalizedAnnotations extends Annotations {
-    private static final Logger LOGGER = Logger.getLogger(LocalizedAnnotations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalizedAnnotations.class);
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
     public LocalizedAnnotations(Field field) {

@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation;
 
 import java.lang.annotation.Annotation;
 
-import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
@@ -45,7 +44,6 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 @Listeners({ CarinaListener.class })
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
-    protected static final Logger LOGGER = Logger.getLogger(AbstractTest.class);
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
     

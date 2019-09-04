@@ -19,11 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.WebDriver;
 
 public class WindowsHandler {
-    protected static final Logger LOGGER = Logger.getLogger(WindowsHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WindowsHandler.class);
 
     private static Map<Integer, Set<String>> windows = new HashMap<Integer, Set<String>>();
 

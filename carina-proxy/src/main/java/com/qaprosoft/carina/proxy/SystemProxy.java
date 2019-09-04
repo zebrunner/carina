@@ -18,14 +18,15 @@ package com.qaprosoft.carina.proxy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class SystemProxy {
 
-    protected static final Logger LOGGER = Logger.getLogger(SystemProxy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemProxy.class);
 
     public static void setupProxy() {
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);

@@ -25,7 +25,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
@@ -33,7 +34,7 @@ import com.qaprosoft.zafira.models.dto.aws.FileUploadType.Type;
 
 public class AmazonS3Client {
 
-    private static final Logger LOGGER = Logger.getLogger(AmazonS3Client.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AmazonS3Client.class);
 
     private static final ExecutorService executorService = Executors.newFixedThreadPool(50);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");

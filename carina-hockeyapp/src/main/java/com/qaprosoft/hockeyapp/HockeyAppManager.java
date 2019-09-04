@@ -27,7 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
@@ -46,7 +47,9 @@ import com.qaprosoft.hockeyapp.http.resttemplate.RestTemplateBuilder;
  * Created by boyle on 8/16/17.
  */
 public class HockeyAppManager {
-    private static final Logger LOGGER = Logger.getLogger(HockeyAppManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HockeyAppManager.class);
+    
+    
     protected RestTemplate restTemplate;
 
     private String revision;

@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.http;
 
-import org.apache.log4j.Logger;
-
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.proxy.SystemProxy;
@@ -27,8 +25,6 @@ import com.qaprosoft.carina.proxy.SystemProxy;
  * @author Alex Khursevich
  */
 public class HttpClient {
-    protected static final Logger LOGGER = Logger.getLogger(HttpClient.class);
-
     public static Response send(RequestSpecification request, String methodPath, HttpMethodType methodType) {
         Response response = null;
         SystemProxy.setupProxy();

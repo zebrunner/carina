@@ -18,7 +18,8 @@ package com.qaprosoft.carina.core.foundation.reporting;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -36,7 +37,7 @@ import com.qaprosoft.zafira.models.dto.TagType;
  */
 public class TestRailTest implements ITestRailManager {
 
-    protected static final Logger LOGGER = Logger.getLogger(TestRailTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestRailTest.class);
 
     private static final String TEST_ID = "5,6,65500";
     private static final String EXPECTED_TEST_ID = "65500";

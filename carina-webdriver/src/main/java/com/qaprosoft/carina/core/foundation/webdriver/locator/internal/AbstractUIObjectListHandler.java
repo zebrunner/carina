@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchElementException;
@@ -38,22 +37,24 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUIObjectListHandler.class);
+    
     private Class<?> clazz;
     private WebDriver webDriver;
     private final ElementLocator locator;
     private String name;
 
     private By locatorBy;
-    private Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
 
     public AbstractUIObjectListHandler(Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
         this.clazz = clazz;

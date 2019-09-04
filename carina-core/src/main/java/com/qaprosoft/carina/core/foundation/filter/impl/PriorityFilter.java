@@ -3,14 +3,15 @@ package com.qaprosoft.carina.core.foundation.filter.impl;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
 import java.util.List;
 
 public class PriorityFilter implements IFilter {
 
-    protected static final Logger LOGGER = Logger.getLogger(PriorityFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PriorityFilter.class);
 
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData) {

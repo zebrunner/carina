@@ -25,7 +25,8 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -65,7 +66,7 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
  * @author Alex Khursevich
  */
 public class DriverHelper {
-    protected static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DriverHelper.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
@@ -950,9 +951,8 @@ public class DriverHelper {
             LOGGER.debug("Command will be performed with the exception ignoring");
             return supplier.get();
         } catch (WebDriverException e) {
-            LOGGER.info("Webdriver exception has been fired. One more attempt to execute action.");
+            LOGGER.info("Webdriver exception has been fired. One more attempt to execute action.", e);
             LOGGER.info(supplier.toString());
-            LOGGER.info(e);
             return supplier.get();
         }
         
