@@ -85,6 +85,11 @@
 		    <artifactId>rest-assured</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.jayway.restassured</groupId>
+			<artifactId>json-path</artifactId>
+		</dependency>
+
 		<!-- Test utilities -->
 		<dependency>
 			<groupId>org.testng</groupId>

@@ -590,6 +590,11 @@
                 <version>${rest-assured.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.jayway.restassured</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${rest-assured.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.imgscalr</groupId>
                 <artifactId>imgscalr-lib</artifactId>
                 <version>${imgscalr-lib.version}</version>
