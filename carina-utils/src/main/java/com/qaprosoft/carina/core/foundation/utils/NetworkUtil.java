@@ -18,11 +18,12 @@ package com.qaprosoft.carina.core.foundation.utils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetworkUtil {
 
-    protected static final Logger LOGGER = Logger.getLogger(NetworkUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkUtil.class);
 
     public static String getIpAddress() {
         String currentIP = "0.0.0.0"; // localhost

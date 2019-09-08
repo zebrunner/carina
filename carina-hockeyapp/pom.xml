@@ -30,16 +30,15 @@
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
+			<!-- Do not remove dependency as it generates 35 compilation failures -->
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
 		</dependency>
-
-		<!-- Test utilities -->
 
 		<!-- needed for spring RestTemplate stuff -->
 		<dependency>
@@ -52,6 +51,16 @@
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
 	</dependencies>

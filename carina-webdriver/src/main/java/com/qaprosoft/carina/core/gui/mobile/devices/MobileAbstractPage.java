@@ -15,15 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public abstract class MobileAbstractPage extends AbstractPage {
-
-    protected static final Logger LOGGER = Logger.getLogger(MobileAbstractPage.class);
 
     protected static final long DELAY = 10;
 

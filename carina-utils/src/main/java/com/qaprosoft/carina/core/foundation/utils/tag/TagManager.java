@@ -23,11 +23,12 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
 public class TagManager {
-    protected static final Logger LOGGER = Logger.getLogger(TagManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagManager.class);
 
     private static final ThreadLocal<HashMap<String, String>> testTags = ThreadLocal.withInitial(HashMap::new);
     private static final String FORBIDDEN_TAG_NAMES = "priority";
@@ -59,7 +60,7 @@ public class TagManager {
                          .orElse(new HashMap<>());
             declarativeTags.forEach(tags::putIfAbsent);
         } catch (ClassNotFoundException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         } finally {
             // remove all tags from current thread as information put to zafira by current method
             testTags.remove();

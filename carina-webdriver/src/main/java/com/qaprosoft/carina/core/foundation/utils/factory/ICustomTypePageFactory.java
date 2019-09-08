@@ -7,7 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
 
@@ -19,6 +20,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public interface ICustomTypePageFactory extends IDriverPool {
+    static final Logger LOG = LoggerFactory.getLogger(ICustomTypePageFactory.class);
 
     String VERSION_SPLITTER = "\\.";
 
@@ -32,8 +34,6 @@ public interface ICustomTypePageFactory extends IDriverPool {
     String DOUBLE_STR = "double";
 
     Reflections REFLECTIONS = new Reflections("");
-
-    Logger LOG = Logger.getLogger(ICustomTypePageFactory.class);
 
     public default <T extends AbstractPage> T initPage(Class<T> parentClass, Object... parameters) {
         return initPage(getDriver(), parentClass, parameters);

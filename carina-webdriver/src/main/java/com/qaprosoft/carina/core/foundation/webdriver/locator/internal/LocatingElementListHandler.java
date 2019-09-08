@@ -22,7 +22,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.SearchContext;
@@ -39,7 +40,7 @@ public class LocatingElementListHandler implements InvocationHandler {
     private By by;
     private final WebDriver driver;
     
-    protected static final Logger LOGGER = Logger.getLogger(LocatingElementListHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocatingElementListHandler.class);
 
     public LocatingElementListHandler(WebDriver driver, ElementLocator locator, String name, By by) {
     	this.driver = driver;

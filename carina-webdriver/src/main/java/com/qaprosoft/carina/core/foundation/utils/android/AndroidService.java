@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
@@ -40,7 +41,7 @@ import io.appium.java_client.android.AndroidDriver;
 
 public class AndroidService implements IDriverPool, IAndroidUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(AndroidService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AndroidService.class);
 
     protected static final int INIT_TIMEOUT = 20;
 
@@ -220,7 +221,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             LOGGER.info("Found activity name for application in focus : " + activityName);
             return packageName + "/" + activityName;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             return "";
         }
     }
@@ -304,7 +305,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             if (found) {
                 resultList.add(notification);
                 if (withLogger)
-                    LOGGER.info(notification);
+                    LOGGER.info(notification.getNotificationText());
                 notification = new Notification();
                 found = false;
             }
@@ -440,7 +441,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             CommonUtils.pause(2); // wait while notifications are playing animation to
             // appear to avoid missed taps
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
             LOGGER.info("Using adb to expand Status bar. ");
             expandStatusBar();
 
@@ -1174,7 +1175,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             LOGGER.info("Output date: " + result);
 
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
         return result;
     }
@@ -1191,7 +1192,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             SimpleDateFormat outputDateFormat = new SimpleDateFormat("yyyyMMdd.HHmmss");
             res = outputDateFormat.format(inputDate);
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
         LOGGER.info("Output date in expected format: " + res);
         return res;

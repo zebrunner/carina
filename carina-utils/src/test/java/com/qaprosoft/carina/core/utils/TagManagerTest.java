@@ -15,24 +15,30 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.tag.*;
-import com.qaprosoft.zafira.models.dto.TagType;
-import org.apache.log4j.Logger;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
+import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
+import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
+import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
+import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
+import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link TagManager}
  */
 public class TagManagerTest {
-    protected static final Logger LOGGER = Logger.getLogger(TagManagerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagManagerTest.class);
 
     private static final String TAG_NAME = "tag1";
     private static final String TAG_NAME2 = "tag2";

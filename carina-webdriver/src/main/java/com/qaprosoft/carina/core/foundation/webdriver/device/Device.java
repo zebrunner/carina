@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 
@@ -51,7 +52,7 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
 public class Device extends RemoteDevice implements IDriverPool {
-    private static final Logger LOGGER = Logger.getLogger(Device.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Device.class);
 
     /**
      * ENABLED only in case of availability of parameter - 'uninstall_related_apps'.

@@ -18,7 +18,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -29,7 +30,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.Abstra
 
 public class DivisionElementExtractor extends AbstractElementExtractor implements IDriverPool {
 
-    private Logger LOGGER = Logger.getLogger(DivisionElementExtractor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DivisionElementExtractor.class);
 
     @Override
     public ExtendedWebElement getElementsByCoordinates(int x, int y) {

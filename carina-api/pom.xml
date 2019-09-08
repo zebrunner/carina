@@ -51,8 +51,23 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -68,6 +83,10 @@
 				<exclusion>
 					<groupId>commons-logging</groupId>
 					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -87,6 +106,7 @@
 		<!-- JSON schema validation -->
 		
 		<dependency>
+			<!-- do not remove otherwise 17 compilation failures -->
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-validator</artifactId>
 			<version>2.2.6</version>
@@ -99,11 +119,34 @@
 		</dependency>
 		
 		<dependency>
+			<!-- do not remove otherwise 6 compilation failures -->
 			<groupId>org.everit.json</groupId>
 			<artifactId>org.everit.json.schema</artifactId>
 			<version>1.5.1</version>
 		</dependency>
-		
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- do not remove otherwise Used undeclared dependencies found -->
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+		</dependency>
+
 	</dependencies>
 	
 	<build>

@@ -24,12 +24,13 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<imgscalr-lib.version>4.2</imgscalr-lib.version>
+		<!--imgscalr-lib.version>4.2</imgscalr-lib.version-->
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
 		<itext.version>5.0.6</itext.version>
 		<reflections.version>0.9.11</reflections.version>
+		<mockito-all.version>1.10.19</mockito-all.version>
 
 	</properties>
 
@@ -51,13 +52,35 @@
 		</dependency>
 
 		<dependency>
+			<!-- Do not remove dependency as it generates 5 compilation failures -->
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 
 		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-crypto</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-commons</artifactId>
+		</dependency>
+
+		<!-- Zafira -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>zafira-client</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<dependency>
@@ -67,7 +90,23 @@
 
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
+			<artifactId>selenium-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-remote-driver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
 		</dependency>
 
 		<!-- Appium -->
@@ -76,12 +115,13 @@
 			<artifactId>java-client</artifactId>
 		</dependency>
 
-		<dependency>
+		<!-- TODO: analyze potential regressions and put details here if dependency needed -->
+		<!--dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
 			<version>${imgscalr-lib.version}</version>
 			<type>jar</type>
-		</dependency>
+		</dependency-->
 
 		<dependency>
 			<groupId>ru.yandex.qatools.ashot</groupId>
@@ -95,6 +135,10 @@
 				<exclusion>
 					<groupId>org.seleniumhq.selenium</groupId>
 					<artifactId>selenium-remote-driver</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-all</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -143,6 +187,40 @@
 			</exclusions>
 		</dependency>
 
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- do not remove otherwise Used undeclared dependencies found -->
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- do not remove otherwise Used undeclared dependencies found -->
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito-all.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

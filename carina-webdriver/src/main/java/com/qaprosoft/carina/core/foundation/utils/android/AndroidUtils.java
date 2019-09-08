@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -51,7 +52,7 @@ import io.appium.java_client.windows.PressesKeyCode;
 public class AndroidUtils extends MobileUtils {
 
 	//TODO: review carefully and remove duplicates and migrate completely to fluent waits
-    protected static final Logger LOGGER = Logger.getLogger(AndroidUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AndroidUtils.class);
     private static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     private static final long SCROLL_TIMEOUT = 300;
 

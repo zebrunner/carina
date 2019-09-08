@@ -25,7 +25,6 @@
 		<target.version>1.8</target.version>
 
 		<opencsv.version>1.7</opencsv.version>
-		<apache-poi.version>3.11-beta3</apache-poi.version>
 	</properties>
 
 	<dependencies>
@@ -40,6 +39,11 @@
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
 		<!-- CSV -->
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
@@ -48,9 +52,9 @@
 		</dependency>
 
 		<dependency>
+			<!-- do not remove otherwise 65 compilation failures -->
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>${apache-poi.version}</version>
 		</dependency>
 
 		<dependency>
@@ -59,8 +63,15 @@
 		</dependency>
 
 		<dependency>
+			<!-- do not remove otherwise 13 compilation failures -->
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-sheets</artifactId>
+		</dependency>
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
 		</dependency>
 
 	</dependencies>

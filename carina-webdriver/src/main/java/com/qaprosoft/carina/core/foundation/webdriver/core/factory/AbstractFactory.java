@@ -22,7 +22,8 @@ import java.util.UUID;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -47,7 +48,7 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  */
 public abstract class AbstractFactory {
     
-    protected static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFactory.class);
     
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
     

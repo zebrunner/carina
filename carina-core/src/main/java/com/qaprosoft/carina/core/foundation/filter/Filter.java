@@ -3,8 +3,8 @@ package com.qaprosoft.carina.core.foundation.filter;
 import com.qaprosoft.carina.core.foundation.filter.impl.OwnerFilter;
 import com.qaprosoft.carina.core.foundation.filter.impl.PriorityFilter;
 import com.qaprosoft.carina.core.foundation.filter.impl.TagFilter;
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Enum to store rules (name and implementation of the rule)
  *
@@ -15,7 +15,7 @@ public enum Filter {
     OWNER("OWNER", new OwnerFilter()),
     TAGS("TAGS", new TagFilter());
 
-    protected static final Logger LOGGER = Logger.getLogger(Filter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Filter.class);
 
     private String ruleName;
 

@@ -334,7 +334,7 @@ public interface IDriverPool {
 
         // 1 - is default run without retry
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
-        while (count++ < maxCount) { //TODO: maybe do while?
+        while (drv == null && count++ < maxCount) {
             try {
                 LOGGER.debug("initDriver start...");
                 
@@ -348,12 +348,13 @@ public interface IDriverPool {
                             " Override max_driver_count to allow more drivers per test!");
                 }
 
-                drv = DriverFactory.create(name, capabilities, seleniumHost);
-
                 // [VD] pay attention that similar piece of code is copied into the DriverPoolTest as registerDriver method!
                 if (currentDrivers.containsKey(name)) {
+                    // [VD] moved containsKey verification before the driver start
                     Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
                 }
+                
+                drv = DriverFactory.create(name, capabilities, seleniumHost);
 
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to

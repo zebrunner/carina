@@ -15,30 +15,33 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.proxy.SystemProxy;
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.proxy.CaptureType;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.Proxy;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.proxy.SystemProxy;
+
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.proxy.CaptureType;
 
 public class BrowserMobTest {
-    protected static final Logger LOGGER = Logger.getLogger(BrowserMobTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserMobTest.class);
     private static String header = "my_header";
     private static String headerValue = "my_value";
     private static String testUrl = "https://ci.qaprosoft.com";

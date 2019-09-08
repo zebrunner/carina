@@ -27,6 +27,8 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -47,6 +49,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordin
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 public class DesktopFactory extends AbstractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DesktopFactory.class);
 
     private static DesiredCapabilities staticCapabilities;
     

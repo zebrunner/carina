@@ -15,7 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
@@ -30,7 +31,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * @author akhursevich
  */
 public interface IDriverCommandListener {
-    static final Logger LOGGER = Logger.getLogger(IDriverCommandListener.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(IDriverCommandListener.class);
 
 	/**
 	 * Triggered before command execution.

@@ -15,13 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -38,6 +39,8 @@ import io.appium.java_client.ios.IOSDriver;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DriverListener implements WebDriverEventListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DriverListener.class);
+    
 	// 1. register live vnc url in DriverFactory (method streamVNC should return valid TestArtifactType
 	// 2. DriverFactory->getEventListeners(TestArtifactType vncArtifact)
 	// 3. declare vncArtifact using constructor in DriverListener
@@ -48,8 +51,6 @@ public class DriverListener implements WebDriverEventListener {
 		this.vncArtifact = vncArtifact;
 	}
 	
-    private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
-
     private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
     private final static ThreadLocal<String> currentNegativeMessage = new ThreadLocal<String>();
 

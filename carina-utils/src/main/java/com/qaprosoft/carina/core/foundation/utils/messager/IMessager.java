@@ -1,12 +1,13 @@
 package com.qaprosoft.carina.core.foundation.utils.messager;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.Reporter;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 /**
  * ReportMessage is used for reporting informational and error messages both
@@ -53,6 +54,20 @@ public interface IMessager {
         getLogger().error(message);
         return message;
     }
+    
+    /**
+     * Logs warn message and adds message to TestNG report.
+     *
+     * @param args
+     *            for insert into patterns
+     * @return generated message
+     */
+    default String warn(String... args) {
+        String message = create(args);
+        Reporter.log(message);
+        getLogger().warn(message);
+        return message;
+    }    
 
     /**
      * Generates error message using message pattern and incoming parameters.

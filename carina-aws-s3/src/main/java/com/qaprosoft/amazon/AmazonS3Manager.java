@@ -20,7 +20,8 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -46,8 +47,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public class AmazonS3Manager {
-    protected static final Logger LOGGER = Logger
-            .getLogger(AmazonS3Manager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AmazonS3Manager.class);
     private static volatile AmazonS3Manager instance = null;
     private static AmazonS3 s3client = null;
 

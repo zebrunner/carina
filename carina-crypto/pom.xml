@@ -29,13 +29,14 @@
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
+			<!-- do not remove based mvn:dependency analysis as it produce 14 compilation failures-->
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-commons</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<dependency>

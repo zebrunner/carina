@@ -30,7 +30,8 @@ import java.awt.*;
 import java.io.File;
 import java.nio.ByteOrder;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.monte.media.AudioFormatKeys;
 import org.monte.media.Format;
 import org.monte.media.FormatKeys;
@@ -63,7 +64,7 @@ public class DesktopVideoRecorder {
      */
     private ScreenRecorder screenRecorder;
 
-    protected static final Logger LOGGER = Logger.getLogger(DesktopVideoRecorder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DesktopVideoRecorder.class);
 
     public enum VideoFormat {
         AVI,

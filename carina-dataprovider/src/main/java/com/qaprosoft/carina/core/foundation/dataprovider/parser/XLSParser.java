@@ -21,7 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.model.ExternalLinksTable;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -32,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class XLSParser extends AbstractXLSParser {
-    protected static final Logger LOGGER = Logger.getLogger(XLSParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XLSParser.class);
     private static DataFormatter df;
     private static FormulaEvaluator evaluator;
 

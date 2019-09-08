@@ -19,13 +19,14 @@ import static com.jayway.restassured.RestAssured.given;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 
 public class RestUtil {
-    protected static final Logger LOGGER = Logger.getLogger(RestUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestUtil.class);
 
     public static Response sendHttpPost(String contentType, String payload, String httpPostCommand) {
         return sendHttpPost(contentType, payload, httpPostCommand, true);

@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -77,7 +78,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
 public class ExtendedWebElement {
-    private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedWebElement.class);
 
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -226,7 +227,7 @@ public class ExtendedWebElement {
 				// that's the only place to use DriverPool to get driver.
 				this.driver = IDriverPool.getDriver(sessionId);
 			} else {
-				LOGGER.error(tempSearchContext);
+				LOGGER.error("Undefined error for searchContext: " + tempSearchContext.toString());
 			}
 		} catch (NoSuchFieldException e) {
 			e.printStackTrace();
@@ -1384,7 +1385,7 @@ public class ExtendedWebElement {
 			}
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
-			LOGGER.error(e);
+		    LOGGER.error(e.getMessage(), e);
 			// print stack trace temporary to be able to handle any problem without extra debugging 
 			e.printStackTrace();
 			throw e;

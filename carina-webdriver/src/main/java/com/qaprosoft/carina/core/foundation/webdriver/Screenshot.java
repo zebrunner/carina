@@ -33,7 +33,8 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -71,7 +72,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
  * @author Alex Khursevich
  */
 public class Screenshot {
-    private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
 
