@@ -51,6 +51,7 @@
 		</dependency>
 
 		<dependency>
+			<!-- Do nor remove dependency as it generates 5 compilation failures -->
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
