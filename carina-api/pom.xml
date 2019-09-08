@@ -106,6 +106,7 @@
 		<!-- JSON schema validation -->
 		
 		<dependency>
+			<!-- do not remove otherwise 17 compilation failures -->
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-validator</artifactId>
 			<version>2.2.6</version>
