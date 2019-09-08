@@ -76,6 +76,9 @@
         <google.apis.version>v4-rev581-1.25.0</google.apis.version>
         <jackson.databind.version>2.9.9.1</jackson.databind.version>
         <apache-poi.version>3.11-beta3</apache-poi.version>
+        <guava.version>25.0-jre</guava.version>
+        <mockito-all.version>1.9.5</mockito-all.version>
+
     </properties>
     <modules>
         <module>carina-commons</module>
@@ -602,6 +605,18 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.databind.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito-all.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
