@@ -203,6 +203,12 @@
 			<artifactId>commons-collections</artifactId>
 		</dependency>
 
+		<dependency>
+			<!-- do not remove otherwise Used undeclared dependencies found -->
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
