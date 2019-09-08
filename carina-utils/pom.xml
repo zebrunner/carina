@@ -173,12 +173,6 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 
-		<!-- For ZafiraListener -->
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-
 	</dependencies>
 
 	<build>

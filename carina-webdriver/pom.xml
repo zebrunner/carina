@@ -55,6 +55,12 @@
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 
+		<!-- Zafira -->
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>zafira-client</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
