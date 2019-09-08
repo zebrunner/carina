@@ -48,6 +48,12 @@
 			<artifactId>netty-all</artifactId>
 			<version>4.1.17.Final</version>
 		</dependency>
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

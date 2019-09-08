@@ -108,6 +108,12 @@
 			<artifactId>org.everit.json.schema</artifactId>
 			<version>1.5.1</version>
 		</dependency>
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
 		
 	</dependencies>
 	
