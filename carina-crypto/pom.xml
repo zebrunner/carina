@@ -29,6 +29,7 @@
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
+			<!-- do not remove based mvn:dependency analysis as it produce 14 compilation failures-->
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-commons</artifactId>
 		</dependency>
