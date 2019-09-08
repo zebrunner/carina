@@ -54,6 +54,11 @@
 			<artifactId>selenium-api</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+		</dependency>
+
 		<!-- Test utilities -->
 		<dependency>
 			<groupId>org.testng</groupId>
