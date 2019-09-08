@@ -15,14 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 

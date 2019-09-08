@@ -55,7 +55,6 @@
         <commons-cli.version>1.2</commons-cli.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-codec.version>1.9</commons-codec.version>
-        <commons-configuration2.version>2.1</commons-configuration2.version>
         <httpclient.version>4.5.3</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
