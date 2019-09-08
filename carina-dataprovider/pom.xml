@@ -63,6 +63,7 @@
 		</dependency>
 
 		<dependency>
+			<!-- do not remove otherwise 13 compilation failures -->
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-sheets</artifactId>
 		</dependency>
