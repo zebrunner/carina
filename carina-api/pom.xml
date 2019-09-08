@@ -132,6 +132,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
@@ -146,17 +151,6 @@
 			<!-- do not remove otherwise Used undeclared dependencies found -->
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-		</dependency>
-
-		<dependency>
-			<!-- do not remove otherwise api tests fail with "org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher" -->
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
 		</dependency>
 
 	</dependencies>
