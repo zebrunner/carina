@@ -30,6 +30,7 @@
 		<apache-http.version>4.4</apache-http.version>
 		<itext.version>5.0.6</itext.version>
 		<reflections.version>0.9.11</reflections.version>
+		<mockito-all.version>1.10.19</mockito-all.version>
 
 	</properties>
 
@@ -193,11 +194,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
 		</dependency>
@@ -217,6 +213,13 @@
 			<!-- do not remove otherwise Used undeclared dependencies found -->
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito-all.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

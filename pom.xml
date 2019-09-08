@@ -78,11 +78,13 @@
         <jackson-annotations.version>2.9.9</jackson-annotations.version>
         <apache-poi.version>3.11-beta3</apache-poi.version>
         <guava.version>25.0-jre</guava.version>
-        <mockito-all.version>1.9.5</mockito-all.version>
         <jaxb-api.version>2.2.2</jaxb-api.version>
         <hamcrest.version>1.3</hamcrest.version>
         <org.json.version>20090211</org.json.version>
         <jersey.version>1.19.4</jersey.version>
+        <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
+                org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
+         -->
 
     </properties>
     <modules>
@@ -634,11 +636,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>${mockito-all.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.bind</groupId>
