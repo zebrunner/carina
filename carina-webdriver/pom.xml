@@ -55,6 +55,11 @@
 			<artifactId>carina-reporting</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-crypto</artifactId>
+		</dependency>
+
 		<!-- Zafira -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
