@@ -40,6 +40,11 @@
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
 		<!-- CSV -->
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
