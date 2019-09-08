@@ -108,6 +108,12 @@
 			<artifactId>testng</artifactId>
 		</dependency>
 
+		<!-- Appium -->
+		<dependency>
+			<groupId>io.appium</groupId>
+			<artifactId>java-client</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
