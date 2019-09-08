@@ -49,10 +49,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-aws-s3</artifactId>
 		</dependency>
 		<dependency>
@@ -120,6 +116,7 @@
 
 		<!-- Appium -->
 		<dependency>
+			<!-- do not remove otherwise maven warn: Used undeclared dependencies found -->
 			<groupId>io.appium</groupId>
 			<artifactId>java-client</artifactId>
 		</dependency>
