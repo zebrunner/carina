@@ -37,12 +37,6 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-		<!-- Zafira -->
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>zafira-client</artifactId>
-		</dependency>
-
 		<!-- monte-repack video recording -->
 		<dependency>
 			<groupId>com.pojosontheweb</groupId>
