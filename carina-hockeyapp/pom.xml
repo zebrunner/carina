@@ -40,7 +40,10 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 
 		<!-- needed for spring RestTemplate stuff -->
 		<dependency>
