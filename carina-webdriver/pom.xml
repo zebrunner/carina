@@ -187,6 +187,16 @@
 			<artifactId>mockito-all</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
