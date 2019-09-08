@@ -141,6 +141,12 @@
 			<artifactId>json</artifactId>
 		</dependency>
 
+		<dependency>
+			<!-- do not remove otherwise Used undeclared dependencies found -->
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+		</dependency>
+
 	</dependencies>
 	
 	<build>
