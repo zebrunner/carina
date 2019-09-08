@@ -61,6 +61,11 @@
 			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-commons</artifactId>
+		</dependency>
+
 		<!-- Zafira -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
