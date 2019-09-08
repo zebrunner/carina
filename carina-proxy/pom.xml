@@ -38,6 +38,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>net.lightbody.bmp</groupId>
 			<artifactId>browsermob-core</artifactId>
 			<version>2.1.5</version>
