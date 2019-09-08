@@ -209,6 +209,12 @@
 			<artifactId>hamcrest-core</artifactId>
 		</dependency>
 
+		<dependency>
+			<!-- do not remove otherwise Used undeclared dependencies found -->
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
