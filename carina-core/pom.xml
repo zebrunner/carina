@@ -81,21 +81,10 @@
 			<artifactId>zafira-client</artifactId>
 		</dependency>
 
-		<!-- For ZafiraListener -->
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-support</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-api</artifactId>
-		</dependency>
-
 
 	</dependencies>
 
