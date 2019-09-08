@@ -135,6 +135,10 @@
 					<groupId>org.seleniumhq.selenium</groupId>
 					<artifactId>selenium-remote-driver</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-all</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
