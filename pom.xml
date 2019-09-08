@@ -495,6 +495,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-core</artifactId>
+                <version>${aws-java-sdk.version}</version>
+            </dependency>
             <!-- Test utilities -->
             <dependency>
                 <groupId>org.testng</groupId>
