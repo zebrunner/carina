@@ -67,6 +67,16 @@
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-api</artifactId>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
