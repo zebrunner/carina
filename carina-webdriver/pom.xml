@@ -24,7 +24,7 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<imgscalr-lib.version>4.2</imgscalr-lib.version>
+		<!--imgscalr-lib.version>4.2</imgscalr-lib.version-->
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
@@ -114,12 +114,13 @@
 			<artifactId>java-client</artifactId>
 		</dependency>
 
-		<dependency>
+		<!-- TODO: analyze potential regressions and put details here if dependency needed -->
+		<!--dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
 			<version>${imgscalr-lib.version}</version>
 			<type>jar</type>
-		</dependency>
+		</dependency-->
 
 		<dependency>
 			<groupId>ru.yandex.qatools.ashot</groupId>
