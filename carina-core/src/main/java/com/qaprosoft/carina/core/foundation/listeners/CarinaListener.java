@@ -843,6 +843,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         private void quitAllDriversOnHook() {
+            // https://github.com/qaprosoft/carina/issues/810
+            // add zafira testrun abort as part of shutdown hook
+            
+            //TODO: integrate abort call after delivering improvement into the ZafiraSingleton 
+            // ZafiraSingleton.INSTANCE.getClient().abortTestRun(arg0);
+
+
             // as it is shutdown hook just try to quit all existing drivers one by one
 
             for (CarinaDriver carinaDriver : driversPool) {
