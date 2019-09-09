@@ -22,8 +22,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -31,7 +30,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class ChromeCapabilities extends AbstractCapabilities {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChromeCapabilities.class);
+    private static final Logger LOGGER = Logger.getLogger(ChromeCapabilities.class);
     
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();

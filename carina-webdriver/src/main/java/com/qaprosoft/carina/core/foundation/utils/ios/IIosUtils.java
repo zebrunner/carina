@@ -15,8 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.ios;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 
@@ -24,7 +23,7 @@ import io.appium.java_client.ios.IOSDriver;
 
 public interface IIosUtils extends IMobileUtils {
     
-    static final Logger LOGGER = LoggerFactory.getLogger(IIosUtils.class);
+    static final Logger LOGGER = Logger.getLogger(IIosUtils.class);
 
     /**
      * Hide Keyboard

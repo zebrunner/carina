@@ -37,8 +37,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
@@ -47,7 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUIObjectListHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractUIObjectListHandler.class);
     
     private Class<?> clazz;
     private WebDriver webDriver;

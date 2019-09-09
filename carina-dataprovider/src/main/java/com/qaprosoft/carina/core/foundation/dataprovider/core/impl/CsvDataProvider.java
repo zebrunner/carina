@@ -20,8 +20,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -38,7 +37,7 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class CsvDataProvider extends BaseDataProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CsvDataProvider.class);
+    private static final Logger LOGGER = Logger.getLogger(CsvDataProvider.class);
     private Map<String, Integer> mapper = new HashMap<String, Integer>();
 
     private String executeColumn;

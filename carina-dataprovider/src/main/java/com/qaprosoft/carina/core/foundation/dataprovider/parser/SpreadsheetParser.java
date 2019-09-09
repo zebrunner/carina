@@ -22,8 +22,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.exception.NotSupportedOperationException;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -33,7 +32,7 @@ import java.util.stream.IntStream;
 
 public class SpreadsheetParser extends AbstractXLSParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpreadsheetParser.class);
+    private static final Logger LOGGER = Logger.getLogger(SpreadsheetParser.class);
 
     public static XLSTable parseSpreadSheet(String spreadsheetId, String sheetName, String executeColumn, String executeValue) {
         XLSTable dataTable = prepareDataTable(executeColumn, executeValue);

@@ -33,8 +33,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
@@ -46,7 +45,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingE
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class ExtendedFieldDecorator implements FieldDecorator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedFieldDecorator.class);
+    private static final Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
 
     protected ElementLocatorFactory factory;
 

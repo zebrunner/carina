@@ -17,13 +17,12 @@ package com.qaprosoft.carina.core.foundation.utils.tag;
 
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 public class PriorityManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PriorityManager.class);
+    private static final Logger LOGGER = Logger.getLogger(PriorityManager.class);
 
     private PriorityManager() {
     }

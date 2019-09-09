@@ -23,15 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public interface ITestRailManager extends ITestCases {
-    static final Logger LOGGER = LoggerFactory.getLogger(ITestRailManager.class);
+    static final Logger LOGGER = Logger.getLogger(ITestRailManager.class);
 
     default Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();

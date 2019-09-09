@@ -24,12 +24,11 @@ import java.security.CodeSource;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class Resources {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Resources.class);
+    private static final Logger LOGGER = Logger.getLogger(Resources.class);
 
     private static void collectURL(ResourceURLFilter f, Set<URL> s, URL u) {
         if (f == null || f.accept(u)) {

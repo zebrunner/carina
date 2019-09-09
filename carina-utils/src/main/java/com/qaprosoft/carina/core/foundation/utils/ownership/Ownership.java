@@ -19,8 +19,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
@@ -28,7 +27,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 public class Ownership {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Ownership.class);
+    private static final Logger LOGGER = Logger.getLogger(Ownership.class);
 
     private Ownership() {
     }

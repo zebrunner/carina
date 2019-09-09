@@ -19,8 +19,7 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
@@ -36,7 +35,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class Screen implements ICapturable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Screen.class);
+    private static final Logger LOGGER = Logger.getLogger(Screen.class);
 
     private WebDriver driver;
 

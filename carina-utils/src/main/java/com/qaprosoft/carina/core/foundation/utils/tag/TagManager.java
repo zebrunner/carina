@@ -23,12 +23,11 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 
 public class TagManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TagManager.class);
+    private static final Logger LOGGER = Logger.getLogger(TagManager.class);
 
     private static final ThreadLocal<HashMap<String, String>> testTags = ThreadLocal.withInitial(HashMap::new);
     private static final String FORBIDDEN_TAG_NAMES = "priority";

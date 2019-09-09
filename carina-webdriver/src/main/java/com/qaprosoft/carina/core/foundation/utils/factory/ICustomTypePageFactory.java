@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
 
@@ -20,7 +19,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public interface ICustomTypePageFactory extends IDriverPool {
-    static final Logger LOG = LoggerFactory.getLogger(ICustomTypePageFactory.class);
+    static final Logger LOG = Logger.getLogger(ICustomTypePageFactory.class);
 
     String VERSION_SPLITTER = "\\.";
 

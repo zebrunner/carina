@@ -15,8 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +27,7 @@ import com.qaprosoft.carina.proxy.SystemProxy;
 import net.lightbody.bmp.BrowserMobProxy;
 
 public class BrowserMobPortsRangeTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserMobPortsRangeTest.class);
+    private static final Logger LOGGER = Logger.getLogger(BrowserMobPortsRangeTest.class);
     private static String header = "my_header";
     private static String headerValue = "my_value";
 

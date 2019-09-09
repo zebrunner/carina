@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
  * Created by YP.
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 // TODO: rename class to CmdExecutor as we added iOS shell commands as well
 public class AdbExecutor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdbExecutor.class);
+    private static final Logger LOGGER = Logger.getLogger(AdbExecutor.class);
 
     // private static final String REMOTE_ADB_EXECUTION_CMD = "ssh %s@%s %s";
     private static String[] cmdInit;

@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone.TimeFormat;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
@@ -41,7 +40,7 @@ import io.appium.java_client.android.AndroidDriver;
 
 public class AndroidService implements IDriverPool, IAndroidUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AndroidService.class);
+    private static final Logger LOGGER = Logger.getLogger(AndroidService.class);
 
     protected static final int INIT_TIMEOUT = 20;
 

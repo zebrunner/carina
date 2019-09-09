@@ -25,8 +25,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -66,7 +65,7 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
  * @author Alex Khursevich
  */
 public class DriverHelper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DriverHelper.class);
+    private static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     

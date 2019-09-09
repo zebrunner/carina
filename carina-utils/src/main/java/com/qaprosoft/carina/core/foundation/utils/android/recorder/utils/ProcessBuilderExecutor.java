@@ -23,8 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 
@@ -35,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.Exe
  */
 public class ProcessBuilderExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessBuilderExecutor.class);
+    private static final Logger LOGGER = Logger.getLogger(ProcessBuilderExecutor.class);
 
     private static final Map<Integer, Process> runPIDs = new HashMap<Integer, Process>();
 

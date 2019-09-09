@@ -19,8 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DriverCommand;
@@ -43,7 +42,7 @@ import io.appium.java_client.screenrecording.BaseStopScreenRecordingOptions;
 public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions, O2 extends BaseStopScreenRecordingOptions>
 		implements IDriverCommandListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MobileRecordingListener.class);
+    private static final Logger LOGGER = Logger.getLogger(MobileRecordingListener.class);
 
 	private CommandExecutor commandExecutor;
 

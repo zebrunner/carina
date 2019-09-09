@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -29,7 +28,7 @@ import com.qaprosoft.carina.core.foundation.rule.IRule;
 
 public class ExpectedSkipManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExpectedSkipManager.class);
+    private static final Logger LOGGER = Logger.getLogger(ExpectedSkipManager.class);
 
     private static ExpectedSkipManager instance = null;
 

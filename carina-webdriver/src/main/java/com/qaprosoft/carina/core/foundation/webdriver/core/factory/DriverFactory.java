@@ -21,8 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.WebDriverEventListener;
@@ -44,7 +43,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  */
 public class DriverFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DriverFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
 	
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 	

@@ -19,14 +19,13 @@ import java.util.*;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public class XLSTable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XLSTable.class);
+    private static final Logger LOGGER = Logger.getLogger(XLSTable.class);
     private final static String FK_PREFIX = "FK_LINK_";
 
     private List<String> headers;

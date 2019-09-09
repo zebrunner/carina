@@ -21,8 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
@@ -49,7 +48,7 @@ public enum R {
 
     ZAFIRA("zafira.properties");
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(R.class);
+    private static final Logger LOGGER = Logger.getLogger(R.class);
 
     private static final String OVERRIDE_SIGN = "_";
 

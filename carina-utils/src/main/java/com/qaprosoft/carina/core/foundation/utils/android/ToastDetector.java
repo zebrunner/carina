@@ -21,14 +21,13 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.google.common.base.Function;
 
 public class ToastDetector implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToastDetector.class);
+    private static final Logger LOGGER = Logger.getLogger(ToastDetector.class);
 
     private static final String TOAST_PATTERN = "//*[@text='%s']";
 

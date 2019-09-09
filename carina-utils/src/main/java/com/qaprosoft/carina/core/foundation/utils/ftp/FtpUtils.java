@@ -10,11 +10,10 @@ import java.util.Base64;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class FtpUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FtpUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(FtpUtils.class);
 	private static final int DEFAULT_PORT = 21;
 
 	public static void uploadFile(String ftpHost, String user, String password, String filePassToUpload,

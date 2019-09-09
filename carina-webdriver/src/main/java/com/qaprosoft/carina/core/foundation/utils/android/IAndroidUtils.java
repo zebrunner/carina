@@ -25,8 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
@@ -53,7 +52,7 @@ import io.appium.java_client.touch.offset.PointOption;
 public interface IAndroidUtils extends IMobileUtils {
     
     //TODO: review carefully and remove duplicates and migrate completely to fluent waits
-    static final Logger LOGGER = LoggerFactory.getLogger(IAndroidUtils.class);
+    static final Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
     AdbExecutor executor = new AdbExecutor();

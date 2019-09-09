@@ -25,11 +25,10 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class ZipManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
+    private static final Logger LOGGER = Logger.getLogger(ZipManager.class);
 
     @SuppressWarnings("rawtypes")
     public static void unzip(String zip, String extractTo) {

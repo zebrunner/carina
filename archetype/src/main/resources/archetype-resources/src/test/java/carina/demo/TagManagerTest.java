@@ -22,8 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -43,7 +42,7 @@ import com.qaprosoft.zafira.models.dto.TagType;
  * Tests for {@link TagManager}
  */
 public class TagManagerTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TagManagerTest.class);
+	private static final Logger LOGGER = Logger.getLogger(TagManagerTest.class);
 
 	private static final String TAG_NAME = "tag3";
 	private static final String TAG_NAME2 = "tag4";

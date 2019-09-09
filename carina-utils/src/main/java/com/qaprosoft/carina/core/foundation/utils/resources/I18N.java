@@ -24,8 +24,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -45,7 +44,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  * 
  */
 public class I18N {
-    private static final Logger LOGGER = LoggerFactory.getLogger(I18N.class);
+    private static final Logger LOGGER = Logger.getLogger(I18N.class);
 
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 

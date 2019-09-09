@@ -17,8 +17,7 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -46,7 +45,7 @@ import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
 
 public interface IMobileUtils extends IDriverPool {
-    static final Logger LOGGER = LoggerFactory.getLogger(IMobileUtils.class);
+    static final Logger LOGGER = Logger.getLogger(IMobileUtils.class);
 
     public enum Direction {
         LEFT,
