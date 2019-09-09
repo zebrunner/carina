@@ -109,6 +109,7 @@ public class SpecialKeywords {
     public static final String TABLET = "tablet";
     public static final String PHONE = "phone";
     public static final String TV = "tv";
+    public static final String ANDROID_TV = "android_tv";
 
     public static final String PASSED = "PASSED";
     public static final String FAILED = "FAILED";

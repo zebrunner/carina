@@ -150,7 +150,7 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     public boolean isTv() {
-        return getType().equalsIgnoreCase(SpecialKeywords.TV);
+        return getType().equalsIgnoreCase(SpecialKeywords.TV) || getType().equalsIgnoreCase(SpecialKeywords.ANDROID_TV);
     }
 
     public Type getDeviceType() {
