@@ -743,7 +743,9 @@ public interface IMobileUtils extends IDriverPool {
         MobileDriver<?> driver = (MobileDriver<?>) castDriver();
         try {
             MultiTouchAction multiTouch = new MultiTouchAction(driver);
+            @SuppressWarnings("rawtypes")
             TouchAction<?> tAction0 = new TouchAction(driver);
+            @SuppressWarnings("rawtypes")
             TouchAction<?> tAction1 = new TouchAction(driver);
 
             PointOption<?> startPoint1 = PointOption.point(startx1, starty1);
@@ -763,7 +765,25 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * Check running in foreground application by bundleId
+     * Check if started driver/application is running in foreground 
+     *
+     * @return boolean
+     */
+    default public boolean isAppRunning() {
+        String bundleId = "";
+        String os = getDevice().getOs();
+        // get bundleId or appId of the application started by driver
+        if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
+        } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)) {
+            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
+        }
+        
+        return isAppRunning(bundleId);
+    }
+
+    /**
+     * Check running in foreground application by bundleId or appId
      *
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to query the state of.
      * @return boolean
@@ -774,22 +794,36 @@ public interface IMobileUtils extends IDriverPool {
     }
     
     /**
-     * Check running in foreground application 
-     *
-     * @return boolean
+     * Terminate running driver/application 
      */
-    default public boolean isAppRunning() {
+    default public void terminateApp() {
         String bundleId = "";
         String os = getDevice().getOs();
+        
+        // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)) {
             bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
         }
-        ApplicationState actualApplicationState = ((MobileDriver<?>) castDriver()).queryAppState(bundleId);
-        return ApplicationState.RUNNING_IN_FOREGROUND.equals(actualApplicationState);
+        
+        terminateApp(bundleId);
     }
 
+    /**
+     * Terminate running application by bundleId or appId
+     *
+     * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to terminate.
+     */
+    default public void terminateApp(String bundleId) {
+        ((MobileDriver<?>) castDriver()).terminateApp(bundleId);
+    }
+    
+    /**
+     * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
+     *
+     * @return WebDriver
+     */
     default public WebDriver castDriver() {
         WebDriver drv = getDriver();
         if (drv instanceof EventFiringWebDriver) {
