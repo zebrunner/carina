@@ -158,8 +158,6 @@ public interface IDriverPool {
      * @return default WebDriver
      */
     public static WebDriver getDriver(SessionId sessionId) {
-        LOGGER.debug("Detecting WebDriver by sessionId...");
-
         for (CarinaDriver carinaDriver : driversPool) {
             WebDriver drv = carinaDriver.getDriver();
             if (drv instanceof EventFiringWebDriver) {
@@ -175,7 +173,6 @@ public interface IDriverPool {
                 }
             }
         }
-
         throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
     }
 
