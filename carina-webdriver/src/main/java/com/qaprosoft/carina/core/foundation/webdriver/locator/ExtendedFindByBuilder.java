@@ -6,8 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.AbstractFindByBuilder;
 
@@ -17,7 +16,7 @@ import io.appium.java_client.MobileBy;
 
 public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedFindByBuilder.class);
+    private static final Logger LOGGER = Logger.getLogger(ExtendedFindByBuilder.class);
      
     private static final String BY_TEXT_TEMPLATE = "//*[@text = \"%s\"]";
 

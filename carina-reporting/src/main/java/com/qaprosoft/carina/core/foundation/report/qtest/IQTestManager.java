@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
@@ -32,7 +31,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 
 public interface IQTestManager extends ITestCases {
-    static final Logger LOGGER = LoggerFactory.getLogger(IQTestManager.class);
+    static final Logger LOGGER = Logger.getLogger(IQTestManager.class);
 
     default Set<String> getQTestCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();

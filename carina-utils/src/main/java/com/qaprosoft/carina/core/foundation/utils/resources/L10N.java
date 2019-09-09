@@ -26,8 +26,7 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -48,7 +47,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  */
 
 public class L10N {
-    private static final Logger LOGGER = LoggerFactory.getLogger(L10N.class);
+    private static final Logger LOGGER = Logger.getLogger(L10N.class);
 
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 

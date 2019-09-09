@@ -20,8 +20,7 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -29,7 +28,7 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 
 public class XmlFormatter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XmlFormatter.class);
+    private static final Logger LOGGER = Logger.getLogger(XmlFormatter.class);
 
     public static String prettyPrint(String xml) {
         if (StringUtils.isEmpty(xml))

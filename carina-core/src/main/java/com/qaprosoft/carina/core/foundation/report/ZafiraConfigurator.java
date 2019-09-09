@@ -22,8 +22,7 @@ import java.util.Set;
 
 import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
 import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestResult;
 
@@ -54,7 +53,7 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  * @author akhursevich
  */
 public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTestManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZafiraConfigurator.class);
+    private static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
 
     @Override
     public ConfigurationType getConfiguration() {

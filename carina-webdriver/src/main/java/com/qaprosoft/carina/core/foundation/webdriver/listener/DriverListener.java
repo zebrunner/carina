@@ -21,8 +21,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.WebDriverEventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -39,7 +38,7 @@ import io.appium.java_client.ios.IOSDriver;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DriverListener implements WebDriverEventListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DriverListener.class);
+    private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
     
 	// 1. register live vnc url in DriverFactory (method streamVNC should return valid TestArtifactType
 	// 2. DriverFactory->getEventListeners(TestArtifactType vncArtifact)

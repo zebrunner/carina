@@ -22,8 +22,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import com.qaprosoft.amazon.client.AmazonS3Client;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -35,7 +34,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  */
 final public class Artifacts {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Artifacts.class);
+    private static final Logger LOGGER = Logger.getLogger(Artifacts.class);
 
 	private static final ThreadLocal<Set<TestArtifactType>> testArtifacts = ThreadLocal.withInitial(HashSet::new);
 	private static final ThreadLocal<Set<AsyncArtifact>> testArtifactsAsync = ThreadLocal.withInitial(HashSet::new);

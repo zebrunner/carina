@@ -22,8 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
@@ -34,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  *         hursevich@gmail.com
  */
 public class Configuration {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
+    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
     private static IEnvArgResolver envArgResolver;
 
     static {

@@ -28,8 +28,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 class Marshaller {
 
@@ -40,7 +39,7 @@ class Marshaller {
     /**
      * Class Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Marshaller.class);
+    private static final Logger LOGGER = Logger.getLogger(Marshaller.class);
 
     private Marshaller() {
 

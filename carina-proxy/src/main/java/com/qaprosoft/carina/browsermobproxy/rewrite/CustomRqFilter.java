@@ -18,8 +18,7 @@ package com.qaprosoft.carina.browsermobproxy.rewrite;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
@@ -34,7 +33,7 @@ import net.lightbody.bmp.util.HttpMessageInfo;
  */
 public class CustomRqFilter implements RequestFilter {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomRqFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(CustomRqFilter.class);
     
     private List<RewriteItem> rewrites = new ArrayList<>();
 

@@ -32,8 +32,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.alice.models.dto.RecognitionMetaType;
 import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
@@ -50,7 +49,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Disa
  * {@link org.openqa.selenium.support.CacheLookup}.
  */
 public class ExtendedElementLocator implements ElementLocator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedElementLocator.class);
+    private static final Logger LOGGER = Logger.getLogger(ExtendedElementLocator.class);
 
     private final SearchContext searchContext;
     private boolean shouldCache;

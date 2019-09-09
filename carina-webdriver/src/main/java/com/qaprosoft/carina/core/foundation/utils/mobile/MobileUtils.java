@@ -17,8 +17,7 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -50,7 +49,7 @@ import io.appium.java_client.touch.offset.PointOption;
  */
 @Deprecated
 public class MobileUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MobileUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
 
     public enum Direction {
         LEFT,

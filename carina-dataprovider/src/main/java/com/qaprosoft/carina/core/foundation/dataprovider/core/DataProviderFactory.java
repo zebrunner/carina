@@ -21,8 +21,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -37,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvi
  */
 public class DataProviderFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(DataProviderFactory.class);
 
     private DataProviderFactory() {
     }

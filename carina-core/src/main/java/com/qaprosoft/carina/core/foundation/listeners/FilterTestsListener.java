@@ -5,8 +5,7 @@ import com.qaprosoft.carina.core.foundation.filter.Filter;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.qaprosoft.carina.core.foundation.filter.rule.Rule;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
@@ -17,7 +16,7 @@ import java.util.List;
 
 public class FilterTestsListener implements ISuiteListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FilterTestsListener.class);
+    private static final Logger LOGGER = Logger.getLogger(FilterTestsListener.class);
 
     private List<Rule> rules = new ArrayList<>();
 

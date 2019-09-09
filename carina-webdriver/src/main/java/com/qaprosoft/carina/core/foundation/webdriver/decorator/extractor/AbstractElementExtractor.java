@@ -17,8 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
@@ -28,7 +27,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 public abstract class AbstractElementExtractor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractElementExtractor.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractElementExtractor.class);
 
     public boolean isInside(Rectangle rect, int x, int y) {
         return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;

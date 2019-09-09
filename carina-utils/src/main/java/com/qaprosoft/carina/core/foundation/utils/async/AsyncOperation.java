@@ -24,12 +24,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class AsyncOperation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncOperation.class);
+    private static final Logger LOGGER = Logger.getLogger(AsyncOperation.class);
 
     private static Set<CompletableFuture<?>> asyncOperations;
 

@@ -28,13 +28,12 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class CryptoConsole {
-    private static final Logger LOG = LoggerFactory.getLogger(CryptoConsole.class);
+    private static final Logger LOG = Logger.getLogger(CryptoConsole.class);
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
     private static final String HELP_ARG = "help";

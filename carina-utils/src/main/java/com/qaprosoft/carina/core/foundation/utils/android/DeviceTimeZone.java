@@ -20,12 +20,11 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class DeviceTimeZone {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceTimeZone.class);
+    private static final Logger LOGGER = Logger.getLogger(DeviceTimeZone.class);
 
     private boolean auto_time;
     private boolean auto_timezone;

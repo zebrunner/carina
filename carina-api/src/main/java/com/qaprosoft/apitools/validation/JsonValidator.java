@@ -20,8 +20,7 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -40,7 +39,7 @@ import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 public class JsonValidator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonValidator.class);
+    private static final Logger LOGGER = Logger.getLogger(JsonValidator.class);
 
 	public static void validateJson(String expectedJson, String actualJson, JSONCompareMode jsonCompareMode) {
 		try {

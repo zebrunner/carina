@@ -15,8 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
@@ -26,7 +25,7 @@ import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 public class TZChangerPage extends MobileAbstractPage {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TZChangerPage.class);
+    private static final Logger LOGGER = Logger.getLogger(TZChangerPage.class);
 
     @FindBy(id = "com.futurek.android.tzc:id/txt_selected")
     protected ExtendedWebElement title;

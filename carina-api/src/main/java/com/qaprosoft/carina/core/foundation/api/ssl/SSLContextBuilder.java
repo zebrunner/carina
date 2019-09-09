@@ -26,14 +26,13 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class SSLContextBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SSLContextBuilder.class);
+    private static final Logger LOGGER = Logger.getLogger(SSLContextBuilder.class);
 
     public static final String TC_CONF_DIR_PATH = "keysecure/";
 

@@ -24,8 +24,7 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -41,7 +40,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.proxy.CaptureType;
 
 public class BrowserMobTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserMobTest.class);
+    private static final Logger LOGGER = Logger.getLogger(BrowserMobTest.class);
     private static String header = "my_header";
     private static String headerValue = "my_value";
     private static String testUrl = "https://ci.qaprosoft.com";
