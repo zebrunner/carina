@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -102,7 +103,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
             // Set log4j properties
-            PropertyConfigurator.configure(ClassLoader.getSystemResource("log4j.properties"));
+            URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
+            LOGGER.debug("carina-log4j.properties: " + log4jUrl);
+            PropertyConfigurator.configure(log4jUrl);
 
             LOGGER.info(Configuration.asString());
             // Configuration.validateConfiguration();
