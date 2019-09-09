@@ -171,7 +171,6 @@ public interface IDriverPool {
 
             if (drvSessionId != null) {
                 if (sessionId.equals(drvSessionId)) {
-                    LOGGER.debug("Detected WebDriver by sessionId: " + drvSessionId.toString());
                     return drv;
                 }
             }
