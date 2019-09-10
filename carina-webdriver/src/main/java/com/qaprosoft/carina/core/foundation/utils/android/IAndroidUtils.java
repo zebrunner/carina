@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
@@ -32,6 +34,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
@@ -41,6 +44,7 @@ import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
@@ -53,6 +57,8 @@ public interface IAndroidUtils extends IMobileUtils {
     
     //TODO: review carefully and remove duplicates and migrate completely to fluent waits
     static final Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
+    
+    static final String INIT_ADB_CONSOLE = "mobile: shell";
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
     AdbExecutor executor = new AdbExecutor();
@@ -656,5 +662,144 @@ public interface IAndroidUtils extends IMobileUtils {
 
         return result;
     }
+    
+	/**
+	 * 
+	 * @param command
+	 * 
+	 *            - ADB shell command represented as single String where 1st literal
+	 *            is a command itself. Everything that follow is treated as
+	 *            arguments.
+	 *
+	 *            NOTE: "adb -s {UDID} shell" - should be omitted.
+	 * 
+	 *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+	 * 
+	 * @return String - response (might be empty)
+	 */
+	default public String executeShellCommand(String command) {
+		LOGGER.info("ADB command to be executed: adb shell ".concat(command.trim()));
+		
+		String output = "";
+		List<String> literals = Arrays.asList(command.split(" "));
+		String commadKeyWord = literals.get(0);
+		List<String> args = literals.subList(1, literals.size());
+		Map<String, Object> preparedCommand = ImmutableMap.of("command", commadKeyWord, "args", args);
+		output = (String) ((AppiumDriver<?>) castDriver()).executeScript(INIT_ADB_CONSOLE, preparedCommand);
+		if (!StringUtils.isEmpty(output)) {
+			LOGGER.debug("ADB command output: " + output);
+		}
+		return output;
+	}
+	
+	/**
+	 * This method performs an action corresponding to press Android device's native
+	 * button to show all recent applications.
+	 * 
+	 * NOTE: logic could be used to get a list of running in background applications
+	 * with respect to particular device.
+	 */
+	default public void displayRecentApps() {
+		String command = "input keyevent KEYCODE_APP_SWITCH";
+		executeShellCommand(command);
+	}
+	
+	/**
+	 * The application that has its package name set to current driver's capabilities will be closed to background. Will be in recent app's list;
+	 */
+	default public void closeApp() {
+		LOGGER.info("Application will be closed to background");
+		((AndroidDriver<?>)castDriver()).closeApp();
+	}
+	
+	/**
+	 * Is user to get GPS service status.
+	 * 
+	 * Response reflects what services are used for obtaining location:
+	 * 
+	 * - "gps" - GPS only (device only);
+	 * 
+	 * - "gps,network" - GPS + Wi-Fi + Bluetooth or cellular networks (High accuracy mode);
+	 * 
+	 * - "network" - Using Wi-Fi, Bluetooth or cellular networks (Battery saving mode);
+	 * 
+	 * @return
+	 */
+	default public boolean isGPSEnabled() {
+		boolean result = false;
+		String command = "settings get secure location_providers_allowed";
+		String response = executeShellCommand(command);
+		if (response.contains("gps")) {
+			result = true;
+		}
+		LOGGER.info("GPS enabled: " + result);
+		return result;
+	}
+	
+	default public void enableGPS() {
+		String command = "settings put secure location_providers_allowed +gps";
+		executeShellCommand(command); 
+	}
+	
+	/**
+	 * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
+	 * @return
+	 */
+	default public void disableGPS() {
+		String command = "settings put secure location_providers_allowed -gps";
+		executeShellCommand(command); 
+	}
+	
+	/**
+	 * This command will save screenshot to specified folder on device's OS using provided path.
+	 * 
+	 * @param path2file - path to save screenshot to device's OS.
+	 */
+	default public void takeScreenShot(String path2file) {
+		LOGGER.info("Screenshot will be saved to: " + path2file);
+		String command = String.format("screencap -p %s", path2file);
+		executeShellCommand(command);
+	}
+	
+	/**
+	 * This method provides app's version of the app that is already installed to
+	 * devices, based on its package name.
+	 * 
+	 * In order to do that we search got "versionCode" parameter in system dump.
+	 */
+	default public String getAppVersion(String packageName) {
+		String command = "dumpsys package ".concat(packageName);
+		String output = executeShellCommand(command);
+		String versionCode = StringUtils.substringBetween(output, "versionCode=", " ");
+		LOGGER.info(String.format("Version code for '%s' package name is %s", packageName, versionCode));
+		return versionCode;
+	}
+	
+	/**
+	 * Method to reset test application.
+	 * 
+	 * App's ettings will be reset. User will be logged out. Application will be closed
+	 * to background.
+	 */
+	default public void clearAppCache() {
+		LOGGER.info("Initiation application reset...");
+		((AndroidDriver<?>) castDriver()).resetApp();
+	}
+	
+	/**
+	 * Method to reset test specific application by package name
+	 * 
+	 * App's ettings will be reset. User will be logged out. Application will be closed
+	 * to background.
+	 */
+	default public void clearAppCache(String packageName) {
+		LOGGER.info("Will clear data for the following app: " + packageName);
+		String command = String.format("pm clear %s", packageName);
+		String response = executeShellCommand(command);
+		LOGGER.info(String.format("Output after resetting custom application by package (%s): ", packageName) + response);
+		if (!response.contains("Success")) {
+			LOGGER.info(String.format("App data was not cleared for %s app", packageName));
+		}
+	}
 
 }
