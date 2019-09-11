@@ -171,6 +171,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 while (allLoggers.hasMoreElements()) {
                     Category tmpLogger = (Category) allLoggers.nextElement();
                     LOGGER.debug("loggerName: " + tmpLogger.getName());
+                    if ("log4j.logger.org.apache.http.wire".equals(tmpLogger.getName())) {
+                        // update this logger to be able to analyse ZafiraClient calls 
+                        LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to "
+                                + Configuration.get(Parameter.CORE_LOG_LEVEL));
+                        tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+                    }
                     for (String coreLogPackage : coreLogPackages) {
                         if (tmpLogger.getName().contains(coreLogPackage.trim())) {
                             LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to "
