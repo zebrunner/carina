@@ -620,6 +620,7 @@ public class Screenshot {
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
+                || message.contains("invalid session id")
 				|| message.contains("Session timed out or not found")
 				|| message.contains("cannot forward the request unexpected end of stream")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
