@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -30,6 +31,8 @@ import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
+    protected static final Logger LOGGER = Logger.getLogger(AbstractApiMethodV2.class);
+    
     private Properties properties;
     private String rqPath;
     private String rsPath;
