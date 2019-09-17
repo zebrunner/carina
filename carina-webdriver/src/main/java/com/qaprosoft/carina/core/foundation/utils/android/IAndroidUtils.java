@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-import static com.qaprosoft.carina.core.foundation.webdriver.IDriverPool.getDefaultDevice;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
