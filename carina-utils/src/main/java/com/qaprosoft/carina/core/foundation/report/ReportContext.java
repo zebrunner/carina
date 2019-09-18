@@ -298,6 +298,7 @@ public class ReportContext {
         try {
             return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
         } catch (Exception e) {
+            LOGGER.debug(e);
             return false;
         }
     }
@@ -326,7 +327,7 @@ public class ReportContext {
 
              return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
          } catch (Exception e) {
-			 LOGGER.debug("Artifact doesn't exist" + e);
+			 LOGGER.debug("Artifact doesn't exist: " + url, e);
              return false;
          }
     }
