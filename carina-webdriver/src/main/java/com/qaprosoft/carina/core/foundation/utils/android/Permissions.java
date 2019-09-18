@@ -15,53 +15,50 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
-public class Permissions  {
-	
-	public enum Permission{
-		CAMERA_ACCESS("android.permission.CAMERA"),
-		READ_EXTERNAL_STORAGE("android.permission.READ_EXTERNAL_STORAGE"), 
-		WRITE_EXTERNAL_STORAGE("android.permission.WRITE_EXTERNAL_STORAGE"), 
-		ACCESS_COARSE_LOCATION("android.permission.ACCESS_COARSE_LOCATION"), 
-		ACCESS_FINE_LOCATION("android.permission.ACCESS_FINE_LOCATION"), 
-		ACCESS_LOCATION_EXTRA_COMMANDS("android.permission.ACCESS_LOCATION_EXTRA_COMMANDS");
-		
+public class Permissions {
+
+	public enum Permission {
+		CAMERA_ACCESS("android.permission.CAMERA"), READ_EXTERNAL_STORAGE(
+				"android.permission.READ_EXTERNAL_STORAGE"), WRITE_EXTERNAL_STORAGE(
+						"android.permission.WRITE_EXTERNAL_STORAGE"), ACCESS_COARSE_LOCATION(
+								"android.permission.ACCESS_COARSE_LOCATION"), ACCESS_FINE_LOCATION(
+										"android.permission.ACCESS_FINE_LOCATION"), ACCESS_LOCATION_EXTRA_COMMANDS(
+												"android.permission.ACCESS_LOCATION_EXTRA_COMMANDS");
+
 		private String permission;
-		
+
 		private Permission(String permission) {
 			this.permission = permission;
 		}
-		
+
 		public String getPermission() {
 			return this.permission;
 		}
 	}
-	
-	public enum PermissionType{
-		DENIED("denied"),
-		GRANTED("granted"),
-		REQUESTED("requested");
-		
+
+	public enum PermissionType {
+		DENIED("denied"), GRANTED("granted"), REQUESTED("requested");
+
 		private String status;
-		
+
 		private PermissionType(String status) {
 			this.status = status;
 		}
-		
+
 		public String getType() {
 			return this.status;
 		}
 	}
-	
+
 	public enum PermissionAction {
-		GRANT("grant"),
-		REVOKE("revoke");
-		
+		GRANT("grant"), REVOKE("revoke");
+
 		private String action;
-		
+
 		private PermissionAction(String action) {
 			this.action = action;
 		}
-		
+
 		public String getAction() {
 			return this.action;
 		}

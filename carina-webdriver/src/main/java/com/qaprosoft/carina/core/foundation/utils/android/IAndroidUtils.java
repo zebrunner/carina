@@ -970,9 +970,10 @@ public interface IAndroidUtils extends IMobileUtils {
 			LOGGER.info("org.openqa.selenium.WebDriverException is caught and ignored.");
 		}
 	}
-	
+
 	/**
 	 * To get list of granted/denied/requested permission for specified application
+	 * 
 	 * @param packageName
 	 * @param type
 	 * @return ArrayList<String>
@@ -980,9 +981,10 @@ public interface IAndroidUtils extends IMobileUtils {
 	@SuppressWarnings("unchecked")
 	default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
 		Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", packageName);
-		return (ArrayList<String>) ((AppiumDriver<?>) castDriver()).executeScript(INIT_GET_PERMISSION_CONSOLE, preparedCommand);
+		return (ArrayList<String>) ((AppiumDriver<?>) castDriver()).executeScript(INIT_GET_PERMISSION_CONSOLE,
+				preparedCommand);
 	}
-	
+
 	/**
 	 * To change (grant or revoke) application permissions.
 	 * 
@@ -990,13 +992,14 @@ public interface IAndroidUtils extends IMobileUtils {
 	 * @param action
 	 * @param permissions
 	 */
-	default public void changePermissions(String packageName, PermissionAction action, Permission...permissions) {
+	default public void changePermissions(String packageName, PermissionAction action, Permission... permissions) {
 		ArrayList<String> permissionsStr = new ArrayList<>();
 		Arrays.asList(permissions).forEach(p -> permissionsStr.add(p.getPermission()));
-		Map<String, Object> preparedCommand = ImmutableMap.of("action", action.getAction(), "appPackage", packageName, "permissions", permissionsStr);
+		Map<String, Object> preparedCommand = ImmutableMap.of("action", action.getAction(), "appPackage", packageName,
+				"permissions", permissionsStr);
 		((AppiumDriver<?>) castDriver()).executeScript(INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
 	}
-	
+
 	/**
 	 * Method to enter text to ACTIVATED input field.
 	 * 
@@ -1052,5 +1055,5 @@ public interface IAndroidUtils extends IMobileUtils {
 		String command = "service call statusbar 2";
 		executeShellCommand(command);
 	}
-	
+
 }
