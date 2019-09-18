@@ -24,9 +24,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.PasswordAuthentication;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,6 +40,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -43,6 +50,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
@@ -215,6 +227,101 @@ public class ReportContext {
 
     public static List<File> getAllArtifacts() {
         return Arrays.asList(getArtifactsFolder().listFiles());
+    }
+    
+    public static File downloadArtifact(WebDriver driver, String name, long timeout) {
+    	File file = getArtifact(name);
+    	if (file == null) {
+    		// attempt to verify and download file from selenoid
+    		
+        	String url = getUrl(driver, name);
+        	String username = getField(url, 1);
+        	String password = getField(url, 2);
+        	
+        	if (!artifactExists(driver, name, timeout)) {
+        		Assert.fail("Unable to find artifact: " + name);
+        	}
+        	
+        	file = new File(getArtifactsFolder() + File.separator + name);
+        	String path = file.getAbsolutePath();
+        	LOGGER.debug ("artifact file to download: " + path);
+
+            if(!username.isEmpty() && !password.isEmpty()) {
+            	Authenticator.setDefault(new CustomAuthenticator(username, password));
+            }
+            
+        	try {
+				FileUtils.copyURLToFile(new URL(url), file);
+				LOGGER.debug("Successfully downloaded artifact: " + name);
+			} catch (IOException e) {
+				LOGGER.error("Artifact: " + url + " wasn't downloaded to " + path, e);
+			}
+    	}
+        return file;
+    }
+    
+    public static class CustomAuthenticator extends Authenticator {  
+    	
+    	String username;
+    	String password;
+    	
+    	public CustomAuthenticator(String username, String password) {
+			this.username = username;
+			this.password = password;
+		}
+    	
+        protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password.toCharArray());  
+        }
+    }
+    
+    public static boolean artifactExists(WebDriver driver, String name, long timeout) {
+        String url = getUrl(driver, name);
+        String username = getField(url, 1);
+        String password = getField(url, 2);
+        try {
+            return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    private static boolean checkArtifactUsingHttp(String url, String username, String password) {
+    	 try {
+             HttpURLConnection.setFollowRedirects(false);
+             // note : you may also need
+             // HttpURLConnection.setInstanceFollowRedirects(false)
+             HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+             con.setRequestMethod("HEAD");
+
+             if (!username.isEmpty() && !password.isEmpty()) {
+                 String usernameColonPassword = username + ":" + password;
+                 String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                 con.addRequestProperty("Authorization", basicAuthPayload);
+             }
+
+             return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+         } catch (Exception e) {
+			 LOGGER.debug("Artifact doesn't exist" + e);
+             return false;
+         }
+    }
+    
+    private static String getField(String url, int position){
+    	Pattern pattern = Pattern.compile(".*:\\/\\/(.*):(.*)@");
+        Matcher matcher = pattern.matcher(url);
+        
+		return matcher.find() ? matcher.group(position) : "";
+    	
+    }
+    
+    private static String getUrl(WebDriver driver, String name) {
+    	String seleniumHost = Configuration.get(Parameter.SELENIUM_HOST).replace("wd/hub", "download/");
+        WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
+        String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
+        String url = seleniumHost + sessionId + "/" + name;
+        LOGGER.debug("url: " + url);
+        return url;
     }
 
     public static File getArtifact(String name) {
