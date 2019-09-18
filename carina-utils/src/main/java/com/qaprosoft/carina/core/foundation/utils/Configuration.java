@@ -29,7 +29,8 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 /**
  * Configuration utility.
  * 
- * @author Aliaksei_Khursevich hursevich@gmail.com
+ * @author Aliaksei_Khursevich
+ *         hursevich@gmail.com
  */
 public class Configuration {
     private static final Logger LOGGER = Logger.getLogger(Configuration.class);
@@ -68,7 +69,7 @@ public class Configuration {
         BROWSER("browser"),
 
         BROWSER_VERSION("browser_version"),
-
+        
         BROWSER_LANGUAGE("browser_language"),
 
         SELENIUM_HOST("selenium_host"),
@@ -88,13 +89,13 @@ public class Configuration {
         PROXY_PROTOCOLS("proxy_protocols"),
 
         BROWSERMOB_PROXY("browsermob_proxy"),
-
+        
         BROWSERMOB_HOST("browsermob_host"),
 
         BROWSERMOB_PORT("browsermob_port"),
-
+        
         BROWSERMOB_PORTS_RANGE("browsermob_ports_range"),
-
+        
         BROWSERMOB_MITM("browsermob_disabled_mitm"),
 
         PROXY_SET_TO_SYSTEM("proxy_set_to_system"),
@@ -111,7 +112,7 @@ public class Configuration {
 
         SMART_SCREENSHOT("smart_screenshot"),
 
-        // TODO: temporary restore to keep compilation. remove later
+        //TODO: temporary restore to keep compilation. remove later
         IMPLICIT_TIMEOUT("implicit_timeout"),
 
         EXPLICIT_TIMEOUT("explicit_timeout"),
@@ -119,7 +120,7 @@ public class Configuration {
         AUTO_DOWNLOAD("auto_download"),
 
         AUTO_DOWNLOAD_APPS("auto_download_apps"),
-
+        
         CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder"),
 
         RETRY_INTERVAL("retry_interval"),
@@ -161,9 +162,9 @@ public class Configuration {
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 
         CORE_LOG_LEVEL("core_log_level"),
-
+        
         CORE_LOG_PACKAGES("core_log_packages"),
-
+        
         ARTIFACTS_EXPIRATION_SECONDS("artifacts_expiration_seconds"),
 
         LOG_ALL_JSON("log_all_json"),
@@ -199,16 +200,16 @@ public class Configuration {
 
         // TestRail
         TESTRAIL_RUN_NAME("testrail_run_name"),
-
+        
         TESTRAIL_MILESTONE("testrail_milestone"),
 
         TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
-
+        
         // qTest
         QTEST_CYCLE_NAME("qtest_cycle_name"),
-
+        
         QTEST_SUITE_NAME("qtest_suite_name"),
-
+        
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
 
@@ -248,22 +249,22 @@ public class Configuration {
         DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
 
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
-
-        // For screen recording
+        
+        //For screen recording
         ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
-
+        
         ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),
-
+        
         ANDROID_ENABLE_BUG_REPORT("android_enable_bug_report"),
-
+        
         IOS_SCREEN_RECORDING_QUALITY("ios_screen_record_quality"),
-
+        
         IOS_SCREEN_RECORDING_CODEC("ios_screen_record_codec"),
-
+        
         IOS_SCREEN_RECORDING_FPS("ios_screen_record_fps"),
-
+        
         SCREEN_RECORD_DURATION("screen_record_duration"),
-
+        
         VIDEO_SCALE("video_scale"),
 
         // Ignore SSL
@@ -271,9 +272,9 @@ public class Configuration {
 
         // Test Execution Filter rules
         TEST_RUN_RULES("test_run_rules"),
-
+        
         HUB_MODE("hub_mode"),
-
+        
         EXTRACT_SYS_LOG("extract_sys_log");
 
         private final String key;
@@ -338,8 +339,7 @@ public class Configuration {
             }
         }
 
-        // write into the log extra information about selenium_host together with
-        // capabilities
+        //write into the log extra information about selenium_host together with capabilities
         asString.append(String.format("%s=%s%n", "selenium_host", R.CONFIG.get("selenium_host")));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
@@ -358,8 +358,7 @@ public class Configuration {
 
     public static void validateConfiguration() {
         for (Parameter param : Parameter.values()) {
-            if (StringUtils.isEmpty(Configuration.get(param))
-                    || SpecialKeywords.MUST_OVERRIDE.equals(Configuration.get(param))) {
+            if (StringUtils.isEmpty(Configuration.get(param)) || SpecialKeywords.MUST_OVERRIDE.equals(Configuration.get(param))) {
                 throw new RuntimeException("Configuration failure: parameter '" + param.getKey() + "' not specified!");
             }
         }
@@ -397,7 +396,7 @@ public class Configuration {
         }
         return platform;
     }
-
+    
     public static String getBrowser() {
         String browser = "";
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
@@ -426,25 +425,25 @@ public class Configuration {
 
     public static String getDriverType(DesiredCapabilities capabilities) {
         if (capabilities == null) {
-            // calculate driver type based on config.properties arguments
+            //calculate driver type based on config.properties arguments
             return getDriverType();
         }
-
+        
         LOGGER.debug("Detecting driver_type by capabilities: " + capabilities);
         String platform = "";
         if (capabilities.getCapability("platform") != null) {
             platform = capabilities.getCapability("platform").toString();
         }
-
+        
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }
-
+        
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
-
+        
         // handle use-case when we provide only uuid object among desired capabilities
         if (capabilities.getCapability("udid") != null) {
             LOGGER.debug("Detected MOBILE driver_type by uuid inside capabilities");
@@ -454,7 +453,6 @@ public class Configuration {
         LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
-
     public static String getMobileApp() {
         // redefine platform if capabilities.app is available
         String mobileApp = "";
@@ -469,8 +467,8 @@ public class Configuration {
         R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".app", mobileApp);
         LOGGER.info("Updated mobile app: " + mobileApp);
     }
-
+    
     public static Object getCapability(String name) {
-        return R.CONFIG.get("capabilities." + name);
+            return R.CONFIG.get("capabilities." + name);
     }
 }
