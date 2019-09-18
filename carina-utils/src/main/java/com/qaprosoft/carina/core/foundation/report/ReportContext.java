@@ -229,6 +229,14 @@ public class ReportContext {
         return Arrays.asList(getArtifactsFolder().listFiles());
     }
     
+    /**
+     * download artifact from selenoid to local java machine
+     * 
+     * @param driver WebDriver
+     * @param name String
+     * @param timeout long
+     * @return artifact File
+     */
     public static File downloadArtifact(WebDriver driver, String name, long timeout) {
     	File file = getArtifact(name);
     	if (file == null) {
@@ -275,6 +283,14 @@ public class ReportContext {
         }
     }
     
+    /**
+     * check if artifact exists
+     * 
+     * @param driver WebDriver
+     * @param name String
+     * @param timeout long
+     * @return boolean
+     */
     public static boolean artifactExists(WebDriver driver, String name, long timeout) {
         String url = getUrl(driver, name);
         String username = getField(url, 1);
@@ -286,6 +302,14 @@ public class ReportContext {
         }
     }
     
+    /**
+     * check if artifact exists using http
+     * 
+     * @param url String
+     * @param username String
+     * @param password String
+     * @return boolean
+     */
     private static boolean checkArtifactUsingHttp(String url, String username, String password) {
     	 try {
              HttpURLConnection.setFollowRedirects(false);
@@ -307,6 +331,13 @@ public class ReportContext {
          }
     }
     
+    /**
+     * get username or password from url
+     * 
+     * @param url String
+     * @param position int
+     * @return String
+     */
     private static String getField(String url, int position){
     	Pattern pattern = Pattern.compile(".*:\\/\\/(.*):(.*)@");
         Matcher matcher = pattern.matcher(url);
@@ -315,6 +346,13 @@ public class ReportContext {
     	
     }
     
+    /**
+     * generate url for artifact by name
+     * 
+     * @param driver WebDriver
+     * @param name String
+     * @return String
+     */
     private static String getUrl(WebDriver driver, String name) {
     	String seleniumHost = Configuration.get(Parameter.SELENIUM_HOST).replace("wd/hub", "download/");
         WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
