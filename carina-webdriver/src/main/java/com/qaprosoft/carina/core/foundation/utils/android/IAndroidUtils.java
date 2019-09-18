@@ -64,16 +64,29 @@ public interface IAndroidUtils extends IMobileUtils {
     // waits
     static final Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
 
-    static final String INIT_ADB_CONSOLE = "mobile: shell";
-    static final String INIT_DEEPLINK_CONSOLE = "mobile:deepLink";
-    static final String INIT_GET_PERMISSION_CONSOLE = "mobile:getPermissions";
-    static final String INIT_CHANGE_PERMISSION_CONSOLE = "mobile:changePermissions";
-
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
     AdbExecutor executor = new AdbExecutor();
     String[] baseInitCmd = executor.getDefaultCmd();
     static final String LANGUAGE_CHANGE_APP_PATH = "app/ADB_Change_Language.apk";
+    
+    static final String SHELL_INIT_CONSOLE = "mobile: shell";
+    static final String SHELL_INIT_DEEPLINK_CONSOLE = "mobile:deepLink";
+    static final String SHELL_INIT_GET_PERMISSION_CONSOLE = "mobile:getPermissions";
+    static final String SHELL_INIT_CHANGE_PERMISSION_CONSOLE = "mobile:changePermissions";
+    
+    static final String SHELL_GPS_STATUS_CMD = "settings get secure location_providers_allowed";
+    static final String SHELL_CLOSE_STATUS_BAR_CMD = "service call statusbar 2";
+    static final String SHELL_OPEN_STATUS_BAR_CMD = "service call statusbar 1";
+    static final String SHELL_INPUT_TXT_CMD = "input text ";
+    static final String SHELL_OPEN_URL_CMD = "am start -a android.intent.action.VIEW";
+    static final String SHELL_CLEAR_CACHE_CMD = "pm clear";
+    static final String SHELL_OPEN_DEVICE_SETTINGS_CMD = "am start -a android.settings.SETTINGS";
+    static final String SHELL_TAKE_SCREENSHOT_CMD = "screencap -p";
+    static final String SHELL_DISABLE_GPS_CMD = "settings put secure location_providers_allowed -gps";
+    static final String SHELL_ENABLE_GPS_CMD = "settings put secure location_providers_allowed +gps";
+    static final String SHELL_PRESS_HOME_CMD = "input keyevent 3";
+    static final String SHELL_RECENT_APPS_CMD = "input keyevent KEYCODE_APP_SWITCH";
 
     default public void pressKeyboardKey(AndroidKey key) {
         ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(key).withFlag(KeyEventFlag.SOFT_KEYBOARD)
@@ -736,18 +749,36 @@ public interface IAndroidUtils extends IMobileUtils {
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
      * 
      *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+     *            
+     * NOTE: shell arguments with space symbols are unsupported!
      * 
      * @return String - response (might be empty)
      */
-    default public String executeShellCommand(String command) {
+    default public String executeShell(String command) {
         LOGGER.info("ADB command to be executed: adb shell ".concat(command.trim()));
-
-        String output = "";
         List<String> literals = Arrays.asList(command.split(" "));
-        String commadKeyWord = literals.get(0);
-        List<String> args = literals.subList(1, literals.size());
+        return executeShell(literals);
+    }
+    
+    /**
+     * 
+     * @param list of string commands
+     * 
+     *            - ADB shell command represented as single String where 1st literal
+     *            is a command itself. Everything that follow is treated as
+     *            arguments.
+     *
+     *            NOTE: "adb -s {UDID} shell" - should be omitted.
+     * 
+     *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+     *            
+     * @return String - response (might be empty)
+     */
+    default public String executeShell(List<String> commands) {
+        String commadKeyWord = commands.get(0);
+        List<String> args = commands.subList(1, commands.size());
         Map<String, Object> preparedCommand = ImmutableMap.of("command", commadKeyWord, "args", args);
-        output = (String) ((AppiumDriver<?>) castDriver()).executeScript(INIT_ADB_CONSOLE, preparedCommand);
+        String output = (String) ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
         if (!StringUtils.isEmpty(output)) {
             LOGGER.debug("ADB command output: " + output);
         }
@@ -762,10 +793,9 @@ public interface IAndroidUtils extends IMobileUtils {
      * applications with respect to particular device.
      */
     default public void displayRecentApps() {
-        String command = "input keyevent KEYCODE_APP_SWITCH";
-        executeShellCommand(command);
+        executeShell(SHELL_RECENT_APPS_CMD);
     }
-
+    
     /**
      * The application that has its package name set to current driver's
      * capabilities will be closed to background IN CASE IT IS CURRENTLY IN
@@ -781,10 +811,9 @@ public interface IAndroidUtils extends IMobileUtils {
      * closed to background.
      */
     default public void pressHome() {
-        String command = "input keyevent 3";
-        executeShellCommand(command);
+        executeShell(SHELL_PRESS_HOME_CMD);
     }
-
+    
     /**
      * Is used to get GPS service status.
      * 
@@ -801,42 +830,34 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return
      */
     default public boolean isGPSEnabled() {
-        boolean result = false;
-        String command = "settings get secure location_providers_allowed";
-        String response = executeShellCommand(command);
-        if (response.contains("gps")) {
-            result = true;
-        }
-        LOGGER.info("GPS enabled: " + result);
-        return result;
+        String response = executeShell(SHELL_GPS_STATUS_CMD);
+        return response.contains("gps");
     }
 
     default public void enableGPS() {
-        String command = "settings put secure location_providers_allowed +gps";
-        executeShellCommand(command);
+        executeShell(SHELL_ENABLE_GPS_CMD);
     }
-
+    
     /**
      * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
      * 
      * @return
      */
     default public void disableGPS() {
-        String command = "settings put secure location_providers_allowed -gps";
-        executeShellCommand(command);
+        executeShell(SHELL_DISABLE_GPS_CMD);
     }
-
+    
     /**
      * This command will save screenshot to specified folder on device's OS using
      * provided path.
      * 
-     * @param path2file
+     * @param filepath
      *            - path to save screenshot to device's OS.
      */
-    default public void takeScreenShot(String path2file) {
-        LOGGER.info("Screenshot will be saved to: " + path2file);
-        String command = String.format("screencap -p %s", path2file);
-        executeShellCommand(command);
+    default public void takeScreenShot(String filepath) {
+        LOGGER.info("Screenshot will be saved to: " + filepath);
+        String command = String.format(SHELL_TAKE_SCREENSHOT_CMD.concat(" %s"), filepath);
+        executeShell(command);
     }
 
     /**
@@ -847,7 +868,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public String getAppVersion(String packageName) {
         String command = "dumpsys package ".concat(packageName);
-        String output = executeShellCommand(command);
+        String output = executeShell(command);
         String versionCode = StringUtils.substringBetween(output, "versionCode=", " ");
         LOGGER.info(String.format("Version code for '%s' package name is %s", packageName, versionCode));
         return versionCode;
@@ -868,10 +889,9 @@ public interface IAndroidUtils extends IMobileUtils {
      * To open Android device native settings
      */
     default public void openDeviceSettings() {
-        String command = "am start -a android.settings.SETTINGS";
-        executeShellCommand(command);
+        executeShell(SHELL_OPEN_DEVICE_SETTINGS_CMD);
     }
-
+    
     /**
      * Method to reset test specific application by package name
      * 
@@ -880,15 +900,15 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public void clearAppCache(String packageName) {
         LOGGER.info("Will clear data for the following app: " + packageName);
-        String command = String.format("pm clear %s", packageName);
-        String response = executeShellCommand(command);
+        String command = String.format(SHELL_CLEAR_CACHE_CMD.concat(" %s"), packageName);
+        String response = executeShell(command);
         LOGGER.info(
                 String.format("Output after resetting custom application by package (%s): ", packageName) + response);
         if (!response.contains("Success")) {
-            LOGGER.info(String.format("App data was not cleared for %s app", packageName));
+            LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
         }
     }
-
+    
     /**
      * If the application you're interested about is installed - returns "true".
      * Otherwise, returns "false".
@@ -903,7 +923,7 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Method to launch Android application by its pckage name.
+     * Method to launch Android application by its package name.
      * 
      * Application should be installed to device.
      * 
@@ -952,15 +972,16 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param link
      *            - URL to trigger
      */
-    default public void triggerURL(String link) {
+    default public void openURL(String link) {
+        //TODO: make openURL call from this mobile interface in DriverHelper
         LOGGER.info("Following link will be triggered via ADB: " + link);
-        String command = String.format("am start -a android.intent.action.VIEW %s", link);
-        executeShellCommand(command);
+        String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
+        executeShell(command);
     }
-
+    
     /**
      * With this method user is able to trigger a deeplink (link to specific place
-     * within the application)ю
+     * within the application)
      * 
      * @param link
      * @param packageName
@@ -968,10 +989,10 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void triggerDeeplink(String link, String packageName) {
         Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
         try {
-            ((AppiumDriver<?>) castDriver()).executeScript(INIT_DEEPLINK_CONSOLE, preparedCommand);
+            ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
-            LOGGER.info("org.openqa.selenium.WebDriverException is caught and ignored.");
+            LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.");
         }
     }
 
@@ -985,7 +1006,7 @@ public interface IAndroidUtils extends IMobileUtils {
     @SuppressWarnings("unchecked")
     default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
         Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", packageName);
-        return (ArrayList<String>) ((AppiumDriver<?>) castDriver()).executeScript(INIT_GET_PERMISSION_CONSOLE,
+        return (ArrayList<String>) ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE,
                 preparedCommand);
     }
 
@@ -1001,7 +1022,7 @@ public interface IAndroidUtils extends IMobileUtils {
         Arrays.asList(permissions).forEach(p -> permissionsStr.add(p.getPermission()));
         Map<String, Object> preparedCommand = ImmutableMap.of("action", action.getAction(), "appPackage", packageName,
                 "permissions", permissionsStr);
-        ((AppiumDriver<?>) castDriver()).executeScript(INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
+        ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
     }
 
     /**
@@ -1021,11 +1042,11 @@ public interface IAndroidUtils extends IMobileUtils {
         char[] array = text.toCharArray();
         for (char sym : array) {
             String ch = (sym == ' ') ? "%s" : String.valueOf(sym);
-            String command = "input text " + ch;
-            executeShellCommand(command);
+            String command = SHELL_INPUT_TXT_CMD + ch;
+            executeShell(command);
         }
     }
-
+    
     default public boolean isWifiEnabled() {
         boolean enabled = ((AndroidDriver<?>) castDriver()).getConnection().isWiFiEnabled();
         LOGGER.info("Wi-Fi enabled: " + enabled);
@@ -1051,13 +1072,12 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     default public void openStatusBar() {
-        String command = "service call statusbar 1";
-        executeShellCommand(command);
+        executeShell(SHELL_OPEN_STATUS_BAR_CMD);
     }
-
+    
+    
     default public void closeStatusBar() {
-        String command = "service call statusbar 2";
-        executeShellCommand(command);
+        executeShell(SHELL_CLOSE_STATUS_BAR_CMD);
     }
 
 }
