@@ -250,9 +250,10 @@ public interface IAndroidUtils extends IMobileUtils {
                 lang = initLanguage;
                 loc = initLanguage;
             }
-            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
-            R.CONFIG.put("locale", loc);
-            R.CONFIG.put("language", lang);
+            // [VD] never override global locale or language properties if you changed just one device locale
+//            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
+//            R.CONFIG.put("locale", loc);
+//            R.CONFIG.put("language", lang);
         }
 
         actualDeviceLanguage = getDeviceLanguage();
