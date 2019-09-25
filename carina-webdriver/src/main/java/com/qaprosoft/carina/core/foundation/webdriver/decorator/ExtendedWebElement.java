@@ -1133,10 +1133,14 @@ public class ExtendedWebElement {
         }
 
         if (locator.startsWith("By.xpath: ")) {
-            if (caseInsensitive) {
-                locator = ExtendedElementLocator.toCaseInsensitive(locator).toString();
+            locator = String.format(StringUtils.remove(locator, "By.xpath: "), objects);
+            if (!caseInsensitive) {
+                // generate xpath from locator string
+                by = By.xpath(locator);
+            } else {
+                // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
+                by = ExtendedElementLocator.toCaseInsensitive(locator);
             }
-            by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
         
         if (locator.startsWith("linkText: ")) {

@@ -186,12 +186,31 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b\\s?(\\bcontains\\b\\()?|\\bor\\b\\s?(\\bcontains\\b\\()?))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\band\\b|\\bor\\b)\\]?)";
+        String attributePattern = "(@text|text\\(\\))\\s*(\\,|\\=)\\s*(\\'|\\\\\\\")(.+)(\\'|\\\\\\\")";
+        //TODO: test when xpath globally are declared inside single quota
+        
+        // @text of text() - group(1)
+        // , or = - group(2)
+        // ' or " - group(3)
+        // value - group(4)
+        // ' or " - group(5)
+        
+        // double translate is needed to make xpath and value case insensitive.
+        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
+        // double translate allow to use as is and convert everywhere
+        
+        // Expected xpath for both side translate
+        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
+        
         Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
-            String replacement = matcher.group(1) + "translate(" + matcher.group(5)
-                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÄÃÇČÉÈÊËĔŒĞĢÎÏÍÌÔÖŌÒÓØŜŞßÙÛÜŪŸ', 'abcdefghijklmnopqrstuvwxyzàáâäåçčéèêëĕœğģîïíìôöōòóøŝşßùûüūÿ') " + matcher.group(7);
+            String value = matcher.group(4);
+            String replacement = "translate(" + matcher.group(1) + ", '" + value.toUpperCase() + "', '" + value.toLowerCase() + "')"
+                    + matcher.group(2) + "translate('" + value + "', '" + value.toUpperCase() + "', '" + value.toLowerCase() + "')"; 
+
+            LOGGER.debug("xpath translate:");
+            LOGGER.debug(replacement);
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
