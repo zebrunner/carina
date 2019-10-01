@@ -36,6 +36,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.appmanagement.ApplicationState;
@@ -714,7 +716,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Check if keyboard is showing
-     * return false if driver is not ios or android driver 
+     * return false if driver is not ios or android driver
      *
      * @return boolean
      */
