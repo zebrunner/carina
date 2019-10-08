@@ -36,6 +36,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.appmanagement.ApplicationState;
@@ -98,7 +100,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * tap with TouchActions slowly to imitate log tap on element
-     * 
+     *
      * @param elem ExtendedWebElement
      *            element
      */
@@ -168,7 +170,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * swipe till element using TouchActions
-     * 
+     *
      * @param element ExtendedWebElement
      * @return boolean
      */
@@ -178,7 +180,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * swipe till element using TouchActions
-     * 
+     *
      * @param element ExtendedWebElement
      * @param count int
      * @return boolean
@@ -189,7 +191,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * swipe till element using TouchActions
-     * 
+     *
      * @param element ExtendedWebElement
      * @param direction Direction
      * @return boolean
@@ -200,7 +202,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * swipe till element using TouchActions
-     * 
+     *
      * @param element ExtendedWebElement
      * @param count int
      * @param duration int
@@ -212,7 +214,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * swipe till element using TouchActions
-     * 
+     *
      * @param element ExtendedWebElement
      * @param direction Direction
      * @param count int
@@ -444,7 +446,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * swipeInContainer
-     * 
+     *
      * @param container ExtendedWebElement
      * @param direction Direction
      * @param count int
@@ -532,7 +534,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe up several times
-     * 
+     *
      * @param times int
      * @param duration int
      */
@@ -544,7 +546,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe up
-     * 
+     *
      * @param duration int
      */
     default public void swipeUp(final int duration) {
@@ -554,7 +556,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe down several times
-     * 
+     *
      * @param times int
      * @param duration int
      */
@@ -566,7 +568,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe down
-     * 
+     *
      * @param duration int
      */
     default public void swipeDown(final int duration) {
@@ -576,7 +578,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe left several times
-     * 
+     *
      * @param times int
      * @param duration int
      */
@@ -588,7 +590,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe left
-     * 
+     *
      * @param duration int
      */
     default public void swipeLeft(final int duration) {
@@ -598,7 +600,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe left in container
-     * 
+     *
      * @param container
      *            ExtendedWebElement
      * @param duration
@@ -611,7 +613,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe right several times
-     * 
+     *
      * @param times int
      * @param duration int
      */
@@ -623,7 +625,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe right
-     * 
+     *
      * @param duration int
      */
     default public void swipeRight(final int duration) {
@@ -633,7 +635,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Swipe right in container
-     * 
+     *
      * @param container
      *            ExtendedWebElement
      * @param duration
@@ -654,7 +656,7 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * set Android Device Default TimeZone And Language based on config or to GMT and En
-     * 
+     *
      * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
      */
     default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
@@ -712,6 +714,23 @@ public interface IMobileUtils extends IDriverPool {
         }
     }
 
+    /**
+     * Check if keyboard is showing
+     * return false if driver is not ios or android driver
+     *
+     * @return boolean
+     */
+    default public boolean isKeyboardShown() {
+        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+        if (driver instanceof IOSDriver) {
+            return ((IOSDriver<?>) castDriver()).isKeyboardShown();
+        }
+        else if (driver instanceof AndroidDriver) {
+            return ((AndroidDriver<?>) castDriver()).isKeyboardShown();
+        }
+        return false;
+    }
+
     default public void zoom(Zoom type) {
         LOGGER.info("Zoom will be performed :" + type);
         MobileDriver<?> driver = (MobileDriver<?>) castDriver();
@@ -765,7 +784,7 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * Check if started driver/application is running in foreground 
+     * Check if started driver/application is running in foreground
      *
      * @return boolean
      */
@@ -778,7 +797,7 @@ public interface IMobileUtils extends IDriverPool {
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)) {
             bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
         }
-        
+
         return isAppRunning(bundleId);
     }
 
@@ -792,21 +811,21 @@ public interface IMobileUtils extends IDriverPool {
         ApplicationState actualApplicationState = ((MobileDriver<?>) castDriver()).queryAppState(bundleId);
         return ApplicationState.RUNNING_IN_FOREGROUND.equals(actualApplicationState);
     }
-    
+
     /**
-     * Terminate running driver/application 
+     * Terminate running driver/application
      */
     default public void terminateApp() {
         String bundleId = "";
         String os = getDevice().getOs();
-        
+
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)) {
             bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
         }
-        
+
         terminateApp(bundleId);
     }
 
@@ -818,7 +837,7 @@ public interface IMobileUtils extends IDriverPool {
     default public void terminateApp(String bundleId) {
         ((MobileDriver<?>) castDriver()).terminateApp(bundleId);
     }
-    
+
     /**
      * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
      *
