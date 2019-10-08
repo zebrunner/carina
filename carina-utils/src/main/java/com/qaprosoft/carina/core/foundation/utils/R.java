@@ -69,14 +69,14 @@ public enum R {
                 URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
                 if (baseResource != null) {
                     properties.load(baseResource.openStream());
-                    LOGGER.info("Base properties loaded: " + resource.resourceFile);
+                    LOGGER.debug("Base properties loaded: " + resource.resourceFile);
                 }
 
                 URL overrideResource;
                 String resourceName = OVERRIDE_SIGN + resource.resourceFile;
                 while ((overrideResource = ClassLoader.getSystemResource(resourceName)) != null) {
                     properties.load(overrideResource.openStream());
-                    LOGGER.info("Override properties loaded: " + resourceName);
+                    LOGGER.debug("Override properties loaded: " + resourceName);
                     resourceName = OVERRIDE_SIGN + resourceName;
                 }
 

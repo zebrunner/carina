@@ -54,7 +54,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractApiMethod extends HttpClient {
-    protected static final Logger LOGGER = Logger.getLogger(AbstractApiMethod.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractApiMethod.class);
     private StringBuilder bodyContent = null;
     protected String methodPath = null;
     protected HttpMethodType methodType = null;
