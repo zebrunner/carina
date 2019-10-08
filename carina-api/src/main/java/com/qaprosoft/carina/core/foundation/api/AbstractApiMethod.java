@@ -241,6 +241,10 @@ public abstract class AbstractApiMethod extends HttpClient {
     public RequestSpecification getRequest() {
         return request;
     }
+    
+    public Object getResponse() {
+        return response;
+    }
 
     public void setLogRequest(boolean logRequest) {
         this.logRequest = logRequest;
