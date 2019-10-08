@@ -407,7 +407,11 @@ public class ExtendedWebElement {
      * @return By by
      */
     public By getBy() {
-        return by;
+        By value = by;
+        if (caseInsensitive) {
+            value = ExtendedElementLocator.toCaseInsensitive(by.toString());
+        }
+        return value;
     }
 
     public void setBy(By by) {
