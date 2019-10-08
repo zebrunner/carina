@@ -90,16 +90,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>u1@gmail.com,u2@gmail.com</td>
 	</tr>
 	<tr>
-		<td>sender_email</td>
-		<td>Email account for reports sending. <br><b>Note:</b> Gmail smtp settings are used by default. Update _email.properties to use your own SMTP server</td>
-		<td>carina.qareport@qaprosoft.com</td>
-	</tr>
-	<tr>
-		<td>sender_pswd</td>
-		<td>Email password for reports sending</td>
-		<td>pwd123</td>
-	</tr>
-	<tr>
 		<td>env</td>
 		<td>Environment specific configuration. More about this [feature](#environment-specific-configuration)</td>
 		<td>STAG, PROD, DEMO</td>
@@ -123,11 +113,6 @@ All project configuration properties are located in **_config.properties** file.
 		<td>browser_language</td>
 		<td>Browser language or nothing to use default English version. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
 		<td>"es", "fr"</td>
-	</tr>
-		<tr>
-		<td>driver_mode</td>
-		<td>Rule for defining WebDriver lifecycle.</td>
-		<td>method_mode / class_mode / suite_mode</td>
 	</tr>
 	<tr>
 		<td>driver_event_listeners</td>
