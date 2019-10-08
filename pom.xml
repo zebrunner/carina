@@ -73,7 +73,7 @@
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <gson.version>2.8.5</gson.version>
         <google.apis.version>v4-rev581-1.25.0</google.apis.version>
-        <jackson-databind.version>2.9.9.1</jackson-databind.version>
+        <jackson-databind.version>2.9.10</jackson-databind.version>
         <jackson-annotations.version>2.9.9</jackson-annotations.version>
         <apache-poi.version>3.11-beta3</apache-poi.version>
         <guava.version>25.0-jre</guava.version>
