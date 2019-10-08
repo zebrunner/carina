@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -856,11 +857,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // #810 add zafira testrun abort as part of shutdown hook
             if (ZafiraSingleton.INSTANCE.isRunning()) {
                 LOGGER.debug("Zafira test run is still in progress. trying to abort...");
-                Optional<TestRunType> testRun = ZafiraEventRegistrar.getTestRun();
-                if (testRun != null) {
-                    LOGGER.debug("detected testrun id to abort: " + testRun.get().getId());
-                    ZafiraSingleton.INSTANCE.getClient().abortTestRun(testRun.get().getId());
-                    LOGGER.debug("aborted testrun");
+                try {
+                    Optional<TestRunType> testRun = ZafiraEventRegistrar.getTestRun();
+                    if (testRun != null) {
+                        LOGGER.debug("detected testrun id to abort: " + testRun.get().getId());
+                        ZafiraSingleton.INSTANCE.getClient().abortTestRun(testRun.get().getId());
+                        LOGGER.debug("aborted testrun");
+                    }
+                } catch (NoSuchElementException e) {
+                    LOGGER.debug("No Zafira testrun detected.");
                 }
             }
 
