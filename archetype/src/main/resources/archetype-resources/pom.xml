@@ -12,8 +12,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <carina-core_version>RELEASE</carina-core_version>
+    <carina-cucumber_version>RELEASE</carina-cucumber_version>
     <httpclient.version>4.5.3</httpclient.version>
-    <log4j.version>1.2.17</log4j.version>
     <java.version>1.8</java.version>
     <suite>api</suite>
   </properties>
@@ -39,15 +39,30 @@
       <version>${carina-core_version}</version>
     </dependency>
     <dependency>
+      <groupId>com.qaprosoft</groupId>
+      <artifactId>carina-cucumber</artifactId>
+      <version>${carina-cucumber_version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>${httpclient.version}</version>
     </dependency>
-     <dependency>
-         <groupId>log4j</groupId>
-         <artifactId>log4j</artifactId>
-         <version>${log4j.version}</version>
-     </dependency>
+    <dependency>
+       <groupId>log4j</groupId>
+       <artifactId>log4j</artifactId>
+       <version>1.2.17</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>3.5.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.6</version>
+    </dependency>
   </dependencies>
 
   <build>

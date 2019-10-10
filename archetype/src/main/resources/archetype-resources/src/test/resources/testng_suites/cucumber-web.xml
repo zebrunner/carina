@@ -1,0 +1,17 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
+<suite verbose="1" name="Carina Demo Tests - Web tests (Cucumber)" annotations="JDK">
+    <parameter name="suiteOwner" value="qpsdemo"/>
+    <parameter name="zafira_project" value="UNKNOWN"/>
+
+    <test verbose="1"
+          name="GSM Arena News - Web tests by cucumber">
+        <classes>
+            <class name="${package}.carina.demo.CucumberWebSampleTest">
+            </class>
+        </classes>
+    </test>
+
+</suite>

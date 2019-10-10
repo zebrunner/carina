@@ -1,0 +1,34 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
+
+
+<suite verbose="1" name="Carina Demo Tests - Web Single Driver Sample" junit="false" parallel="tests" annotations="JDK" >
+
+  <listeners>
+		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
+	</listeners>
+
+	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="zafira_project" value="UNKNOWN"/>
+	<parameter name="jenkinsJobCreation" value="true"/>
+	<parameter name="jenkinsJobName" value="Web-Demo-Single-Driver-Test"/>
+	<parameter name="jenkinsJobType" value="web"/>
+	<parameter name="jenkinsEnvironments" value="DEMO"/>
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+
+	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+
+	<parameter name="jenkinsPipelineBrowsers" value="browser: chrome; browser: firefox"/>
+	<parameter name="jenkinsJobExecutionOrder" value="1"/>
+	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+
+	<test name="GSM arena web tests using single driver between tests">
+		<classes>
+			<class name="${package}.carina.demo.WebSampleSingleDriver" />
+		</classes>
+	</test>
+
+</suite>

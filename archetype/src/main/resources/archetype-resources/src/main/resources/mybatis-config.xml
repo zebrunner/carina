@@ -1,0 +1,27 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="${version}" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="_database.properties" />
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${symbol_dollar}{db.driver}" />
+				<property name="url" value="${symbol_dollar}{db.url}" />
+				<property name="username" value="${symbol_dollar}{db.user}" />
+				<property name="password" value="${symbol_dollar}{db.pass}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="mappers/UserMapper.xml" />
+		<mapper resource="mappers/UserPreferenceMapper.xml" />
+	</mappers>
+</configuration>

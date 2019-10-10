@@ -1,0 +1,49 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="${version}" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${package}.carina.demo.db.mappers.UserPreferenceMapper">
+
+	<insert id="create" useGeneratedKeys="true"
+		keyProperty="id">
+		<![CDATA[
+			INSERT INTO carina.USER_PREFERENCES (NAME, VALUE, USER_ID)
+			VALUES (
+				${symbol_pound}{name},
+			    ${symbol_pound}{value},
+				${symbol_pound}{userId}
+			)
+		]]>
+	</insert>
+
+	<sql id="getUserPreference">
+		<![CDATA[
+			SELECT
+				UP.ID AS USER_PREFERENCE_ID,
+				UP.NAME AS USER_PREFERENCE_NAME,
+				UP.VALUE AS USER_PREFERENCE_VALUE,
+				UP.USER_ID AS USER_PREFERENCE_USER_ID
+			FROM
+				carina.USER_PREFERENCES UP
+		]]>
+	</sql>
+
+	<select id="findById"
+		resultMap="UserPreferenceResultMap">
+		<include refid="getUserPreference" />
+		<![CDATA[
+			WHERE UP.ID = ${symbol_pound}{id};
+		]]>
+	</select>
+
+	<resultMap type="${package}.db.models.UserPreference"
+		id="UserPreferenceResultMap" autoMapping="false">
+		<id column="USER_PREFERENCE_ID" property="id" />
+		<result column="USER_PREFERENCE_NAME" property="name" />
+		<result column="USER_PREFERENCE_VALUE" property="value" />
+		<result column="USER_PREFERENCE_USER_ID" property="userId" />
+	</resultMap>
+
+</mapper>

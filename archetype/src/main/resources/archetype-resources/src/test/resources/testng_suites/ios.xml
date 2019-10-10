@@ -1,0 +1,33 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
+<suite name="Carina Demo Tests - Mobile Sample (iOS)" verbose="1"
+	skipfailedinvocationcounts="false" junit="false" parallel="tests"
+	data-provider-thread-count="1" annotations="JDK">
+
+	<parameter name="suiteOwner" value="qpsdemo" />
+	<parameter name="zafira_project" value="UNKNOWN" />
+	<parameter name="jenkinsJobCreation" value="true" />
+	<parameter name="jenkinsJobName" value="Mobile-iOS-Demo-Test" />
+	<parameter name="jenkinsJobType" value="ios"/>
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
+	<parameter name="jenkinsEnvironments" value="DEMO" />
+
+	<parameter name="stringParam::capabilities.app::path to carina demo mobile application on the appium server host" value="/opt/apk/carinademoexample.zip" />
+
+	<parameter name="jenkinsDefaultThreadCount" value="1" />
+	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
+
+<!-- 	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline" /> -->
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO" />
+	<parameter name="jenkinsJobExecutionOrder" value="1" />
+	<parameter name="jenkinsJobExecutionMode" value="continue" />
+
+	<test name="Mobile test">
+		<classes>
+			<class name="${package}.carina.demo.MobileSampleTest" />
+		</classes>
+	</test>
+
+</suite>

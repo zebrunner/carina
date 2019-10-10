@@ -1,10 +1,12 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite verbose="1" name="Carina Demo Tests - API sample tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
+
+<suite verbose="1" name="Carina Demo Tests - API Sample" skipfailedinvocationcounts="false" junit="false" parallel="tests" annotations="JDK">
+
 	<listeners>
-        	<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
+		<listener class-name="${groupId}.zafira.listener.ZafiraListener"/>
 	</listeners>
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
@@ -13,16 +15,18 @@
 	<parameter name="jenkinsJobName" value="API-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
-	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
-
+	<parameter name="jenkinsSlackChannels" value="slack-test"/>
+	
 	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
-	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
-	<parameter name="jenkinsPipelineLanguages" value="fr_FR:fr,en_US:en,es_ES:es,it_IT:it,de_DE:de,pt_PT:pt,zh_CN:zh-rCN,ja_JP:ja,ko_KR:ko"/>
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>	
+<!-- 	<parameter name="jenkinsPipelineLocales" value="fr_FR,en_US,es_ES,it_IT,de_DE,pt_PT,zh_CN:zh-rCN,ja_JP,ko_KR"/> -->
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+<!-- 	<parameter name="jenkinsJobExecutionOrder" value="ordered"/> -->
+<!-- 	<parameter name="jenkinsQueueRegistration" value="false"/> -->
 
 	<test name="User API tests">
 		<classes>
-			<class name="${package}.carina.demo.APISampleTest" />
+			<class name="${package}.APISampleTest" />
 		</classes>
 	</test>
 

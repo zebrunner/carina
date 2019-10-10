@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2019 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2018 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ${package}.carina.demo;
+package ${package};
 
 import java.util.List;
 
@@ -31,19 +31,19 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
-import ${package}.carina.demo.gui.components.FooterMenu;
-import ${package}.carina.demo.gui.components.NewsItem;
-import ${package}.carina.demo.gui.components.compare.ModelSpecs;
-import ${package}.carina.demo.gui.components.compare.ModelSpecs.SpecType;
-import ${package}.carina.demo.gui.pages.BrandModelsPage;
-import ${package}.carina.demo.gui.pages.CompareModelsPage;
-import ${package}.carina.demo.gui.pages.HomePage;
-import ${package}.carina.demo.gui.pages.ModelInfoPage;
-import ${package}.carina.demo.gui.pages.NewsPage;
+import ${package}.gui.components.FooterMenu;
+import ${package}.gui.components.NewsItem;
+import ${package}.gui.components.compare.ModelSpecs;
+import ${package}.gui.components.compare.ModelSpecs.SpecType;
+import ${package}.gui.pages.BrandModelsPage;
+import ${package}.gui.pages.CompareModelsPage;
+import ${package}.gui.pages.HomePage;
+import ${package}.gui.pages.ModelInfoPage;
+import ${package}.gui.pages.NewsPage;
 
 /**
  * This sample shows how create Web test.
- *
+ * 
  * @author qpsdemo
  */
 public class WebSampleTest extends AbstractTest {
@@ -58,7 +58,12 @@ public class WebSampleTest extends AbstractTest {
         HomePage homePage = new HomePage(getDriver());
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+        
+        //Closing advertising if it's displayed
+        homePage.getWeValuePrivacyAd().closeAdIfPresent();
+        
         // Select phone brand
+        homePage = new HomePage(getDriver());
         BrandModelsPage productsPage = homePage.selectBrand(brand);
         // Select phone model
         ModelInfoPage productInfoPage = productsPage.selectModel(model);
@@ -87,20 +92,20 @@ public class WebSampleTest extends AbstractTest {
         List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
         // Verify model announced dates
         Assert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2015, November");
-        Assert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2016, September");
+        Assert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June");
         Assert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
     }
-
+    
     @Test(description = "JIRA${symbol_pound}AUTO-0010")
     @MethodOwner(owner = "qpsdemo")
     public void testNewsSearch() {
         HomePage homePage = new HomePage(getDriver());
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened!");
-
+        
         NewsPage newsPage = homePage.getFooterMenu().openNewsPage();
         Assert.assertTrue(newsPage.isPageOpened(), "News page is not opened!");
-
+        
         final String searchQ = "iphone";
         List<NewsItem> news = newsPage.searchNews(searchQ);
         Assert.assertFalse(CollectionUtils.isEmpty(news), "News not found!");
@@ -109,4 +114,5 @@ public class WebSampleTest extends AbstractTest {
             Assert.assertTrue(StringUtils.containsIgnoreCase(n.readTitle(), searchQ), "Invalid search results!");
         }
     }
+
 }
