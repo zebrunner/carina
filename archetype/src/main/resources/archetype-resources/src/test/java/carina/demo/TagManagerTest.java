@@ -16,14 +16,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package ${package};
+package ${package}.carina.demo;
 
 import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.tag.*;
-import ${groupId}.zafira.models.dto.TagType;
+import com.qaprosoft.zafira.models.dto.TagType;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
