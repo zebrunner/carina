@@ -14,7 +14,7 @@
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
 	<parameter name="jenkinsEnvironments" value="DEMO" />
 
-	<parameter name="stringParam::capabilities.app::path to carina demo mobile application on the appium server host" value="/opt/apk/carinademoexample.zip" />
+	<parameter name="stringParam::capabilities.app::path to carina demo mobile application on the appium server host" value="https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip" />
 
 	<parameter name="jenkinsDefaultThreadCount" value="1" />
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
