@@ -34,7 +34,7 @@
 	<test name="Sum operation test">
 		<parameter name="{ds_custom_provider}" value="true" />
 		<classes>
-			<class name="${package}.DataprovidersSampleTest">
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
 				<methods>
 					<include name="testSumOperation"/>
 					<include name="testSumOperationEx"/>
@@ -46,7 +46,7 @@
 	<test name="Multiply operation test">
 		<parameter name="{ds_custom_provider}" value="true" />
 		<classes>
-			<class name="${package}.DataprovidersSampleTest">
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
 				<methods>
 					<include name="testMuliplyOperation"/>
 				</methods>
@@ -59,7 +59,7 @@
 		<parameter name="b" value="3"/>
 		<parameter name="c" value="9"/>
 		<classes>
-			<class name="${package}.DataprovidersSampleTest">
+			<class name="${package}.carina.demo.DataprovidersSampleTest">
 				<methods>
 					<include name="testSubstractOperation"/>
 				</methods>

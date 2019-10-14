@@ -16,9 +16,9 @@
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsSlackChannels" value="slack-test"/>
-	
+
 	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
-	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>	
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 <!-- 	<parameter name="jenkinsPipelineLocales" value="fr_FR,en_US,es_ES,it_IT,de_DE,pt_PT,zh_CN:zh-rCN,ja_JP,ko_KR"/> -->
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 <!-- 	<parameter name="jenkinsJobExecutionOrder" value="ordered"/> -->
@@ -26,7 +26,7 @@
 
 	<test name="User API tests">
 		<classes>
-			<class name="${package}.APISampleTest" />
+			<class name="${package}.carina.demo.APISampleTest" />
 		</classes>
 	</test>
 

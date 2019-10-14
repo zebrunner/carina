@@ -9,7 +9,7 @@
   <listeners>
 		<listener class-name="${groupId}.zafira.listener.ZafiraListener"/>
 	</listeners>
-	
+
 	<parameter name="suiteOwner" value="qpsdemo"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobCreation" value="true"/>
@@ -17,7 +17,7 @@
 	<parameter name="jenkinsJobType" value="web"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
-	
+
 	<!-- Example howto override default job thread_count via jobDSL parameter -->
 	<parameter name="jenkinsDefaultThreadCount" value="3"/>
 
@@ -30,8 +30,8 @@
 
 	<test name="GSM arena web tests">
 		<classes>
-			<class name="${package}.WebSampleTest" />
+			<class name="${package}.carina.demo.WebSampleTest" />
 		</classes>
 	</test>
-	
+
 </suite>
