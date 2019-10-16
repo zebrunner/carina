@@ -59,14 +59,26 @@ public class ChromeCapabilities extends AbstractCapabilities {
 
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
+        
+        // add all custom chrome args
+        for (String arg: Configuration.get(Parameter.CHROME_ARGS).split(",")) {
+            options.addArguments(arg.trim());
+        }
+        
+        // add all custom chrome experimental options, w3c=false
+        for (String opts: Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+            //TODO: think about equal sign inside name or value later
+            opts = opts.trim();
+            String name = opts.split("=")[0].trim();
+            String value = opts.split("=")[1].trim();
+            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
+                options.setExperimentalOption(name, Boolean.valueOf(value));
+            } else {
+                options.setExperimentalOption(name, value);
+            }
+        }
 
-/*        Proxy proxy = setupProxy();
-        if (proxy != null) {
-        	// explicitely add proxy as chrome option
-        	// https://github.com/SeleniumHQ/selenium/issues/5299
-        	options.setProxy(proxy);
-        }*/
-
+        
         
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         return capabilities;
