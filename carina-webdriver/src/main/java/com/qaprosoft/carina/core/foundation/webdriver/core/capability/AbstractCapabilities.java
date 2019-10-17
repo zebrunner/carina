@@ -108,10 +108,6 @@ public abstract class AbstractCapabilities {
             capabilities = addFirefoxOptions(capabilities);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
-        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
-            
-        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
-            
         }
         
         return capabilities;
@@ -159,7 +155,7 @@ public abstract class AbstractCapabilities {
         return null;
     }
     
-    
+
     private DesiredCapabilities addChromeOptions(DesiredCapabilities caps) {
         // add default carina options and arguments
         ChromeOptions options = new ChromeOptions();
