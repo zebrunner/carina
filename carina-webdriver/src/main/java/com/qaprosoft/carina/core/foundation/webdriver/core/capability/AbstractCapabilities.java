@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,9 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -38,6 +42,7 @@ import com.qaprosoft.carina.proxy.SystemProxy;
 
 public abstract class AbstractCapabilities {
     private static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
+    private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
     public abstract DesiredCapabilities getCapability(String testName);
 
@@ -96,9 +101,19 @@ public abstract class AbstractCapabilities {
         
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
-        if (BrowserType.CHROME.equalsIgnoreCase(Configuration.getBrowser())) {
+        String browser = Configuration.getBrowser();
+
+
+        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
+            capabilities = addFirefoxOptions(capabilities);
+        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
+        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
+            
+        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
+            
         }
+        
         return capabilities;
     }
 
@@ -190,4 +205,88 @@ public abstract class AbstractCapabilities {
     }
 
 
+    private DesiredCapabilities addFirefoxOptions(DesiredCapabilities caps) {
+        FirefoxProfile profile = getDefaultFirefoxProfile();
+        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
+        caps.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
+
+        // add all custom firefox args
+        for (String arg : Configuration.get(Parameter.FIREFOX_ARGS).split(",")) {
+            options.addArguments(arg.trim());
+        }
+        // add all custom firefox preferences
+        for (String opts : Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+            // TODO: think about equal sign inside name or value later
+            opts = opts.trim();
+            String name = opts.split("=")[0].trim();
+            String value = opts.split("=")[1].trim();
+            // TODO: test approach with numbers
+            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
+                options.addPreference(name, Boolean.valueOf(value));
+            } else {
+                options.addPreference(name, value);
+            }
+        }
+
+        return caps;
+    }
+
+    /**
+     * Generate default default Carina FirefoxProfile.
+     *
+     * @return Firefox profile.
+     */
+    // keep it public to be bale to get default and override on client layerI
+    public FirefoxProfile getDefaultFirefoxProfile() {
+        FirefoxProfile profile = new FirefoxProfile();
+
+        // update browser language
+        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE);
+        if (!browserLang.isEmpty()) {
+            LOGGER.info("Set Firefox lanaguage to: " + browserLang);
+            profile.setPreference("intl.accept_languages", browserLang);
+        }
+
+        boolean generated = false;
+        int newPort = 7055;
+        int i = 100;
+        while (!generated && (--i > 0)) {
+            newPort = PortProber.findFreePort();
+            generated = firefoxPorts.add(newPort);
+        }
+        if (!generated) {
+            newPort = 7055;
+        }
+        if (firefoxPorts.size() > 20) {
+            firefoxPorts.remove(0);
+        }
+
+        profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
+        LOGGER.debug("FireFox profile will use '" + newPort + "' port number.");
+
+        profile.setPreference("dom.max_chrome_script_run_time", 0);
+        profile.setPreference("dom.max_script_run_time", 0);
+
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
+                || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
+            profile.setPreference("browser.download.folderList", 2);
+            profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
+            profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
+            profile.setPreference("browser.download.manager.showWhenStarting", false);
+            profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
+            profile.setPreference("pdfjs.disabled", true);
+            profile.setPreference("plugin.scan.plid.all", false);
+            profile.setPreference("plugin.scan.Acrobat", "99.0");
+        } else if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
+                || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS))) {
+            LOGGER.warn(
+                    "If you want to enable auto-download for FF please specify '" + Configuration.Parameter.AUTO_DOWNLOAD_APPS.getKey() + "' param");
+        }
+
+        profile.setAcceptUntrustedCertificates(true);
+        profile.setAssumeUntrustedCertificateIssuer(true);
+
+        // TODO: implement support of custom args if any
+        return profile;
+    }
 }

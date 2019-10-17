@@ -83,6 +83,10 @@ public class Configuration {
         CHROME_ARGS("chrome_args"),
         
         CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
+        
+        FIREFOX_ARGS("firefox_args"),
+        
+        FIREFOX_PREFERENCES("firefox_preferences"),
 
         APP_VERSION("app_version"),
 
