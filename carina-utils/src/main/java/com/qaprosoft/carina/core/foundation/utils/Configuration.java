@@ -79,6 +79,14 @@ public class Configuration {
         MAX_DRIVER_COUNT("max_driver_count"),
 
         CUSTOM_CAPABILITIES("custom_capabilities"),
+        
+        CHROME_ARGS("chrome_args"),
+        
+        CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
+        
+        FIREFOX_ARGS("firefox_args"),
+        
+        FIREFOX_PREFERENCES("firefox_preferences"),
 
         APP_VERSION("app_version"),
 

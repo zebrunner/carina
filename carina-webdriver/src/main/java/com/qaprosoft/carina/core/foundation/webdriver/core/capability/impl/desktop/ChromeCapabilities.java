@@ -16,17 +16,12 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class ChromeCapabilities extends AbstractCapabilities {
@@ -38,37 +33,7 @@ public class ChromeCapabilities extends AbstractCapabilities {
         capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-ssl-errors"));
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("test-type");
-        
-        //update browser language
-        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
-        if (!browserLang.isEmpty()) {
-        	LOGGER.info("Set Chrome lanaguage to: " + browserLang);
-        	options.addArguments("--lang=" + browserLang);
-        }
-
-        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
-            HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
-            chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
-            chromePrefs.put("plugins.always_open_pdf_externally", true);
-            options.setExperimentalOption("prefs", chromePrefs);
-        }
-
-        // [VD] no need to set proxy via options anymore!
-        // moreover if below code is uncommented then we have double proxy start and mess in host:port values
-
-/*        Proxy proxy = setupProxy();
-        if (proxy != null) {
-        	// explicitely add proxy as chrome option
-        	// https://github.com/SeleniumHQ/selenium/issues/5299
-        	options.setProxy(proxy);
-        }*/
-
-        
-        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+        LOGGER.debug("chrome caps: " + capabilities);
         return capabilities;
     }
 }
