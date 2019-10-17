@@ -6,7 +6,7 @@
 <suite verbose="1" name="Carina Demo - Test Custom Jobs Params" skipfailedinvocationcounts="false" junit="false" parallel="tests" annotations="JDK">
 
 	<listeners>
-		<listener class-name="${groupId}.zafira.listener.ZafiraListener"/>
+		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
 	</listeners>
 
 	<parameter name="suiteOwner" value="qpsdemo"/>

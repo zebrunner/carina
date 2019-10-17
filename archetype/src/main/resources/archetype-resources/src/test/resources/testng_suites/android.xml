@@ -6,6 +6,10 @@
 	skipfailedinvocationcounts="false" junit="false" parallel="methods"
 	data-provider-thread-count="1" annotations="JDK">
 
+	<listeners>
+		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
+	</listeners>
+
 	<parameter name="suiteOwner" value="qpsdemo" />
 	<parameter name="zafira_project" value="UNKNOWN" />
 	<parameter name="jenkinsJobCreation" value="true" />
