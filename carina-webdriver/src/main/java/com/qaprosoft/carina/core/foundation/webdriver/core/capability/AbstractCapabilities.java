@@ -181,15 +181,22 @@ public abstract class AbstractCapabilities {
         
         // add all custom chrome args
         for (String arg: Configuration.get(Parameter.CHROME_ARGS).split(",")) {
+            if (arg.isEmpty()) {
+                continue;
+            }
             options.addArguments(arg.trim());
         }
     
         // add all custom chrome experimental options, w3c=false
-        for (String opts: Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+        for (String option: Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+            if (option.isEmpty()) {
+                continue;
+            }
+
             //TODO: think about equal sign inside name or value later
-            opts = opts.trim();
-            String name = opts.split("=")[0].trim();
-            String value = opts.split("=")[1].trim();
+            option = option.trim();
+            String name = option.split("=")[0].trim();
+            String value = option.split("=")[1].trim();
             if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                 options.setExperimentalOption(name, Boolean.valueOf(value));
             } else {
@@ -208,14 +215,20 @@ public abstract class AbstractCapabilities {
 
         // add all custom firefox args
         for (String arg : Configuration.get(Parameter.FIREFOX_ARGS).split(",")) {
+            if (arg.isEmpty()) {
+                continue;
+            }
             options.addArguments(arg.trim());
         }
         // add all custom firefox preferences
-        for (String opts : Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+        for (String preference : Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+            if (preference.isEmpty()) {
+                continue;
+            }
             // TODO: think about equal sign inside name or value later
-            opts = opts.trim();
-            String name = opts.split("=")[0].trim();
-            String value = opts.split("=")[1].trim();
+            preference = preference.trim();
+            String name = preference.split("=")[0].trim();
+            String value = preference.split("=")[1].trim();
             // TODO: test approach with numbers
             if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                 options.addPreference(name, Boolean.valueOf(value));
