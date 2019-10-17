@@ -33,7 +33,7 @@ public class ChromeCapabilities extends AbstractCapabilities {
         capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-ssl-errors"));
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-        LOGGER.debug("chrome cpas: " + capabilities);
+        LOGGER.debug("chrome caps: " + capabilities);
         return capabilities;
     }
 }
