@@ -179,6 +179,14 @@ public abstract class AbstractCapabilities {
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
         
+        // setup default mobile chrome args and preferences
+        String driverType = Configuration.getDriverType();
+        if (SpecialKeywords.MOBILE.equals(driverType)) {
+            options.addArguments("--no-first-run");
+            options.addArguments("--disable-notifications");
+            options.setExperimentalOption("w3c", false);
+        }
+        
         // add all custom chrome args
         for (String arg: Configuration.get(Parameter.CHROME_ARGS).split(",")) {
             if (arg.isEmpty()) {
