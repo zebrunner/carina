@@ -382,7 +382,7 @@ public class Screenshot {
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
-        LOGGER.debug("Screenshot->capture starting...");
+        LOGGER.info("Screenshot->capture starting...");
 
         if (isTakeScreenshot) {
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
@@ -470,7 +470,7 @@ public class Screenshot {
             	Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
         }
-        LOGGER.debug("Screenshot->capture finished.");
+        LOGGER.info("Screenshot->capture finished.");
         return screenName;
     }
 

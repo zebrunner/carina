@@ -69,17 +69,17 @@ public class AmazonS3Client {
             String url = null;
             try {
                 int expiresIn = Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
-                LOGGER.debug("Uploading to AWS: " + file.getName() + ". Expires in " + expiresIn + " seconds.");
+                LOGGER.info("Uploading to AWS: " + file.getName() + ". Expires in " + expiresIn + " seconds.");
                 url = ZafiraSingleton.INSTANCE.getClient().uploadFile(file, expiresIn, String.format(fileType.getPath() + "/%s/", DATE_FORMAT.format(new Date())));
-                LOGGER.debug("Uploaded to AWS: " + file.getName());
+                LOGGER.info("Uploaded to AWS: " + file.getName());
                 callback.accept(url);
                 LOGGER.debug("Updated AWS metadata: " + file.getName());
             } catch (Exception e) {
-                LOGGER.debug("Can't save file to Amazon S3!", e);
+                LOGGER.info("Can't save file to Amazon S3!", e);
             }
             return url;
         }, executorService).exceptionally(e -> {
-            LOGGER.debug("Can't save file to Amazon S3!", e);
+            LOGGER.info("Can't save file to Amazon S3!", e);
             return null;
         }));
     }
