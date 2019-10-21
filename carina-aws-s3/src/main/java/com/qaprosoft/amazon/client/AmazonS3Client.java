@@ -71,6 +71,7 @@ public class AmazonS3Client {
                 int expiresIn = Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS);
                 LOGGER.info("Uploading to AWS: " + file.getName() + ". Expires in " + expiresIn + " seconds.");
                 url = ZafiraSingleton.INSTANCE.getClient().uploadFile(file, expiresIn, String.format(fileType.getPath() + "/%s/", DATE_FORMAT.format(new Date())));
+                LOGGER.info("Uploaded url: " + url);
                 LOGGER.info("Uploaded to AWS: " + file.getName());
                 callback.accept(url);
                 LOGGER.debug("Updated AWS metadata: " + file.getName());

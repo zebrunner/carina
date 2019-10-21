@@ -383,6 +383,8 @@ public class Screenshot {
         // For the rest of cases returned previous implementation
 
         LOGGER.info("Screenshot->capture starting...");
+        LOGGER.info("Take screenshot: " + isTakeScreenshot);
+        LOGGER.info("Is artifact: " + artifact);
 
         if (isTakeScreenshot) {
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
