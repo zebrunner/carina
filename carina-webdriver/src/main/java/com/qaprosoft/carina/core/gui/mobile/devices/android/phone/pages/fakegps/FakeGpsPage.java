@@ -15,24 +15,26 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
-import io.appium.java_client.android.AndroidKeyCode;
+import io.appium.java_client.android.nativekey.AndroidKey;
+
 
 /**
  * Fake GPS Page
  */
 
-public class FakeGpsPage extends MobileAbstractPage {
+public class FakeGpsPage extends MobileAbstractPage implements IAndroidUtils {
     private static final Logger LOGGER = Logger.getLogger(FakeGpsPage.class);
 
     @FindBy(id = "com.lexa.fakegps:id/buttonStart")
@@ -110,8 +112,8 @@ public class FakeGpsPage extends MobileAbstractPage {
             actionSearch.click();
             if (inputLocationNew.isElementPresent(DELAY)) {
                 inputLocationNew.type(location);
-                AndroidUtils.pressKeyCode(AndroidKeyCode.ENTER);
-                AndroidUtils.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH);
+                pressKeyboardKey(AndroidKey.ENTER);
+                pressKeyboardKey(AndroidKey.SEARCH);
                 CommonUtils.pause(3);
                 return true;
             }
@@ -147,11 +149,11 @@ public class FakeGpsPage extends MobileAbstractPage {
             String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
             LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
             if (currentAndroidVersion.contains("7.")) {
-                MobileUtils.swipe(allowMock7, devSettingsContainer);
+                swipe(allowMock7, devSettingsContainer);
                 allowMock7.clickIfPresent(MINIMAL_TIMEOUT);
                 fakeGpsPackage.clickIfPresent(DELAY);
             } else {
-                MobileUtils.swipe(allowMock, devSettingsContainer);
+                swipe(allowMock, devSettingsContainer);
                 LOGGER.info("Allow Mock config is present:" + allowMock.isElementPresent(SHORT_TIMEOUT));
                 allowMock.clickIfPresent(MINIMAL_TIMEOUT);
                 fakeGpsPackage.clickIfPresent(DELAY / 3);
@@ -167,7 +169,7 @@ public class FakeGpsPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(EXPLICIT_TIMEOUT / 2);
+        return isOpened(Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 2);
     }
 
 }

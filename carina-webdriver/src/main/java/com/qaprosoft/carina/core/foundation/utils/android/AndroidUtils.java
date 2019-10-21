@@ -36,7 +36,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidKeyCode;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
@@ -186,10 +185,7 @@ public class AndroidUtils extends MobileUtils {
         MobileUtils.hideKeyboard();
     }
     
-    @SuppressWarnings("deprecation")
-	public static void pressBack() {
-        ((AndroidDriver<?>) getDriver()).pressKeyCode(AndroidKeyCode.BACK);
-    }
+
 
     /**
      * Pressing "search" key of Android keyboard by coordinates.
