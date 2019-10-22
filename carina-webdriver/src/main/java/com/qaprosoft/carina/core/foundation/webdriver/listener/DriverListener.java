@@ -164,7 +164,8 @@ public class DriverListener implements WebDriverEventListener {
         if (thr.getMessage() == null)
             return;
 
-        if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")) {
+        if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
+                thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
             LOGGER.error("Do not generate screenshot for invalid driver!");
             // prevent recursive crash for onException
             return;
