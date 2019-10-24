@@ -216,7 +216,7 @@ public class MobileFactory extends AbstractFactory {
 
             Device device = IDriverPool.nullDevice;
             if (R.CONFIG.getBoolean("capabilities.STF_ENABLED")) {
-                LOGGER.info("STF is enabled. Debug info will be extracted from the exception.");
+                LOGGER.debug("STF is enabled. Debug info will be extracted from the exception.");
                 if (e != null) {
                     String debugInfo = getDebugInfo(e.getMessage());
                     if (!debugInfo.isEmpty()) {
@@ -388,9 +388,9 @@ public class MobileFactory extends AbstractFactory {
         String debugInfo = "";
         if (m.find()) {
             debugInfo = m.group(1);
-            LOGGER.info("Extracted debug info: ".concat(debugInfo));
+            LOGGER.debug("Extracted debug info: ".concat(debugInfo));
         } else {
-            LOGGER.info("Debug info hasn'been found");
+            LOGGER.debug("Debug info hasn'been found");
         }
         return debugInfo;
     }
@@ -416,9 +416,9 @@ public class MobileFactory extends AbstractFactory {
         String paramValue = "";
         if (m.find()) {
             paramValue = m.group(1);
-            LOGGER.info(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
+            LOGGER.debug(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
         } else {
-            LOGGER.info(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
+            LOGGER.debug(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
         }
 
         return paramValue;
