@@ -388,6 +388,6 @@ private ExtendedWebElement signUpBtn;
 Available list of actions with image elements and related driver settings are listed [here](http://appium.io/docs/en/advanced-concepts/image-elements/).
 
 Basically all you need is to create image template of the element in .png format and place it to your project. We suggest to use ```src/main/resources/``` folder to store images. 
-Be sure your image size less then real screen size. Real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. 
+Be sure your image size less then real screen size. Real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. The ultimate guide to iPhone resolutions you can find [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
 
 
