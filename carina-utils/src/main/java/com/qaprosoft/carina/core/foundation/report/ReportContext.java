@@ -789,8 +789,8 @@ public class ReportContext {
 
     public static void generateTestReport() {
         File testDir = testDirectory.get();
-        List<File> images = FileManager.getFilesInDir(testDir);
         try {
+            List<File> images = FileManager.getFilesInDir(testDir);
             List<String> imgNames = new ArrayList<String>();
             for (File image : images) {
                 imgNames.add(image.getName());

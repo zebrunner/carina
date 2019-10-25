@@ -44,6 +44,9 @@ public class FileManager {
         try {
             File[] fileArray = directory.listFiles();
 
+            if (fileArray == null) {
+                return files;
+            }
             for (int i = 0; i < fileArray.length; i++) {
                 files.add(fileArray[i]);
             }
