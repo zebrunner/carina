@@ -164,7 +164,7 @@ public abstract class AbstractCapabilities {
         //update browser language
         String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
         if (!browserLang.isEmpty()) {
-            LOGGER.info("Set Chrome lanaguage to: " + browserLang);
+            LOGGER.info("Set Chrome language to: " + browserLang);
             options.addArguments("--lang=" + browserLang);
         }
 
