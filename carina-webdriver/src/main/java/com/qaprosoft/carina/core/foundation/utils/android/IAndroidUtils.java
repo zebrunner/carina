@@ -876,6 +876,22 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
+     * This method provides app's version name for the app that is already installed to
+     * devices, based on its package name.
+     *
+     * In order to do that we search for "versionName" parameter in system dump.
+     *
+     * Ex. "versionCode" returns 11200050, "versionName" returns 11.2.0
+     */
+    default public String getAppVersionName(String packageName){
+        String command = "dumpsys package ".concat(packageName);
+        String output = this.executeShell(command);
+        String versionName = StringUtils.substringBetween(output, "versionName=", "\n");
+        LOGGER.info(String.format("Version name for '%s' package name is %s", packageName, versionName));
+        return versionName;
+    }
+
+    /**
      * Method to reset test application.
      * 
      * App's settings will be reset. User will be logged out. Application will be
