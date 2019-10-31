@@ -28,6 +28,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import org.testng.internal.TestResult;
 
 /**
  * Common naming utility for unique test method identification.
@@ -43,12 +44,12 @@ public class TestNamingUtil {
 
     private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
 
-    public static synchronized String associateTestInfo2Thread(String test, Long threadId) {
+    public static synchronized String associateTestInfo2Thread(String test, Long threadId, ITestResult result) {
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
         int count = 1;
         if (testName2Counter.containsKey(test)) {
-            count = testName2Counter.get(test) + 1;
+            count = ((TestResult) result).getParameterIndex() + 1;
             LOGGER.debug(test + " test was already registered. Incrementing invocation count to " + count);
         }
         testName2Counter.put(test, count);

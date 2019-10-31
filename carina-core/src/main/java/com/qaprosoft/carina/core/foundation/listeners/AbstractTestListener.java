@@ -59,7 +59,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         RetryCounter.initCounter();
 
         String test = TestNamingUtil.getCanonicalTestName(result);
-        test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId());
+        test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId(), result);
 
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
