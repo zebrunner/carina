@@ -84,6 +84,8 @@ public class Configuration {
         
         CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
         
+        CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts"),
+        
         FIREFOX_ARGS("firefox_args"),
         
         FIREFOX_PREFERENCES("firefox_preferences"),
@@ -415,6 +417,11 @@ public class Configuration {
         // redefine browser if capabilities.browserName is available
         if (!R.CONFIG.get("capabilities.browserName").isEmpty()) {
             browser = R.CONFIG.get("capabilities.browserName");
+        }
+        
+        // redefine browser if capabilities.browserName is available
+        if (!R.CONFIG.get("capabilities.deviceBrowser").isEmpty()) {
+            browser = R.CONFIG.get("capabilities.deviceBrowser");
         }
         return browser;
     }

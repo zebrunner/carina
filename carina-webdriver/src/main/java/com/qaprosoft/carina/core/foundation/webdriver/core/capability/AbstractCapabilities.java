@@ -211,6 +211,24 @@ public abstract class AbstractCapabilities {
                 options.setExperimentalOption(name, value);
             }
         }
+        
+        // add all custom chrome mobileEmulation options, deviceName=Nexus 5
+        Map<String, String> mobileEmulation = new HashMap<>();
+        for (String option: Configuration.get(Parameter.CHROME_MOBILE_EMULATION_OPTS).split(",")) {
+            if (option.isEmpty()) {
+                continue;
+            }
+
+            option = option.trim();
+            String name = option.split("=")[0].trim();
+            String value = option.split("=")[1].trim();
+            mobileEmulation.put(name, value);
+        }
+        
+        if (!mobileEmulation.isEmpty()) {
+            options.setExperimentalOption("mobileEmulation", mobileEmulation);
+        }
+        
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
     }
