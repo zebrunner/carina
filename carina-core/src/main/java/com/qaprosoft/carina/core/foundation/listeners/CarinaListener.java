@@ -230,7 +230,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 			Class<CarinaListener> theClass = CarinaListener.class;
 
 			String classPath = theClass.getResource(theClass.getSimpleName() + ".class").toString();
-			LOGGER.info("Class: " + classPath);
+			LOGGER.debug("Class: " + classPath);
 
 			Pattern pattern = Pattern.compile(".*\\\\/(.*)\\\\/.*!");
 			Matcher matcher = pattern.matcher(classPath);
