@@ -232,7 +232,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 			String classPath = theClass.getResource(theClass.getSimpleName() + ".class").toString();
 			LOGGER.debug("Class: " + classPath);
 
-			Pattern pattern = Pattern.compile(".*\\\\/(.*)\\\\/.*!");
+			Pattern pattern = Pattern.compile(".*\\/(.*)\\/.*!");
 			Matcher matcher = pattern.matcher(classPath);
 
 			if (matcher.find()) {
