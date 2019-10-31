@@ -219,9 +219,33 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
 
         onHealthCheck(suite);
+        
+        LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
 
-    @Override
+	private String getCarinaVersion() {
+
+		String carinaVersion = "";
+		try {
+			Class<CarinaListener> theClass = CarinaListener.class;
+
+			String classPath = theClass.getResource(theClass.getSimpleName() + ".class").toString();
+			LOGGER.debug("Class: " + classPath);
+
+			Pattern pattern = Pattern.compile(".*\\/(.*)\\/.*!");
+			Matcher matcher = pattern.matcher(classPath);
+
+			if (matcher.find()) {
+				carinaVersion = matcher.group(1);
+			}
+		} catch (Exception e) {
+			LOGGER.debug(e);
+		}
+
+		return carinaVersion;
+	}
+
+	@Override
     public void onStart(ITestContext context) {
         LOGGER.debug("CarinaListener->OnTestStart(context): " + context.getName());
         super.onStart(context);
