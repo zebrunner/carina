@@ -44,7 +44,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public interface IDriverPool {
-    static final Logger LOGGER = Logger.getLogger(IDriverPool.class);
+    static final Logger POOL_LOGGER = Logger.getLogger(IDriverPool.class);
     static final String DEFAULT = "default";
 
     // unified set of Carina WebDrivers
@@ -111,9 +111,9 @@ public interface IDriverPool {
             CarinaDriver cdrv = currentDrivers.get(name);
             drv = cdrv.getDriver();
             if (Phase.BEFORE_SUITE.equals(cdrv.getPhase())) {
-                LOGGER.info("Before suite registered driver will be returned.");
+                POOL_LOGGER.info("Before suite registered driver will be returned.");
             } else {
-                LOGGER.debug(cdrv.getPhase() + " registered driver will be returned.");
+                POOL_LOGGER.debug(cdrv.getPhase() + " registered driver will be returned.");
             }
         }
 
@@ -139,7 +139,7 @@ public interface IDriverPool {
          */
 
         if (drv == null) {
-            LOGGER.debug("Starting new driver as nothing was found in the pool");
+            POOL_LOGGER.debug("Starting new driver as nothing was found in the pool");
             drv = createDriver(name, capabilities, seleniumHost);
         }
 
@@ -202,11 +202,11 @@ public interface IDriverPool {
         if (isSameDevice) {
             keepProxy = true;
             device = getDefaultDevice();
-            LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
+            POOL_LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
         }
 
-        LOGGER.debug("before restartDriver: " + driversPool);
+        POOL_LOGGER.debug("before restartDriver: " + driversPool);
         for (CarinaDriver carinaDriver : driversPool) {
             if (carinaDriver.getDriver().equals(drv)) {
                 quitDriver(carinaDriver, keepProxy);
@@ -215,7 +215,7 @@ public interface IDriverPool {
                 break;
             }
         }
-        LOGGER.debug("after restartDriver: " + driversPool);
+        POOL_LOGGER.debug("after restartDriver: " + driversPool);
 
         return createDriver(DEFAULT, caps, null);
     }
@@ -243,7 +243,7 @@ public interface IDriverPool {
         CarinaDriver carinaDrv = null;
         Long threadId = Thread.currentThread().getId();
 
-        LOGGER.debug("before quitDriver: " + driversPool);
+        POOL_LOGGER.debug("before quitDriver: " + driversPool);
         for (CarinaDriver carinaDriver : driversPool) {
             if ((Phase.BEFORE_SUITE.equals(carinaDriver.getPhase()) && name.equals(carinaDriver.getName()))
                     || (threadId.equals(carinaDriver.getThreadId()) && name.equals(carinaDriver.getName()))) {
@@ -260,7 +260,7 @@ public interface IDriverPool {
         quitDriver(carinaDrv, false);
         driversPool.remove(carinaDrv);
 
-        LOGGER.debug("after quitDriver: " + driversPool);
+        POOL_LOGGER.debug("after quitDriver: " + driversPool);
 
     }
 
@@ -296,16 +296,16 @@ public interface IDriverPool {
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
             }
-            LOGGER.debug("start driver quit: " + carinaDriver.getName());
+            POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             carinaDriver.getDriver().quit();
-            LOGGER.debug("finished driver quit: " + carinaDriver.getName());
+            POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
             // stop timer to be able to track mobile app session time. It should be started on createDriver!
             Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
         } catch (WebDriverException e) {
-            LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
+            POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
         } catch (Exception e) {
-            LOGGER.error("Error discovered during driver quit: " + e.getMessage(), e);
+            POOL_LOGGER.error("Error discovered during driver quit: " + e.getMessage(), e);
         } finally {
             MDC.remove("device");
         }
@@ -332,7 +332,7 @@ public interface IDriverPool {
         int maxCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT) + 1;
         while (drv == null && count++ < maxCount) {
             try {
-                LOGGER.debug("initDriver start...");
+                POOL_LOGGER.debug("initDriver start...");
                 
                 Long threadId = Thread.currentThread().getId();
                 ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
@@ -387,7 +387,7 @@ public interface IDriverPool {
                 Timer.start(device.getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
                 driversPool.add(carinaDriver);
 
-                LOGGER.debug("initDriver finish...");
+                POOL_LOGGER.debug("initDriver finish...");
 
             } catch (Exception e) {
                 device.disconnectRemote();
@@ -395,7 +395,7 @@ public interface IDriverPool {
                 // but initially try to implement it on selenium-hub level
                 String msg = String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
                         maxCount, e.getMessage());
-                LOGGER.error(msg, e); //TODO: test how 2 messages are displayed in logs and zafira
+                POOL_LOGGER.error(msg, e); //TODO: test how 2 messages are displayed in logs and zafira
                 if (count == maxCount) {
                     throw e;
                 }
@@ -431,7 +431,7 @@ public interface IDriverPool {
     default public int getDriversCount() {
         Long threadId = Thread.currentThread().getId();
         int size = getDrivers().size();
-        LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+        POOL_LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
 
@@ -445,7 +445,7 @@ public interface IDriverPool {
     default public int size() {
         Long threadId = Thread.currentThread().getId();
         int size = getDrivers().size();
-        LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
+        POOL_LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
         return size;
     }
 
@@ -461,10 +461,10 @@ public interface IDriverPool {
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
         for (CarinaDriver carinaDriver : driversPool) {
             if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-                LOGGER.debug("Add suite_mode drivers into the getDrivers response: " + carinaDriver.getName());
+                POOL_LOGGER.debug("Add suite_mode drivers into the getDrivers response: " + carinaDriver.getName());
                 currentDrivers.put(carinaDriver.getName(), carinaDriver);
             } else if (threadId.equals(carinaDriver.getThreadId())) {
-                LOGGER.debug("Add driver into the getDrivers response: " + carinaDriver.getName() + " by threadId: "
+                POOL_LOGGER.debug("Add driver into the getDrivers response: " + carinaDriver.getName() + " by threadId: "
                         + threadId);
                 currentDrivers.put(carinaDriver.getName(), carinaDriver);
             }
@@ -496,10 +496,10 @@ public interface IDriverPool {
         ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
         for (CarinaDriver carinaDriver : driversPool) {
             if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-                LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
+                POOL_LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
                 currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
             } else if (threadId.equals(carinaDriver.getThreadId())) {
-                LOGGER.debug("Add driver into the getStaticDrivers response: " + carinaDriver.getName() + " by threadId: "
+                POOL_LOGGER.debug("Add driver into the getStaticDrivers response: " + carinaDriver.getName() + " by threadId: "
                         + threadId);
                 currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
             }
@@ -552,10 +552,10 @@ public interface IDriverPool {
 
         // register current device to be able to transfer it into Zafira at the end of the test
         long threadId = Thread.currentThread().getId();
-        LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
+        POOL_LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
         currentDevice.set(device);
 
-        LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
+        POOL_LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
         // clear logcat log for Android devices
         device.clearSysLog();
@@ -573,12 +573,12 @@ public interface IDriverPool {
         long threadId = Thread.currentThread().getId();
         Device device = currentDevice.get();
         if (device == null) {
-            LOGGER.debug("Current device is null for thread: " + threadId);
+            POOL_LOGGER.debug("Current device is null for thread: " + threadId);
             device = nullDevice;
         } else if (device.getName().isEmpty()) {
-            LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
+            POOL_LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
         } else {
-            LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
+            POOL_LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
         }
         return device;
     }
