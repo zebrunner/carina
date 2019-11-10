@@ -30,7 +30,7 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public interface ITestRailManager extends ITestCases {
-    static final Logger LOGGER = Logger.getLogger(ITestRailManager.class);
+    static final Logger TESTRAIL_LOGGER = Logger.getLogger(ITestRailManager.class);
 
     default Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
@@ -84,7 +84,7 @@ public interface ITestRailManager extends ITestCases {
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
                             testCases.add(uuid);
-                            LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
+                            TESTRAIL_LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
                         }
 
                     }
@@ -101,14 +101,14 @@ public interface ITestRailManager extends ITestCases {
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;
                                 testCases.add(uuid);
-                                LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
+                                TESTRAIL_LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
                             }
                         }
                     }
                 }
             }
         } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
+            TESTRAIL_LOGGER.error(e.getMessage(), e);
         }
 
         // append cases id values from ITestCases map (custom TestNG provider)

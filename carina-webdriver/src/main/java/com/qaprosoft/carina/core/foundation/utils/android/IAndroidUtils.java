@@ -38,7 +38,6 @@ import org.openqa.selenium.WebElement;
 
 import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.Permission;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.PermissionAction;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.PermissionType;
@@ -62,7 +61,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
     // TODO: review carefully and remove duplicates and migrate completely to fluent
     // waits
-    static final Logger LOGGER = Logger.getLogger(IAndroidUtils.class);
+    static final Logger UTILS_LOGGER = Logger.getLogger(IAndroidUtils.class);
 
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
@@ -202,15 +201,15 @@ public interface IAndroidUtils extends IMobileUtils {
 
         String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
 
-        LOGGER.info("Do not concat language for Android. Keep: " + language);
+        UTILS_LOGGER.info("Do not concat language for Android. Keep: " + language);
         language = language.replace("_", "-");
-        LOGGER.info("Refactor language to : " + language);
+        UTILS_LOGGER.info("Refactor language to : " + language);
 
         String actualDeviceLanguage = getDeviceLanguage();
 
         if (language.contains(actualDeviceLanguage.toLowerCase())
                 || actualDeviceLanguage.toLowerCase().contains(language)) {
-            LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
+            UTILS_LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
             return true;
         }
 
@@ -219,24 +218,24 @@ public interface IAndroidUtils extends IMobileUtils {
         String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language "
                 + language;
 
-        LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
+        UTILS_LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
         String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
 
         if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
-            LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
+            UTILS_LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
             installApk(LANGUAGE_CHANGE_APP_PATH, true);
             expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
         }
 
-        LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
+        UTILS_LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
 
-        LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
+        UTILS_LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
         String changeLocaleOutput = executeAdbCommand(setLocalizationCmd);
-        LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : "
+        UTILS_LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : "
                 + changeLocaleOutput);
 
         if (waitTime > 0) {
-            LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
+            UTILS_LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
             CommonUtils.pause(waitTime);
         }
 
@@ -257,19 +256,19 @@ public interface IAndroidUtils extends IMobileUtils {
         }
 
         actualDeviceLanguage = getDeviceLanguage();
-        LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
+        UTILS_LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
         if (language.contains(actualDeviceLanguage.toLowerCase())
                 || actualDeviceLanguage.toLowerCase().contains(language)) {
             status = true;
         } else {
             if (getDeviceLanguage().isEmpty()) {
-                LOGGER.info("Adb return empty response without errors.");
+                UTILS_LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
                 currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
-                LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
+                UTILS_LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
-                    LOGGER.info("Adb return language command do not work on some Android 7+ devices."
+                    UTILS_LOGGER.info("Adb return language command do not work on some Android 7+ devices."
                             + " Check that there are no error.");
                     status = !getDeviceLanguage().toLowerCase().contains("error");
                 }
@@ -319,7 +318,7 @@ public interface IAndroidUtils extends IMobileUtils {
             if (baseResource == null) {
                 throw new RuntimeException("Unable to get resource from classpath: " + apkPath);
             } else {
-                LOGGER.debug("Resource was found: " + baseResource.getPath());
+                UTILS_LOGGER.debug("Resource was found: " + baseResource.getPath());
             }
 
             String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "."
@@ -333,7 +332,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 try {
                     Files.copy(link, file.getAbsoluteFile().toPath());
                 } catch (IOException e) {
-                    LOGGER.error("Unable to extract resource from ClassLoader!", e);
+                    UTILS_LOGGER.error("Unable to extract resource from ClassLoader!", e);
                 }
             }
         }
@@ -420,12 +419,12 @@ public interface IAndroidUtils extends IMobileUtils {
 
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
-                    LOGGER.info("Element found!!!");
+                    UTILS_LOGGER.info("Element found!!!");
                     extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -434,7 +433,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 MobileBy.AndroidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ".instance(" + containerInstance + ")).scrollForward()");
-                LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
+                UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
             }
         }
 
@@ -492,12 +491,12 @@ public interface IAndroidUtils extends IMobileUtils {
 
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
-                    LOGGER.info("Element found!!!");
+                    UTILS_LOGGER.info("Element found!!!");
                     extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -506,7 +505,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 MobileBy.AndroidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ".instance(" + containerInstance + ")).scrollForward()");
-                LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
+                UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
             }
         }
 
@@ -558,12 +557,12 @@ public interface IAndroidUtils extends IMobileUtils {
 
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
-                    LOGGER.info("Element found!!!");
+                    UTILS_LOGGER.info("Element found!!!");
                     extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -571,7 +570,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 checkTimeout(startTime);
                 MobileBy.AndroidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ").scrollForward()");
-                LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
+                UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
             }
         }
 
@@ -590,7 +589,7 @@ public interface IAndroidUtils extends IMobileUtils {
      **/
     default String getScrollContainerSelector(ExtendedWebElement scrollableContainer,
             SelectorType containerSelectorType) {
-        LOGGER.debug(scrollableContainer.getBy().toString());
+        UTILS_LOGGER.debug(scrollableContainer.getBy().toString());
         String scrollableContainerBy;
         String scrollViewContainerFinder = "";
 
@@ -625,7 +624,7 @@ public interface IAndroidUtils extends IMobileUtils {
             scrollViewContainerFinder = "new UiSelector().className(\"" + scrollableContainerBy + "\")";
             break;
         default:
-            LOGGER.info("Please provide valid selectorType for element to be found...");
+            UTILS_LOGGER.info("Please provide valid selectorType for element to be found...");
             break;
         }
 
@@ -671,7 +670,7 @@ public interface IAndroidUtils extends IMobileUtils {
             neededElementFinder = "new UiSelector().className(\"" + scrollToEleTrimmed + "\")";
             break;
         default:
-            LOGGER.info("Please provide valid selectorType for element to be found...");
+            UTILS_LOGGER.info("Please provide valid selectorType for element to be found...");
             break;
         }
 
@@ -715,25 +714,25 @@ public interface IAndroidUtils extends IMobileUtils {
             // add remoteURL/udid reference
             command = "-s " + deviceName + " " + command;
         } else {
-            LOGGER.warn("nullDevice detected fot current thread!");
+            UTILS_LOGGER.warn("nullDevice detected fot current thread!");
         }
 
         String result = "";
-        LOGGER.info("Command: " + command);
+        UTILS_LOGGER.info("Command: " + command);
         String[] listOfCommands = command.split(" ");
 
         String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
 
         try {
-            LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
+            UTILS_LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
             List<String> execOutput = executor.execute(execCmd);
-            LOGGER.info("Output after execution ADB command: " + execOutput);
+            UTILS_LOGGER.info("Output after execution ADB command: " + execOutput);
 
             result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
 
-            LOGGER.info("Returning Output: " + result);
+            UTILS_LOGGER.info("Returning Output: " + result);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            UTILS_LOGGER.error(e.getMessage(), e);
         }
 
         return result;
@@ -756,7 +755,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return String - response (might be empty)
      */
     default public String executeShell(String command) {
-        LOGGER.info("ADB command to be executed: adb shell ".concat(command.trim()));
+        UTILS_LOGGER.info("ADB command to be executed: adb shell ".concat(command.trim()));
         List<String> literals = Arrays.asList(command.split(" "));
         return executeShell(literals);
     }
@@ -781,7 +780,7 @@ public interface IAndroidUtils extends IMobileUtils {
         Map<String, Object> preparedCommand = ImmutableMap.of("command", commadKeyWord, "args", args);
         String output = (String) ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
         if (!StringUtils.isEmpty(output)) {
-            LOGGER.debug("ADB command output: " + output);
+            UTILS_LOGGER.debug("ADB command output: " + output);
         }
         return output;
     }
@@ -803,7 +802,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * FOREGROUND. Will be in recent app's list;
      */
     default public void closeApp() {
-        LOGGER.info("Application will be closed to background");
+        UTILS_LOGGER.info("Application will be closed to background");
         ((AndroidDriver<?>) castDriver()).closeApp();
     }
 
@@ -856,7 +855,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *            - path to save screenshot to device's OS.
      */
     default public void takeScreenShot(String filepath) {
-        LOGGER.info("Screenshot will be saved to: " + filepath);
+        UTILS_LOGGER.info("Screenshot will be saved to: " + filepath);
         String command = String.format(SHELL_TAKE_SCREENSHOT_CMD.concat(" %s"), filepath);
         executeShell(command);
     }
@@ -871,7 +870,7 @@ public interface IAndroidUtils extends IMobileUtils {
         String command = "dumpsys package ".concat(packageName);
         String output = executeShell(command);
         String versionCode = StringUtils.substringBetween(output, "versionCode=", " ");
-        LOGGER.info(String.format("Version code for '%s' package name is %s", packageName, versionCode));
+        UTILS_LOGGER.info(String.format("Version code for '%s' package name is %s", packageName, versionCode));
         return versionCode;
     }
 
@@ -887,7 +886,7 @@ public interface IAndroidUtils extends IMobileUtils {
         String command = "dumpsys package ".concat(packageName);
         String output = this.executeShell(command);
         String versionName = StringUtils.substringBetween(output, "versionName=", "\n");
-        LOGGER.info(String.format("Version name for '%s' package name is %s", packageName, versionName));
+        UTILS_LOGGER.info(String.format("Version name for '%s' package name is %s", packageName, versionName));
         return versionName;
     }
 
@@ -898,7 +897,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * closed to background.
      */
     default public void clearAppCache() {
-        LOGGER.info("Initiation application reset...");
+        UTILS_LOGGER.info("Initiation application reset...");
         ((AndroidDriver<?>) castDriver()).resetApp();
     }
 
@@ -916,13 +915,13 @@ public interface IAndroidUtils extends IMobileUtils {
      * closed to background.
      */
     default public void clearAppCache(String packageName) {
-        LOGGER.info("Will clear data for the following app: " + packageName);
+        UTILS_LOGGER.info("Will clear data for the following app: " + packageName);
         String command = String.format(SHELL_CLEAR_CACHE_CMD.concat(" %s"), packageName);
         String response = executeShell(command);
-        LOGGER.info(
+        UTILS_LOGGER.info(
                 String.format("Output after resetting custom application by package (%s): ", packageName) + response);
         if (!response.contains("Success")) {
-            LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
+            UTILS_LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
         }
     }
     
@@ -935,7 +934,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public boolean isApplicationInstalled(String packageName) {
         boolean installed = ((AndroidDriver<?>) castDriver()).isAppInstalled(packageName);
-        LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
+        UTILS_LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
         return installed;
     }
 
@@ -950,7 +949,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *            - app's package name
      */
     default public void startApp(String packageName) {
-        LOGGER.info("Starting " + packageName);
+        UTILS_LOGGER.info("Starting " + packageName);
         ((AndroidDriver<?>) castDriver()).activateApp(packageName);
     }
 
@@ -960,7 +959,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param apkPath
      */
     default public void installApp(String apkPath) {
-        LOGGER.info("Will install application with apk-file from " + apkPath);
+        UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
         ((AndroidDriver<?>) castDriver()).installApp(apkPath);
     }
 
@@ -973,7 +972,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public boolean removeApp(String packageName) {
         boolean removed = ((AndroidDriver<?>) castDriver()).removeApp(packageName);
-        LOGGER.info(String.format("Application (%s) is successfuly removed: ", packageName) + removed);
+        UTILS_LOGGER.info(String.format("Application (%s) is successfuly removed: ", packageName) + removed);
         return removed;
     }
 
@@ -991,7 +990,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public void openURL(String link) {
         //TODO: make openURL call from this mobile interface in DriverHelper
-        LOGGER.info("Following link will be triggered via ADB: " + link);
+        UTILS_LOGGER.info("Following link will be triggered via ADB: " + link);
         String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
         executeShell(command);
     }
@@ -1009,7 +1008,7 @@ public interface IAndroidUtils extends IMobileUtils {
             ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
-            LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.");
+            UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.");
         }
     }
 
@@ -1053,7 +1052,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param text
      */
     default public void typeWithADB(String text) {
-        LOGGER.info(String.format("Will enter '%s' to an active input field via ADB.", text));
+        UTILS_LOGGER.info(String.format("Will enter '%s' to an active input field via ADB.", text));
         // In this method characters are entered one by one because sometimes some
         // characters might be omitted if to enter whole text at a time.
         char[] array = text.toCharArray();
@@ -1066,7 +1065,7 @@ public interface IAndroidUtils extends IMobileUtils {
     
     default public boolean isWifiEnabled() {
         boolean enabled = ((AndroidDriver<?>) castDriver()).getConnection().isWiFiEnabled();
-        LOGGER.info("Wi-Fi enabled: " + enabled);
+        UTILS_LOGGER.info("Wi-Fi enabled: " + enabled);
         return enabled;
     }
 
@@ -1076,7 +1075,7 @@ public interface IAndroidUtils extends IMobileUtils {
             ((AndroidDriver<?>) castDriver()).toggleWifi();
             return;
         }
-        LOGGER.info("Wifi is already anebled. No actions needed");
+        UTILS_LOGGER.info("Wifi is already anebled. No actions needed");
     }
 
     default public void disableWifi() {
@@ -1085,7 +1084,7 @@ public interface IAndroidUtils extends IMobileUtils {
             ((AndroidDriver<?>) castDriver()).toggleWifi();
             return;
         }
-        LOGGER.info("Wifi is already disabled. No actions needed");
+        UTILS_LOGGER.info("Wifi is already disabled. No actions needed");
     }
 
     default public void openStatusBar() {

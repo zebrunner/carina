@@ -30,7 +30,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * @author akhursevich
  */
 public interface IDriverCommandListener {
-    static final Logger LOGGER = Logger.getLogger(IDriverCommandListener.class);
+    static final Logger LISTENER_LOGGER = Logger.getLogger(IDriverCommandListener.class);
 
 	/**
 	 * Triggered before command execution.
@@ -60,7 +60,7 @@ public interface IDriverCommandListener {
             if (ztid != videoArtifact.getTestId()) {
                 videoArtifact.setTestId(ztid);
 
-                LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
+                LISTENER_LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
                 if (ZafiraSingleton.INSTANCE.isRunning()) {
                     ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
                 }

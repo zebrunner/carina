@@ -19,7 +19,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public interface ICustomTypePageFactory extends IDriverPool {
-    static final Logger LOG = Logger.getLogger(ICustomTypePageFactory.class);
+    static final Logger PAGEFACTORY_LOGGER = Logger.getLogger(ICustomTypePageFactory.class);
 
     String VERSION_SPLITTER = "\\.";
 
@@ -41,12 +41,12 @@ public interface ICustomTypePageFactory extends IDriverPool {
     public default <T extends AbstractPage> T initPage(WebDriver driver, Class<T> parentClass, Object... parameters) {
 
         if (driver == null) {
-            LOG.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
+            PAGEFACTORY_LOGGER.error("Page isn't created. There is no any initialized driver for thread: " + Thread.currentThread().getId());
             throw new RuntimeException("Page isn't created. Driver isn't initialized.");
         }
 
         Set<Class<? extends T>> setClasses = REFLECTIONS.getSubTypesOf(parentClass);
-        LOG.debug("Relatives classes count:" + setClasses.size());
+        PAGEFACTORY_LOGGER.debug("Relatives classes count:" + setClasses.size());
         Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
         Type screenType = IDriverPool.getDefaultDevice().getDeviceType();
 
@@ -57,20 +57,20 @@ public interface ICustomTypePageFactory extends IDriverPool {
             deviceVersion = device.getOsVersion();
         }
         String majorVersionNumber = deviceVersion.split(VERSION_SPLITTER)[0];
-        LOG.debug("Major version of device OS: " + majorVersionNumber);
+        PAGEFACTORY_LOGGER.debug("Major version of device OS: " + majorVersionNumber);
         for (Class<? extends T> clazz : setClasses) {
             if (clazz.getAnnotation(DeviceType.class) == null || clazz.getAnnotation(DeviceType.class).parentClass() != parentClass) {
-                LOG.debug(String.format("Removing as parentClass (%s) is not satisfied or due to absence of @DeviceType annotation on class: %s",
+                PAGEFACTORY_LOGGER.debug(String.format("Removing as parentClass (%s) is not satisfied or due to absence of @DeviceType annotation on class: %s",
                         parentClass.getName(), clazz.getName()));
                 continue;
             }
             DeviceType dt = clazz.getAnnotation(DeviceType.class);
 
-            LOG.debug(String.format("Expected screenType: %s, Actual screenType: %s", screenType, dt.pageType()));
+            PAGEFACTORY_LOGGER.debug(String.format("Expected screenType: %s, Actual screenType: %s", screenType, dt.pageType()));
             if (dt.pageType().equals(screenType)) {
                 if (Arrays.asList(dt.version()).contains(deviceVersion)) {
-                    LOG.debug("Expected version: " + deviceVersion);
-                    LOG.debug("Actual versions: " + dt.version());
+                    PAGEFACTORY_LOGGER.debug("Expected version: " + deviceVersion);
+                    PAGEFACTORY_LOGGER.debug("Actual versions: " + dt.version());
                     versionClass = clazz;
                     break;
                 }
@@ -78,7 +78,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
                 for (String version : dt.version()) {
                     if (version.split(VERSION_SPLITTER)[0].equals(majorVersionNumber)) {
                         majorVersionClass = clazz;
-                        LOG.debug("Class was chosen by major version number of device");
+                        PAGEFACTORY_LOGGER.debug("Class was chosen by major version number of device");
                         break;
                     }
                 }
@@ -87,23 +87,23 @@ public interface ICustomTypePageFactory extends IDriverPool {
                 continue;
             }
             if (dt.pageType().getFamily().equals(screenType.getFamily())) {
-                LOG.debug(String.format("Family class '%s' correspond to required page.", screenType.getFamily()));
+                PAGEFACTORY_LOGGER.debug(String.format("Family class '%s' correspond to required page.", screenType.getFamily()));
                 familyClass = clazz;
             }
 
         }
         try {
             if (versionClass != null) {
-                LOG.debug("Instance by version and platform will be created.");
+                PAGEFACTORY_LOGGER.debug("Instance by version and platform will be created.");
                 requiredClass = versionClass;
             } else if (majorVersionClass != null) {
-                LOG.debug("Instance by major version and platform will be created.");
+                PAGEFACTORY_LOGGER.debug("Instance by major version and platform will be created.");
                 requiredClass = majorVersionClass;
             } else if (deviceClass != null) {
-                LOG.debug("Instance by platform will be created.");
+                PAGEFACTORY_LOGGER.debug("Instance by platform will be created.");
                 requiredClass = deviceClass;
             } else if (familyClass != null) {
-                LOG.debug("Instance by family will be created.");
+                PAGEFACTORY_LOGGER.debug("Instance by family will be created.");
                 requiredClass = familyClass;
             } else {
                 throw new RuntimeException(
@@ -114,12 +114,12 @@ public interface ICustomTypePageFactory extends IDriverPool {
             if (parameters.length == 0) {
                 parameters = new Object[] { driver };
             }
-            LOG.debug("Invoking constructor for " + requiredClass);
+            PAGEFACTORY_LOGGER.debug("Invoking constructor for " + requiredClass);
             Constructor<? extends T> requiredCtor = getConstructorByParams(requiredClass, parameters);
 
             return requiredCtor.newInstance(parameters);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-            LOG.debug(
+            PAGEFACTORY_LOGGER.debug(
                     "Discovered one of the InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException");
             throw new RuntimeException("Unable to instantiate page!", e);
         }
@@ -141,7 +141,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
-        LOG.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
+        PAGEFACTORY_LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
         Class<?>[] parametersTypes;
         List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
         for (Object param : parameters) {
@@ -150,9 +150,9 @@ public interface ICustomTypePageFactory extends IDriverPool {
         parametersTypes = parametersTypesList.toArray(new Class<?>[parametersTypesList.size()]);
         Constructor<?> requiredCtor = null;
         Constructor<?>[] ctors = clazz.getDeclaredConstructors();
-        LOG.debug(String.format("Class %s contains %d ctors ", clazz.toString(), ctors.length));
+        PAGEFACTORY_LOGGER.debug(String.format("Class %s contains %d ctors ", clazz.toString(), ctors.length));
         for (Constructor<?> constructor : ctors) {
-            LOG.debug("Constructor: ".concat(constructor.toString()));
+            PAGEFACTORY_LOGGER.debug("Constructor: ".concat(constructor.toString()));
         }
         for (Constructor<?> constructor : ctors) {
             Class<?>[] ctorTypes = constructor.getParameterTypes();
@@ -160,7 +160,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
             // Check if passed parameters quantity satisfy to constructor's
             // parameters size
             if (parametersTypes.length != ctorTypes.length) {
-                LOG.debug(String.format("Ctors quantity doesn't satisfy to requirements. " + "Expected: %d. Actual: %d", parametersTypes.length,
+                PAGEFACTORY_LOGGER.debug(String.format("Ctors quantity doesn't satisfy to requirements. " + "Expected: %d. Actual: %d", parametersTypes.length,
                         ctorTypes.length));
                 continue;
             }
