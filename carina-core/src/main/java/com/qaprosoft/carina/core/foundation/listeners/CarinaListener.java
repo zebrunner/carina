@@ -94,7 +94,7 @@ import com.qaprosoft.zafira.models.dto.TestRunType;
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener {
-    protected static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
+    private static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
