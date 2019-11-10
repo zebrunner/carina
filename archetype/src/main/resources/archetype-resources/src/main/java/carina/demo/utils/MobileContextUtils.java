@@ -3,7 +3,6 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.utils;
 
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import io.appium.java_client.AppiumDriver;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.NotFoundException;
@@ -16,7 +15,7 @@ import static com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.getD
 
 public class MobileContextUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
+    private static final Logger LOGGER = Logger.getLogger(MobileContextUtils.class);
 
     private WebDriver getDriverSafe() {
         WebDriver driver = getDriver();
