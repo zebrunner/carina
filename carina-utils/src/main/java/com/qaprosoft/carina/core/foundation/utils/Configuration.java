@@ -230,7 +230,7 @@ public class Configuration {
         S3_LOCAL_STORAGE("s3_local_storage"),
 
         // HockeyApp token
-        HOCKEYAPP_TOKEN("hockeyapp_token"),
+        APPCENTER_TOKEN("appcenter_token"),
 
         HOCKEYAPP_LOCAL_STORAGE("hockeyapp_local_storage"),
 

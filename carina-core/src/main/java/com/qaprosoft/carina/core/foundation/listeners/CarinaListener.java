@@ -83,7 +83,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.hockeyapp.HockeyAppManager;
+import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.models.dto.TestRunType;
@@ -621,7 +621,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         try {
-            if (!Configuration.get(Parameter.HOCKEYAPP_TOKEN).isEmpty()) {
+            if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
                 updateHockeyAppPath();
             }
         } catch (Exception e) {
@@ -651,7 +651,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String hockeyAppLocalStorage = Configuration.get(Parameter.HOCKEYAPP_LOCAL_STORAGE);
             // download file from HockeyApp to local storage
 
-            File file = HockeyAppManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType,
+            File file = AppCenterManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType,
                     version);
 
             Configuration.setMobileApp(file.getAbsolutePath());
