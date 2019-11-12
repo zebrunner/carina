@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.hockeyapp;
+package com.qaprosoft.appcenter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,32 +40,34 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.hockeyapp.http.resttemplate.RestTemplateBuilder;
+import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 
 /**
  * Created by boyle on 8/16/17.
  */
-public class HockeyAppManager {
-    private static final Logger LOGGER = Logger.getLogger(HockeyAppManager.class);
+public class AppCenterManager {
+    private static final Logger LOGGER = Logger.getLogger(AppCenterManager.class);
     
     
     protected RestTemplate restTemplate;
 
-    private String revision;
-    private String versionNumber;
+    private String ownerName;
+    private String versionLong;
+    private String versionShort;
 
-    private static final String HOCKEY_APP_URL = "rink.hockeyapp.net";
+    private static final String HOST_URL = "api.appcenter.ms";
+    private static final String API_APPS = "/v0.1/apps";
 
-    private static volatile HockeyAppManager instance = null;
+    private static volatile AppCenterManager instance = null;
 
-    private HockeyAppManager() {
+    private AppCenterManager() {
     }
 
-    public static HockeyAppManager getInstance() {
+    public static AppCenterManager getInstance() {
         if (instance == null) {
-            synchronized (HockeyAppManager.class) {
+            synchronized (AppCenterManager.class) {
                 if (instance == null) {
-                    instance = new HockeyAppManager();
+                    instance = new AppCenterManager();
                 }
             }
         }
@@ -79,7 +81,7 @@ public class HockeyAppManager {
     /**
      *
      * @param folder to which upload build artifact.
-     * @param appName takes in the HockeyApp Name tЩo look for.
+     * @param appName takes in the AppCenter Name to look for.
      * @param platformName takes in the platform we wish to download for.
      * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
      * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
@@ -118,7 +120,7 @@ public class HockeyAppManager {
 
         if (fileToLocate == null) {
             try {
-                LOGGER.debug("Beginning Transfer of HockeyApp Build");
+                LOGGER.debug("Beginning Transfer of AppCenter Build");
                 URL downloadLink = new URL(buildToDownload);
                 int retryCount = 0;
                 boolean retry = true;
@@ -126,12 +128,12 @@ public class HockeyAppManager {
                     retry = downloadBuild(fileName, downloadLink);
                     retryCount = retryCount + 1;
                 }
-                LOGGER.debug(String.format("HockeyApp Build (%s) was retrieved", fileName));
+                LOGGER.debug(String.format("AppCenter Build (%s) was retrieved", fileName));
             } catch (Exception ex) {
-                LOGGER.error(String.format("Error Thrown When Attempting to Transfer HockeyApp Build (%s)", ex.getMessage()), ex);
+                LOGGER.error(String.format("Error Thrown When Attempting to Transfer AppCenter Build (%s)", ex.getMessage()), ex);
             }
         } else {
-            LOGGER.info("Preparing to use local version of HockeyApp Build...");
+            LOGGER.info("Preparing to use local version of AppCenter Build...");
         }
 
         return new File(fileName);
@@ -173,7 +175,7 @@ public class HockeyAppManager {
 
     /**
      *
-     * @param appName takes in the HockeyApp Name to look for.
+     * @param appName takes in the AppCenter Name to look for.
      * @param platformName takes in the platform we wish to download for.
      * @return
      */
@@ -182,70 +184,76 @@ public class HockeyAppManager {
         Map<String, String> appMap = new HashMap<>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
-                HOCKEY_APP_URL,
-                "/api/2/apps",
+                HOST_URL,
+                API_APPS,
                 HttpMethod.GET);
         JsonNode appResults = restTemplate.exchange(retrieveApps, JsonNode.class).getBody();
+        LOGGER.info("AppCenter Searching For App: " + appName);
+        LOGGER.debug("AppCenter JSON Response: " + appResults);
 
-        for (JsonNode node : appResults.get("apps")) {
-            if (platformName.equalsIgnoreCase(node.get("platform").asText())
-                    && node.get("title").asText().toLowerCase().contains(appName.toLowerCase())) {
-                LOGGER.info(String.format("Found App: %s (%s)", node.get("title"), node.get("public_identifier")));
-                appMap.put(node.get("public_identifier").asText(), node.get("updated_at").asText());
+        for (JsonNode node : appResults) {
+            if (platformName.equalsIgnoreCase(node.get("os").asText()) && node.get("name").asText().toLowerCase().contains(appName.toLowerCase())) {
+                ownerName = node.get("owner").get("name").asText();
+                String app = node.get("name").asText();
+                LOGGER.info(String.format("Found Owner: %s App: %s", ownerName, app));
+                appMap.put(app, node.get("updated_at").asText());
             }
         }
 
         if (!appMap.isEmpty()) {
-            Map<String, String> sortedMap = appMap.entrySet()
+            return appMap.entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-            return sortedMap;
         }
 
-        throw new RuntimeException(String.format("Application Not Found in HockeyApp for Name (%s), Platform (%s)", appName, platformName));
+        throw new RuntimeException(String.format("Application Not Found in AppCenter for Organization (%s) Name (%s), Platform (%s)", ownerName, appName, platformName));
     }
 
     /**
      *
-     * @param appIds takes in the application Ids
+     * @param apps takes in the application Ids
      * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
      * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
      *            build.
      * @return
      */
-    private String scanAppForBuild(Map<String, String> appIds, String buildType, String version) {
+    private String scanAppForBuild(Map<String, String> apps, String buildType, String version) {
 
-        for (String appId : appIds.keySet()) {
-            LOGGER.info("\nHockeyApp Id: " + appId);
-            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
-            queryParams.add("page", "1");
-            queryParams.add("include_build_urls", "true");
-            queryParams.add("per_page", "50");
+        for (String currentApp : apps.keySet()) {
+            LOGGER.info("Scanning App " + currentApp);
+            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+            queryParams.add("published_only", "true");
 
-            RequestEntity<String> retrieveBuilds = buildRequestEntity(
-                    HOCKEY_APP_URL,
-                    "api/2/apps/" + appId + "/app_versions",
+            RequestEntity<String> retrieveList = buildRequestEntity(
+                    HOST_URL,
+                    String.format("%s/%s/%s/releases", API_APPS, ownerName, currentApp),
                     queryParams,
                     HttpMethod.GET);
+            JsonNode buildList = restTemplate.exchange(retrieveList, JsonNode.class).getBody();
+            LOGGER.debug("Available Builds JSON: " + buildList);
 
-            JsonNode buildResults = restTemplate.exchange(retrieveBuilds, JsonNode.class).getBody();
+            if (buildList.size() > 0) {
+                for (JsonNode build : buildList) {
+                    String latestBuildNumber = build.get("id").asText();
+                    versionShort = build.get("short_version").asText();
+                    versionLong = build.get("version").asText();
 
-            for (JsonNode node : buildResults.get("app_versions")) {
-                if (checkBuild(version, node) && (checkTitleForCorrectPattern(buildType.toLowerCase(), node) || checkNotesForCorrectBuild(buildType.toLowerCase(), node))) {
-                    LOGGER.info("Downloading Version: " + node);
-                    versionNumber = node.get("shortversion").asText();
-                    revision = node.get("version").asText();
+                    RequestEntity<String> retrieveBuildUrl = buildRequestEntity(
+                            HOST_URL,
+                            String.format("%s/%s/%s/releases/%s", API_APPS, ownerName, currentApp, latestBuildNumber),
+                            HttpMethod.GET);
+                    JsonNode appBuild = restTemplate.exchange(retrieveBuildUrl, JsonNode.class).getBody();
+                    if (checkBuild(version, appBuild) && (checkTitleForCorrectPattern(buildType.toLowerCase(), appBuild) || checkNotesForCorrectBuild(buildType.toLowerCase(), appBuild))) {
+                        LOGGER.debug("Print Build Info: " + appBuild);
+                        LOGGER.info(
+                                String.format(
+                                        "Fetching Build ID (%s) Version: %s (%s)", latestBuildNumber, versionShort, versionLong));
+                        String buildUrl = appBuild.get("download_url").asText();
+                        LOGGER.info("Download URL For Build: " + buildUrl);
 
-                    List<String> packageUrls = new ArrayList<>();
-                    packageUrls.add("build_url");
-                    packageUrls.add("download_url");
-
-                    for (String packageUrl : packageUrls) {
-                        if (node.has(packageUrl)) {
-                            return node.get(packageUrl).asText();
-                        }
+                        return buildUrl;
                     }
                 }
             }
@@ -260,10 +268,9 @@ public class HockeyAppManager {
             return true;
         }
 
-        if (version.equalsIgnoreCase(node.get("shortversion").asText() + "." + node.get("version").asText()) || version.equalsIgnoreCase(node.get("shortversion").asText())) {
-            return true;
-        }
-        return false;
+        return version.equalsIgnoreCase(
+                node.get("short_version").asText() + "." + node.get("version").asText())
+                || version.equalsIgnoreCase(node.get("short_version").asText());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -296,17 +303,21 @@ public class HockeyAppManager {
     private HttpHeaders setHeaders() {
 
         HttpHeaders httpHeader = new HttpHeaders();
-        httpHeader.add("X-HockeyAppToken", Configuration.get(Parameter.HOCKEYAPP_TOKEN));
+        httpHeader.add("Content-Type", "application/json; charset=utf-8");
+        httpHeader.add("x-api-token", Configuration.get(Parameter.APPCENTER_TOKEN));
 
         return httpHeader;
     }
 
     private String createFileName(String appName, String buildType, String platformName) {
 
-        String fileName = String.format("%s.%s.%s.%s", appName, buildType, versionNumber, revision)
+        String fileName = String.format("%s.%s.%s.%s", appName, buildType, versionShort, versionLong)
                 .replace(" ", "");
 
-        return fileName + "." + returnProperPlatformExtension(platformName);
+        if (platformName.toLowerCase().contains("ios")) {
+            return fileName + ".ipa";
+        }
+        return fileName + ".apk";
     }
 
     private String returnProperPlatformExtension(String platformName) {
@@ -319,50 +330,29 @@ public class HockeyAppManager {
 
     private boolean checkNotesForCorrectBuild(String pattern, JsonNode node) {
 
-        return checkForPattern("notes", pattern, node);
+        return checkForPattern("release_notes", pattern, node);
     }
 
     private boolean checkTitleForCorrectPattern(String pattern, JsonNode node) {
-
-        return checkForPattern("title", pattern, node);
+        return checkForPattern("app_name", pattern, node);
     }
 
     private boolean checkForPattern(String nodeName, String pattern, JsonNode node) {
 
         LOGGER.debug("\nPattern to be checked: " + pattern);
+        if (node.findPath("release_notes").isMissingNode()) {
+            return false;
+        }
         String nodeField = node.get(nodeName).asText().toLowerCase();
 
         if (nodeField.contains(pattern)) {
-            LOGGER.info("\nPattern match found!! This is the buildType to be used: " + nodeField);
+            LOGGER.debug("\nPattern match found!! This is the buildType to be used: " + nodeField);
             return true;
         }
 
-//        String[] patternList = pattern.split("[^\\w']+");
-
-//        if (patternList.length <= 1) {
-//            throw new RuntimeException("Expected Multiple Word Pattern, Actual: " + pattern);
-//        }
-
-//        List<String> updatedPatternlist = new ArrayList<>();
-
-//        String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
-//        for (String currentPattern : patternList) {
-//            updatedPatternlist.add(String.format(patternToReplace, currentPattern));
-//        }
-
-//        for (String str : updatedPatternlist) {
-//            LOGGER.info("Updated Pattern List, pattern: " + str);
-//        }
         String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
 
-//        if (patternList.length > 1 && scanningAllNotes(Arrays.asList(patternList), nodeField)) {
-//            return true;
-//        }
-        if (!pattern.isEmpty() && scanningAllNotes(String.format(patternToReplace, pattern), nodeField)){
-            return true;
-        }
-
-        return false;
+        return !pattern.isEmpty() && scanningAllNotes(String.format(patternToReplace, pattern), nodeField);
     }
 
     private boolean searchFieldsForString(String pattern, String stringToSearch) {
@@ -375,11 +365,6 @@ public class HockeyAppManager {
     private boolean scanningAllNotes(String pattern, String noteField) {
         boolean foundMessages = false;
 
-//        LOGGER.debug(String.format("Message to Scan: %s", noteField));
-//        for (String pattern : patternList) {
-//            foundMessages &= searchFieldsForString(pattern, noteField);
-//            LOGGER.debug(String.format("Checking Found Messages for (%s).  Initial Result (%s), Full Reset (%s)", pattern, searchFieldsForString(pattern, noteField), foundMessages));
-//        }
         foundMessages = searchFieldsForString(pattern, noteField);
 
         return foundMessages;

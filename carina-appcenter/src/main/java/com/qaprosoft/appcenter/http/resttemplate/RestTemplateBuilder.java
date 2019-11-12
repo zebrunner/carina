@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.hockeyapp.http.resttemplate;
+package com.qaprosoft.appcenter.http.resttemplate;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.qaprosoft.hockeyapp.http.resttemplate.ssl.DisabledSslClientHttpRequestFactory;
+import com.qaprosoft.appcenter.http.resttemplate.ssl.DisabledSslClientHttpRequestFactory;
 
 /**
  * Created by mk on 6/30/15.
