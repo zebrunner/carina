@@ -622,10 +622,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         try {
             if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
-                updateHockeyAppPath();
+                updateAppCenterAppPath();
             }
         } catch (Exception e) {
-            LOGGER.error("HockeyApp manager exception detected!", e);
+            LOGGER.error("AppCenter manager exception detected!", e);
         }
 
     }
@@ -633,25 +633,25 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     /**
      * Method to update MOBILE_APP path in case if apk is located in Hockey App.
      */
-    private static void updateHockeyAppPath() {
-        // hockeyapp://appName/platformName/buildType/version
-        Pattern HOCKEYAPP_PATTERN = Pattern.compile(
-                "hockeyapp:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
+    private static void updateAppCenterAppPath() {
+        // appcenter://appName/platformName/buildType/version
+        Pattern APPCENTER_PATTERN = Pattern.compile(
+                "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
         String mobileAppPath = Configuration.getMobileApp();
-        Matcher matcher = HOCKEYAPP_PATTERN.matcher(mobileAppPath);
+        Matcher matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
 
-        LOGGER.info("Analyzing if mobile_app is located on HockeyApp...");
+        LOGGER.info("Analyzing if mobile_app is located on AppCenter...");
         if (matcher.find()) {
-            LOGGER.info("app artifact is located on HockeyApp...");
+            LOGGER.info("app artifact is located on AppCenter...");
             String appName = matcher.group(1);
             String platformName = matcher.group(2);
             String buildType = matcher.group(3);
             String version = matcher.group(4);
 
-            String hockeyAppLocalStorage = Configuration.get(Parameter.HOCKEYAPP_LOCAL_STORAGE);
-            // download file from HockeyApp to local storage
+            String appCenterAppLocalStorage = Configuration.get(Parameter.APPCENTER_LOCAL_STORAGE);
+            // download file from AppCenter to local storage
 
-            File file = AppCenterManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType,
+            File file = AppCenterManager.getInstance().getBuild(appCenterAppLocalStorage, appName, platformName, buildType,
                     version);
 
             Configuration.setMobileApp(file.getAbsolutePath());
