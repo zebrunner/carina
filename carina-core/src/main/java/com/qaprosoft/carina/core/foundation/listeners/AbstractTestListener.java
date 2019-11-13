@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
@@ -192,9 +191,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void afterTest(ITestResult result) {
-        // register configuration step as test artifact
-        String test = TestNamingUtil.getCanonicalTestName(result);
-
         // TODO: do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
@@ -206,11 +202,10 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             File sysLogFile = device.saveSysLog();
             if (sysLogFile != null) {
                 LOGGER.debug("Logcat log will be extracted and added as artifact");
-                Artifacts.add("Logcat", ReportContext.getSysLogLink(test));
+                Artifacts.add("Logcat", ReportContext.getSysLogLink());
             }
         }
         
-        // ReportContext.renameTestDir(test);
         ReportContext.generateTestReport();
 
         TestNamingUtil.releaseTestInfoByThread();
@@ -537,10 +532,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
         String group = TestNamingUtil.getPackageName(result);
-        String test = TestNamingUtil.getCanonicalTestName(result);
-        String linkToLog = ReportContext.getTestLogLink(test);
-        // String linkToScreenshots = ReportContext.getTestScreenshotsLink(testName);
-        String linkToScreenshots = null;
+        
+        String linkToLog = ReportContext.getTestLogLink();
+        String linkToScreenshots = ReportContext.getTestScreenshotsLink();
 
         if (TestResultType.FAIL.equals(resultType)) {
             String bugInfo = Jira.processBug(result);
@@ -553,9 +547,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             }
         }
 
-        if (!FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
-            linkToScreenshots = ReportContext.getTestScreenshotsLink(test);
-        }
+        String test = TestNamingUtil.getCanonicalTestName(result);
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
