@@ -50,7 +50,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-hockeyapp</artifactId>
+			<artifactId>carina-appcenter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>

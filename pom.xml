@@ -96,7 +96,7 @@
         <module>carina-crypto</module>
         <module>carina-webdriver</module>
         <module>carina-aws-s3</module>
-        <module>carina-hockeyapp</module>
+        <module>carina-appcenter</module>
         <module>carina-core</module>
     </modules>
     <repositories>
@@ -365,7 +365,7 @@
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-hockeyapp</artifactId>
+                <artifactId>carina-appcenter</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>

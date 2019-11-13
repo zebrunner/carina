@@ -355,14 +355,14 @@ All project configuration properties are located in **_config.properties** file.
 		<td>./s3</td>
 	</tr>
 		<tr>
-		<td>hockeyapp_token</td>
+		<td>appcenter_token</td>
 		<td>Token for authentication in Hockey App</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
-		<td>hockeyapp_local_storage</td>
-		<td>Directory for Hockey App artefacts</td>
-		<td>./hockeyapp</td>
+		<td>appcenter_local_storage</td>
+		<td>Directory for AppCenter artifacts</td>
+		<td>./appcenter</td>
 	</tr>
 		<tr>
 		<td>add_new_localization</td>
