@@ -210,7 +210,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             }
         }
         
-        ReportContext.renameTestDir(test);
+        // ReportContext.renameTestDir(test);
         ReportContext.generateTestReport();
 
         TestNamingUtil.releaseTestInfoByThread();

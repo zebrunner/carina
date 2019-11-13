@@ -120,8 +120,6 @@ public class Configuration {
 
         AUTO_SCREENSHOT("auto_screenshot"),
 
-        SMART_SCREENSHOT("smart_screenshot"),
-
         // TODO: temporary restore to keep compilation. remove later
         IMPLICIT_TIMEOUT("implicit_timeout"),
 
