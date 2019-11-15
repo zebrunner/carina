@@ -144,15 +144,19 @@ public class MobileFactory extends AbstractFactory {
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-        				case DEFAULT:
-        					ce.getListeners()
-                            	.add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2,
-                                    initVideoArtifact(videoName)));
-        					break;
-        				case ZEBRUNNER:
-        					ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
-        					break;
-        				}
+                        case DEFAULT:
+                        case MCLOUD:
+                        case BROWSERSTACK:
+                        case SAUCELABS:
+                            ce.getListeners()
+                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
+                                            o2,
+                                            initVideoArtifact(videoName)));
+                            break;
+                        case ZEBRUNNER:
+                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
+                            break;
+                        }
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);

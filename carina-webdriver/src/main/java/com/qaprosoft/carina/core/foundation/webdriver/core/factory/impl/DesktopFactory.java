@@ -76,14 +76,18 @@ public class DesktopFactory extends AbstractFactory {
             	capabilities.setCapability("videoName", videoName);
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
             	
+                // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
                 switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-				case DEFAULT:
-					ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
-					break;
-				case ZEBRUNNER:
-					ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
-					break;
-				}
+                case DEFAULT:
+                case MCLOUD:
+                case BROWSERSTACK:
+                case SAUCELABS:
+                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+                    break;
+                case ZEBRUNNER:
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
+                    break;
+                }
             }
             
             driver = new RemoteWebDriver(ce, capabilities);
