@@ -206,8 +206,8 @@ public class ExtendedElementLocator implements ElementLocator {
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             String value = matcher.group(4);
-            String replacement = "translate(" + matcher.group(1) + ", '" + value.toUpperCase() + "', '" + value.toLowerCase() + "')"
-                    + matcher.group(2) + "translate('" + value + "', '" + value.toUpperCase() + "', '" + value.toLowerCase() + "')"; 
+            String replacement = "translate(" + matcher.group(1) + ", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase() + "\")"
+                    + matcher.group(2) + "translate(\"" + value + "\", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase(); 
 
             LOGGER.debug("xpath translate:");
             LOGGER.debug(replacement);
