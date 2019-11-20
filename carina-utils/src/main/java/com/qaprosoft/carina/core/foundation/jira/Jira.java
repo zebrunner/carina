@@ -180,7 +180,7 @@ public class Jira {
                     bugId = annotation.id();
                 }
             }
-            if (bugId != null) {
+            if (bugId != null && !Configuration.get(Parameter.JIRA_URL).isEmpty()) {
                 String bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + bugId;
                 LOG.info("Bug URL retrieved: " + bugUrl);
 
@@ -188,7 +188,8 @@ public class Jira {
                     Issue bug = jira.getIssue(bugId);
                     return String.format("Bug %s \"%s\" with status \"%s\" associated", bugUrl, bug.getSummary(), bug.getStatus().getName());
                 } catch (Exception e) {
-                    LOG.error("Exception during retrieving bug info", e);
+                    LOG.error("Exception during retrieving bug info: " + e.getMessage());
+                    LOG.debug("Exception during retrieving bug info.", e);
                     return null;
                 }
             }
