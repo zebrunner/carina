@@ -18,7 +18,7 @@ mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -Durl=<your_proj_url> \
                        -Dversion=<your_proj_version>
 ```
-If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above  Maven command you have to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:
+If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above  Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:
 
 <table>
 	<tr>
@@ -54,7 +54,7 @@ If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hell
 </table>
 
 ### Import to Eclipse
-If the generation is successfully complete, you will see a new project folder with a name equal to the artifactId attribute specified during generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:
+If the generation is successfully complete, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:
 ```
 mvn clean eclipse:eclipse
 ```
@@ -62,6 +62,6 @@ By executing this command, Maven should resolve all dependencies, downloading th
 ```
 mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
 ```
-Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
+Here you need to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
 
 ![Eclipse view](img/001-Initial-setup.png)
