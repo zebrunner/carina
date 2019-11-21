@@ -544,7 +544,7 @@
                        -Dversion=&lt;your_proj_version&gt;
 </code></pre>
 
-<p>If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above  Maven command you have to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:</p>
+<p>If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above  Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:</p>
 <table>
     <tr>
         <th>Attribute</th>
@@ -579,7 +579,7 @@
 </table>
 
 <h3 id="import-to-eclipse">Import to Eclipse</h3>
-<p>If the generation is successfully complete, you will see a new project folder with a name equal to the artifactId attribute specified during generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:</p>
+<p>If the generation is successfully complete, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:</p>
 <pre><code>mvn clean eclipse:eclipse
 </code></pre>
 
@@ -587,7 +587,7 @@
 <pre><code>mvn -Dworkspace=&lt;path_to_workspace&gt; eclipse:configure-workspace
 </code></pre>
 
-<p>Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.</p>
+<p>Here you need to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.</p>
 <p><img alt="Eclipse view" src="../img/001-Initial-setup.png" /></p>
                 
                   
