@@ -667,24 +667,24 @@
                 
                   <h1>Mobile automation</h1>
                 
-                <p>Carina framework provides the useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through <a href="http://qaprosoft.github.io/carina/automation/web/">Web automation article</a>.</p>
+                <p>Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through <a href="http://qaprosoft.github.io/carina/automation/web/">Web automation article</a>.</p>
 <h3 id="mobile-special-requirements">Mobile special requirements:</h3>
-<p>To run mobile tests <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console and both are good for Carina. <b>Appium has to be running every time before the test run.</b></p>
+<p>To run mobile tests, <a href="http://appium.io/">Appium</a> is used instead of Selenium. There are 2 versions of Appium: desktop and console ones, and both are good for Carina. <b>Appium must be running every time before the test run.</b></p>
 <p><img alt="Alt text" src="../../img/appium_design.png" title="Appium" /></p>
 <h3 id="android-special-requirements">Android special requirements:</h3>
 <ol>
-<li>Android SDK(part of <a href="https://developer.android.com/studio/">Android Studio</a>) is an important component for work. Pay attention that after installing Android Studio sometimes (depends on version) you need to additionally install ADB and aapt (for mac only). </li>
+<li>Android SDK (part of <a href="https://developer.android.com/studio/">Android Studio</a>) is an important component for work. Pay attention that after installing Android Studio you sometimes (depends on the version) need to additionally install ADB and aapt (for Mac only). </li>
 <li>Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
-Hint: sometimes (especially on Mac) you need to add paths to important folders inside sdk, such as “platform-tools” (here is ADB located), “tools” and “build-tools”(here is aapt located).</li>
-<li>.apk file - installation file of a program that’s being tested is required, the same for both - real device and emulator.</li>
+Hint: you sometimes (especially on Mac) need to add paths to important folders inside sdk, such as “platform-tools” (ADB is located here), “tools” and “build-tools” (aapt is located here).</li>
+<li>.apk file - installation file of a program that’s being tested is required, the same for both - the real device and the emulator.</li>
 </ol>
 <h3 id="ios-special-requirements">iOS special requirements:</h3>
 <ol>
-<li><a href="https://developer.apple.com/xcode/">Xcode</a> is vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.</li>
-<li>Installation file of a program that’s being tested is required. For real device it’s .ipa file and for simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on simulator is free. On the other hand, the license is needed to work with the real device.</li>
+<li><a href="https://developer.apple.com/xcode/">Xcode</a> is a vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.</li>
+<li>Installation file of a program that’s being tested is required. For the real device it’s .ipa file, and for the simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on the simulator is free. On the other hand, the license is needed to work with the real device.</li>
 </ol>
 <h3 id="mobile-config-properties">Mobile config properties</h3>
-<p>We could provide any Appium capabilty in <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing description for the most popular mobile capabilities:</p>
+<p>We could provide any Appium capability in the <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing the description of the most popular mobile capabilities:</p>
 <table>
     <tr>
         <th>Attribute</th>
@@ -700,37 +700,37 @@ Hint: sometimes (especially on Mac) you need to add paths to important folders i
     </tr>
         <tr>
         <td>capabilities.deviceType</td>
-        <td>The only custom carina capability to detmine type of device</td>
+        <td>The only custom Carina capability to determine the type of the device</td>
                 <td>n/a</td>
         <td>phone/tablet/tv...</td>
     </tr>
         <tr>
         <td>capabilities.platformName</td>
-        <td>Name of mobile platform</td>
+        <td>Name of the mobile platform</td>
                 <td>n/a</td>
         <td>Android/iOS/AndroidTV/tvOS</td>
     </tr>
         <tr>
         <td>capabilities.platformVersion</td>
-        <td>Version of mobile platform</td>
+        <td>Version of the mobile platform</td>
                 <td>n/a</td>
         <td>6.0.1</td>
     </tr>
         <tr>
         <td>capabilities.automationName</td>
-        <td>Name of programm using for automation (for Android 7+ use uiautomator2 instead of Appium)</td>
+        <td>Name of the program used for automation (for Android 7+ use uiautomator2 instead of Appium)</td>
                 <td>n/a</td>
         <td>Appium/uiautomator2/XCUITest</td>
     </tr>
         <tr>
         <td>capabilities.app</td>
-        <td>Path to application (apk/app/ipa) which is tested, Can be provided as a pattern from AWS S3 storage with automatic downloading</td>
+        <td>Path to the application (apk/app/ipa) which is tested, can be provided as a pattern from AWS S3 storage with automatic downloading</td>
                 <td>n/a</td>
         <td>D:/application.apk, s3://qaprosoft.com/android/myapk.*-release.apk</td>
     </tr>
         <tr>
         <td>capabilities.newCommandTimeout</td>
-        <td>New implicit timeout in seconds to wait for element for mobile automation</td>
+        <td>New implicit timeout is seconds to wait for the element for mobile automation</td>
                 <td>n/a</td>
         <td>180</td>
     </tr>
@@ -772,19 +772,19 @@ Hint: sometimes (especially on Mac) you need to add paths to important folders i
     </tr>
     <tr>
         <td>capabilities.noSign</td>
-        <td>Skip checking and signing of app with debug keys, will work only with UiAutomator and not with selendroid, default false</td>
+        <td>Skips checking and signing of the app with debug keys, will work only with UiAutomator and not with selendroid, defaults to false</td>
                 <td>n/a</td>
         <td>true, false</td>
     </tr>
     <tr>
         <td>capabilities.autoGrantPermissions</td>
-        <td>Have Appium automatically determine which permissions your app requires and grant them to the app on install. Defaults to false</td>
+        <td>Has Appium automatically determine which permissions your app requires and grants them to the app on install. Defaults to false</td>
                 <td>n/a</td>
         <td>true, false</td>
     </tr>
     <tr>
         <td>capabilities.skipUnlock</td>
-        <td>Skip the device unlock process. Defaults to false</td>
+        <td>Skips the device unlock process. Defaults to false</td>
                 <td>n/a</td>
         <td>true, false</td>
     </tr>
@@ -792,7 +792,7 @@ Hint: sometimes (especially on Mac) you need to add paths to important folders i
 
 <p><b>Important:</b>
 <em> though it’s not necessary to run Selenium, seleniumum_host must be defined.
-</em> file _config.properties should be located in src/main/resources</p>
+</em> The file _config.properties should be located in src/main/resources</p>
 <h3 id="example-for-android-of-_configproperties">Example for Android of _config.properties:</h3>
 <pre><code>#=====================================================#
 #================= Configuration v2 ==================#
@@ -817,7 +817,7 @@ capabilities.autoGrantPermissions=true
 </code></pre>
 
 <p><b>Note:</b>
-To get device’s unique id (UDID) command “adb devices” is used. This command provides a list of devices attached with their UDIDs. For real device it will look like “759b543c” (can be shorter or longer) and for emulator it will be like  “emulator-5554”.</p>
+To get the device’s unique id (UDID), the command “adb devices” is used. This command provides a list of devices attached with their UDIDs. For the real device it will look like “759b543c” (can be shorter or longer), and for the emulator it will be like “emulator-5554”.</p>
 <h3 id="example-for-ios-of-_configproperties">Example for iOS of _config.properties:</h3>
 <pre><code>#=====================================================#
 #================= Configuration v2 ==================#
@@ -840,28 +840,28 @@ capabilities.newCommandTimeout=1800
 </code></pre>
 
 <p><b>Note:</b>
-To get device’s unique id (UDID) for emulator command “xcrun simctl list” is useful. It will show the list of simulators with their names, iOS versions, udids and statuses (shutdown or booted). 
-To get UDID from the real device you have to plug your phone into a computer and copy it out of iTunes:
+To get the device’s unique id (UDID) for the emulator, the command “xcrun simctl list” is used. It will show the list of simulators with their names, iOS versions, udids and statuses (shutdown or booted). 
+To get UDID from the real device, you need to plug your phone into a computer and copy it out of iTunes:
 1. Launch iTunes and connect your iPhone.
 2. In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
-3. Reveal the Identifier by clicking on Serial Number.</p>
+3. Reveal the Identifier by clicking on the Serial Number.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects:</h3>
-<p>The main idea is the same as in <a href="http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects">web-testing</a> except that css isn’t used in Mobile. 
-ExtendedWebElement(Carina’s implementation of WebElement) is used instead of WebElement and it has methods similar to those that WebElement has but more reliable and convenient.
+<p>The main idea is the same as in <a href="http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects">web-testing</a> except that CSS isn’t used in Mobile. 
+ExtendedWebElement (Carina’s implementation of WebElement) is used instead of WebElement, and it has methods similar to those that WebElement has, but more reliable and convenient ones.
 <b>Important</b>:
- * Page should extends com.qaprosoft.carina.core.gui.AbstractPage
+ * Page should extend com.qaprosoft.carina.core.gui.AbstractPage
  * Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
  * Locate Page Object classes in src/main/java package</p>
 <h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
-<p>To obtain locators of web elements from Android app different programs are used, such as latest Appium itself and convenient Android SDK tool: uiautomatorviewer. It’s located in $ANDROID_HOME/tools/bin and could be launched using command line  (./uiautomatorviewer).
+<p>To obtain the locators of web elements from an Android app, different programs are used, such as the latest Appium itself and a convenient Android SDK tool: uiautomatorviewer. It’s located in $ANDROID_HOME/tools/bin and can be launched using the command line  (./uiautomatorviewer).
 Example:</p>
 <pre><code> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
  private ExtendedWebElement input;
 </code></pre>
 
 <h3 id="how-to-find-locators-for-ios-application">How to find locators for iOS application</h3>
-<p>To obtain locators of web elements from iOS app different programs are used, such as GUI Appium itself and convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
-To faster work @Predicate is used. With predicates complicate “xpaths” can’t be used, but “id”, “name”, “className” and etc. search are sufficient. 
+<p>To obtain the locators of web elements from an iOS app, different programs are used, such as GUI Appium itself and a convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
+To speed up the work, @Predicate is used. Complicate “xpaths” can’t be used with predicates, but “id”, “name”, “className” and etc. search is sufficient. 
 Example:</p>
 <pre><code>@FindBy(xpath = &quot;name = 'DONE'&quot;)
 @Predicate
@@ -875,7 +875,7 @@ Example:</p>
 protected ExtendedWebElement developerText;
 </code></pre>
 
-<p>Starting from Carina version 6.0.12 it's recommended to use @ExtendedFindBy() annotation
+<p>Starting from Carina version 6.0.12, it's recommended to use @ExtendedFindBy() annotation.
 Example:</p>
 <pre><code>@ExtendedFindBy(iosClassChain = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
 protected ExtendedWebElement developerText;
@@ -887,7 +887,7 @@ protected ExtendedWebElement developerText;
 </code></pre>
 
 <h3 id="implementation-of-tests">Implementation of tests</h3>
-<p>Carina framework uses TestNG for test organization. In general, test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
+<p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is a sample test implementation:</p>
 <pre><code>public class SampleTest extends AbstractTest {
 
     String name = &quot;My name&quot;;
@@ -917,15 +917,15 @@ protected ExtendedWebElement developerText;
 <em> Use getDriver() method to get driver instance in test
 </em> Locate tests in src/test/java source folder</p>
 <h3 id="how-to-use-customtypepagefactory">How to use CustomTypePageFactory</h3>
-<p>Carina provides technique to combine Desktop/iOS/Android tests into the single test class/method. For all platforms you should use <a href="https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern">Page Object Design Pattern</a> but in a bit improved way.
-Each page has abstract declaration and different implementations if needed (by default 3 ones should be enough: Desktop, iOS/Android):</p>
+<p>Carina provides the technique to combine Desktop/iOS/Android tests into the single test class/method. For all platforms you should use <a href="https://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern">Page Object Design Pattern</a>, but in a bit improved way.
+Every page has an abstract declaration and different implementations if needed (by default, 3 ones should be enough: Desktop, iOS/Android):</p>
 <ul>
-<li>Common abstract page in common package with common methods and elements;</li>
-<li>Desktop page in desktop package with desktop methods and elements;</li>
+<li>Common abstract page in a common package with common methods and elements;</li>
+<li>Desktop page in a desktop package with desktop methods and elements;</li>
 <li>iOS page in ios package with iOS methods and elements;</li>
 <li>Android page in android package with Android methods and elements.</li>
 </ul>
-<p>Child pages should extends BasePage implementing all abstract methods. Annotation @DeviceType would provide information about device type and parent (common) page.</p>
+<p>Child pages should extend BasePage implementing all abstract methods. Annotation @DeviceType will provide the information about the device type and the parent (common) page.</p>
 <p><strong>Examples:</strong></p>
 <p><strong>Common (Base) Page</strong></p>
 <pre><code>public abstract class HomePageBase extends AbstractPage {
@@ -996,7 +996,7 @@ public class HomePage extends HomePageBase {
     }
 </code></pre>
 
-<p>Inside each tests Carina operates with abstract base page using CustomTypePageFactory and substitute it by real implementation based on desired capabilities in _config.properties etc.</p>
+<p>Inside of every test Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.</p>
 <p><strong>Example:</strong></p>
 <pre><code>@Test
     public void comparePhonesTest() {
@@ -1006,14 +1006,14 @@ public class HomePage extends HomePageBase {
     }
 </code></pre>
 
-<p>If there are differences in application according to OS version just implement pages for different versions and include version parameter in @DeviceTypeae for each page</p>
+<p>If there are differences in application according to OS version, just implement the pages for different versions and include the version parameter in @DeviceTypeae for every page.</p>
 <p><strong>Example:</strong></p>
 <p>For Android 8 (either 8.0 or 8.1)</p>
 <pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8”, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 </code></pre>
 
-<p>Or for specific version</p>
+<p>Or for the specific version</p>
 <pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8.1”, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 </code></pre>
@@ -1026,9 +1026,9 @@ Find by image logic is covered by <code>@ExtendedFindBy</code> annotation. </p>
 private ExtendedWebElement signUpBtn;
 </code></pre>
 
-<p>Available list of actions with image elements and related driver settings are listed <a href="http://appium.io/docs/en/advanced-concepts/image-elements/">here</a>.</p>
-<p>Basically all you need is to create image template of the element in .png format and place it to your project. We suggest to use <code>src/main/resources/</code> folder to store images. 
-Be sure your image size less then real screen size. Real iOS screen sizes are listed <a href="https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html">here</a> in 'UIKit Size (Points)' column. The ultimate guide to iPhone resolutions you can find <a href="https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions">here</a>.</p>
+<p>The list of actions with image elements and related driver settings is available <a href="http://appium.io/docs/en/advanced-concepts/image-elements/">here</a>.</p>
+<p>Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using <code>src/main/resources/</code> folder to store images. 
+Be sure your image size is less than the real screen size. The real iOS screen sizes are listed <a href="https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html">here</a> in 'UIKit Size (Points)' column. You can find the ultimate guide to iPhone resolutions <a href="https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions">here</a>.</p>
                 
                   
                 
