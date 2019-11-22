@@ -78,10 +78,12 @@ public class DesktopFactory extends AbstractFactory {
             	
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
                 switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-                case DEFAULT:
+                case SELENIUM:
                 case MCLOUD:
+                case AEROKUBE:
                 case BROWSERSTACK:
                 case SAUCELABS:
+                case DEFAULT:
                     ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
                     break;
                 case ZEBRUNNER:

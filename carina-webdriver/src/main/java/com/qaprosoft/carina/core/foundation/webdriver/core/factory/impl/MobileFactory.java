@@ -144,10 +144,12 @@ public class MobileFactory extends AbstractFactory {
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-                        case DEFAULT:
+                        case SELENIUM:
                         case MCLOUD:
+                        case AEROKUBE:
                         case BROWSERSTACK:
                         case SAUCELABS:
+                        case DEFAULT:
                             ce.getListeners()
                                     .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
                                             o2,
@@ -194,7 +196,12 @@ public class MobileFactory extends AbstractFactory {
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
                         
                         switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-        				case DEFAULT:
+                        case SELENIUM:
+                        case MCLOUD:
+                        case AEROKUBE:
+                        case BROWSERSTACK:
+                        case SAUCELABS:
+                        case DEFAULT:
         					ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
         					break;
         				case ZEBRUNNER:
@@ -333,7 +340,12 @@ public class MobileFactory extends AbstractFactory {
 			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 
 			switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-			case DEFAULT:
+            case SELENIUM:
+            case MCLOUD:
+            case AEROKUBE:
+            case BROWSERSTACK:
+            case SAUCELABS:
+            case DEFAULT:
 				RemoteDevice rd = getDeviceInfo(rwd);
 				if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
 					if (rd.getVnc().matches(".+:\\d+")) {
