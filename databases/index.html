@@ -572,11 +572,11 @@
                 
                 
                 <h1 id="database-usage">Database usage</h1>
-<p>Here is simple DB schema that will be used for that sample:
+<p>Here is a simple DB schema that will be used for this sample:
 <img alt="db_schema" src="../img/database-usage-1.png" />
 We will implement mapping for Users and UserPreferences tables.</p>
 <h2 id="dependencies">Dependencies</h2>
-<p>For integration with DB we recommend to use <a href="http://www.mybatis.org/mybatis-3">MyBatis</a> ORM framework. MyBatis is a first class persistence framework with support for custom SQL, stored procedures and advanced mappings. To start with, let's add required dependencies into Maven pom.xml:</p>
+<p>For integration with DB, we recommend to use <a href="http://www.mybatis.org/mybatis-3">MyBatis</a> ORM framework. MyBatis is a first class persistence framework with support for custom SQL, stored procedures and advanced mappings. To start with, let's add the required dependencies into Maven pom.xml:</p>
 <pre><code class="xml">&lt;dependency&gt;
    &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
    &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
@@ -597,7 +597,7 @@ We will implement mapping for Users and UserPreferences tables.</p>
 </code></pre>
 
 <h2 id="mappers">Mappers</h2>
-<p>Next step is MyBatis mappers implementation, read <a href="http://www.mybatis.org/mybatis-3/sqlmap-xml.html">official documentation</a> to understand all the details. Let's place all the mappers into <strong>src/main/resources/mappers</strong>. Here is <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml">UserMapper.xml</a> sample:</p>
+<p>The next step is MyBatis mappers implementation, read <a href="http://www.mybatis.org/mybatis-3/sqlmap-xml.html">the official documentation</a> to understand all the details. Let's place all the mappers into <strong>src/main/resources/mappers</strong>. Here is a <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml">UserMapper.xml</a> sample:</p>
 <pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
 
@@ -716,7 +716,7 @@ We will implement mapping for Users and UserPreferences tables.</p>
 &lt;/mapper&gt;
 </code></pre>
 
-<p>Now we have to implement DB domain object <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User class</a>, that reflects DB table structure:</p>
+<p>Now we have to implement a DB domain object <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User class</a> which reflects the DB table structure:</p>
 <pre><code class="java">package com.qaprosoft.carina.demo.db.models;
 
 import java.util.ArrayList;
@@ -806,7 +806,7 @@ public class User {
 }
 </code></pre>
 
-<p>Also we have to describe mapper interface, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper interface</a>:</p>
+<p>Also, we have to describe the mapper interface, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper interface</a>:</p>
 <pre><code class="java">package com.qaprosoft.carina.demo.db.mappers;
 
 import com.qaprosoft.carina.demo.db.models.User;
@@ -828,7 +828,7 @@ public interface UserMapper {
 </code></pre>
 
 <h2 id="configuration">Configuration</h2>
-<p>First of all we need to place DB credentials into <strong>src/main/resources/_database.properties</strong>:</p>
+<p>First of all, we need to place DB credentials into <strong>src/main/resources/_database.properties</strong>:</p>
 <pre><code>#===============================================================#
 #================== Database configuration ====================#
 #===============================================================#
@@ -871,7 +871,7 @@ db.pass=postgres
 </code></pre>
 
 <h2 id="connection-factory">Connection factory</h2>
-<p>Connection factory is responsible for MyBatis context initializtion and creation of mapper instances, take a look at sample implementation of <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>:</p>
+<p>Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>:</p>
 <pre><code class="java">package com.qaprosoft.carina.demo.utils;
 
 import java.io.IOException;
@@ -912,7 +912,7 @@ public class ConnectionFactory {
 </code></pre>
 
 <h2 id="usage-sample">Usage sample</h2>
-<p>Finally <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java">DBSampleTest</a> illustrates usage of MyBatis in tests:</p>
+<p>Finally, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java">DBSampleTest</a> illustrates the usage of MyBatis in tests:</p>
 <pre><code class="java">package com.qaprosoft.carina.demo;
 
 import static org.testng.Assert.assertEquals;
