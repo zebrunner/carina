@@ -22,7 +22,7 @@ The default config properties can be obtained by
 Configuration.get(Parameter.BROWSER)
 ```
 
-All the project configuration properties are located in **_config.properties** file. In the table below we are providing the description of most of the parameters:
+All the project configuration properties are located in a **_config.properties** file. In the table below we are providing the description of most of the parameters:
 <table>
 	<tr>
 		<th>Attribute</th>
@@ -166,7 +166,7 @@ All the project configuration properties are located in **_config.properties** f
 	</tr>
 		<tr>
 		<td>track_known_issues</td>
-		<td>Boolean parameter. If it is true and some Jira tickets are assosiated with the test, in case of failure Jira info will be added to the report</td>
+		<td>Boolean parameter. If it is true and some Jira tickets are associated with the test, in case of failure Jira info will be added to the report</td>
 		<td>true,false</td>
 	</tr>
 	<tr>
@@ -226,7 +226,7 @@ All the project configuration properties are located in **_config.properties** f
 	</tr>
 	<tr>
 		<td>retry_count</td>
-		<td>Number of test-retryings in case of failure. The default value 0 means that the test will be performed only once</td>
+		<td>Number of test-retryings in case of failure. The default value 0 means that a test will be performed only once</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
@@ -296,7 +296,7 @@ All the project configuration properties are located in **_config.properties** f
 	</tr>
 	<tr>
 		<td>jira_url</td>
-		<td>Url to Jira</td>
+		<td>URL to Jira</td>
 		<td>https://yourclass.atlassian.net</td>
 	</tr>
 		<tr>
@@ -456,7 +456,7 @@ As a result, you switch between the environments just changing the env argument 
 	</tr>
 	<tr>
 		<td>zafira_configurator</td>
-		<td>Configurator class (use default)</td>
+		<td>Configurator class (used by default)</td>
 		<td>com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator</td>
 	</tr>	
 </table>
