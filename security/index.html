@@ -525,9 +525,9 @@
                 
                   <h1>Security</h1>
                 
-                <p>Security functionality in the Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In the Carina framework, AES encryption is used by default with a 128-bit security key.</p>
+                <p>Security functionality in Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In Carina framework, AES encryption is used by default with a 128-bit security key.</p>
 <p><img alt="Security Algorithm" src="../img/security-alg.png" /></p>
-<p>Anyone may generate their own security key and encrypt the data using that key, so that decrypted valid data may be used in the test only if the valid key is specified in test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.</p>
+<p>Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.</p>
 <h2 id="secured-data-preparation">Secured data preparation</h2>
 <p>For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:</p>
 <pre><code>com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -generate -key_file &quot;file_path_to_save_key&quot;
@@ -540,7 +540,7 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file &quot;c
 <p><strong>To generate an individual crypto key:</strong></p>
 <ol>
 <li>Go to "Run configuration" in Eclipse</li>
-<li>Create new Java application configuration selecting project and main class <strong>com.qaprosoft.cariana.core.foundation.crypto.CryptoConsole</strong>:
+<li>Create a new Java application configuration selecting the project and the main class <strong>com.qaprosoft.cariana.core.foundation.crypto.CryptoConsole</strong>:
 <img alt="Security Config 1" src="../img/security-config-1.png" /></li>
 <li>Set arguments
 <img alt="Security Config 2" src="../img/security-config-2.png" /></li>
@@ -548,26 +548,26 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file &quot;c
 <li>Crypto key will be generated:
 <img alt="Security Config 3" src="../img/security-config-3.png" /></li>
 </ol>
-<p><strong>To prepare test data file with secured data:</strong></p>
+<p><strong>To prepare a test data file with secured data:</strong></p>
 <ol>
-<li>Prepare input file  using  pattern {crypt:str_to_encrypt} for secured values
+<li>Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values
 <img alt="Security Config 4" src="../img/security-config4.png" /></li>
-<li>Prepare input file  using  pattern {crypt:str_to_encrypt} for secured values
-Go to “Run configuration”, navigate to arguments tab and execute encryption command specifying key path and input file:
+<li>Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values.
+Go to “Run configuration”, navigate to the arguments tab and execute an encryption command specifying the key path and input file:
 <img alt="Security Config 5" src="../img/security-config5.png" /></li>
 <li>File with encrypted data will be generated:
 <img alt="Security Config 6" src="../img/security-config6.png" /></li>
-<li>To encrypt single string use the following config:
+<li>To encrypt a single string, use the following config:
 <img alt="Security Config 7" src="../img/security-config7.png" /></li>
-<li>Encrypted string will be shown in console:
+<li>Encrypted string will be shown in the console:
 <img alt="Security Config 8" src="../img/security-config-8.png" /></li>
-<li>To decrypt encrypted file execute:
+<li>To decrypt the encrypted file, execute:
 <img alt="Security Config 9" src="../img/security-config-9.png" /></li>
 <li>Decrypted file will be generated:
 <img alt="Security Config 4" src="../img/security-config4.png" /></li>
 </ol>
 <h2 id="secured-data-usage">Secured data usage</h2>
-<p>You may use encrypted values, both in test configuration and test data files; pay attention to the fact that there is no explicit before test listener for data decryption, so there is no way to find out later in the test if the data is sensitive or not. All the decryption logic is located in WebDriverHelper that wraps Selenium WebDriver methods for interaction with UI and encapsulates action logging logic. Every method that receives text tests if text contains {crypt:...} pattern and if it does, decrypts it and passes it to UI- logging and screenshots are populated with hidden characters:
+<p>You may use encrypted values, both in test configuration and test data files; pay attention to the fact that there is no explicit before test listener for data decryption, so there is no way to find out later in the test if the data is sensitive or not. All the decryption logic is located in WebDriverHelper that wraps Selenium WebDriver methods for interaction with UI and encapsulates action logging logic. Every method that receives a text tests if the text contains {crypt:...} pattern, and if it does, decrypts it and passes it to UI- logging, and screenshots are populated with hidden characters:
 <img alt="Security Config 11" src="../img/security-config-11.png" /></p>
                 
                   
