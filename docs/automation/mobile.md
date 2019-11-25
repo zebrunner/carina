@@ -347,7 +347,7 @@ public class HomePage extends HomePageBase {
     }
 ```
 
-Inside of every test Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.
+Inside every test Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.
 
 **Example:**
 ```
@@ -359,7 +359,7 @@ Inside of every test Carina operates with an abstract base page using CustomType
     }
 ```
 
-If there are differences in application according to OS version, just implement the pages for different versions and include the version parameter in @DeviceTypeae for every page.
+If there are differences in application according to OS version, just implement the pages for different versions and include the version parameter in @DeviceType for every page.
 
 **Example:**
 
@@ -369,7 +369,7 @@ For Android 8 (either 8.0 or 8.1)
 public class HomePage extends HomePageBase {
 ```
 
-Or for the specific version
+Or for a specific version
 ```
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8.1”, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
@@ -388,6 +388,6 @@ private ExtendedWebElement signUpBtn;
 The list of actions with image elements and related driver settings is available [here](http://appium.io/docs/en/advanced-concepts/image-elements/).
 
 Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using ```src/main/resources/``` folder to store images. 
-Be sure your image size is less than the real screen size. The real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. You can find the ultimate guide to iPhone resolutions [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
+Be sure your image size is less than the real screen size. The real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
 
 
