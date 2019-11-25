@@ -8,7 +8,7 @@ java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-X.
 ```
 You have another option for running [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way to create docker-compose.yml:
 ```
-# To execute this docker-compose yml file use docker-compose -f <file_name> up
+# To execute this docker-compose yml file, use docker-compose -f <file_name> up
 # Add the "-d" flag at the end for deattached execution
 version: '2'
 services:
@@ -44,9 +44,9 @@ docker-compose up
 
 [![Carina - Running tests](http://img.youtube.com/vi/QGHCezE-d-I/0.jpg)](https://youtu.be/QGHCezE-d-I)
 
-There are several options to execute the test: you may run a test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
+There are several options to execute a test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
 
-To run the test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
+To run test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
 
 ![Execution from Eclipse IDE](img/006-Configuration-and-execution.png)
 
