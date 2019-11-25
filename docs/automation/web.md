@@ -1,6 +1,6 @@
 [![Carina - Web automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/Wgyffk7hJQw)
 
-Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
+Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
 
 
 ### Implementation of Page Objects
@@ -173,14 +173,14 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 * Locate tests in src/test/java source folder
 
 ### Test configuration
-There are a few critical properties in config.properties file which are required for web test execution:
+There are a few critical properties in a config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
 * platform=*
 * browser=chrome
 * browser_version=*
 
-The implemented test cases should be placed in TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
+The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
