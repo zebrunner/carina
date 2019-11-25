@@ -439,15 +439,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#using-proxy-server-in-java-code" title="Using proxy-server in java code:" class="md-nav__link">
-    Using proxy-server in java code:
+  <a href="#using-proxy-server-in-java-code" title="Using proxy-server in Java code:" class="md-nav__link">
+    Using proxy-server in Java code:
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#dealing-with-mitm-and-installing-ssl-sertificate-into-your-system" title="Dealing with MITM and installing SSL sertificate into your system:" class="md-nav__link">
-    Dealing with MITM and installing SSL sertificate into your system:
+  <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" title="Dealing with MITM and installing SSL certificate into your system:" class="md-nav__link">
+    Dealing with MITM and installing SSL certificate into your system:
   </a>
   
     <nav class="md-nav">
@@ -466,8 +466,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adding-ssl-sertificate-into-java-keystore" title="Adding ssl sertificate into Java keystore:" class="md-nav__link">
-    Adding ssl sertificate into Java keystore:
+  <a href="#adding-ssl-certificate-into-java-keystore" title="Adding ssl certificate into Java keystore:" class="md-nav__link">
+    Adding ssl certificate into Java keystore:
   </a>
   
     <nav class="md-nav">
@@ -559,15 +559,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#using-proxy-server-in-java-code" title="Using proxy-server in java code:" class="md-nav__link">
-    Using proxy-server in java code:
+  <a href="#using-proxy-server-in-java-code" title="Using proxy-server in Java code:" class="md-nav__link">
+    Using proxy-server in Java code:
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#dealing-with-mitm-and-installing-ssl-sertificate-into-your-system" title="Dealing with MITM and installing SSL sertificate into your system:" class="md-nav__link">
-    Dealing with MITM and installing SSL sertificate into your system:
+  <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" title="Dealing with MITM and installing SSL certificate into your system:" class="md-nav__link">
+    Dealing with MITM and installing SSL certificate into your system:
   </a>
   
     <nav class="md-nav">
@@ -586,8 +586,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adding-ssl-sertificate-into-java-keystore" title="Adding ssl sertificate into Java keystore:" class="md-nav__link">
-    Adding ssl sertificate into Java keystore:
+  <a href="#adding-ssl-certificate-into-java-keystore" title="Adding ssl certificate into Java keystore:" class="md-nav__link">
+    Adding ssl certificate into Java keystore:
   </a>
   
     <nav class="md-nav">
@@ -632,8 +632,8 @@
                   <h1>Proxy</h1>
                 
                 <h3 id="operating-with-proxies">Operating with Proxies</h3>
-<p>There is possibility to send all test traffic via the proxy included embelled light-weight BrowserMob proxy server.
-Ther are several properties available to manage all kind of proxies usage:</p>
+<p>There is a possibility to send all test traffic via the proxy including the embedded light-weight BrowserMob proxy server.
+There are several properties available to manage all kinds of proxy usage:</p>
 <pre><code>proxy_host=NULL
 proxy_port=NULL
 proxy_protocols=http,https,ftp
@@ -645,35 +645,35 @@ browsermob_port=0
 </code></pre>
 
 <p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
-Also to enable proxy for TestNG Java process <strong>proxy_set_to_system</strong> must be specifed to <strong>true</strong> otherwise only WebDrivers and API clients will be proxied</p>
-<p>Note: Above settings mostly required to get public internet access through corporate proxies.</p>
+Also, to enable a proxy for TestNG Java process, <strong>proxy_set_to_system</strong> must be specifed to <strong>true</strong>, otherwise only WebDrivers and API clients will be proxied.</p>
+<p>Note: The above settings are mostly required to get public internet access through corporate proxies.</p>
 <h3 id="raising-inbuilt-proxy-server-browsermob">Raising inbuilt proxy-server (BrowserMob)</h3>
-<p>Also Carina can start embedded proxy to proxy/view/filter requests/responses. There is inbuilt library BrowserMobProxy in carina-proxy module. Below you can find BrowserMob proxy related parameters in your <strong>config.properties</strong> file:</p>
+<p>Also, Carina can start the embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find the BrowserMob proxy related parameters in your <strong>config.properties</strong> file:</p>
 <pre><code>browsermob_proxy=true
 browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 </code></pre>
 
-<p>With enabled <strong>browsermob_proxy</strong> Carina will start dedicated proxy instance on every test method. </p>
-<p><strong>browsermob_host=NULL</strong> means that Carina automatically detect IP address and put it into the capabilities etc.</p>
-<p><strong>browsermob_host=myhostname</strong> that's useful in case of running maven process inside docker container. Override hostname to be available from Selenium instance.</p>
-<p><strong>browsermob_port=0</strong> means that Carina dynamically identify free port for proxy session.</p>
+<p>With the enabled <strong>browsermob_proxy</strong> Carina will start the dedicated proxy instance on every test method. </p>
+<p><strong>browsermob_host=NULL</strong> means that Carina automatically detects an IP address and puts it into the capabilities, etc.</p>
+<p><strong>browsermob_host=myhostname</strong> is useful in case of running maven process inside a docker container. Override the hostname to be available from Selenium instance.</p>
+<p><strong>browsermob_port=0</strong> means that Carina dynamically identifies a free port for a proxy session.</p>
 <p><strong>browsermob_disabled_mitm</strong> is disabled by default. </p>
-<p><strong>Important!</strong> If you have troubles with  SSL traffic sniffering first thing you should do - change <strong>browsermob_disabled_mitm</strong> property value!</p>
-<h4 id="using-proxy-server-in-java-code">Using proxy-server in java code:</h4>
+<p><strong>Important!</strong> If you have troubles with  SSL traffic sniffing, the first thing you should do - change <strong>browsermob_disabled_mitm</strong> property value!</p>
+<h4 id="using-proxy-server-in-java-code">Using proxy-server in Java code:</h4>
 <ol>
-<li>Make sure driver instance is already started:</li>
+<li>Make sure the driver instance is already started:</li>
 </ol>
 <pre><code>getDriver();
 </code></pre>
 
-<p>Note: During driver startup Carina automatically start proxy and adjust browser capabilities to track desired protocols. To get proxy instance for the current test/thread you can call:</p>
+<p>Note: During the driver startup Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get proxy instance for the current test/thread, you can call:</p>
 <pre><code>BrowserMobProxy proxy = ProxyPool.getProxy();
 </code></pre>
 
 <ol>
-<li>Enable required Har capture type using::</li>
+<li>Enable the required Har capture type using:</li>
 </ol>
 <pre><code>proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
 </code></pre>
@@ -687,9 +687,9 @@ CaptureType.REQUEST_CONTENT
 ...
 </code></pre>
 
-<p>They all can be set as comma separated parameters.</p>
+<p>They all can be set as comma-separated parameters.</p>
 <ol>
-<li>You may want to save captured content into a .har file:</li>
+<li>You may want to save the captured content into a .har file:</li>
 </ol>
 <pre><code>proxy.newHar(HAR_NAME);
 
@@ -706,7 +706,7 @@ try {
 }
 </code></pre>
 
-<p>Your .har file will be created in project root folder</p>
+<p>Your .har file will be created in the project root folder</p>
 <ol>
 <li>
 <p>There are four methods to support request and response interception:</p>
@@ -718,32 +718,32 @@ try {
 <li>addFirstHttpFilterFactory</li>
 <li>addLastHttpFilterFactory</li>
 </ol>
-<p>To add and configure content filters look <a href="https://github.com/lightbody/browsermob-proxy#http-request-manipulation">here</a>.</p>
-<h4 id="dealing-with-mitm-and-installing-ssl-sertificate-into-your-system">Dealing with MITM and installing SSL sertificate into your system:</h4>
+<p>To add and configure content filters, look <a href="https://github.com/lightbody/browsermob-proxy#http-request-manipulation">here</a>.</p>
+<h4 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h4>
 <h5 id="for-mac-users">For Mac users:</h5>
 <ol>
 <li>Go <a href="https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer">here</a> and save it as <strong>ca-certificate-rsa.cer</strong>.</li>
-<li>Double click created file. Next window should be shown:</li>
+<li>Double click creates a file. The next window should appear:</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../img/SSLInstallStep1.png" /></p>
 <ol>
-<li>After authorization the certificate will be added into your system certificates,  but it's still untrusted:</li>
+<li>After authorization, the certificate will be added into your system certificates,  but it's still untrusted:</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../img/SSLInstallStep2.png" /></p>
 <ol>
-<li>To make it trusted double click on it. Following window should be shown:</li>
+<li>To make it trusted, double click on it. The following window should appear:</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../img/SSLInstallStep3.png" /></p>
 <ol>
-<li>Click first drop-down menu and select <strong>Always Trust</strong> option. Then close the window (second authorization will be required):</li>
+<li>First, click the drop-down menu and select <strong>Always Trust</strong> option. Then close the window (a second authorization will be required):</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../img/SSLInstallStep4.png" /></p>
 <ol>
-<li>Make sure red cross on your certificate turned into a blue one:</li>
+<li>Make sure the red cross on your certificate turned into a blue one:</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../img/SSLInstallStep5.png" /></p>
-<h4 id="adding-ssl-sertificate-into-java-keystore">Adding ssl sertificate into Java keystore:</h4>
-<p>If you are still getting following exception:</p>
+<h4 id="adding-ssl-certificate-into-java-keystore">Adding ssl certificate into Java keystore:</h4>
+<p>If you are still getting the following exception:</p>
 <pre><code>javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
 </code></pre>
 
