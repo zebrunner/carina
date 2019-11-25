@@ -627,8 +627,8 @@ public class Screenshot {
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
-				// [VD] why do we disable screenshot for that use case? enabled to test
-				// || message.contains("An element could not be located on the page using the given search parameters")
+				// [VD] exclude below condition otherwise we overload appium when fluent wait looking for device and doing screenshot in a loop 
+				|| message.contains("An element could not be located on the page using the given search parameters")
 				|| message.contains("current view have 'secure' flag set")
 				|| message.contains("Error communicating with the remote browser. It may have died")
 				|| message.contains("unexpected alert open") 
