@@ -627,6 +627,7 @@ public class Screenshot {
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
+				|| message.contains("Method is not implemented") //to often exception for mobile native app testing
 				// [VD] exclude below condition otherwise we overload appium when fluent wait looking for device and doing screenshot in a loop 
 				|| message.contains("An element could not be located on the page using the given search parameters")
 				|| message.contains("current view have 'secure' flag set")
