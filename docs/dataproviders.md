@@ -8,7 +8,7 @@ Modern test automation frameworks should support data-driven testing, when you a
 * CSV data-providers
 
 ## Java data-provider
-As far as Carina is based on TestNG framework, you are able to use well known Java data-providers which return a matrix of Objects and pass to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with `@DataProvider` that will return `Object[][]` as a test data set:
+As far as Carina is based on TestNG framework, you are able to use well known Java data-providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with `@DataProvider` that will return `Object[][]` as a test data set:
 ```java
 @Test(dataProvider = "DP1")
 public void testMuliplyOperation(int a, int b, int c)
@@ -57,7 +57,7 @@ public void testSubstractOperation(int a, int b, int c) {
 ```
 
 ## XLS/CSV data-providers
-Carina test framework provides the possibility to write all the tests with data providers in one place include parametrization using external XLS/CSV spreadsheets. First of all, you need to declare the test class that extends `AbstractTest.java`:
+Carina test framework provides the possibility to write all the tests with data providers in one place including parametrization, using external XLS/CSV spreadsheets. First of all, you need to declare the test class that extends `AbstractTest.java`:
 After that, you can specify the data provider tests as follows.
 ```java
 public class DataprovidersSampleTest extends AbstractTest {
@@ -88,7 +88,7 @@ Here you can look at the spreadsheet as a data provider example for your further
 
 ![XLS file - Data Provider - screenshot](./img/xlsscreen.png)
 
-In the TUID column you should specify some unique test identifier that will be set at the beginning of the test name in the test results report. In the next columns you can specify the arguments for a test and their values in lower rows. They will be used as parameters in `@XlsDataSourceParameters`. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.
+In the TUID column you should specify some unique test identifier that will be set at the beginning of the test name in the test results report. In the next columns you can specify the arguments for a test and their values in the bottom lines. They will be used as parameters in `@XlsDataSourceParameters`. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.
 
 ## DataProvider with huge number of columns
 In some cases, we have to provide 10+ columns into the test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the rows into the single HashMap<String, String> object, so you can dynamically get any column in the test using the column name.
