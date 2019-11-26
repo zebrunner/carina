@@ -75,7 +75,7 @@ This test uses XLS/CSV files as the data source. Every row in a spreadsheet is a
 
 * createData method (data provider name = "DataProvider") for common use cases
 
-* createDataSingeThread method (data provider name = "SingleDataProvider") for single-thread execution.
+* createDataSingeThread method (data provider name = "SingleDataProvider") for a single-thread execution.
 
 To specify the XLS/CSV spreadsheets for a test, you should declare `@XlsDataSourceParameters` annotation and define its parameters:
 
