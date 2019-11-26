@@ -161,8 +161,9 @@ public class DriverListener implements WebDriverEventListener {
         LOGGER.debug("DriverListener->onException starting...");
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
-        if (thr.getMessage() == null)
+        if (thr.getMessage() == null) {
             return;
+        }
 
         if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
                 thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
@@ -171,7 +172,8 @@ public class DriverListener implements WebDriverEventListener {
             return;
         }
 
-        if (thr.getMessage().contains("Method has not yet been implemented")) {
+        if (thr.getMessage().contains("Method has not yet been implemented")
+                || thr.getMessage().contains("Method is not implemented")) {
             // do nothing
             return;
         }
