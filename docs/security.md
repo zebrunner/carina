@@ -2,7 +2,7 @@ Security functionality in Carina framework is required for sensitive data that s
 
 ![Security Algorithm](img/security-alg.png)
 
-Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.
+Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.
 
 ## Secured data preparation
 For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:
