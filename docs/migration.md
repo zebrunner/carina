@@ -45,7 +45,7 @@ Due to the architectural changes, code cleanup, etc., 6.0 carina-core generation
 
 4) Cucumber functionality has been completely removed in 6.0, so just remove all dependent classes if any. Inform [carina-support](mailto:carina-support@qaprosoft.com) if you want to restore cucumber module in Carina.
 
-5) All TestRail updaters, interfaces, etc. have been removed. Carina can't push at runtime data to 3rd party Reporting Tools. 
+5) All TestRail updaters, interfaces, etc. have been removed. Carina can't push the data to 3rd party Reporting Tools at runtime. 
    Carina can register only TestRail related tags in Zafira. Integration has been moved to the qps-pipeline level which is much easier to develop, maintain and support.
 
 6) DriverHelper (AbstractPage) - deprecated methods' removal
