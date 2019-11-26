@@ -3,9 +3,9 @@
 ### Introduction
 Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
-1. Compile HTTP request with the required meta data
+1. Compile an HTTP request with the required meta data
 2. Send the prepared data to the required server endpoint
-3. Validate HTTP status and response data
+3. Validate the HTTP status and response data
 4. Extract some response data for the next requests
 5. Build a call to the next (or the same) endpoint using (or not using) the data from the previous response
 
@@ -19,7 +19,7 @@ Assured brings the simplicity of using these languages into the Java domain."
 * Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
 files, source code, etc.) based on templates and changing data."
 * JsonPath - library for extracting data from JSON body
-* JsonAssert - library for comparing actual JSON body with an expected one
+* JsonAssert - library for comparing the actual JSON body with an expected one
 * Json-schema-validator - library for validating of JSON body for matching to JSON schema
 
 ### Example of test implementation
@@ -54,7 +54,7 @@ Let's create an automated test for the next call: POST https://jsonplaceholder.t
 and the response body the same as the request body
 
 #### Definition of request and response templates
-If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in package structure for better maintenance and visibility:
+If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in a package structure for better maintenance and visibility:
 ![API flow](../img/api/resources-structure.png)
 Request (rq.json) and response (rs.json) templates have some placeholders that will be populated from the tests later on:
 ![API flow](../img/api/rq-example.png)
@@ -63,7 +63,7 @@ While user.properties contains some default value which may be replaced later:
 ![API flow](../img/api/props-example.png)
 
 #### REST service call domain object
-Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace URL placeholder to set an appropriate environment.
+Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
 ```
 package com.qaprosoft.carina.demo.api;
 
@@ -80,7 +80,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 
 #### HTTP method and path
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
-It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, value has the following pattern {http_method}:{http_path}. HTTP path may contain placeholders, HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
+It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
 #=====================================================#
 #=================== API methods  ====================#
@@ -185,7 +185,7 @@ Now we need to generate a schema (you may use any generator you like, for exampl
 IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
 In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
 ![API flow](../img/api/schema-generator.png)
-Make sure that you change all the flags required to true, after that create a new file in the resources and place it into an appropriate endpoint package:
+Make sure that you change all the flags required to true. After that, create a new file in the resources and place it into an appropriate endpoint package:
 ```
 {
     "type":"object",
@@ -251,7 +251,7 @@ There are a couple of options for building a request with an array of items prov
    ]
 }
 ```
-As you see, this structure is quite flexible. If you need 2 taskTypes items, you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that, you need to declare task_name_3 or task_description_3 property. Otherwise, the array will contain only 1 item.
+As you see, this structure is quite flexible. If you need 2 taskTypes items, you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that, you need to declare a task_name_3 or task_description_3 property. Otherwise, the array will contain only 1 item.
 For instance, you need to build JSON which contains a taskTypes array. Then the template with placeholders will be the following:
 It's easy to extend such a structure. You just need to add items with similar placeholders increasing their index.
 
@@ -353,8 +353,8 @@ And the actual response:
 ### Deserialization of JSON
 Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from the database as the expected data.
 For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
-For this you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities. For instance, https://timboudreau.com/blog/json/read
-For example, we need to deserialize an array of Clients from JSON. An example of the required domain object will be:
+For this you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
+Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:
 ```
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
