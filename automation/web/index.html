@@ -627,7 +627,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <li>Locate Page Object classes in src/main/java</li>
 </ul>
 <h3 id="implementation-of-ui-components">Implementation of UI Components</h3>
-<p>In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects, for top menu or footer instance may be shared between multiple pages:</p>
+<p>In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects. For instance, a top menu or footer may be shared between multiple pages:</p>
 <pre><code>public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = &quot;Home&quot;)
     private ExtendedWebElement homeLink;
