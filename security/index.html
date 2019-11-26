@@ -527,7 +527,7 @@
                 
                 <p>Security functionality in Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In Carina framework, AES encryption is used by default with a 128-bit security key.</p>
 <p><img alt="Security Algorithm" src="../img/security-alg.png" /></p>
-<p>Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.</p>
+<p>Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.</p>
 <h2 id="secured-data-preparation">Secured data preparation</h2>
 <p>For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:</p>
 <pre><code>com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -generate -key_file &quot;file_path_to_save_key&quot;
