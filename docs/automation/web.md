@@ -77,7 +77,7 @@ public class ModelInfoPage extends AbstractPage {
 
 
 ### Implementation of UI Components
-In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects, for top menu or footer instance may be shared between multiple pages:
+In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects. For instance, a top menu or footer may be shared between multiple pages:
 ```
 public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = "Home")
