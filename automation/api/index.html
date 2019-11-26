@@ -709,9 +709,9 @@
 <h3 id="introduction">Introduction</h3>
 <p>Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:</p>
 <ol>
-<li>Compile HTTP request with the required meta data</li>
+<li>Compile an HTTP request with the required meta data</li>
 <li>Send the prepared data to the required server endpoint</li>
-<li>Validate HTTP status and response data</li>
+<li>Validate the HTTP status and response data</li>
 <li>Extract some response data for the next requests</li>
 <li>Build a call to the next (or the same) endpoint using (or not using) the data from the previous response</li>
 </ol>
@@ -724,7 +724,7 @@ Assured brings the simplicity of using these languages into the Java domain."</l
 <li>Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
 files, source code, etc.) based on templates and changing data."</li>
 <li>JsonPath - library for extracting data from JSON body</li>
-<li>JsonAssert - library for comparing actual JSON body with an expected one</li>
+<li>JsonAssert - library for comparing the actual JSON body with an expected one</li>
 <li>Json-schema-validator - library for validating of JSON body for matching to JSON schema</li>
 </ul>
 <h3 id="example-of-test-implementation">Example of test implementation</h3>
@@ -758,7 +758,7 @@ files, source code, etc.) based on templates and changing data."</li>
 
 <p>and the response body the same as the request body</p>
 <h4 id="definition-of-request-and-response-templates">Definition of request and response templates</h4>
-<p>If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in package structure for better maintenance and visibility:
+<p>If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in a package structure for better maintenance and visibility:
 <img alt="API flow" src="../../img/api/resources-structure.png" />
 Request (rq.json) and response (rs.json) templates have some placeholders that will be populated from the tests later on:
 <img alt="API flow" src="../../img/api/rq-example.png" />
@@ -766,7 +766,7 @@ Request (rq.json) and response (rs.json) templates have some placeholders that w
 While user.properties contains some default value which may be replaced later:
 <img alt="API flow" src="../../img/api/props-example.png" /></p>
 <h4 id="rest-service-call-domain-object">REST service call domain object</h4>
-<p>Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace URL placeholder to set an appropriate environment.</p>
+<p>Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.</p>
 <pre><code>package com.qaprosoft.carina.demo.api;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
@@ -782,7 +782,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 
 <h4 id="http-method-and-path">HTTP method and path</h4>
 <p>The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
-It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, value has the following pattern {http_method}:{http_path}. HTTP path may contain placeholders, HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.</p>
+It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.</p>
 <pre><code>#=====================================================#
 #=================== API methods  ====================#
 #=====================================================#
@@ -883,7 +883,7 @@ public class APISampleTest extends AbstractTest {
 IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
 In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
 <img alt="API flow" src="../../img/api/schema-generator.png" />
-Make sure that you change all the flags required to true, after that create a new file in the resources and place it into an appropriate endpoint package:</p>
+Make sure that you change all the flags required to true. After that, create a new file in the resources and place it into an appropriate endpoint package:</p>
 <pre><code>{
     &quot;type&quot;:&quot;object&quot;,
     &quot;$schema&quot;: &quot;http://json-schema.org/draft-03/schema&quot;,
@@ -948,7 +948,7 @@ public void testCheckJSONSchema()
 }
 </code></pre>
 
-<p>As you see, this structure is quite flexible. If you need 2 taskTypes items, you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that, you need to declare task_name_3 or task_description_3 property. Otherwise, the array will contain only 1 item.
+<p>As you see, this structure is quite flexible. If you need 2 taskTypes items, you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that, you need to declare a task_name_3 or task_description_3 property. Otherwise, the array will contain only 1 item.
 For instance, you need to build JSON which contains a taskTypes array. Then the template with placeholders will be the following:
 It's easy to extend such a structure. You just need to add items with similar placeholders increasing their index.</p>
 <ol>
@@ -1049,8 +1049,8 @@ Here is the code sample:</p>
 <h3 id="deserialization-of-json">Deserialization of JSON</h3>
 <p>Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from the database as the expected data.
 For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
-For this you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities. For instance, https://timboudreau.com/blog/json/read
-For example, we need to deserialize an array of Clients from JSON. An example of the required domain object will be:</p>
+For this you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
+Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:</p>
 <pre><code>import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 public final class Clients
