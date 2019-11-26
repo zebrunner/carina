@@ -42,7 +42,7 @@ With the enabled **browsermob_proxy** Carina will start the dedicated proxy inst
 ```
 getDriver();
 ```
-Note: During the driver startup Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get proxy instance for the current test/thread, you can call:
+Note: During the driver startup Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get a proxy instance for the current test/thread, you can call:
 ```
 BrowserMobProxy proxy = ProxyPool.getProxy();
 ```

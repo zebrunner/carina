@@ -16,7 +16,7 @@ Configure ssh connection based on git documentation [https://help.github.com/art
 
 7) `git checkout -b work_local_branch upstream/master`
 
-And then, after the adding files (`git add` ...), use `git commit` (add description) and then`push`:
+And then, after adding the files (`git add` ...), use `git commit` (add description) and then`push`:
 
     git push origin work_local_branch:work_remote_branch
     

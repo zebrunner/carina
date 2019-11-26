@@ -6,7 +6,7 @@ Before running any web test, you have to start Selenium server locally or use a 
 ```
 java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-X.jar
 ```
-You have another option for running [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way to create docker-compose.yml:
+You have several options to run [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way is to create docker-compose.yml:
 ```
 # To execute this docker-compose yml file, use docker-compose -f <file_name> up
 # Add the "-d" flag at the end for deattached execution

@@ -111,7 +111,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>browser_language</td>
-		<td>Browser language or nothing to use default English version. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
+		<td>Browser language or nothing to use the English version by default. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
 		<td>"es", "fr"</td>
 	</tr>
 	<tr>
@@ -341,12 +341,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>access_key_id</td>
-		<td>Access key id for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Access key id for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>secret_key</td>
-		<td>Secret key for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Secret key for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
