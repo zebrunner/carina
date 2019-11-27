@@ -22,7 +22,7 @@ The default config properties can be obtained by
 Configuration.get(Parameter.BROWSER)
 ```
 
-All the project configuration properties are located in a **_config.properties** file. In the table below we are providing the description of most of the parameters:
+All the project configuration properties are located in a **_config.properties** file. In the table below we are providing a description of most of the parameters:
 <table>
 	<tr>
 		<th>Attribute</th>
@@ -61,7 +61,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>retry_interval</td>
-		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify the number from 500-1500 range</td>
+		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -181,7 +181,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>auto_download_apps</td>
-		<td>MIME types / Internet Media Types. The parameter is necessary only to configure auto downloading for FireFox</td>
+		<td>MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for FireFox</td>
 		<td>application/pdf, list of [values](https://freeformatter.com/mime-types-list.html)</td>
 	</tr>
 	<tr>
@@ -221,7 +221,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>init_retry_interval</td>
-		<td>Interval is seconds between the attempts to create a driver</td>
+		<td>Interval in seconds between the attempts to create a driver</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -321,7 +321,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>jira_create_new_ticket</td>
-		<td>If the feature is enabled after the test failure, a new Jira ticket will be created</td>
+		<td>If the feature is enabled, a new Jira ticket will be created after the test failure</td>
 		<td>true, false</td>
 	</tr>
 	<tr>
@@ -336,7 +336,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>testrail_assignee</td>
-		<td>User asserted for the suit</td>
+		<td>User assigned for the suit</td>
 		<td>asignee_user@yuorcompany.com</td>
 	</tr>
 		<tr>
@@ -376,12 +376,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>add_new_localization_path</td>
-		<td>Path where the created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
+		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>utf-16, utf-32</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_property_name</td>
-		<td>Path where the created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
+		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>Basic template for property name.</td>
 	</tr>
 		<tr>
