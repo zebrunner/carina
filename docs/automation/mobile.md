@@ -6,17 +6,17 @@ To run mobile tests, [Appium](http://appium.io/) is used instead of Selenium. Th
 ![Alt text](../img/appium_design.png "Appium")
 	
 ### Android special requirements:	
-1. Android SDK (part of [Android Studio](https://developer.android.com/studio/)) is an important component for work. Pay attention that after installing Android Studio you sometimes (depends on the version) need to additionally install ADB and aapt (for Mac only). 
+1. Android SDK (part of [Android Studio](https://developer.android.com/studio/)) is an important component for work. Pay attention that after installing Android Studio you sometimes (depends on a version) need to additionally install ADB and aapt (for Mac only). 
 2. Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
 Hint: you sometimes (especially on Mac) need to add paths to important folders inside sdk, such as “platform-tools” (ADB is located here), “tools” and “build-tools” (aapt is located here).
-3. .apk file - installation file of a program that’s being tested is required, the same for both - the real device and the emulator.
+3. .apk file - installation file of a program that’s being tested is required, the same for both - a real device and an emulator.
 
 ### iOS special requirements:
 1. [Xcode](https://developer.apple.com/xcode/) is a vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.
-2. Installation file of a program that’s being tested is required. For the real device it’s .ipa file, and for the simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on the simulator is free. On the other hand, the license is needed to work with the real device.
+2. Installation file of a program that’s being tested is required. For a real device it’s .ipa file, and for a simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on the simulator is free. On the other hand, the license is needed to work with the real device.
 
 ### Mobile config properties
-We could provide any Appium capability in the **config.properties** file using capabilities.name=value format. In the table below we are providing the description of the most popular mobile capabilities:
+We can provide any Appium capability in the **config.properties** file using capabilities.name=value format. In the table below we are providing the description of the most popular mobile capabilities:
 
 <table>
 	<tr>
@@ -33,7 +33,7 @@ We could provide any Appium capability in the **config.properties** file using c
 	</tr>
         <tr>
 		<td>capabilities.deviceType</td>
-		<td>The only custom Carina capability to determine the type of the device</td>
+		<td>The only custom Carina capability to determine the type of a device</td>
                 <td>n/a</td>
 		<td>phone/tablet/tv...</td>
 	</tr>
@@ -63,7 +63,7 @@ We could provide any Appium capability in the **config.properties** file using c
 	</tr>
         <tr>
 		<td>capabilities.newCommandTimeout</td>
-		<td>New implicit timeout is seconds to wait for the element for mobile automation</td>
+		<td>New implicit timeout in seconds to wait for the element for mobile automation</td>
                 <td>n/a</td>
 		<td>180</td>
 	</tr>
@@ -152,7 +152,7 @@ capabilities.autoGrantPermissions=true
 ```
 
 <b>Note:</b>
-To get the device’s unique id (UDID), the command “adb devices” is used. This command provides a list of devices attached with their UDIDs. For the real device it will look like “759b543c” (can be shorter or longer), and for the emulator it will be like “emulator-5554”.
+To get the device’s unique id (UDID), the command “adb devices” is used. This command provides a list of devices attached with their UDIDs. For a real device, it will look like “759b543c” (can be shorter or longer), and for an emulator, it will be like “emulator-5554”.
 
 ### Example for iOS of _config.properties:
 ```
@@ -177,7 +177,7 @@ capabilities.newCommandTimeout=1800
 ```
 
 <b>Note:</b>
-To get the device’s unique id (UDID) for the emulator, the command “xcrun simctl list” is used. It will show the list of simulators with their names, iOS versions, udids and statuses (shutdown or booted). 
+To get the device’s unique id (UDID) for an emulator, the command “xcrun simctl list” is used. It will show the list of simulators with their names, iOS versions, udids and statuses (shutdown or booted). 
 To get UDID from the real device, you need to plug your phone into a computer and copy it out of iTunes:
 1. Launch iTunes and connect your iPhone.
 2. In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
@@ -230,7 +230,7 @@ protected ExtendedWebElement developerText;
 ```
 
 ### Implementation of tests
-Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is a sample test implementation:
+Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 
 ```
 public class SampleTest extends AbstractTest {
@@ -347,7 +347,7 @@ public class HomePage extends HomePageBase {
     }
 ```
 
-Inside every test Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.
+Inside every test, Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.
 
 **Example:**
 ```
@@ -388,6 +388,6 @@ private ExtendedWebElement signUpBtn;
 The list of actions with image elements and related driver settings is available [here](http://appium.io/docs/en/advanced-concepts/image-elements/).
 
 Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using ```src/main/resources/``` folder to store images. 
-Be sure your image size is less than the real screen size. The real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
+Be sure your image size is less than the real screen size. Real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
 
 
