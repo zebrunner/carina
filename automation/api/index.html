@@ -723,9 +723,9 @@
 Assured brings the simplicity of using these languages into the Java domain."</li>
 <li>Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
 files, source code, etc.) based on templates and changing data."</li>
-<li>JsonPath - library for extracting data from JSON body</li>
-<li>JsonAssert - library for comparing the actual JSON body with an expected one</li>
-<li>Json-schema-validator - library for validating of JSON body for matching to JSON schema</li>
+<li>JsonPath - a library for extracting data from JSON body</li>
+<li>JsonAssert - a library for comparing the actual JSON body with an expected one</li>
+<li>Json-schema-validator - a library for validating of JSON body for matching to JSON schema</li>
 </ul>
 <h3 id="example-of-test-implementation">Example of test implementation</h3>
 <p>Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body</p>
@@ -794,7 +794,7 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 </code></pre>
 
 <h4 id="api-test">API test</h4>
-<p>API test is the general TestNG test, a class should extend APITest, in our case, the test extends it over AbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.</p>
+<p>API test is a general TestNG test, a class should extend APITest, in our case, the test extends it over AbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.</p>
 <pre><code>package com.qaprosoft.carina.demo;
 
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -852,7 +852,7 @@ public class APISampleTest extends AbstractTest {
 <li>Make further calls using the data from the previous call if needed</li>
 </ol>
 <h3 id="useful-features">Useful features</h3>
-<p>The framework contains a list of useful features for requests building and for responses validation. It makes the support of such tests easier and at the same time minimizes the amount of test data.</p>
+<p>The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.</p>
 <h4 id="wildcards">Wildcards</h4>
 <p>In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:</p>
 <pre><code>{
@@ -863,7 +863,7 @@ public class APISampleTest extends AbstractTest {
 </code></pre>
 
 <p>Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.</p>
-<p>Another way of wildcards' usage is response validation. In some cases, you may need to skip some values or validate by regex:</p>
+<p>Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex:</p>
 <pre><code>{
     &quot;id&quot;: &quot;skip&quot;,                                    // Will skip actual value validation and just verify id key presence
     &quot;signup_date&quot;: &quot;regex:\\d{4}-\\d{2}-\\d{2}&quot;,     // Will validate date value by specified regex
@@ -883,7 +883,7 @@ public class APISampleTest extends AbstractTest {
 IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
 In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
 <img alt="API flow" src="../../img/api/schema-generator.png" />
-Make sure that you change all the flags required to true. After that, create a new file in the resources and place it into an appropriate endpoint package:</p>
+Make sure that you change all the required flags to true. After that, create a new file in the resources and place it into an appropriate endpoint package:</p>
 <pre><code>{
     &quot;type&quot;:&quot;object&quot;,
     &quot;$schema&quot;: &quot;http://json-schema.org/draft-03/schema&quot;,
@@ -985,13 +985,13 @@ It's easy to extend such a structure. You just need to add items with similar pl
 }
 </code></pre>
 
-<p>This approach is useful when a structure of an array item is quite complex. So, it makes sense to specify the item attributes only once, doing it inside #list operation.
+<p>This approach is useful when the structure of an array item is quite complex. So, it makes sense to specify the item attributes only once, doing it inside #list operation.
 This approach also allows to choose the amount of array items dynamically.
 But note that you should specify all properties for every item, so this view cannot be used for negative tests when you need to miss some properties.</p>
 <h4 id="validation-of-responses-with-an-array">Validation of responses with an array</h4>
 <p>Sometimes you can face a situation when you need to validate the presence of only one item (or a couple of them) in a JSON array ignoring the rest of the items.
 In such case, you can use a validation option ARRAY_CONTAINS.
-Here is the code sample:</p>
+Here is a code sample:</p>
 <pre><code>JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + &quot;content&quot;));
 </code></pre>
@@ -1047,9 +1047,9 @@ Here is the code sample:</p>
 </code></pre>
 
 <h3 id="deserialization-of-json">Deserialization of JSON</h3>
-<p>Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from the database as the expected data.
+<p>Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from a database as the expected data.
 For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
-For this you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
+For this, you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
 Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:</p>
 <pre><code>import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -1092,7 +1092,7 @@ ObjectMapper mapper = new ObjectMapper();
 Clients clients = mapper.readValue(rs, Clients.class);
 </code></pre>
 
-<p>Then you can use POJO object for any kind of validation or for an easy retrieving of the required properties.</p>
+<p>Then you can use POJO object for any kind of validation or for easy retrieving of the required properties.</p>
                 
                   
                 
