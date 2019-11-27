@@ -624,6 +624,7 @@ public class Screenshot {
                 || message.contains("invalid session id")
 				|| message.contains("Session timed out or not found")
 				|| message.contains("cannot forward the request")
+                || message.contains("connect ECONNREFUSED")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
