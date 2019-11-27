@@ -623,6 +623,7 @@ public class Screenshot {
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
+                || message.contains("Session does not exist")
 				|| message.contains("Session timed out or not found")
 				|| message.contains("cannot forward the request")
                 || message.contains("connect ECONNREFUSED")
