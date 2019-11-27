@@ -4,7 +4,7 @@ Carina framework follows Selenium best practices for web test automation. If you
 
 
 ### Implementation of Page Objects
-When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of the element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:
+When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:
 ```
 List<WebElement> zipCodes = driver.findElements(By.id("zipCodes"));
 for (WebElement zipCode : zipCodes) {
@@ -139,7 +139,7 @@ public class HomePage extends AbstractPage {
 * Locate UI Object classes in src/main/java source folder
 
 ### Implementation of tests
-Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is a sample test implementation:
+Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
 public class WebSampleTest extends AbstractTest {
     @Test(description = "JIRA#AUTO-0009")
