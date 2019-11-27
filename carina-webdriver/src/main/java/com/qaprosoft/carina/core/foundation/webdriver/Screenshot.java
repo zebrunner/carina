@@ -199,7 +199,7 @@ public class Screenshot {
 
         try {
             if (!isCaptured(comment)) {
-                LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+                LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
                 return null;
             }
 
