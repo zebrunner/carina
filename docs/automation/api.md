@@ -18,9 +18,9 @@ From this perspective, we decided to use the following instruments:
 Assured brings the simplicity of using these languages into the Java domain."
 * Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
 files, source code, etc.) based on templates and changing data."
-* JsonPath - library for extracting data from JSON body
-* JsonAssert - library for comparing the actual JSON body with an expected one
-* Json-schema-validator - library for validating of JSON body for matching to JSON schema
+* JsonPath - a library for extracting data from JSON body
+* JsonAssert - a library for comparing the actual JSON body with an expected one
+* Json-schema-validator - a library for validating of JSON body for matching to JSON schema
 
 ### Example of test implementation
 Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body
@@ -93,7 +93,7 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
 
 #### API test
-API test is the general TestNG test, a class should extend APITest, in our case, the test extends it over AbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
+API test is a general TestNG test, a class should extend APITest, in our case, the test extends it over AbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
 ```
 package com.qaprosoft.carina.demo;
 
@@ -151,7 +151,7 @@ public class APISampleTest extends AbstractTest {
 7. Make further calls using the data from the previous call if needed
 
 ### Useful features
-The framework contains a list of useful features for requests building and for responses validation. It makes the support of such tests easier and at the same time minimizes the amount of test data.
+The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
@@ -164,7 +164,7 @@ In some cases, you may need to generate data in the request to make the request 
 ```
 Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
-Another way of wildcards' usage is response validation. In some cases, you may need to skip some values or validate by regex:
+Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex:
 ```
 {
     "id": "skip",                                    // Will skip actual value validation and just verify id key presence
@@ -185,7 +185,7 @@ Now we need to generate a schema (you may use any generator you like, for exampl
 IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
 In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
 ![API flow](../img/api/schema-generator.png)
-Make sure that you change all the flags required to true. After that, create a new file in the resources and place it into an appropriate endpoint package:
+Make sure that you change all the required flags to true. After that, create a new file in the resources and place it into an appropriate endpoint package:
 ```
 {
     "type":"object",
@@ -287,14 +287,14 @@ It's easy to extend such a structure. You just need to add items with similar pl
    ]
 }
 ```
-This approach is useful when a structure of an array item is quite complex. So, it makes sense to specify the item attributes only once, doing it inside #list operation.
+This approach is useful when the structure of an array item is quite complex. So, it makes sense to specify the item attributes only once, doing it inside #list operation.
 This approach also allows to choose the amount of array items dynamically.
 But note that you should specify all properties for every item, so this view cannot be used for negative tests when you need to miss some properties.
 
 #### Validation of responses with an array
 Sometimes you can face a situation when you need to validate the presence of only one item (or a couple of them) in a JSON array ignoring the rest of the items.
 In such case, you can use a validation option ARRAY_CONTAINS.
-Here is the code sample:
+Here is a code sample:
 ```
 JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "content"));
@@ -351,9 +351,9 @@ And the actual response:
 ```
 
 ### Deserialization of JSON
-Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from the database as the expected data.
+Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from a database as the expected data.
 For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
-For this you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
+For this, you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
 Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:
 ```
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -396,4 +396,4 @@ String rs = getClientsMethod.callAPI().asString();
 ObjectMapper mapper = new ObjectMapper();
 Clients clients = mapper.readValue(rs, Clients.class);
 ```
-Then you can use POJO object for any kind of validation or for an easy retrieving of the required properties.
+Then you can use POJO object for any kind of validation or for easy retrieving of the required properties.
