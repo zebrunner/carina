@@ -7,7 +7,7 @@
 * Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
 
 ### Generating project
-The easiest way to initialize a new project is to use Carina archetype, you will get a correct project structure along with test samples:
+The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples:
 ```
 mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
@@ -18,7 +18,7 @@ mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -Durl=<your_proj_url> \
                        -Dversion=<your_proj_version>
 ```
-If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above  Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:
+If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:
 
 <table>
 	<tr>

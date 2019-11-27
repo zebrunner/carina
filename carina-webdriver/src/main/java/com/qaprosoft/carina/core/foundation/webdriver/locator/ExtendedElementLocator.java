@@ -193,7 +193,7 @@ public class ExtendedElementLocator implements ElementLocator {
         // , or = - group(2)
         // ' or " - group(3)
         // value - group(4)
-        // ' or " - group(5)
+        // '] or "] or ') or ") - group(5)
         
         // double translate is needed to make xpath and value case insensitive.
         // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
@@ -207,7 +207,11 @@ public class ExtendedElementLocator implements ElementLocator {
         while (matcher.find()) {
             String value = matcher.group(4);
             String replacement = "translate(" + matcher.group(1) + ", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase() + "\")"
-                    + matcher.group(2) + "translate(\"" + value + "\", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase(); 
+                    + matcher.group(2) + "translate(\"" + value + "\", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase();
+            if (matcher.group(3).equalsIgnoreCase("'")) {
+            	replacement = "translate(" + matcher.group(1) + ", '" + value.toUpperCase() + "', '" + value.toLowerCase() + "')"
+                    + matcher.group(2) + "translate('" + value + "', '" + value.toUpperCase() + "', '" + value.toLowerCase(); 
+            }
 
             LOGGER.debug("xpath translate:");
             LOGGER.debug(replacement);
