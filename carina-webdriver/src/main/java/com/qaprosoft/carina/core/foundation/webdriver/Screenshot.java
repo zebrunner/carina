@@ -199,7 +199,8 @@ public class Screenshot {
 
         try {
             if (!isCaptured(comment)) {
-                LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+                // [VD] do not write something to log as this original exception is used as original exception for failure
+                //LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
                 return null;
             }
 
@@ -622,11 +623,12 @@ public class Screenshot {
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
 				|| message.contains("Session timed out or not found")
-				|| message.contains("cannot forward the request unexpected end of stream")
+				|| message.contains("cannot forward the request")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
+				|| message.contains("Method is not implemented") //to often exception for mobile native app testing
 				// [VD] exclude below condition otherwise we overload appium when fluent wait looking for device and doing screenshot in a loop 
 				|| message.contains("An element could not be located on the page using the given search parameters")
 				|| message.contains("current view have 'secure' flag set")

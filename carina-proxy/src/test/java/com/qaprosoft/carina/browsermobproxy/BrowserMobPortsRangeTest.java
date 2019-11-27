@@ -53,6 +53,7 @@ public class BrowserMobPortsRangeTest {
     }
 
     private void initialize() {
+    	ProxyPool.initProxyPortsRange();
         ProxyPool.setupBrowserMobProxy();
         SystemProxy.setupProxy();
 

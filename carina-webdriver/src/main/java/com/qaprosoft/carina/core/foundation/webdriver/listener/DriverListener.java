@@ -16,21 +16,18 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.WebDriverEventListener;
-import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
-
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
@@ -161,8 +158,9 @@ public class DriverListener implements WebDriverEventListener {
         LOGGER.debug("DriverListener->onException starting...");
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
-        if (thr.getMessage() == null)
+        if (thr.getMessage() == null) {
             return;
+        }
 
         if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
                 thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
@@ -171,7 +169,8 @@ public class DriverListener implements WebDriverEventListener {
             return;
         }
 
-        if (thr.getMessage().contains("Method has not yet been implemented")) {
+        if (thr.getMessage().contains("Method has not yet been implemented")
+                || thr.getMessage().contains("Method is not implemented")) {
             // do nothing
             return;
         }
@@ -193,9 +192,10 @@ public class DriverListener implements WebDriverEventListener {
 
         String urlPrefix = "";
         try {
-            if (!isMobile(driver)) {
-                urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
-            }
+            //[VD] commented as too many issues observed due to this feature
+//            if (!isMobile(driver)) {
+//                urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
+//            }
             // 1. if you see mess with afterTest carina actions and Timer startup failure you should follow steps #2+ to determine root cause.
             //      Driver initialization 'default' FAILED! Retry 1 of 1 time - Operation already started: mobile_driverdefault
             // 2. carefully track all preliminary exception for the same thread to detect 1st problematic exception
@@ -310,10 +310,6 @@ public class DriverListener implements WebDriverEventListener {
         currentNegativeMessage.remove();
     }
 
-    private boolean isMobile(WebDriver driver) {
-        return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
-    }
-    
 	@Override
 	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
 		// do nothing

@@ -83,8 +83,7 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void tap(ExtendedWebElement element) {
         Point point = element.getLocation();
-        Dimension size = helper.performIgnoreException(() -> element.getSize());
-
+        Dimension size = element.getSize();
         tap(point.getX() + size.getWidth() / 2, point.getY() + size.getHeight() / 2);
     }
 
@@ -105,7 +104,7 @@ public interface IMobileUtils extends IDriverPool {
      *            element
      */
     default public void longTap(ExtendedWebElement elem) {
-        Dimension size = helper.performIgnoreException(() -> elem.getSize());
+        Dimension size = elem.getSize();
 
         int width = size.getWidth();
         int height = size.getHeight();
@@ -402,7 +401,7 @@ public interface IMobileUtils extends IDriverPool {
         WebDriver drv = castDriver();
 
         UTILS_LOGGER.debug("Getting driver dimension size...");
-        Dimension scrSize = helper.performIgnoreException(() -> drv.manage().window().getSize());
+        Dimension scrSize = drv.manage().window().getSize();
         UTILS_LOGGER.debug("Finished driver dimension size...");
         // explicitly limit range of coordinates
         if (endx >= scrSize.width) {
@@ -468,13 +467,13 @@ public interface IMobileUtils extends IDriverPool {
             WebDriver driver = castDriver();
             elementLocation = new Point(0, 0); // initial left corner for that case
 
-            elementDimensions = helper.performIgnoreException(() -> driver.manage().window().getSize());
+            elementDimensions = driver.manage().window().getSize();
         } else {
             if (container.isElementNotPresent(5)) {
                 Assert.fail("Cannot swipe! Impossible to find element " + container.getName());
             }
             elementLocation = container.getLocation();
-            elementDimensions = helper.performIgnoreException(() -> container.getSize());
+            elementDimensions = container.getSize();
         }
 
         double minCoefficient = 0.3;
@@ -734,7 +733,7 @@ public interface IMobileUtils extends IDriverPool {
     default public void zoom(Zoom type) {
         UTILS_LOGGER.info("Zoom will be performed :" + type);
         MobileDriver<?> driver = (MobileDriver<?>) castDriver();
-        Dimension scrSize = helper.performIgnoreException(() -> driver.manage().window().getSize());
+        Dimension scrSize = driver.manage().window().getSize();
         int height = scrSize.getHeight();
         int width = scrSize.getWidth();
         UTILS_LOGGER.debug("Screen height : " + height);
