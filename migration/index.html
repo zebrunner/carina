@@ -516,7 +516,7 @@
 <ul>
 <li>Visit <a href="http://qaprosoft.github.io/carina/releases/">Release Notes</a> for details.</li>
 </ul>
-<p>1) Listeners Updates</p>
+<p>1) Listener Updates</p>
 <ul>
 <li>AnnotationTransformer is a part of CarinaListener, so it should be removed from all TestNG suites and pom.xml files:</li>
 </ul>
@@ -536,7 +536,7 @@
     &lt;/listeners&gt;
 </code></pre>
 
-<p>2) Apache Maven plugins upgrade</p>
+<p>2) Apache Maven plugin upgrade</p>
 <ul>
 <li>all plugins have been upgraded on a core level, and we recommend to bump up the below mentioned plugins to the newest versions on project levels as well:<ul>
 <li>maven-compiler-plugin 3.2 -&gt; 3.8.0</li>
@@ -547,10 +547,10 @@
 <p>3) DriverPool has been refactored and is delivered as IDriverPool interface with default functionality</p>
 <ul>
 <li>
-<p>No changes on a test classes level if they extend AbstractTest</p>
+<p>No changes on a test class levels if they extend AbstractTest</p>
 </li>
 <li>
-<p>For every services layer which used static DriverPool functionality we should:</p>
+<p>For every service layer which used static DriverPool functionality we should:</p>
 </li>
 </ul>
 <pre><code>   // add &quot;implements IDriverPool&quot; for each service class
@@ -562,9 +562,9 @@
 </code></pre>
 
 <p>4) Cucumber functionality has been completely removed in 6.0, so just remove all dependent classes if any. Inform <a href="mailto:carina-support@qaprosoft.com">carina-support</a> if you want to restore cucumber module in Carina.</p>
-<p>5) All TestRail updaters, interfaces, etc. have been removed. Carina can't push the data to 3rd party Reporting Tools at runtime. 
+<p>5) All TestRail updaters, interfaces, etc. have been removed. Carina can't push data to 3rd party Reporting Tools at runtime. 
    Carina can register only TestRail related tags in Zafira. Integration has been moved to the qps-pipeline level which is much easier to develop, maintain and support.</p>
-<p>6) DriverHelper (AbstractPage) - deprecated methods' removal</p>
+<p>6) DriverHelper (AbstractPage) - removal of deprecated methods</p>
 <ul>
 <li>click, type, hover, select, etc.</li>
 </ul>
@@ -600,7 +600,7 @@
 
 <p>7) CustomTypePageFactory-&gt;initPage method has an obligatory driver as the 1st argument. </p>
 <ul>
-<li>transferring the driver as an argument should resolve invalid calls on services layer when we got "driver already quit..." too often</li>
+<li>transferring the driver as an argument should resolve invalid calls on service layer when we received "driver already quit..." too often</li>
 </ul>
 <pre><code>   return CustomTypePageFactory.initPage(PlayerPageBase.class);
    // change to
