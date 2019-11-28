@@ -527,7 +527,7 @@
                 
                 <p>Security functionality in Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In Carina framework, AES encryption is used by default with a 128-bit security key.</p>
 <p><img alt="Security Algorithm" src="../img/security-alg.png" /></p>
-<p>Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration. Also, one may use the default common key located in the test resources, giving access to all other users for secured data decryption.</p>
+<p>Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration. Also, one may use the default common key located in test resources, giving access to all other users for secured data decryption.</p>
 <h2 id="secured-data-preparation">Secured data preparation</h2>
 <p>For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:</p>
 <pre><code>com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -generate -key_file &quot;file_path_to_save_key&quot;
@@ -545,7 +545,7 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file &quot;c
 <li>Set arguments
 <img alt="Security Config 2" src="../img/security-config-2.png" /></li>
 <li>Press Apply and then Run</li>
-<li>Crypto key will be generated:
+<li>A crypto key will be generated:
 <img alt="Security Config 3" src="../img/security-config-3.png" /></li>
 </ol>
 <p><strong>To prepare a test data file with secured data:</strong></p>
@@ -553,17 +553,17 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file &quot;c
 <li>Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values
 <img alt="Security Config 4" src="../img/security-config4.png" /></li>
 <li>Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values.
-Go to “Run configuration”, navigate to the arguments tab and execute an encryption command specifying the key path and input file:
+Go to “Run configuration”, navigate to the arguments tab and execute the encryption command specifying the key path and input file:
 <img alt="Security Config 5" src="../img/security-config5.png" /></li>
-<li>File with encrypted data will be generated:
+<li>A file with encrypted data will be generated:
 <img alt="Security Config 6" src="../img/security-config6.png" /></li>
 <li>To encrypt a single string, use the following config:
 <img alt="Security Config 7" src="../img/security-config7.png" /></li>
-<li>Encrypted string will be shown in the console:
+<li>The encrypted string will be shown in the console:
 <img alt="Security Config 8" src="../img/security-config-8.png" /></li>
 <li>To decrypt the encrypted file, execute:
 <img alt="Security Config 9" src="../img/security-config-9.png" /></li>
-<li>Decrypted file will be generated:
+<li>The decrypted file will be generated:
 <img alt="Security Config 4" src="../img/security-config4.png" /></li>
 </ol>
 <h2 id="secured-data-usage">Secured data usage</h2>
