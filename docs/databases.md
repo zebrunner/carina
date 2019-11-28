@@ -278,7 +278,7 @@ db.pass=postgres
 #db.pass=mysql
 ```
 
-All the mappers and the reference to _database.properties should be specified in **src/main/resources/mybatis-config.xml**:
+All the mappers and reference to _database.properties should be specified in **src/main/resources/mybatis-config.xml**:
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE configuration
