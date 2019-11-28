@@ -1,5 +1,5 @@
 ### Operating with Proxies
-There is a possibility to send all test traffic via the proxy including the embedded light-weight BrowserMob proxy server.
+There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserMob proxy server.
 There are several properties available to manage all kinds of proxy usage:
 ```
 proxy_host=NULL
@@ -12,29 +12,29 @@ browsermob_disabled_mitm=false
 browsermob_port=0
 ```
 Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
-Also, to enable a proxy for TestNG Java process, **proxy_set_to_system** must be specifed to **true**, otherwise only WebDrivers and API clients will be proxied.
+Also, to enable proxy for TestNG Java process, **proxy_set_to_system** must be specifed to **true**, otherwise only WebDrivers and API clients will be proxied.
 
 Note: The above settings are mostly required to get public internet access through corporate proxies.
 
 ### Raising inbuilt proxy-server (BrowserMob)
-Also, Carina can start the embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find the BrowserMob proxy related parameters in your **config.properties** file:
+Also, Carina can start an embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find BrowserMob proxy related parameters in your **config.properties** file:
 ```
 browsermob_proxy=true
 browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 ```
-With the enabled **browsermob_proxy** Carina will start the dedicated proxy instance on every test method. 
+With the enabled **browsermob_proxy**, Carina will start the dedicated proxy instance on every test method. 
 
 **browsermob_host=NULL** means that Carina automatically detects an IP address and puts it into the capabilities, etc.
 
-**browsermob_host=myhostname** is useful in case of running maven process inside a docker container. Override the hostname to be available from Selenium instance.
+**browsermob_host=myhostname** is useful in case of running maven process inside a docker container. Override the hostname, and it will be available from Selenium instance.
 
 **browsermob_port=0** means that Carina dynamically identifies a free port for a proxy session.
 
 **browsermob_disabled_mitm** is disabled by default. 
 
-**Important!** If you have troubles with  SSL traffic sniffing, the first thing you should do - change **browsermob_disabled_mitm** property value!
+**Important!** If you have troubles with  SSL traffic sniffing, the first thing you should do is to change **browsermob_disabled_mitm** property value!
 
 #### Using proxy-server in Java code:
 
@@ -42,7 +42,7 @@ With the enabled **browsermob_proxy** Carina will start the dedicated proxy inst
 ```
 getDriver();
 ```
-Note: During the driver startup Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get a proxy instance for the current test/thread, you can call:
+Note: During the driver startup, Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get proxy instance for the current test/thread, you can call:
 ```
 BrowserMobProxy proxy = ProxyPool.getProxy();
 ```
@@ -93,7 +93,7 @@ To add and configure content filters, look [here](https://github.com/lightbody/b
 ##### For Mac users:
 
 1. Go [here](https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer) and save it as **ca-certificate-rsa.cer**.
-2. Double click creates a file. The next window should appear:
+2. A double click creates a file. The next window should appear:
 
 ![Adding ssl certificate](img/SSLInstallStep1.png)
 
@@ -113,9 +113,9 @@ To add and configure content filters, look [here](https://github.com/lightbody/b
 
 ![Adding ssl certificate](img/SSLInstallStep5.png)
 
-#### Adding ssl certificate into Java keystore:
+#### Adding SSL certificate into Java keystore:
 
-If you are still getting the following exception:
+If you are still receiving the following exception:
 ```
 javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
 ```
