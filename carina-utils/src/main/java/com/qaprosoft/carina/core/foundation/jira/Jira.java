@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -50,7 +51,8 @@ public class Jira {
     private static CryptoTool cryptoTool;
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
-    protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<List<String>>();
+    protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<>();
+    protected static ThreadLocal<BaseWorkItem> knownIssue = new ThreadLocal<>();
 
     static {
         try {
@@ -86,7 +88,7 @@ public class Jira {
         }
     }
 
-    public static void clearTickets() {
+    private static void clearTickets() {
         jiraTickets.remove();
     }
 
@@ -195,6 +197,32 @@ public class Jira {
             }
         }
         return null;
+    }
+
+    public synchronized static void setKnownIssue(String jiraId) {
+        setKnownIssue(jiraId, null);
+    }
+
+    public synchronized static void setKnownIssue(String jiraId, String description) {
+        setKnownIssue(jiraId, description, false);
+    }
+
+    public synchronized static void setKnownIssue(String jiraId, String description, boolean blocker) {
+        BaseWorkItem workItem = new BaseWorkItem(jiraId, description, blocker);
+        knownIssue.set(workItem);
+    }
+
+    public static BaseWorkItem getKnownIssue() {
+        return knownIssue.get();
+    }
+
+    private static void clearKnownIssue() {
+        knownIssue.remove();
+    }
+
+    public static void clearJiraArtifacts() {
+        clearTickets();
+        clearKnownIssue();
     }
 
 }

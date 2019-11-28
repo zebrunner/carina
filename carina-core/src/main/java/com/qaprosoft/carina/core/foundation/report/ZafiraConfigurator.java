@@ -22,6 +22,7 @@ import java.util.Set;
 
 import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
 import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
+import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestResult;
@@ -160,6 +161,16 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     public List<String> getTestWorkItems(TestResultAdapter testResultAdapter) {
         ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         return Jira.getTickets(test);
+    }
+
+    @Override
+    public BaseWorkItem getTestKnownIssue(TestResultAdapter testResultAdapter) {
+        return Jira.getKnownIssue();
+    }
+
+    @Override
+    public void clearTestWorkItemArtifacts() {
+        Jira.clearJiraArtifacts();
     }
 
     @Override

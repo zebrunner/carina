@@ -37,7 +37,7 @@ public class JiraTest {
         Jira.setTickets(customTicket1);
         Assert.assertEquals(Jira.jiraTickets.get().size(), 1);
 
-        Jira.clearTickets();
+        Jira.clearJiraArtifacts();
         Assert.assertNull(Jira.jiraTickets.get());
 
         List<String> tickets = new ArrayList<String>();
