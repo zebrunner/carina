@@ -427,7 +427,7 @@ public class Configuration {
     public static String getDriverType() {
 
         String platform = getPlatform();
-        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
@@ -452,7 +452,7 @@ public class Configuration {
             platform = capabilities.getCapability("platformName").toString();
         }
 
-        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
