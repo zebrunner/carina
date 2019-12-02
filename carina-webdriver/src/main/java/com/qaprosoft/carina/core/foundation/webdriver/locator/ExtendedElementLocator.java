@@ -76,7 +76,7 @@ public class ExtendedElementLocator implements ElementLocator {
             this.caseInsensitive = false;
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(DisableCacheLookup.class)) {
-            	this.shouldCache = false;
+                this.shouldCache = false;
             }
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
                 this.caseInsensitive = true;
@@ -95,7 +95,7 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public WebElement findElement() {
         if (cachedElement != null && shouldCache) {
-        	LOGGER.debug("returning element from cache: " + by);
+            LOGGER.debug("returning element from cache: " + by);
             return cachedElement;
         }
 
@@ -108,16 +108,16 @@ public class ExtendedElementLocator implements ElementLocator {
                 by = toCaseInsensitive(by.toString());
             }
             try {
-            	element = searchContext.findElement(by);
+                element = searchContext.findElement(by);
             } catch (NoSuchElementException e) {
                 exception = e;
-            	//TODO: on iOS findElement return nothing but findElements return valid single item
-            	// maybe migrate to the latest appium java driver
-            	elements = searchContext.findElements(by);
-            	if (!elements.isEmpty()) {
-            		exception = null;
-            		element = searchContext.findElements(by).get(0);
-            	}
+                //TODO: on iOS findElement return nothing but findElements return valid single item
+                // maybe migrate to the latest appium java driver
+                elements = searchContext.findElements(by);
+                if (!elements.isEmpty()) {
+                    exception = null;
+                    element = searchContext.findElements(by).get(0);
+                }
                 LOGGER.debug("Unable to find element: " + e.getMessage());
             }
         }
@@ -131,7 +131,7 @@ public class ExtendedElementLocator implements ElementLocator {
             throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
         }
 
-		// 1. enable cache for successfully discovered element to minimize selenium calls
+        // 1. enable cache for successfully discovered element to minimize selenium calls
         if (shouldCache) {
             cachedElement = element;
         }
@@ -143,16 +143,16 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public List<WebElement> findElements() {
         List<WebElement> elements = null;
-    	NoSuchElementException exception = null;
+        NoSuchElementException exception = null;
 
-    	try {
-    		elements = searchContext.findElements(by);
+        try {
+            elements = searchContext.findElements(by);
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         }
 
-    	//TODO: incorporate find by AI???
-    	
+        //TODO: incorporate find by AI???
+        
         // If no luck throw general NoSuchElementException
         if (elements == null) {
             throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
@@ -186,43 +186,20 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "(@text|text\\(\\))\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(?=(\\'(\\)|\\])|\\\"(\\)|\\])))";
-        //TODO: test when xpath globally are declared inside single quota
-        
-        // @text of text() - group(1)
-        // , or = - group(2)
-        // ' or " - group(3)
-        // value - group(4)
-        // '] or "] or ') or ") - group(5)
-        
-        // double translate is needed to make xpath and value case insensitive.
-        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
-        // double translate allow to use as is and convert everywhere
-        
-        // Expected xpath for both side translate
-        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
-        
+        String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b\\s?(\\bcontains\\b\\()?|\\bor\\b\\s?(\\bcontains\\b\\()?))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\band\\b|\\bor\\b)\\]?)";
         Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
-            String value = matcher.group(4);
-            String replacement = "translate(" + matcher.group(1) + ", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase() + "\")"
-                    + matcher.group(2) + "translate(\"" + value + "\", \"" + value.toUpperCase() + "\", \"" + value.toLowerCase();
-            if (matcher.group(3).equalsIgnoreCase("'")) {
-            	replacement = "translate(" + matcher.group(1) + ", '" + value.toUpperCase() + "', '" + value.toLowerCase() + "')"
-                    + matcher.group(2) + "translate('" + value + "', '" + value.toUpperCase() + "', '" + value.toLowerCase(); 
-            }
-
-            LOGGER.debug("xpath translate:");
-            LOGGER.debug(replacement);
+            String replacement = matcher.group(1) + "translate(" + matcher.group(5)
+                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÄÃÇČÉÈÊËĔŒĞĢÎÏÍÌÔÖŌÒÓØŜŞßÙÛÜŪŸ', 'abcdefghijklmnopqrstuvwxyzàáâäåçčéèêëĕœğģîïíìôöōòóøŝşßùûüūÿ') " + matcher.group(7);
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
         return By.xpath(sb.toString());
     }
 
-	public void setShouldCache(boolean shouldCache) {
-		this.shouldCache = shouldCache;
-	}
+    public void setShouldCache(boolean shouldCache) {
+        this.shouldCache = shouldCache;
+    }
 
 }
