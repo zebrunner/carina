@@ -28,6 +28,8 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 import ${package}.carina.demo.gui.components.FooterMenu;
 
 public class HomePage extends AbstractPage {
+    Logger LOGGER = Logger.getLogger(HomePage.class);
+
     @FindBy(id = "footmenu")
     private FooterMenu footerMenu;
 
