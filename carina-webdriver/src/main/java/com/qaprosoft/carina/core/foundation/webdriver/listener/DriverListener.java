@@ -21,6 +21,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -31,6 +32,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
+ * IMPORTANT! Please avoid any driver calls with extra listeners (recursive exception generation)
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
@@ -156,12 +158,14 @@ public class DriverListener implements WebDriverEventListener {
     @Override
     public void onException(Throwable thr, WebDriver driver) {
         LOGGER.debug("DriverListener->onException starting...");
+        driver = castDriver(driver);
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
         if (thr.getMessage() == null) {
             return;
         }
 
+        //TODO: hopefully castDriver at the beginning resolve root cause of the recursive onException calls
         if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
                 thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
             LOGGER.error("Do not generate screenshot for invalid driver!");
@@ -238,17 +242,39 @@ public class DriverListener implements WebDriverEventListener {
     }
 
     @Override
-    public void afterSwitchToWindow(String arg0, WebDriver arg1) {
+    public void afterSwitchToWindow(String arg0, WebDriver driver) {
         // do nothing
 
     }
 
     @Override
-    public void beforeSwitchToWindow(String arg0, WebDriver arg1) {
+    public void beforeSwitchToWindow(String arg0, WebDriver driver) {
     	onBeforeAction();
     }
+    
+    @Override
+    public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
+        // do nothing
+        
+    }
+
+    @Override
+    public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
+        onBeforeAction();
+    }
+
+    @Override
+    public void afterGetText(WebElement element, WebDriver driver, String arg2) {
+        // do nothing       
+    }
+
+    @Override
+    public void beforeGetText(WebElement element, WebDriver driver) {
+        // do nothing       
+    }    
 
     private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
+        driver = castDriver(driver);
         if (getMessage(errorMessage) != null) {
             comment = getMessage(errorMessage);
         }
@@ -309,26 +335,19 @@ public class DriverListener implements WebDriverEventListener {
         currentPositiveMessage.remove();
         currentNegativeMessage.remove();
     }
+    
+    /**
+     * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
+     *
+     * @return WebDriver
+     */
+    private WebDriver castDriver(WebDriver drv) {
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        }
+        return drv;
+    }
 
-	@Override
-	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
-		// do nothing
-		
-	}
 
-	@Override
-	public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
-		onBeforeAction();
-	}
-
-	@Override
-	public void afterGetText(WebElement arg0, WebDriver arg1, String arg2) {
-		// do nothing		
-	}
-
-	@Override
-	public void beforeGetText(WebElement arg0, WebDriver arg1) {
-		// do nothing		
-	}
 
 }
