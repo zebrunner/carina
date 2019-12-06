@@ -617,8 +617,7 @@ public class Screenshot {
 			return true;
 		}
 		// disable screenshot if error message contains any of this info
-		LOGGER.info("isCaptured->message: '" + message + "'");
-		boolean disableScreenshot = message.contains("StaleObjectException")
+		boolean isContains = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
@@ -645,7 +644,12 @@ public class Screenshot {
 				|| message.contains("Expected to read a START_MAP but instead have: END") // potential drivers issues fix for moon
 				|| message.contains("An unknown error has occurred") // 
 				|| message.contains("Unable to locate element");
-		return !disableScreenshot;
+		
+		if (!isContains) {
+		    //TODO: closer to the 6.3.30 release move it to debug level
+		    LOGGER.info("isCaptured->message: '" + message + "'");
+		}
+		return !isContains;
 	}
 
     /**
