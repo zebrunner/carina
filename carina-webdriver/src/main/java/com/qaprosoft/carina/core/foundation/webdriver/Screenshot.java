@@ -617,7 +617,7 @@ public class Screenshot {
 			return true;
 		}
 		// disable screenshot if error message contains any of this info
-		LOGGER.debug("isCaptured->message: " + message);
+		LOGGER.info("isCaptured->message: '" + message + "'");
 		boolean disableScreenshot = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
