@@ -195,6 +195,9 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull())
             return;
 
+        if (isIOS())
+            return;
+        
         isStfEnabled = true;
         
         LOGGER.debug("adb connect " + getRemoteURL());
@@ -714,6 +717,10 @@ public class Device extends RemoteDevice implements IDriverPool {
     
     private boolean isMobile() {
         return SpecialKeywords.ANDROID.equalsIgnoreCase(getOs()) || SpecialKeywords.IOS.equalsIgnoreCase(getOs()) || SpecialKeywords.TVOS.equalsIgnoreCase(getOs());
+    }
+    
+    private boolean isIOS() {
+        return SpecialKeywords.IOS.equalsIgnoreCase(getOs()) || SpecialKeywords.TVOS.equalsIgnoreCase(getOs());
     }
 
     private boolean isConnected() {
