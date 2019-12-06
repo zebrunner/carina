@@ -465,7 +465,6 @@ public class Screenshot {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
             	LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
-            	e.printStackTrace();
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot due to the Exception!", e);
             } finally {
@@ -618,6 +617,7 @@ public class Screenshot {
 			return true;
 		}
 		// disable screenshot if error message contains any of this info
+		LOGGER.debug("isCaptured->message: " + message);
 		boolean disableScreenshot = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
