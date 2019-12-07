@@ -254,8 +254,13 @@ public class Screenshot {
         } catch (IOException e) {
             LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
         } catch (WebDriverException e) {
-            LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
-            e.printStackTrace();
+            if (isCaptured(e.getMessage())) {
+                // display exception as we suspect to make screenshot for this use-case
+                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+            } else {
+                // Do not display exception by default as we don't suspect to make screenshot for this use-case
+                LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
+            }
         } catch (Exception e) {
             LOGGER.error("Unable to capture screenshot due to the Exception!", e);
         } finally {
