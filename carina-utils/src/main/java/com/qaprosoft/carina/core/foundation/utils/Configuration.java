@@ -225,6 +225,8 @@ public class Configuration {
 
         SECRET_KEY("secret_key"),
 
+        S3_USE_PRESIGN_URL("s3_use_presign_url"),
+        
         S3_LOCAL_STORAGE("s3_local_storage"),
 
         // AppCenter token

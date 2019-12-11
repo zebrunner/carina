@@ -699,31 +699,40 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             }
 
-            S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
-
-            String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
-
-            // download file from AWS to local storage
-
-            String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
-            File file = new File(fileName);
-
-            // verify maybe requested artifact with the same size was already
-            // download
-            if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
-                LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+            if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
+                // generate presigned url for nearest 4 hours
+                long hours = 4*1000*60*60; //4 hours
+                String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
+                LOGGER.debug("preSigned URL: " + presignedAppUrl);
+                Configuration.setMobileApp(presignedAppUrl);
             } else {
-                LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s",
-                        bucketName, key, file.getAbsolutePath()));
-                AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
-            }
+                // download artifact into the local storage
+                S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
+    
+                String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
+    
+                // download file from AWS to local storage
+    
+                String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
+                File file = new File(fileName);
+    
+                // verify maybe requested artifact with the same size was already
+                // download
+                if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
+                    LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+                } else {
+                    LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s",
+                            bucketName, key, file.getAbsolutePath()));
+                    AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
+                }
+    
+                Configuration.setMobileApp(file.getAbsolutePath());
 
-            Configuration.setMobileApp(file.getAbsolutePath());
-
-            // try to redefine app_version if it's value is latest or empty
-            String appVersion = Configuration.get(Parameter.APP_VERSION);
-            if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+                // try to redefine app_version if it's value is latest or empty
+                String appVersion = Configuration.get(Parameter.APP_VERSION);
+                if (appVersion.equals("latest") || appVersion.isEmpty()) {
+                    R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+                }
             }
 
         }
