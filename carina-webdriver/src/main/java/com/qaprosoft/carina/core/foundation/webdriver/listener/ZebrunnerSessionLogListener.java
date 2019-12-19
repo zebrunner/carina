@@ -20,31 +20,31 @@ import org.openqa.selenium.remote.Command;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
- * ZebrunnerRecordingListener - saves video artifact link before driver is closed.
+ * ZebrunnerSessionLogListener - saves session log artifact link before driver is closed.
  * 
  * @author akhursevich
  */
-public class ZebrunnerRecordingListener implements IDriverCommandListener {
+public class ZebrunnerSessionLogListener implements IDriverCommandListener {
 
-	private TestArtifactType videoArtifact;
+	private TestArtifactType logArtifact;
 	
 	private boolean recording = false;
 
-	public ZebrunnerRecordingListener(TestArtifactType videoArtifact) {
-		this.videoArtifact = videoArtifact;
+	public ZebrunnerSessionLogListener(TestArtifactType logArtifact) {
+		this.logArtifact = logArtifact;
 	}
 
     @Override
     public void beforeEvent(Command command) {
         if (recording) {
-            registerArtifact(command, videoArtifact);
+            registerArtifact(command, logArtifact);
         }
     }
 	
     @Override
     public void afterEvent(Command command) {
         if (!recording && command.getSessionId() != null) {
-            videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
+        	logArtifact.setLink(String.format(logArtifact.getLink(), command.getSessionId().toString()));
             recording = true;
         }
     }

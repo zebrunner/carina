@@ -42,6 +42,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -101,7 +102,9 @@ public class MobileFactory extends AbstractFactory {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
                 EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-
+                
+                final HubType hubType = HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase());
+                
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
                     if (isVideoEnabled()) {
@@ -143,7 +146,7 @@ public class MobileFactory extends AbstractFactory {
                         // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+                        switch (hubType) {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:
@@ -159,6 +162,11 @@ public class MobileFactory extends AbstractFactory {
                             ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
                             break;
                         }
+                    }
+                    
+                    // Adding reference to Appium/Selenium session logs
+                    if(HubType.ZEBRUNNER.equals(hubType)) {
+                    	ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%/session.log")));
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
@@ -195,7 +203,7 @@ public class MobileFactory extends AbstractFactory {
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
                         
-                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+                        switch (hubType) {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:

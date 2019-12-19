@@ -108,19 +108,28 @@ public abstract class AbstractFactory {
     abstract protected int getBitrate(VideoQuality quality);
     
     /**
-     * Generate test artifact for zafira upload.
-     * @param videoName - video link name
+     * Initialize test artifact for upload.
+     * @param videoName - video file name
      * @return test artifact with video details
      */
     protected TestArtifactType initVideoArtifact(String videoName) {
         TestArtifactType artifact = new TestArtifactType();
         artifact.setName("Video " + SDF.format(new Date()));
-        // do not uncomment below steps with "tzid" otherwise each odd (1, 3, 5...) test lost video artifact
-//        ITestResult res = Reporter.getCurrentTestResult();
-//        if (res != null) {
-//        	artifact.setTestId((Long) res.getAttribute("ztid"));
-//        }
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
+        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
+        return artifact;
+    }
+    
+    /**
+     * Initialize test artifact for upload.
+     * @param sessionLogName - session log file name
+     * @return test artifact with session log details
+     */
+    protected TestArtifactType initSessionLogArtifact(String sessionLogName) {
+        TestArtifactType artifact = new TestArtifactType();
+        artifact.setName("Session log " + SDF.format(new Date()));
+        // TODO: allocate separate configuration property
+        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), sessionLogName));
         artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }

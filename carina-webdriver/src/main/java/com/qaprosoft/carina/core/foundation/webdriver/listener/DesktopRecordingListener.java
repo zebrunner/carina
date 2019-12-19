@@ -37,7 +37,7 @@ public class DesktopRecordingListener implements IDriverCommandListener {
     @Override
     public void beforeEvent(Command command) {
         if (recording) {
-            registerVideoArtifact(command, videoArtifact);
+            registerArtifact(command, videoArtifact);
         }
     }
 
@@ -47,5 +47,4 @@ public class DesktopRecordingListener implements IDriverCommandListener {
             recording = true;
         }
     }
-
 }

@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -27,7 +28,6 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -44,6 +44,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
 
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
@@ -71,13 +72,16 @@ public class DesktopFactory extends AbstractFactory {
         try {
             
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
+            
+            final HubType hubType = HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase());
+            
             if (isVideoEnabled()) {
-            	final String videoName = getVideoName();
+            	
+            	String videoName = getVideoName();
             	capabilities.setCapability("videoName", videoName);
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-            	
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
-                switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+                switch (hubType) {
                 case SELENIUM:
                 case MCLOUD:
                 case AEROKUBE:
@@ -87,9 +91,17 @@ public class DesktopFactory extends AbstractFactory {
                     ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
                     break;
                 case ZEBRUNNER:
+                	// Zebrunner will place video to separate unique folder, no need to generate new name
+                	videoName = "video.mp4";
+                	capabilities.setCapability("videoName", videoName);
                     ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
                     break;
                 }
+            }
+            
+            // Adding reference to Appium/Selenium session logs
+            if(HubType.ZEBRUNNER.equals(hubType)) {
+            	ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%/session.log")));
             }
             
             driver = new RemoteWebDriver(ce, capabilities);
