@@ -388,9 +388,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // we shouldn't deregister info here as all retries will not work
             // TestNamingUtil.releaseZafiraTest();
 
-            // clear jira tickets to be sure that next test is not affected.
-            Jira.clearTickets();
-
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }
