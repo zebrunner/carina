@@ -647,7 +647,8 @@ public class Screenshot {
 				|| message.contains("Unable to find elements by Selenium")
 				|| message.contains("generateUiDump") //do not generate screenshot if getPageSource is invalid
 				|| message.contains("Expected to read a START_MAP but instead have: END") // potential drivers issues fix for moon
-				|| message.contains("An unknown error has occurred") // 
+				|| message.contains("An unknown error has occurred") //
+				|| message.contains("Unable to find element with xpath")
 				|| message.contains("Unable to locate element");
 		
 		if (!isContains) {
