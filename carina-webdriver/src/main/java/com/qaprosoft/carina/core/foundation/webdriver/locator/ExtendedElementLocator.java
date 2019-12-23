@@ -206,8 +206,12 @@ public class ExtendedElementLocator implements ElementLocator {
         Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
-            String replacement = matcher.group(1) + "translate(" + matcher.group(5)
-                    + ", 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÄÃÇČÉÈÊËĔŒĞĢÎÏÍÌÔÖŌÒÓØŜŞßÙÛÜŪŸ', 'abcdefghijklmnopqrstuvwxyzàáâäåçčéèêëĕœğģîïíìôöōòóøŝşßùûüūÿ') " + matcher.group(7);
+            String value = matcher.group(5);
+            String replacement = "translate(" + matcher.group(2) + ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(4) + ")" + matcher.group(3)
+                    + "translate(" + matcher.group(4) + value + matcher.group(4)+ ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(6)
+                    + ")" + matcher.group(7);
+            LOGGER.debug("xpath translate:");
+            LOGGER.debug(replacement);
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
