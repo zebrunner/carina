@@ -46,15 +46,15 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-    
+
     private static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
-    
+
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
-    
+
     protected static final String vnc_protocol = "vnc_protocol";
     protected static final String vnc_host = "vnc_host";
     protected static final String vnc_port = "vnc_port";
-    
+
     protected final static String VIDEO_DEFAULT = "video.mp4";
     protected final static String SESSION_LOG_DEFAULT = "session.log";
 
@@ -94,7 +94,7 @@ public abstract class AbstractFactory {
     protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
     }
-    
+
     /**
      * Retrieves VNC URL if available.
      * 
@@ -102,16 +102,18 @@ public abstract class AbstractFactory {
      * @return VNC URL
      */
     abstract public String getVncURL(WebDriver driver);
-    
+
     /**
      * Returns bitrate by {@link VideoQuality}
+     * 
      * @param quality - video quality for recording
      * @return appropriate bitrate
      */
     abstract protected int getBitrate(VideoQuality quality);
-    
+
     /**
      * Initialize test artifact for upload.
+     * 
      * @param videoName - video file name
      * @return test artifact with video details
      */
@@ -122,9 +124,10 @@ public abstract class AbstractFactory {
         artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
-    
+
     /**
      * Initialize test artifact for upload.
+     * 
      * @param sessionLogName - session log file name
      * @return test artifact with session log details
      */
@@ -136,29 +139,29 @@ public abstract class AbstractFactory {
         artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
-    
-	protected boolean isVideoEnabled() {
-		boolean isEnabled = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
 
-		if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
-			if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
-				LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
-						+ "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
-				// disable video recording for not the final retry if
-				// "optimize_video_recording=true"
-				isEnabled = false;
-			}
-		}
-		return isEnabled;
-	}
-	
-	/**
-	 * Gets video name from configuration or generates a random one.
-	 * 
-	 * @return video recording name
-	 */
-	protected String getVideoName() {
-		String videoName = R.CONFIG.get("capabilities.videoName");
-		return !StringUtils.isEmpty(videoName) ? videoName : UUID.randomUUID().toString() + ".mp4";
-	}
+    protected boolean isVideoEnabled() {
+        boolean isEnabled = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
+
+        if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
+            if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
+                LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
+                        + "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
+                // disable video recording for not the final retry if
+                // "optimize_video_recording=true"
+                isEnabled = false;
+            }
+        }
+        return isEnabled;
+    }
+
+    /**
+     * Gets video name from configuration or generates a random one.
+     * 
+     * @return video recording name
+     */
+    protected String getVideoName() {
+        String videoName = R.CONFIG.get("capabilities.videoName");
+        return !StringUtils.isEmpty(videoName) ? videoName : UUID.randomUUID().toString() + ".mp4";
+    }
 }

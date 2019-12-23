@@ -26,13 +26,13 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  */
 public class ZebrunnerSessionLogListener implements IDriverCommandListener {
 
-	private TestArtifactType logArtifact;
-	
-	private boolean recording = false;
+    private TestArtifactType logArtifact;
 
-	public ZebrunnerSessionLogListener(TestArtifactType logArtifact) {
-		this.logArtifact = logArtifact;
-	}
+    private boolean recording = false;
+
+    public ZebrunnerSessionLogListener(TestArtifactType logArtifact) {
+        this.logArtifact = logArtifact;
+    }
 
     @Override
     public void beforeEvent(Command command) {
@@ -40,11 +40,11 @@ public class ZebrunnerSessionLogListener implements IDriverCommandListener {
             registerArtifact(command, logArtifact);
         }
     }
-	
+
     @Override
     public void afterEvent(Command command) {
         if (!recording && command.getSessionId() != null) {
-        	logArtifact.setLink(String.format(logArtifact.getLink(), command.getSessionId().toString()));
+            logArtifact.setLink(String.format(logArtifact.getLink(), command.getSessionId().toString()));
             recording = true;
         }
     }

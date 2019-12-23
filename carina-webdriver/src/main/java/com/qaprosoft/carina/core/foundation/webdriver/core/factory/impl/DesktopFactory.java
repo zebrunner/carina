@@ -52,7 +52,7 @@ public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = Logger.getLogger(DesktopFactory.class);
 
     private static DesiredCapabilities staticCapabilities;
-    
+
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
@@ -70,13 +70,13 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         try {
-            
+
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            
+
             if (isVideoEnabled()) {
-            	
-            	final String videoName = getVideoName();
-            	capabilities.setCapability("videoName", videoName);
+
+                final String videoName = getVideoName();
+                capabilities.setCapability("videoName", videoName);
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
                 switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
@@ -89,16 +89,16 @@ public class DesktopFactory extends AbstractFactory {
                     ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
                     break;
                 case ZEBRUNNER:
-                	// Zebrunner will place video to separate unique folder, no need to generate new name
-                	capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                    // Zebrunner will place video to separate unique folder, no need to generate new name
+                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
                     ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
                     ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 }
             }
-            
+
             driver = new RemoteWebDriver(ce, capabilities);
-            
+
             resizeBrowserWindow(driver, capabilities);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Unable to create desktop driver", e);
@@ -109,7 +109,7 @@ public class DesktopFactory extends AbstractFactory {
     }
 
     @SuppressWarnings("deprecation")
-	public DesiredCapabilities getCapabilities(String name) {
+    public DesiredCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
@@ -123,7 +123,7 @@ public class DesktopFactory extends AbstractFactory {
         } else if (BrowserType.OPERA_BLINK.equalsIgnoreCase(browser) || BrowserType.OPERA.equalsIgnoreCase(browser)) {
             return new OperaCapabilities().getCapability(name);
         } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
-            return  new EdgeCapabilities().getCapability(name);
+            return new EdgeCapabilities().getCapability(name);
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
         }
@@ -136,26 +136,26 @@ public class DesktopFactory extends AbstractFactory {
         staticCapabilities.setCapability(name, value);
     }
 
-	@Override
-	public String getVncURL(WebDriver driver) {
-		String vncURL = null;
-		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
-			// TODO: resolve negative case when VNC is not supported
-			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-		    String protocol = R.CONFIG.get(vnc_protocol);
-			String host = R.CONFIG.get(vnc_host);
-			String port = R.CONFIG.get(vnc_port); 
-			// If VNC host/port not set user them from Selenium
-			if(StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
-			    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-			    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
-			}
-			vncURL = String.format(R.CONFIG.get("vnc_desktop"), protocol, host, port, rwd.getSessionId().toString());
-		}
-		return vncURL;
-	}
-	
-	@Override
+    @Override
+    public String getVncURL(WebDriver driver) {
+        String vncURL = null;
+        if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
+            // TODO: resolve negative case when VNC is not supported
+            final RemoteWebDriver rwd = (RemoteWebDriver) driver;
+            String protocol = R.CONFIG.get(vnc_protocol);
+            String host = R.CONFIG.get(vnc_host);
+            String port = R.CONFIG.get(vnc_port);
+            // If VNC host/port not set user them from Selenium
+            if (StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
+                host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
+                port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
+            }
+            vncURL = String.format(R.CONFIG.get("vnc_desktop"), protocol, host, port, rwd.getSessionId().toString());
+        }
+        return vncURL;
+    }
+
+    @Override
     protected int getBitrate(VideoQuality quality) {
         switch (quality) {
         case LOW:
@@ -168,7 +168,7 @@ public class DesktopFactory extends AbstractFactory {
             return 1;
         }
     }
-	
+
     private String getBrowserVersion(WebDriver driver) {
         String browser_version = Configuration.get(Parameter.BROWSER_VERSION);
         try {
@@ -184,29 +184,29 @@ public class DesktopFactory extends AbstractFactory {
         }
         return browser_version;
     }
-    
+
     /**
-	 * Sets browser window according to capabilites.resolution value, otherwise
-	 * maximizes window.
-	 * 
-	 * @param driver       - instance of desktop @WebDriver
-	 * @param capabilities - driver capabilities
-	 */
-	private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
-		try {
-			if (capabilities.getCapability("resolution") != null) {
-				String resolution = (String) capabilities.getCapability("resolution");
-				int width = Integer.valueOf(resolution.split("x")[0]);
-				int height = Integer.valueOf(resolution.split("x")[1]);
-				driver.manage().window().setPosition(new Point(0, 0));
-				driver.manage().window().setSize(new Dimension(width, height));
-				LOGGER.info(String.format("Browser window size set to %dx%d", width, height));
-			} else {
-				driver.manage().window().maximize();
-				LOGGER.info("Browser window was maximized");
-			}
-		} catch (Exception e) {
-			LOGGER.error("Unable to resize browser window", e);
-		}
-	}
+     * Sets browser window according to capabilites.resolution value, otherwise
+     * maximizes window.
+     * 
+     * @param driver - instance of desktop @WebDriver
+     * @param capabilities - driver capabilities
+     */
+    private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
+        try {
+            if (capabilities.getCapability("resolution") != null) {
+                String resolution = (String) capabilities.getCapability("resolution");
+                int width = Integer.valueOf(resolution.split("x")[0]);
+                int height = Integer.valueOf(resolution.split("x")[1]);
+                driver.manage().window().setPosition(new Point(0, 0));
+                driver.manage().window().setSize(new Dimension(width, height));
+                LOGGER.info(String.format("Browser window size set to %dx%d", width, height));
+            } else {
+                driver.manage().window().maximize();
+                LOGGER.info("Browser window was maximized");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unable to resize browser window", e);
+        }
+    }
 }
