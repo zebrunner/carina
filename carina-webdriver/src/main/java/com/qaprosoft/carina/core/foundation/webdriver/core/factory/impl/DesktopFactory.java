@@ -73,15 +73,13 @@ public class DesktopFactory extends AbstractFactory {
             
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
             
-            final HubType hubType = HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase());
-            
             if (isVideoEnabled()) {
             	
-            	String videoName = getVideoName();
+            	final String videoName = getVideoName();
             	capabilities.setCapability("videoName", videoName);
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
-                switch (hubType) {
+                switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
                 case SELENIUM:
                 case MCLOUD:
                 case AEROKUBE:
@@ -92,16 +90,11 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case ZEBRUNNER:
                 	// Zebrunner will place video to separate unique folder, no need to generate new name
-                	videoName = "video.mp4";
-                	capabilities.setCapability("videoName", videoName);
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
+                	capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 }
-            }
-            
-            // Adding reference to Appium/Selenium session logs
-            if(HubType.ZEBRUNNER.equals(hubType)) {
-            	ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%/session.log")));
             }
             
             driver = new RemoteWebDriver(ce, capabilities);

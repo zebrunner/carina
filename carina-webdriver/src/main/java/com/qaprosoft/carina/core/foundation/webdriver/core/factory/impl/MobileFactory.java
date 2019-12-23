@@ -63,7 +63,7 @@ public class MobileFactory extends AbstractFactory {
     private static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
 	
 	private final static String vnc_mobile = "vnc_mobile";
-
+	
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
 
@@ -102,8 +102,6 @@ public class MobileFactory extends AbstractFactory {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
                 EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-                
-                final HubType hubType = HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase());
                 
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
@@ -146,7 +144,7 @@ public class MobileFactory extends AbstractFactory {
                         // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        switch (hubType) {
+                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:
@@ -154,21 +152,17 @@ public class MobileFactory extends AbstractFactory {
                         case SAUCELABS:
                         case DEFAULT:
                             ce.getListeners()
-                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2,
-                                            initVideoArtifact(videoName)));
+                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
                             break;
                         case ZEBRUNNER:
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
+                        	// Zebrunner will place video to separate unique folder, no need to generate new name
+                        	capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                             break;
                         }
                     }
                     
-                    // Adding reference to Appium/Selenium session logs
-                    if(HubType.ZEBRUNNER.equals(hubType)) {
-                    	ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%/session.log")));
-                    }
-
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
 
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS) || mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.TVOS)) {
@@ -203,7 +197,7 @@ public class MobileFactory extends AbstractFactory {
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
                         
-                        switch (hubType) {
+                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:
