@@ -186,7 +186,23 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "(\\[?(contains\\(|starts-with\\(|ends-with\\(|\\,|\\[|\\=|\\band\\b\\s?(\\bcontains\\b\\()?|\\bor\\b\\s?(\\bcontains\\b\\()?))(.+?(\\(\\))?)((?=\\,|\\)|\\=|\\]|\\band\\b|\\bor\\b)\\]?)";
+        String attributePattern = "((@text|text\\(\\))\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)\\]|\\]))";
+        //TODO: test when xpath globally are declared inside single quota
+        
+        // @text of text() - group(2)
+        // , or = - group(3)
+        // ' or " - group(4)
+        // value - group(5)
+        // ' or " - group(6)
+        // ] or )] - group(7)
+        
+        // double translate is needed to make xpath and value case insensitive.
+        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
+        // double translate allow to use as is and convert everywhere
+        
+        // Expected xpath for both side translate
+        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
+        
         Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
