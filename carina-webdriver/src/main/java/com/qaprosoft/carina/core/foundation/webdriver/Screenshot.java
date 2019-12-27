@@ -629,6 +629,7 @@ public class Screenshot {
                 || message.contains("invalid session id")
                 || message.contains("Session does not exist")
 				|| message.contains("Session timed out or not found")
+				|| message.contains("Unable to determine type from: <. Last 1 characters read")
 				|| message.contains("cannot forward the request")
                 || message.contains("connect ECONNREFUSED")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
