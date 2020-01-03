@@ -418,11 +418,6 @@ public class Configuration {
         if (!R.CONFIG.get("capabilities.browserName").isEmpty()) {
             browser = R.CONFIG.get("capabilities.browserName");
         }
-        
-        // redefine browser if capabilities.browserName is available
-        if (!R.CONFIG.get("capabilities.deviceBrowser").isEmpty()) {
-            browser = R.CONFIG.get("capabilities.deviceBrowser");
-        }
         return browser;
     }
 
