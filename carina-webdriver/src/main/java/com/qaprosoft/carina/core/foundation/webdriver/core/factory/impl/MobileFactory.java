@@ -42,6 +42,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -60,8 +61,8 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
  */
 public class MobileFactory extends AbstractFactory {
     private static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
-	
-	private final static String vnc_mobile = "vnc_mobile";
+
+    private final static String vnc_mobile = "vnc_mobile";
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -87,7 +88,7 @@ public class MobileFactory extends AbstractFactory {
         LOGGER.debug("selenium: " + seleniumHost);
 
         RemoteWebDriver driver = null;
-        //if inside capabilities only singly "udid" capability then generate default one and append udid
+        // if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
@@ -105,9 +106,9 @@ public class MobileFactory extends AbstractFactory {
                 if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
                     if (isVideoEnabled()) {
-                        
-                    	final String videoName = getVideoName();
-                    	capabilities.setCapability("videoName", videoName);
+
+                        final String videoName = getVideoName();
+                        capabilities.setCapability("videoName", videoName);
 
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
@@ -152,31 +153,34 @@ public class MobileFactory extends AbstractFactory {
                         case DEFAULT:
                             ce.getListeners()
                                     .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2,
-                                            initVideoArtifact(videoName)));
+                                            o2, initVideoArtifact(videoName)));
                             break;
                         case ZEBRUNNER:
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + videoName)));
+                            // Zebrunner will place video to separate unique folder, no need to generate new name
+                            capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                             break;
                         }
                     }
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
 
-                } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS) || mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.TVOS)) {
+                } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)
+                        || mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
                     if (isVideoEnabled()) {
-                        
-                    	final String videoName = getVideoName();
-                    	capabilities.setCapability("videoName", videoName);
-                        
+
+                        final String videoName = getVideoName();
+                        capabilities.setCapability("videoName", videoName);
+
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
                                 .withVideoQuality(VideoQuality.valueOf(Configuration.get(Parameter.IOS_SCREEN_RECORDING_QUALITY)))
                                 .withVideoType(Configuration.get(Parameter.IOS_SCREEN_RECORDING_CODEC))
                                 .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
-                        
+
                         String fpsSt = Configuration.get(Parameter.IOS_SCREEN_RECORDING_FPS);
                         if (!fpsSt.isEmpty()) {
                             try {
@@ -187,14 +191,14 @@ public class MobileFactory extends AbstractFactory {
                                 LOGGER.error("Screen recording fps value should be integer between 1..60", e);
                             }
                         }
-                        
+
                         if (!Configuration.get(Parameter.VIDEO_SCALE).isEmpty()) {
                             LOGGER.debug("Video scale option will be set to " + Configuration.get(Parameter.VIDEO_SCALE));
                             o1.withVideoScale(Configuration.get(Parameter.VIDEO_SCALE));
                         }
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
-                        
+
                         switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
                         case SELENIUM:
                         case MCLOUD:
@@ -202,12 +206,13 @@ public class MobileFactory extends AbstractFactory {
                         case BROWSERSTACK:
                         case SAUCELABS:
                         case DEFAULT:
-        					ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2, initVideoArtifact(videoName)));
-        					break;
-        				case ZEBRUNNER:
-        					LOGGER.info("Video recording is not supported in Zebrunner for iOS");
-        					break;
-        				}
+                            ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
+                                    o2, initVideoArtifact(videoName)));
+                            break;
+                        case ZEBRUNNER:
+                            LOGGER.info("Video recording is not supported in Zebrunner for iOS");
+                            break;
+                        }
                     }
 
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
@@ -220,7 +225,7 @@ public class MobileFactory extends AbstractFactory {
                 }
             }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed selenium URL!", e); 
+            throw new RuntimeException("Malformed selenium URL!", e);
         } catch (Exception e) {
             Map<String, Object> capabilitiesMap = capabilities.asMap();
             LOGGER.debug("Driver hasn't been created with capabilities: ".concat(capabilitiesMap.toString()));
@@ -242,7 +247,7 @@ public class MobileFactory extends AbstractFactory {
                 device = new Device(getDeviceInfo(capabilitiesMap));
             }
             IDriverPool.registerDevice(device);
-            throw e; 
+            throw e;
         }
 
         Device device = IDriverPool.getNullDevice();
@@ -261,7 +266,7 @@ public class MobileFactory extends AbstractFactory {
         // will be performed just in case uninstall_related_apps flag marked as
         // true
         device.uninstallRelatedApps();
-        
+
         return driver;
     }
 
@@ -276,12 +281,12 @@ public class MobileFactory extends AbstractFactory {
      *            - driver
      * @return remote device information
      */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     private RemoteDevice getDeviceInfo(RemoteWebDriver drv) {
-		return getDeviceInfo((Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES));
-	}
-	
-	/**
+        return getDeviceInfo((Map<String, Object>) drv.getCapabilities().getCapability(SpecialKeywords.SLOT_CAPABILITIES));
+    }
+
+    /**
      * Returns device information from Grid Hub using STF service.
      * 
      * @param caps
@@ -318,11 +323,11 @@ public class MobileFactory extends AbstractFactory {
                 if (cap.containsKey(Parameter.PROXY_PORT.getKey())) {
                     remoteDevice.setProxyPort(String.valueOf(cap.get(Parameter.PROXY_PORT.getKey())));
                 }
-                
+
                 if (cap.containsKey("remoteURL")) {
                     remoteDevice.setRemoteURL(String.valueOf(cap.get("remoteURL")));
                 }
-                
+
                 remoteDevice.setCapabilities(new DesiredCapabilities(cap));
             }
 
@@ -332,50 +337,50 @@ public class MobileFactory extends AbstractFactory {
         return remoteDevice;
     }
 
-	@Override
-	public String getVncURL(WebDriver driver) {
-		String vncURL = null;
+    @Override
+    public String getVncURL(WebDriver driver) {
+        String vncURL = null;
 
-		if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
-			final RemoteWebDriver rwd = (RemoteWebDriver) driver;
+        if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
+            final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 
-			switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+            switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
             case SELENIUM:
             case MCLOUD:
             case AEROKUBE:
             case BROWSERSTACK:
             case SAUCELABS:
             case DEFAULT:
-				RemoteDevice rd = getDeviceInfo(rwd);
-				if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
-					if (rd.getVnc().matches(".+:\\d+")) {
-						// host:port format
-						final String protocol = R.CONFIG.get(vnc_protocol);
-						final String host = rd.getVnc().split(":")[0];
-						final String port = rd.getVnc().split(":")[1];
-						vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port);
-					} else {
-						// ws://host:port/websockify format
-						vncURL = rd.getVnc();
-					}
-				}
-				break;
-			case ZEBRUNNER:
-				String protocol = R.CONFIG.get(vnc_protocol);
-				String host = R.CONFIG.get(vnc_host);
-				String port = R.CONFIG.get(vnc_port); 
-				// If VNC host/port not set user them from Selenium
-				if(StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
-				    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-				    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
-				}
-				vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port, rwd.getSessionId().toString());
-				break;
-			}
-		}
-		return vncURL;
-	}
-    
+                RemoteDevice rd = getDeviceInfo(rwd);
+                if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
+                    if (rd.getVnc().matches(".+:\\d+")) {
+                        // host:port format
+                        final String protocol = R.CONFIG.get(vnc_protocol);
+                        final String host = rd.getVnc().split(":")[0];
+                        final String port = rd.getVnc().split(":")[1];
+                        vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port);
+                    } else {
+                        // ws://host:port/websockify format
+                        vncURL = rd.getVnc();
+                    }
+                }
+                break;
+            case ZEBRUNNER:
+                String protocol = R.CONFIG.get(vnc_protocol);
+                String host = R.CONFIG.get(vnc_host);
+                String port = R.CONFIG.get(vnc_port);
+                // If VNC host/port not set user them from Selenium
+                if (StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
+                    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
+                    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
+                }
+                vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port, rwd.getSessionId().toString());
+                break;
+            }
+        }
+        return vncURL;
+    }
+
     @Override
     protected int getBitrate(VideoQuality quality) {
         switch (quality) {
@@ -389,7 +394,7 @@ public class MobileFactory extends AbstractFactory {
             return 1;
         }
     }
-    
+
     /**
      * Method to extract debug info in case exception has been thrown during app installation
      * 
@@ -414,10 +419,11 @@ public class MobileFactory extends AbstractFactory {
     private String getUdidFromDebugInfo(String debugInfo) {
         return getParamFromDebugInfo(debugInfo, "udid");
     }
-    
+
     /**
      * Method to extract specific parameter from debug info in case STF enabled
-     * Debug info example: [[[DEBUG info: /opt/android-sdk-linux/platform-tools/adb -P 5037 -s 4d002c7f5b328095 shell pm install -r /data/local/tmp/appium_cache/642637a49a85a430df0f3c4c1b2dd36022c83df4.apk --udid 4d002c7f5b328095 --name Samsung_Galaxy_Note3]]]
+     * Debug info example: [[[DEBUG info: /opt/android-sdk-linux/platform-tools/adb -P 5037 -s 4d002c7f5b328095 shell pm install -r
+     * /data/local/tmp/appium_cache/642637a49a85a430df0f3c4c1b2dd36022c83df4.apk --udid 4d002c7f5b328095 --name Samsung_Galaxy_Note3]]]
      * Example: --{paramName} {paramValue}
      * 
      * @param debugInfo

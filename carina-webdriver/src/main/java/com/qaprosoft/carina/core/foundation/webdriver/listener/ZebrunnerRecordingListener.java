@@ -26,21 +26,21 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  */
 public class ZebrunnerRecordingListener implements IDriverCommandListener {
 
-	private TestArtifactType videoArtifact;
-	
-	private boolean recording = false;
+    private TestArtifactType videoArtifact;
 
-	public ZebrunnerRecordingListener(TestArtifactType videoArtifact) {
-		this.videoArtifact = videoArtifact;
-	}
+    private boolean recording = false;
+
+    public ZebrunnerRecordingListener(TestArtifactType videoArtifact) {
+        this.videoArtifact = videoArtifact;
+    }
 
     @Override
     public void beforeEvent(Command command) {
         if (recording) {
-            registerVideoArtifact(command, videoArtifact);
+            registerArtifact(command, videoArtifact);
         }
     }
-	
+
     @Override
     public void afterEvent(Command command) {
         if (!recording && command.getSessionId() != null) {

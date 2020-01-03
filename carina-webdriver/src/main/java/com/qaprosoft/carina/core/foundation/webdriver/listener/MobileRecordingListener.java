@@ -65,7 +65,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
-			registerVideoArtifact(command, videoArtifact);
+			registerArtifact(command, videoArtifact);
 
 			if (DriverCommand.QUIT.equals(command.getName())) {
 				try {

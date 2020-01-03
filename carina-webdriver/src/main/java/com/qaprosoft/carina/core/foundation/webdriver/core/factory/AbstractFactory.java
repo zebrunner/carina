@@ -46,14 +46,17 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-    
+
     private static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
-    
+
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
-    
+
     protected static final String vnc_protocol = "vnc_protocol";
     protected static final String vnc_host = "vnc_host";
     protected static final String vnc_port = "vnc_port";
+
+    protected final static String VIDEO_DEFAULT = "video.mp4";
+    protected final static String SESSION_LOG_DEFAULT = "session.log";
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
@@ -91,7 +94,7 @@ public abstract class AbstractFactory {
     protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
     }
-    
+
     /**
      * Retrieves VNC URL if available.
      * 
@@ -99,54 +102,66 @@ public abstract class AbstractFactory {
      * @return VNC URL
      */
     abstract public String getVncURL(WebDriver driver);
-    
+
     /**
      * Returns bitrate by {@link VideoQuality}
+     * 
      * @param quality - video quality for recording
      * @return appropriate bitrate
      */
     abstract protected int getBitrate(VideoQuality quality);
-    
+
     /**
-     * Generate test artifact for zafira upload.
-     * @param videoName - video link name
+     * Initialize test artifact for upload.
+     * 
+     * @param videoName - video file name
      * @return test artifact with video details
      */
     protected TestArtifactType initVideoArtifact(String videoName) {
         TestArtifactType artifact = new TestArtifactType();
         artifact.setName("Video " + SDF.format(new Date()));
-        // do not uncomment below steps with "tzid" otherwise each odd (1, 3, 5...) test lost video artifact
-//        ITestResult res = Reporter.getCurrentTestResult();
-//        if (res != null) {
-//        	artifact.setTestId((Long) res.getAttribute("ztid"));
-//        }
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
         artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
-    
-	protected boolean isVideoEnabled() {
-		boolean isEnabled = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
 
-		if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
-			if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
-				LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
-						+ "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
-				// disable video recording for not the final retry if
-				// "optimize_video_recording=true"
-				isEnabled = false;
-			}
-		}
-		return isEnabled;
-	}
-	
-	/**
-	 * Gets video name from configuration or generates a random one.
-	 * 
-	 * @return video recording name
-	 */
-	protected String getVideoName() {
-		String videoName = R.CONFIG.get("capabilities.videoName");
-		return !StringUtils.isEmpty(videoName) ? videoName : UUID.randomUUID().toString() + ".mp4";
-	}
+    /**
+     * Initialize test artifact for upload.
+     * 
+     * @param sessionLogName - session log file name
+     * @return test artifact with session log details
+     */
+    protected TestArtifactType initSessionLogArtifact(String sessionLogName) {
+        TestArtifactType artifact = new TestArtifactType();
+        artifact.setName("Session log " + SDF.format(new Date()));
+        // TODO: allocate separate configuration property
+        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), sessionLogName));
+        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
+        return artifact;
+    }
+
+    protected boolean isVideoEnabled() {
+        boolean isEnabled = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
+
+        if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
+            if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
+                LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
+                        + "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
+                // disable video recording for not the final retry if
+                // "optimize_video_recording=true"
+                isEnabled = false;
+            }
+        }
+        return isEnabled;
+    }
+
+    /**
+     * Gets video name from configuration or generates a random one.
+     * 
+     * @return video recording name
+     */
+    protected String getVideoName() {
+        String videoName = R.CONFIG.get("capabilities.videoName");
+        return !StringUtils.isEmpty(videoName) ? videoName : UUID.randomUUID().toString() + ".mp4";
+    }
 }
