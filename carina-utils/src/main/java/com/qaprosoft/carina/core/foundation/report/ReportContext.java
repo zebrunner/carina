@@ -187,6 +187,8 @@ public class ReportContext {
 
             if (!isCreated) {
                 throw new RuntimeException("Artifacts folder not created: " + artifactsDirectory.getAbsolutePath());
+            } else {
+                LOGGER.debug(("Artifacts folder created: " + artifactsDirectory.getAbsolutePath()));
             }
         }
         return artifactsDirectory;
