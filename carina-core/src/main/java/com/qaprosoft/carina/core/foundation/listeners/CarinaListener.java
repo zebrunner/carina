@@ -195,32 +195,45 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
-        // TODO: moved into separate class/method
-        LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
-        suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-        LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
-
-        // update DataProviderThreadCount if any property is provided otherwise
-        // sync with value from suite xml file
-        int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
-        if (count > 0) {
-            LOGGER.debug("Updated 'data_provider_thread_count' from " + suite.getXmlSuite().getDataProviderThreadCount()
-                    + " to " + count);
-            suite.getXmlSuite().setDataProviderThreadCount(count);
-        } else {
-            LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
-                    String.valueOf(suite.getXmlSuite().getDataProviderThreadCount()));
-            LOGGER.debug("Updated 'data_provider_thread_count': "
-                    + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-        }
-
-        LOGGER.debug("Default data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
-        LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
-
+        setThreadCount(suite);
         onHealthCheck(suite);
         
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
+    }
+    
+    private void setThreadCount(ISuite suite) {
+        if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains("thread-count")) {
+            LOGGER.info("Set thread_count=1");
+            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
+            suite.getXmlSuite().setThreadCount(1);
+        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains("thread-count")) {
+            // reuse value from suite xml file
+            LOGGER.debug("Synching thread_count with values from suite xml file...");
+            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(),
+                    String.valueOf(suite.getXmlSuite().getThreadCount()));
+            LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
+        } else {
+            // use thread-count from config.properties
+            suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+            LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
+        }
+        
+        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains("data-provider-thread-count")) {
+            LOGGER.info("Set data_provider_thread_count=1");
+            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
+            suite.getXmlSuite().setDataProviderThreadCount(1);
+        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains("data-provider-thread-count")) {
+            // reuse value from suite xml file
+            LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
+                    String.valueOf(suite.getXmlSuite().getDataProviderThreadCount()));
+            LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
+        } else {
+            // use thread-count from config.properties
+            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+            LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
+        }
+
     }
 
 	private String getCarinaVersion() {
