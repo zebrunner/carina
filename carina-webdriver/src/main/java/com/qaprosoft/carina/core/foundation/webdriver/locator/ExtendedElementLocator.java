@@ -186,7 +186,7 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "((@text|text\\(\\))\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)\\]|\\]))";
+        String attributePattern = "((@text|text\\(\\))\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)(\\s*\\bor\\b\\s*)?|\\]|\\)\\]))";
         //TODO: test when xpath globally are declared inside single quota
         
         // @text of text() - group(2)
@@ -194,7 +194,7 @@ public class ExtendedElementLocator implements ElementLocator {
         // ' or " - group(4)
         // value - group(5)
         // ' or " - group(6)
-        // ] or )] - group(7)
+        // ] or ) - group(7)
         
         // double translate is needed to make xpath and value case insensitive.
         // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
