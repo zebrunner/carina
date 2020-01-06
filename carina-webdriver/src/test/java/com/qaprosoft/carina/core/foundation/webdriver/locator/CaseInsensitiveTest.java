@@ -146,5 +146,17 @@ public class CaseInsensitiveTest {
     	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
+    
+    @Test()
+    public void testComplexTextLocatorWithOr() {
+    	String xpath = "//android.widget.HorizontalScrollView//*[contains(@text, '{L10N:Text}') or contains(@text, '{L10N:Other}') or contains(@text, 'Some') or contains(@text, '{L10N:Any}')]";
+    	By expectedRes = By.xpath("//android.widget.HorizontalScrollView//*[contains(translate(@text, '{L10N:TEXT}', '{l10n:text}'),translate('{L10N:Text}', '{L10N:TEXT}', '{l10n:text}'))"
+    			+ " or contains(translate(@text, '{L10N:OTHER}', '{l10n:other}'),translate('{L10N:Other}', '{L10N:OTHER}', '{l10n:other}'))"
+    			+ " or contains(translate(@text, 'SOME', 'some'),translate('Some', 'SOME', 'some'))"
+    			+ " or contains(translate(@text, '{L10N:ANY}', '{l10n:any}'),translate('{L10N:Any}', '{L10N:ANY}', '{l10n:any}'))]");
+    	
+    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
+    }
 
 }
