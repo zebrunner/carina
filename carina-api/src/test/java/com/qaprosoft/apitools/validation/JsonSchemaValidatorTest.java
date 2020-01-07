@@ -29,11 +29,11 @@ public class JsonSchemaValidatorTest {
 	@Test
     public void testErrorSchema4() throws IOException {
         String actualRs = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema4/rs_w_schema_error.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema4/rs_w_schema_error.json"), Charset.forName("UTF-8").toString());
         String schema = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema4/schema4.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema4/schema4.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema4/error_schema4.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema4/error_schema4.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -49,11 +49,11 @@ public class JsonSchemaValidatorTest {
 	@Test
     public void testErrorSchema3() throws IOException {
         String actualRs = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema3/rs_w_schema_error.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema3/rs_w_schema_error.json"), Charset.forName("UTF-8").toString());
         String schema = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema3/schema3.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema3/schema3.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema3/error_schema3.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema3/error_schema3.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -69,11 +69,11 @@ public class JsonSchemaValidatorTest {
 	@Test
     public void testErrorSchema7() throws IOException {
         String actualRs = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema7/rs_w_schema_error.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema7/rs_w_schema_error.json"), Charset.forName("UTF-8").toString());
         String schema = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema7/schema7.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema7/schema7.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonSchemaValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/schema/schema7/error_schema7.json"), Charset.forName("UTF-8"));
+                "validation/schema/schema7/error_schema7.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
