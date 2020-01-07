@@ -32,11 +32,11 @@ public class JsonValidatorTest {
     @Test
     public void testArrayContainsValidation() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/contains/rs_array_many_items.json"), Charset.forName("UTF-8"));
+                "validation/array/contains/rs_array_many_items.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/contains/rs_array_2_items.json"), Charset.forName("UTF-8"));
+                "validation/array/contains/rs_array_2_items.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/contains/error.json"), Charset.forName("UTF-8"));
+                "validation/array/contains/error.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -54,11 +54,11 @@ public class JsonValidatorTest {
     @Test
     public void testArrayDiffSizeNoContainsFlag() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/contains/rs_array_many_items.json"), Charset.forName("UTF-8"));
+                "validation/array/contains/rs_array_many_items.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/contains/rs_array_2_items.json"), Charset.forName("UTF-8"));
+                "validation/array/contains/rs_array_2_items.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/contains/error_diff_size.json"), Charset.forName("UTF-8"));
+                "validation/array/contains/error_diff_size.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -73,9 +73,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayWSkipSuccess() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader()
-                .getResourceAsStream("validation/array/skip/array_act.json"), Charset.forName("UTF-8"));
+                .getResourceAsStream("validation/array/skip/array_act.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/skip/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/skip/array_exp.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.NON_EXTENSIBLE);
     }
@@ -83,11 +83,11 @@ public class JsonValidatorTest {
     @Test
     public void testArrayWSkipError() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/skip/array_act_err.json"), Charset.forName("UTF-8"));
+                "validation/array/skip/array_act_err.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/skip/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/skip/array_exp.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/skip/error.json"), Charset.forName("UTF-8"));
+                "validation/array/skip/error.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -102,9 +102,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayWDuplicateSuccess() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/duplicate/array_act.json"), Charset.forName("UTF-8"));
+                "validation/array/duplicate/array_act.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/duplicate/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/duplicate/array_exp.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.NON_EXTENSIBLE);
     }
@@ -112,11 +112,11 @@ public class JsonValidatorTest {
     @Test
     public void testArrayWDuplicateError() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/duplicate/array_act_err.json"), Charset.forName("UTF-8"));
+                "validation/array/duplicate/array_act_err.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/duplicate/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/duplicate/array_exp.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/duplicate/error.json"), Charset.forName("UTF-8"));
+                "validation/array/duplicate/error.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -131,9 +131,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayOfIntegersSuccess() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_act.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_act.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.NON_EXTENSIBLE);
     }
@@ -141,9 +141,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayOfIntegersSkip() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_act.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_act.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_exp_skip.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_exp_skip.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.NON_EXTENSIBLE);
     }
@@ -151,11 +151,11 @@ public class JsonValidatorTest {
     @Test
     public void testArrayOfIntegersError() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_act_err.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_act_err.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/error.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/error.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -170,9 +170,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayOfIntegersContains() throws IOException, JSONException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_act_contains.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_act_contains.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8").toString());
 
         JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
                 JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "clientIds"));
@@ -181,11 +181,11 @@ public class JsonValidatorTest {
     @Test
     public void testArrayOfIntegersContainsMissed() throws IOException, JSONException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_act_contains_missed.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_act_contains_missed.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/array_exp.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/integer/error_contains_missed.json"), Charset.forName("UTF-8"));
+                "validation/array/integer/error_contains_missed.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
@@ -202,9 +202,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayValidationNotExtensible() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/mode/actual.json"), Charset.forName("UTF-8"));
+                "validation/array/mode/actual.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/mode/expected.json"), Charset.forName("UTF-8"));
+                "validation/array/mode/expected.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.NON_EXTENSIBLE);
     }
@@ -212,9 +212,9 @@ public class JsonValidatorTest {
     @Test
     public void testArrayValidationStrict() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/mode/actual.json"), Charset.forName("UTF-8"));
+                "validation/array/mode/actual.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/array/mode/expected.json"), Charset.forName("UTF-8"));
+                "validation/array/mode/expected.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.STRICT);
     }
@@ -222,9 +222,9 @@ public class JsonValidatorTest {
     @Test
     public void testObjectValidationLenient() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/object/mode/actual.json"), Charset.forName("UTF-8"));
+                "validation/object/mode/actual.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/object/mode/expected.json"), Charset.forName("UTF-8"));
+                "validation/object/mode/expected.json"), Charset.forName("UTF-8").toString());
 
         JsonValidator.validateJson(expectedRs, actualRs, JSONCompareMode.LENIENT);
     }
@@ -232,11 +232,11 @@ public class JsonValidatorTest {
     @Test
     public void testObjectValidationNotExtensible() throws IOException {
         String actualRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/object/mode/actual.json"), Charset.forName("UTF-8"));
+                "validation/object/mode/actual.json"), Charset.forName("UTF-8").toString());
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/object/mode/expected.json"), Charset.forName("UTF-8"));
+                "validation/object/mode/expected.json"), Charset.forName("UTF-8").toString());
         String expectedError = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
-                "validation/object/mode/error.json"), Charset.forName("UTF-8"));
+                "validation/object/mode/error.json"), Charset.forName("UTF-8").toString());
 
         boolean isErrorThrown = false;
         try {
