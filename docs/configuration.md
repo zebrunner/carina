@@ -399,6 +399,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Comma-separated list of methods of health_check_class to execute preliminarily</td>
 		<td>doThis, doThat</td>
 	</tr>
+	<tr>
+		<td>test_run_rules</td>
+		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
+		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>owner;;TAGS=>tag1=temp&amp;&amp;feature=reg</td>
+	</tr>
 </table>
 Most of the properties may be read in the following way:
 ```
