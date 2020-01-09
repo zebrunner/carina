@@ -938,6 +938,11 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>Comma-separated list of methods of health_check_class to execute preliminarily</td>
         <td>doThis, doThat</td>
     </tr>
+    <tr>
+        <td>test_run_rules</td>
+        <td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...</td>
+        <td>test_run_rules=PRIORITY=&gt;P1&amp;&amp;P2;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp&amp;&amp;feature=reg</td>
+    </tr>
 </table>
 Most of the properties may be read in the following way:</p>
 <pre><code>Configuration.get(Parameter.URL) // returns string value
