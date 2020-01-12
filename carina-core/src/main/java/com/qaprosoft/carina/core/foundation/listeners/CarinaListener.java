@@ -710,8 +710,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
 
             if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
-                // generate presigned url for nearest 4 hours
-                long hours = 8*1000*60*60; //8 hours
+                // generate presigned url for nearest 8 hours
+                long hours = 8*1000*60*60;
                 String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
                 LOGGER.debug("preSigned URL: " + presignedAppUrl);
                 Configuration.setMobileApp(presignedAppUrl);
