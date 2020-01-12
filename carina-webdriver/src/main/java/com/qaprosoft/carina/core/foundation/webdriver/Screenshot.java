@@ -653,8 +653,10 @@ public class Screenshot {
 				|| message.contains("Unable to locate element");
 		
 		if (!isContains) {
-		    //TODO: closer to the 6.3.30 release move it to debug level
-		    LOGGER.info("isCaptured->message: '" + message + "'");
+		    // for released builds put below message to debug  
+		    LOGGER.debug("isCaptured->message: '" + message + "'");
+		    // for snapshot builds use info to get more useful information
+		    //LOGGER.info("isCaptured->message: '" + message + "'");
 		}
 		return !isContains;
 	}
