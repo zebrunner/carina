@@ -186,7 +186,7 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "((@text|text\\(\\))\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)(\\s*\\bor\\b\\s*)?|\\]|\\)\\]))";
+        String attributePattern = "((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)(\\s*\\bor\\b\\s*)?|\\]|\\)\\]))";
         //TODO: test when xpath globally are declared inside single quota
         
         // @text of text() - group(2)
