@@ -158,5 +158,14 @@ public class CaseInsensitiveTest {
     	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
+    
+    @Test()
+    public void testMobileTextLocatorWithContentDesc() {
+    	String xpath = "//*[@content-desc=\"{L10N:anySelect}\"]";
+    	By expectedRes = By.xpath("//*[translate(@content-desc, \"{L10N:ANYSELECT}\", \"{l10n:anyselect}\")=translate(\"{L10N:anySelect}\", \"{L10N:ANYSELECT}\", \"{l10n:anyselect}\")]");
+    	
+    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
+    }
 
 }
