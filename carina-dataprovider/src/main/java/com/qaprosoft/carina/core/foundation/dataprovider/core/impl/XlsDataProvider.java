@@ -19,7 +19,6 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.SpreadsheetParser;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -46,9 +45,7 @@ public class XlsDataProvider extends BaseDataProvider {
         DSBean dsBean = new DSBean(parameters, context
                 .getCurrentXmlTest().getAllParameters());
 
-        XLSTable dsData = dsBean.isSpreadsheet() ?
-                SpreadsheetParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue()) :
-                XLSParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
+        XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
 
         argsList = dsBean.getArgs();
         staticArgsList = dsBean.getStaticArgs();
