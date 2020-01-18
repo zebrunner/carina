@@ -53,7 +53,7 @@ public class RTest {
     
     @Test
     public void testGetDouble() {
-        Double doubleValue = 3.14;
+        double doubleValue = 3.14;
         Assert.assertEquals(R.CONFIG.getDouble("double"), doubleValue);
     }
     

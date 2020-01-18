@@ -202,11 +202,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
     
     private void setThreadCount(ISuite suite) {
-        if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains("thread-count")) {
+        //Reuse default thread-count value from suite TestNG file if it is not overridden in _config.properties
+        final String THREAD_COUNT = " thread-count"; // space at the beginning to avoid conflicting with data-provider-thread-count
+        
+        if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains(THREAD_COUNT)) {
             LOGGER.info("Set thread_count=1");
             R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
             suite.getXmlSuite().setThreadCount(1);
-        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains("thread-count")) {
+        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains(THREAD_COUNT)) {
             // reuse value from suite xml file
             LOGGER.debug("Synching thread_count with values from suite xml file...");
             R.CONFIG.put(Parameter.THREAD_COUNT.getKey(),
@@ -217,12 +220,17 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
             LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
         }
-        
-        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains("data-provider-thread-count")) {
+
+        // WARNING! We can't override data provider thread count if inside suite it has default value "10"!
+        // in 7.0.1 RemoteTestNG and earlier suite.getXmlSuite().toXml() returns content without 'data-provider-thread-count' if it has default value "10"!
+        // to be able to use this feature effectively avoid those number usage so far :(
+        // TODO: setup pipeline to inform users about those limitation if any
+        final String DATA_PROVIDER_THREAD_COUNT = "data-provider-thread-count";
+        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains(DATA_PROVIDER_THREAD_COUNT)) {
             LOGGER.info("Set data_provider_thread_count=1");
             R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
             suite.getXmlSuite().setDataProviderThreadCount(1);
-        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains("data-provider-thread-count")) {
+        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains(DATA_PROVIDER_THREAD_COUNT)) {
             // reuse value from suite xml file
             LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
             R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
