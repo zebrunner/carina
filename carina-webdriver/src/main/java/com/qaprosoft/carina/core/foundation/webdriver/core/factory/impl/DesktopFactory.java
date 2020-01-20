@@ -104,7 +104,8 @@ public class DesktopFactory extends AbstractFactory {
             throw new RuntimeException("Unable to create desktop driver", e);
         }
 
-        R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
+        // put actual browser version into the current thread only to support multi version startup
+        R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver), true);
         return driver;
     }
 

@@ -62,28 +62,19 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         
         String platform = Configuration.getPlatform();
         // override platform to register correctly on Zafira based on capabilities.platform and platformName
-        R.CONFIG.put(Parameter.PLATFORM.getKey(), platform);
+        R.CONFIG.put(Parameter.PLATFORM.getKey(), platform, true);
+        
+        String platformVersion = Configuration.getPlatformVersion();
+        R.CONFIG.put("platform_version", platformVersion, true);
         
         String browser = Configuration.getBrowser();
         // override browser to register correctly on Zafira based on capabilities.browserName as well
-        R.CONFIG.put(Parameter.BROWSER.getKey(), browser);
+        R.CONFIG.put(Parameter.BROWSER.getKey(), browser, true);
         
-        for (Parameter parameter : Parameter.values()) {
-            conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
-        }
-
-        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
-            // update browser_version in returned config to register real value instead of * of matcher
-            conf.getArg().add(buildArgumentType("browser_version", R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION)));
-        }
-
-        if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
-            // TODO: review and fix for 5.2.2.xx implementation
-            // add custom arguments from browserStack
-            conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
-            conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
-        }
-
+        String browserVersion = Configuration.getBrowserVersion();
+        // override browserVersion to register correctly on Zafira based on capabilities.browserVersion or actual_browser_version as well
+        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), browserVersion, true);
+        
         long threadId = Thread.currentThread().getId();
 
         // add custom arguments from current mobile device
@@ -92,15 +83,22 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
             String deviceName = device.getName();
             String deviceOs = device.getOs();
             String deviceOsVersion = device.getOsVersion();
-
-            conf.getArg().add(buildArgumentType("device", deviceName));
-            conf.getArg().add(buildArgumentType("platform", deviceOs));
-            conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
+            
+            R.CONFIG.put("device", deviceName, true);
+            R.CONFIG.put(Parameter.PLATFORM.getKey(), deviceOs, true);
+            R.CONFIG.put("platform_version", deviceOsVersion, true);
 
             LOGGER.debug("Detected device: '" + deviceName + "'; os: '" + deviceOs + "'; os version: '" + deviceOsVersion + "'");
         } else {
             LOGGER.debug("Unable to detect current device for threadId: " + threadId);
         }
+        
+        // read all config parameter values and put into the Zafira configXML field
+        for (Parameter parameter : Parameter.values()) {
+            conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
+        }
+        
+
         return conf;
     }
 
