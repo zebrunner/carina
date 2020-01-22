@@ -100,11 +100,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>java class </td>
 	</tr>
 		<tr>
-		<td>platform</td>
-		<td>Platform version for Selenium Grid</td>
-		<td>ANDROID,IOS,WINDOWS,MAC,LINUX</td>
-	</tr>
-		<tr>
 		<td>browser_version</td>
 		<td>Browser version or an empty string if unknown for Selenium Grid</td>
 		<td>"8.0", "52.1"</td>

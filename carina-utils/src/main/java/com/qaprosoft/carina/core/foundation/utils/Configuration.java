@@ -64,8 +64,6 @@ public class Configuration {
 
         ENV_ARG_RESOLVER("env_arg_resolver"),
 
-        PLATFORM("platform"),
-
         BROWSER("browser"),
 
         BROWSER_VERSION("browser_version"),
@@ -392,17 +390,12 @@ public class Configuration {
     }
 
     public static String getPlatform() {
-        // default "platform=value" should be used to determine current platform
-        String platform = Configuration.get(Parameter.PLATFORM);
-
-        // redefine platform if capabilities.platform is available
-        if (!R.CONFIG.get("capabilities.platform").isEmpty()) {
-            platform = R.CONFIG.get("capabilities.platform");
-        }
+        // any platform by default
+        String platform = "*";
 
         // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get("capabilities.platformName").isEmpty()) {
-            platform = R.CONFIG.get("capabilities.platformName");
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
         
         //TODO: try to get actual platform name
@@ -414,8 +407,8 @@ public class Configuration {
         String platformVersion = "";
 
         // redefine platform if mobile.platformVersion is available
-        if (!R.CONFIG.get("capabilities.platformVersion").isEmpty()) {
-            platformVersion = R.CONFIG.get("capabilities.platformVersion");
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
         }
         
         //TODO: try to get actual platform version

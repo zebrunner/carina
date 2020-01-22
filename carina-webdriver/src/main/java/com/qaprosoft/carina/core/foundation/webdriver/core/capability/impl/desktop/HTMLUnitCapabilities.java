@@ -25,7 +25,7 @@ public class HTMLUnitCapabilities extends AbstractCapabilities {
 
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
-        String platform = Configuration.get(Configuration.Parameter.PLATFORM);
+        String platform = Configuration.getPlatform();
         if (!platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }

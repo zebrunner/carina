@@ -176,7 +176,6 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 There are a few critical properties in a config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
-* platform=*
 * browser=chrome
 * browser_version=*
 
