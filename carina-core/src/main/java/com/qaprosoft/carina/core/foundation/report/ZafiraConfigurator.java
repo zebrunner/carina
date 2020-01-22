@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,14 +61,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     public ConfigurationType getConfiguration() {
         ConfigurationType conf = new ConfigurationType();
         
-        List<String> exludedArgs = Arrays.asList("platform", "platform_version", "browser", "browser_version");
-        
         // read all config parameter values and put into the Zafira configXML field
         for (Parameter parameter : Parameter.values()) {
-            // do not add excluded args as they are calculated at run-time from another sources
-            if (!exludedArgs.contains(parameter.getKey())) {
-                conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
-            }
+            conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
         }
         
         // Override using actual platform, browser etc versions
