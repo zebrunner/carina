@@ -76,22 +76,26 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         
         String platform = Configuration.getPlatform();
         if (!platform.isEmpty() && !"*".equalsIgnoreCase(platform)) {
+            LOGGER.debug("Detected platform: '" + platform + "';");
             conf.getArg().add(buildArgumentType("platform", platform));
         }
         
         String platformVersion = Configuration.getPlatformVersion();
         if (!platformVersion.isEmpty()) {
+            LOGGER.debug("Detected platform_version: '" + platformVersion + "';");
             conf.getArg().add(buildArgumentType("platform_version", platformVersion));
         }
         
         String browser = Configuration.getBrowser();
         if (!browser.isEmpty()) {
-            conf.getArg().add(buildArgumentType("browser", platformVersion));
+            LOGGER.debug("Detected browser: '" + browser + "';");
+            conf.getArg().add(buildArgumentType("browser", browser));
         }
         
         String browserVersion = Configuration.getBrowserVersion();
         if (!browserVersion.isEmpty()) {
-            conf.getArg().add(buildArgumentType("browser_version", platformVersion));
+            LOGGER.debug("Detected browser_version: '" + browserVersion + "';");
+            conf.getArg().add(buildArgumentType("browser_version", browserVersion));
         }
         
         long threadId = Thread.currentThread().getId();
