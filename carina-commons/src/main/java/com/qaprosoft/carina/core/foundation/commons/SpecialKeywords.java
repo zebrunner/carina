@@ -146,6 +146,7 @@ public class SpecialKeywords {
     // ------------- CAPABILITIES PROPERTIES --------------------------
     public static final String CAPABILITIES = "capabilities";
     public static final String ENABLE_VIDEO = "capabilities.enableVideo";
+    public static final String PLATFORM = "capabilities.platform";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
     

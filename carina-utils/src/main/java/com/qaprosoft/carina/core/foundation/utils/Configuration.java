@@ -394,6 +394,11 @@ public class Configuration {
         String platform = "*";
 
         // redefine platform if mobile.platformName is available
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
+        }
+        
+        // redefine platform if mobile.platformName is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
