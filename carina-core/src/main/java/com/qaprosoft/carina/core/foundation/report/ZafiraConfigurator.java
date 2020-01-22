@@ -15,14 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
-import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
-import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestResult;
@@ -43,6 +41,9 @@ import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.zafira.config.IConfigurator;
+import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
+import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
+import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
@@ -55,14 +56,20 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  */
 public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTestManager {
     private static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
+    
 
     @Override
     public ConfigurationType getConfiguration() {
         ConfigurationType conf = new ConfigurationType();
         
+        List<String> exludedArgs = Arrays.asList("platform", "platform_version", "browser", "browser_version");
+        
         // read all config parameter values and put into the Zafira configXML field
         for (Parameter parameter : Parameter.values()) {
-            conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
+            // do not add excluded args as they are calculated at run-time from another sources
+            if (!exludedArgs.contains(parameter.getKey())) {
+                conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
+            }
         }
         
         // Override using actual platform, browser etc versions
