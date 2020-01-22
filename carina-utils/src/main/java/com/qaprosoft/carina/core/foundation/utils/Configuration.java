@@ -395,11 +395,6 @@ public class Configuration {
         // default "platform=value" should be used to determine current platform
         String platform = Configuration.get(Parameter.PLATFORM);
 
-        // redefine platform if os is available
-        if (!R.CONFIG.get("os").isEmpty()) {
-            platform = R.CONFIG.get("os");
-        }
-        
         // redefine platform if capabilities.platform is available
         if (!R.CONFIG.get("capabilities.platform").isEmpty()) {
             platform = R.CONFIG.get("capabilities.platform");
@@ -416,7 +411,7 @@ public class Configuration {
     
     public static String getPlatformVersion() {
         // default "os_version=value" should be used to determine current platform
-        String platformVersion = R.CONFIG.get("os_version");
+        String platformVersion = "";
 
         // redefine platform if mobile.platformVersion is available
         if (!R.CONFIG.get("capabilities.platformVersion").isEmpty()) {
@@ -435,7 +430,7 @@ public class Configuration {
         }
 
         // redefine browser if capabilities.browserName is available
-        if (!R.CONFIG.get("capabilities.browserName").isEmpty()) {
+        if (!R.CONFIG.get("capabilities.browserName").isEmpty() && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserName"))) {
             browser = R.CONFIG.get("capabilities.browserName");
         }
         return browser;
@@ -449,7 +444,7 @@ public class Configuration {
         }
 
         // redefine browserVersion if capabilities.browserVersion is available
-        if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()) {
+        if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
             browserVersion = R.CONFIG.get("capabilities.browserVersion");
         }
         

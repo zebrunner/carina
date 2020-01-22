@@ -65,7 +65,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         R.CONFIG.put(Parameter.PLATFORM.getKey(), platform, true);
         
         String platformVersion = Configuration.getPlatformVersion();
-        R.CONFIG.put("platform_version", platformVersion, true);
+        if (!platformVersion.isEmpty()) {
+            R.CONFIG.put("platform_version", platformVersion, true);
+        }
         
         String browser = Configuration.getBrowser();
         // override browser to register correctly on Zafira based on capabilities.browserName as well
@@ -73,7 +75,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         
         String browserVersion = Configuration.getBrowserVersion();
         // override browserVersion to register correctly on Zafira based on capabilities.browserVersion or actual_browser_version as well
-        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), browserVersion, true);
+        if (!browserVersion.isEmpty()) {
+            R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), browserVersion, true);
+        }
         
         long threadId = Thread.currentThread().getId();
 
