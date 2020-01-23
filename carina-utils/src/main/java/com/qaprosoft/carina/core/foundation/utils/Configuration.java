@@ -64,8 +64,6 @@ public class Configuration {
 
         ENV_ARG_RESOLVER("env_arg_resolver"),
 
-        PLATFORM("platform"),
-
         BROWSER("browser"),
 
         BROWSER_VERSION("browser_version"),
@@ -392,19 +390,34 @@ public class Configuration {
     }
 
     public static String getPlatform() {
-        // default "platform=value" should be used to determine current platform
-        String platform = Configuration.get(Parameter.PLATFORM);
-
-        // redefine platform if capabilities.platform is available
-        if (!R.CONFIG.get("capabilities.platform").isEmpty()) {
-            platform = R.CONFIG.get("capabilities.platform");
-        }
+        // any platform by default
+        String platform = "*";
 
         // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get("capabilities.platformName").isEmpty()) {
-            platform = R.CONFIG.get("capabilities.platformName");
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
         }
+        
+        // redefine platform if mobile.platformName is available
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
+        }
+        
+        //TODO: try to get actual platform name
         return platform;
+    }
+    
+    public static String getPlatformVersion() {
+        // default "os_version=value" should be used to determine current platform
+        String platformVersion = "";
+
+        // redefine platform if mobile.platformVersion is available
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
+        }
+        
+        //TODO: try to get actual platform version
+        return platformVersion;
     }
 
     public static String getBrowser() {
@@ -415,10 +428,30 @@ public class Configuration {
         }
 
         // redefine browser if capabilities.browserName is available
-        if (!R.CONFIG.get("capabilities.browserName").isEmpty()) {
+        if (!R.CONFIG.get("capabilities.browserName").isEmpty() && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserName"))) {
             browser = R.CONFIG.get("capabilities.browserName");
         }
         return browser;
+    }
+    
+    public static String getBrowserVersion() {
+        String browserVersion = "";
+        if (!Configuration.get(Parameter.BROWSER_VERSION).isEmpty()) {
+            // default "browser_version=value" should be used to determine current browser
+            browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
+        }
+
+        // redefine browserVersion if capabilities.browserVersion is available
+        if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
+            browserVersion = R.CONFIG.get("capabilities.browserVersion");
+        }
+        
+        // read from actual_browser_version if specified
+        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
+            browserVersion = R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION);
+        }
+        
+        return browserVersion;
     }
 
     public static String getDriverType() {

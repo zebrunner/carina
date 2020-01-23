@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
-import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
-import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestResult;
@@ -43,6 +40,9 @@ import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.zafira.config.IConfigurator;
+import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
+import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
+import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import com.qaprosoft.zafira.models.dto.TagType;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
@@ -55,35 +55,43 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  */
 public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTestManager {
     private static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
+    
 
     @Override
     public ConfigurationType getConfiguration() {
         ConfigurationType conf = new ConfigurationType();
         
-        String platform = Configuration.getPlatform();
-        // override platform to register correctly on Zafira based on capabilities.platform and platformName
-        R.CONFIG.put(Parameter.PLATFORM.getKey(), platform);
-        
-        String browser = Configuration.getBrowser();
-        // override browser to register correctly on Zafira based on capabilities.browserName as well
-        R.CONFIG.put(Parameter.BROWSER.getKey(), browser);
-        
+        // read all config parameter values and put into the Zafira configXML field
         for (Parameter parameter : Parameter.values()) {
             conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
         }
-
-        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
-            // update browser_version in returned config to register real value instead of * of matcher
-            conf.getArg().add(buildArgumentType("browser_version", R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION)));
+        
+        // Override using actual platform, browser etc versions
+        
+        String platform = Configuration.getPlatform();
+        if (!platform.isEmpty() && !"*".equalsIgnoreCase(platform)) {
+            LOGGER.debug("Detected platform: '" + platform + "';");
+            conf.getArg().add(buildArgumentType("platform", platform));
         }
-
-        if (buildArgumentType("platform", R.CONFIG.get("os")).getValue() != null) {
-            // TODO: review and fix for 5.2.2.xx implementation
-            // add custom arguments from browserStack
-            conf.getArg().add(buildArgumentType("platform", R.CONFIG.get("os")));
-            conf.getArg().add(buildArgumentType("platform_version", R.CONFIG.get("os_version")));
+        
+        String platformVersion = Configuration.getPlatformVersion();
+        if (!platformVersion.isEmpty()) {
+            LOGGER.debug("Detected platform_version: '" + platformVersion + "';");
+            conf.getArg().add(buildArgumentType("platform_version", platformVersion));
         }
-
+        
+        String browser = Configuration.getBrowser();
+        if (!browser.isEmpty()) {
+            LOGGER.debug("Detected browser: '" + browser + "';");
+            conf.getArg().add(buildArgumentType("browser", browser));
+        }
+        
+        String browserVersion = Configuration.getBrowserVersion();
+        if (!browserVersion.isEmpty()) {
+            LOGGER.debug("Detected browser_version: '" + browserVersion + "';");
+            conf.getArg().add(buildArgumentType("browser_version", browserVersion));
+        }
+        
         long threadId = Thread.currentThread().getId();
 
         // add custom arguments from current mobile device
@@ -92,7 +100,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
             String deviceName = device.getName();
             String deviceOs = device.getOs();
             String deviceOsVersion = device.getOsVersion();
-
+            
             conf.getArg().add(buildArgumentType("device", deviceName));
             conf.getArg().add(buildArgumentType("platform", deviceOs));
             conf.getArg().add(buildArgumentType("platform_version", deviceOsVersion));
@@ -101,6 +109,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         } else {
             LOGGER.debug("Unable to detect current device for threadId: " + threadId);
         }
+        
         return conf;
     }
 

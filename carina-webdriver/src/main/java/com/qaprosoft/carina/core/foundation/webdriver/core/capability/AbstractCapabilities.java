@@ -48,7 +48,7 @@ public abstract class AbstractCapabilities {
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
 
-        String platform = Configuration.get(Configuration.Parameter.PLATFORM);
+        String platform = Configuration.getPlatform();
         if (!platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }

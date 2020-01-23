@@ -9,8 +9,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -41,13 +41,13 @@ public class AppleTVTest {
 
 	@Test
 	public void getTvOSPlatformTest() {
-		R.CONFIG.put(Parameter.PLATFORM.getKey(), TVOS);
+		R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, TVOS);
 		Assert.assertEquals(Configuration.getDriverType(), MOBILE);
 	}
 
 	@Test
 	public void negativeTvOSPlatformTest() {
-		R.CONFIG.put(Parameter.PLATFORM.getKey(), TVOS);
+		R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, TVOS);
 		Assert.assertNotEquals(Configuration.getDriverType(), DESKTOP);
 	}
 
