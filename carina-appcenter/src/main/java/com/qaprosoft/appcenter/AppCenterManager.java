@@ -203,7 +203,7 @@ public class AppCenterManager {
         if (!appMap.isEmpty()) {
             return appMap.entrySet()
                     .stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         }
