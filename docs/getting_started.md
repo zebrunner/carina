@@ -60,7 +60,7 @@ mvn clean eclipse:eclipse
 ```
 By executing this command, Maven should resolve all dependencies, downloading the required libraries to your local repository and generating the Eclipse classpath. Before importing a new project to Eclipse, you should link your IDE to your Maven repository by executing the following task:
 ```
-mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
+mvn -Declipse.workspace=<path_to_workspace> eclipse:configure-workspace
 ```
 Here you need to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
 
