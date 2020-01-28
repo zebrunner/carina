@@ -187,6 +187,8 @@ public class ReportContext {
 
             if (!isCreated) {
                 throw new RuntimeException("Artifacts folder not created: " + artifactsDirectory.getAbsolutePath());
+            } else {
+                LOGGER.debug(("Artifacts folder created: " + artifactsDirectory.getAbsolutePath()));
             }
         }
         return artifactsDirectory;
@@ -473,7 +475,7 @@ public class ReportContext {
         }
     }
 
-    public static File renameTestDir(String test) {
+    private static File renameTestDir(String test) {
         File testDir = testDirectory.get();
         initIsCustomTestDir();
         if (testDir != null && !isCustomTestDirName.get()) {
@@ -584,8 +586,6 @@ public class ReportContext {
     public static String getTestArtifactsLink() {
         String link = "";
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
-            // remove report url and make link relative
-            // link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
             link = String.format("%s/%d/artifacts", Configuration.get(Parameter.REPORT_URL), rootID);
         } else {
             link = String.format("file://%s/%d/artifacts", baseDirectory, rootID);
@@ -598,27 +598,21 @@ public class ReportContext {
     /**
      * Returns URL for test screenshot folder.
      * 
-     * @param test
-     *            test name
      * @return - URL for test screenshot folder.
      */
-    public static String getTestScreenshotsLink(String test) {
-        // TODO: find unified solution for screenshots presence determination. Combine it with
-        // AbstractTestListener->createTestResult code
+    public static String getTestScreenshotsLink() {
         String link = "";
         if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
             // no png screenshot files at all
             return link;
         }
-
-        // TODO: remove reference using "String test" argument
+        
+        String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
+        
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
-            // remove report url and make link relative
-            // link = String.format("./%d/%s/report.html", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-            link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            // TODO: it seems like defect
-            link = String.format("file://%s/%s/report.html", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("file://%s/%s/report.html", baseDirectory, test);
         }
 
         return link;
@@ -627,13 +621,9 @@ public class ReportContext {
 
     /**
      * Returns URL for test log.
-     * 
-     * @param test
-     *            test name
      * @return - URL to test log folder.
      */
-    // TODO: refactor removing "test" argument
-    public static String getTestLogLink(String test) {
+    public static String getTestLogLink() {
         String link = "";
         File testLogFile = new File(ReportContext.getTestDir() + "/" + "test.log");
         if (!testLogFile.exists()) {
@@ -641,20 +631,18 @@ public class ReportContext {
             return link;
         }
 
+        String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
-            // remove report url and make link relative
-            // link = String.format("./%d/%s/test.log", rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
-            link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            // TODO: it seems like defect
-            link = String.format("file://%s/%s/test.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("file://%s/%s/test.log", baseDirectory, test);
         }
 
         return link;
     }
 
     // TODO: refactor as soon as getLogLink will be updated
-    public static String getSysLogLink(String test) {
+    public static String getSysLogLink() {
         String link = "";
         File testLogFile = new File(ReportContext.getTestDir() + "/" + "logcat.log");
         if (!testLogFile.exists()) {
@@ -662,17 +650,19 @@ public class ReportContext {
             return link;
         }
 
+        String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
+        
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
-            link = String.format("%s/%d/%s/logcat.log", Configuration.get(Parameter.REPORT_URL), rootID, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("%s/%d/%s/logcat.log", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("file://%s/%s/logcat.log", baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("file://%s/%s/logcat.log", baseDirectory, test);
         }
         LOGGER.debug("Extracted syslog link: ".concat(link));
         return link;
     }
 
     // TODO: refactor as soon as getLogLink will be updated
-    public static String getUIxLink(String test, String uixFileName) {
+    public static String getUIxLink(String uixFileName) {
         String link = "";
         File testLogFile = new File(ReportContext.getTestDir() + "/" + uixFileName);
         if (!testLogFile.exists()) {
@@ -680,11 +670,12 @@ public class ReportContext {
             return link;
         }
 
+        String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/".concat(uixFileName), Configuration.get(Parameter.REPORT_URL), rootID,
-                    test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+                    test);
         } else {
-            link = String.format("file://%s/%s/".concat(uixFileName), baseDirectory, test.replaceAll("[^a-zA-Z0-9.-]", "_"));
+            link = String.format("file://%s/%s/".concat(uixFileName), baseDirectory, test);
         }
         LOGGER.info("Extracted uix link: ".concat(link));
         return link;
@@ -789,8 +780,8 @@ public class ReportContext {
 
     public static void generateTestReport() {
         File testDir = testDirectory.get();
-        List<File> images = FileManager.getFilesInDir(testDir);
         try {
+            List<File> images = FileManager.getFilesInDir(testDir);
             List<String> imgNames = new ArrayList<String>();
             for (File image : images) {
                 imgNames.add(image.getName());

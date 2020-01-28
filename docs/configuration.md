@@ -9,7 +9,7 @@ There are multiple properties files located in src/main/resources:
 *  **email.properties** - emailable reports config
 *  **testdata.properties** - test user credentials 
 
-All properties may be retrieved in test using R class:
+All the properties may be retrieved in a test using R class:
 ```
 R.API.get("GetUserMethods")
 R.CONFIG.get("browser")
@@ -17,12 +17,12 @@ R.DATABASE.get("db.url")
 R.EMAIL.get("title")
 R.TESTDATA.get("user.email")
 ```
-Default config properties can be obtained by
+The default config properties can be obtained by
 ```
 Configuration.get(Parameter.BROWSER)
 ```
 
-All project configuration properties are located in **_config.properties** file. In the table below we are providing description for most of the parameters:
+All the project configuration properties are located in a **_config.properties** file. In the table below we are providing a description of most of the parameters:
 <table>
 	<tr>
 		<th>Attribute</th>
@@ -56,17 +56,17 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>language</td>
-		<td>Language for i18n defature. Enabled when enable_i18n=true</td>
+		<td>Language for i18n defeature. Enabled when enable_i18n=true</td>
 		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
 		<td>retry_interval</td>
-		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify number from 500-1500 range</td>
+		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_screenshot</td>
-		<td>Global switch for taking screenshots. When disabled only failures will be captured</td>
+		<td>Global switch for taking screenshots. When disabled, only failures will be captured</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
@@ -96,27 +96,22 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>env_arg_resolver</td>
-		<td>This parametr is optional, if it isn't set default value will be used. In most cases <b>default value is enough</b></td>
+		<td>This parameter is optional, if it isn't set, the default value will be used. In most cases, <b> the default value is enough</b></td>
 		<td>java class </td>
 	</tr>
 		<tr>
-		<td>platform</td>
-		<td>Platform version for Selenium Grid</td>
-		<td>ANDROID,IOS,WINDOWS,MAC,LINUX</td>
-	</tr>
-		<tr>
 		<td>browser_version</td>
-		<td>The browser version, or the empty string if unknown for Selenium Grid</td>
+		<td>Browser version or an empty string if unknown for Selenium Grid</td>
 		<td>"8.0", "52.1"</td>
 	</tr>
 		<tr>
 		<td>browser_language</td>
-		<td>Browser language or nothing to use default English version. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
+		<td>Browser language or nothing to use the English version by default. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
 		<td>"es", "fr"</td>
 	</tr>
 	<tr>
 		<td>driver_event_listeners</td>
-		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be instances of WebDriverEventListener</td>
+		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be the instances of WebDriverEventListener</td>
 		<td>com.someCompane.core.EventListener</td>
 	</tr>
 		<tr>
@@ -126,37 +121,37 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>custom_capabilities</td>
-		<td>Name of propertie file with custom capabilities(key-value)</td>
+		<td>Name of a properties file with custom capabilities (key-value)</td>
 		<td>custom.properties</td>
 	</tr>
 		<tr>
 		<td>proxy_host</td>
-		<td>The hostname of the server</td>
+		<td>Hostname of the server</td>
 		<td>host.example.com</td>
 	</tr>
 		<tr>
 		<td>proxy_port</td>
-		<td>The port number</td>
+		<td>Port number</td>
 		<td>80</td>
 	</tr>
 		<tr>
 		<td>proxy_protocols</td>
-		<td>Comma-separated list of internet protocols used to carry connection information from the source requesting the connection to the destination for which the connection was requested.</td>
+		<td>Comma-separated list of internet protocols used to carry the connection information from the source requesting the connection to the destination for which the connection was requested.</td>
 		<td>http, https, ftp, socks</td>
 	</tr>
 		<tr>
 		<td>browsermob_proxy</td>
-		<td>Boolean parameter which enable or disable automatic BrowserMob proxy launch</td>
+		<td>Boolean parameter which enables or disables the automatic BrowserMob proxy launch</td>
 		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>browsermob_port</td>
-		<td>The port number for BrowserMob proxy (if nothing or 0 specified then any free port will be reused)</td>
+		<td>Port number for BrowserMob proxy (if nothing or 0 specified, then any free port will be reused)</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>proxy_set_to_system</td>
-		<td>Boolean parameter which enable or disable set up of proxy</td>
+		<td>Boolean parameter which enables or disables the setup of a proxy</td>
 		<td>true, false</td>
 	</tr>
 		<tr>
@@ -166,72 +161,72 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>track_known_issues</td>
-		<td>Boolean parameter. If it is true and some Jira tickets assosiated with test in case of failure Jira info will be added to report</td>
+		<td>Boolean parameter. If it is true and some Jira tickets are associated with the test, in case of failure Jira info will be added to the report</td>
 		<td>true,false</td>
 	</tr>
 	<tr>
 		<td>explicit_timeout</td>
-		<td>Timeout in seconds to wait for a certain condition to occur before proceeding further in the code</td>
+		<td>Timeout is seconds to wait for a certain condition to occur before proceeding further in the code</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_download</td>
-		<td>Enabled parametr prevent download dialog and download file automatically. Feature currently avaliable for Chrome and FireFox</td>
+		<td>The enabled parameter prevents downloading a dialog and downloading a file automatically. The feature is currently available for Chrome and FireFox</td>
 		<td>false, true</td>
 	</tr>
 	<tr>
 		<td>auto_download_apps</td>
-		<td>MIME types / Internet Media Types. Parameter is necessary only for configure auto downloading for FireFox</td>
+		<td>MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for FireFox</td>
 		<td>application/pdf, list of [values](https://freeformatter.com/mime-types-list.html)</td>
 	</tr>
 	<tr>
 		<td>project_report_directory</td>
-		<td>Path to folder where reports will be saved</td>
+		<td>Path to a folder where the reports will be saved</td>
 		<td>./reports/qa</td>
 	</tr>
 	<tr>
 		<td>big_screen_width</td>
-		<td>Sreenshots will be resized according this width if there own width is bigger</td>
+		<td>Screenshots will be resized according to this width if their own width is bigger</td>
 		<td>500, 1200, Integer</td>
 	</tr>
 	<tr>
 		<td>big_screen_height</td>
-		<td>Sreenshots will be resized according this height if there own height is bigger</td>
+		<td>Screenshots will be resized according to this height if their own height is bigger</td>
 		<td>500, 1200, Integer</td>
 	</tr>
 		<tr>
 		<td>small_screen_width</td>
-		<td>Thumbnails width</td>
+		<td>Thumbnails' width</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>big_screen_height</td>
-		<td>Thumbnails height</td>
+		<td>Thumbnails' height</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>big_screen_height</td>
-		<td>Thumbnails height</td>
+		<td>Thumbnails' height</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>init_retry_count</td>
-		<td>Number of attempts to create driver.  Default value 0 means that it would be only 1 attempt</td>
+		<td>Number of attempts to create a driver. The default value 0 means that there will be only 1 attempt</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>init_retry_interval</td>
-		<td>Interval is seconds between attempts to create driver</td>
+		<td>Interval in seconds between the attempts to create a driver</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>retry_count</td>
-		<td>Number of test-retrying in case of failure.  Default value 0 means that test would be performed only once</td>
+		<td>Number of test-retryings in case of failure. The default value 0 means that a test will be performed only once</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>enable_l10n</td>
-		<td>Enable L10N feature</td>
+		<td>Enables L10N feature</td>
 		<td>false, true</td>
 	</tr>
 			<tr>
@@ -241,7 +236,7 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 	<tr>
 		<td>enable_i18n</td>
-		<td>Enable i18n feature</td>
+		<td>Enables i18n feature</td>
 		<td>false, true</td>
 	</tr>
 		<tr>
@@ -261,7 +256,7 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>core_log_packages</td>
-		<td>Comma separated list of core packages where you want to redefine log level</td>
+		<td>Comma-separated list of core packages where you want to redefine the log level</td>
 		<td>com.qaprosoft.carina.core, ZafiraConfigurator etc</td>
 	</tr>
 		<tr>
@@ -281,22 +276,22 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>crypto_key_path</td>
-		<td>Path to file with crypto key</td>
+		<td>Path to a file with a crypto key</td>
 		<td>./src/main/resources/crypto.key</td>
 	</tr>
 		<tr>
 		<td>suite_name</td>
-		<td>Suite name for report and TestRail. If this parameter is NULL will be get from TestNG xml (parameter suite name) or _email.properties (title)</td>
+		<td>Suite name for the report and TestRail. If this parameter is NULL, will be taken from TestNG xml (the parameter suite name) or _email.properties (the title)</td>
 		<td>Advanced Acceptance</td>
 	</tr>
 	<tr>
 		<td>jira_updater</td>
-		<td>Class contains logic to update Jira. <b>Note</b> Custom updater have to implement DefaultJiraUpdater, by default methods do nothing</td>
+		<td>Class contains logic to update Jira. <b>Note</b> Custom updater has to implement DefaultJiraUpdater, by default, the methods do nothing</td>
 		<td>Custom class</td>
 	</tr>
 	<tr>
 		<td>jira_url</td>
-		<td>Url to Jira</td>
+		<td>URL to Jira</td>
 		<td>https://yourclass.atlassian.net</td>
 	</tr>
 		<tr>
@@ -321,12 +316,12 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>jira_create_new_ticket</td>
-		<td>If feature is enabled after test failure new jira ticket will be created</td>
+		<td>If the feature is enabled, a new Jira ticket will be created after the test failure</td>
 		<td>true, false</td>
 	</tr>
 	<tr>
 		<td>optimize_video_recording</td>
-		<td>Enable video recording only for the final retry attempt</td>
+		<td>Enables video recording only for the final retry attempt</td>
 		<td>true, false</td>
 	</tr>
 	<tr>
@@ -336,17 +331,17 @@ All project configuration properties are located in **_config.properties** file.
 	</tr>
 		<tr>
 		<td>testrail_assignee</td>
-		<td>User asserneed for the suit</td>
+		<td>User assigned for the suit</td>
 		<td>asignee_user@yuorcompany.com</td>
 	</tr>
 		<tr>
 		<td>access_key_id</td>
-		<td>Acces key id for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Access key id for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>secret_key</td>
-		<td>Secret key for Amamzon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Secret key for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
@@ -355,49 +350,54 @@ All project configuration properties are located in **_config.properties** file.
 		<td>./s3</td>
 	</tr>
 		<tr>
-		<td>hockeyapp_token</td>
+		<td>appcenter_token</td>
 		<td>Token for authentication in Hockey App</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
-		<td>hockeyapp_local_storage</td>
-		<td>Directory for Hockey App artefacts</td>
-		<td>./hockeyapp</td>
+		<td>appcenter_local_storage</td>
+		<td>Directory for AppCenter artifacts</td>
+		<td>./appcenter</td>
 	</tr>
 		<tr>
 		<td>add_new_localization</td>
-		<td>Should be set to 'true' if you want to create new localization files for required Locale.Otherwise there will be just localization checking</td>
+		<td>Should be set to 'true' if you want to create new localization files for the required Locale. Otherwise, there will be just the localization checking</td>
 		<td>false, true</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_encoding</td>
-		<td>Encoding for new lokalization</td>
+		<td>Encoding for a new localization</td>
 		<td>utf-16, utf-32</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_path</td>
-		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>utf-16, utf-32</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_property_name</td>
-		<td>Path where created localization properties should be saved. If null - they will be added to artifactory folder in report</td>
+		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>Basic template for property name.</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
-		<td>Path to directory with tls secure keys</td>
+		<td>Path to a directory with tls secure keys</td>
 		<td>./tls/keysecure</td>
 	</tr>
 		<tr>
 		<td>health_check_class</td>
-		<td>Class to execute helth checks</td>
+		<td>Class to execute health checks</td>
 		<td>Custom class</td>
 	</tr>
 		<tr>
 		<td>health_check_methods</td>
-		<td>Comma-separate list of methods of health_check_class to execute preliminary</td>
+		<td>Comma-separated list of methods of health_check_class to execute preliminarily</td>
 		<td>doThis, doThat</td>
+	</tr>
+	<tr>
+		<td>test_run_rules</td>
+		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
+		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>owner;;TAGS=>tag1=temp&amp;&amp;feature=reg</td>
 	</tr>
 </table>
 Most of the properties may be read in the following way:
@@ -409,21 +409,21 @@ Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 
 ### Environment specific configuration
-In some cases it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case we need to specify the following properties in _config.properties:
+In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in _config.properties:
 ```
 env=PROD
 STAG.url=http://stag-app-server.com
 PROD.url=http://prod-app-server.com
 ```
 
-And get env-specific argument in test the following way:
+And get an env-specific argument in the test in the following way:
 ```
 Configuration.getEnvArg("url")
 ```
-As a result you switch between environments just changing env argument in _config.properties file.
+As a result, you switch between the environments just changing the env argument in the _config.properties file.
 
 ### [Zafira](https://github.com/qaprosoft/zafira) configuration
-[**zafira.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/zafira.properties) is used for Zafira QA reporting integration, here you should specify some values for proper integration:<table>
+[**zafira.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/zafira.properties) are used for Zafira QA reporting integration, here you should specify some values for a proper integration:<table>
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>
@@ -446,7 +446,7 @@ As a result you switch between environments just changing env argument in _confi
 	</tr>
 	<tr>
 		<td>zafira_rerun_failures</td>
-		<td>Rerun only failures</td>
+		<td>Reruns only failures</td>
 		<td>true/false</td>
 	</tr>
 	<tr>
@@ -456,7 +456,7 @@ As a result you switch between environments just changing env argument in _confi
 	</tr>
 	<tr>
 		<td>zafira_configurator</td>
-		<td>Configurator class (use default)</td>
+		<td>Configurator class (used by default)</td>
 		<td>com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator</td>
 	</tr>	
 </table>

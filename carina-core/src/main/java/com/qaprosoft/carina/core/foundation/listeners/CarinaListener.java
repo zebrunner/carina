@@ -83,7 +83,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.hockeyapp.HockeyAppManager;
+import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.models.dto.TestRunType;
@@ -94,7 +94,7 @@ import com.qaprosoft.zafira.models.dto.TestRunType;
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener {
-    protected static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
+    private static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -195,33 +195,70 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
-        // TODO: moved into separate class/method
-        LOGGER.debug("Default thread_count=" + suite.getXmlSuite().getThreadCount());
-        suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-        LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
-
-        // update DataProviderThreadCount if any property is provided otherwise
-        // sync with value from suite xml file
-        int count = Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
-        if (count > 0) {
-            LOGGER.debug("Updated 'data_provider_thread_count' from " + suite.getXmlSuite().getDataProviderThreadCount()
-                    + " to " + count);
-            suite.getXmlSuite().setDataProviderThreadCount(count);
+        setThreadCount(suite);
+        onHealthCheck(suite);
+        
+        LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
+    }
+    
+    private void setThreadCount(ISuite suite) {
+        if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains("thread-count")) {
+            LOGGER.info("Set thread_count=1");
+            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
+            suite.getXmlSuite().setThreadCount(1);
+        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains("thread-count")) {
+            // reuse value from suite xml file
+            LOGGER.debug("Synching thread_count with values from suite xml file...");
+            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(),
+                    String.valueOf(suite.getXmlSuite().getThreadCount()));
+            LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
         } else {
+            // use thread-count from config.properties
+            suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
+            LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
+        }
+        
+        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains("data-provider-thread-count")) {
+            LOGGER.info("Set data_provider_thread_count=1");
+            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
+            suite.getXmlSuite().setDataProviderThreadCount(1);
+        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains("data-provider-thread-count")) {
+            // reuse value from suite xml file
             LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
             R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
                     String.valueOf(suite.getXmlSuite().getDataProviderThreadCount()));
-            LOGGER.debug("Updated 'data_provider_thread_count': "
-                    + Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+            LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
+        } else {
+            // use thread-count from config.properties
+            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
+            LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
         }
 
-        LOGGER.debug("Default data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
-        LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
-
-        onHealthCheck(suite);
     }
 
-    @Override
+	private String getCarinaVersion() {
+
+		String carinaVersion = "";
+		try {
+			Class<CarinaListener> theClass = CarinaListener.class;
+
+			String classPath = theClass.getResource(theClass.getSimpleName() + ".class").toString();
+			LOGGER.debug("Class: " + classPath);
+
+			Pattern pattern = Pattern.compile(".*\\/(.*)\\/.*!");
+			Matcher matcher = pattern.matcher(classPath);
+
+			if (matcher.find()) {
+				carinaVersion = matcher.group(1);
+			}
+		} catch (Exception e) {
+			LOGGER.debug(e);
+		}
+
+		return carinaVersion;
+	}
+
+	@Override
     public void onStart(ITestContext context) {
         LOGGER.debug("CarinaListener->OnTestStart(context): " + context.getName());
         super.onStart(context);
@@ -363,9 +400,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             // we shouldn't deregister info here as all retries will not work
             // TestNamingUtil.releaseZafiraTest();
-
-            // clear jira tickets to be sure that next test is not affected.
-            Jira.clearTickets();
 
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
@@ -597,11 +631,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         try {
-            if (!Configuration.get(Parameter.HOCKEYAPP_TOKEN).isEmpty()) {
-                updateHockeyAppPath();
+            if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
+                updateAppCenterAppPath();
             }
         } catch (Exception e) {
-            LOGGER.error("HockeyApp manager exception detected!", e);
+            LOGGER.error("AppCenter manager exception detected!", e);
         }
 
     }
@@ -609,25 +643,25 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     /**
      * Method to update MOBILE_APP path in case if apk is located in Hockey App.
      */
-    private static void updateHockeyAppPath() {
-        // hockeyapp://appName/platformName/buildType/version
-        Pattern HOCKEYAPP_PATTERN = Pattern.compile(
-                "hockeyapp:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
+    private static void updateAppCenterAppPath() {
+        // appcenter://appName/platformName/buildType/version
+        Pattern APPCENTER_PATTERN = Pattern.compile(
+                "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
         String mobileAppPath = Configuration.getMobileApp();
-        Matcher matcher = HOCKEYAPP_PATTERN.matcher(mobileAppPath);
+        Matcher matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
 
-        LOGGER.info("Analyzing if mobile_app is located on HockeyApp...");
+        LOGGER.info("Analyzing if mobile_app is located on AppCenter...");
         if (matcher.find()) {
-            LOGGER.info("app artifact is located on HockeyApp...");
+            LOGGER.info("app artifact is located on AppCenter...");
             String appName = matcher.group(1);
             String platformName = matcher.group(2);
             String buildType = matcher.group(3);
             String version = matcher.group(4);
 
-            String hockeyAppLocalStorage = Configuration.get(Parameter.HOCKEYAPP_LOCAL_STORAGE);
-            // download file from HockeyApp to local storage
+            String appCenterAppLocalStorage = Configuration.get(Parameter.APPCENTER_LOCAL_STORAGE);
+            // download file from AppCenter to local storage
 
-            File file = HockeyAppManager.getInstance().getBuild(hockeyAppLocalStorage, appName, platformName, buildType,
+            File file = AppCenterManager.getInstance().getBuild(appCenterAppLocalStorage, appName, platformName, buildType,
                     version);
 
             Configuration.setMobileApp(file.getAbsolutePath());
@@ -675,31 +709,40 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             }
 
-            S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
-
-            String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
-
-            // download file from AWS to local storage
-
-            String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
-            File file = new File(fileName);
-
-            // verify maybe requested artifact with the same size was already
-            // download
-            if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
-                LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+            if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
+                // generate presigned url for nearest 8 hours
+                long hours = 8*1000*60*60;
+                String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
+                LOGGER.debug("preSigned URL: " + presignedAppUrl);
+                Configuration.setMobileApp(presignedAppUrl);
             } else {
-                LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s",
-                        bucketName, key, file.getAbsolutePath()));
-                AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
-            }
+                // download artifact into the local storage
+                S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
+    
+                String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
+    
+                // download file from AWS to local storage
+    
+                String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
+                File file = new File(fileName);
+    
+                // verify maybe requested artifact with the same size was already
+                // download
+                if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
+                    LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+                } else {
+                    LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s",
+                            bucketName, key, file.getAbsolutePath()));
+                    AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
+                }
+    
+                Configuration.setMobileApp(file.getAbsolutePath());
 
-            Configuration.setMobileApp(file.getAbsolutePath());
-
-            // try to redefine app_version if it's value is latest or empty
-            String appVersion = Configuration.get(Parameter.APP_VERSION);
-            if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+                // try to redefine app_version if it's value is latest or empty
+                String appVersion = Configuration.get(Parameter.APP_VERSION);
+                if (appVersion.equals("latest") || appVersion.isEmpty()) {
+                    R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+                }
             }
 
         }

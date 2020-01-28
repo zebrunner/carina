@@ -35,7 +35,8 @@ public @interface DeviceType {
         IOS_TABLET("ios_tablet", "ios"),
         IOS_PHONE(
                 "ios_phone",
-                "ios");
+                "ios"),
+        APPLE_TV("apple_tv", "tvos");
 
         private String type;
 

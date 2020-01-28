@@ -23,7 +23,7 @@ public enum ACTION_NAME implements IPerformanceOperation {
     DOUBLE_CLICK("double_click"),
     RIGHT_CLICK("right_click"),
     HOVER("hover"),
-    SEND_KEYS("send_kyes"),
+    SEND_KEYS("send_keys"),
     TYPE("type"),
     ATTACH_FILE("attach_file"),
     GET_TEXT("get_text"),

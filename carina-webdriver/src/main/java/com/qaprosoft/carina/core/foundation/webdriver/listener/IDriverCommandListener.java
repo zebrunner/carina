@@ -30,7 +30,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * @author akhursevich
  */
 public interface IDriverCommandListener {
-    static final Logger LOGGER = Logger.getLogger(IDriverCommandListener.class);
+    static final Logger LISTENER_LOGGER = Logger.getLogger(IDriverCommandListener.class);
 
 	/**
 	 * Triggered before command execution.
@@ -46,23 +46,17 @@ public interface IDriverCommandListener {
 	 */
 	void afterEvent(Command command);
 	
-    default public void registerVideoArtifact(Command command, TestArtifactType videoArtifact) {
-        // 4a. if "tzid" not exist inside videoArtifact and exists in Reporter ->
-        // register new videoArtifact in Zafira.
-        // 4b. if "tzid" already exists in current artifact but in Reporter there is
-        // another value. Then this is use case for class/suite mode when we share the
-        // same
-        // driver across different tests
-
+    default public void registerArtifact(Command command, TestArtifactType artifact) {
+        // 4a. if "tzid" not exist inside videoArtifact and exists in Reporter -> register new videoArtifact in Zafira.
+        // 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same driver across different tests
         ITestResult res = Reporter.getCurrentTestResult();
         if (res != null && res.getAttribute("ztid") != null) {
             Long ztid = (Long) res.getAttribute("ztid");
-            if (ztid != videoArtifact.getTestId()) {
-                videoArtifact.setTestId(ztid);
-
-                LOGGER.debug("Registered recorded video artifact " + videoArtifact.getName() + " into zafira");
+            if (ztid != artifact.getTestId()) {
+                artifact.setTestId(ztid);
+                LISTENER_LOGGER.debug("Registered artifact " + artifact.getName() + " into zafira");
                 if (ZafiraSingleton.INSTANCE.isRunning()) {
-                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(videoArtifact);
+                    ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
                 }
             }
         }

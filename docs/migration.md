@@ -1,12 +1,12 @@
 ### Migration steps from 5.3.3.xx to 6.0.x carina
 
-Due to the architectual changes, code cleanup etc 6.0 carina-core generation is not compatible with 5.3 anymore.
+Due to the architectural changes, code cleanup, etc., 6.0 carina-core generation is not compatible with 5.3 anymore.
 
 * Visit [Release Notes](http://qaprosoft.github.io/carina/releases/) for details.
 
-1) Listeners Updates
+1) Listener Updates
 
-   * AnnotationTransformer is part of CarinaListener so it should be removed from all TestNG suites and pom.xml files:
+   * AnnotationTransformer is a part of CarinaListener, so it should be removed from all TestNG suites and pom.xml files:
 ```
     // remove below lines from each TestNG suites and pom.xml files
     <listeners>
@@ -15,7 +15,7 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
     </listeners>
 ```
 
-   * HealthCheckListener is part of carinaListener so it should be removed from TestNG suites and pom.xml files:
+   * HealthCheckListener is a part of CarinaListener, so it should be removed from TestNG suites and pom.xml files:
 ```
     // remove below lines from each TestNG suites and pom.xml files
     <listeners>
@@ -23,17 +23,17 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
     </listeners>
 ```
 
-2) Apache Maven plugins upgrade
+2) Apache Maven plugin upgrade
 
-   * all plugins where upgraded on core level and we recommend to bump up below plugins to the newest versions on project leveles as well:
+   * all plugins have been upgraded on a core level, and we recommend to bump up the below mentioned plugins to the newest versions on project levels as well:
       * maven-compiler-plugin 3.2 -> 3.8.0
       * maven-surefire-plugin 2.18.1 -> 2.22.1
 
-3) DriverPool was refactored and is delivered as IDriverPool intefrace with default functionality
+3) DriverPool has been refactored and is delivered as IDriverPool interface with default functionality
 
-   * No changes on test classes level if they extends AbstractTest
+   * No changes on a test class levels if they extend AbstractTest
 
-   * For each services layer which used static DriverPool functionality we should:
+   * For every service layer which used static DriverPool functionality we should:
 ```
    // add "implements IDriverPool" for each service class
    public class TestService implements IDriverPool {
@@ -43,14 +43,14 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
    WebDriver drv = getDriver();
 ```
 
-4) Cucumber functionality was completely removed in 6.0 so just remove all dependent classes if any. Inform [carina-support](mailto:carina-support@qaprosoft.com) if you want to restore cucumber module in Carina.
+4) Cucumber functionality has been completely removed in 6.0, so just remove all dependent classes if any. Inform [carina-support](mailto:carina-support@qaprosoft.com) if you want to restore cucumber module in Carina.
 
-5) All TestRail updaters, interfaces etc were removed. Carina can't push at runtime data to 3rd party Reporting Tools. 
-   Carina can register only TestRail related tags in Zafira. Integration was moved to the qps-pipeline level with much more easier to develop, maintain and support
+5) All TestRail updaters, interfaces, etc. have been removed. Carina can't push data to 3rd party Reporting Tools at runtime. 
+   Carina can register only TestRail related tags in Zafira. Integration has been moved to the qps-pipeline level which is much easier to develop, maintain and support.
 
-6) DriverHelper (AbstractPage) - deprecated methods removal
+6) DriverHelper (AbstractPage) - removal of deprecated methods
 
-   * click, type, hoved, select etc
+   * click, type, hover, select, etc.
 ```
    ExtendedWebElement element;
    String value = "value";
@@ -64,25 +64,25 @@ Due to the architectual changes, code cleanup etc 6.0 carina-core generation is 
 
    format(element, "dynamic attr"); -> element.format("dynamic attr");
 ```
-   Note: replaced all methods using new OOP format
+   Note: all the methods using a new OOP format have been replaced
 
-   * pressEnter() was removed
+   * pressEnter() has been removed
 ```
    pressEnter(fileNameLabel);
    // change to
    fileNameLabel.sendKeys(Keys.RETURN);
 ```
 
-   * waitForElementToBeClickable(...) was removed
+   * waitForElementToBeClickable(...) has been removed
 ```
    waitForElementToBeClickable(element, LONG_TIMEOUT);
    // change to
    element.isClickable(LONG_TIMEOUT);
 ```
 
-7) CustomTypePageFactory->initPage method has obligatory driver as 1st argument. 
+7) CustomTypePageFactory->initPage method has an obligatory driver as the 1st argument. 
 
-   * transferring driver as argument should resolve invalid calls on services layer when we got too often "driver already quit..." 
+   * transferring the driver as an argument should resolve invalid calls on service layer when we received "driver already quit..." too often
 ```
    return CustomTypePageFactory.initPage(PlayerPageBase.class);
    // change to

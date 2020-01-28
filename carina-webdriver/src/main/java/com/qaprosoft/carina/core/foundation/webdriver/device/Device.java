@@ -150,7 +150,7 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     public boolean isTv() {
-        return getType().equalsIgnoreCase(SpecialKeywords.TV) || getType().equalsIgnoreCase(SpecialKeywords.ANDROID_TV);
+        return getType().equalsIgnoreCase(SpecialKeywords.TV) || getType().equalsIgnoreCase(SpecialKeywords.ANDROID_TV) || getType().equalsIgnoreCase(SpecialKeywords.TVOS);
     }
 
     public Type getDeviceType() {
@@ -167,11 +167,14 @@ public class Device extends RemoteDevice implements IDriverPool {
                 return Type.ANDROID_TV;
             }
             return Type.ANDROID_PHONE;
-        } else if (getOs().equalsIgnoreCase(SpecialKeywords.IOS) || getOs().equalsIgnoreCase(SpecialKeywords.MAC)) {
+        } else if (getOs().equalsIgnoreCase(SpecialKeywords.IOS) || getOs().equalsIgnoreCase(SpecialKeywords.MAC) || getOs().equalsIgnoreCase(SpecialKeywords.TVOS)) {
             if (isTablet()) {
                 return Type.IOS_TABLET;
             }
-            return Type.IOS_PHONE;
+            if (isTv()) {
+                return Type.APPLE_TV;
+            }
+                return Type.IOS_PHONE;
         }
         throw new RuntimeException("Incorrect driver type. Please, check config file for " + toString());
     }
@@ -192,6 +195,9 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isNull())
             return;
 
+        if (isIOS())
+            return;
+        
         isStfEnabled = true;
         
         LOGGER.debug("adb connect " + getRemoteURL());
@@ -710,7 +716,11 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
     
     private boolean isMobile() {
-        return SpecialKeywords.ANDROID.equalsIgnoreCase(getOs()) || SpecialKeywords.IOS.equalsIgnoreCase(getOs());
+        return SpecialKeywords.ANDROID.equalsIgnoreCase(getOs()) || SpecialKeywords.IOS.equalsIgnoreCase(getOs()) || SpecialKeywords.TVOS.equalsIgnoreCase(getOs());
+    }
+    
+    private boolean isIOS() {
+        return SpecialKeywords.IOS.equalsIgnoreCase(getOs()) || SpecialKeywords.TVOS.equalsIgnoreCase(getOs());
     }
 
     private boolean isConnected() {

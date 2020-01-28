@@ -7,7 +7,7 @@
 * Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
 
 ### Generating project
-The easiest way to initialize new project is to use Carina archetype, you will get correct project structure along with test samples:
+The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples:
 ```
 mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
@@ -18,7 +18,7 @@ mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -Durl=<your_proj_url> \
                        -Dversion=<your_proj_version>
 ```
-If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In above Maven command you have to specify 5 attributes while the first 3 should be left unchanged. Let's go through these attributes:
+If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:
 
 <table>
 	<tr>
@@ -28,7 +28,7 @@ If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hell
 	</tr>
 	<tr>
 		<td>-DgroupId</td>
-		<td>Company domain in reverce order</td>
+		<td>Company domain in reverse order</td>
 		<td>com.qaprosoft</td>
 	</tr>
 	<tr>
@@ -54,14 +54,14 @@ If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hell
 </table>
 
 ### Import to Eclipse
-If generation is successfully complete, you would see a new project folder with a name equal to the artifactId attribute specified during generation, so navigate to that folder (where pom.xml is located) and execute the following Maven task:
+If the generation is successfully complete, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:
 ```
 mvn clean eclipse:eclipse
 ```
-By executing this command, Maven should resolve all dependencies, downloading required libraries to your local repository and generating Eclipse classpath. Before importing new project to Eclipse, you should link your IDE to your Maven repository by executing the following task:
+By executing this command, Maven should resolve all dependencies, downloading the required libraries to your local repository and generating the Eclipse classpath. Before importing a new project to Eclipse, you should link your IDE to your Maven repository by executing the following task:
 ```
-mvn -Dworkspace=<path_to_workspace> eclipse:configure-workspace
+mvn -Declipse.workspace=<path_to_workspace> eclipse:configure-workspace
 ```
-Here you have to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
+Here you need to specify the absolute path to the Eclipse workspace. After that, restart Eclipse IDE. Now you can import generated projects such as "Existing Java Project" into Eclipse IDE.
 
 ![Eclipse view](img/001-Initial-setup.png)

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -34,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public class DriverPoolTest implements IDriverPool {
+    private static final Logger LOGGER = Logger.getLogger(DriverPoolTest.class);
 
     private final static String BEFORE_SUITE_DRIVER_NAME = "custom-0-driver";
     private final static String CUSTOM1 = "custom-1-driver";

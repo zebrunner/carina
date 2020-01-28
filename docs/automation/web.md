@@ -1,10 +1,10 @@
 [![Carina - Web automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/Wgyffk7hJQw)
 
-Carina framework follows Selenium best practices for web tests automation. If you are familiar with Selenium WebDriver and have already implemented few tests with Page Object pattern the following guide will be pretty much easy for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, all the test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
+Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
 
 
 ### Implementation of Page Objects
-When you are writing functional tests using Selenium a major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements you will verify some state of the element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:
+When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:
 ```
 List<WebElement> zipCodes = driver.findElements(By.id("zipCodes"));
 for (WebElement zipCode : zipCodes) {
@@ -16,19 +16,19 @@ for (WebElement zipCode : zipCodes) {
 WebElement city = driver.findElement(By.id("city"));
 assertEquals("MyCityName", city.getText());
 ```
-So some of the typical problems for this type of Selenium test are:
+Some of the typical problems for this type of Selenium test are:
 
 * Test cases are difficult to read
-* Changes in the UI breaks multiple tests often in several places
+* Changes in the UI break multiple tests, often in several places
 * Duplication of selectors both inside and across tests - no reuse
 
-So instead of having each test fetch elements directly and being fragile towards UI changes, the Page Object Pattern introduces what is basically a decoupling layer. 
+So, instead of having each test fetch elements directly and being fragile towards the UI changes, the Page Object Pattern introduces what is basically a decoupling layer. 
 
-You create an object that represents the UI you want to test, which could be a whole page or a significant part of it. The responsibility of this object is to wrap HTML elements and encapsulate interactions with the UI, meaning that this is where all calls to WebDriver will go. This is where most WebElements are. And this is the only place you need to modify when the UI changes.
+You create an object that represents the UI you want to test, which can be a whole page or a significant part of it. The responsibility of this object is to wrap HTML elements and encapsulate interactions with the UI, meaning that this is where all calls to WebDriver will go. This is where most WebElements are. And this is the only place you need to modify when the UI changes.
 
 ![Page Object Pattern](../img/page-objects.png)
 
-In general Page Object contains locators of the elements located on the page and some business logic that may be reused by different tests:
+In general, Page Object contains locators of the elements situated on the page and some business logic that may be reused by different tests:
 ```
 public class ModelInfoPage extends AbstractPage {
     @FindBy(css = ".help-display strong")
@@ -77,7 +77,7 @@ public class ModelInfoPage extends AbstractPage {
 
 
 ### Implementation of UI Components
-In some cases it is useful to implement UI Objects that may be reused between multiple Page Objects, for top menu or footer instance may be shared between multiple pages:
+In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects. For instance, a top menu or footer may be shared between multiple pages:
 ```
 public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = "Home")
@@ -101,7 +101,7 @@ public class FooterMenu extends AbstractUIObject {
     }
 }
 ```
-And then you can use that in Page Object:
+And then you can use this in Page Object:
 ```
 public class HomePage extends AbstractPage {
     @FindBy(id = "footmenu")
@@ -135,11 +135,11 @@ public class HomePage extends AbstractPage {
 **Important:**
 
 * UI Object should extend **com.qaprosoft.carina.core.gui.AbstractUIObject**
-* You should call super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
+* You should call the super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
 * Locate UI Object classes in src/main/java source folder
 
 ### Implementation of tests
-Carina framework uses TestNG for test organization. In general, test represents manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
+Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
 public class WebSampleTest extends AbstractTest {
     @Test(description = "JIRA#AUTO-0009")
@@ -163,24 +163,23 @@ public class WebSampleTest extends AbstractTest {
 }
 
 ```
-It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in the test, do not mix that logic.
+It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in the test, do not mix this logic.
 
 **Important:**
 
 * Test class should extend **com.qaprosoft.carina.core.foundation.AbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
-* Use **getDriver()** method to get driver instance in test
+* Use **getDriver()** method to get driver instance in the test
 * Locate tests in src/test/java source folder
 
 ### Test configuration
-There are few critical properties in config.properties file which are required for web tests execution:
+There are a few critical properties in a config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
-* platform=*
 * browser=chrome
 * browser_version=*
 
-Implemented tests cases should be placed in TestNG xml file according to test group the test belongs to. More details about TestNG configuration you may find in the [official documentation](http://testng.org/doc/documentation-main.html).
+The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 

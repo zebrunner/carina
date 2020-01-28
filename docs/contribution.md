@@ -16,8 +16,8 @@ Configure ssh connection based on git documentation [https://help.github.com/art
 
 7) `git checkout -b work_local_branch upstream/master`
 
-And then after adding files (`git add` ...) use `git commit` (add description) and then`push`:
+And then, after adding the files (`git add` ...), use `git commit` (add description) and then`push`:
 
     git push origin work_local_branch:work_remote_branch
     
-And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "Compare & Pull Request"
+And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see the possibility to "Compare & Pull Request"

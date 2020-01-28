@@ -6,7 +6,7 @@
 ### 6.1.24 (2019-07-14)
 [6.1.24](https://github.com/qaprosoft/carina/releases/tag/6.1.24)
 
-### Starting from now release notes will be published only on Github!
+### Starting from now, the release notes will be published only on Github!
 
 ### 6.1.22 (2019-06-29)
 
@@ -28,7 +28,7 @@ Note: previous single @MethodOwner annotation without platform works as well
 
 **Fixes**
 
-* Browser resize moved to DesktopFactory only to minimize erros in mobile web tests. Browser window resolution sets according to <b>capabilites.resolution</b> values otherwise maximizes window using old functionality.
+* Browser resize moved to DesktopFactory only to minimize errors in mobile web tests. Browser window resolution sets according to <b>capabilites.resolution</b> values, otherwise maximizes the window using old functionality.
 
 **Known Issues**
 
@@ -40,8 +40,8 @@ Note: previous single @MethodOwner annotation without platform works as well
 
 **Migration Steps**
 
-* Remove all occurrences of <b>secondaryOwner</b> parameter for <i>@MethodOwner</i> annotation. Use platform filter based on information above instead
-* To complete migration replace in your _config.properties all occurrences of <i>browser_locale</i> to <i>browser_language</i>
+* Remove all occurrences of <b>secondaryOwner</b> parameter for <i>@MethodOwner</i> annotation. Use platform filter based on the information above instead
+* To complete migration, replace in your _config.properties all occurrences of <i>browser_locale</i> to <i>browser_language</i>
 
 
 

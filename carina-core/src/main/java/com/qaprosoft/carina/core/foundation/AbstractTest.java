@@ -100,5 +100,4 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     protected void skipExecution(String message) {
         throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
     }
-
 }

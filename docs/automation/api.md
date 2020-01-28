@@ -1,29 +1,29 @@
 [![Carina - API automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/oJL5y8Ovta0)
 
 ### Introduction
-Rest API testing is a vital part of integration testing process, it may be used separately or in complex with web, mobile or DB testing. General process may be described by the following steps:
+Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
-1. Compile HTTP request with required meta data
-2. Send prepared data to the required server endpoint
-3. Validate HTTP status and response data
+1. Compile an HTTP request with the required meta data
+2. Send the prepared data to the required server endpoint
+3. Validate the HTTP status and response data
 4. Extract some response data for the next requests
-5. Build call to next (or same) endpoint using (or not using) data from the previous response
+5. Build a call to the next (or the same) endpoint using (or not using) the data from the previous response
 
-Schema below demonstrates the sequence:
+The schema below demonstrates the sequence:
 ![API flow](../img/api/api-flow-new.png)
 
-From that perspective we decided to use the following instruments:
+From this perspective, we decided to use the following instruments:
 
-* Rest-assured - "Testing and validation of REST services in Java is harder than in dynamic languages such as Ruby and Groovy. REST
+* Rest-assured - "Testing and validation of REST services in Java are harder than in dynamic languages such as Ruby and Groovy. REST
 Assured brings the simplicity of using these languages into the Java domain."
 * Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
 files, source code, etc.) based on templates and changing data."
-* JsonPath - library for extracting data from JSON body
-* JsonAssert - library for comparing of actual JSON body with expected one
-* Json-schema-validator - library for validating of JSON body for matching to json schema
+* JsonPath - a library for extracting data from JSON body
+* JsonAssert - a library for comparing the actual JSON body with an expected one
+* Json-schema-validator - a library for validating of JSON body for matching to JSON schema
 
 ### Example of test implementation
-Let's create an automated test for next call: POST https://jsonplaceholder.typicode.com/users request with a request body
+Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body
 ```
 [
     {
@@ -51,10 +51,10 @@ Let's create an automated test for next call: POST https://jsonplaceholder.typic
     }
 ]
 ```
-and response body same as the request body
+and the response body the same as the request body
 
 #### Definition of request and response templates
-If we are going to send POST request we have to create request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in package structure for better maintenance and visibility:
+If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in a package structure for better maintenance and visibility:
 ![API flow](../img/api/resources-structure.png)
 Request (rq.json) and response (rs.json) templates have some placeholders that will be populated from the tests later on:
 ![API flow](../img/api/rq-example.png)
@@ -63,7 +63,7 @@ While user.properties contains some default value which may be replaced later:
 ![API flow](../img/api/props-example.png)
 
 #### REST service call domain object
-Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers base class constructor for initialization. In general case you will specify path to request and response templates along with default properties files (all of them were created in previous step). Also we replace URL placeholder to set appropriate environment.
+Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
 ```
 package com.qaprosoft.carina.demo.api;
 
@@ -79,8 +79,8 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 ```
 
 #### HTTP method and path
-The last step before test implementation itself is the association of domain object class and required HTTP method and path.
-It should be defined in /carina-demo/src/main/resources/_api.properties file, key should be equal to domain class name, value has the following pattern {http_method}:{http_path}. HTTP path may contain placeholders, HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
+The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
+It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
 #=====================================================#
 #=================== API methods  ====================#
@@ -93,7 +93,7 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
 
 #### API test
-API test is the general TestNG test, a class should extend APITest, in our case test extend it over AbstractTest that encapsulates some test data and login method. Test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
+API test is a general TestNG test, a class should extend APITest, in our case, the test extends it over AbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
 ```
 package com.qaprosoft.carina.demo;
 
@@ -143,18 +143,18 @@ public class APISampleTest extends AbstractTest {
 
 #### Test steps once again
 1. Create REST call object
-2. Specify properties for request/response placeholder
+2. Specify the properties for a request/response placeholder
 3. Add headers if required
-4. Specify expected HTTP status
+4. Specify the expected HTTP status
 5. Call API
-6. Validate response by template or parse some data by JSON path
-7. Make further calls using data from the previous call if needed
+6. Validate the response by a template or parse some data by JSON path
+7. Make further calls using the data from the previous call if needed
 
 ### Useful features
-Framework contains a list of useful feature for requests building and for responses validation. That makes easier support of such tests and at the same time minimizes the amount of test data.
+The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
 #### Wildcards
-In some cases you may need to generate data in the request to make request data unique. The best way of doing this is to use wildcards for data generation:
+In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
 ```
 {
     "username": "generate_word(10)",          // Will generate random alphanumeric string with 10 characters
@@ -162,9 +162,9 @@ In some cases you may need to generate data in the request to make request data 
     "birthday": "generate_date(yyyy-MM-dd;0)" // Will generate current date (first arg is date format, second is delta in days from now)
 }
 ```
-Other option is to specify placeholder in request template and then pass some generated value directly from the test method.
+Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
-Another useful way of wildcards usage is response validation. In some cases you may need to skip some values or validate by regex:
+Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex:
 ```
 {
     "id": "skip",                                    // Will skip actual value validation and just verify id key presence
@@ -173,7 +173,7 @@ Another useful way of wildcards usage is response validation. In some cases you 
 ```
 
 #### Validation against JSON schema
-When you need to validate response structure regardless of the actual values you may use validation by JSON schema. In this case you need an actual response from service, let's say we have the following:
+When you need to validate response structure regardless of the actual values, you may use validation by JSON schema. In this case, you need an actual response from the service, let's say we have the following:
 ```
 {
     "email": "test@domain.com",
@@ -181,11 +181,11 @@ When you need to validate response structure regardless of the actual values you
     "id": 11111
 }
 ```
-Now we need to generate a schema (you may use any generator you like for example https://jsonschema.net/).
-IMPORTANT: For now schemas of version draft03 and draft04 are supported only. Please use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
-In the tool like this you need to provide original JSON from response then choose some schema options (allow additional properties in objects, mark current object properties as required, hard-code some expected values, ect) and then generate the schema. Copy-paste generated schema into test resources and you're ready to use it in the test.
+Now we need to generate a schema (you may use any generator you like, for example, https://jsonschema.net/).
+IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
+In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
 ![API flow](../img/api/schema-generator.png)
-Make sure that you change all flags required to true, after that create a new file in resources and place into appropriate endpoint package:
+Make sure that you change all the required flags to true. After that, create a new file in the resources and place it into an appropriate endpoint package:
 ```
 {
     "type":"object",
@@ -211,7 +211,7 @@ Make sure that you change all flags required to true, after that create a new fi
     }
 }
 ```
-And finally we call JSON validation from Java test as following:
+And finally, we call JSON validation from Java test as the following:
 ```
 @Test
 public void testCheckJSONSchema()
@@ -223,9 +223,9 @@ public void testCheckJSONSchema()
 }
 ```
 
-#### Building of requests with an array
-There are couple options for building request with an array of items provided by the framework:
-1. First one use hardcoded placeholders for changeable variables.
+#### Building requests with an array
+There are a couple of options for building a request with an array of items provided by the framework:
+1. The first one uses hardcoded placeholders for changeable variables.
 ```
 {
    "name": "${name}",
@@ -251,9 +251,9 @@ There are couple options for building request with an array of items provided by
    ]
 }
 ```
-As you see this structure is pretty flexible. If you need 2 taskTypes items then you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that you need to declare task_name_3 or task_description_3 property. Otherwise array will contain only 1 item.
-For instance you need to build json which contains taskTypes array. Then template with placeholders will be following:
-It's easy to extend such structure. You just need to add items with similar placeholders increasing their index.
+As you see, this structure is quite flexible. If you need 2 taskTypes items, you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that, you need to declare a task_name_3 or task_description_3 property. Otherwise, the array will contain only 1 item.
+For instance, you need to build JSON which contains a taskTypes array. Then the template with placeholders will be the following:
+It's easy to extend such a structure. You just need to add items with similar placeholders increasing their index.
 
 2. Another approach is based on using Freemarker loop. Here is the template example for the same JSON:
 ```
@@ -287,19 +287,19 @@ It's easy to extend such structure. You just need to add items with similar plac
    ]
 }
 ```
-This approach is useful when a structure of array item is pretty complex. So it makes sense to specify item attributes only once doing it inside #list operation.
-This approach also allows to choose amount of array items dynamically.
-But note that you should specify all properties for each item so this view can be not used for negative tests when you need to miss some properties.
+This approach is useful when the structure of an array item is quite complex. So, it makes sense to specify the item attributes only once, doing it inside #list operation.
+This approach also allows to choose the amount of array items dynamically.
+But note that you should specify all properties for every item, so this view cannot be used for negative tests when you need to miss some properties.
 
 #### Validation of responses with an array
-Sometimes you could face a situation when you need to validate presence of only one (or couple) item in JSON array ignoring rest items.
-In such case you can use validation option ARRAY_CONTAINS.
-Here is code sample:
+Sometimes you can face a situation when you need to validate the presence of only one item (or a couple of them) in a JSON array ignoring the rest of the items.
+In such case, you can use a validation option ARRAY_CONTAINS.
+Here is a code sample:
 ```
 JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "content"));
 ```
-Expected array:
+The expected array:
 ```
 {
     "totalElements": "skip",
@@ -351,10 +351,10 @@ And the actual response:
 ```
 
 ### Deserialization of JSON
-Sometimes you may need to transform your json response to POJO. It may be useful if you need to validate your response using data from the database as expected data.
-For that purposes it's better to use Jackson libraries that are already included in carina framework.
-For that you have to prepare domain class based on your json structure. Some online resources provide such opportunities. For instance https://timboudreau.com/blog/json/read
-For example we need to deserialize array of Clients from json. Example of required domain object will be:
+Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from a database as the expected data.
+For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
+For this, you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
+Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:
 ```
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -387,8 +387,8 @@ public final class Clients
     }
 }
 ```
-Pay attention that POJO fields names could differ from json properties. In this case @JsonProperty annotation can be used for mapping.
-Example of deserialization code:
+Pay attention that POJO field names can differ from JSON properties. In this case, @JsonProperty annotation can be used for mapping.
+An example of a deserialization code:
 ```
 GetClientsMethod getClientsMethod = new GetClientsMethod("11111");
 getClientsMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
@@ -396,4 +396,4 @@ String rs = getClientsMethod.callAPI().asString();
 ObjectMapper mapper = new ObjectMapper();
 Clients clients = mapper.readValue(rs, Clients.class);
 ```
-Then you can use POJO object for any kind of validation or for easy retrieving of required properties.
+Then you can use POJO object for any kind of validation or for easy retrieving of the required properties.

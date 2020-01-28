@@ -103,6 +103,7 @@ public class SpecialKeywords {
     public static final String ANDROID = "Android";
     public static final String IOS = "IOS";
     public static final String MAC = "MAC";
+    public static final String TVOS = "TVOS";
 
     public static final String NATIVE = "native";
 
@@ -145,11 +146,15 @@ public class SpecialKeywords {
     // ------------- CAPABILITIES PROPERTIES --------------------------
     public static final String CAPABILITIES = "capabilities";
     public static final String ENABLE_VIDEO = "capabilities.enableVideo";
+    public static final String PLATFORM = "capabilities.platform";
+    public static final String PLATFORM_NAME = "capabilities.platformName";
+    public static final String PLATFORM_VERSION = "capabilities.platformVersion";
     
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
     public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
     public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
     public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
+    //TODO: switch into the PLATFORM_NAME later
     public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
     public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";
     public static final String MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";

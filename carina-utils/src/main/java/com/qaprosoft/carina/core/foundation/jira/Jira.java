@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -50,7 +51,8 @@ public class Jira {
     private static CryptoTool cryptoTool;
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
-    protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<List<String>>();
+    protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<>();
+    protected static ThreadLocal<BaseWorkItem> knownIssue = new ThreadLocal<>();
 
     static {
         try {
@@ -86,7 +88,7 @@ public class Jira {
         }
     }
 
-    public static void clearTickets() {
+    private static void clearTickets() {
         jiraTickets.remove();
     }
 
@@ -115,12 +117,14 @@ public class Jira {
         }
         if (result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
             tickets.clear();
-            String description = null;
-            try {
-                description = result.getMethod().getDescription();
-                tickets.add(description.split("#")[1].trim());
-            } catch (Exception e) {
-                LOG.error("Incorrect Jira-ticket format: " + description, e);
+            String description = result.getMethod().getDescription();
+            
+            if (description.split("#").length > 1) {
+	            try {
+	                tickets.add(description.split("#")[1].trim());
+	            } catch (Exception e) {
+	                LOG.error("Incorrect Jira-ticket format: " + description, e);
+	            }
             }
         }
 
@@ -178,7 +182,7 @@ public class Jira {
                     bugId = annotation.id();
                 }
             }
-            if (bugId != null) {
+            if (bugId != null && !Configuration.get(Parameter.JIRA_URL).isEmpty()) {
                 String bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + bugId;
                 LOG.info("Bug URL retrieved: " + bugUrl);
 
@@ -186,12 +190,39 @@ public class Jira {
                     Issue bug = jira.getIssue(bugId);
                     return String.format("Bug %s \"%s\" with status \"%s\" associated", bugUrl, bug.getSummary(), bug.getStatus().getName());
                 } catch (Exception e) {
-                    LOG.error("Exception during retrieving bug info", e);
+                    LOG.error("Exception during retrieving bug info: " + e.getMessage());
+                    LOG.debug("Exception during retrieving bug info.", e);
                     return null;
                 }
             }
         }
         return null;
+    }
+
+    public synchronized static void setKnownIssue(String jiraId) {
+        setKnownIssue(jiraId, null);
+    }
+
+    public synchronized static void setKnownIssue(String jiraId, String description) {
+        setKnownIssue(jiraId, description, false);
+    }
+
+    public synchronized static void setKnownIssue(String jiraId, String description, boolean blocker) {
+        BaseWorkItem workItem = new BaseWorkItem(jiraId, description, blocker);
+        knownIssue.set(workItem);
+    }
+
+    public static BaseWorkItem getKnownIssue() {
+        return knownIssue.get();
+    }
+
+    private static void clearKnownIssue() {
+        knownIssue.remove();
+    }
+
+    public static void clearJiraArtifacts() {
+        clearTickets();
+        clearKnownIssue();
     }
 
 }

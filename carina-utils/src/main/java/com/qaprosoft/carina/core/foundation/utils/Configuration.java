@@ -64,8 +64,6 @@ public class Configuration {
 
         ENV_ARG_RESOLVER("env_arg_resolver"),
 
-        PLATFORM("platform"),
-
         BROWSER("browser"),
 
         BROWSER_VERSION("browser_version"),
@@ -83,6 +81,8 @@ public class Configuration {
         CHROME_ARGS("chrome_args"),
         
         CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
+        
+        CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts"),
         
         FIREFOX_ARGS("firefox_args"),
         
@@ -117,8 +117,6 @@ public class Configuration {
         TRACK_KNOWN_ISSUES("track_known_issues"),
 
         AUTO_SCREENSHOT("auto_screenshot"),
-
-        SMART_SCREENSHOT("smart_screenshot"),
 
         // TODO: temporary restore to keep compilation. remove later
         IMPLICIT_TIMEOUT("implicit_timeout"),
@@ -225,12 +223,14 @@ public class Configuration {
 
         SECRET_KEY("secret_key"),
 
+        S3_USE_PRESIGN_URL("s3_use_presign_url"),
+        
         S3_LOCAL_STORAGE("s3_local_storage"),
 
-        // HockeyApp token
-        HOCKEYAPP_TOKEN("hockeyapp_token"),
+        // AppCenter token
+        APPCENTER_TOKEN("appcenter_token"),
 
-        HOCKEYAPP_LOCAL_STORAGE("hockeyapp_local_storage"),
+        APPCENTER_LOCAL_STORAGE("appcenter_local_storage"),
 
         // For localization parser
         ADD_NEW_LOCALIZATION("add_new_localization"),
@@ -390,19 +390,34 @@ public class Configuration {
     }
 
     public static String getPlatform() {
-        // default "platform=value" should be used to determine current platform
-        String platform = Configuration.get(Parameter.PLATFORM);
-
-        // redefine platform if capabilities.platform is available
-        if (!R.CONFIG.get("capabilities.platform").isEmpty()) {
-            platform = R.CONFIG.get("capabilities.platform");
-        }
+        // any platform by default
+        String platform = "*";
 
         // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get("capabilities.platformName").isEmpty()) {
-            platform = R.CONFIG.get("capabilities.platformName");
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
         }
+        
+        // redefine platform if mobile.platformName is available
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
+        }
+        
+        //TODO: try to get actual platform name
         return platform;
+    }
+    
+    public static String getPlatformVersion() {
+        // default "os_version=value" should be used to determine current platform
+        String platformVersion = "";
+
+        // redefine platform if mobile.platformVersion is available
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
+        }
+        
+        //TODO: try to get actual platform version
+        return platformVersion;
     }
 
     public static String getBrowser() {
@@ -413,16 +428,36 @@ public class Configuration {
         }
 
         // redefine browser if capabilities.browserName is available
-        if (!R.CONFIG.get("capabilities.browserName").isEmpty()) {
+        if (!R.CONFIG.get("capabilities.browserName").isEmpty() && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserName"))) {
             browser = R.CONFIG.get("capabilities.browserName");
         }
         return browser;
+    }
+    
+    public static String getBrowserVersion() {
+        String browserVersion = "";
+        if (!Configuration.get(Parameter.BROWSER_VERSION).isEmpty()) {
+            // default "browser_version=value" should be used to determine current browser
+            browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
+        }
+
+        // redefine browserVersion if capabilities.browserVersion is available
+        if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
+            browserVersion = R.CONFIG.get("capabilities.browserVersion");
+        }
+        
+        // read from actual_browser_version if specified
+        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
+            browserVersion = R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION);
+        }
+        
+        return browserVersion;
     }
 
     public static String getDriverType() {
 
         String platform = getPlatform();
-        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS)) {
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
@@ -447,7 +482,7 @@ public class Configuration {
             platform = capabilities.getCapability("platformName").toString();
         }
 
-        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform)) {
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }

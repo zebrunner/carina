@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import com.jayway.restassured.path.xml.XmlPath;
 
 public class JenkinsClient {
-    protected static final Logger LOGGER = Logger.getLogger(JenkinsClient.class);
+    private static final Logger LOGGER = Logger.getLogger(JenkinsClient.class);
 
     private static final String JOB = "%s/job/%s/%s/console";
     private static final String JOB_API = "%s/job/%s/api/xml?depth=1";

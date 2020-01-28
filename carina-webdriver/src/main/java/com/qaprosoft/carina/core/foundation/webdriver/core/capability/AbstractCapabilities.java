@@ -48,7 +48,7 @@ public abstract class AbstractCapabilities {
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
 
-        String platform = Configuration.get(Configuration.Parameter.PLATFORM);
+        String platform = Configuration.getPlatform();
         if (!platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }
@@ -164,7 +164,7 @@ public abstract class AbstractCapabilities {
         //update browser language
         String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
         if (!browserLang.isEmpty()) {
-            LOGGER.info("Set Chrome lanaguage to: " + browserLang);
+            LOGGER.info("Set Chrome language to: " + browserLang);
             options.addArguments("--lang=" + browserLang);
         }
 
@@ -211,6 +211,24 @@ public abstract class AbstractCapabilities {
                 options.setExperimentalOption(name, value);
             }
         }
+        
+        // add all custom chrome mobileEmulation options, deviceName=Nexus 5
+        Map<String, String> mobileEmulation = new HashMap<>();
+        for (String option: Configuration.get(Parameter.CHROME_MOBILE_EMULATION_OPTS).split(",")) {
+            if (option.isEmpty()) {
+                continue;
+            }
+
+            option = option.trim();
+            String name = option.split("=")[0].trim();
+            String value = option.split("=")[1].trim();
+            mobileEmulation.put(name, value);
+        }
+        
+        if (!mobileEmulation.isEmpty()) {
+            options.setExperimentalOption("mobileEmulation", mobileEmulation);
+        }
+        
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
     }

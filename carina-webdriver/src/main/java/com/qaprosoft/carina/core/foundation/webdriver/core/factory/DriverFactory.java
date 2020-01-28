@@ -47,8 +47,8 @@ public class DriverFactory {
 	
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 	
-	//TODO: add custom listeners for Browserstack and Saucelabs to be able to download video recordings etc
-	public enum HubType { DEFAULT, ZEBRUNNER }; 
+	//TODO: add custom listeners for Aerokube, Browserstack and Saucelabs etc to be able to download video recordings and other artifacts
+	public enum HubType { SELENIUM, MCLOUD, ZEBRUNNER, AEROKUBE, BROWSERSTACK, SAUCELABS, DEFAULT }; 
 	
 	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");

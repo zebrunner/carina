@@ -199,7 +199,8 @@ public class Screenshot {
 
         try {
             if (!isCaptured(comment)) {
-                LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+                // [VD] do not write something to log as this original exception is used as original exception for failure
+                //LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
                 return null;
             }
 
@@ -253,8 +254,13 @@ public class Screenshot {
         } catch (IOException e) {
             LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
         } catch (WebDriverException e) {
-            LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
-            e.printStackTrace();
+            if (isCaptured(e.getMessage())) {
+                // display exception as we suspect to make screenshot for this use-case
+                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+            } else {
+                // Do not display exception by default as we don't suspect to make screenshot for this use-case
+                LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
+            }
         } catch (Exception e) {
             LOGGER.error("Unable to capture screenshot due to the Exception!", e);
         } finally {
@@ -388,7 +394,8 @@ public class Screenshot {
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
             try {
             	if (!isCaptured(comment)) {
-            		LOGGER.error("Unable to capture screenshot as driver seems invalid: " + comment);
+                    // [VD] do not write something to log as this original exception is used as original exception for failure
+            		//LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
             		return screenName;
             	}
                 // Define test screenshot root
@@ -463,7 +470,6 @@ public class Screenshot {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
             	LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
-            	e.printStackTrace();
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot due to the Exception!", e);
             } finally {
@@ -616,17 +622,22 @@ public class Screenshot {
 			return true;
 		}
 		// disable screenshot if error message contains any of this info
-		boolean disableScreenshot = message.contains("StaleObjectException")
+		boolean isContains = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
+                || message.contains("Session does not exist")
 				|| message.contains("Session timed out or not found")
-				|| message.contains("cannot forward the request unexpected end of stream")
+				|| message.contains("Unable to determine type from: <. Last 1 characters read")
+				|| message.contains("cannot forward the request")
+                || message.contains("connect ECONNREFUSED")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("no such window: window was already closed")
+				|| message.contains("Method is not implemented") //to often exception for mobile native app testing
+				// [VD] exclude below condition otherwise we overload appium when fluent wait looking for device and doing screenshot in a loop 
 				|| message.contains("An element could not be located on the page using the given search parameters")
 				|| message.contains("current view have 'secure' flag set")
 				|| message.contains("Error communicating with the remote browser. It may have died")
@@ -637,9 +648,17 @@ public class Screenshot {
 				|| message.contains("Unable to find elements by Selenium")
 				|| message.contains("generateUiDump") //do not generate screenshot if getPageSource is invalid
 				|| message.contains("Expected to read a START_MAP but instead have: END") // potential drivers issues fix for moon
-				|| message.contains("An unknown error has occurred") // 
+				|| message.contains("An unknown error has occurred") //
+				|| message.contains("Unable to find element with")
 				|| message.contains("Unable to locate element");
-		return !disableScreenshot;
+		
+		if (!isContains) {
+		    // for released builds put below message to debug  
+		    LOGGER.debug("isCaptured->message: '" + message + "'");
+		    // for snapshot builds use info to get more useful information
+		    //LOGGER.info("isCaptured->message: '" + message + "'");
+		}
+		return !isContains;
 	}
 
     /**

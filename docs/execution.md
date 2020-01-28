@@ -2,13 +2,13 @@
 
 [![Carina - Start Selenium](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/YGXsVoEY74M)
 
-Before running any web test you have to start Selenium server locally or use remote Selenium server. You may download latest version of Selenium standalone server on [official website](https://www.seleniumhq.org/download) along with browser binary for Chrome, Firefox, IE etc. For running test with Chrome browser you will need to download chromedriver and place along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by current Selenium version):
+Before running any web test, you have to start Selenium server locally or use a remote Selenium server. You may download the latest version of Selenium standalone server on [the official website](https://www.seleniumhq.org/download) along with a browser binary for Chrome, Firefox, IE, etc. For running a test with Chrome browser, you will need to download chromedriver and place it along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by the current Selenium version):
 ```
 java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-X.jar
 ```
-You have another option for running [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way to create docker-compose.yml:
+You have several options to run [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way is to create docker-compose.yml:
 ```
-# To execute this docker-compose yml file use docker-compose -f <file_name> up
+# To execute this docker-compose yml file, use docker-compose -f <file_name> up
 # Add the "-d" flag at the end for deattached execution
 version: '2'
 services:
@@ -35,7 +35,7 @@ services:
     ports:
       - "4444:4444"
 ```
-Now you may start Selenium running the following command in terminal:
+Now you may start Selenium, running the following command in terminal:
 ```
 docker-compose up
 ```
@@ -44,9 +44,9 @@ docker-compose up
 
 [![Carina - Running tests](http://img.youtube.com/vi/QGHCezE-d-I/0.jpg)](https://youtu.be/QGHCezE-d-I)
 
-There are a several options to execute the test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
+There are several options to execute a test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
 
-To run the test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
+To run test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite
 
 ![Execution from Eclipse IDE](img/006-Configuration-and-execution.png)
 
