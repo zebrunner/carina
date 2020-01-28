@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.ImmutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
@@ -75,6 +76,7 @@ import io.appium.java_client.remote.NewAppiumSessionPayload;
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
+    private static final Logger LOGGER = Logger.getLogger(EventFiringAppiumCommandExecutor.class);
     
     private final Optional<DriverService> serviceOptional;
 
@@ -252,15 +254,21 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
 
         Response response;
         try {
+            LOGGER.info("EventFiringAppiumCommandExecutor command: " + command);
+            LOGGER.info("EventFiringAppiumCommandExecutor before event listeners started");
             for (IDriverCommandListener listener : listeners) {
                 listener.beforeEvent(command);
             }
+            LOGGER.info("EventFiringAppiumCommandExecutor after event listeners started");
             
+            LOGGER.info("EventFiringAppiumCommandExecutor execute");
             response = NEW_SESSION.equals(command.getName()) ? createSession(command) : super.execute(command);
             
+            LOGGER.info("EventFiringAppiumCommandExecutor after event listeners started");
             for (IDriverCommandListener listener : listeners) {
                 listener.afterEvent(command);
             }
+            LOGGER.info("EventFiringAppiumCommandExecutor after event listeners finished");
             
         } catch (Throwable t) {
             Throwable rootCause = Throwables.getRootCause(t);
@@ -293,60 +301,6 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
         return response;
     }
     
-    //@Override
-    public Response execute2(Command command) throws WebDriverException {
-        if (DriverCommand.NEW_SESSION.equals(command.getName())) {
-            serviceOptional.ifPresent(driverService -> {
-                try {
-                    driverService.start();
-                } catch (IOException e) {
-                    throw new WebDriverException(e.getMessage(), e);
-                }
-            });
-        }
-
-        Response response;
-        try {
-
-            for (IDriverCommandListener listener : listeners) {
-                listener.beforeEvent(command);
-            }
-
-            response = super.execute(command);
-
-            for (IDriverCommandListener listener : listeners) {
-                listener.afterEvent(command);
-            }
-        } catch (Throwable t) {
-            Throwable rootCause = Throwables.getRootCause(t);
-            if (rootCause instanceof ConnectException
-                    && rootCause.getMessage().contains("Connection refused")) {
-                throw serviceOptional.map(service -> {
-                    if (service.isRunning()) {
-                        return new WebDriverException("The session is closed!", rootCause);
-                    }
-
-                    return new WebDriverException("The appium server has accidentally died!", rootCause);
-                }).orElseGet((Supplier<WebDriverException>) () -> new WebDriverException(rootCause.getMessage(), rootCause));
-            }
-            // [VD] never enable throwIfUnchecked as it generates RuntimeException and corrupt TestNG main thread!   
-            // throwIfUnchecked(t);
-            throw new WebDriverException(t);
-        } finally {
-            if (DriverCommand.QUIT.equals(command.getName())) {
-                serviceOptional.ifPresent(DriverService::stop);
-            }
-        }
-
-        if (DriverCommand.NEW_SESSION.equals(command.getName())
-                && getCommandCodec() instanceof W3CHttpCommandCodec) {
-            setCommandCodec(new AppiumW3CHttpCommandCodec());
-            getAdditionalCommands().forEach(this::defineCommand);
-        }
-
-        return response;
-    }
-
     public List<IDriverCommandListener> getListeners() {
         return listeners;
     }
