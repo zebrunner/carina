@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobi
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class MobileCapabilies extends AbstractCapabilities {
@@ -25,6 +27,10 @@ public class MobileCapabilies extends AbstractCapabilities {
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
+        // explicitly set locale/language capabilities even for en_US 
+        capabilities.setCapability("locale", Configuration.get(Parameter.LOCALE));
+        capabilities.setCapability("language", Configuration.get(Parameter.LANGUAGE));
+        
         // add capabilities based on dynamic _config.properties variables
         capabilities = initCapabilities(capabilities);
         return capabilities;
