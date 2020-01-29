@@ -69,10 +69,12 @@ public class HttpClientFactoryCustom implements HttpClient.Factory {
 							? response.newBuilder().code(500).message("Server-Side Timeout").build()
 							: response;
 				});
+				
+				client.addNetworkInterceptor(new HttpClientLoggingInterceptor());
 
 				return new OkHttpClient(client.build(), url);
 			}
-		}.connectionTimeout(Duration.ofMinutes(5)).readTimeout(Duration.ofMinutes(15));
+		}.connectionTimeout(Duration.ofMinutes(10)).readTimeout(Duration.ofMinutes(15));
 	}
 
 	@Override
