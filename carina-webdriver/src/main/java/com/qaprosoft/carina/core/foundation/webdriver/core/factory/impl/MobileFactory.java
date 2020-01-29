@@ -463,6 +463,14 @@ public class MobileFactory extends AbstractFactory {
             caps.setCapability("language", values[0]);
             caps.setCapability("locale", values[1]);
         }
+        
+        if (!R.CONFIG.get("capabilities.locale").isEmpty()) {
+            caps.setCapability("locale", R.CONFIG.get("capabilities.locale"));
+        }
+        
+        if (!R.CONFIG.get("capabilities.language").isEmpty()) {
+            caps.setCapability("language", R.CONFIG.get("capabilities.language"));
+        }
 
         return caps;
     }
