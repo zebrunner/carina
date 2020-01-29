@@ -164,7 +164,7 @@ public class MobileFactory extends AbstractFactory {
                         }
                     }
 
-                    driver = new AndroidDriver<AndroidElement>(capabilities);
+                    driver = new AndroidDriver<AndroidElement>(ce, capabilities);
 
                 } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)
                         || mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.TVOS)) {

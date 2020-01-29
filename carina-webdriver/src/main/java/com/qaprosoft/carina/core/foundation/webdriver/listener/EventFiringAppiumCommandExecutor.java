@@ -61,6 +61,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.io.CountingOutputStream;
 import com.google.common.io.FileBackedOutputStream;
+import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.internal.Config;
@@ -105,16 +106,16 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
 
     public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             URL addressOfRemoteServer) {
-        this(additionalCommands, addressOfRemoteServer, HttpClient.Factory.createDefault());
+        this(additionalCommands, addressOfRemoteServer, new HttpClientFactoryCustom());
     }
 
     public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             DriverService service) {
-        this(additionalCommands, service, HttpClient.Factory.createDefault());
+        this(additionalCommands, service, new HttpClientFactoryCustom());
     }
 
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
-        this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
+        this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
     }
 
     private <B> B getPrivateFieldValue(String fieldName, Class<B> fieldType) {
