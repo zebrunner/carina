@@ -53,6 +53,10 @@ public abstract class AbstractCapabilities {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }
 
+        // explicitly set locale/language capabilities even for en_US 
+        capabilities.setCapability("locale", Configuration.get(Parameter.LOCALE));
+        capabilities.setCapability("language", Configuration.get(Parameter.LANGUAGE));
+        
         capabilities.setBrowserName(browser);
 
         // Selenium 3.4 doesn't support '*'. Only explicit or empty browser version should be provided
