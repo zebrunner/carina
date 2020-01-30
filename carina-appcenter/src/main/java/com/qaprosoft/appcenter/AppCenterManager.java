@@ -235,7 +235,14 @@ public class AppCenterManager {
             LOGGER.debug("Available Builds JSON: " + buildList);
 
             if (buildList.size() > 0) {
+                int buildLimiter = 0;
                 for (JsonNode build : buildList) {
+                    
+                    buildLimiter += 1;
+                    if (buildLimiter >=50) {
+                        break;
+                    }
+
                     String latestBuildNumber = build.get("id").asText();
                     versionShort = build.get("short_version").asText();
                     versionLong = build.get("version").asText();
