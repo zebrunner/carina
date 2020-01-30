@@ -33,7 +33,7 @@ public class HttpClientLoggingInterceptor implements Interceptor {
 
 		long t1 = System.nanoTime();
 		LOGGER.info(
-				String.format("Sending request %s on %s%n%s", request.url(), chain.connection(), request.headers()));
+				String.format("Sending request %s %s on %s%n%s%n%s", request.method(), request.url(), chain.connection(), request.headers(), request.body()));
 
 		Response response = chain.proceed(request);
 
