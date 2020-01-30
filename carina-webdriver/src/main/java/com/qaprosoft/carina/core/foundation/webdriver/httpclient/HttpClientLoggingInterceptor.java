@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import okio.Buffer;
 
 public class HttpClientLoggingInterceptor implements Interceptor {
 
@@ -33,7 +34,7 @@ public class HttpClientLoggingInterceptor implements Interceptor {
 
 		long t1 = System.nanoTime();
 		LOGGER.info(
-				String.format("Sending request %s %s on %s%n%s%n%s", request.method(), request.url(), chain.connection(), request.headers(), request.body()));
+				String.format("Sending request %s %s on %s%n%s%n%s", request.method(), request.url(), chain.connection(), request.headers(), bodyToString(request)));
 
 		Response response = chain.proceed(request);
 
@@ -42,5 +43,17 @@ public class HttpClientLoggingInterceptor implements Interceptor {
 				response.headers()));
 
 		return response;
+	}
+	
+	private static String bodyToString(final Request request) {
+
+		try {
+			final Request copy = request.newBuilder().build();
+			final Buffer buffer = new Buffer();
+			copy.body().writeTo(buffer);
+			return buffer.readUtf8();
+		} catch (final IOException e) {
+			return "did not work";
+		}
 	}
 }
