@@ -1192,6 +1192,10 @@ public class ExtendedWebElement {
             LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
             by = MobileBy.image(base64image);
         }
+
+        if (locator.startsWith("By.AndroidUIAutomator: ")) {
+            by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
+        }
         return new ExtendedWebElement(by, name, getDriver());
     }
 
