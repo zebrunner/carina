@@ -93,15 +93,9 @@ public class AppCenterManager {
 
         String buildToDownload = scanAppForBuild(getAppId(appName, platformName), buildType, version);
 
-        if (!buildToDownload.contains("api")) {
-            buildToDownload = new StringBuilder(buildToDownload).insert(buildToDownload.indexOf("/apps"), "/api/2").toString()
-                    + "?format=" + returnProperPlatformExtension(platformName);
-        }
-
         String fileName = folder + "/" + createFileName(appName, buildType, platformName);
         File fileToLocate = null;
 
-        //TODO:  Make sure to use the correct paths here
         try {
             File file = new File(folder);
             File[] listOfFiles = file.listFiles();
@@ -237,7 +231,7 @@ public class AppCenterManager {
             if (buildList.size() > 0) {
                 int buildLimiter = 0;
                 for (JsonNode build : buildList) {
-                    
+
                     buildLimiter += 1;
                     if (buildLimiter >=50) {
                         break;
