@@ -1382,7 +1382,7 @@ public class ExtendedWebElement {
 			element = refindElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
-			LOGGER.error("catched WebDriverException: ", e);
+			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
 			try {
 				element = refindElement();
