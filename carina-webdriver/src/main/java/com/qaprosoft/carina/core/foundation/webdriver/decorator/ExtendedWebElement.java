@@ -1382,6 +1382,7 @@ public class ExtendedWebElement {
 			element = refindElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
+			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
 			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
 			try {
