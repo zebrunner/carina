@@ -24,8 +24,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
     public boolean retry(ITestResult result) {
-        if (RetryCounter.getRunCount() < getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
-            RetryCounter.incrementRunCount();
+        RetryCounter.incrementRunCount();
+        if (RetryCounter.getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {  
             return true;
         }
         return false;

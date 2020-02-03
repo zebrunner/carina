@@ -80,7 +80,6 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 					    LOGGER.debug("Upload video is enabled.");
 					    CompletableFuture.runAsync(() -> {uploadToFTP(data);});
 					}
-					VideoAnalyzer.disableVideoUpload();
 				} catch (Throwable e) {
 					LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
 				}

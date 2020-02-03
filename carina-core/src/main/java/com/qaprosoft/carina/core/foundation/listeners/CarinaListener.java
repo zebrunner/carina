@@ -307,6 +307,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestStart(ITestResult result) {
+        VideoAnalyzer.disableVideoUpload();
         TestPhase.setActivePhase(Phase.METHOD);
 
         // handle expected skip
@@ -949,7 +950,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         int count = RetryCounter.getRunCount();
         int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
         
-        if (count > 0 && count <= maxCount) {
+        if (count <= maxCount) {
             LOGGER.debug("Video uploading will be disabled as far as max retry count is not reached.");
             VideoAnalyzer.disableVideoUpload();
         } else {
