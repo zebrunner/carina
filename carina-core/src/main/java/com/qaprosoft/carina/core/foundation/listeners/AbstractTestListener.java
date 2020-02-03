@@ -333,6 +333,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         // TestNamingUtil.releaseTestInfoByThread();
         afterTest(result);
+        
+        // obligatory reset counter 
+        RetryCounter.resetCounter();
         super.onTestSuccess(result);
     }
 
