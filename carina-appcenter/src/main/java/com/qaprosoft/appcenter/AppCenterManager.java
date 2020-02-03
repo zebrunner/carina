@@ -93,15 +93,9 @@ public class AppCenterManager {
 
         String buildToDownload = scanAppForBuild(getAppId(appName, platformName), buildType, version);
 
-        if (!buildToDownload.contains("api")) {
-            buildToDownload = new StringBuilder(buildToDownload).insert(buildToDownload.indexOf("/apps"), "/api/2").toString()
-                    + "?format=" + returnProperPlatformExtension(platformName);
-        }
-
         String fileName = folder + "/" + createFileName(appName, buildType, platformName);
         File fileToLocate = null;
 
-        //TODO:  Make sure to use the correct paths here
         try {
             File file = new File(folder);
             File[] listOfFiles = file.listFiles();
@@ -196,7 +190,7 @@ public class AppCenterManager {
                 ownerName = node.get("owner").get("name").asText();
                 String app = node.get("name").asText();
                 LOGGER.info(String.format("Found Owner: %s App: %s", ownerName, app));
-                appMap.put(app, node.get("updated_at").asText());
+                appMap.put(app, getLatestBuildDate(app, node.get("updated_at").asText()));
             }
         }
 
@@ -235,7 +229,14 @@ public class AppCenterManager {
             LOGGER.debug("Available Builds JSON: " + buildList);
 
             if (buildList.size() > 0) {
+                int buildLimiter = 0;
                 for (JsonNode build : buildList) {
+
+                    buildLimiter += 1;
+                    if (buildLimiter >=50) {
+                        break;
+                    }
+
                     String latestBuildNumber = build.get("id").asText();
                     versionShort = build.get("short_version").asText();
                     versionLong = build.get("version").asText();
@@ -260,6 +261,28 @@ public class AppCenterManager {
         }
 
         throw new RuntimeException(String.format("Unable to find build to download, version provided (%s)", version));
+    }
+
+    /**
+     * The updated_at field returned by AppCenter doesn't contain the "latest time" a build was updated, so we grab the first build to do our sort.
+     * @param app name of the app to check.
+     * @param appUpdatedAt passing in of a backup date value if the app we look at doesn't have a build associated to it.
+     * @return the date value to be used in sorting.
+     */
+    private String getLatestBuildDate(String app, String appUpdatedAt) {
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("published_only", "true");
+
+        RequestEntity<String> retrieveList = buildRequestEntity(
+                HOST_URL,
+                String.format("%s/%s/%s/releases", API_APPS, ownerName, app),
+                queryParams,
+                HttpMethod.GET);
+        JsonNode buildList = restTemplate.exchange(retrieveList, JsonNode.class).getBody();
+        if (buildList.size() > 0) {
+            return buildList.get(0).get("uploaded_at").asText();
+        }
+        return appUpdatedAt;
     }
 
     private boolean checkBuild(String version, JsonNode node) {
