@@ -55,6 +55,7 @@ import org.testng.xml.XmlTest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
@@ -63,6 +64,8 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
+import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -76,6 +79,7 @@ import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
+import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -83,7 +87,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.models.dto.TestRunType;
@@ -317,6 +320,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        LOGGER.debug("Video uploading will be enabled as far as test passed.");
+        VideoAnalyzer.enableVideoUpload();
         onTestFinish(result);
         super.onTestSuccess(result);
     }
@@ -326,6 +331,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
         
+        analyzeIsVideoUplodEnabled();
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -335,6 +341,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
         
+        analyzeIsVideoUplodEnabled();     
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -936,6 +943,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             generateMetadata();
         }
 
+    }
+    
+    private void analyzeIsVideoUplodEnabled() {
+        int count = RetryCounter.getRunCount();
+        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
+        
+        if (count > 0 && count <= maxCount) {
+            LOGGER.debug("Video uploading will be disabled as far as max retry count is not reached.");
+            VideoAnalyzer.disableVideoUpload();
+        } else {
+            LOGGER.debug("Video uploading will be enabled as far as max retry count is reached.");
+            VideoAnalyzer.enableVideoUpload();
+        }       
     }
 
 }

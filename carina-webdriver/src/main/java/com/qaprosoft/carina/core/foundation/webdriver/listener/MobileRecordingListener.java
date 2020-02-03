@@ -26,6 +26,7 @@ import org.openqa.selenium.remote.DriverCommand;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
+import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.MobileCommand;
@@ -75,7 +76,11 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 											(BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
 							.getValue().toString();
 					LOGGER.debug("Video will be uploaded to ftp. Test thread ID : " + Thread.currentThread().getId());
-					CompletableFuture.runAsync(() -> {uploadToFTP(data);});
+					if(VideoAnalyzer.isVideoUploadEnabled() && null != VideoAnalyzer.isVideoUploadEnabled()) {
+					    LOGGER.debug("Upload video is enabled.");
+					    CompletableFuture.runAsync(() -> {uploadToFTP(data);});
+					}
+					VideoAnalyzer.disableVideoUpload();
 				} catch (Throwable e) {
 					LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
 				}
