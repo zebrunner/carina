@@ -338,13 +338,33 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestFailure(ITestResult result) {
-        failItem(result, Messager.TEST_FAILED);
-        afterTest(result);
-
-        // already achieved max retry count. need reset it for the next test if any
-        RetryCounter.resetCounter();
+        int count = RetryCounter.getRunCount();
+        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
+        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
         
-        super.onTestFailure(result);
+        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
+        if (count > 0 && retry == null) {
+            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
+                    + result.getMethod().getMethodName());
+        } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
+            failRetryItem(result, Messager.RETRY_FAILED, count - 1, maxCount);
+            afterTest(result);
+            super.onTestFailure(result);
+        } else {
+            failItem(result, Messager.TEST_FAILED);
+            afterTest(result);
+            RetryCounter.resetCounter();
+            super.onTestFailure(result);
+        }
+        
+        
+//        failItem(result, Messager.TEST_FAILED);
+//        afterTest(result);
+//
+//        // already achieved max retry count. need reset it for the next test if any
+//        RetryCounter.resetCounter();
+//        
+//        super.onTestFailure(result);
     }
 
     @Override

@@ -1195,6 +1195,7 @@ public class ExtendedWebElement {
 
         if (locator.startsWith("By.AndroidUIAutomator: ")) {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
+            LOGGER.debug("Formatted locator is : " + by.toString());
         }
         return new ExtendedWebElement(by, name, getDriver());
     }
@@ -1386,7 +1387,8 @@ public class ExtendedWebElement {
 			element = refindElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
-			LOGGER.error("catched WebDriverException: ", e);
+			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
+			LOGGER.debug("catched WebDriverException: ", e);
 			// try to find again using driver
 			try {
 				element = refindElement();

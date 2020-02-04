@@ -39,6 +39,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.qaprosoft.amazon.client.AmazonS3Client;
@@ -576,7 +577,12 @@ public class Screenshot {
                 }
             } else {
                 int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
-                String deviceName = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
+                String deviceName = "";
+                if (augmentedDriver instanceof EventFiringWebDriver) {
+                    deviceName = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
+                } else if (augmentedDriver instanceof RemoteWebDriver) {
+                    deviceName = String.valueOf(((RemoteWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
+                }
                 screenshot = new AShot().shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName)).takeScreenshot(augmentedDriver);
                 screenShot = screenshot.getImage();
             }
