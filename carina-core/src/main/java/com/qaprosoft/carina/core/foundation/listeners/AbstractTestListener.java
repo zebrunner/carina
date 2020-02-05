@@ -331,12 +331,34 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void onTestSuccess(ITestResult result) {
         passItem(result, Messager.TEST_PASSED);
 
-        // TestNamingUtil.releaseTestInfoByThread();
         afterTest(result);
         
-        // obligatory reset counter 
-        RetryCounter.resetCounter();
         super.onTestSuccess(result);
+        
+        // obligatory reset retry counter and remove failures which pass after several retries
+        resetTestContext(result);
+    }
+    
+    private void resetTestContext(ITestResult result) {
+        int count = RetryCounter.getRunCount();
+        if (count > 0) {
+            ITestContext context = result.getTestContext();
+            long passedTestId = getMethodId(result);
+            LOGGER.debug("passedTest: " + passedTestId);
+            
+            // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
+            // finally delete all tests that are marked for removal
+            for (Iterator<ITestResult> iterator = context.getFailedTests()
+                    .getAllResults().iterator(); iterator.hasNext();) {
+                ITestResult testResult = iterator.next();
+                if (getMethodId(testResult) == passedTestId) {
+                    LOGGER.debug("Removed test from context: " + testResult.getName());
+                    iterator.remove();
+                }
+            }
+        }
+        
+        RetryCounter.resetCounter();
     }
 
     @Override
