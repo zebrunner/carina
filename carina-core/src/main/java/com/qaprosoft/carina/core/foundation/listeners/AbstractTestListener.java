@@ -350,7 +350,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
                     + result.getMethod().getMethodName());
         } else if (count <= maxCount && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_FAILED, count - 1, maxCount);
+            failRetryItem(result, Messager.RETRY_FAILED, count, maxCount + 1);
             afterTest(result);
             super.onTestFailure(result);
         } else {
@@ -396,13 +396,14 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         if (count > 0 && retry == null) {
             LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
                     + result.getMethod().getMethodName());
-        } else if (count <= maxCount && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_FAILED, count - 1, maxCount);
+        } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
+            failRetryItem(result, Messager.RETRY_FAILED, count, maxCount + 1);
             //TODO: try to change current result->method status to failed
             result.setStatus(2);
             afterTest(result);
             super.onTestFailure(result);
         } else {
+            // count == 0 means that RetryAnalyzer counter wasn't invoked and it is blocked dependent method
             skipItem(result, Messager.TEST_SKIPPED);
             afterTest(result);
             super.onTestSkipped(result);
