@@ -62,15 +62,15 @@ public class HttpClientFactoryCustom implements HttpClient.Factory {
 					});
 				}
 
-				client.addNetworkInterceptor(chain -> {
-					Request request = chain.request();
-					Response response = chain.proceed(request);
-					return response.code() == 408
-							? response.newBuilder().code(500).message("Server-Side Timeout").build()
-							: response;
-				});
-				
-				client.addNetworkInterceptor(new HttpClientLoggingInterceptor());
+//				client.addNetworkInterceptor(chain -> {
+//					Request request = chain.request();
+//					Response response = chain.proceed(request);
+//					return response.code() == 408
+//							? response.newBuilder().code(500).message("Server-Side Timeout").build()
+//							: response;
+//				});
+//				
+//				client.addNetworkInterceptor(new HttpClientLoggingInterceptor());
 
 				return new OkHttpClient(client.build(), url);
 			}
