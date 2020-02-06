@@ -26,7 +26,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
+import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.testng.internal.TestResult;
 
@@ -55,7 +55,8 @@ public class TestNamingUtil {
         testName2Counter.put(test, count);
 
         // don't use invCount for tests during retry
-        if (count > 1 && RetryCounter.getRunCount() == 0) {
+        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        if (count > 1 && retryAnalyzer != null && retryAnalyzer.getRunCount() == 0) {
             // TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
             test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", count));
         }

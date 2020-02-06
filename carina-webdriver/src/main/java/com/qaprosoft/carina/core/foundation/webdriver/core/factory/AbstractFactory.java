@@ -31,10 +31,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -143,15 +140,16 @@ public abstract class AbstractFactory {
     protected boolean isVideoEnabled() {
         boolean isEnabled = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
 
-        if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
-            if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
-                LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
+        //TODO: refactor video recording making it independent from old static RetryAnalyzer counter
+/*        if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
+            if (RetryAnalyzer.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
+                LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryAnalyzer.getRunCount()
                         + "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
                 // disable video recording for not the final retry if
                 // "optimize_video_recording=true"
                 isEnabled = false;
             }
-        }
+        }*/
         return isEnabled;
     }
 

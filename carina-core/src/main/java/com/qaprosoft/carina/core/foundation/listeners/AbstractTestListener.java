@@ -41,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
@@ -57,7 +56,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
 
     private void startItem(ITestResult result, Messager messager) {
-        RetryCounter.initCounter();
 
         String test = TestNamingUtil.getCanonicalTestName(result);
         test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId(), result);
@@ -268,10 +266,10 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestStart(ITestResult result) {
-        //declare carina custom RetryAnalyzer annotation for each test method
-        IRetryAnalyzer retryAnalyzer = new RetryAnalyzer();
         IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
         if (curRetryAnalyzer == null) {
+            //declare carina custom RetryAnalyzer annotation for each test method
+            IRetryAnalyzer retryAnalyzer = new RetryAnalyzer();
             result.getMethod().setRetryAnalyzer(retryAnalyzer);
         } else {
             if (!"com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer".equals(curRetryAnalyzer.getClass().getName())) {
@@ -334,37 +332,17 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         // TestNamingUtil.releaseTestInfoByThread();
         afterTest(result);
         super.onTestSuccess(result);
+        
+        result.getMethod().setRetryAnalyzer(null);
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        int count = RetryCounter.getRunCount();
-        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
-        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
-        
-        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
-        if (count > 0 && retry == null) {
-            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
-                    + result.getMethod().getMethodName());
-        } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_FAILED, count - 1, maxCount);
-            afterTest(result);
-            super.onTestFailure(result);
-        } else {
-            failItem(result, Messager.TEST_FAILED);
-            afterTest(result);
-            RetryCounter.resetCounter();
-            super.onTestFailure(result);
-        }
-        
-        
-//        failItem(result, Messager.TEST_FAILED);
-//        afterTest(result);
-//
-//        // already achieved max retry count. need reset it for the next test if any
-//        RetryCounter.resetCounter();
-//        
-//        super.onTestFailure(result);
+        failItem(result, Messager.TEST_FAILED);
+        afterTest(result);
+        super.onTestFailure(result);
+
+        result.getMethod().setRetryAnalyzer(null);
     }
 
     @Override
@@ -375,6 +353,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
             skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
+            result.getMethod().setRetryAnalyzer(null);
             return;
         }
 
@@ -385,7 +364,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             return;
         }
         
-        int count = RetryCounter.getRunCount();
+        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        
+        int count = retryAnalyzer != null ? retryAnalyzer.getRunCount() : 0;
         int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
         LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
         
@@ -394,7 +375,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
                     + result.getMethod().getMethodName());
         } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_FAILED, count - 1, maxCount);
+            failRetryItem(result, Messager.RETRY_FAILED, count, maxCount + 1);
             //TODO: try to change current result->method status to failed
             result.setStatus(2);
             afterTest(result);
@@ -403,6 +384,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             skipItem(result, Messager.TEST_SKIPPED);
             afterTest(result);
             super.onTestSkipped(result);
+            
+            result.getMethod().setRetryAnalyzer(null);
         }
 
         //skipItem(result, Messager.TEST_SKIPPED);
