@@ -25,6 +25,7 @@ import org.openqa.selenium.remote.http.HttpClient.Builder;
 import org.openqa.selenium.remote.internal.OkHttpClient;
 
 import com.google.common.base.Strings;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
@@ -62,19 +63,19 @@ public class HttpClientFactoryCustom implements HttpClient.Factory {
 					});
 				}
 
-//				client.addNetworkInterceptor(chain -> {
-//					Request request = chain.request();
-//					Response response = chain.proceed(request);
-//					return response.code() == 408
-//							? response.newBuilder().code(500).message("Server-Side Timeout").build()
-//							: response;
-//				});
-//				
+				client.addNetworkInterceptor(chain -> {
+					Request request = chain.request();
+					Response response = chain.proceed(request);
+					return response.code() == 408
+							? response.newBuilder().code(500).message("Server-Side Timeout").build()
+							: response;
+				});
+				
 //				client.addNetworkInterceptor(new HttpClientLoggingInterceptor());
 
 				return new OkHttpClient(client.build(), url);
 			}
-		}.connectionTimeout(Duration.ofMinutes(10)).readTimeout(Duration.ofMinutes(15));
+		}.readTimeout(Duration.ofMinutes(R.CONFIG.getInt("appium_http_client_read_timeout_min")));
 	}
 
 	@Override
