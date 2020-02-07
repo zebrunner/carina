@@ -268,13 +268,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void onTestStart(ITestResult result) {
         IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
         if (curRetryAnalyzer == null) {
-            //declare carina custom RetryAnalyzer annotation for each test method
-            IRetryAnalyzer retryAnalyzer = new RetryAnalyzer();
-            result.getMethod().setRetryAnalyzer(retryAnalyzer);
+            // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
+            result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
         } else {
-            if (!"com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer".equals(curRetryAnalyzer.getClass().getName())) {
-                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
+            if (!(curRetryAnalyzer instanceof RetryAnalyzer)) {
+                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());                
             }
+            
         }
         
         generateParameters(result);
@@ -329,11 +329,14 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void onTestSuccess(ITestResult result) {
         passItem(result, Messager.TEST_PASSED);
 
-        // TestNamingUtil.releaseTestInfoByThread();
         afterTest(result);
         super.onTestSuccess(result);
         
-        result.getMethod().setRetryAnalyzer(null);
+        // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
+        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        if (retryAnalyzer != null) {
+            retryAnalyzer.resetCounter();
+        }
     }
 
     @Override
@@ -342,7 +345,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         afterTest(result);
         super.onTestFailure(result);
 
-        result.getMethod().setRetryAnalyzer(null);
+        // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
+        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        if (retryAnalyzer != null) {
+            retryAnalyzer.resetCounter();
+        }
     }
 
     @Override
@@ -353,7 +360,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
             skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
-            result.getMethod().setRetryAnalyzer(null);
+            
             return;
         }
 
@@ -365,7 +372,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         }
         
         RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        
         int count = retryAnalyzer != null ? retryAnalyzer.getRunCount() : 0;
         int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
         LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
@@ -376,7 +382,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                     + result.getMethod().getMethodName());
         } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
             failRetryItem(result, Messager.RETRY_FAILED, count, maxCount + 1);
-            //TODO: try to change current result->method status to failed
             result.setStatus(2);
             afterTest(result);
             super.onTestFailure(result);
@@ -385,12 +390,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             afterTest(result);
             super.onTestSkipped(result);
             
-            result.getMethod().setRetryAnalyzer(null);
+            if (retryAnalyzer != null) {
+                // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
+                retryAnalyzer.resetCounter();
+            }
         }
-
-        //skipItem(result, Messager.TEST_SKIPPED);
-        //afterTest(result);
-        //super.onTestSkipped(result);
     }
 
     @Override

@@ -25,23 +25,43 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
     private static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
-    private int runCount = 0;
+    private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
     
     public boolean retry(ITestResult result) {
         //TODO: try to sync about using result status like skipped or passed to prohibit retry
         LOGGER.info("status: " + result.getStatus());
-        runCount++;
+        incrementRunCount();
         
-        if (runCount <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
+        if (getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             return true;
         }
         return false;
     }
     
-    public int getRunCount() {
-        return runCount;
-    }
+    public Integer getRunCount() {
+        int count = 0;
+        if (runCount.get() != null) {
+            // retryCounter already init for current thread
+            count = runCount.get();
+        }
 
+        return count;
+    }
+    
+    public void incrementRunCount() {
+        int count = 0;
+        if (runCount.get() != null) {
+            // retryCounter already init for current thread
+            count = runCount.get();
+        }
+        runCount.set(++count);
+    }
+    
+    public void resetCounter() {
+        // explicitly set runCount to 0 for current thread
+        runCount.set(0);
+    }
+    
     public static int getMaxRetryCountForTest() {
         return Configuration.getInt(Parameter.RETRY_COUNT);
     }
