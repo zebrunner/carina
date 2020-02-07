@@ -335,18 +335,10 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestFailure(ITestResult result) {
-        // handle Zafira already passed exception for re-run and do nothing. Return should be enough
-        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-            // [VD] it is prohibited to release TestInfoByThread in this place.!
-            skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
-            removeAlreadyPassedTests(result);
-        } else {
-            failItem(result, Messager.TEST_FAILED);
-            VideoAnalyzer.enableVideoUpload();
-            afterTest(result);
-            super.onTestFailure(result);
-        }
+        failItem(result, Messager.TEST_FAILED);
+        VideoAnalyzer.enableVideoUpload();
+        afterTest(result);
+        super.onTestFailure(result);
 
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
         RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
@@ -357,6 +349,22 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestSkipped(ITestResult result) {
+        // handle Zafira already passed exception for re-run and do nothing. Return should be enough
+        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+            // [VD] it is prohibited to release TestInfoByThread in this place.!
+            skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
+            removeAlreadyPassedTests(result);
+
+//            // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
+//            RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+//            if (retryAnalyzer != null) {
+//                retryAnalyzer.resetCounter();
+//            }
+            
+            return;
+        }
+        
         // handle AbstractTest->SkipExecution
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
