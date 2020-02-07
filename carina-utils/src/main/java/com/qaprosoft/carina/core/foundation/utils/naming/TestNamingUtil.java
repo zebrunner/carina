@@ -24,11 +24,10 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
+import org.testng.internal.TestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import org.testng.internal.TestResult;
 
 /**
  * Common naming utility for unique test method identification.
@@ -40,27 +39,21 @@ public class TestNamingUtil {
 
     private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
 
-    private static final ConcurrentHashMap<String, Integer> testName2Counter = new ConcurrentHashMap<String, Integer>();
-
     private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
 
     public static synchronized String associateTestInfo2Thread(String test, Long threadId, ITestResult result) {
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
-        int count = 1;
-        if (testName2Counter.containsKey(test)) {
-            count = ((TestResult) result).getParameterIndex() + 1;
-            LOGGER.debug(test + " test was already registered. Incrementing invocation count to " + count);
+        
+        int index = ((TestResult) result).getParameterIndex();
+        
+        if (index > 0) {
+            // that's a dataprovider line index
+            index++; //to make correlation between line and index number
+            LOGGER.debug("test: " + test  + "; index: " + index);
+            test = test + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
         }
-        testName2Counter.put(test, count);
-
-        // don't use invCount for tests during retry
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        if (count > 1 && retryAnalyzer != null && retryAnalyzer.getRunCount() == 0) {
-            // TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
-            test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", count));
-        }
-
+        
         // TODO: analyze how to use stack for retries
         Stack<String> stack = new Stack<String>();
 
