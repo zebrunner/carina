@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -29,6 +30,12 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     
     public boolean retry(ITestResult result) {
         incrementRunCount();
+        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+            LOGGER.error("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
+            return false;
+        }
+
         LOGGER.info("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
         if (getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             return true;
