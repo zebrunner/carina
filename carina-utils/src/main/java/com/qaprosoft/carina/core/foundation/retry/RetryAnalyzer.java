@@ -32,7 +32,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
         incrementRunCount();
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-            LOGGER.error("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
+            LOGGER.info("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
             return false;
         }
 
