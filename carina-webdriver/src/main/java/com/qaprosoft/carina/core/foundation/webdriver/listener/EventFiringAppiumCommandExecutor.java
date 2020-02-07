@@ -255,22 +255,15 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
 
         Response response;
         try {
-            LOGGER.info("EventFiringAppiumCommandExecutor command: " + command);
-            LOGGER.info("EventFiringAppiumCommandExecutor before event listeners started");
             for (IDriverCommandListener listener : listeners) {
                 listener.beforeEvent(command);
             }
-            LOGGER.info("EventFiringAppiumCommandExecutor before event listeners finished");
             
-            
-            LOGGER.info("EventFiringAppiumCommandExecutor execute");
             response = NEW_SESSION.equals(command.getName()) ? createSession(command) : super.execute(command);
             
-            LOGGER.info("EventFiringAppiumCommandExecutor after event listeners started");
             for (IDriverCommandListener listener : listeners) {
                 listener.afterEvent(command);
             }
-            LOGGER.info("EventFiringAppiumCommandExecutor after event listeners finished");
             
         } catch (Throwable t) {
             Throwable rootCause = Throwables.getRootCause(t);
