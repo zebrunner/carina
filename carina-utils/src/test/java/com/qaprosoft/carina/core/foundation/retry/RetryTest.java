@@ -16,21 +16,49 @@
 package com.qaprosoft.carina.core.foundation.retry;
 
 import org.testng.Assert;
-import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class RetryTest {
 
-    @Test(priority = 1)
-    public void testInitRetryCounter(ITestResult result) {
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+    @Test
+    public void testInitRetryCounter() {
+        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
+        retryAnalyzer.resetCounter();
+        
         int count = retryAnalyzer.getRunCount();
         Assert.assertEquals(count, 0);
     }
 
-    @Test(priority = 2)
+    @Test
+    public void testRetryCounterIncrement() {
+        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
+        retryAnalyzer.resetCounter();
+        
+        int count = retryAnalyzer.getRunCount();
+        Assert.assertEquals(count, 0);
+        retryAnalyzer.incrementRunCount();
+        count = retryAnalyzer.getRunCount();
+        Assert.assertEquals(count, 1);
+    }
+    
+    @Test
+    public void testRetryCounterReset() {
+        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
+        retryAnalyzer.resetCounter();
+        
+        int count = retryAnalyzer.getRunCount();
+        Assert.assertEquals(count, 0);
+        retryAnalyzer.incrementRunCount();
+        count = retryAnalyzer.getRunCount();
+        Assert.assertEquals(count, 1);
+        retryAnalyzer.resetCounter();
+        count = retryAnalyzer.getRunCount();
+        Assert.assertEquals(count, 0);
+    }
+    
+    @Test
     public void testGetMaxRetryCountForTest() {
         R.CONFIG.put("retry_count", "1");
         Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
