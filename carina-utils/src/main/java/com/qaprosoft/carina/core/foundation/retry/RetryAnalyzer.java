@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.retry;
 
+import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -23,11 +24,12 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
+    private static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
     private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
     
     public boolean retry(ITestResult result) {
         incrementRunCount();
-        
+        LOGGER.info("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
         if (getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             return true;
         }
