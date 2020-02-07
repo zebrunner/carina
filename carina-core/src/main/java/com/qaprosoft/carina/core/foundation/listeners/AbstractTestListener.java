@@ -16,14 +16,10 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -212,12 +208,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void beforeConfiguration(ITestResult result) {
-        // startItem(result, Messager.CONFIG_STARTED);
-        // // do failure test cleanup in this place as right after the test
-        // // context doesn't have up-to-date information.
-        // // This context cleanup is required to launch dependent steps if parent method pass from Nth retry!
-        removeIncorrectlyFailedTests(result.getTestContext());
-
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
         TestNamingUtil.releaseTestInfoByThread();
 
@@ -335,30 +325,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
         RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
         if (retryAnalyzer != null) {
-            resetTestContext(result, retryAnalyzer.getRunCount());
+            removeFailedRetryTests(result, retryAnalyzer.getRunCount());
             retryAnalyzer.resetCounter();
         }
     }
     
-    private void resetTestContext(ITestResult result, int count) {
-        if (count > 0) {
-            ITestContext context = result.getTestContext();
-            long passedTestId = getMethodId(result);
-            LOGGER.debug("passedTest: " + passedTestId);
-
-            // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
-            // finally delete all tests that are marked for removal
-            for (Iterator<ITestResult> iterator = context.getFailedTests()
-                    .getAllResults().iterator(); iterator.hasNext();) {
-                ITestResult testResult = iterator.next();
-                if (getMethodId(testResult) == passedTestId) {
-                    LOGGER.debug("Removed test from context: " + testResult.getName());
-                    iterator.remove();
-                }
-            }
-        }
-    }
-
     @Override
     public void onTestFailure(ITestResult result) {
         // handle Zafira already passed exception for re-run and do nothing. Return should be enough
@@ -366,6 +337,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
             skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
+            removeAlreadyPassedTests(result);
         } else {
             failItem(result, Messager.TEST_FAILED);
             afterTest(result);
@@ -378,7 +350,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             retryAnalyzer.resetCounter();
         }
     }
-
+    
     @Override
     public void onTestSkipped(ITestResult result) {
         // handle AbstractTest->SkipExecution
@@ -416,57 +388,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onFinish(ITestContext context) {
-        removeIncorrectlyFailedTests(context);
         super.onFinish(context);
-    }
-
-    /**
-     * When the test is restarted this method cleans fail statistics in test context.
-     *
-     */
-    private void removeIncorrectlyFailedTests(ITestContext context) {
-        // List of test results which we will delete later
-        List<ITestResult> testsToBeRemoved = new ArrayList<>();
-
-        // collect all id's from passed test
-        Set<Long> passedTestIds = new HashSet<>();
-        for (ITestResult passedTest : context.getPassedTests().getAllResults()) {
-            // adding passed test
-            long passedTestId = getMethodId(passedTest);
-            // LOGGER.debug("Adding passedTest info: " + passedTestId + "; " + passedTest.getName());
-            passedTestIds.add(passedTestId);
-        }
-
-        // LOGGER.debug("---------------- ANALYZE FAILED RESULTS FOR DUPLICATES -----------------------");
-
-        Set<Long> failedTestIds = new HashSet<>();
-        for (ITestResult failedTest : context.getFailedTests().getAllResults()) {
-
-            // id = class + method + dataprovider
-            long failedTestId = getMethodId(failedTest);
-
-            // if we saw this test as a failed test before we mark as to be deleted
-            // or delete this failed test if there is at least one passed version
-            if (failedTestIds.contains(failedTestId)
-                    || passedTestIds.contains(failedTestId)) {
-                // LOGGER.debug("Test to be removed from context: " + failedTestId + "; " + failedTest.getName());
-                testsToBeRemoved.add(failedTest);
-            } else {
-                // LOGGER.debug("Test to mark as failed: " + failedTestId + "; " + failedTest.getName());
-                failedTestIds.add(failedTestId);
-            }
-        }
-
-        // LOGGER.debug("---------------- REMOVE DUPLICATES FAILURES -----------------------");
-        // finally delete all tests that are marked for removal
-        for (Iterator<ITestResult> iterator = context.getFailedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-            if (testsToBeRemoved.contains(testResult)) {
-                // LOGGER.debug("Removing test from context: " + testResult.getName());
-                iterator.remove();
-            }
-        }
     }
 
     @SuppressWarnings("unused")
@@ -626,6 +548,43 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     protected void setConfigFailure(TestResultItem resultItem) {
         configFailures.set(resultItem);
+    }
+    
+    private void removeFailedRetryTests(ITestResult result, int count) {
+        if (count > 0) {
+            ITestContext context = result.getTestContext();
+            long passedTestId = getMethodId(result);
+            LOGGER.debug("passedTest: " + passedTestId);
+
+            // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
+            // finally delete all tests that are marked for removal
+            for (Iterator<ITestResult> iterator = context.getFailedTests()
+                    .getAllResults().iterator(); iterator.hasNext();) {
+                ITestResult testResult = iterator.next();
+                if (getMethodId(testResult) == passedTestId) {
+                    LOGGER.debug("Removed test from context: " + testResult.getName());
+                    iterator.remove();
+                }
+            }
+        }
+    }
+    
+    private void removeAlreadyPassedTests(ITestResult result) {
+        //TODO: implement removal from context to make TestNG default reports cleaner
+        ITestContext context = result.getTestContext();
+        long alreadyPassedTestId = getMethodId(result);
+        LOGGER.debug("alreadyPassedTestId: " + alreadyPassedTestId);
+
+        // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
+        // finally delete all tests that are marked for removal
+        for (Iterator<ITestResult> iterator = context.getFailedTests()
+                .getAllResults().iterator(); iterator.hasNext();) {
+            ITestResult testResult = iterator.next();
+            if (getMethodId(testResult) == alreadyPassedTestId) {
+                LOGGER.debug("Removed test from context: " + testResult.getName());
+                iterator.remove();
+            }
+        }
     }
 
 }
