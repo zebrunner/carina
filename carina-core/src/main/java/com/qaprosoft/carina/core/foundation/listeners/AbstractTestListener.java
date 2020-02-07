@@ -43,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
@@ -256,6 +257,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestStart(ITestResult result) {
+        VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
         if (curRetryAnalyzer == null) {
             // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
@@ -318,6 +320,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onTestSuccess(ITestResult result) {
         passItem(result, Messager.TEST_PASSED);
+        VideoAnalyzer.enableVideoUpload();
 
         afterTest(result);
         super.onTestSuccess(result);
@@ -340,6 +343,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             removeAlreadyPassedTests(result);
         } else {
             failItem(result, Messager.TEST_FAILED);
+            VideoAnalyzer.enableVideoUpload();
             afterTest(result);
             super.onTestFailure(result);
         }
