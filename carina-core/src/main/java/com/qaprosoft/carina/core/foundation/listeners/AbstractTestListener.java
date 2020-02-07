@@ -335,7 +335,27 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
         RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
         if (retryAnalyzer != null) {
+            resetTestContext(result, retryAnalyzer.getRunCount());
             retryAnalyzer.resetCounter();
+        }
+    }
+    
+    private void resetTestContext(ITestResult result, int count) {
+        if (count > 0) {
+            ITestContext context = result.getTestContext();
+            long passedTestId = getMethodId(result);
+            LOGGER.debug("passedTest: " + passedTestId);
+
+            // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
+            // finally delete all tests that are marked for removal
+            for (Iterator<ITestResult> iterator = context.getFailedTests()
+                    .getAllResults().iterator(); iterator.hasNext();) {
+                ITestResult testResult = iterator.next();
+                if (getMethodId(testResult) == passedTestId) {
+                    LOGGER.debug("Removed test from context: " + testResult.getName());
+                    iterator.remove();
+                }
+            }
         }
     }
 
