@@ -71,8 +71,6 @@ public class HttpClientFactoryCustom implements HttpClient.Factory {
 							: response;
 				});
 				
-//				client.addNetworkInterceptor(new HttpClientLoggingInterceptor());
-
 				return new OkHttpClient(client.build(), url);
 			}
 		}.readTimeout(Duration.ofMinutes(R.CONFIG.getInt("appium_http_client_read_timeout_min")));
