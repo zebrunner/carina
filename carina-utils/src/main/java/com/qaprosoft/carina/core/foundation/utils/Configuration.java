@@ -201,9 +201,6 @@ public class Configuration {
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
 
-        // Enable video recording capabilities only for the final retry attempt
-        OPTIMIZE_VIDEO_RECORDING("optimize_video_recording"),
-
         // TestRail
         TESTRAIL_RUN_NAME("testrail_run_name"),
 
