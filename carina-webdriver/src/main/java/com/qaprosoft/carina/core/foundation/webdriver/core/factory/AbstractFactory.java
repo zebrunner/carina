@@ -22,7 +22,6 @@ import java.util.UUID;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -31,10 +30,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.retry.RetryAnalyzer;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -47,7 +43,7 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  */
 public abstract class AbstractFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
+    // private static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
 
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 
@@ -141,18 +137,7 @@ public abstract class AbstractFactory {
     }
 
     protected boolean isVideoEnabled() {
-        boolean isEnabled = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
-
-        if (isEnabled && Configuration.getBoolean(Parameter.OPTIMIZE_VIDEO_RECORDING)) {
-            if (RetryCounter.getRunCount() < RetryAnalyzer.getMaxRetryCountForTest()) {
-                LOGGER.info("To optimize video recording it will be disabled for attempt {" + RetryCounter.getRunCount()
-                        + "} because max retry_count={" + RetryAnalyzer.getMaxRetryCountForTest() + "}");
-                // disable video recording for not the final retry if
-                // "optimize_video_recording=true"
-                isEnabled = false;
-            }
-        }
-        return isEnabled;
+        return R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
     }
 
     /**

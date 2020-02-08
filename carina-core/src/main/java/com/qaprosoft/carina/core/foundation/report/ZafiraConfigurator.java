@@ -29,7 +29,6 @@ import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
-import com.qaprosoft.carina.core.foundation.retry.RetryCounter;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -184,9 +183,8 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public int getRunCount(TestResultAdapter testResultAdapter) {
-        int runCount = RetryCounter.getRunCount();
-        LOGGER.debug("runCount: " + runCount);
-        return runCount;
+        //TODO: remove from zafira-client as seems useless
+        return 0;
     }
 
     @Override

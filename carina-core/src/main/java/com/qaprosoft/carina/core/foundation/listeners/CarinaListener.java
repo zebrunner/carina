@@ -55,6 +55,7 @@ import org.testng.xml.XmlTest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.qaprosoft.amazon.AmazonS3Manager;
+import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
@@ -83,7 +84,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.models.dto.TestRunType;
@@ -317,26 +317,24 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        onTestFinish(result);
         super.onTestSuccess(result);
+        onTestFinish(result);
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
-        
-        onTestFinish(result);
         super.onTestFailure(result);
+        onTestFinish(result);    
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
-        
-        onTestFinish(result);
         super.onTestSkipped(result);
+        onTestFinish(result);  
     }
 
     private boolean hasDependencies(ITestResult result) {

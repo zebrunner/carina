@@ -15,23 +15,60 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.retry;
 
+import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
+    private static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
+    private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
+    
     public boolean retry(ITestResult result) {
-        if (RetryCounter.getRunCount() < getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
-            RetryCounter.incrementRunCount();
+        incrementRunCount();
+        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
+            LOGGER.debug("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
+            return false;
+        }
+
+        LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
+        if (getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             return true;
         }
         return false;
     }
+    
+    public Integer getRunCount() {
+        int count = 0;
+        if (runCount.get() != null) {
+            // retryCounter already init for current thread
+            count = runCount.get();
+        }
 
+        return count;
+    }
+    
+    public void incrementRunCount() {
+        int count = 0;
+        if (runCount.get() != null) {
+            // retryCounter already init for current thread
+            count = runCount.get();
+        }
+        runCount.set(++count);
+    }
+    
+    public void resetCounter() {
+        // explicitly set runCount to 0 for current thread
+        runCount.set(0);
+    }
+    
     public static int getMaxRetryCountForTest() {
         return Configuration.getInt(Parameter.RETRY_COUNT);
     }
+
 }
