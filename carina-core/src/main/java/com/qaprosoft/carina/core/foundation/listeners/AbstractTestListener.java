@@ -327,8 +327,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
         RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        if (retryAnalyzer != null) {
-            removeFailedRetryTests(result, retryAnalyzer.getRunCount());
+        if (retryAnalyzer != null && retryAnalyzer.getRunCount() > 0) {
+            removeRetriedTests(result);
             retryAnalyzer.resetCounter();
         }
     }
@@ -342,7 +342,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
         RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        if (retryAnalyzer != null) {
+        if (retryAnalyzer != null && retryAnalyzer.getRunCount() > 0) {
+            removeRetriedTests(result);
             retryAnalyzer.resetCounter();
         }
     }
@@ -354,14 +355,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
             skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
-            removeAlreadyPassedTests(result);
-
-//            // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
-//            RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-//            if (retryAnalyzer != null) {
-//                retryAnalyzer.resetCounter();
-//            }
-            
+            // [VD] no need to reset as we TestNG doesn't launch retryAnalyzer so we don't increment it on ALREADY_PASSDE skip exception
             return;
         }
         
@@ -401,79 +395,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onFinish(ITestContext context) {
         super.onFinish(context);
-    }
-
-    @SuppressWarnings("unused")
-    private void printContextTestsSummary(ITestContext context) {
-        LOGGER.debug("getAllTestMethods length: " + context.getAllTestMethods().length);
-        LOGGER.debug("---------------- PRINT SUMMARIZED SUCCESS -----------------------");
-        // print messages about all tests in context
-        LOGGER.debug("passed tests size: " + context.getPassedTests().getAllResults().size());
-        for (Iterator<ITestResult> iterator = context.getPassedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-
-            long testId = getMethodId(testResult);
-            LOGGER.debug("Pass test in context: " + testId + "; "
-                    + testResult.getName());
-        }
-
-        LOGGER.debug("---------------- PRINT SUMMARIZED FAILURE -----------------------");
-        // print messages about all tests in context
-        LOGGER.debug("failed tests size: " + context.getFailedTests().getAllResults().size());
-        for (Iterator<ITestResult> iterator = context.getFailedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-
-            long testId = getMethodId(testResult);
-            LOGGER.debug("Failed test in context: " + testId + "; "
-                    + testResult.getName());
-        }
-
-        LOGGER.debug("---------------- PRINT SUMMARIZED SKIP -----------------------");
-        // print messages about all tests in context
-        LOGGER.debug("skipped tests size: " + context.getSkippedTests().getAllResults().size());
-        for (Iterator<ITestResult> iterator = context.getSkippedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-
-            long testId = getMethodId(testResult);
-            LOGGER.debug("Skipped test in context: " + testId + "; "
-                    + testResult.getName());
-        }
-
-        LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION SUCCESS -----------------------");
-        LOGGER.debug("passed configurations size: " + context.getPassedConfigurations().getAllResults().size());
-        for (Iterator<ITestResult> iterator = context.getPassedConfigurations()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-
-            long testId = getMethodId(testResult);
-            LOGGER.debug("passed configurations in context: " + testId + "; "
-                    + testResult.getName());
-        }
-
-        LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION FAILURE -----------------------");
-        LOGGER.debug("failed configurations size: " + context.getFailedConfigurations().getAllResults().size());
-        for (Iterator<ITestResult> iterator = context.getFailedConfigurations()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-
-            long testId = getMethodId(testResult);
-            LOGGER.debug("failed configurations in context: " + testId + "; "
-                    + testResult.getName());
-        }
-
-        LOGGER.debug("---------------- PRINT SUMMARIZED CONFIGURATION SKIP -----------------------");
-        LOGGER.debug("skipped configurations size: " + context.getSkippedConfigurations().getAllResults().size());
-        for (Iterator<ITestResult> iterator = context.getSkippedConfigurations()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-
-            long testId = getMethodId(testResult);
-            LOGGER.debug("failed configurations in context: " + testId + "; "
-                    + testResult.getName());
-        }
+        removeAlreadyPassedTests(context);
     }
 
     private long getMethodId(ITestResult result) {
@@ -562,38 +484,31 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         configFailures.set(resultItem);
     }
     
-    private void removeFailedRetryTests(ITestResult result, int count) {
-        if (count > 0) {
-            ITestContext context = result.getTestContext();
-            long passedTestId = getMethodId(result);
-            LOGGER.debug("passedTest: " + passedTestId);
+    private void removeRetriedTests(ITestResult result) {
+        ITestContext context = result.getTestContext();
+        long passedTestId = getMethodId(result);
+        LOGGER.debug("passedTest: " + passedTestId);
 
-            // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
-            // finally delete all tests that are marked for removal
-            for (Iterator<ITestResult> iterator = context.getFailedTests()
-                    .getAllResults().iterator(); iterator.hasNext();) {
-                ITestResult testResult = iterator.next();
-                if (getMethodId(testResult) == passedTestId) {
-                    LOGGER.debug("Removed test from context: " + testResult.getName());
-                    iterator.remove();
-                }
+        // Removed failed retries for passed tests
+        for (Iterator<ITestResult> iterator = context.getFailedTests()
+                .getAllResults().iterator(); iterator.hasNext();) {
+            ITestResult testResult = iterator.next();
+            if (getMethodId(testResult) == passedTestId) {
+                LOGGER.debug("Removed test retry from context: " + testResult.getName());
+                iterator.remove();
             }
         }
     }
     
-    private void removeAlreadyPassedTests(ITestResult result) {
-        //TODO: implement removal from context to make TestNG default reports cleaner
-        ITestContext context = result.getTestContext();
-        long alreadyPassedTestId = getMethodId(result);
-        LOGGER.debug("alreadyPassedTestId: " + alreadyPassedTestId);
-
-        // LOGGER.debug("---------------- REMOVED TESTS PASSED WITH RETRIES -----------------------");
-        // finally delete all tests that are marked for removal
-        for (Iterator<ITestResult> iterator = context.getFailedTests()
+    private void removeAlreadyPassedTests(ITestContext context) {
+        // Remove skipped tests which exception starts with "ALREADY_PASSED".
+        // It should make default TestNG reports cleaner
+        for (Iterator<ITestResult> iterator = context.getSkippedTests()
                 .getAllResults().iterator(); iterator.hasNext();) {
             ITestResult testResult = iterator.next();
-            if (getMethodId(testResult) == alreadyPassedTestId) {
-                LOGGER.debug("Removed test from context: " + testResult.getName());
+            
+            if (testResult.getThrowable().toString().startsWith("org.testng.SkipException: " + SpecialKeywords.ALREADY_PASSED)) {
+                LOGGER.debug("Removed skipped test from context: " + testResult.getName());
                 iterator.remove();
             }
         }
