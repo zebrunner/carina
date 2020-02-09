@@ -119,11 +119,14 @@ public abstract class AbstractCapabilities {
 
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);
         String proxyPort = Configuration.get(Parameter.PROXY_PORT);
+        String noProxy = Configuration.get(Parameter.NO_PROXY);
+        
         if (Configuration.get(Parameter.BROWSERMOB_PROXY).equals("true")) {
             proxyPort = Integer.toString(ProxyPool.getProxyPortFromThread());
         }
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 
+        //TODO: test removal comparing with null
         if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
 
             org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
@@ -147,6 +150,10 @@ public abstract class AbstractCapabilities {
             if (protocols.contains("socks")) {
                 LOGGER.info(String.format("Socks proxy will be set: %s:%s", proxyHost, proxyPort));
                 proxy.setSocksProxy(proxyAddress);
+            }
+            
+            if (!noProxy.isEmpty()) {
+                proxy.setNoProxy(noProxy);
             }
 
             return proxy;

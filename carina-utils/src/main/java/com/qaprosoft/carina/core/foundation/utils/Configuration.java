@@ -95,6 +95,8 @@ public class Configuration {
         PROXY_PORT("proxy_port"),
 
         PROXY_PROTOCOLS("proxy_protocols"),
+        
+        NO_PROXY("no_proxy"),
 
         BROWSERMOB_PROXY("browsermob_proxy"),
 

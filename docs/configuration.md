@@ -155,6 +155,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>true, false</td>
 	</tr>
 		<tr>
+		<td>no_proxy</td>
+		<td>Excluded hostname(s) for communication via proxy. Available only when proxy_host and proxy_port are declared!</td>
+		<td>localhost.example.com</td>
+	</tr>
+		<tr>
 		<td>failure_email_list</td>
 		<td>Comma-separated list of emails for failure reports</td>
 		<td>u1@mail.com,u2@mail.com</td>
