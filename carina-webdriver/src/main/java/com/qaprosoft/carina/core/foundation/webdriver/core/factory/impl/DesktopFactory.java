@@ -17,6 +17,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -169,6 +171,7 @@ public class DesktopFactory extends AbstractFactory {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private String getBrowserVersion(WebDriver driver) {
         String browser_version = Configuration.get(Parameter.BROWSER_VERSION);
         try {
@@ -182,7 +185,40 @@ public class DesktopFactory extends AbstractFactory {
         } catch (Exception e) {
             LOGGER.error("Unable to get actual browser version!", e);
         }
+        
+        // hotfix to https://github.com/qaprosoft/carina/issues/882
+        String browser = Configuration.get(Parameter.BROWSER);
+        if (BrowserType.OPERA.equalsIgnoreCase(browser) || BrowserType.OPERA_BLINK.equalsIgnoreCase(browser)) {
+            browser_version = getOperaVersion(driver);
+        }
         return browser_version;
+    }
+    
+    //TODO: reformat later using UserAgent for all browser version identification
+    private String getOperaVersion(WebDriver driver) {
+        String browser_version = Configuration.get(Parameter.BROWSER_VERSION);
+        try { 
+            String userAgent = (String) ((RemoteWebDriver) driver).executeScript("return navigator.userAgent", "");
+            LOGGER.debug("User Agent: " + userAgent);
+            Optional<String> version = getPartialBrowserVersion("OPR", userAgent);
+            if (version.isPresent()) {
+                browser_version = version.get();
+            }
+        } catch (Exception e){
+            // do nothing
+            LOGGER.debug("Unable to get browser_version using userAgent call!", e);
+        }
+        return browser_version;
+    }
+    
+    private Optional<String> getPartialBrowserVersion(String browserName, String userAgentResponse) {
+        return Arrays.stream(userAgentResponse.split(" "))
+                .filter(str -> isRequiredBrowser(browserName,str))
+                .findFirst().map(str -> str.split("/")[1].split("\\.")[0]);
+    }
+    
+    private Boolean isRequiredBrowser(String browser, String auCapabilitie) {
+        return auCapabilitie.split("/")[0].equalsIgnoreCase(browser);
     }
 
     /**
