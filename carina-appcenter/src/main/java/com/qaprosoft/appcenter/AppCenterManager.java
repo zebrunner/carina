@@ -361,20 +361,23 @@ public class AppCenterManager {
     }
 
     private boolean checkForPattern(String nodeName, String pattern, JsonNode node) {
-
         LOGGER.debug("\nPattern to be checked: " + pattern);
         if (node.findPath("release_notes").isMissingNode()) {
             return false;
         }
+        
         String nodeField = node.get(nodeName).asText().toLowerCase();
+        String[] splitPattern = pattern.split("\\.");
+        LinkedList<Boolean> segmentsFound = new LinkedList<>();
+        for(String segment : splitPattern){
+            segmentsFound.add(nodeField.contains(segment));
+        }
 
-        if (nodeField.contains(pattern)) {
+        if (!segmentsFound.isEmpty() && !segmentsFound.contains(false)) {
             LOGGER.debug("\nPattern match found!! This is the buildType to be used: " + nodeField);
             return true;
         }
-
         String patternToReplace = ".*[ ->\\S]%s[ -<\\S].*";
-
         return !pattern.isEmpty() && scanningAllNotes(String.format(patternToReplace, pattern), nodeField);
     }
 
