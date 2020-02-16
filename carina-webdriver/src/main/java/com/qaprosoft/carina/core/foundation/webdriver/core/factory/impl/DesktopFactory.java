@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
+import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.Browser;
+import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.BrowserFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
@@ -200,25 +202,14 @@ public class DesktopFactory extends AbstractFactory {
         try { 
             String userAgent = (String) ((RemoteWebDriver) driver).executeScript("return navigator.userAgent", "");
             LOGGER.debug("User Agent: " + userAgent);
-            Optional<String> version = getPartialBrowserVersion("OPR", userAgent);
-            if (version.isPresent()) {
-                browser_version = version.get();
-            }
+            Browser browser = BrowserFactory.create("Opera");
+            String browserVersion = browser.getBrowserVersion(browser.getUserAgentKey(), userAgent);
+            LOGGER.info(browserVersion);
         } catch (Exception e){
             // do nothing
             LOGGER.debug("Unable to get browser_version using userAgent call!", e);
         }
         return browser_version;
-    }
-    
-    private Optional<String> getPartialBrowserVersion(String browserName, String userAgentResponse) {
-        return Arrays.stream(userAgentResponse.split(" "))
-                .filter(str -> isRequiredBrowser(browserName,str))
-                .findFirst().map(str -> str.split("/")[1].split("\\.")[0]);
-    }
-    
-    private Boolean isRequiredBrowser(String browser, String auCapabilitie) {
-        return auCapabilitie.split("/")[0].equalsIgnoreCase(browser);
     }
 
     /**
