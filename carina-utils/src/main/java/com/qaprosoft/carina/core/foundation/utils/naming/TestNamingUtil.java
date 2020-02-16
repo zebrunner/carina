@@ -38,21 +38,30 @@ public class TestNamingUtil {
     private static final Logger LOGGER = Logger.getLogger(TestNamingUtil.class);
 
     private static final ConcurrentHashMap<Long, Stack<String>> threadId2TestName = new ConcurrentHashMap<Long, Stack<String>>();
-
     private static final ConcurrentHashMap<String, String> testName2Bug = new ConcurrentHashMap<String, String>();
-
+    
+    private static final ConcurrentHashMap<String, Integer> testNameInvCounter = new ConcurrentHashMap<String, Integer>();
+    
     public static synchronized String associateTestInfo2Thread(String test, Long threadId, ITestResult result) {
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
         
-        int index = ((TestResult) result).getParameterIndex();
         
+        int index = ((TestResult) result).getParameterIndex();
         if (index > 0) {
             // that's a dataprovider line index
             index++; //to make correlation between line and index number
             LOGGER.debug("test: " + test  + "; index: " + index);
             test = test + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
         }
+        
+        int invCount = result.getTestContext().getAllTestMethods()[0].getInvocationCount();
+        if (invCount > 0) {
+            LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
+            int countIndex = getCurrentInvocationCount(test);
+            LOGGER.debug("test: " + test  + "; InvCount index: " + countIndex);
+            test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
+        }        
         
         // TODO: analyze how to use stack for retries
         Stack<String> stack = new Stack<String>();
@@ -189,18 +198,7 @@ public class TestNamingUtil {
     }
 
     public static String appendTestMethodName(String testName, ITestNGMethod m) {
-        int invocationID = -1;
-        if (m.getInvocationCount() > 1) {
-            invocationID = m.getCurrentInvocationCount() + 1;
-        }
-
-        if (invocationID != -1) {
-            // TODO: analyze if "InvCount=nnnn" is already present in name and don't append it one more time
-            testName = testName + " - " + adjustTestName(m) + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", invocationID));
-        } else {
-            testName = testName + " - " + adjustTestName(m);
-        }
-
+        testName = testName + " - " + adjustTestName(m);
         return StringEscapeUtils.escapeHtml4(testName);
     }
 
@@ -219,4 +217,19 @@ public class TestNamingUtil {
         return testName;
     }
 
+    private static int getCurrentInvocationCount(String test) {
+        /*TODO: reopen https://github.com/cbeust/testng/issues/1758 bug 
+         * Explain that appropriate TestNG functionality doesn't work in multi-threading env 
+         */
+        
+        int invCount = 1;
+        if (!testNameInvCounter.containsKey(test)) {
+            testNameInvCounter.put(test, invCount);
+        } else {
+            invCount = testNameInvCounter.get(test) + 1;
+            testNameInvCounter.put(test, invCount);
+        }
+        
+        return invCount;
+    }
 }
