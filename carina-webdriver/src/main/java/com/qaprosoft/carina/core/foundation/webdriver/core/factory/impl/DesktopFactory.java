@@ -17,8 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Optional;
 
 import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.Browser;
 import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.BrowserFactory;

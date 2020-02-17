@@ -12,16 +12,15 @@ public interface IParsable {
      * Some browser like IE, has customized this method.
      *
      * @param userAgent
-     *
      * @return String: Object()
      */
-     default String getBrowserVersion(String browserName, String userAgent){
-         Stream<String> streamVersion = Arrays.stream(userAgent.split(" "));
-         Optional<String[]> version = streamVersion
-                 .filter(str -> Utils.isRequiredBrowser(browserName, str))
-                 .findFirst().map(str -> Utils.splitVersion(str)[1].split("\\."));
-         streamVersion.close();
-         return Utils.buildBrowserVersion(version).replaceAll("[^\\d.]", "");
-     }
+    default String getBrowserVersion(String browserName, String userAgent) {
+        Stream<String> streamVersion = Arrays.stream(userAgent.split(" "));
+        Optional<String[]> version = streamVersion
+                .filter(str -> Utils.isRequiredBrowser(browserName, str))
+                .findFirst().map(str -> Utils.splitVersion(str)[1].split("\\."));
+        streamVersion.close();
+        return Utils.buildBrowserVersion(version).replaceAll("[^\\d.]", "");
+    }
 
 }

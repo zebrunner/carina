@@ -14,4 +14,4 @@ public abstract class Browser implements IParsable {
 
     public abstract String getUserAgentKey();
 
-};
+}

@@ -6,6 +6,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.browsers.*
 
 public class BrowserFactory {
 
+    private BrowserFactory() {
+    }
+
     // This could be handle as enums
     public static Browser create(String browserName) {
         switch (browserName) {
