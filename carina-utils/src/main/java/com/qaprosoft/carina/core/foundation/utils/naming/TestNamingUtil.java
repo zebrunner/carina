@@ -56,7 +56,7 @@ public class TestNamingUtil {
         }
         
         int invCount = result.getTestContext().getAllTestMethods()[0].getInvocationCount();
-        if (invCount > 0) {
+        if (invCount > 1) {
             LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
             int countIndex = getCurrentInvocationCount(test);
             LOGGER.debug("test: " + test  + "; InvCount index: " + countIndex);
