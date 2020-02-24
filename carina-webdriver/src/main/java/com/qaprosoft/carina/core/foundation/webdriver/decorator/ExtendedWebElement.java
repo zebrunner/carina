@@ -1512,7 +1512,7 @@ public class ExtendedWebElement {
 						Messager.FILE_NOT_ATTACHED.getMessage(textLog, getNameWithLocator()));
 
 				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
-				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
+				((RemoteWebDriver) castDriver(getDriver())).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
 			}
 
@@ -1684,6 +1684,13 @@ public class ExtendedWebElement {
 					"Driver isn't initialized. Review stacktrace to analyze why driver is not populated correctly via reflection!");
 		}
 		return driver;
+    }
+    
+    private WebDriver castDriver(WebDriver drv) {
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        }
+        return drv;
     }
     
 	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
