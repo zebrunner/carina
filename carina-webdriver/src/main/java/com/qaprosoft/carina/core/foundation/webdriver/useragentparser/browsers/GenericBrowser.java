@@ -2,10 +2,10 @@ package com.qaprosoft.carina.core.foundation.webdriver.useragentparser.browsers;
 
 import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.Browser;
 
-public class Edge extends Browser {
+public class GenericBrowser extends Browser {
 
-    public Edge(String browser) {
-        super(browser);
+    public GenericBrowser(String browserName) {
+        super(browserName);
     }
 
     @Override public String getUserAgentKey() {

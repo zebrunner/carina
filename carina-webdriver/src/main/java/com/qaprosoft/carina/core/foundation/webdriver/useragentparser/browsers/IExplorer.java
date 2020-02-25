@@ -14,7 +14,7 @@ public class IExplorer extends Browser {
         return USER_AGENT_KEY;
     }
 
-    public String getBrowserVersion(String browserName, String userAgent) {
+    public String getBrowserVersion(String userAgentKey, String userAgent) {
         String[] version = userAgent.split(" ");
         for (int i = 1; i < version.length - 1; i++) {
             if (version[i].equalsIgnoreCase(getUserAgentKey())) {

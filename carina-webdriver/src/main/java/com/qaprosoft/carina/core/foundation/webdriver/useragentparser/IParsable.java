@@ -14,10 +14,10 @@ public interface IParsable {
      * @param userAgent
      * @return String: Object()
      */
-    default String getBrowserVersion(String browserName, String userAgent) {
+    default String getBrowserVersion(String userAgentKey, String userAgent) {
         Stream<String> streamVersion = Arrays.stream(userAgent.split(" "));
         Optional<String[]> version = streamVersion
-                .filter(str -> Utils.isRequiredBrowser(browserName, str))
+                .filter(str -> Utils.isRequiredBrowser(userAgentKey, str))
                 .findFirst().map(str -> Utils.splitVersion(str)[1].split("\\."));
         streamVersion.close();
         return Utils.buildBrowserVersion(version).replaceAll("[^\\d.]", "");
