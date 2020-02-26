@@ -103,14 +103,12 @@ public class DataProviderFactory {
         }
 
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
-        context.setAttribute(SpecialKeywords.CANONICAL_TEST_NAME_ARGS_MAP, canonicalTestNameArgsMap);
         // TODO: analyze usage and remove TEST_METHOD_NAME_ARGS_MAP feature as soon as possible
         context.setAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP, testMethodNameArgsMap);
         context.setAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP, testMethodOwnerArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
         context.setAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP, testRailsArgsMap);
         context.setAttribute(SpecialKeywords.BUG_ARGS_MAP, bugArgsMap);
-        context.setAttribute(SpecialKeywords.DO_NOT_RUN_TESTS, doNotRunTests);
 
         // clear group by settings
         GroupByMapper.getInstanceInt().clear();
@@ -137,24 +135,6 @@ public class DataProviderFactory {
         }
 
         return finalProvider;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Object[][] getNeedRerunDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
-        Object[][] dp = getDataProvider(annotations, context, m);
-        List<String> doNotRunRowIDs = (List<String>) context.getAttribute(SpecialKeywords.DO_NOT_RUN_TESTS);
-        Map<String, String> testNameArgsMap = (Map<String, String>) context.getAttribute(SpecialKeywords.CANONICAL_TEST_NAME_ARGS_MAP);
-        if (!doNotRunRowIDs.isEmpty()) {
-            for (int i = dp.length - 1; i >= 0; i--) {
-                String testUniqueName = testNameArgsMap.get(testNameArgsMap.keySet().toArray()[i]);
-                if (testUniqueName != null) {
-                    if (doNotRunRowIDs.contains(testUniqueName)) {
-                        dp = ArrayUtils.remove(dp, i);
-                    }
-                }
-            }
-        }
-        return dp;
     }
 
 }

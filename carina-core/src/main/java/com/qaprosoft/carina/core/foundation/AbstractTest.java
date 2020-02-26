@@ -65,7 +65,7 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     @DataProvider(name = "DataProvider", parallel = true)
     public Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {
         Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
+        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
         return objects;
     }
 
@@ -73,7 +73,7 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     public Object[][] createDataSingleThread(final ITestNGMethod testMethod,
             ITestContext context) {
         Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
+        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
         return objects;
     }
 
