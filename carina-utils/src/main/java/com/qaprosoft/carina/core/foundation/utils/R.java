@@ -197,9 +197,30 @@ public enum R {
         return path;
     }
 
-    public Properties getProperties() {
-        return propertiesHolder.get(resourceFile);
-    }
+	public Properties getProperties() {
+		Properties globalProp = propertiesHolder.get(resourceFile);
+		// Glodal properties will be updated with test specific properties
+		if (!testProperties.get().isEmpty()) {
+			Properties testProp = testProperties.get();
+			LOGGER.debug(String.format("CurrentTestOnly properties has [%s] entries.", testProp.size()));
+			LOGGER.debug(testProp.toString());
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			Map<String, String> testCapabilitiesMap = new HashMap(testProp);
+			testCapabilitiesMap.keySet().stream().forEach(i -> {
+				if (globalProp.containsKey(i)) {
+					LOGGER.debug(String.format(
+							"Global properties already contains key --- %s --- with value --- %s ---. Global property will be overridden by  --- %s --- from test properties.",
+							i, globalProp.get(i), testProp.get(i)));
+				} else {
+					LOGGER.debug(String.format(
+							"Global properties isn't contains key --- %s ---.  Global key --- %s --- will be set to --- %s ---  from test properties.",
+							i, i, testProp.get(i)));
+				}
+				globalProp.setProperty(i, (String) testProp.get(i));
+			});
+		}
+		return globalProp;
+	}
     
     public void clearTestProperties() {
         LOGGER.debug("Cler temporary test properties.");
