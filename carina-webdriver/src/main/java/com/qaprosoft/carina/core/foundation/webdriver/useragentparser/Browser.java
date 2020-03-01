@@ -1,6 +1,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.useragentparser;
 
-public abstract class Browser implements IParsable {
+public abstract class Browser {
 
     private String browserName;
 

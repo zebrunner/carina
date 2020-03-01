@@ -20,6 +20,7 @@ import java.net.URL;
 
 import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.Browser;
 import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.BrowserFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.useragentparser.BrowserVersionExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
@@ -201,7 +202,7 @@ public class DesktopFactory extends AbstractFactory {
             String userAgent = (String) ((RemoteWebDriver) driver).executeScript("return navigator.userAgent", "");
             LOGGER.debug("User Agent: " + userAgent);
             Browser browser = BrowserFactory.create("Opera");
-            String browserVersion = browser.getBrowserVersion(browser.getUserAgentKey(), userAgent);
+            String browserVersion = BrowserVersionExtractor.getBrowserVersion(browser,userAgent);
             LOGGER.info(browserVersion);
         } catch (Exception e){
             // do nothing
