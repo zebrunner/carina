@@ -200,13 +200,15 @@ public class Device extends RemoteDevice implements IDriverPool {
         
         isStfEnabled = true;
         
-        LOGGER.debug("adb connect " + getRemoteURL());
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
-        executor.execute(cmd);
-        CommonUtils.pause(1);
-
-        String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
-        executor.execute(cmd2);
+        // https://github.com/qaprosoft/carina/issues/927
+        
+//        LOGGER.debug("adb connect " + getRemoteURL());
+//        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
+//        executor.execute(cmd);
+//        CommonUtils.pause(1);
+//
+//        String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
+//        executor.execute(cmd2);
 
     }
 
@@ -219,9 +221,11 @@ public class Device extends RemoteDevice implements IDriverPool {
 
         // [VD] No need to do adb command as stopping STF session do it correctly
         // in new STF we have huge problems with sessions disconnect
-        LOGGER.debug("adb disconnect " + getRemoteURL());
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
-        executor.execute(cmd);
+        
+        // https://github.com/qaprosoft/carina/issues/927
+        //LOGGER.debug("adb disconnect " + getRemoteURL());
+        //String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
+        //executor.execute(cmd);
 
     }
 
