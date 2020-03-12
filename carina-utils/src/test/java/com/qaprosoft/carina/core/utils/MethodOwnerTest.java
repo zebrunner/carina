@@ -21,6 +21,7 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
@@ -49,7 +50,7 @@ public class MethodOwnerTest {
     @MethodOwner(owner = DEFAULT_OWNER)
     @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
     public void testAndroidMethodOwner() {
-    	R.CONFIG.put("platform", "android");
+    	R.CONFIG.put(SpecialKeywords.PLATFORM, "android");
         ITestResult result = Reporter.getCurrentTestResult();
         String ownerName = Ownership.getMethodOwner(result);
         Assert.assertEquals(ownerName, ANDROID_OWNER);
@@ -60,7 +61,7 @@ public class MethodOwnerTest {
     @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
     @MethodOwner(owner = DEFAULT_OWNER)
     public void testIOSMethodOwner() {
-    	R.CONFIG.put("platform", "ios");
+    	R.CONFIG.put(SpecialKeywords.PLATFORM, "ios");
         ITestResult result = Reporter.getCurrentTestResult();
         String ownerName = Ownership.getMethodOwner(result);
         Assert.assertEquals(ownerName, IOS_OWNER);

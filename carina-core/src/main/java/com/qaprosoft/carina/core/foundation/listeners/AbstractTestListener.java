@@ -258,7 +258,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onTestStart(ITestResult result) {
         VideoAnalyzer.disableVideoUpload();
-        IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
+        IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
         if (curRetryAnalyzer == null) {
             // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
             result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
@@ -326,7 +326,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         super.onTestSuccess(result);
         
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        RetryAnalyzer retryAnalyzer = getRetryAnalyzer(result);
         if (retryAnalyzer != null && retryAnalyzer.getRunCount() > 0) {
             removeRetriedTests(result);
             retryAnalyzer.resetCounter();
@@ -341,7 +341,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         super.onTestFailure(result);
 
         // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        RetryAnalyzer retryAnalyzer = getRetryAnalyzer(result);
         if (retryAnalyzer != null && retryAnalyzer.getRunCount() > 0) {
             removeRetriedTests(result);
             retryAnalyzer.resetCounter();
@@ -366,13 +366,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             return;
         }
         
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        int count = retryAnalyzer != null ? retryAnalyzer.getRunCount() : 0;
+        RetryAnalyzer retryAnalyzer = getRetryAnalyzer(result);
+        int count = retryAnalyzer != null ? count = retryAnalyzer.getRunCount() : 0;
+        
         int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
         LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
         
-        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
-        if (count > 0 && retry == null) {
+        if (count > 0 && retryAnalyzer == null) {
             LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
                     + result.getMethod().getMethodName());
         } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
@@ -512,6 +512,16 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 iterator.remove();
             }
         }
+    }
+    
+    private RetryAnalyzer getRetryAnalyzer(ITestResult result) {
+        RetryAnalyzer retryAnalyzer = null;
+        try {
+            retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
+        } catch (ClassCastException e) {
+            LOGGER.debug("Unexpected casting issue for getRetryAnalyzer!", e); 
+        }
+        return retryAnalyzer;
     }
 
 }
