@@ -4,7 +4,7 @@
 
   <groupId>com.qaprosoft</groupId>
   <artifactId>carina-archetype</artifactId>
-  <version>1.0</version>
+  <version>3.0</version>
   <packaging>maven-archetype</packaging>
   <url>http://www.qaprosoft.com/</url>
   <name>carina-archetype</name>
