@@ -11,13 +11,12 @@
 
 	<parameter name="suiteOwner" value="qpsdemoSuite"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
-	<parameter name="jenkinsJobCreation" value="true"/>
 	<parameter name="jenkinsJobName" value="Tags-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
 
-	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
+	<parameter name="jenkinsRegressionPipeline" value="nightly_regression, full_regression"/>
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 
