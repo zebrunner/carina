@@ -3,16 +3,18 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.utils;
 
-import io.appium.java_client.AppiumDriver;
+import static com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.getDriver;
+
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 
-import java.util.Set;
-
-import static com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils.getDriver;
+import io.appium.java_client.AppiumDriver;
 
 public class MobileContextUtils {
 

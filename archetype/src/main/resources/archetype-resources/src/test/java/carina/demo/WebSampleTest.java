@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2018 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2019 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,9 @@ public class WebSampleTest extends AbstractTest {
         HomePage homePage = new HomePage(getDriver());
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+
+        //Closing advertising if it's displayed
+        homePage.getWeValuePrivacyAd().closeAdIfPresent();
 
         // Select phone brand
         homePage = new HomePage(getDriver());

@@ -3,13 +3,12 @@
 #set( $symbol_escape = '\' )
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
 <suite verbose="1" name="Carina Demo Tests - Web tests (Cucumber)" annotations="JDK">
-
-    <listeners>
-      <listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-    </listeners>
-
     <parameter name="suiteOwner" value="qpsdemo"/>
     <parameter name="zafira_project" value="UNKNOWN"/>
+
+    <parameter name="jenkinsJobName" value="Soap-Web-Test"/>
+    <parameter name="jenkinsJobType" value="web"/>
+    <parameter name="jenkinsEnvironments" value="DEMO"/>
 
     <test verbose="1"
           name="GSM Arena News - Web tests by cucumber">

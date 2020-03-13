@@ -1,0 +1,32 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
+
+<suite verbose="1" name="Carina Demo Tests - SOAP Sample" skipfailedinvocationcounts="false" junit="false"
+       parallel="tests" annotations="JDK">
+
+    <listeners>
+        <listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
+    </listeners>
+
+    <parameter name="suiteOwner" value="qpsdemo"/>
+    <parameter name="zafira_project" value="UNKNOWN"/>
+    <parameter name="jenkinsJobName" value="SOAP-Demo-Test"/>
+    <parameter name="jenkinsJobType" value="api"/>
+    <parameter name="jenkinsEnvironments" value="DEMO"/>
+    <parameter name="jenkinsSlackChannels" value="slack-test,slack-test2"/>
+
+    <parameter name="jenkinsRegressionPipeline" value="nightly_regression, full_regression"/>
+    <parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+    <parameter name="jenkinsJobExecutionMode" value="continue"/>
+
+    <test name="Country info SOAP tests">
+        <parameter name="countryISOCode" value="USA"/>
+        <parameter name="capitalCity" value="Washington"/>
+        <classes>
+            <class name="${package}.carina.demo.SOAPSampleTest"/>
+        </classes>
+    </test>
+
+</suite>

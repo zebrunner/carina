@@ -12,19 +12,15 @@
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
-	<parameter name="jenkinsJobCreation" value="true"/>
 	<parameter name="jenkinsJobName" value="Web-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="web"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
 
-	<!-- Example howto override default job thread_count via jobDSL parameter -->
-	<parameter name="jenkinsDefaultThreadCount" value="3"/>
-
-	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline"/>
+	<parameter name="jenkinsRegressionPipeline" value="nightly_regression, full_regression"/>
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 
-	<parameter name="jenkinsPipelineBrowsers" value="browser: chrome; browser: firefox"/>
+	<parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome; browser: firefox; browser: opera"/>
 	<parameter name="jenkinsJobExecutionOrder" value="1"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 
