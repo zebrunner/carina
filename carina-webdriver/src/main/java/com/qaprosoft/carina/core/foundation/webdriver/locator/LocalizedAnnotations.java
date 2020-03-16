@@ -67,6 +67,10 @@ public class LocalizedAnnotations extends Annotations {
             param = StringUtils.remove(param, "By.name: ");
             by = MobileBy.AccessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
+            if (param.startsWith("By.AndroidUIAutomator: ")) {
+                param = StringUtils.remove(param, "By.AndroidUIAutomator: ");
+                by = MobileBy.AndroidUIAutomator(param);
+            }
             LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : " + by);
         } else {
             by = createBy(param);
