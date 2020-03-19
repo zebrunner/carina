@@ -41,7 +41,6 @@ import org.openqa.selenium.remote.service.DriverService;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
-import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.remote.AppiumCommandExecutor;
@@ -50,12 +49,12 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 /**
  * EventFiringAppiumCommandExecutor triggers event listener before/after execution of the command.
  * Please track {@link AppiumCommandExecutor} for latest changes.
- * 
+ *
  * @author akhursevich
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
-    
+
     private final Optional<DriverService> serviceOptional;
 
     private List<IDriverCommandListener> listeners = new ArrayList<>();
@@ -83,16 +82,16 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
 
     public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             URL addressOfRemoteServer) {
-        this(additionalCommands, addressOfRemoteServer, new HttpClientFactoryCustom());
+        this(additionalCommands, addressOfRemoteServer, HttpClient.Factory.createDefault());
     }
 
     public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             DriverService service) {
-        this(additionalCommands, service, new HttpClientFactoryCustom());
+        this(additionalCommands, service, HttpClient.Factory.createDefault());
     }
 
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
-        this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
+        this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
     }
 
     private <B> B getPrivateFieldValue(String fieldName, Class<B> fieldType) {
@@ -165,7 +164,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                     return new WebDriverException("The appium server has accidentally died!", rootCause);
                 }).orElseGet((Supplier<WebDriverException>) () -> new WebDriverException(rootCause.getMessage(), rootCause));
             }
-            // [VD] never enable throwIfUnchecked as it generates RuntimeException and corrupt TestNG main thread!   
+            // [VD] never enable throwIfUnchecked as it generates RuntimeException and corrupt TestNG main thread!
             // throwIfUnchecked(t);
             throw new WebDriverException(t);
         } finally {
