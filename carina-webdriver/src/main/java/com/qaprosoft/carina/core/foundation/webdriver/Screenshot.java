@@ -50,6 +50,7 @@ import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
@@ -169,17 +170,28 @@ public class Screenshot {
         if (!screenName.isEmpty()) {
             // XML layout extraction
             File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
+            
             if (uiDumpFile != null) {
-                LOGGER.debug("Dump file will be uploaded to amazon S3. File name is : " + uiDumpFile.getName());
-                Artifacts.add("Failure UI dump report", uiDumpFile);
+                // use the same naming but with zip extension. Put into the test artifacts folder
+                String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", "zip");
+                LOGGER.debug("UI Dump artifact: " + dumpArtifact);
+                
+                // build path to screenshot using name 
+                File screenFile = new File(ReportContext.getTestDir().getAbsolutePath() + "/" + screenName);
+                
+                // archive page source dump and screenshot both together
+                FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
+                
+                Artifacts.add("UI Dump artifact", dumpArtifact);
             } else {
                 LOGGER.debug("Dump file is empty.");
             }
         }
         LOGGER.debug("Screenshot->captureFailure finished.");
+        
         return screenName;
     }
-
+    
     /**
      * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
      * location.

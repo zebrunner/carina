@@ -16,10 +16,15 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -76,6 +81,27 @@ public class FileManager {
 
         } catch (IOException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
+        }
+    }
+    
+    /**
+     * Archive list of files into the single zip archive.
+     *
+     * @param output
+     *          String zip file path.
+     * @param files 
+     *          List of files to archive
+     */
+    public static void zipFiles(String output, File... files) {
+        try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(output))) {
+            for (File fileToZip : files) {
+                zipOut.putNextEntry(new ZipEntry(fileToZip.getName()));
+                Files.copy(fileToZip.toPath(), zipOut);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Unable to find file for archive operation!", e);
+        } catch (IOException e) {
+            LOGGER.error("IO exception for archive operation!", e);
         }
     }
 

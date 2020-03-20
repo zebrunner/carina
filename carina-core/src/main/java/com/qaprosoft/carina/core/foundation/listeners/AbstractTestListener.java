@@ -197,7 +197,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             File sysLogFile = device.saveSysLog();
             if (sysLogFile != null) {
                 LOGGER.debug("Logcat log will be extracted and added as artifact");
-                Artifacts.add("Logcat", ReportContext.getSysLogLink());
+                Artifacts.add("Logcat", sysLogFile);
             }
         }
         
