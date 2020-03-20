@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -297,7 +301,19 @@ public interface IDriverPool {
                 ProxyPool.stopProxy();
             }
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
-            carinaDriver.getDriver().quit();
+            //carinaDriver.getDriver().quit();
+            
+            WebDriver driver = carinaDriver.getDriver();
+            Future<?> future = Executors.newSingleThreadExecutor().submit((Runnable) driver::quit);
+            long wait = 10;
+            try {
+                future.get(10, TimeUnit.SECONDS);
+            } catch (InterruptedException | java.util.concurrent.TimeoutException e) {
+                POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
+            } catch (ExecutionException e) {
+                POOL_LOGGER.error("Error on driver quite detected!", e);
+            }
+            
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
             // stop timer to be able to track mobile app session time. It should be started on createDriver!
             Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
@@ -310,7 +326,8 @@ public interface IDriverPool {
             MDC.remove("device");
         }
     }
-
+    
+    
     /**
      * Create driver with custom capabilities
      * 
