@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
@@ -39,7 +38,7 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     }
 
     @Override
-    public Response execute(Command command) throws WebDriverException, IOException {
+    public Response execute(Command command) throws IOException {
 
         Response response;
         for (IDriverCommandListener listener : listeners) {
