@@ -182,7 +182,7 @@ public class Screenshot {
                 // archive page source dump and screenshot both together
                 FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
                 
-                Artifacts.add("UI Dump artifact", dumpArtifact);
+                Artifacts.add("UI Dump artifact", new File(dumpArtifact));
             } else {
                 LOGGER.debug("Dump file is empty.");
             }
