@@ -173,7 +173,7 @@ public class Screenshot {
             
             if (uiDumpFile != null) {
                 // use the same naming but with zip extension. Put into the test artifacts folder
-                String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", "zip");
+                String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", ".zip");
                 LOGGER.debug("UI Dump artifact: " + dumpArtifact);
                 
                 // build path to screenshot using name 
