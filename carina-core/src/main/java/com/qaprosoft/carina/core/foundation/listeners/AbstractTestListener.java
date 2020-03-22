@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +30,6 @@ import org.testng.TestListenerAdapter;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -45,7 +43,6 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 @SuppressWarnings("deprecation")
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
@@ -189,17 +186,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         // TODO: do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
-        
-        // device log
-        Device device = IDriverPool.getDefaultDevice();
-        if (!device.isNull()) {
-            LOGGER.debug("Device isn't null additional artifacts will be extracted.");
-            File sysLogFile = device.saveSysLog();
-            if (sysLogFile != null) {
-                LOGGER.debug("Logcat log will be extracted and added as artifact");
-                Artifacts.add("Logcat", sysLogFile);
-            }
-        }
         
         ReportContext.generateTestReport();
 

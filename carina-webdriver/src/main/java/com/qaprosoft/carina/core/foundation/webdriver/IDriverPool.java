@@ -15,7 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,12 +29,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -42,6 +46,8 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -263,22 +269,6 @@ public interface IDriverPool {
         if (drv == null || carinaDrv == null) {
             throw new RuntimeException("Unable to find driver '" + name + "'!");
         }
-
-        if (drv.manage() != null) {
-            Timer.start(ACTION_NAME.GET_LOGS);
-            // incorporate getting all kind of loggs and put them into artifacts
-            Set<String> logTypes = drv.manage().logs().getAvailableLogTypes();
-            POOL_LOGGER.info("logTypes: " + Arrays.toString(logTypes.toArray()));
-            
-            LogEntries logEntries = drv.manage().logs().get("driver");
-            for (LogEntry logEntry : logEntries) {
-                POOL_LOGGER.info(logEntry);
-            }
-            Timer.stop(ACTION_NAME.GET_LOGS);
-        } else {
-            POOL_LOGGER.error("driver.manae() is null!");
-        }
-        
         
         quitDriver(carinaDrv, false);
         driversPool.remove(carinaDrv);
@@ -311,7 +301,7 @@ public interface IDriverPool {
         // don't use modern removeIf as it uses iterator!
         // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
     }
-
+    
     //TODO: [VD] make it as private after migrating to java 9+
     default void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
         try {
@@ -319,14 +309,39 @@ public interface IDriverPool {
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
             }
+            
+            // Collect all possible logs and put them as artifacts
+            for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
+                String fileName = ReportContext.getTestDir() + "/" + logType + ".log";
+                
+                StringBuilder tempStr = new StringBuilder();
+                LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
+                logcatEntries.getAll().stream().forEach((k) -> tempStr.append(k.toString().concat("\n")));
+                
+                if (tempStr == null || tempStr.length() == 0) {
+                    //don't write something to file and don't register appropriate artifact
+                    continue;
+                }
+                File file = null;
+                try {
+                    file = new File(fileName);
+                    FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
+                } catch (IOException e) {
+                    POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
+                }
+                
+                Artifacts.add(logType, file);
+            }
+            
+            
+            WebDriver driver = carinaDriver.getDriver();
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             //carinaDriver.getDriver().quit();
             
-            WebDriver driver = carinaDriver.getDriver();
             Future<?> future = Executors.newSingleThreadExecutor().submit((Runnable) driver::quit);
             long wait = 10;
             try {
-                future.get(10, TimeUnit.SECONDS);
+                future.get(wait, TimeUnit.SECONDS);
             } catch (InterruptedException | java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
             } catch (ExecutionException e) {
@@ -346,7 +361,36 @@ public interface IDriverPool {
         }
     }
     
+    default Set<String> getAvailableDriverLogTypes(WebDriver driver) {
+        Set<String> logTypes = Collections.<String>emptySet();
+        if (driver.manage() != null) {
+            logTypes = driver.manage().logs().getAvailableLogTypes();
+        }
+        // logTypes: logcat, bugreport, server, client
+        POOL_LOGGER.info("logTypes: " + Arrays.toString(logTypes.toArray()));
+        return logTypes;
+    }
     
+    /**
+     * Get driver logs by type: logcat, bugreport, server, client
+     * TODO: test for iOS
+     * 
+     * @return LogEntries entries
+     */
+    default LogEntries getDriverLogs(WebDriver driver, String logType) {
+        LogEntries logEntries = null;
+        POOL_LOGGER.debug("start getting driver logs");
+        if (driver.manage() != null) {
+            Timer.start(ACTION_NAME.GET_LOGS);
+            logEntries = driver.manage().logs().get(logType);
+            Timer.stop(ACTION_NAME.GET_LOGS);
+        } else {
+            POOL_LOGGER.error("driver.manage() is null!");
+        }
+        POOL_LOGGER.debug("finish getting driver logs");
+        
+        return logEntries;
+    }
     /**
      * Create driver with custom capabilities
      * 
@@ -592,9 +636,6 @@ public interface IDriverPool {
         currentDevice.set(device);
 
         POOL_LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
-
-        // clear logcat log for Android devices
-        device.clearSysLog();
 
         return device;
     }
