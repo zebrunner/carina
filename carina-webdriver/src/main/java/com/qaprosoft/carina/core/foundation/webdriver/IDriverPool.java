@@ -275,6 +275,8 @@ public interface IDriverPool {
                 POOL_LOGGER.info(logEntry);
             }
             Timer.stop(ACTION_NAME.GET_LOGS);
+        } else {
+            POOL_LOGGER.error("driver.manae() is null!");
         }
         
         
