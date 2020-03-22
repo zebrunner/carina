@@ -69,6 +69,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			registerArtifact(command, videoArtifact);
 
 			if (DriverCommand.QUIT.equals(command.getName())) {
+			    // stop video recording and publish it to ftp
+			    //TODO: publish as artifact to S3!
 				try {
 					String data = commandExecutor
 							.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
@@ -81,7 +83,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                         CompletableFuture.runAsync(() -> {uploadToFTP(data);});
                     }
 				} catch (Throwable e) {
-					LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
+					LOGGER.error("Unable to stop screen recording!", e);
 				}
 			}
 		}
