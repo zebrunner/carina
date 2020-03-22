@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -38,6 +40,7 @@ import org.testng.Assert;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -261,6 +264,18 @@ public interface IDriverPool {
             throw new RuntimeException("Unable to find driver '" + name + "'!");
         }
 
+        Timer.start(ACTION_NAME.GET_LOGS);
+        // incorporate getting all kind of loggs and put them into artifacts
+        Set<String> logTypes = drv.manage().logs().getAvailableLogTypes();
+        POOL_LOGGER.info("logTypes: " + Arrays.toString(logTypes.toArray()));
+        
+        LogEntries logEntries = drv.manage().logs().get("driver");
+        for (LogEntry logEntry : logEntries) {
+            POOL_LOGGER.info(logEntry);
+        }
+        Timer.stop(ACTION_NAME.GET_LOGS);
+        
+        
         quitDriver(carinaDrv, false);
         driversPool.remove(carinaDrv);
 
