@@ -264,16 +264,18 @@ public interface IDriverPool {
             throw new RuntimeException("Unable to find driver '" + name + "'!");
         }
 
-        Timer.start(ACTION_NAME.GET_LOGS);
-        // incorporate getting all kind of loggs and put them into artifacts
-        Set<String> logTypes = drv.manage().logs().getAvailableLogTypes();
-        POOL_LOGGER.info("logTypes: " + Arrays.toString(logTypes.toArray()));
-        
-        LogEntries logEntries = drv.manage().logs().get("driver");
-        for (LogEntry logEntry : logEntries) {
-            POOL_LOGGER.info(logEntry);
+        if (drv.manage() != null) {
+            Timer.start(ACTION_NAME.GET_LOGS);
+            // incorporate getting all kind of loggs and put them into artifacts
+            Set<String> logTypes = drv.manage().logs().getAvailableLogTypes();
+            POOL_LOGGER.info("logTypes: " + Arrays.toString(logTypes.toArray()));
+            
+            LogEntries logEntries = drv.manage().logs().get("driver");
+            for (LogEntry logEntry : logEntries) {
+                POOL_LOGGER.info(logEntry);
+            }
+            Timer.stop(ACTION_NAME.GET_LOGS);
         }
-        Timer.stop(ACTION_NAME.GET_LOGS);
         
         
         quitDriver(carinaDrv, false);
