@@ -339,7 +339,7 @@ public interface IDriverPool {
             //carinaDriver.getDriver().quit();
             
             Future<?> future = Executors.newSingleThreadExecutor().submit((Runnable) driver::quit);
-            long wait = 10;
+            long wait = 30;
             try {
                 future.get(wait, TimeUnit.SECONDS);
             } catch (InterruptedException | java.util.concurrent.TimeoutException e) {
