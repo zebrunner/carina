@@ -607,55 +607,6 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
     
     /**
-     * Clear sys log
-     */
-    public void clearSysLog() {
-        if (isNull()) {
-            return;
-        }
-
-		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return;
-		}
-        
-        LOGGER.info(String.format("Test will be started on device: %s:%s", getName(), getAdbName()));
-        // adb -s UDID logcat -c
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
-        executor.execute(cmd);
-        LOGGER.debug("Logcat logs were cleared.");
-    }
-    
-    /**
-     * Save logcat log for Android (logs will be uploaded in future as artifacts)
-     * TODO: for iOS
-     * 
-     * @return saved file
-     */
-    public File saveSysLog() {
-		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return null;
-		}
-		LOGGER.debug("Sys log will be extracted...");
-        String fileName = ReportContext.getTestDir() + "/logcat.log";
-        String log = getSysLog();
-        if (log.isEmpty()) {
-            return null;
-        }
-        
-        File file = null;
-        try {
-            file = new File(fileName);
-            FileUtils.writeStringToFile(file, log, Charset.defaultCharset());
-        } catch (IOException e) {
-            LOGGER.warn("Error has been occured during attempt to extract logcat log.", e);
-        }
-        LOGGER.debug("Logcat file path: ".concat(fileName));
-        return file;
-    }
-    
-    /**
      * Save xml layout of the application 
      * @param screenshotName - png file name to generate appropriate uix  
      * @return saved file

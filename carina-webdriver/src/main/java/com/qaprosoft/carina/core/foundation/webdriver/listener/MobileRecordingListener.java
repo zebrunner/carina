@@ -15,18 +15,18 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.CompletableFuture;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DriverCommand;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
-import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.MobileCommand;
@@ -69,20 +69,40 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			registerArtifact(command, videoArtifact);
 
 			if (DriverCommand.QUIT.equals(command.getName())) {
-				try {
-					String data = commandExecutor
-							.execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
-									MobileCommand.stopRecordingScreenCommand(
-											(BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
-							.getValue().toString();
-					LOGGER.debug("Video will be uploaded to ftp. Test thread ID : " + Thread.currentThread().getId());
-					if(VideoAnalyzer.isVideoUploadEnabled()) {
-                        LOGGER.debug("Upload video is enabled.");
-                        CompletableFuture.runAsync(() -> {uploadToFTP(data);});
-                    }
-				} catch (Throwable e) {
-					LOGGER.error("Unable to stop screen recording: " + e.getMessage(), e);
-				}
+			    // stop video recording and publish it to local artifacts
+			    String data = "";
+                try {
+                    LOGGER.debug("Stop mobile video recording and upload data locally for " + command.getSessionId());
+                    data = commandExecutor
+                            .execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
+                                    MobileCommand.stopRecordingScreenCommand(
+                                            (BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
+                            .getValue().toString();
+                    
+                    LOGGER.debug("Stopped mobile video recording and uploaded data locally for " + command.getSessionId());
+                } catch (Throwable e) {
+                    LOGGER.error("Unable to stop screen recording!", e);
+                }
+                
+                if (data == null || data.isEmpty()) {
+                    // do nothing
+                    return;
+                }
+                
+                // create file in artifacts using driver session id
+                //IMPORTANT! DON'T MODIFY FILENAME WITHOUT UPDATING DRIVER FACTORIES AND LISTENERS!
+                String fileName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, command.getSessionId());
+                String filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
+                File file = null;
+                
+                try {
+                    LOGGER.debug("Getting video artifact: " + fileName);
+                    file = new File(filePath);
+                    FileUtils.writeByteArrayToFile(file, Base64.getDecoder().decode(data));
+                    LOGGER.debug("Got video artifact: " + fileName);
+                } catch (IOException e) {
+                    LOGGER.warn("Error has been occured during video artifact generation: " + fileName, e);
+                }
 			}
 		}
 	}
@@ -92,6 +112,9 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
         if (!recording && command.getSessionId() != null) {
             try {
                 recording = true;
+                
+                videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
+                
                 commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
                         MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)
                                 .getValue()));
@@ -100,32 +123,5 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
             }
         }
     }
-
-	// To get host address for video uploading we have to use screen_record_ftp parameter. 
-	// To generate file name we have to extract it from video artifact link.
-	private void uploadToFTP(String data) {
-	    LOGGER.debug("Uploading in async mode started in thread ID : " + Thread.currentThread().getId());
-	    LOGGER.debug("Link to video artifact : " + videoArtifact.getLink());
-	    LOGGER.debug("Screen record ftp : " + R.CONFIG.get("screen_record_ftp"));
-	    LOGGER.debug("Screen record host : " + R.CONFIG.get("screen_record_host"));
-		String videoUrl = videoArtifact.getLink();
-		String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%","");
-		URI ftpUri = null;
-		URI videoUri = null;
-		try {
-			ftpUri = new URI(ftpUrl);
-			videoUri = new URI(videoUrl);
-		} catch (URISyntaxException e1) {
-			LOGGER.error("Incorrect URL format for screen record ftp parameter");
-		}
-		if (null != ftpUri && null != videoUri) {
-			String ftpHost = ftpUri.getHost();
-			String[] segments = videoUri.getPath().split("/");
-			String destinationFileName = segments[segments.length-1];
-			FtpUtils.uploadData(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), data,
-					destinationFileName);
-		} else {
-			LOGGER.error("The video won't be uploaded due to incorrect ftp or video recording parameters");
-		}
-	}
+    
 }

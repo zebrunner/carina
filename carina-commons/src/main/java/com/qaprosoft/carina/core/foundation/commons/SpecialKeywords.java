@@ -205,4 +205,7 @@ public class SpecialKeywords {
     // ------------- Cucumber configuration  ---------------
     public static final String CUCUMBER_REPORT_FOLDER = "CucumberReport";
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
+    
+    
+    public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";
 }

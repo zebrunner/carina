@@ -45,6 +45,8 @@ public class DesktopRecordingListener implements IDriverCommandListener {
     public void afterEvent(Command command) {
         if (!recording && command.getSessionId() != null) {
             recording = true;
+            
+            videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
         }
     }
 }

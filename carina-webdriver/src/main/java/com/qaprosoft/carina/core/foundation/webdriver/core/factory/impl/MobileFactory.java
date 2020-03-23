@@ -108,10 +108,6 @@ public class MobileFactory extends AbstractFactory {
                     capabilities = setAndroidLocaleCaps(capabilities);
                     
                     if (isVideoEnabled()) {
-
-                        final String videoName = getVideoName();
-                        capabilities.setCapability("videoName", videoName);
-
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
@@ -155,11 +151,10 @@ public class MobileFactory extends AbstractFactory {
                         case DEFAULT:
                             ce.getListeners()
                                     .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2, initVideoArtifact(videoName)));
+                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         case ZEBRUNNER:
                             // Zebrunner will place video to separate unique folder, no need to generate new name
-                            capabilities.setCapability("videoName", VIDEO_DEFAULT);
                             ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
                             ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                             break;
@@ -172,10 +167,6 @@ public class MobileFactory extends AbstractFactory {
                         || mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
                     if (isVideoEnabled()) {
-
-                        final String videoName = getVideoName();
-                        capabilities.setCapability("videoName", videoName);
-
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
@@ -209,7 +200,7 @@ public class MobileFactory extends AbstractFactory {
                         case SAUCELABS:
                         case DEFAULT:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initVideoArtifact(videoName)));
+                                    o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         case ZEBRUNNER:
                             LOGGER.info("Video recording is not supported in Zebrunner for iOS");

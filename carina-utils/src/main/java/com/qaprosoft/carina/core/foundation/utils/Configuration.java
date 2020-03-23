@@ -277,9 +277,7 @@ public class Configuration {
         // Test Execution Filter rules
         TEST_RUN_RULES("test_run_rules"),
 
-        HUB_MODE("hub_mode"),
-
-        EXTRACT_SYS_LOG("extract_sys_log");
+        HUB_MODE("hub_mode");
 
         private final String key;
 

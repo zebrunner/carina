@@ -17,11 +17,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -42,17 +40,17 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-
-    // private static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
-
+    
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 
     protected static final String vnc_protocol = "vnc_protocol";
     protected static final String vnc_host = "vnc_host";
     protected static final String vnc_port = "vnc_port";
-
+    
+    //TODO: refactor to use SpecialKeywords.DEFAULT_VIDEO_FILENAME. Make sure to change uploading approach removing extra sub-folder 
     protected final static String VIDEO_DEFAULT = "video.mp4";
     protected final static String SESSION_LOG_DEFAULT = "session.log";
+
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
@@ -140,13 +138,4 @@ public abstract class AbstractFactory {
         return R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
     }
 
-    /**
-     * Gets video name from configuration or generates a random one.
-     * 
-     * @return video recording name
-     */
-    protected String getVideoName() {
-        String videoName = R.CONFIG.get("capabilities.videoName");
-        return !StringUtils.isEmpty(videoName) ? videoName : UUID.randomUUID().toString() + ".mp4";
-    }
 }

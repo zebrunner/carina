@@ -157,11 +157,12 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void onException(Throwable thr, WebDriver driver) {
-        LOGGER.debug("DriverListener->onException starting...");
+        LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
         driver = castDriver(driver);
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
         if (thr.getMessage() == null) {
+            LOGGER.debug("DriverListener->onException finished.");
             return;
         }
 
@@ -176,6 +177,7 @@ public class DriverListener implements WebDriverEventListener {
         if (thr.getMessage().contains("Method has not yet been implemented")
                 || thr.getMessage().contains("Method is not implemented")) {
             // do nothing
+            LOGGER.debug("DriverListener->onException finished.");
             return;
         }
 
