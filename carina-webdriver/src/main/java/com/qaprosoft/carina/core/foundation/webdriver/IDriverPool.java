@@ -365,10 +365,10 @@ public interface IDriverPool {
             
             // Upload video artifacts if any
             //IMPORTANT! DON'T MODIFY FILENAME WITHOUT UPDATING DRIVER FACTORIES AND LISTENERS!
-            String videoFileName = SpecialKeywords.VIDEO_DEFAULT;
-            String videoFilePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + sessionId.toString() + File.separator
-                    + SpecialKeywords.VIDEO_DEFAULT;
-            File videoFile = new File(videoFilePath); 
+            String fileName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, sessionId.toString());
+            String filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
+            
+            File videoFile = new File(filePath); 
             
             if (VideoAnalyzer.isVideoUploadEnabled() && videoFile.exists()) {
                 POOL_LOGGER.debug("Upload video is enabled.");
@@ -386,8 +386,8 @@ public interface IDriverPool {
                     }
                     if (null != ftpUri) {
                         String ftpHost = ftpUri.getHost();
-                        FtpUtils.uploadFile(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), videoFilePath,
-                                videoFileName);
+                        FtpUtils.uploadFile(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), filePath,
+                                fileName);
                     } else {
                         POOL_LOGGER.error("The video won't be uploaded due to incorrect ftp or video recording parameters");
                     }

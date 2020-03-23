@@ -151,12 +151,12 @@ public class MobileFactory extends AbstractFactory {
                         case DEFAULT:
                             ce.getListeners()
                                     .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2, initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
+                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         case ZEBRUNNER:
                             // Zebrunner will place video to separate unique folder, no need to generate new name
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
-                            ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SpecialKeywords.SESSION_LOG_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                             break;
                         }
                     }
@@ -200,7 +200,7 @@ public class MobileFactory extends AbstractFactory {
                         case SAUCELABS:
                         case DEFAULT:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
+                                    o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         case ZEBRUNNER:
                             LOGGER.info("Video recording is not supported in Zebrunner for iOS");

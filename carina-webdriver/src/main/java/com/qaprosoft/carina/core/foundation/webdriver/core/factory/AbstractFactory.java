@@ -40,14 +40,17 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-
-    // private static final Logger LOGGER = Logger.getLogger(AbstractFactory.class);
-
+    
     protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
 
     protected static final String vnc_protocol = "vnc_protocol";
     protected static final String vnc_host = "vnc_host";
     protected static final String vnc_port = "vnc_port";
+    
+    //TODO: refactor to use SpecialKeywords.DEFAULT_VIDEO_FILENAME. Make sure to change uploading approach removing extra sub-folder 
+    protected final static String VIDEO_DEFAULT = "video.mp4";
+    protected final static String SESSION_LOG_DEFAULT = "session.log";
+
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.

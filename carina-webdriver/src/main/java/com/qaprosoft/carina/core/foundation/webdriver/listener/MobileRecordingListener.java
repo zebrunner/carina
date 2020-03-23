@@ -91,17 +91,17 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                 
                 // create file in artifacts using driver session id
                 //IMPORTANT! DON'T MODIFY FILENAME WITHOUT UPDATING DRIVER FACTORIES AND LISTENERS!
-                String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + command.getSessionId() + File.separator
-                        + SpecialKeywords.VIDEO_DEFAULT;
+                String fileName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, command.getSessionId());
+                String filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
                 File file = null;
                 
                 try {
                     LOGGER.debug("Getting video artifact: " + fileName);
-                    file = new File(fileName);
+                    file = new File(filePath);
                     FileUtils.writeByteArrayToFile(file, Base64.getDecoder().decode(data));
                     LOGGER.debug("Got video artifact: " + fileName);
                 } catch (IOException e) {
-                    LOGGER.warn("Error has been occured during video artifact generation: " + command.getSessionId() + ".mp4", e);
+                    LOGGER.warn("Error has been occured during video artifact generation: " + fileName, e);
                 }
 			}
 		}

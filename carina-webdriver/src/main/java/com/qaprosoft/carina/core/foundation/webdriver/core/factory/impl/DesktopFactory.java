@@ -85,12 +85,12 @@ public class DesktopFactory extends AbstractFactory {
                 case BROWSERSTACK:
                 case SAUCELABS:
                 case DEFAULT:
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
+                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                     break;
                 case ZEBRUNNER:
                     // Zebrunner will place video to separate unique folder, no need to generate new name
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SpecialKeywords.SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 }
             }
