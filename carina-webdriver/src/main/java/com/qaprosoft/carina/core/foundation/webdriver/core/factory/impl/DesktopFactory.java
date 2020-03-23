@@ -76,9 +76,6 @@ public class DesktopFactory extends AbstractFactory {
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
 
             if (isVideoEnabled()) {
-
-                final String videoName = getVideoName();
-                capabilities.setCapability("videoName", videoName);
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
                 switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
@@ -88,13 +85,12 @@ public class DesktopFactory extends AbstractFactory {
                 case BROWSERSTACK:
                 case SAUCELABS:
                 case DEFAULT:
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
                     break;
                 case ZEBRUNNER:
                     // Zebrunner will place video to separate unique folder, no need to generate new name
-                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + SpecialKeywords.VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SpecialKeywords.SESSION_LOG_DEFAULT)));
                     break;
                 }
             }
