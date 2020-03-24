@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -85,7 +86,9 @@ public class DesktopFactory extends AbstractFactory {
                 case BROWSERSTACK:
                 case SAUCELABS:
                 case DEFAULT:
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
+                    capabilities.setCapability("videoName", videoName);
+                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));   
                     break;
                 case ZEBRUNNER:
                     // Zebrunner will place video to separate unique folder, no need to generate new name

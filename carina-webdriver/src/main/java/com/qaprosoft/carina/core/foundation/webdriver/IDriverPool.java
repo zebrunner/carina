@@ -411,13 +411,14 @@ public interface IDriverPool {
             logTypes = driver.manage().logs().getAvailableLogTypes();
         }
         // logTypes: logcat, bugreport, server, client
-        POOL_LOGGER.info("logTypes: " + Arrays.toString(logTypes.toArray()));
+        POOL_LOGGER.debug("logTypes: " + Arrays.toString(logTypes.toArray()));
         return logTypes;
     }
     
     /**
-     * Get driver logs by type: logcat, bugreport, server, client
-     * TODO: test for iOS
+     * Get driver logs by type. 
+     * Android: logcat, bugreport, server, client; 
+     * iOS: syslog, crashlog, performance, server, safariConsole, safariNetwork, client
      * 
      * @return LogEntries entries
      */
@@ -447,7 +448,7 @@ public interface IDriverPool {
      * @return WebDriver
      */
     default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
-        // TODO: meake current method as private after migrating to java 9+
+        // TODO: make current method as private after migrating to java 9+
         int count = 0;
         WebDriver drv = null;
         Device device = nullDevice;
