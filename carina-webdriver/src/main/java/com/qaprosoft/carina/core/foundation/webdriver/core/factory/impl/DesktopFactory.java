@@ -87,6 +87,7 @@ public class DesktopFactory extends AbstractFactory {
                 case SAUCELABS:
                 case DEFAULT:
                     String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
+                    capabilities.setCapability("videoName", videoName);
                     ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));   
                     break;
                 case ZEBRUNNER:
