@@ -146,12 +146,15 @@ public class MobileFactory extends AbstractFactory {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:
-                        case BROWSERSTACK:
                         case SAUCELABS:
                         case DEFAULT:
                             ce.getListeners()
                                     .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
                                             o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                            break;
+                        case BROWSERSTACK:
+                            // TODO: https://github.com/qaprosoft/carina/issues/949  
+                            // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                             break;
                         case ZEBRUNNER:
                             // Zebrunner will place video to separate unique folder, no need to generate new name
