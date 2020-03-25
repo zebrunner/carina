@@ -83,12 +83,15 @@ public class DesktopFactory extends AbstractFactory {
                 case SELENIUM:
                 case MCLOUD:
                 case AEROKUBE:
-                case BROWSERSTACK:
                 case SAUCELABS:
                 case DEFAULT:
                     String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
-                    capabilities.setCapability("videoName", videoName);
+                    capabilities.setCapability("videoName", videoName); //required capability for selenoid 
                     ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));   
+                    break;
+                case BROWSERSTACK:
+                    // TODO: https://github.com/qaprosoft/carina/issues/949  
+                    // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                     break;
                 case ZEBRUNNER:
                     // Zebrunner will place video to separate unique folder, no need to generate new name
