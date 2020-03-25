@@ -101,7 +101,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                     FileUtils.writeByteArrayToFile(file, Base64.getDecoder().decode(data));
                     LOGGER.debug("Got video artifact: " + fileName);
                 } catch (IOException e) {
-                    LOGGER.warn("Error has been occured during video artifact generation: " + fileName, e);
+                    LOGGER.warn("Error has been occurred during video artifact generation: " + fileName, e);
                 }
 			}
 		}
