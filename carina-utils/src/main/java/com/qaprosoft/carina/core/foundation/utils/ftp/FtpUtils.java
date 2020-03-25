@@ -64,7 +64,7 @@ public class FtpUtils {
 			LOGGER.debug("Reply code is : " + reply);
 			if (!FTPReply.isPositiveCompletion(reply)) {
 				ftp.disconnect();
-				LOGGER.info("FTP server refused connection. Reply code is : " + reply);
+				LOGGER.error("FTP server refused connection. Reply code is : " + reply);
 				throw new Exception("FTP server refused connection.");
 			}
 			if (!ftp.login(user, password)) {
@@ -79,16 +79,15 @@ public class FtpUtils {
 			    LOGGER.debug("Local port : " + ftp.getLocalPort());
 			    LOGGER.debug("Remote port : " + ftp.getRemotePort());
 				if (ftp.storeFile(fileName, is)) {
-				    long finish = System.currentTimeMillis();
-                    LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
+                    LOGGER.info("Video uploading completed in " + (System.currentTimeMillis() - start) + " msecs.");
 				} else {
-				    LOGGER.info("Some issues occures during storing file to FTP. storeFile method returns false.");			    
+				    LOGGER.error("Some issues occures during storing file to FTP. storeFile method returns false.");			    
 				}
 			} catch (IOException e) {
-				LOGGER.info("Exception while storing file to FTP", e);
+				LOGGER.error("Exception while storing file to FTP", e);
 			}
 		} catch (Exception e) {
-			LOGGER.info("Exception while uploading while to FTP", e);
+			LOGGER.error("Exception while uploading while to FTP", e);
 		} finally {
 			ftpDisconnect(ftp);
 		}
