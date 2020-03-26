@@ -339,10 +339,10 @@ public interface IDriverPool {
                 }
                 File file = null;
                 try {
-                    POOL_LOGGER.info("Saving log artifact: " + fileName);
+                    POOL_LOGGER.debug("Saving log artifact: " + fileName);
                     file = new File(fileName);
                     FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
-                    POOL_LOGGER.info("Saved log artifact: " + fileName);
+                    POOL_LOGGER.debug("Saved log artifact: " + fileName);
                 } catch (IOException e) {
                     POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
                 }
