@@ -323,6 +323,10 @@ public interface IDriverPool {
             SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
             
             for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
+                if ("bugreport".equals(logType)) {
+                    // there is no sense to upload as it is too slow (~1 min) and doesn't return valuable info
+                    continue;
+                }
                 String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
                 
                 StringBuilder tempStr = new StringBuilder();
