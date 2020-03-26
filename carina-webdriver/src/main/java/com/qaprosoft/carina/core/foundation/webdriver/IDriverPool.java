@@ -328,6 +328,11 @@ public interface IDriverPool {
                     // performance - no response from Appium in 99% of cases
                     continue;
                 }
+                if ("server".equals(logType) && SpecialKeywords.IOS.equalsIgnoreCase(Configuration.getPlatform())) {
+                    // unrecognized exception on this phase for iOS which block below execution
+                    //TODO: make any disaster in this code not affectable to original behavior 
+                    continue;
+                }
                 String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
                 
                 StringBuilder tempStr = new StringBuilder();
