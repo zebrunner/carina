@@ -337,17 +337,20 @@ public interface IDriverPool {
                     //don't write something to file and don't register appropriate artifact
                     continue;
                 }
-                File file = null;
-                try {
-                    POOL_LOGGER.debug("Saving log artifact: " + fileName);
-                    file = new File(fileName);
-                    FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
-                    POOL_LOGGER.debug("Saved log artifact: " + fileName);
-                } catch (IOException e) {
-                    POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
-                }
-                
-                Artifacts.add(logType, file);
+
+                // upload driver logs async
+                CompletableFuture.runAsync(() -> {
+                    File file = null;
+                    try {
+                        POOL_LOGGER.debug("Saving log artifact: " + fileName);
+                        file = new File(fileName);
+                        FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
+                        POOL_LOGGER.debug("Saved log artifact: " + fileName);
+                    } catch (IOException e) {
+                        POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
+                    }
+                    Artifacts.add(logType, file);
+                });
             }
             
             
