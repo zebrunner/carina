@@ -19,7 +19,7 @@ public class VideoAnalyzer {
 
     public static Boolean isVideoUploadEnabled() {
         Boolean isEnabled = uploadVideo.get();
-        LOGGER.debug("Video upload is enabled : " + isEnabled);
+        LOGGER.info("Video upload is enabled : " + isEnabled);
         return isEnabled;    
     }
 }

@@ -72,14 +72,14 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			    // stop video recording and publish it to local artifacts
 			    String data = "";
                 try {
-                    LOGGER.debug("Stop mobile video recording and upload data locally for " + command.getSessionId());
+                    LOGGER.info("Stopping mobile video recording and upload data locally for " + command.getSessionId());
                     data = commandExecutor
                             .execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
                                     MobileCommand.stopRecordingScreenCommand(
                                             (BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
                             .getValue().toString();
                     
-                    LOGGER.debug("Stopped mobile video recording and uploaded data locally for " + command.getSessionId());
+                    LOGGER.info("Stopped mobile video recording and uploaded data locally for " + command.getSessionId());
                 } catch (Throwable e) {
                     LOGGER.error("Unable to stop screen recording!", e);
                 }
@@ -96,10 +96,10 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                 File file = null;
                 
                 try {
-                    LOGGER.debug("Getting video artifact: " + fileName);
+                    LOGGER.debug("Saving video artifact: " + fileName);
                     file = new File(filePath);
                     FileUtils.writeByteArrayToFile(file, Base64.getDecoder().decode(data));
-                    LOGGER.debug("Got video artifact: " + fileName);
+                    LOGGER.debug("Saved video artifact: " + fileName);
                 } catch (IOException e) {
                     LOGGER.warn("Error has been occurred during video artifact generation: " + fileName, e);
                 }
