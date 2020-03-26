@@ -335,8 +335,10 @@ public interface IDriverPool {
                 }
                 File file = null;
                 try {
+                    POOL_LOGGER.info("Saving log artifact: " + fileName);
                     file = new File(fileName);
                     FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
+                    POOL_LOGGER.info("Saved log artifact: " + fileName);
                 } catch (IOException e) {
                     POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
                 }
@@ -423,11 +425,14 @@ public interface IDriverPool {
      * @return LogEntries entries
      */
     default LogEntries getDriverLogs(WebDriver driver, String logType) {
+        //TODO: make it async in parallel thread
         LogEntries logEntries = null;
         POOL_LOGGER.debug("start getting driver logs");
         if (driver.manage() != null) {
             Timer.start(ACTION_NAME.GET_LOGS);
+            POOL_LOGGER.info("Getting log artifact: " + logType);
             logEntries = driver.manage().logs().get(logType);
+            POOL_LOGGER.info("Got log artifact: " + logType);
             Timer.stop(ACTION_NAME.GET_LOGS);
         } else {
             POOL_LOGGER.error("driver.manage() is null!");

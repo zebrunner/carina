@@ -78,10 +78,11 @@ public class FtpUtils {
 			    LOGGER.debug("Default port : " + ftp.getDefaultPort());
 			    LOGGER.debug("Local port : " + ftp.getLocalPort());
 			    LOGGER.debug("Remote port : " + ftp.getRemotePort());
+			    LOGGER.info("Started video uploading: " + fileName);
 				if (ftp.storeFile(fileName, is)) {
-                    LOGGER.info("Video uploading completed in " + (System.currentTimeMillis() - start) + " msecs.");
+                    LOGGER.info("Video uploaded in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);
 				} else {
-				    LOGGER.error("Some issues occures during storing file to FTP. storeFile method returns false.");			    
+				    LOGGER.error("Video failed to upload in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);			    
 				}
 			} catch (IOException e) {
 				LOGGER.error("Exception while storing file to FTP", e);
