@@ -15,6 +15,10 @@ import org.apache.log4j.Logger;
 public class FtpUtils {
     private static final Logger LOGGER = Logger.getLogger(FtpUtils.class);
 	private static final int DEFAULT_PORT = 21;
+	
+	//TODO: https://github.com/qaprosoft/carina/issues/954
+	// migrate FtpUtils methods to use com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation
+	private static int uploading = 0;
 
 	public static void uploadFile(String ftpHost, String user, String password, String filePassToUpload,
 			String fileName) {
@@ -78,6 +82,8 @@ public class FtpUtils {
 			    LOGGER.debug("Default port : " + ftp.getDefaultPort());
 			    LOGGER.debug("Local port : " + ftp.getLocalPort());
 			    LOGGER.debug("Remote port : " + ftp.getRemotePort());
+			    
+			    uploading++;
 			    LOGGER.info("Uploading video: " + fileName);
 				if (ftp.storeFile(fileName, is)) {
                     LOGGER.info("Uploaded video in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);
@@ -86,6 +92,8 @@ public class FtpUtils {
 				}
 			} catch (IOException e) {
 				LOGGER.error("Exception while storing file to FTP", e);
+			} finally {
+			    uploading--;
 			}
 		} catch (Exception e) {
 			LOGGER.error("Exception while uploading while to FTP", e);
@@ -108,5 +116,9 @@ public class FtpUtils {
             LOGGER.error("Throwable while disconnecting ftp", thr);
         }
         LOGGER.debug("FTP has been successfully disconnected.");
+    }
+    
+    public static boolean isUploading() {
+        return uploading > 0;
     }
 }
