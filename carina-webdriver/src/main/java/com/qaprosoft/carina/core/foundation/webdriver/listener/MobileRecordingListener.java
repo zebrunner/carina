@@ -72,14 +72,14 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			    // stop video recording and publish it to local artifacts
 			    String data = "";
                 try {
-                    LOGGER.info("Stopping mobile video recording and upload data locally for " + command.getSessionId());
+                    LOGGER.debug("Stopping mobile video recording and upload data locally for " + command.getSessionId());
                     data = commandExecutor
                             .execute(new Command(command.getSessionId(), MobileCommand.STOP_RECORDING_SCREEN,
                                     MobileCommand.stopRecordingScreenCommand(
                                             (BaseStopScreenRecordingOptions) stopRecordingOpt).getValue()))
                             .getValue().toString();
                     
-                    LOGGER.info("Stopped mobile video recording and uploaded data locally for " + command.getSessionId());
+                    LOGGER.debug("Stopped mobile video recording and uploaded data locally for " + command.getSessionId());
                 } catch (Throwable e) {
                     LOGGER.error("Unable to stop screen recording!", e);
                 }
