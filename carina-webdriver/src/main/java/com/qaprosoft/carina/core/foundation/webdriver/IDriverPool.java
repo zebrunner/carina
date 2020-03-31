@@ -334,7 +334,6 @@ public interface IDriverPool {
                     continue;
                 }
                 String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
-                
                 StringBuilder tempStr = new StringBuilder();
                 LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
                 logcatEntries.getAll().stream().forEach((k) -> tempStr.append(k.toString().concat("\n")));
@@ -440,18 +439,21 @@ public interface IDriverPool {
     default LogEntries getDriverLogs(WebDriver driver, String logType) {
         //TODO: make it async in parallel thread
         LogEntries logEntries = null;
-        POOL_LOGGER.debug("start getting driver logs");
-        if (driver.manage() != null) {
-            Timer.start(ACTION_NAME.GET_LOGS);
-            POOL_LOGGER.info("Getting log artifact: " + logType);
-            logEntries = driver.manage().logs().get(logType);
-            POOL_LOGGER.info("Got log artifact: " + logType);
-            Timer.stop(ACTION_NAME.GET_LOGS);
-        } else {
-            POOL_LOGGER.error("driver.manage() is null!");
+        POOL_LOGGER.debug("start getting driver logs: " + logType);
+        try {
+            if (driver.manage() != null) {
+                Timer.start(ACTION_NAME.GET_LOGS);
+                POOL_LOGGER.debug("Getting log artifact: " + logType);
+                logEntries = driver.manage().logs().get(logType);
+                POOL_LOGGER.debug("Got log artifact: " + logType);
+                Timer.stop(ACTION_NAME.GET_LOGS);
+            } else {
+                POOL_LOGGER.error("driver.manage() is null!");
+            }
+        } catch (Exception e) {
+            POOL_LOGGER.error("Unrecorgnized error durig driver log populating!", e);
         }
         POOL_LOGGER.debug("finish getting driver logs");
-        
         return logEntries;
     }
     /**
