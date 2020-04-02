@@ -84,9 +84,9 @@ public class FtpUtils {
 			    LOGGER.debug("Remote port : " + ftp.getRemotePort());
 			    
 			    uploading++;
-			    LOGGER.debug("Uploading video: " + fileName);
+			    LOGGER.info("Uploading video: " + fileName);
 				if (ftp.storeFile(fileName, is)) {
-                    LOGGER.debug("Uploaded video in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);
+                    LOGGER.info("Uploaded video in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);
 				} else {
 				    LOGGER.error("Failed to upload video in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);			    
 				}
