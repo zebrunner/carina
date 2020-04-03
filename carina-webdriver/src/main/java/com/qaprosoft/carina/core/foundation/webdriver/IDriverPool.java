@@ -343,19 +343,16 @@ public interface IDriverPool {
                     continue;
                 }
 
-                // upload driver logs async
-                CompletableFuture.runAsync(() -> {
-                    File file = null;
-                    try {
-                        POOL_LOGGER.debug("Saving log artifact: " + fileName);
-                        file = new File(fileName);
-                        FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
-                        POOL_LOGGER.debug("Saved log artifact: " + fileName);
-                    } catch (IOException e) {
-                        POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
-                    }
-                    Artifacts.add(logType, file);
-                });
+                File file = null;
+                try {
+                    POOL_LOGGER.info("Saving log artifact: " + fileName);
+                    file = new File(fileName);
+                    FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
+                    POOL_LOGGER.info("Saved log artifact: " + fileName);
+                } catch (IOException e) {
+                    POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
+                }
+                Artifacts.add(logType, file);
             }
             
             
