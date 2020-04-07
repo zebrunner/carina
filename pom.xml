@@ -63,8 +63,6 @@
         <!-- Qaprosoft integrations -->
         <zafira-client.version>4.0.51-SNAPSHOT</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
-        <!-- HTTP and SMPT -->
-        <javax-mail.version>1.4</javax-mail.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
         <monte-repack.version>1.0</monte-repack.version>
