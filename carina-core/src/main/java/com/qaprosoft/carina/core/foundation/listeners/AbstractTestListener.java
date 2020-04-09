@@ -161,7 +161,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return errorMessage;
     }
 
-    private void skipAlreadyPassedItem(ITestResult result, Messager messager) {
+    private void skipTestItem(ITestResult result, Messager messager) {
         String test = TestNamingUtil.getCanonicalTestName(result);
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
@@ -340,8 +340,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
-            skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
-            // [VD] no need to reset as we TestNG doesn't launch retryAnalyzer so we don't increment it on ALREADY_PASSDE skip exception
+            skipTestItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
+            // [VD] no need to reset as TestNG doesn't launch retryAnalyzer so we don't increment it on ALREADY_PASSED skip exception
             return;
         }
         
@@ -349,6 +349,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
             // [VD] it is prohibited to release TestInfoByThread in this place.!
+            return;
+        }
+        
+        // handle Zafira already failed by known bug exception for re-run and do nothing
+        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
+                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_FAILED_BY_KNOWN_BUG)) {
+            skipTestItem(result, Messager.TEST_SKIPPED_AS_ALREADY_FAILED_BY_BUG);
             return;
         }
         
