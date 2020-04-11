@@ -435,7 +435,7 @@ public interface IDriverPool {
      */
     default LogEntries getDriverLogs(WebDriver driver, String logType) {
         //TODO: make it async in parallel thread
-        LogEntries logEntries = null;
+        LogEntries logEntries = new LogEntries(Collections.emptyList());
         POOL_LOGGER.debug("start getting driver logs: " + logType);
         try {
             if (driver.manage() != null) {
