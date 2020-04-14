@@ -71,7 +71,6 @@ import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
@@ -492,10 +491,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
         } finally {
-            // wait until all async  operations (i.e. artifacts uploading) are finished
-            AsyncOperation.waitUntilFinish(30);
-            //TODO: remove as only AsyncOperation reused or uploading logic moved into zafira client
-            
             int counter = 0;
             while (FtpUtils.isUploading() && ++counter < 30) {
                 LOGGER.info("waiting to finish FTP uploading... " + counter + " sec.");
