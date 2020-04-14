@@ -502,10 +502,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     private RetryAnalyzer getRetryAnalyzer(ITestResult result) {
         RetryAnalyzer retryAnalyzer = null;
-        try {
-            retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        } catch (ClassCastException e) {
-            LOGGER.debug("Unexpected casting issue for getRetryAnalyzer!", e); 
+        IRetryAnalyzer iRetry = result.getMethod().getRetryAnalyzer(result);
+        if (iRetry instanceof RetryAnalyzer) {
+            retryAnalyzer = (RetryAnalyzer) iRetry;
         }
         return retryAnalyzer;
     }
