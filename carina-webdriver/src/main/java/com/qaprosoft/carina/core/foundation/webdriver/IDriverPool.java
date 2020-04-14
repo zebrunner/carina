@@ -419,7 +419,11 @@ public interface IDriverPool {
     default Set<String> getAvailableDriverLogTypes(WebDriver driver) {
         Set<String> logTypes = Collections.<String>emptySet();
         if (driver.manage() != null) {
-            logTypes = driver.manage().logs().getAvailableLogTypes();
+            try {
+                logTypes = driver.manage().logs().getAvailableLogTypes();
+            } catch (Exception e) {
+                POOL_LOGGER.debug("Unrecognized failure while getAvailableLogTypes()", e);
+            }
         }
         // logTypes: logcat, bugreport, server, client
         POOL_LOGGER.debug("logTypes: " + Arrays.toString(logTypes.toArray()));
@@ -435,7 +439,7 @@ public interface IDriverPool {
      */
     default LogEntries getDriverLogs(WebDriver driver, String logType) {
         //TODO: make it async in parallel thread
-        LogEntries logEntries = null;
+        LogEntries logEntries = new LogEntries(Collections.emptyList());
         POOL_LOGGER.debug("start getting driver logs: " + logType);
         try {
             if (driver.manage() != null) {

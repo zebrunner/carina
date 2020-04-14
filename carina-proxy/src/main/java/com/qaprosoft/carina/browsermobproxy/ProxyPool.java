@@ -246,9 +246,9 @@ public final class ProxyPool {
      * @param threadId
      */
     private static void stopProxyByThread(long threadId) {
-        LOGGER.debug("stopProxy starting...");
         if (proxies.containsKey(threadId)) {
-        	setProxyPortToAvailable(threadId);
+            LOGGER.debug("stopProxy starting...");
+            setProxyPortToAvailable(threadId);
             BrowserMobProxy proxy = proxies.get(threadId);
             if (proxy != null) {
                 LOGGER.debug("Found registered proxy by thread: " + threadId);
@@ -269,8 +269,8 @@ public final class ProxyPool {
             }
             proxies.remove(threadId);
             //proxyPortsByThread.remove(threadId);
+            LOGGER.debug("stopProxy finished...");
         }
-        LOGGER.debug("stopProxy finished...");
     }
 
     /**
