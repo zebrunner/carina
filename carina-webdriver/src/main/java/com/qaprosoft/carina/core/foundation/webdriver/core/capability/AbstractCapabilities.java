@@ -178,7 +178,7 @@ public abstract class AbstractCapabilities {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
             chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
+            chromePrefs.put("download.default_directory", getAutoDownloadFolder());
             chromePrefs.put("plugins.always_open_pdf_externally", true);
             options.setExperimentalOption("prefs", chromePrefs);
         }
@@ -312,7 +312,7 @@ public abstract class AbstractCapabilities {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
                 || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
+            profile.setPreference("browser.download.dir", getAutoDownloadFolder());
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
             profile.setPreference("browser.download.manager.showWhenStarting", false);
             profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
@@ -330,5 +330,16 @@ public abstract class AbstractCapabilities {
 
         // TODO: implement support of custom args if any
         return profile;
+    }
+    
+    
+    private String getAutoDownloadFolder() {
+        // use custom folder for auto download
+        String autoDownloadFolder = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
+        if (autoDownloadFolder.isEmpty()) {
+            // if no AUTO_DOWNLOAD_FOLDER defined use artifacts folder
+            autoDownloadFolder = ReportContext.getArtifactsFolder().getAbsolutePath();
+        }
+        return autoDownloadFolder;
     }
 }
