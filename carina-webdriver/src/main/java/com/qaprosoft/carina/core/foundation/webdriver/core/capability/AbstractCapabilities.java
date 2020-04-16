@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -178,7 +179,7 @@ public abstract class AbstractCapabilities {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
             chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", getAutoDownloadFolder());
+            chromePrefs.put("download.default_directory", getAutoDownloadFolderPath());
             chromePrefs.put("plugins.always_open_pdf_externally", true);
             options.setExperimentalOption("prefs", chromePrefs);
         }
@@ -312,7 +313,7 @@ public abstract class AbstractCapabilities {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
                 || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.dir", getAutoDownloadFolder());
+            profile.setPreference("browser.download.dir", getAutoDownloadFolderPath());
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
             profile.setPreference("browser.download.manager.showWhenStarting", false);
             profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
@@ -333,13 +334,24 @@ public abstract class AbstractCapabilities {
     }
     
     
-    private String getAutoDownloadFolder() {
+    private String getAutoDownloadFolderPath() {
         // use custom folder for auto download
         String autoDownloadFolder = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
-        if (autoDownloadFolder.isEmpty()) {
+        File autoDownloadPath;
+
+        if (!autoDownloadFolder.isEmpty()) {
+            autoDownloadPath = new File(autoDownloadFolder);
+            boolean isCreated = autoDownloadPath.exists() && autoDownloadPath.isDirectory();
+            if (!isCreated) {
+                isCreated = autoDownloadPath.mkdir();
+            } else {
+                LOGGER.info("Folder for auto download already exists: " + autoDownloadPath.getAbsolutePath());
+            }
+        } else {
             // if no AUTO_DOWNLOAD_FOLDER defined use artifacts folder
-            autoDownloadFolder = ReportContext.getArtifactsFolder().getAbsolutePath();
+            autoDownloadPath = ReportContext.getArtifactsFolder();
         }
-        return autoDownloadFolder;
+
+        return autoDownloadPath.getAbsolutePath();
     }
 }
