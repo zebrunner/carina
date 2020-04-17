@@ -185,6 +185,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>application/pdf, list of [values](https://freeformatter.com/mime-types-list.html)</td>
 	</tr>
 	<tr>
+		<td>auto_download_folder</td>
+		<td>Path to auto download folder for Chrome and Firefox browsers. If nothing specified custom_artifacts_folder or default artifacts folder is used</td>
+		<td>String</td>
+	</tr>
+	<tr>
 		<td>project_report_directory</td>
 		<td>Path to a folder where the reports will be saved</td>
 		<td>./reports/qa</td>
