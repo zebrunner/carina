@@ -24,14 +24,10 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.zafira.util.upload.UploadUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
@@ -42,7 +38,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
-import com.qaprosoft.amazon.client.AmazonS3Client;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
@@ -51,14 +46,8 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
-import com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation;
-import com.qaprosoft.carina.core.foundation.utils.messager.ZafiraMessager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
-import com.qaprosoft.zafira.log.domain.MetaInfoMessage;
-import com.qaprosoft.zafira.log.log4j.level.MetaInfoLevel;
-import com.qaprosoft.zafira.models.dto.aws.FileUploadType;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -259,7 +248,7 @@ public class Screenshot {
                     Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
             // Uploading screenshot to Amazon S3
-            uploadToAmazonS3(screenshot, screenshotThumb, comment, artifact);
+            UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
 
             // add screenshot comment to collector
             ReportContext.addScreenshotComment(screenName, comment);
@@ -475,7 +464,7 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-                uploadToAmazonS3(screenshot, screenshotThumb, comment, artifact);
+                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -491,39 +480,6 @@ public class Screenshot {
         }
         LOGGER.debug("Screenshot->capture finished.");
         return screenName;
-    }
-
-    private static void uploadToAmazonS3(File screenshot, File screenshotThumb, String comment, boolean artifact) {
-        final String correlationId = UUID.randomUUID().toString();
-        final String ciTestId = ZafiraEventRegistrar.getThreadCiTestId();
-        Optional<CompletableFuture<String>> originalScreenshotFuture = uploadToAmazonS3(screenshot, comment, correlationId, ciTestId, false);
-        Optional<CompletableFuture<String>> thumbFuture = uploadToAmazonS3(screenshotThumb, comment, correlationId, ciTestId, true);
-        originalScreenshotFuture.ifPresent(of -> thumbFuture.ifPresent(tf -> {
-            if(artifact) {
-                List<CompletableFuture<String>> urlFutures = Stream.of(of, tf).collect(Collectors.toList());
-                Artifacts.add(urlFutures, comment);
-            } else {
-                AsyncOperation.add(of, tf);
-            }
-        }));
-    }
-
-    /**
-     * Upload screenshot file to Amazon S3 using Zafira Client
-     * @param screenshot - existing screenshot {@link File}
-     */
-    private static Optional<CompletableFuture<String>> uploadToAmazonS3(File screenshot, String comment, String correlationId, String ciTestId,
-            boolean thumb) {
-        final String pathHeader = thumb ? "THUMB_AMAZON_PATH" : "AMAZON_PATH";
-        return AmazonS3Client.upload(screenshot,
-                () -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                        .addHeader(pathHeader, null)
-                        .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
-                url -> ZafiraMessager.custom(MetaInfoLevel.META_INFO, new MetaInfoMessage()
-                        .addHeader(pathHeader, url)
-                        .addHeader("CI_TEST_ID", ciTestId)
-                        .addHeader("AMAZON_PATH_CORRELATION_ID", correlationId)),
-                FileUploadType.Type.SCREENSHOTS);
     }
 
     /**
@@ -723,7 +679,7 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading comparative screenshot to Amazon S3
-                uploadToAmazonS3(screenshot, screenshotThumb, comment, artifact);
+                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");

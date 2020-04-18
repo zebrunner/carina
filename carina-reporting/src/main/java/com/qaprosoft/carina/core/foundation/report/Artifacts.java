@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import com.qaprosoft.amazon.client.AmazonS3Client;
+import com.qaprosoft.zafira.util.upload.UploadUtil;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -88,7 +88,7 @@ final public class Artifacts {
 	}
 
 	public static void add(String name, File file, Integer expiresIn) {
-		AmazonS3Client.upload(file).ifPresent(urlFuture -> add(Collections.singletonList(urlFuture), name, expiresIn));
+		UploadUtil.uploadArtifact(file, name, expiresIn);
 	}
 
 	private static int getArtifactExpirationSeconds() {
