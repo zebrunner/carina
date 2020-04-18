@@ -28,6 +28,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     private static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
     private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
     
+    @Override
     public boolean retry(ITestResult result) {
         incrementRunCount();
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null

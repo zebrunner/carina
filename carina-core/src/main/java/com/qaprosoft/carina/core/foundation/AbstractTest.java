@@ -24,11 +24,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
-import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -41,7 +39,10 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
  * 
  * @author Alex Khursevich
  */
-@Listeners({ CarinaListener.class })
+
+// https://github.com/qaprosoft/carina/issues/951
+// moved CarinaListener to META-INF/services/org.testng.ITestNGListener to implicitly register it for any Carina based test
+//@Listeners({ CarinaListener.class })
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
