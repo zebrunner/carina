@@ -31,6 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Category;
 import org.apache.log4j.Level;
@@ -51,6 +54,9 @@ import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -202,19 +208,78 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
     
+    /*
+     * Parse TestNG <suite ...> tag and return any attribute
+     * @param ISuite suite
+     * @param IString attribute
+     * @return String attribute value or empty string
+     * 
+    */    
+    private String getAttributeValue(ISuite suite, String attribute) {
+        String res = "";
+        File file = new File(suite.getXmlSuite().getFileName());
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
+        documentBuilderFactory.setValidating(false);
+        documentBuilderFactory.setNamespaceAware(true);
+        try {
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/namespaces", false);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/validation", false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(file);
+
+            for (int i = 0; i < document.getChildNodes().getLength(); i++) {
+                NamedNodeMap nodeMapAttributes = document.getChildNodes().item(i).getAttributes();
+                if (nodeMapAttributes == null) {
+                    continue;
+                }
+
+                // get "name" from suite element
+                // <suite verbose="1" name="Carina Demo Tests - API Sample" thread-count="3" >
+                Node nodeName = nodeMapAttributes.getNamedItem("name");
+                if (nodeName == null) {
+                    continue;
+                }
+
+                if (suite.getName().equals(nodeName.getNodeValue())) {
+                    // valid suite node detected
+                    Node nodeAttribute = nodeMapAttributes.getNamedItem(attribute);
+                    if (nodeAttribute != null) {
+                        res = nodeAttribute.getNodeValue();
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Unable to get attribute '" + attribute +"' from suite: " + suite.getXmlSuite().getFileName(), e);
+        }
+
+        return res;
+
+    }
     private void setThreadCount(ISuite suite) {
         //Reuse default thread-count value from suite TestNG file if it is not overridden in _config.properties
-        final String THREAD_COUNT = " thread-count"; // space at the beginning to avoid conflicting with data-provider-thread-count
         
-        if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains(THREAD_COUNT)) {
+        /*
+         * WARNING! We coudn't override default thread-count="5" and data-provider-thread-count="10"!
+         * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
+         * To make possible to parse correctly we had to reuse external parser and private getAttributeValue  
+        */
+        
+        String suiteThreadCount = getAttributeValue(suite, "thread-count");
+        LOGGER.debug("thread-count from suite: " + suiteThreadCount);
+        
+        if (Configuration.getInt(Parameter.THREAD_COUNT) < 1 && suiteThreadCount.isEmpty()) {
             LOGGER.info("Set thread_count=1");
             R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
             suite.getXmlSuite().setThreadCount(1);
-        } else if (Configuration.getInt(Parameter.THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains(THREAD_COUNT)) {
+        } else if (Configuration.getInt(Parameter.THREAD_COUNT) < 1 && !suiteThreadCount.isEmpty()) {
             // reuse value from suite xml file
             LOGGER.debug("Synching thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(),
-                    String.valueOf(suite.getXmlSuite().getThreadCount()));
+            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
             LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
         } else {
             // use thread-count from config.properties
@@ -222,27 +287,23 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
         }
 
-        // WARNING! We can't override data provider thread count if inside suite it has default value "10"!
-        // in 7.0.1 RemoteTestNG and earlier suite.getXmlSuite().toXml() returns content without 'data-provider-thread-count' if it has default value "10"!
-        // to be able to use this feature effectively avoid those number usage so far :(
-        // TODO: setup pipeline to inform users about those limitation if any
-        final String DATA_PROVIDER_THREAD_COUNT = "data-provider-thread-count";
-        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && !suite.getXmlSuite().toXml().contains(DATA_PROVIDER_THREAD_COUNT)) {
+        String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");        
+        LOGGER.debug("data-provider-thread-count from suite: " + suiteDataProviderThreadCount);
+
+        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) < 1 && suiteDataProviderThreadCount.isEmpty()) {
             LOGGER.info("Set data_provider_thread_count=1");
             R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
             suite.getXmlSuite().setDataProviderThreadCount(1);
-        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) == -1 && suite.getXmlSuite().toXml().contains(DATA_PROVIDER_THREAD_COUNT)) {
+        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) < 1 && !suiteDataProviderThreadCount.isEmpty()) {
             // reuse value from suite xml file
             LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(),
-                    String.valueOf(suite.getXmlSuite().getDataProviderThreadCount()));
+            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
             LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
         } else {
             // use thread-count from config.properties
             suite.getXmlSuite().setDataProviderThreadCount(Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
             LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
         }
-
     }
 
 	private String getCarinaVersion() {
