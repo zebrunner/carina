@@ -43,7 +43,10 @@ import net.rcarz.jiraclient.JiraClient;
  * 
  * @author Alex Khursevich
  */
+//TODO: #978: remove all synchronized fir Jira.java
 public class Jira {
+    private static final int MAX_LENGTH = 45;
+    
     private static final Logger LOG = Logger.getLogger(Jira.class);
     private static IJiraUpdater updater;
     private static JiraClient jira;
@@ -93,17 +96,23 @@ public class Jira {
     }
 
     public static void setTickets(List<String> tickets) {
-        jiraTickets.set(tickets);
+        List<String> tempTickets = new ArrayList<String>();
+        for (String ticket : tickets) {
+            tempTickets.add(parseTicket(ticket));
+        }
+        
+        jiraTickets.set(tempTickets);
     }
 
     public static void setTickets(String... tickets) {
         List<String> tempTickets = new ArrayList<String>();
         for (String ticket : tickets) {
-            tempTickets.add(ticket);
+            tempTickets.add(parseTicket(ticket));
         }
         setTickets(tempTickets);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     public synchronized static List<String> getTickets(ITestResult result) {
         // return any specified jira tickets by tests
         if (jiraTickets.get() != null) {
@@ -113,7 +122,9 @@ public class Jira {
         List<String> tickets = new ArrayList<String>();
 
         if (result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET) != null) {
-            tickets.add(result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET));
+            tickets.add(
+                    parseTicket(
+                            result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET)));
         }
         if (result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
             tickets.clear();
@@ -121,7 +132,7 @@ public class Jira {
             
             if (description.split("#").length > 1) {
 	            try {
-	                tickets.add(description.split("#")[1].trim());
+	                tickets.add(parseTicket(description.split("#")[1].trim()));
 	            } catch (Exception e) {
 	                LOG.error("Incorrect Jira-ticket format: " + description, e);
 	            }
@@ -150,7 +161,7 @@ public class Jira {
         return disableRetryForKnownIssues;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes", "unchecked", "unlikely-arg-type" })
     public synchronized static String processBug(ITestResult result) {
         if (isInitialized) {
             Class clazz = result.getMethod().getRealClass();
@@ -224,5 +235,27 @@ public class Jira {
         clearTickets();
         clearKnownIssue();
     }
+    
+    private static String parseTicket(String ticket) {
+        /*
+        #938 jira ticket allow anomalies in registration logic
+        JIRA# and space, i.e.
+        "JIRA#TICKET111, JIRA bla-bla" -> "TICKET111"
+        "JIRA# TICKET111, JIRA bla-bla" -> "TICKET111"
+        */
+        if (ticket.contains(",")) {
+            ticket = ticket.split(",")[0];
+        }
+        if (ticket.contains(" ")) {
+            ticket = ticket.split(" ")[0];
+        }
+        
+        if (ticket.length() > 45) {
+            LOG.error("Too big jira ticket will be cut (45 chars max!) Ticket: '" + ticket +"';");
+            ticket = ticket.substring(0, MAX_LENGTH);
+        }
+        return ticket;
+    }
+
 
 }

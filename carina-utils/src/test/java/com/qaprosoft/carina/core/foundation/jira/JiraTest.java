@@ -28,7 +28,21 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 public class JiraTest {
     private static final String customTicket1 = "bug1";
     private static final String customTicket2 = "bug2";
-    private static final String customTicket3 = "Ticket From Test Description";
+    
+    private static final String customTicket3 = "bug3 with spaces";
+    private static final String customTicket3_verify = "bug3";
+    
+    private static final String customTicket4 = "bug4, with comma";
+    private static final String customTicket4_verify = "bug4";
+    
+    private static final String customTicket5 = "bug5 , with comma after space";
+    private static final String customTicket5_verify = "bug5";
+
+    private static final String customTicket6 = "Ticket From Test Description";
+    private static final String customTicket6_verify = "Ticket";
+    
+    private static final String ticket50Char        = "1234567890123456789012345678901234567890123456";
+    private static final String ticket50Char_verify = "123456789012345678901234567890123456789012345";
 
     @Test
     public void testJiraTickets() {
@@ -45,9 +59,29 @@ public class JiraTest {
         tickets.add(customTicket2);
         Jira.setTickets(tickets);
         Assert.assertEquals(Jira.jiraTickets.get().size(), 2);
+        
+        tickets.add(customTicket3);
+        Jira.setTickets(tickets);
+        Assert.assertTrue(Jira.jiraTickets.get().contains(customTicket3_verify));
+        
+        tickets.add(customTicket4);
+        Jira.setTickets(tickets);
+        Assert.assertTrue(Jira.jiraTickets.get().contains(customTicket4_verify));
+        
+        tickets.add(customTicket5);
+        Jira.setTickets(tickets);
+        Assert.assertTrue(Jira.jiraTickets.get().contains(customTicket5_verify));
+        
+        Assert.assertEquals(Jira.jiraTickets.get().size(), 5);
+        
+        tickets.add(ticket50Char);
+        Jira.setTickets(tickets);
+        
+        Assert.assertEquals(Jira.jiraTickets.get().size(), 6);
+        Assert.assertTrue(Jira.jiraTickets.get().contains(ticket50Char_verify));
     }
-
-    @Test(description = "JIRA# " + customTicket3)
+    
+    @Test(description = "JIRA# " + customTicket6)
     public void testJiraTicketFromTestDescriptionAnnotation() {
         // do nothing. verification is in AfterMethod
     }
@@ -65,7 +99,8 @@ public class JiraTest {
 
         if (result.getMethod().getMethodName().equals("testJiraTicketFromTestDescriptionAnnotation")) {
             List<String> tickets = Jira.getTickets(result);
-            Assert.assertTrue(tickets.contains(customTicket3));
+            // #938 parse all spaces and commas before registration!
+            Assert.assertTrue(tickets.contains(customTicket6_verify));
 
         }
 
