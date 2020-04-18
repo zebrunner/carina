@@ -247,7 +247,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
         if (curRetryAnalyzer == null) {
             // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
-            result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
+            // result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
+            result.getMethod().setRetryAnalyzerClass(RetryAnalyzer.class);
         } else {
             if (!(curRetryAnalyzer instanceof RetryAnalyzer)) {
                 LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());                

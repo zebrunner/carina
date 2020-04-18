@@ -28,15 +28,16 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     private static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
     private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
     
+    @Override
     public boolean retry(ITestResult result) {
         incrementRunCount();
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-            LOGGER.debug("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
+            LOGGER.info("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + getRunCount());
             return false;
         }
 
-        LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer() + "Method: " + result.getMethod().getMethodName() + "; Incrementet retryCount: " + getRunCount());
+        LOGGER.info("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + getRunCount());
         if (getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             return true;
         }
