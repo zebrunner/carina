@@ -33,11 +33,11 @@ public class RetryAnalyzer implements IRetryAnalyzer {
         incrementRunCount();
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-            LOGGER.info("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + getRunCount());
+            LOGGER.debug("AlreadyPassedRetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + getRunCount());
             return false;
         }
 
-        LOGGER.info("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + getRunCount());
+        LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + getRunCount());
         if (getRunCount() <= getMaxRetryCountForTest() && !Jira.isRetryDisabled(result)) {
             return true;
         }
