@@ -136,12 +136,6 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>${project.build.directory}/test-classes/testng_suites/${suite}.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>com.qaprosoft.zafira.listener.ZafiraListener</value>
-                        </property>
-                    </properties>
                 </configuration>
             </plugin>
             <plugin>

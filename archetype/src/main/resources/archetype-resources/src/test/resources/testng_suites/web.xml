@@ -4,11 +4,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
 
 
-<suite verbose="1" name="Carina Demo Tests - Web Sample" skipfailedinvocationcounts="false" junit="false" parallel="methods" annotations="JDK">
-
-  <listeners>
-		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-	</listeners>
+<suite verbose="1" name="Carina Demo Tests - Web Sample" parallel="methods" annotations="JDK">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
