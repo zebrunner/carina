@@ -44,7 +44,7 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
  */
 
 // https://github.com/qaprosoft/carina/issues/951
-// moved CarinaListener to META-INF/services/org.testng.ITestNGListener to implicitly register it for any Carina based test
+// reused com.nordstrom.tools.testng-foundation to register ordered listeners 
 @LinkedListeners({CarinaListener.class, ZafiraListener.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
