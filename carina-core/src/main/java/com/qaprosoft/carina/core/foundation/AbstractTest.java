@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.zafira.listener.ZafiraListener;
+import com.qaprosoft.zafira.listener.ZebrunnerListener;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
@@ -45,7 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 // https://github.com/qaprosoft/carina/issues/951
 // moved CarinaListener to META-INF/services/org.testng.ITestNGListener to implicitly register it for any Carina based test
-@LinkedListeners({CarinaListener.class, ZafiraListener.class})
+@LinkedListeners({CarinaListener.class, ZebrunnerListener.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
