@@ -241,6 +241,10 @@ public abstract class AbstractApiMethod extends HttpClient {
     public RequestSpecification getRequest() {
         return request;
     }
+
+    public String getRequestBody() {
+        return bodyContent.toString();
+    }
     
     public Object getResponse() {
         return response;
