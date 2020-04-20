@@ -103,9 +103,7 @@ public class MobileFactory extends AbstractFactory {
 
                 EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
 
-                if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                    
-                    capabilities = setAndroidLocaleCaps(capabilities);
+                if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                     
                     if (isVideoEnabled()) {
                         // Details about available parameters
@@ -166,8 +164,8 @@ public class MobileFactory extends AbstractFactory {
 
                     driver = new AndroidDriver<AndroidElement>(ce, capabilities);
 
-                } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.IOS)
-                        || mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.TVOS)) {
+                } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
+                        || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
                     if (isVideoEnabled()) {
                         // Details about available parameters
@@ -213,7 +211,7 @@ public class MobileFactory extends AbstractFactory {
 
                     driver = new IOSDriver<IOSElement>(ce, capabilities);
 
-                } else if (mobilePlatformName.toLowerCase().equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
+                } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                     // that's a case for custom mobile capabilities like browserstack or saucelabs
                     driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
                 } else {
@@ -440,33 +438,6 @@ public class MobileFactory extends AbstractFactory {
         }
 
         return paramValue;
-    }
-    
-    private DesiredCapabilities setAndroidLocaleCaps(DesiredCapabilities caps) {
-        /*
-         * http://appium.io/docs/en/writing-running-appium/caps/ locale and language
-         * Locale to set for iOS (XCUITest driver only) and Android.
-         * fr_CA format for iOS. CA format (country name abbreviation) for Android
-         */
-
-        // parse locale param as it has language and country by default like en_US
-        String[] values = Configuration.get(Parameter.LOCALE).split("_");
-        // TODO: think about smart splitter (maybe something already exists)
-        if (values.length == 2) {
-            LOGGER.debug("Put language and locale to android capabilities. language: " + values[0] + "; locale: " + values[1]);
-            caps.setCapability("language", values[0]);
-            caps.setCapability("locale", values[1]);
-        }
-        
-        if (!R.CONFIG.get("capabilities.locale").isEmpty()) {
-            caps.setCapability("locale", R.CONFIG.get("capabilities.locale"));
-        }
-        
-        if (!R.CONFIG.get("capabilities.language").isEmpty()) {
-            caps.setCapability("language", R.CONFIG.get("capabilities.language"));
-        }
-
-        return caps;
     }
     
 }
