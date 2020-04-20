@@ -2,8 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
-
-<suite verbose="1" name="Carina Demo Tests - Tags Sample" parallel="methods" annotations="JDK">
+<suite verbose="1" name="Carina Demo Tests - Tags Sample" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>

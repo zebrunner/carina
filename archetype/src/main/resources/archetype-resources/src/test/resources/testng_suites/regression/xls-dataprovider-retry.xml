@@ -2,7 +2,6 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
-
 <suite verbose="1" name="XLS DataProvider Test With Retry (33% pass rate)" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
