@@ -31,7 +31,7 @@ public class MobileCapabilies extends AbstractCapabilities {
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        //this step should be executed before initCapabiliries() to be able to override this capabilities by default appium approach.
+        //this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
         capabilities = setLocaleAndLanguage(capabilities);
         // add capabilities based on dynamic _config.properties variables
         capabilities = initCapabilities(capabilities);
