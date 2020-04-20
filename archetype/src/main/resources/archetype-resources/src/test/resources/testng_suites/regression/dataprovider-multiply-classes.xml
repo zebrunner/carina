@@ -5,10 +5,6 @@
 
 <suite verbose="1" name="Single DataProvider Multiply Classes (25% pass rate)" parallel="tests">
 
-	<listeners>
-		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-	</listeners>
-
 	<parameter name="suiteOwner" value="qpsdemo"/>
 	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="API-DataProvider-Classes"/>
