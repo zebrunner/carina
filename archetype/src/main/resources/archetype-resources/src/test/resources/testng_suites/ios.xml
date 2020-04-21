@@ -14,7 +14,6 @@
 
 	<parameter name="stringParam::capabilities.app::path to carina demo mobile application" value="https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip" />
 
-	<parameter name="jenkinsDefaultThreadCount" value="1" />
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
 
  	<parameter name="jenkinsRegressionPipeline" value="full_regression" />

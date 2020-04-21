@@ -9,9 +9,6 @@
 	<parameter name="jenkinsJobName" value="API-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="api"/>
 
-	<!-- Example howto override default job thread_count via jobDSL parameter -->
-	<parameter name="jenkinsDefaultThreadCount" value="3"/>
-
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsSlackChannels" value="slack-test"/>
 
