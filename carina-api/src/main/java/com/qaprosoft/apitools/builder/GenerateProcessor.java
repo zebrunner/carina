@@ -51,11 +51,11 @@ public class GenerateProcessor implements PropertiesProcessor {
             while (dateMatcher.find()) {
                 String toReplace = dateMatcher.group();
                 // getting offset
-                Matcher offsetMatcher = Pattern.compile("-{0,1}\\d+").matcher(tmp);
+                Matcher offsetMatcher = Pattern.compile("-{0,1}\\d+").matcher(toReplace);
                 offsetMatcher.find();
                 String offset = offsetMatcher.group();
                 // getting format
-                Matcher formatMatcher = Pattern.compile("(?<=generate_date\\().*?(?=;)").matcher(tmp);
+                Matcher formatMatcher = Pattern.compile("(?<=generate_date\\().*?(?=;)").matcher(toReplace);
                 formatMatcher.find();
                 String format = formatMatcher.group();
                 // generating date
