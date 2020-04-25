@@ -28,7 +28,6 @@
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
-		<itext.version>5.0.6</itext.version>
 		<reflections.version>0.9.10</reflections.version>
 		<mockito-all.version>1.10.19</mockito-all.version>
 
@@ -134,27 +133,6 @@
 				<exclusion>
 					<groupId>org.hamcrest</groupId>
 					<artifactId>hamcrest-all</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!--iText for pdf -->
-		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>${itext.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcmail-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bctsp-jdk14</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
