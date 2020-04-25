@@ -41,6 +41,7 @@ public class GenerateProcessor implements PropertiesProcessor {
                 String length = tmpMatcher.group();
                 tmp = tmp.replace(toReplace, GenerationUtil.generateWord(Integer.parseInt(length)));
             }
+
             while (numberMatcher.find()) {
                 String toReplace = numberMatcher.group();
                 Matcher tmpMatcher = Pattern.compile("\\d+").matcher(toReplace);
@@ -48,6 +49,7 @@ public class GenerateProcessor implements PropertiesProcessor {
                 String length = tmpMatcher.group();
                 tmp = tmp.replace(toReplace, GenerationUtil.generateNumber(Integer.parseInt(length)));
             }
+
             while (dateMatcher.find()) {
                 String toReplace = dateMatcher.group();
                 // getting offset
@@ -61,8 +63,9 @@ public class GenerateProcessor implements PropertiesProcessor {
                 // generating date
                 tmp = tmp.replace(toReplace,
                         GenerationUtil.generateTime(format, Integer.parseInt(offset), Calendar.DAY_OF_YEAR));
-                }
-                out.put(entry.getKey(), tmp);
+            }
+
+            out.put(entry.getKey(), tmp);
         }
         return out;
     }
