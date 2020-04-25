@@ -15,7 +15,7 @@ public class GenerateProcessorTest {
         GenerateProcessor generateProcessor = new GenerateProcessor();
         Properties properties = new Properties();
         String text = "generate_word(5)";
-        String reg = "[a-zA-z]{5}";
+        String reg = "[a-zA-Z]{5}";
         String key = "username";
         properties.setProperty(key, text);
         Pattern pattern = Pattern.compile(reg);
