@@ -874,40 +874,43 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue  
         */
         
-        String suiteThreadCount = getAttributeValue(suite, "thread-count");
-        LOGGER.debug("thread-count from suite: " + suiteThreadCount);
-        
-        if (Configuration.getInt(Parameter.THREAD_COUNT) < 1 && suiteThreadCount.isEmpty()) {
-            LOGGER.info("Set thread_count=1");
-            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
-            suite.getXmlSuite().setThreadCount(1);
-        } else if (Configuration.getInt(Parameter.THREAD_COUNT) < 1 && !suiteThreadCount.isEmpty()) {
-            // reuse value from suite xml file
-            LOGGER.debug("Synching thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
-            LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
-        } else {
+        if (Configuration.getInt(Parameter.THREAD_COUNT) >= 1) {
             // use thread-count from config.properties
             suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
             LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
-        }
-
-        String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");        
-        LOGGER.debug("data-provider-thread-count from suite: " + suiteDataProviderThreadCount);
-
-        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) < 1 && suiteDataProviderThreadCount.isEmpty()) {
-            LOGGER.info("Set data_provider_thread_count=1");
-            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
-            suite.getXmlSuite().setDataProviderThreadCount(1);
-        } else if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) < 1 && !suiteDataProviderThreadCount.isEmpty()) {
-            // reuse value from suite xml file
-            LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
-            R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
-            LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
         } else {
+            String suiteThreadCount = getAttributeValue(suite, "thread-count");
+            LOGGER.debug("thread-count from suite: " + suiteThreadCount);
+            if (suiteThreadCount.isEmpty()) {
+                LOGGER.info("Set thread_count=1");
+                R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
+                suite.getXmlSuite().setThreadCount(1);
+            } else {
+                // reuse value from suite xml file
+                LOGGER.debug("Synching thread_count with values from suite xml file...");
+                R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
+                LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");                
+            }
+        }
+        
+        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) >= 1) {
             // use thread-count from config.properties
             suite.getXmlSuite().setDataProviderThreadCount(Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-            LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());
+            LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());            
+        } else {
+            String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");        
+            LOGGER.debug("data-provider-thread-count from suite: " + suiteDataProviderThreadCount);
+            
+            if (suiteDataProviderThreadCount.isEmpty()) {
+                LOGGER.info("Set data_provider_thread_count=1");
+                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
+                suite.getXmlSuite().setDataProviderThreadCount(1);                
+            } else {
+                // reuse value from suite xml file
+                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
+                LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");                
+            }
         }
     }
 
