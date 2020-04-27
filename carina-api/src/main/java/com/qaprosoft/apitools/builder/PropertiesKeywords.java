@@ -19,7 +19,7 @@ public enum PropertiesKeywords {
 
     GENERATE_WORD_REGEX("generate_word\\(\\d+\\)"),
     GENERATE_NUMBER_REGEX("generate_number\\(\\d+\\)"),
-    GENERATE_DATE_REGEX("generate_date\\(.+;-{0,1}\\d+\\)");
+    GENERATE_DATE_REGEX("generate_date\\((.*?);-?[0-9]{0,}\\)");
 
     private String key;
 
