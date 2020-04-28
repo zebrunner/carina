@@ -139,35 +139,37 @@ public class TestNamingUtil {
 
         String testName = "";
 
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
-
-        if (testnameMap != null) {
-            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-            if (testnameMap.containsKey(testHash)) {
-                testName = testnameMap.get(testHash);
-            }
-        }
-
-        if (testName.isEmpty()) {
-            testName = result.getTestContext().getCurrentXmlTest().getName();
-        }
-
-        // TODO: find the bext way to calculate TUID/hash
-        if (result.getTestContext().getCurrentXmlTest().getAllParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) ||
-                result.getTestContext().getCurrentXmlTest().getAllParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
-            // AUTO-274 "Pass"ing status set on emailable report when a test step fails
-            String methodUID = "";
-            for (int i = 0; i < result.getParameters().length; i++) {
-                if (result.getParameters()[i] != null) {
-                    if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
-                        methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
-                        break; // first TUID: parameter is used
-                    }
+        if (result.getTestContext() != null) {
+            @SuppressWarnings("unchecked")
+            Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
+    
+            if (testnameMap != null) {
+                String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+                if (testnameMap.containsKey(testHash)) {
+                    testName = testnameMap.get(testHash);
                 }
             }
-            if (!methodUID.isEmpty()) {
-                testName = methodUID + " - " + testName;
+    
+            if (testName.isEmpty()) {
+                testName = result.getTestContext().getCurrentXmlTest().getName();
+            }
+    
+            // TODO: find the bext way to calculate TUID/hash
+            if (result.getTestContext().getCurrentXmlTest().getAllParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) ||
+                    result.getTestContext().getCurrentXmlTest().getAllParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
+                // AUTO-274 "Pass"ing status set on emailable report when a test step fails
+                String methodUID = "";
+                for (int i = 0; i < result.getParameters().length; i++) {
+                    if (result.getParameters()[i] != null) {
+                        if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
+                            methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
+                            break; // first TUID: parameter is used
+                        }
+                    }
+                }
+                if (!methodUID.isEmpty()) {
+                    testName = methodUID + " - " + testName;
+                }
             }
         }
 
