@@ -43,7 +43,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 import org.testng.ISuite;
-import org.testng.ISuiteListener;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -100,7 +99,7 @@ import com.qaprosoft.zafira.models.dto.TestRunType;
  * 
  * @author Vadim Delendik
  */
-public class CarinaListener extends AbstractTestListener implements ISuiteListener {
+public class CarinaListener extends AbstractTestListener {
     private static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
