@@ -1,1 +1,1 @@
-com.nordstrom.automation.testng.ListenerChain
+com.qaprosoft.carina.core.foundation.listeners.CarinaListener

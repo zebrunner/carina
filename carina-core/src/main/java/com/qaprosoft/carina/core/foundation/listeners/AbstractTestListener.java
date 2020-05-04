@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.TestListenerAdapter;
+import org.testng.internal.IResultListener2;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -43,9 +43,10 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.zafira.listener.ZebrunnerListener;
 
 @SuppressWarnings("deprecation")
-public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
+public class AbstractTestListener extends ZebrunnerListener implements IResultListener2, IDriverPool {
     private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
 
@@ -197,30 +198,21 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void beforeConfiguration(ITestResult result) {
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
         TestNamingUtil.releaseTestInfoByThread();
-
-        super.beforeConfiguration(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
         afterConfiguration(result);
-        // passItem(result, Messager.CONFIG_PASSED);
-        super.onConfigurationSuccess(result);
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
         afterConfiguration(result);
-        // skipItem(result, Messager.CONFIG_SKIPPED);
-        super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
         afterConfiguration(result);
-        // failItem(result, Messager.CONFIG_FAILED);
-        // String test = TestNamingUtil.getCanonicalTestName(result);
-        // closeLogAppender(test);
 
         String errorMessage = getFailureReason(result);
 
@@ -228,7 +220,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 result.getMethod().getDescription());
         setConfigFailure(resultItem);
 
-        super.onConfigurationFailure(result);
     }
 
     @Override
@@ -279,6 +270,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         TestNamingUtil.releaseTestInfoByThread();
 
         startItem(result, Messager.TEST_STARTED);
+        
+        super.onTestStart(result);
 
     }
     

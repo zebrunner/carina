@@ -46,7 +46,6 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!-- Testings -->
         <testng.version>7.1.0</testng.version>
-        <testng-foundation.version>2.0.1</testng-foundation.version>
         <!-- Logging and commons -->
         <log4j.version>1.2.17</log4j.version>
         <commons-text.version>1.7</commons-text.version>
@@ -519,18 +518,6 @@
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
                 <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.nordstrom.tools</groupId>
-                <artifactId>testng-foundation</artifactId>
-                <version>${testng-foundation.version}</version>
-                <scope>compile</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.testng</groupId>
-                        <artifactId>testng</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <!-- AI integration -->
             <dependency>
