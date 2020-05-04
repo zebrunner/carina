@@ -19,7 +19,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -51,6 +53,14 @@ public enum R {
     private static final Logger LOGGER = Logger.getLogger(R.class);
 
     private static final String OVERRIDE_SIGN = "_";
+
+    //TODO: find solution to get path for Crypto key without hardcoding it.
+    //private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
+
+    private CryptoTool cryptoTool = new CryptoTool("./src/test/resources/crypto.key");
+
+    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+
 
     private String resourceFile;
 
@@ -169,6 +179,12 @@ public enum R {
         
         value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
                 : propertiesHolder.get(resourceFile).getProperty(key);
+
+        String decryptedText = cryptoTool.decryptByPattern(value, CRYPTO_PATTERN);
+
+        if(!decryptedText.equals(value)) {
+            value = decryptedText;
+        }
         // TODO: why we return empty instead of null?
         // [VD] as designed empty MUST be returned
         return value != null ? value : StringUtils.EMPTY;
