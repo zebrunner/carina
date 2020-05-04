@@ -46,7 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 // https://github.com/qaprosoft/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
-@LinkedListeners({CarinaListener.class, ZebrunnerListener.class})
+@LinkedListeners({ZebrunnerListener.class, CarinaListener.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
