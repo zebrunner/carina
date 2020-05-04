@@ -205,6 +205,8 @@ public class CarinaListener extends AbstractTestListener {
         onHealthCheck(suite);
         
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
+        
+        super.onStart(suite);
     }
 
 	@Override
@@ -437,6 +439,8 @@ public class CarinaListener extends AbstractTestListener {
                 CommonUtils.pause(1);
             }
         }
+        
+        super.onFinish(suite);
     }
     
     /**
