@@ -72,7 +72,7 @@ public class MobileFactory extends AbstractFactory {
         }
 
         String driverType = Configuration.getDriverType(capabilities);
-        String mobilePlatformName = Configuration.getPlatform();
+        String mobilePlatformName = Configuration.getPlatform(capabilities);
 
         // TODO: refactor code to be able to remove SpecialKeywords.CUSTOM property
         // completely

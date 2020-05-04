@@ -50,7 +50,7 @@ public class MobileCapabilies extends AbstractCapabilities {
         LOGGER.debug("Default locale value is : " + localeValue);
         String[] values = localeValue.split("_");
         if (values.length == 2) {
-            if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            if (Configuration.getPlatform(caps).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 LOGGER.debug("Put language and locale to android capabilities. language: " + values[0] + "; locale: " + values[1]);
                 caps.setCapability("language", values[0]);
                 caps.setCapability("locale", values[1]);

@@ -49,6 +49,7 @@ public abstract class AbstractCapabilities {
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
 
+        //TODO: should use provide capabilities as an argument for getPlatform call below?
         String platform = Configuration.getPlatform();
         if (!platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
