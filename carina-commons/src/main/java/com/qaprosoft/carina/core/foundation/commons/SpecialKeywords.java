@@ -79,7 +79,6 @@ public class SpecialKeywords {
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
-    public static final String TEST_METHOD_NAME_ARGS_MAP = "testMethodNameArgsMap";
     public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";
     public static final String JIRA_ARGS_MAP = "jiraArgsMap";
     
@@ -209,4 +208,5 @@ public class SpecialKeywords {
     
     
     public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";
+    public final static String UNDEFINED = "undefined";
 }

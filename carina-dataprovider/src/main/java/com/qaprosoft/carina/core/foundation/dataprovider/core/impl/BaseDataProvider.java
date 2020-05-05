@@ -60,6 +60,7 @@ public abstract class BaseDataProvider {
         return testNameArgsMap;
     }
 
+    @Deprecated
     public Map<String, String> getTestMethodNameArgsMap() {
         return testMethodNameArgsMap;
     }

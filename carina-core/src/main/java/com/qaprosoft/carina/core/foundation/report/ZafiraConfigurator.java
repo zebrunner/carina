@@ -26,6 +26,7 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
+import com.qaprosoft.carina.core.foundation.listeners.TestNameListener;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
@@ -149,11 +150,12 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public String getTestName(TestResultAdapter testResultAdapter) {
-        // TODO: avoid TestNamingUtil
-        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
-        String testName = TestNamingUtil.getCanonicalTestName(test);
-        LOGGER.debug("testName: " + testName);
-        return testName;
+        return TestNameListener.getTestName();
+//        // TODO: avoid TestNamingUtil
+//        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
+//        String testName = TestNamingUtil.getCanonicalTestName(test);
+//        LOGGER.info("testName: " + testName);
+//        return testName;
     }
 
     @Override
@@ -161,7 +163,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         // TODO: avoid TestNamingUtil
         ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         String testMethodName = TestNamingUtil.getCanonicalTestMethodName(test);
-        LOGGER.debug("testMethodName: " + testMethodName);
+        LOGGER.info("testMethodName: " + testMethodName);
         return testMethodName;
     }
 

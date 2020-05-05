@@ -178,20 +178,6 @@ public class TestNamingUtil {
 
     public static String getCanonicalTestMethodName(ITestResult result) {
         String testMethodName = result.getMethod().getMethodName();
-
-        // TODO: remove test method name map as soon as possible
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testMethodNameMap = (Map<Object[], String>) result.getTestContext()
-                .getAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP);
-
-        if (testMethodNameMap != null) {
-            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-            if (testMethodNameMap.containsKey(testHash)) {
-                LOGGER.error("Error message to check how often this feature is used.");
-                testMethodName = testMethodNameMap.get(testHash);
-            }
-        }
-
         return StringEscapeUtils.escapeHtml4(testMethodName);
     }
 
