@@ -175,10 +175,9 @@ public enum R {
         value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
                 : propertiesHolder.get(resourceFile).getProperty(key);
 
-        String decryptedText = decrypt(value, CRYPTO_PATTERN);
 
-        if ((null != value) && (null != decryptedText) && (!decryptedText.equals(value))) {
-            value = decryptedText;
+        if(isEncrypted(value, CRYPTO_PATTERN)) {
+            value = decrypt(value, CRYPTO_PATTERN);;
         }
 
         // TODO: why we return empty instead of null?
@@ -264,11 +263,8 @@ public enum R {
     }
 
     private String decrypt(String content, Pattern pattern) {
-        if(isEncrypted(content, pattern)) {
-            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-            return cryptoTool.decryptByPattern(content, pattern);
-        }
-        return content;
+        CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
+        return cryptoTool.decryptByPattern(content, pattern);
     }
 
 }
