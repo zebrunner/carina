@@ -156,6 +156,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onStart(ISuite suite) {
+        LOGGER.info("CarinaListener->onStart(ISuite suite)");
         // register programmatically carina based BeforeSuite/BeforeClass and
         // BeforeMethod to execute those configuration part obligatory
         /*
@@ -210,12 +211,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
 	@Override
     public void onStart(ITestContext context) {
-        LOGGER.debug("CarinaListener->OnTestStart(context): " + context.getName());
+        LOGGER.info("CarinaListener->OnTestStart(context): " + context.getName());
         super.onStart(context);
     }
 
     @Override
     public void beforeConfiguration(ITestResult result) {
+        LOGGER.info("CarinaListener->beforeConfiguration");
         super.beforeConfiguration(result);
         // remember active test phase to organize valid driver pool manipulation
         // process
@@ -246,6 +248,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     @Override
     public void onConfigurationFailure(ITestResult result) {
+        LOGGER.info("CarinaListener->onConfigurationFailure");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
 
@@ -254,6 +257,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestStart(ITestResult result) {
+        LOGGER.info("CarinaListener->onTestStart");
         TestPhase.setActivePhase(Phase.METHOD);
 
         // handle expected skip
@@ -267,12 +271,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        LOGGER.info("CarinaListener->onTestSuccess");
         super.onTestSuccess(result);
         onTestFinish(result);
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
+        LOGGER.info("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
         super.onTestFailure(result);
@@ -281,6 +287,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        LOGGER.info("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
         super.onTestSkipped(result);
@@ -356,6 +363,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onFinish(ITestContext context) {
+        LOGGER.info("CarinaListener->onFinish(ITestContext context)");
         super.onFinish(context);
 
         // [SZ] it's still needed to close driver from BeforeClass stage.
@@ -371,6 +379,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onFinish(ISuite suite) {
+        LOGGER.info("CarinaListener->onFinish(ISuite suite)");
         try {
             // TODO: quitAllDivers forcibly
             ReportContext.removeTempDir(); // clean temp artifacts directory

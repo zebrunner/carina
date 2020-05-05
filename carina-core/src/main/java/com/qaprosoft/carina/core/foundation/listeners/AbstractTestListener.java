@@ -195,6 +195,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void beforeConfiguration(ITestResult result) {
+        LOGGER.info("AbstractTestListener->beforeConfiguration");
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
         TestNamingUtil.releaseTestInfoByThread();
 
@@ -203,6 +204,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onConfigurationSuccess");
         afterConfiguration(result);
         // passItem(result, Messager.CONFIG_PASSED);
         super.onConfigurationSuccess(result);
@@ -210,6 +212,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onConfigurationSkip");
         afterConfiguration(result);
         // skipItem(result, Messager.CONFIG_SKIPPED);
         super.onConfigurationSkip(result);
@@ -217,6 +220,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onConfigurationFailure");
         afterConfiguration(result);
         // failItem(result, Messager.CONFIG_FAILED);
         // String test = TestNamingUtil.getCanonicalTestName(result);
@@ -233,6 +237,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onStart(ITestContext context) {
+        LOGGER.info("AbstractTestListener->onStart(ITestContext context)");
         String uuid = StringGenerator.generateNumeric(8);
         ParameterGenerator.setUUID(uuid);
 
@@ -243,6 +248,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestStart(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestStart");
         VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
         if (curRetryAnalyzer == null) {
@@ -306,6 +312,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestSuccess");
         passItem(result, Messager.TEST_PASSED);
         VideoAnalyzer.enableVideoUpload();
 
@@ -322,6 +329,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestFailure(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestFailure");
         failItem(result, Messager.TEST_FAILED);
         VideoAnalyzer.enableVideoUpload();
         afterTest(result);
@@ -337,6 +345,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestSkipped(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestSkipped");
         // handle Zafira already passed exception for re-run and do nothing. Return should be enough
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
@@ -388,6 +397,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onFinish(ITestContext context) {
+        LOGGER.info("AbstractTestListener->onFinish(ITestContext context)");
         super.onFinish(context);
         removeAlreadyPassedTests(context);
     }

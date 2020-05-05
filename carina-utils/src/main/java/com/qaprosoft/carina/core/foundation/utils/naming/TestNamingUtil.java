@@ -51,15 +51,15 @@ public class TestNamingUtil {
         if (index > 0) {
             // that's a dataprovider line index
             index++; //to make correlation between line and index number
-            LOGGER.debug("test: " + test  + "; index: " + index);
+            LOGGER.info("test: " + test  + "; index: " + index);
             test = test + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
         }
         
         int invCount = result.getTestContext().getAllTestMethods()[0].getInvocationCount();
         if (invCount > 1) {
-            LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
+            LOGGER.info("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
             int countIndex = getCurrentInvocationCount(test);
-            LOGGER.debug("test: " + test  + "; InvCount index: " + countIndex);
+            LOGGER.info("test: " + test  + "; InvCount index: " + countIndex);
             test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
         }        
         
@@ -84,7 +84,7 @@ public class TestNamingUtil {
 
         Stack<String> stack = threadId2TestName.get(threadId);
         String test = stack.pop();
-        LOGGER.debug("Releasing information about test: " + test);
+        LOGGER.info("Releasing information about test: " + test);
 
         if (stack.isEmpty()) {
             threadId2TestName.remove(threadId);
@@ -108,12 +108,12 @@ public class TestNamingUtil {
 
         Stack<String> stack = threadId2TestName.get(threadId);
         if (stack == null) {
-            LOGGER.debug("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
+            LOGGER.info("Unable to find registered test name for threadId: " + threadId + ". stack is null!");
             return null;
         }
 
         if (stack.size() == 0) {
-            LOGGER.debug("Unable to find registered test name for threadId from empty stack: " + threadId);
+            LOGGER.info("Unable to find registered test name for threadId from empty stack: " + threadId);
             return null;
         }
 
