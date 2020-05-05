@@ -15,14 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.rest;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 
 public class RestUtil {
     private static final Logger LOGGER = Logger.getLogger(RestUtil.class);
@@ -35,7 +35,7 @@ public class RestUtil {
         if (responseLog) {
             return given()
                     .contentType(contentType)
-                    .formParameters(parameters)
+                    .formParams(parameters)
                     .log().all()
                     .expect()
                     .log().all()
@@ -44,7 +44,7 @@ public class RestUtil {
         }
         return given()
                 .contentType(contentType)
-                .formParameters(parameters)
+                .formParams(parameters)
                 // .log().all()
                 .when()
                 .post(httpPostCommand);

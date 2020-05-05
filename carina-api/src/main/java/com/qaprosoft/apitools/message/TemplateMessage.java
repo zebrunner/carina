@@ -18,7 +18,7 @@ package com.qaprosoft.apitools.message;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 
 import com.qaprosoft.apitools.builder.MessageBuilder;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;

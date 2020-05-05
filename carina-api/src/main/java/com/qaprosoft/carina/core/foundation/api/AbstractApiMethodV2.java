@@ -24,11 +24,12 @@ import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import com.jayway.restassured.response.Response;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
 import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
+
+import io.restassured.response.Response;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     protected static final Logger LOGGER = Logger.getLogger(AbstractApiMethodV2.class);

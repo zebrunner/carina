@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
 import java.security.KeyManagementException;
@@ -33,14 +33,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.config.RestAssuredConfig;
-import com.jayway.restassured.config.SSLConfig;
-import com.jayway.restassured.filter.log.RequestLoggingFilter;
-import com.jayway.restassured.filter.log.ResponseLoggingFilter;
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
-import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
@@ -51,6 +43,15 @@ import com.qaprosoft.carina.core.foundation.api.ssl.SSLContextBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+
+import io.restassured.RestAssured;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractApiMethod extends HttpClient {

@@ -24,8 +24,9 @@
 		<source.version>1.8</source.version>
 		<target.version>1.8</target.version>
 
-		<api-tools.version>1.0.11</api-tools.version>
-
+		<freemarker.version>2.3.14</freemarker.version>
+		<jsonassert.version>1.5.0</jsonassert.version>
+		<org.everit.json.schema.version>1.5.1</org.everit.json.schema.version>
 	</properties>
 
 	<dependencies>
@@ -66,14 +67,14 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.jayway.restassured</groupId>
+			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 		</dependency>
 		
 		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.7</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-configuration2</artifactId>
+			<version>2.7</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -89,22 +90,28 @@
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
-			<version>2.3.14</version>
+			<version>${freemarker.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.skyscreamer</groupId>
 			<artifactId>jsonassert</artifactId>
-			<version>1.2.3</version>
+			<version>${jsonassert.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- JSON schema validation -->
 		
 		<dependency>
 			<!-- do not remove otherwise 17 compilation failures -->
-			<groupId>com.github.fge</groupId>
+			<groupId>io.rest-assured</groupId>
 			<artifactId>json-schema-validator</artifactId>
-			<version>2.2.6</version>
+			<version>${rest-assured.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.guava</groupId>
@@ -114,10 +121,9 @@
 		</dependency>
 		
 		<dependency>
-			<!-- do not remove otherwise 6 compilation failures -->
 			<groupId>org.everit.json</groupId>
 			<artifactId>org.everit.json.schema</artifactId>
-			<version>1.5.1</version>
+			<version>${org.everit.json.schema.version}</version>
 		</dependency>
 
 		<!-- Test utilities -->
@@ -126,21 +132,16 @@
 			<artifactId>testng</artifactId>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-		</dependency>
-
-		<dependency>
-			<!-- do not remove otherwise Used undeclared dependencies found -->
+			do not remove otherwise Used undeclared dependencies found
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
-		</dependency>
+		</dependency> -->
 
 	</dependencies>
 	

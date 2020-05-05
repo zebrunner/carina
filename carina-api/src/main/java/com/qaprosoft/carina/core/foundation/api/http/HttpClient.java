@@ -15,9 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.http;
 
-import com.jayway.restassured.response.Response;
-import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.proxy.SystemProxy;
+
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.

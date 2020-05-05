@@ -19,9 +19,10 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.UUID;
 
-import com.jayway.restassured.filter.log.RequestLoggingFilter;
-import com.jayway.restassured.filter.log.ResponseLoggingFilter;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 
 public class APIMethodBuilder {
     private File temp;
