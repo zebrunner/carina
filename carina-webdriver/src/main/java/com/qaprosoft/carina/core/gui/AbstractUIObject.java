@@ -36,6 +36,8 @@ public abstract class AbstractUIObject extends DriverHelper {
     protected WebElement rootElement;
     protected By rootBy;
 
+    protected ExtendedWebElement uiLoadingMarker;
+
     /**
      * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context
      * 
@@ -77,11 +79,19 @@ public abstract class AbstractUIObject extends DriverHelper {
      *         false - otherwise
      */
     public boolean isUIObjectPresent(int timeout) {
-    	return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
+        return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
     }
 
     public boolean isUIObjectPresent() {
-    	return isUIObjectPresent(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+        return isUIObjectPresent(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+
+    public ExtendedWebElement getUiLoadingMarker() {
+        return uiLoadingMarker;
+    }
+
+    public void setUiLoadingMarker(ExtendedWebElement uiLoadingMarker) {
+        this.uiLoadingMarker = uiLoadingMarker;
     }
 
     public String getName() {
@@ -99,14 +109,13 @@ public abstract class AbstractUIObject extends DriverHelper {
     public void setRootElement(WebElement element) {
         this.rootElement = element;
     }
-    
+
     public By getRootBy() {
         return rootBy;
     }
-    
+
     public void setRootBy(By rootBy) {
         this.rootBy = rootBy;
     }
-    
-    
+
 }
