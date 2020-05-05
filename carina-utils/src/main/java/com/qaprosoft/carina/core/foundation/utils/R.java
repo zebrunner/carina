@@ -19,7 +19,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -52,13 +55,15 @@ public enum R {
 
     private static final String OVERRIDE_SIGN = "_";
 
+    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+
     private String resourceFile;
 
     // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
-    private static ThreadLocal<Properties> testProperties = new ThreadLocal<Properties>();
+    private static ThreadLocal<Properties> testProperties = new ThreadLocal<>();
 
     // permanent global configuration map 
-    private static Map<String, Properties> propertiesHolder = new HashMap<String, Properties>();
+    private static Map<String, Properties> propertiesHolder = new HashMap<>();
     
     // init global configuration map statically
     static {
@@ -163,16 +168,23 @@ public enum R {
     public String get(String key) {
         String value = getTestProperties().getProperty(key);
         if (value != null) {
-            LOGGER.warn("Overriden '" + key + "=" + value + "' property will be used for current test!");
+            LOGGER.warn("Overridden '" + key + "=" + value + "' property will be used for current test!");
             return value;
         }
         
         value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
                 : propertiesHolder.get(resourceFile).getProperty(key);
+
+
+        if(isEncrypted(value, CRYPTO_PATTERN)) {
+            value = decrypt(value, CRYPTO_PATTERN);;
+        }
+
         // TODO: why we return empty instead of null?
         // [VD] as designed empty MUST be returned
         return value != null ? value : StringUtils.EMPTY;
     }
+
 
     public int getInt(String key) {
         return Integer.parseInt(get(key));
@@ -235,6 +247,24 @@ public enum R {
         }
         
         return testProperties.get();
+    }
+
+    private boolean isEncrypted(String content, Pattern pattern) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            if (matcher.find()) {
+                LOGGER.debug("'" + content + "' require decryption.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String decrypt(String content, Pattern pattern) {
+        CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
+        return cryptoTool.decryptByPattern(content, pattern);
     }
 
 }
