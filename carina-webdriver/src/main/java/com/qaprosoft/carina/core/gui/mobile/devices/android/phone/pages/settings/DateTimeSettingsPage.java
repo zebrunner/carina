@@ -204,24 +204,6 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
         return result;
     }
 
-
-    /**
-     * selectTimezoneByText
-     *
-     * @param timezone         String
-     * @param defaultSwipeTime int
-     * @return boolean
-     */
-    private boolean selectTimezoneByText(String timezone, int defaultSwipeTime) {
-        boolean scrolled = AndroidUtils.scroll(timezone, scrollableContainerByClassName,
-                AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
-        if (scrolled) {
-            LOGGER.info("Select timezone by TimeZone text: " + timezone);
-            tzSelectionBase.format(timezone).click();
-        }
-        return scrolled;
-    }
-
     /**
      * clickNextButton
      *

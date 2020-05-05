@@ -343,14 +343,6 @@ public class AppCenterManager {
         return fileName + ".apk";
     }
 
-    private String returnProperPlatformExtension(String platformName) {
-
-        if (platformName.toLowerCase().contains("ios")) {
-            return "ipa";
-        }
-        return "apk";
-    }
-
     private boolean checkNotesForCorrectBuild(String pattern, JsonNode node) {
 
         return checkForPattern("release_notes", pattern, node);
