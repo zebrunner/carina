@@ -86,7 +86,6 @@ public class SpecialKeywords {
     public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
     public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
     public static final String TESTRAIL_TESTCASE_UUID = "TESTRAIL_TESTCASE_UUID";
-    public static final String BUG_ARGS_MAP = "bugArgsMap";
 
     public static final String BEFORE_TEST_METHOD = "executeBeforeTestMethod";
 

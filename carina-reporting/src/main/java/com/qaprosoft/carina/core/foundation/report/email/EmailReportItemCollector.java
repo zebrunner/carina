@@ -16,11 +16,10 @@
 package com.qaprosoft.carina.core.foundation.report.email;
 
 import java.util.*;
-
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.listeners.TestNameListener;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
@@ -42,8 +41,7 @@ public class EmailReportItemCollector {
     }
 
     public static synchronized TestResultItem pull(ITestResult result) {
-        //TODO: refactor using listener!
-        return testResultsMap.get(TestNamingUtil.getCanonicalTestName(result));
+        return testResultsMap.get(TestNameListener.getTestName());
     }
 
     public static List<TestResultItem> getTestResults() {

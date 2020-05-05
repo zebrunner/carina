@@ -212,6 +212,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 	@Override
     public void onStart(ITestContext context) {
         LOGGER.info("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
+        ReportContext.getBaseDir(); // create directory for logging as soon as possible
         super.onStart(context);
     }
 

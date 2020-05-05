@@ -35,7 +35,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.zafira.listener.ZebrunnerListener;
 
 /*
@@ -80,19 +79,12 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
         Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
         return objects;
     }
-
-    protected void setBug(String id) {
-        String test = TestNamingUtil.getTestNameByThread();
-        TestNamingUtil.associateBug(test, id);
-    }
-
     
     /**
      * Pause for specified timeout.
      *
      * @param timeout in seconds.
      */
-
     public void pause(long timeout) {
         CommonUtils.pause(timeout);
     }

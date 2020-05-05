@@ -28,8 +28,8 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByM
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
+import com.qaprosoft.carina.core.foundation.listeners.TestNameListener;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -133,7 +133,7 @@ public class XlsDataProvider extends BaseDataProvider {
             // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
-            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingUtil.appendTestMethodName(testName, testMethod));
+            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNameListener.getTestName());
             if (testMethodColumn.isEmpty()) {
                 testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
             } else {

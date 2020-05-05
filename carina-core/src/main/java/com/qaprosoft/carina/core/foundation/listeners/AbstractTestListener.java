@@ -41,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
@@ -418,17 +417,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
-
-        if (TestResultType.FAIL.equals(resultType)) {
-            String bugInfo = Jira.processBug(result);
-            if (bugInfo != null) {
-                if (failReason != null) {
-                    failReason = bugInfo.concat("\n").concat(failReason);
-                } else {
-                    failReason = bugInfo;
-                }
-            }
-        }
 
         String test = StringEscapeUtils.escapeHtml4(TestNameListener.getTestName());
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);

@@ -27,10 +27,7 @@ import org.testng.internal.IResultListener2;
 import org.testng.internal.TestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 
 public class TestNameListener implements IResultListener2 {
     private static final Logger LOGGER = Logger.getLogger(TestNameListener.class);
@@ -65,10 +62,6 @@ public class TestNameListener implements IResultListener2 {
     @Override
     public void onStart(ITestContext context) {
         LOGGER.info("TestNameListener->onStart(ITestContext context)");
-        String uuid = StringGenerator.generateNumeric(8);
-        ParameterGenerator.setUUID(uuid);
-
-        ReportContext.getBaseDir(); // create directory for logging as soon as possible
     }
 
     @Override

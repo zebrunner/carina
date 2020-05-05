@@ -27,11 +27,11 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.qaprosoft.carina.core.foundation.listeners.TestNameListener;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 
 /**
@@ -85,12 +85,7 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
         String pdfName = "";
 
         // Define test screenshot root
-        String test = "";
-        if (TestNamingUtil.isTestNameRegistered()) {
-            test = TestNamingUtil.getTestNameByThread();
-        } else {
-            test = "undefined";
-        }
+        String test = TestNameListener.getTestName();
 
         File testRootDir = ReportContext.getTestDir();
         File artifactsFolder = ReportContext.getArtifactsFolder();
