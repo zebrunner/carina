@@ -98,21 +98,22 @@ public class RTest {
         R.CONFIG.put("key1", "value1", true);
         Assert.assertEquals(R.CONFIG.containsKey("key1"), true);
     }
-    
-    /*
-     * @Test
-     * public void testEncryption()
-     * {
-     * Assert.assertEquals(R.CONFIG.get("password"), "EncryptMe");
-     * Assert.assertEquals(R.CONFIG.getSecured("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}");
-     * }
-     * 
-     * @Test
-     * public void testPlaceholdersWithEncryption()
-     * {
-     * Assert.assertEquals(R.CONFIG.get("credentials"), "test@gmail.com/EncryptMe");
-     * }
-     */
+
+    @Test
+    public void testEncryption() {
+        Assert.assertEquals(R.CONFIG.get("password"), "EncryptMe");
+        //Assert.assertEquals(R.CONFIG.getSecured("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}")
+    }
+
+    @Test
+    public void testPlaceholdersWithEncryption() {
+        Assert.assertEquals(R.CONFIG.get("credentials"), "test@gmail.com/EncryptMe");
+    }
+
+    @Test
+    public void testPlaceholdersWithEncryptionTestData() {
+        Assert.assertEquals(R.TESTDATA.get("test_credentials"), "test@gmail.com/EncryptMe");
+    }
 
     @Test
     public void testPlaceholdersInEmail() {
