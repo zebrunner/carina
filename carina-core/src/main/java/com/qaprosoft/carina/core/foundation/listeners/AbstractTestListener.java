@@ -51,10 +51,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
 
     private void startItem(ITestResult result, Messager messager) {
-
         String test = TestNameListener.getTestName();
-        test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId(), result);
-
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
@@ -179,10 +176,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return deviceName;
     }
 
+    //TODO: remove later after testing
     private void afterConfiguration(ITestResult result) {
-        TestNamingUtil.releaseTestInfoByThread();
-    }
-
+        // TestNamingUtil.releaseTestInfoByThread();
+    }   
+    
     private void afterTest(ITestResult result) {
         // TODO: do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
@@ -190,7 +188,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         
         ReportContext.generateTestReport();
 
-        TestNamingUtil.releaseTestInfoByThread();
+        //TestNamingUtil.releaseTestInfoByThread();
         ReportContext.emptyTestDirData();
     }
 
@@ -198,7 +196,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void beforeConfiguration(ITestResult result) {
         LOGGER.info("AbstractTestListener->beforeConfiguration");
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
-        TestNamingUtil.releaseTestInfoByThread();
+        // TestNamingUtil.releaseTestInfoByThread();
 
         super.beforeConfiguration(result);
     }
@@ -206,7 +204,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onConfigurationSuccess(ITestResult result) {
         LOGGER.info("AbstractTestListener->onConfigurationSuccess");
-        afterConfiguration(result);
+        afterConfiguration(result);        
         // passItem(result, Messager.CONFIG_PASSED);
         super.onConfigurationSuccess(result);
     }
@@ -283,7 +281,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         }
         // obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in
         // onTestSkipped method
-        TestNamingUtil.releaseTestInfoByThread();
+        // TestNamingUtil.releaseTestInfoByThread();
 
         startItem(result, Messager.TEST_STARTED);
 

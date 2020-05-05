@@ -42,55 +42,6 @@ public class TestNamingUtil {
     
     private static final ConcurrentHashMap<String, Integer> testNameInvCounter = new ConcurrentHashMap<String, Integer>();
     
-    public static synchronized String associateTestInfo2Thread(String test, Long threadId, ITestResult result) {
-        // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
-        // getInvocationCount() value
-        
-        
-        int index = ((TestResult) result).getParameterIndex();
-        if (index > 0) {
-            // that's a dataprovider line index
-            index++; //to make correlation between line and index number
-            LOGGER.info("test: " + test  + "; index: " + index);
-            test = test + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
-        }
-        
-        int invCount = result.getTestContext().getAllTestMethods()[0].getInvocationCount();
-        if (invCount > 1) {
-            LOGGER.info("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
-            int countIndex = getCurrentInvocationCount(test);
-            LOGGER.info("test: " + test  + "; InvCount index: " + countIndex);
-            test = test + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
-        }        
-        
-        // TODO: analyze how to use stack for retries
-        Stack<String> stack = new Stack<String>();
-
-        if (threadId2TestName.containsKey(threadId)) {
-            // not the first time
-            stack = threadId2TestName.get(threadId);
-        }
-        stack.push(test);
-        threadId2TestName.put(threadId, stack);
-        return test;
-    }
-
-    public static synchronized void releaseTestInfoByThread() {
-        long threadId = Thread.currentThread().getId();
-        if (!isTestNameRegistered()) {
-            // LOGGER.warn("There is no TestInfo for release in threadId: " + threadId);
-            return;
-        }
-
-        Stack<String> stack = threadId2TestName.get(threadId);
-        String test = stack.pop();
-        LOGGER.info("Releasing information about test: " + test);
-
-        if (stack.isEmpty()) {
-            threadId2TestName.remove(threadId);
-        }
-    }
-
     public static boolean isTestNameRegistered() {
         long threadId = Thread.currentThread().getId();
         if (threadId2TestName.get(threadId) != null) {
