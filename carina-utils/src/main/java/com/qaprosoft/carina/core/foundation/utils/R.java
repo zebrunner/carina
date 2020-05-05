@@ -250,7 +250,7 @@ public enum R {
         return testProperties.get();
     }
 
-    private boolean requireDecryption(String content, Pattern pattern) {
+    private boolean isEncrypted(String content, Pattern pattern) {
         String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
                 pattern.pattern().indexOf(":"));
         if (content != null && content.contains(wildcard)) {
@@ -264,10 +264,9 @@ public enum R {
     }
 
     private String decrypt(String content, Pattern pattern) {
-        if(requireDecryption(content, pattern)) {
+        if(isEncrypted(content, pattern)) {
             CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-            String decryptedText = cryptoTool.decryptByPattern(content, pattern);
-            return decryptedText;
+            return cryptoTool.decryptByPattern(content, pattern);
         }
         return content;
     }
