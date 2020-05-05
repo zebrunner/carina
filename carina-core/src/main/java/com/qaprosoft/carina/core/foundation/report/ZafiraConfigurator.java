@@ -33,7 +33,6 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
@@ -151,20 +150,12 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public String getTestName(TestResultAdapter testResultAdapter) {
         return TestNameListener.getTestName();
-//        // TODO: avoid TestNamingUtil
-//        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
-//        String testName = TestNamingUtil.getCanonicalTestName(test);
-//        LOGGER.info("testName: " + testName);
-//        return testName;
     }
 
     @Override
     public String getTestMethodName(TestResultAdapter testResultAdapter) {
-        // TODO: avoid TestNamingUtil
-        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
-        String testMethodName = TestNamingUtil.getCanonicalTestMethodName(test);
-        LOGGER.info("testMethodName: " + testMethodName);
-        return testMethodName;
+        ITestResult testResult = (ITestResult) testResultAdapter.getTestResult();
+        return testResult.getMethod().getMethodName();
     }
 
     @Override

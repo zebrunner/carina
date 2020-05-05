@@ -42,6 +42,7 @@ public class EmailReportItemCollector {
     }
 
     public static synchronized TestResultItem pull(ITestResult result) {
+        //TODO: refactor using listener!
         return testResultsMap.get(TestNamingUtil.getCanonicalTestName(result));
     }
 

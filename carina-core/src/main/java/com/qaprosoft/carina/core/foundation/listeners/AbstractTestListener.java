@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
@@ -51,7 +52,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     private void startItem(ITestResult result, Messager messager) {
 
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameListener.getTestName();
         test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId(), result);
 
         String deviceName = getDeviceName();
@@ -59,7 +60,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void passItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameListener.getTestName();
 
         String deviceName = getDeviceName();
 
@@ -72,7 +73,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameListener.getTestName();
 
         String errorMessage = getFailureReason(result);
         String deviceName = getDeviceName();
@@ -96,7 +97,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failRetryItem(ITestResult result, Messager messager, int count, int maxCount) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameListener.getTestName();
 
         String errorMessage = getFailureReason(result);
 
@@ -109,7 +110,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String skipItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameListener.getTestName();
 
         String errorMessage = getFailureReason(result);
         if (errorMessage.isEmpty()) {
@@ -162,7 +163,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void skipTestItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameListener.getTestName();
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
@@ -415,7 +416,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
-        String group = TestNamingUtil.getPackageName(result);
+        String group = StringEscapeUtils.escapeHtml4(TestNameListener.getPackageName(result));
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
@@ -431,7 +432,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             }
         }
 
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = StringEscapeUtils.escapeHtml4(TestNameListener.getTestName());
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED

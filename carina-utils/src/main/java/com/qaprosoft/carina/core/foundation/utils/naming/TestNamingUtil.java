@@ -131,6 +131,18 @@ public class TestNamingUtil {
         return testName2Bug.get(testName);
     }
 
+    /**
+     * get full test name based on test class, method and other generic information
+     * 
+     * @deprecated
+     *             This method is no longer acceptable to get test name.
+     *             <p>
+     *             Use {@link TestNameListener#getTestName()} instead.
+     *
+     * @param ITestResult result
+     * @return String test name
+     */
+    @Deprecated
     public static String getCanonicalTestName(ITestResult result) {
         // verify if testName is already registered with thread then return it back
         if (isTestNameRegistered()) {
@@ -176,11 +188,36 @@ public class TestNamingUtil {
         return StringEscapeUtils.escapeHtml4(appendTestMethodName(testName, result.getMethod()));
     }
 
+    /**
+     * get test method name
+     * 
+     * @deprecated
+     *             This method is no longer acceptable to get method name.
+     *             <p>
+     *             Use {@link TestNameListener#getMethodName(result)} instead.
+     *
+     * @param ITestResult result
+     * @return String method name
+     */
+    @Deprecated
     public static String getCanonicalTestMethodName(ITestResult result) {
+        LOGGER.error("Use new 'TestNameListener.getMethodName(result);' instead!");
         String testMethodName = result.getMethod().getMethodName();
         return StringEscapeUtils.escapeHtml4(testMethodName);
     }
 
+    /**
+     * get test package name
+     * 
+     * @deprecated
+     *             This method is no longer acceptable to get package name.
+     *             <p>
+     *             Use {@link TestNameListener#getPackageName(result)} instead.
+     *
+     * @param ITestResult result
+     * @return String package name
+     */
+    @Deprecated
     public static String getPackageName(ITestResult result) {
         return StringEscapeUtils.escapeHtml4(result.getMethod().getRealClass().getPackage().getName());
     }
