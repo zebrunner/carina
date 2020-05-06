@@ -26,6 +26,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ElementLoadingStrategy;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
@@ -37,6 +38,8 @@ public abstract class AbstractUIObject extends DriverHelper {
     protected By rootBy;
 
     protected ExtendedWebElement uiLoadingMarker;
+
+    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     /**
      * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context
@@ -79,7 +82,14 @@ public abstract class AbstractUIObject extends DriverHelper {
      *         false - otherwise
      */
     public boolean isUIObjectPresent(int timeout) {
-        return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
+        switch (loadingStrategy) {
+        case BY_PRESENCE:
+            return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
+        case BY_VISIBILITY:
+            return waitUntil(ExpectedConditions.visibilityOfElementLocated(rootBy), timeout);
+        default:
+            return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
+        }
     }
 
     public boolean isUIObjectPresent() {
