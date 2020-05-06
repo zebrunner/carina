@@ -207,5 +207,4 @@ public class SpecialKeywords {
     
     
     public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";
-    public final static String UNDEFINED = "undefined";
 }

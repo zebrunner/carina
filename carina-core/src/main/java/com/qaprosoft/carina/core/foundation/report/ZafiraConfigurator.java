@@ -149,7 +149,8 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public String getTestName(TestResultAdapter testResultAdapter) {
-        return TestNameListener.getTestName();
+        ITestResult testResult = (ITestResult) testResultAdapter.getTestResult();
+        return TestNameListener.getTestName(testResult);
     }
 
     @Override
