@@ -263,8 +263,13 @@ public enum R {
     }
 
     private String decrypt(String content, Pattern pattern) {
-        CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-        return cryptoTool.decryptByPattern(content, pattern);
+        try {
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
+            return cryptoTool.decryptByPattern(content, pattern);
+        } catch (Exception e) {
+            LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
+            return content;
+        }
     }
 
 }
