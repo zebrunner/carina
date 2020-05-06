@@ -22,9 +22,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ElementLoadingStrategy;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
@@ -81,7 +83,7 @@ public abstract class AbstractUIObject extends DriverHelper {
      *
      *         false - otherwise
      */
-    public boolean isUIObjectPresent(int timeout) {
+    public boolean isUIObjectPresent(long timeout) {
         switch (loadingStrategy) {
         case BY_PRESENCE:
             return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
@@ -126,6 +128,30 @@ public abstract class AbstractUIObject extends DriverHelper {
 
     public void setRootBy(By rootBy) {
         this.rootBy = rootBy;
+    }
+
+    public void assertUIObjectPresent() {
+        assertUIObjectPresent(EXPLICIT_TIMEOUT);
+    }
+
+    public void assertUIObjectPresent(long timeout) {
+        if (!isUIObjectPresent(timeout)) {
+            Assert.fail(Messager.UI_OBJECT_NOT_PRESENT.getMessage(getNameWithLocator()));
+        }
+    }
+
+    public void assertUIObjectNotPresent() {
+        assertUIObjectNotPresent(EXPLICIT_TIMEOUT);
+    }
+
+    public void assertUIObjectNotPresent(long timeout) {
+        if (isUIObjectPresent(timeout)) {
+            Assert.fail(Messager.UI_OBJECT_PRESENT.getMessage(getNameWithLocator()));
+        }
+    }
+
+    public String getNameWithLocator() {
+        return rootBy != null ? name + String.format(" (%s)", rootBy) : name + " (n/a)";
     }
 
 }
