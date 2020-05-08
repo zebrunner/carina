@@ -39,7 +39,7 @@ public abstract class AbstractUIObject extends DriverHelper {
     protected WebElement rootElement;
     protected By rootBy;
 
-    protected ExtendedWebElement uiLoadingMarker;
+    protected ExtendedWebElement uiLoadedMarker;
 
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
@@ -98,12 +98,12 @@ public abstract class AbstractUIObject extends DriverHelper {
         return isUIObjectPresent(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
     }
 
-    public ExtendedWebElement getUiLoadingMarker() {
-        return uiLoadingMarker;
+    public ExtendedWebElement getUiLoadedMarker() {
+        return uiLoadedMarker;
     }
 
-    public void setUiLoadingMarker(ExtendedWebElement uiLoadingMarker) {
-        this.uiLoadingMarker = uiLoadingMarker;
+    public void setUiLoadedMarker(ExtendedWebElement uiLoadedMarker) {
+        this.uiLoadedMarker = uiLoadedMarker;
     }
 
     public String getName() {
@@ -130,27 +130,43 @@ public abstract class AbstractUIObject extends DriverHelper {
         this.rootBy = rootBy;
     }
 
+    /**
+     * Checks presence of UIObject root element on the page and throws Assertion error in case if it's missing
+     */
     public void assertUIObjectPresent() {
         assertUIObjectPresent(EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Checks presence of UIObject root element on the page and throws Assertion error in case if it's missing
+     * 
+     * @param timeout
+     */
     public void assertUIObjectPresent(long timeout) {
         if (!isUIObjectPresent(timeout)) {
             Assert.fail(Messager.UI_OBJECT_NOT_PRESENT.getMessage(getNameWithLocator()));
         }
     }
 
+    /**
+     * Checks missing of UIObject root element on the page and throws Assertion error in case if it presents
+     */
     public void assertUIObjectNotPresent() {
         assertUIObjectNotPresent(EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Checks missing of UIObject root element on the page and throws Assertion error in case if it presents
+     * 
+     * @param timeout
+     */
     public void assertUIObjectNotPresent(long timeout) {
         if (isUIObjectPresent(timeout)) {
             Assert.fail(Messager.UI_OBJECT_PRESENT.getMessage(getNameWithLocator()));
         }
     }
 
-    public String getNameWithLocator() {
+    private String getNameWithLocator() {
         return rootBy != null ? name + String.format(" (%s)", rootBy) : name + " (n/a)";
     }
 

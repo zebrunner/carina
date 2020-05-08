@@ -89,31 +89,41 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
             return false;
         }
 
-        if (uiLoadingMarker != null) {
-            isOpened = uiLoadingMarker.isVisible(timeout);
+        if (uiLoadedMarker != null) {
+            isOpened = uiLoadedMarker.isVisible(timeout);
         }
 
         if (!isOpened) {
             LOGGER.warn(String.format(
                     "Loaded page url is as expected but page loading marker element is not visible: %s",
-                    uiLoadingMarker.getBy().toString()));
+                    uiLoadedMarker.getBy().toString()));
         }
         return isOpened;
     }
 
+    /**
+     * Asserts whether page is opened or not. Inside there is a check for expected url matches actual page url.
+     * In addition if uiLoadedMarker is specified for the page it will check whether mentioned element presents on page or not.
+     */
     public void assertPageOpened() {
         assertPageOpened(EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Asserts whether page is opened or not. Inside there is a check for expected url matches actual page url.
+     * In addition if uiLoadedMarker is specified for the page it will check whether mentioned element presents on page or not.
+     * 
+     * @param timeout Completing of page loading conditions will be verified within specified timeout
+     */
     public void assertPageOpened(long timeout) {
         if (!super.isPageOpened(this, timeout)) {
             Assert.fail(String.format("%s not loaded: url is not as expected", getPageClassName()));
         }
 
-        if (uiLoadingMarker != null) {
-            Assert.assertTrue(uiLoadingMarker.isVisible(timeout),
+        if (uiLoadedMarker != null) {
+            Assert.assertTrue(uiLoadedMarker.isVisible(timeout),
                     String.format("%s not loaded: url is correct but page loading marker element is not visible: %s",
-                            getPageClassName(), uiLoadingMarker.getBy().toString()));
+                            getPageClassName(), uiLoadedMarker.getBy().toString()));
         }
     }
 
@@ -172,10 +182,18 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 		return url;
 	}
 
+    /**
+     * Waits till JS and jQuery (if applicable for the page) are completely processed on the page
+     */
     public void waitForJSToLoad() {
         waitForJSToLoad(EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Waits till JS and jQuery (if applicable for the page) are completely processed on the page
+     * 
+     * @param timeout Completing of JS loading will be verified within specified timeout
+     */
     public void waitForJSToLoad(long timeout) {
         // wait for jQuery to load
         JavascriptExecutor executor = (JavascriptExecutor) driver;
