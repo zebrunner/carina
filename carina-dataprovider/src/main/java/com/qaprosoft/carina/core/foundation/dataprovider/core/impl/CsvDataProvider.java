@@ -27,7 +27,7 @@ import org.testng.ITestNGMethod;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.listeners.TestNameListener;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -170,7 +170,7 @@ public class CsvDataProvider extends BaseDataProvider {
 
             HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
 
-            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNameListener.getTestName());
+            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingListener.getTestName());
             if (testMethodColumn.isEmpty()) {
                 testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); // provide organized args to generate valid hash
             } else {

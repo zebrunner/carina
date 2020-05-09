@@ -26,7 +26,7 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.listeners.TestNameListener;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
@@ -150,7 +150,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     @Override
     public String getTestName(TestResultAdapter testResultAdapter) {
         ITestResult testResult = (ITestResult) testResultAdapter.getTestResult();
-        return TestNameListener.getTestName(testResult);
+        return TestNamingListener.getTestName(testResult);
     }
 
     @Override

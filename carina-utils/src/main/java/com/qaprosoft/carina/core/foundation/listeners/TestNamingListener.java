@@ -29,8 +29,8 @@ import org.testng.internal.TestResult;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
-public class TestNameListener implements IResultListener2 {
-    private static final Logger LOGGER = Logger.getLogger(TestNameListener.class);
+public class TestNamingListener implements IResultListener2 {
+    private static final Logger LOGGER = Logger.getLogger(TestNamingListener.class);
     
     static final ThreadLocal<String> testName = new ThreadLocal<String>();
     private static final ConcurrentHashMap<String, Integer> testNameInvCounter = new ConcurrentHashMap<String, Integer>();

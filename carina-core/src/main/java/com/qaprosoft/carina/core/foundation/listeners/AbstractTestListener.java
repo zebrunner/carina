@@ -50,13 +50,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
 
     private void startItem(ITestResult result, Messager messager) {
-        String test = TestNameListener.getTestName();
+        String test = TestNamingListener.getTestName();
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
-        String test = TestNameListener.getTestName();
+        String test = TestNamingListener.getTestName();
 
         String deviceName = getDeviceName();
 
@@ -69,7 +69,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failItem(ITestResult result, Messager messager) {
-        String test = TestNameListener.getTestName();
+        String test = TestNamingListener.getTestName();
 
         String errorMessage = getFailureReason(result);
         String deviceName = getDeviceName();
@@ -93,7 +93,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failRetryItem(ITestResult result, Messager messager, int count, int maxCount) {
-        String test = TestNameListener.getTestName();
+        String test = TestNamingListener.getTestName();
 
         String errorMessage = getFailureReason(result);
 
@@ -106,7 +106,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String skipItem(ITestResult result, Messager messager) {
-        String test = TestNameListener.getTestName();
+        String test = TestNamingListener.getTestName();
 
         String errorMessage = getFailureReason(result);
         if (errorMessage.isEmpty()) {
@@ -159,7 +159,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void skipTestItem(ITestResult result, Messager messager) {
-        String test = TestNameListener.getTestName();
+        String test = TestNamingListener.getTestName();
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
@@ -413,12 +413,12 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
-        String group = StringEscapeUtils.escapeHtml4(TestNameListener.getPackageName(result));
+        String group = StringEscapeUtils.escapeHtml4(TestNamingListener.getPackageName(result));
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
 
-        String test = StringEscapeUtils.escapeHtml4(TestNameListener.getTestName());
+        String test = StringEscapeUtils.escapeHtml4(TestNamingListener.getTestName());
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
