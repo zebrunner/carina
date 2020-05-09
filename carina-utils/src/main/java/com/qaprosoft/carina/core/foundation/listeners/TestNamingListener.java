@@ -37,33 +37,33 @@ public class TestNamingListener implements IResultListener2 {
 
     @Override
     public void beforeConfiguration(ITestResult result) {
-        LOGGER.info("TestNameListener->beforeConfiguration");
+        LOGGER.info("TestNamingListener->beforeConfiguration");
         setTestName(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-        LOGGER.info("TestNameListener->onConfigurationSuccess");
+        LOGGER.info("TestNamingListener->onConfigurationSuccess");
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
-        LOGGER.info("TestNameListener->onConfigurationSkip");
+        LOGGER.info("TestNamingListener->onConfigurationSkip");
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-        LOGGER.info("TestNameListener->onConfigurationFailure");
+        LOGGER.info("TestNamingListener->onConfigurationFailure");
     }
 
     @Override
     public void onStart(ITestContext context) {
-        LOGGER.info("TestNameListener->onStart(ITestContext context)");
+        LOGGER.info("TestNamingListener->onStart(ITestContext context)");
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        LOGGER.info("TestNameListener->onTestStart");
+        LOGGER.info("TestNamingListener->onTestStart");
 
         // obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in
         // onTestSkipped method
@@ -75,22 +75,22 @@ public class TestNamingListener implements IResultListener2 {
     
     @Override
     public void onTestSuccess(ITestResult result) {
-        LOGGER.info("TestNameListener->onTestSuccess");
+        LOGGER.info("TestNamingListener->onTestSuccess");
     }
     
     @Override
     public void onTestFailure(ITestResult result) {
-        LOGGER.info("TestNameListener->");
+        LOGGER.info("TestNamingListener->");
     }
     
     @Override
     public void onTestSkipped(ITestResult result) {
-        LOGGER.info("TestNameListener->onTestFailure");
+        LOGGER.info("TestNamingListener->onTestFailure");
     }
 
     @Override
     public void onFinish(ITestContext context) {
-        LOGGER.info("TestNameListener->onFinish");
+        LOGGER.info("TestNamingListener->onFinish");
     }
     
     /**
