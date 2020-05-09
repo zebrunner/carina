@@ -38,9 +38,6 @@ public class TestNamingListener implements IResultListener2 {
     @Override
     public void beforeConfiguration(ITestResult result) {
         LOGGER.info("TestNameListener->beforeConfiguration");
-        // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
-        //TestNamingUtil.releaseTestInfoByThread();
-        
         setTestName(result);
     }
 
@@ -122,12 +119,25 @@ public class TestNamingListener implements IResultListener2 {
         return testName.get();
     }
     
+    /**
+     * Set any custom full test name.
+     * 
+     * @param String name
+     * @return String test name
+     */ 
     public static String setTestName(String name) {
         LOGGER.warn("Overridden testName: " + name);
         testName.set(name);
         return testName.get();
     }
+
     
+    /**
+     * Set full test name based on test class, method and other generic information. It is generated based by ITestResult object.
+     * 
+     * @param ITestResult result
+     * @return String test name
+     */     
     @SuppressWarnings("unlikely-arg-type")
     private static String setTestName(ITestResult result) {
         String name = "";
@@ -227,6 +237,12 @@ public class TestNamingListener implements IResultListener2 {
         return result.getMethod().getRealClass().getPackage().getName();
     }
     
+    /**
+     * get InvocationCount number based on test name
+     * 
+     * @param String test
+     * @return int invCount
+     */
     private static int getCurrentInvocationCount(String test) {
         /*TODO: reopen https://github.com/cbeust/testng/issues/1758 bug 
          * Explain that appropriate TestNG functionality doesn't work in multi-threading env 
