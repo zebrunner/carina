@@ -175,19 +175,12 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return deviceName;
     }
 
-    //TODO: remove later after testing
-    private void afterConfiguration(ITestResult result) {
-        // TestNamingUtil.releaseTestInfoByThread();
-    }   
-    
     private void afterTest(ITestResult result) {
         // TODO: do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
         
         ReportContext.generateTestReport();
-
-        //TestNamingUtil.releaseTestInfoByThread();
         ReportContext.emptyTestDirData();
     }
 
@@ -195,15 +188,12 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void beforeConfiguration(ITestResult result) {
         LOGGER.info("AbstractTestListener->beforeConfiguration");
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
-        // TestNamingUtil.releaseTestInfoByThread();
-
         super.beforeConfiguration(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
         LOGGER.info("AbstractTestListener->onConfigurationSuccess");
-        afterConfiguration(result);        
         // passItem(result, Messager.CONFIG_PASSED);
         super.onConfigurationSuccess(result);
     }
@@ -211,7 +201,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onConfigurationSkip(ITestResult result) {
         LOGGER.info("AbstractTestListener->onConfigurationSkip");
-        afterConfiguration(result);
         // skipItem(result, Messager.CONFIG_SKIPPED);
         super.onConfigurationSkip(result);
     }
@@ -219,10 +208,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.info("AbstractTestListener->onConfigurationFailure");
-        afterConfiguration(result);
         // failItem(result, Messager.CONFIG_FAILED);
-        // String test = TestNamingUtil.getCanonicalTestName(result);
-        // closeLogAppender(test);
 
         String errorMessage = getFailureReason(result);
 
