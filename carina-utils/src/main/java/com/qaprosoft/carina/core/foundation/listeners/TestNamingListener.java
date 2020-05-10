@@ -209,8 +209,6 @@ public class TestNamingListener implements IResultListener2 {
      * @return String method name
      */
     public static String getMethodName(ITestResult result) {
-        
-        //TODO: test testMethodName adjustment based on pattern
         // adjust testName using pattern
         ITestNGMethod m = result.getMethod();
         String name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
