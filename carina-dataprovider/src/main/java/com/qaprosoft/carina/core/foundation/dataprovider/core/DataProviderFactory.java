@@ -44,7 +44,6 @@ public class DataProviderFactory {
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
 
         Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> canonicalTestNameArgsMap = Collections.synchronizedMap(new LinkedHashMap<>());
         Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
@@ -82,7 +81,6 @@ public class DataProviderFactory {
                     BaseDataProvider activeProvider = (BaseDataProvider) object;
                     provider = ArrayUtils.addAll(provider, activeProvider.getDataProvider(annotation, context, m));
                     testNameArgsMap.putAll(activeProvider.getTestNameArgsMap());
-                    canonicalTestNameArgsMap.putAll(activeProvider.getCanonicalTestNameArgsMap());
                     testMethodOwnerArgsMap.putAll(activeProvider.getTestMethodOwnerArgsMap());
                     jiraArgsMap.putAll(activeProvider.getJiraArgsMap());
                     testRailsArgsMap.putAll(activeProvider.getTestRailsArgsMap());

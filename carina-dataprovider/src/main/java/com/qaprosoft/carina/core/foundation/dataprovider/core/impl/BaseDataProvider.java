@@ -35,8 +35,6 @@ import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 public abstract class BaseDataProvider {
 
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-    protected Map<String, String> testMethodNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-    protected Map<String, String> canonicalTestNameArgsMap = Collections.synchronizedMap(new LinkedHashMap<>());
 
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
 
@@ -60,11 +58,6 @@ public abstract class BaseDataProvider {
         return testNameArgsMap;
     }
 
-    @Deprecated
-    public Map<String, String> getTestMethodNameArgsMap() {
-        return testMethodNameArgsMap;
-    }
-
     public Map<String, String> getTestMethodOwnerArgsMap() {
         return testMethodOwnerArgsMap;
     }
@@ -83,10 +76,6 @@ public abstract class BaseDataProvider {
 
     public List<String> getDoNotRunRowsIDs() {
         return doNotRunTestNames;
-    }
-
-    public Map<String, String> getCanonicalTestNameArgsMap() {
-        return canonicalTestNameArgsMap;
     }
 
 }
