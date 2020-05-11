@@ -33,6 +33,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
+import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
@@ -79,8 +80,15 @@ public abstract class AbstractApiMethod extends HttpClient {
         request.contentType(contentType);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes" })
     private void init(Class clazz) {
+        Endpoint e = this.getClass().getAnnotation(Endpoint.class);
+        if (e != null) {
+            methodType = e.methodType();
+            methodPath = e.url();
+            return;
+        }
+
         String typePath = R.API.get(clazz.getSimpleName());
         if (typePath == null) {
             throw new RuntimeException("Method type and path are not specified for: " + clazz.getSimpleName());

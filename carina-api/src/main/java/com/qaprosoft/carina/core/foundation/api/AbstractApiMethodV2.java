@@ -28,6 +28,9 @@ import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
 import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
@@ -39,23 +42,16 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rsPath;
     private String actualRsBody;
 
+    public AbstractApiMethodV2() {
+        super("application/json");
+        setHeaders("Accept=*/*");
+        initPathsFromAnnotation();
+    }
+
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
         super("application/json");
         setHeaders("Accept=*/*");
-
-        URL baseResource = ClassLoader.getSystemResource(propertiesPath);
-        if (baseResource != null) {
-            properties = new Properties();
-            try {
-                properties.load(baseResource.openStream());
-            } catch (IOException e) {
-                throw new RuntimeException("Properties can't be loaded by path: " + propertiesPath, e);
-            }
-            LOGGER.info("Base properties loaded: " + propertiesPath);
-        } else {
-            throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
-        }
-        properties = PropertiesProcessorMain.processProperties(properties);
+        setProperties(propertiesPath);
         this.rqPath = rqPath;
         this.rsPath = rsPath;
     }
@@ -68,6 +64,17 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
         this.rqPath = rqPath;
         this.rsPath = rsPath;
+    }
+
+    private void initPathsFromAnnotation() {
+        RequestTemplatePath requestTemplatePath = this.getClass().getAnnotation(RequestTemplatePath.class);
+        if (requestTemplatePath != null) {
+            this.rqPath = requestTemplatePath.path();
+        }
+        ResponseTemplatePath responseTemplatePath = this.getClass().getAnnotation(ResponseTemplatePath.class);
+        if (responseTemplatePath != null) {
+            this.rsPath = responseTemplatePath.path();
+        }
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
@@ -99,6 +106,35 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         Response rs = super.callAPI();
         actualRsBody = rs.asString();
         return rs;
+    }
+
+    public Response callAPIExpectSuccess() {
+        SuccessfulHttpStatus successfulHttpStatus = this.getClass().getAnnotation(SuccessfulHttpStatus.class);
+        if (successfulHttpStatus == null) {
+            throw new RuntimeException("To use this method please declare @SuccessfulHttpStatus for your AbstractApiMethod class");
+        }
+        expectResponseStatus(successfulHttpStatus.status());
+        return callAPI();
+    }
+
+    public void setProperties(String propertiesPath) {
+        URL baseResource = ClassLoader.getSystemResource(propertiesPath);
+        if (baseResource != null) {
+            properties = new Properties();
+            try {
+                properties.load(baseResource.openStream());
+            } catch (IOException e) {
+                throw new RuntimeException("Properties can't be loaded by path: " + propertiesPath, e);
+            }
+            LOGGER.info("Base properties loaded: " + propertiesPath);
+        } else {
+            throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
+        }
+        properties = PropertiesProcessorMain.processProperties(properties);
+    }
+
+    public void setProperties(Properties properties) {
+        properties = PropertiesProcessorMain.processProperties(properties);
     }
 
     public void addProperty(String key, Object value) {
