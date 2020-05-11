@@ -81,7 +81,7 @@ public class MobileFactory extends AbstractFactory {
         // CUSTOM attribute
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()
-                && (customCapabilities.toLowerCase().contains("browserstack") || customCapabilities.toLowerCase().contains("saucelabs"))) {
+                && (customCapabilities.toLowerCase().contains("localhost") || customCapabilities.toLowerCase().contains("browserstack") || customCapabilities.toLowerCase().contains("saucelabs"))) {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
 
@@ -101,9 +101,8 @@ public class MobileFactory extends AbstractFactory {
         try {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
-                EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-
                 if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+                    EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     
                     if (isVideoEnabled()) {
                         // Details about available parameters
@@ -167,6 +166,7 @@ public class MobileFactory extends AbstractFactory {
                 } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                         || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
+                    EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     if (isVideoEnabled()) {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
