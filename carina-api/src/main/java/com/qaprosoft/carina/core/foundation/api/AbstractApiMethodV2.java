@@ -50,6 +50,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         super("application/json");
         setHeaders("Accept=*/*");
         initPathsFromAnnotation();
+        setProperties(new Properties());
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
@@ -82,7 +83,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
-        this(rqPath, rsPath, (Properties) null);
+        this(rqPath, rsPath, new Properties());
     }
 
     /**
@@ -171,7 +172,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param properties Properties object with predefined properties for declared API method
      */
     public void setProperties(Properties properties) {
-        properties = PropertiesProcessorMain.processProperties(properties);
+        this.properties = PropertiesProcessorMain.processProperties(properties);
     }
 
     public void addProperty(String key, Object value) {
