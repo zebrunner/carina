@@ -42,6 +42,10 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rsPath;
     private String actualRsBody;
 
+    /**
+     * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
+     * and @ResponseTemplatePath if present
+     */
     public AbstractApiMethodV2() {
         super("application/json");
         setHeaders("Accept=*/*");
@@ -81,6 +85,24 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this(rqPath, rsPath, (Properties) null);
     }
 
+    /**
+     * Sets path to freemarker template for request body
+     * 
+     * @param path String
+     */
+    public void setRequestTemplate(String path) {
+        this.rqPath = path;
+    }
+
+    /**
+     * Sets path to freemarker template for expected response body
+     * 
+     * @param path String
+     */
+    public void setResponseTemplate(String path) {
+        this.rsPath = path;
+    }
+
     @Override
     @Deprecated
     public String call() {
@@ -108,6 +130,11 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         return rs;
     }
 
+    /**
+     * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
+     * 
+     * @return restassured Response object
+     */
     public Response callAPIExpectSuccess() {
         SuccessfulHttpStatus successfulHttpStatus = this.getClass().getAnnotation(SuccessfulHttpStatus.class);
         if (successfulHttpStatus == null) {
@@ -117,6 +144,11 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         return callAPI();
     }
 
+    /**
+     * Sets path to .properties file which stores properties list for declared API method
+     * 
+     * @param propertiesPath String path to properties file
+     */
     public void setProperties(String propertiesPath) {
         URL baseResource = ClassLoader.getSystemResource(propertiesPath);
         if (baseResource != null) {
@@ -133,6 +165,11 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         properties = PropertiesProcessorMain.processProperties(properties);
     }
 
+    /**
+     * Sets properties list for declared API method
+     * 
+     * @param properties Properties object with predefined properties for declared API method
+     */
     public void setProperties(Properties properties) {
         properties = PropertiesProcessorMain.processProperties(properties);
     }
