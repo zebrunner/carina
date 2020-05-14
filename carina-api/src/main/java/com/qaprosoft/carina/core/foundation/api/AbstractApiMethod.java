@@ -95,8 +95,8 @@ public abstract class AbstractApiMethod extends HttpClient {
 
     public void setHeaders(String... headerKeyValues) {
         for (String headerKeyValue : headerKeyValues) {
-            String key = headerKeyValue.split("=")[0];
-            String value = headerKeyValue.split("=")[1];
+            String key = headerKeyValue.split("=", 2)[0];
+            String value = headerKeyValue.split("=", 2)[1];
             request.header(key, value);
         }
     }
