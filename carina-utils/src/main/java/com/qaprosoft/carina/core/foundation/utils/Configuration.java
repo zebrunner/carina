@@ -387,7 +387,21 @@ public class Configuration {
         return get(param).isEmpty();
     }
 
+    /**
+     * Get platform name from configuration properties.
+     * @return String platform name
+     */
     public static String getPlatform() {
+        return getPlatform(new DesiredCapabilities());
+    }
+
+    /**
+     * Get platform name from configuration properties or DesiredCapabilities.
+     * @param caps
+     *            DesiredCapabilities
+     * @return String platform name
+     */
+    public static String getPlatform(DesiredCapabilities caps) {
         // any platform by default
         String platform = "*";
 
@@ -400,6 +414,14 @@ public class Configuration {
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
+        
+        if (caps.getCapability("platform") != null) {
+            platform = caps.getCapability("platform").toString();
+        }
+
+        if (caps.getCapability("platformName") != null) {
+            platform = caps.getCapability("platformName").toString();
+        }        
         
         //TODO: try to get actual platform name
         return platform;
