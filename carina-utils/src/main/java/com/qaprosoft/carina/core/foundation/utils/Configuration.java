@@ -201,8 +201,6 @@ public class Configuration {
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
-        
-        ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
 
         // TestRail
         TESTRAIL_RUN_NAME("testrail_run_name"),
