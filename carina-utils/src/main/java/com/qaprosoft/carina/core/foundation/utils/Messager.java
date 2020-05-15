@@ -132,6 +132,10 @@ public enum Messager implements IMessager {
 
     KEYS_NOT_SEND_TO_ELEMENT("FAIL: keys '%s' are not sent to element '%s'!"),
 
+    UI_OBJECT_PRESENT("PASS: UI object '%s' presents!"),
+
+    UI_OBJECT_NOT_PRESENT("FAIL: UI object '%s' does not present!"),
+
     TITLE_CORERECT("PASS: page '%s' has correct title '%s'."),
 
     TITLE_NOT_CORERECT("FAIL: unexpected title for page '%s', expected '%s' but actual '%s'!"),
