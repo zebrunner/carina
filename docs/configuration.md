@@ -404,6 +404,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
 		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>owner;;TAGS=>tag1=temp&amp;&amp;feature=reg</td>
 	</tr>
+	<tr>
+		<td>element_loading_strategy</td>
+		<td>Determines how carina detects appearing of web elements on page: by presence in DOM model or by visibility</td>
+		<td>BY_PRESENCE, BY_VISIBILITY</td>
+	</tr>
 </table>
 Most of the properties may be read in the following way:
 ```
