@@ -22,13 +22,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ElementLoadingStrategy;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
@@ -38,10 +35,6 @@ public abstract class AbstractUIObject extends DriverHelper {
 
     protected WebElement rootElement;
     protected By rootBy;
-
-    protected ExtendedWebElement uiLoadedMarker;
-
-    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     /**
      * Initializes UI object using {@link PageFactory}. Whole browser window is used as search context
@@ -83,27 +76,12 @@ public abstract class AbstractUIObject extends DriverHelper {
      *
      *         false - otherwise
      */
-    public boolean isUIObjectPresent(long timeout) {
-        switch (loadingStrategy) {
-        case BY_PRESENCE:
-            return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
-        case BY_VISIBILITY:
-            return waitUntil(ExpectedConditions.visibilityOfElementLocated(rootBy), timeout);
-        default:
-            return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
-        }
+    public boolean isUIObjectPresent(int timeout) {
+    	return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
     }
 
     public boolean isUIObjectPresent() {
-        return isUIObjectPresent(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
-    }
-
-    public ExtendedWebElement getUiLoadedMarker() {
-        return uiLoadedMarker;
-    }
-
-    public void setUiLoadedMarker(ExtendedWebElement uiLoadedMarker) {
-        this.uiLoadedMarker = uiLoadedMarker;
+    	return isUIObjectPresent(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
     }
 
     public String getName() {
@@ -121,53 +99,14 @@ public abstract class AbstractUIObject extends DriverHelper {
     public void setRootElement(WebElement element) {
         this.rootElement = element;
     }
-
+    
     public By getRootBy() {
         return rootBy;
     }
-
+    
     public void setRootBy(By rootBy) {
         this.rootBy = rootBy;
     }
-
-    /**
-     * Checks presence of UIObject root element on the page and throws Assertion error in case if it's missing
-     */
-    public void assertUIObjectPresent() {
-        assertUIObjectPresent(EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Checks presence of UIObject root element on the page and throws Assertion error in case if it's missing
-     * 
-     * @param timeout
-     */
-    public void assertUIObjectPresent(long timeout) {
-        if (!isUIObjectPresent(timeout)) {
-            Assert.fail(Messager.UI_OBJECT_NOT_PRESENT.getMessage(getNameWithLocator()));
-        }
-    }
-
-    /**
-     * Checks missing of UIObject root element on the page and throws Assertion error in case if it presents
-     */
-    public void assertUIObjectNotPresent() {
-        assertUIObjectNotPresent(EXPLICIT_TIMEOUT);
-    }
-
-    /**
-     * Checks missing of UIObject root element on the page and throws Assertion error in case if it presents
-     * 
-     * @param timeout
-     */
-    public void assertUIObjectNotPresent(long timeout) {
-        if (isUIObjectPresent(timeout)) {
-            Assert.fail(Messager.UI_OBJECT_PRESENT.getMessage(getNameWithLocator()));
-        }
-    }
-
-    private String getNameWithLocator() {
-        return rootBy != null ? name + String.format(" (%s)", rootBy) : name + " (n/a)";
-    }
-
+    
+    
 }
