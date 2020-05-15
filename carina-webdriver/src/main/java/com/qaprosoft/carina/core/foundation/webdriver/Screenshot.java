@@ -63,6 +63,8 @@ public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+    
+    protected static boolean defaultCapturer = true;
 
     private Screenshot() {
     	//hide default constructor
@@ -110,11 +112,12 @@ public class Screenshot {
     }
 
     /**
-     * Clear all rules
+     * Clear all rules and disable all kind of screenshots even for failures!
      */
     public static List<IScreenshotRule> clearRules() {
-        LOGGER.debug("All rules will be deleted. All kind of screenshot capturing disabled!");
+        LOGGER.debug("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
         rules.clear();
+        defaultCapturer = false;
         return rules;
     }
 
@@ -162,10 +165,20 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static String capture(WebDriver driver, String comment, boolean isFullSize) {
-        LOGGER.debug("Screenshot->captureFailure starting...");
         String screenName = capture(driver, true, comment, isFullSize);
-        LOGGER.debug("Screenshot->captureFailure finished.");
         return screenName;
+    }
+    
+    /**
+     * Verify if default screenshot capturing rules are available
+     * 
+     * @return boolean.
+     */    
+    public static boolean isEnabled() {
+        if (!defaultCapturer) {
+            LOGGER.info("Default carina screenshot capturing rules are disabled!");
+        }
+        return defaultCapturer;
     }
     
     /**
@@ -184,7 +197,7 @@ public class Screenshot {
         String screenName;
         BufferedImage screen = null;
 
-        LOGGER.debug("Screenshot->capture starting...");
+        LOGGER.debug("Screenshot->captureFullSize starting...");
 
         try {
             if (!isCaptured(comment)) {
@@ -255,7 +268,7 @@ public class Screenshot {
         } finally {
             Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
         }
-        LOGGER.debug("Screenshot->capture finished.");
+        LOGGER.debug("Screenshot->captureFullSize finished.");
         return screen;
     }
 
@@ -660,4 +673,5 @@ public class Screenshot {
                     SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_DPR);
         }
     }
+    
 }

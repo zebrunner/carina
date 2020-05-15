@@ -291,10 +291,12 @@ public class DriverListener implements WebDriverEventListener {
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
-                String screenName = Screenshot.capture(driver, comment, true); // in case of failure
-                //do not generate UI dump if no screenshot
-                if (!screenName.isEmpty()) {
-                    generateDump(screenName);
+                if (Screenshot.isEnabled()) {
+                    String screenName = Screenshot.capture(driver, comment, true); // in case of failure
+                    //do not generate UI dump if no screenshot
+                    if (!screenName.isEmpty()) {
+                        generateDump(screenName);
+                    }
                 }
             } else {
                 LOGGER.info(comment);
