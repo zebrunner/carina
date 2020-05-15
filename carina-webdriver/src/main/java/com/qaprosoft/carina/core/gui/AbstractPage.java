@@ -95,7 +95,7 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 
         String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
         // TODO: test this implementation and change back to capture if necessary
-        Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.captureFailure(getDriver(), ""));
+        Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.capture(getDriver(), "", true));
         Document document = null;
         if (scaled) {
             document = new Document(PageSize.A4, 10, 10, 10, 10);

@@ -510,7 +510,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
                 expandStatusBar();
             }
             LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
-            Screenshot.capture(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
+            Screenshot.captureByRule(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
             try {
                 notificationPage.clearNotifications();
             } catch (Exception e) {

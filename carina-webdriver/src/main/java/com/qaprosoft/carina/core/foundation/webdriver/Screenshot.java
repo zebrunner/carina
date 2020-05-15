@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.zafira.util.upload.UploadUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
@@ -41,13 +40,12 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.qaprosoft.zafira.util.upload.UploadUtil;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -65,6 +63,8 @@ public class Screenshot {
     private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+    
+    protected static boolean defaultCapturer = true;
 
     private Screenshot() {
     	//hide default constructor
@@ -99,7 +99,7 @@ public class Screenshot {
     }
 
     /**
-     * Deletes rule
+     * Delete rule
      *
      * @param rule IScreenshotRule
      * @return list of existing rules
@@ -111,12 +111,25 @@ public class Screenshot {
         return rules;
     }
 
+    /**
+     * Clear all rules and disable all kind of screenshots even for failures!
+     */
     public static List<IScreenshotRule> clearRules() {
-        LOGGER.debug("All rules will be deleted.");
+        LOGGER.debug("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
         rules.clear();
+        defaultCapturer = false;
         return rules;
     }
 
+    /**
+     * Captures visible screenshot explicitly by any rule, creates thumbnail and copies both images to specified screenshots
+     * location.
+     *
+     * @param driver
+     *            instance used for capturing.
+     * @param comment String
+     * @return screenshot name.
+     */
     public static String captureByRule(WebDriver driver, String comment) {
         boolean isTakeScreenshotRules = false;
         for (IScreenshotRule iScreenshotRule : rules) {
@@ -125,25 +138,11 @@ public class Screenshot {
                 break;
             }
         }
-        return capture(driver, isTakeScreenshotRules, comment, false, false);
+        return capture(driver, isTakeScreenshotRules, comment, false);
     }
 
     /**
-     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
-     *
-     * Captures screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots location.
-     *
-     * @param driver
-     *            instance used for capturing.
-     * @return screenshot name.
-     */
-    @Deprecated
-    public static String capture(WebDriver driver) {
-        return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT));
-    }
-
-    /**
-     * Captures screenshot explicitly ignoring auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
+     * Captures visible screenshot explicitly ignoring any rules, creates thumbnail and copies both images to specified screenshots
      * location.
      *
      * @param driver
@@ -151,34 +150,34 @@ public class Screenshot {
      * @param comment String
      * @return screenshot name.
      */
-    public static String captureFailure(WebDriver driver, String comment) {
-        LOGGER.debug("Screenshot->captureFailure starting...");
-        String screenName = capture(driver, true, comment, true, false);
-
-        //do not generate UI dump if no screenshot 
-        if (!screenName.isEmpty()) {
-            // XML layout extraction
-            File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
-            
-            if (uiDumpFile != null) {
-                // use the same naming but with zip extension. Put into the test artifacts folder
-                String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", ".zip");
-                LOGGER.debug("UI Dump artifact: " + dumpArtifact);
-                
-                // build path to screenshot using name 
-                File screenFile = new File(ReportContext.getTestDir().getAbsolutePath() + "/" + screenName);
-                
-                // archive page source dump and screenshot both together
-                FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
-                
-                Artifacts.add("UI Dump artifact", new File(dumpArtifact));
-            } else {
-                LOGGER.debug("Dump file is empty.");
-            }
+    public static String capture(WebDriver driver, String comment) {
+        return capture(driver, comment, false);
+    }
+    
+    /**
+     * Captures screenshot explicitly ignoring any rules, creates thumbnail and copies both images to specified screenshots
+     * location.
+     *
+     * @param driver
+     *            instance used for capturing.
+     * @param comment String
+     * @param isFullSize boolean
+     * @return screenshot name.
+     */
+    public static String capture(WebDriver driver, String comment, boolean isFullSize) {
+        return capture(driver, true, comment, isFullSize);
+    }
+    
+    /**
+     * Verify if default screenshot capturing rules are available
+     * 
+     * @return boolean.
+     */    
+    public static boolean isEnabled() {
+        if (!defaultCapturer) {
+            LOGGER.info("Default carina screenshot capturing rules are disabled!");
         }
-        LOGGER.debug("Screenshot->captureFailure finished.");
-        
-        return screenName;
+        return defaultCapturer;
     }
     
     /**
@@ -197,7 +196,7 @@ public class Screenshot {
         String screenName;
         BufferedImage screen = null;
 
-        LOGGER.debug("Screenshot->capture starting...");
+        LOGGER.debug("Screenshot->captureFullSize starting...");
 
         try {
             if (!isCaptured(comment)) {
@@ -268,67 +267,12 @@ public class Screenshot {
         } finally {
             Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
         }
-        LOGGER.debug("Screenshot->capture finished.");
+        LOGGER.debug("Screenshot->captureFullSize finished.");
         return screen;
     }
 
     public static BufferedImage captureFullSize(WebDriver driver, String comment) {
         return captureFullSize(driver, comment, false);
-    }
-
-    /**
-     * Captures screenshot with comment based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
-     * location.
-     *
-     * @param driver
-     *            instance used for capturing.
-     * @param comment 
-     * 			String comment
-   	 * @param artifact
-     * 			boolean artifact
-     * @return screenshot name.
-     */
-    public static String capture(WebDriver driver, String comment, boolean artifact) {
-        return capture(driver, Configuration.getBoolean(Parameter.AUTO_SCREENSHOT), comment, false, artifact);
-    }
-
-    public static String capture(WebDriver driver, String comment) {
-        return capture(driver, comment, false);
-    }
-
-    /**
-     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
-     *
-     * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
-     *
-     * @param driver
-     *            instance used for capturing.
-     * @param isTakeScreenshot
-     *            perform actual capture or not
-     * @return screenshot name.
-     */
-    @Deprecated
-    public static String capture(WebDriver driver, boolean isTakeScreenshot) {
-        return capture(driver, isTakeScreenshot, "", false, false);
-
-    }
-
-    /**
-     * @deprecated  As of release 5.x, replaced by {@link #capture(WebDriver driver, String comment)}
-     *
-     * Captures screenshot, creates thumbnail and copies both images to specified screenshots location.
-     *
-     * @param driver
-     *            instance used for capturing.
-     * @param isTakeScreenshot
-     *            perform actual capture or not
-     * @param comment
-     *            String
-     * @return screenshot name.
-     */
-    @Deprecated
-    public static String capture(WebDriver driver, boolean isTakeScreenshot, String comment) {
-        return capture(driver, isTakeScreenshot, comment, false, false);
     }
 
     /**
@@ -384,9 +328,9 @@ public class Screenshot {
      * @return screenshot name.
      */
 
-    private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize, boolean artifact) {
+    private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
         String screenName = "";
-
+        
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
@@ -464,18 +408,18 @@ public class Screenshot {
                         Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
 
                 // Uploading screenshot to Amazon S3
-                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
+                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, false);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
-            	LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
             } catch (Exception e) {
                 LOGGER.error("Unable to capture screenshot due to the Exception!", e);
             } finally {
-            	Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+                Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
         }
         LOGGER.debug("Screenshot->capture finished.");
@@ -728,4 +672,5 @@ public class Screenshot {
                     SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_DPR);
         }
     }
+    
 }
