@@ -149,6 +149,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 new CapabilitiesLoader().loadCapabilities(customCapabilities);
             }
 
+            IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
+            Screenshot.addScreenshotRule(autoScreenshotsRule);
+            
             updateAppPath();
 
         } catch (Exception e) {
@@ -208,8 +211,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         setThreadCount(suite);
         onHealthCheck(suite);
         
-        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
-        Screenshot.addScreenshotRule(autoScreenshotsRule);
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
 
