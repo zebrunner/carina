@@ -165,8 +165,7 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static String capture(WebDriver driver, String comment, boolean isFullSize) {
-        String screenName = capture(driver, true, comment, isFullSize);
-        return screenName;
+        return capture(driver, true, comment, isFullSize);
     }
     
     /**
