@@ -91,6 +91,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.models.dto.TestRunType;
@@ -108,7 +110,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
     
-    protected static boolean automaticDriversCleanup = true; 
+    protected static boolean automaticDriversCleanup = true;
 
     static {
         try {
@@ -206,6 +208,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         setThreadCount(suite);
         onHealthCheck(suite);
         
+        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
+        Screenshot.addScreenshotRule(autoScreenshotsRule);
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
 
@@ -815,7 +819,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     drv = ((EventFiringWebDriver) drv).getWrappedDriver();
                 }
                 
-                screenId = Screenshot.captureFailure(drv, driverName + ": " + msg); // in case of failure
+                screenId = Screenshot.capture(drv, driverName + ": " + msg, true); // in case of failure
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);

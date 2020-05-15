@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
+import java.io.File;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -26,6 +28,10 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -285,10 +291,14 @@ public class DriverListener implements WebDriverEventListener {
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
-                Screenshot.captureFailure(driver, comment); // in case of failure
+                String screenName = Screenshot.capture(driver, comment, true); // in case of failure
+                //do not generate UI dump if no screenshot
+                if (!screenName.isEmpty()) {
+                    generateDump(screenName);
+                }
             } else {
                 LOGGER.info(comment);
-                Screenshot.capture(driver, comment);
+                Screenshot.captureByRule(driver, comment);
             }
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot: " + e.getMessage(), e);
@@ -298,11 +308,30 @@ public class DriverListener implements WebDriverEventListener {
         LOGGER.debug("DriverListener->captureScreenshot finished...");
     }
 
+    private void generateDump(String screenName) {
+        // XML layout extraction
+        File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
+        if (uiDumpFile != null) {
+            // use the same naming but with zip extension. Put into the test artifacts folder
+            String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", ".zip");
+            LOGGER.debug("UI Dump artifact: " + dumpArtifact);
+            
+            // build path to screenshot using name 
+            File screenFile = new File(ReportContext.getTestDir().getAbsolutePath() + "/" + screenName);
+            
+            // archive page source dump and screenshot both together
+            FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
+            
+            Artifacts.add("UI Dump artifact", new File(dumpArtifact));
+        } else {
+            LOGGER.debug("Dump file is empty.");
+        }
+    }
+    
     private void onAfterAction(String comment, WebDriver driver) {
         captureScreenshot(comment, driver, null, false);
     }
     
-
 	private void onBeforeAction() {
 		// 4a. if "tzid" not exist inside vncArtifact and exists in Reporter -> register new vncArtifact in Zafira.
 		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
