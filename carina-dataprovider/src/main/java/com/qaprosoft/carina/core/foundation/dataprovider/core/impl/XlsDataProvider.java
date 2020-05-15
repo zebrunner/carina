@@ -29,7 +29,6 @@ import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -133,13 +132,10 @@ public class XlsDataProvider extends BaseDataProvider {
             // update testName adding UID values from DataSource arguments if any
             testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
-            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingUtil.appendTestMethodName(testName, testMethod));
-            if (testMethodColumn.isEmpty()) {
-                testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
-            } else {
-                // add testName value from xls datasource to special hashMap
+            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            if (!testMethodColumn.isEmpty()) {
+                // override testName value from xls datasource to special hashMap
                 addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
-                addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
             }
 
             // add testMethoOwner from xls datasource to special hashMap

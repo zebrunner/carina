@@ -767,7 +767,6 @@ public class MobileUtils {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public static WebDriver getDriver() {
 		WebDriver drv = IDriverPool.getDefaultDriver();
 		if (drv instanceof EventFiringWebDriver) {

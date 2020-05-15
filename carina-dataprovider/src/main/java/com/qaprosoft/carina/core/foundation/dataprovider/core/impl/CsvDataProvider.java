@@ -28,7 +28,6 @@ import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSour
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -169,14 +168,11 @@ public class CsvDataProvider extends BaseDataProvider {
             testName = dsBean.setDataSorceUUID(testName, strings, mapper); // provide whole line from data provider for UUID generation
 
             HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
-
-            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingUtil.appendTestMethodName(testName, testMethod));
-            if (testMethodColumn.isEmpty()) {
-                testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); // provide organized args to generate valid hash
-            } else {
-                // add testName value from csv datasource to special hashMap
+            
+            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            if (!testMethodColumn.isEmpty()) {
+                // override testName value from xls datasource to special hashMap
                 addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-                addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             }
 
             // add testMethoOwner from xls datasource to special hashMap

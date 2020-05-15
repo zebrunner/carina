@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.IRetryAnalyzer;
@@ -40,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
@@ -50,16 +50,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
 
     private void startItem(ITestResult result, Messager messager) {
-
-        String test = TestNamingUtil.getCanonicalTestName(result);
-        test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId(), result);
-
+        String test = TestNamingListener.getTestName();
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNamingListener.getTestName();
 
         String deviceName = getDeviceName();
 
@@ -72,7 +69,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNamingListener.getTestName();
 
         String errorMessage = getFailureReason(result);
         String deviceName = getDeviceName();
@@ -96,7 +93,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failRetryItem(ITestResult result, Messager messager, int count, int maxCount) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNamingListener.getTestName();
 
         String errorMessage = getFailureReason(result);
 
@@ -109,7 +106,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String skipItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNamingListener.getTestName();
 
         String errorMessage = getFailureReason(result);
         if (errorMessage.isEmpty()) {
@@ -162,7 +159,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void skipTestItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNamingListener.getTestName();
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
@@ -178,49 +175,40 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return deviceName;
     }
 
-    private void afterConfiguration(ITestResult result) {
-        TestNamingUtil.releaseTestInfoByThread();
-    }
-
     private void afterTest(ITestResult result) {
         // TODO: do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
         
         ReportContext.generateTestReport();
-
-        TestNamingUtil.releaseTestInfoByThread();
         ReportContext.emptyTestDirData();
     }
 
     @Override
     public void beforeConfiguration(ITestResult result) {
+        LOGGER.info("AbstractTestListener->beforeConfiguration");
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
-        TestNamingUtil.releaseTestInfoByThread();
-
         super.beforeConfiguration(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-        afterConfiguration(result);
+        LOGGER.info("AbstractTestListener->onConfigurationSuccess");
         // passItem(result, Messager.CONFIG_PASSED);
         super.onConfigurationSuccess(result);
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
-        afterConfiguration(result);
+        LOGGER.info("AbstractTestListener->onConfigurationSkip");
         // skipItem(result, Messager.CONFIG_SKIPPED);
         super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-        afterConfiguration(result);
+        LOGGER.info("AbstractTestListener->onConfigurationFailure");
         // failItem(result, Messager.CONFIG_FAILED);
-        // String test = TestNamingUtil.getCanonicalTestName(result);
-        // closeLogAppender(test);
 
         String errorMessage = getFailureReason(result);
 
@@ -233,6 +221,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onStart(ITestContext context) {
+        LOGGER.info("AbstractTestListener->onStart(ITestContext context)");
         String uuid = StringGenerator.generateNumeric(8);
         ParameterGenerator.setUUID(uuid);
 
@@ -243,6 +232,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestStart(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestStart");
         VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
         if (curRetryAnalyzer == null) {
@@ -276,7 +266,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         }
         // obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in
         // onTestSkipped method
-        TestNamingUtil.releaseTestInfoByThread();
+        // TestNamingUtil.releaseTestInfoByThread();
 
         startItem(result, Messager.TEST_STARTED);
 
@@ -306,6 +296,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestSuccess");
         passItem(result, Messager.TEST_PASSED);
         VideoAnalyzer.enableVideoUpload();
 
@@ -322,6 +313,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestFailure(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestFailure");
         failItem(result, Messager.TEST_FAILED);
         VideoAnalyzer.enableVideoUpload();
         afterTest(result);
@@ -337,6 +329,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestSkipped(ITestResult result) {
+        LOGGER.info("AbstractTestListener->onTestSkipped");
         // handle Zafira already passed exception for re-run and do nothing. Return should be enough
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
@@ -388,6 +381,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onFinish(ITestContext context) {
+        LOGGER.info("AbstractTestListener->onFinish(ITestContext context)");
         super.onFinish(context);
         removeAlreadyPassedTests(context);
     }
@@ -405,23 +399,12 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
-        String group = TestNamingUtil.getPackageName(result);
+        String group = StringEscapeUtils.escapeHtml4(TestNamingListener.getPackageName(result));
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
 
-        if (TestResultType.FAIL.equals(resultType)) {
-            String bugInfo = Jira.processBug(result);
-            if (bugInfo != null) {
-                if (failReason != null) {
-                    failReason = bugInfo.concat("\n").concat(failReason);
-                } else {
-                    failReason = bugInfo;
-                }
-            }
-        }
-
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = StringEscapeUtils.escapeHtml4(TestNamingListener.getTestName());
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED

@@ -26,13 +26,13 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
@@ -149,20 +149,14 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public String getTestName(TestResultAdapter testResultAdapter) {
-        // TODO: avoid TestNamingUtil
-        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
-        String testName = TestNamingUtil.getCanonicalTestName(test);
-        LOGGER.debug("testName: " + testName);
-        return testName;
+        ITestResult testResult = (ITestResult) testResultAdapter.getTestResult();
+        return TestNamingListener.getTestName(testResult);
     }
 
     @Override
     public String getTestMethodName(TestResultAdapter testResultAdapter) {
-        // TODO: avoid TestNamingUtil
-        ITestResult test = (ITestResult) testResultAdapter.getTestResult();
-        String testMethodName = TestNamingUtil.getCanonicalTestMethodName(test);
-        LOGGER.debug("testMethodName: " + testMethodName);
-        return testMethodName;
+        ITestResult testResult = (ITestResult) testResultAdapter.getTestResult();
+        return testResult.getMethod().getMethodName();
     }
 
     @Override
