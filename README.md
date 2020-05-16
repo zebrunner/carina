@@ -1,8 +1,5 @@
 ![Alt text](./docs/img/carina.png "Carina Logo")
 
-[![Release Build Status](https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE/badge/icon?subject=release%20build)](https://ci.qaprosoft.com/jenkins/job/carina/job/carina-CENTRAL-RELEASE)
-[![Snapshot Build Status](https://ci.qaprosoft.com/jenkins/job/carina/job/carina-core-SNAPSHOT/badge/icon?subject=snapshot%20build)](https://ci.qaprosoft.com/jenkins/job/carina/job/carina-core-SNAPSHOT)
-
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
 * Carina framework is built on top of most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on specific technology stack.
