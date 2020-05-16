@@ -413,11 +413,11 @@ public class Configuration {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
         
-        if (caps.getCapability("platform") != null) {
+        if (caps != null && caps.getCapability("platform") != null) {
             platform = caps.getCapability("platform").toString();
         }
 
-        if (caps.getCapability("platformName") != null) {
+        if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
         }        
         
