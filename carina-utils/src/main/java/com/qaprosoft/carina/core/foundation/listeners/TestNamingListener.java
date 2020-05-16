@@ -37,33 +37,33 @@ public class TestNamingListener implements IResultListener2 {
 
     @Override
     public void beforeConfiguration(ITestResult result) {
-        LOGGER.info("TestNamingListener->beforeConfiguration");
+        LOGGER.debug("TestNamingListener->beforeConfiguration");
         setTestName(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-        LOGGER.info("TestNamingListener->onConfigurationSuccess");
+        LOGGER.debug("TestNamingListener->onConfigurationSuccess");
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
-        LOGGER.info("TestNamingListener->onConfigurationSkip");
+        LOGGER.debug("TestNamingListener->onConfigurationSkip");
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-        LOGGER.info("TestNamingListener->onConfigurationFailure");
+        LOGGER.debug("TestNamingListener->onConfigurationFailure");
     }
 
     @Override
     public void onStart(ITestContext context) {
-        LOGGER.info("TestNamingListener->onStart(ITestContext context)");
+        LOGGER.debug("TestNamingListener->onStart(ITestContext context)");
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        LOGGER.info("TestNamingListener->onTestStart");
+        LOGGER.debug("TestNamingListener->onTestStart");
 
         // obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in
         // onTestSkipped method
@@ -75,22 +75,22 @@ public class TestNamingListener implements IResultListener2 {
     
     @Override
     public void onTestSuccess(ITestResult result) {
-        LOGGER.info("TestNamingListener->onTestSuccess");
+        LOGGER.debug("TestNamingListener->onTestSuccess");
     }
     
     @Override
     public void onTestFailure(ITestResult result) {
-        LOGGER.info("TestNamingListener->");
+        LOGGER.debug("TestNamingListener->");
     }
     
     @Override
     public void onTestSkipped(ITestResult result) {
-        LOGGER.info("TestNamingListener->onTestFailure");
+        LOGGER.debug("TestNamingListener->onTestFailure");
     }
 
     @Override
     public void onFinish(ITestContext context) {
-        LOGGER.info("TestNamingListener->onFinish");
+        LOGGER.debug("TestNamingListener->onFinish");
     }
     
     /**
@@ -178,7 +178,7 @@ public class TestNamingListener implements IResultListener2 {
         }
 
         name = name + " - " + getMethodName(result);
-        LOGGER.info("testName: " + name);
+        LOGGER.debug("testName: " + name);
         
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
@@ -186,15 +186,15 @@ public class TestNamingListener implements IResultListener2 {
         if (index > 0) {
             // that's a dataprovider line index
             index++; //to make correlation between line and index number
-            LOGGER.info("test: " + name  + "; index: " + index);
+            LOGGER.debug("test: " + name  + "; index: " + index);
             name = name + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
         }
         
         int invCount = result.getTestContext().getAllTestMethods()[0].getInvocationCount();
         if (invCount > 1) {
-            LOGGER.info("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
+            LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
             int countIndex = getCurrentInvocationCount(name);
-            LOGGER.info("test: " + name  + "; InvCount index: " + countIndex);
+            LOGGER.debug("test: " + name  + "; InvCount index: " + countIndex);
             name = name + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
         }   
         
