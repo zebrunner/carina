@@ -68,7 +68,7 @@ public class Jira {
         }
     }
 
-    public synchronized static void updateAfterTest(ITestResult result) {
+    public static void updateAfterTest(ITestResult result) {
         if (isInitialized) {
             try {
                 updater.updateAfterTest(jira, result);
@@ -78,7 +78,7 @@ public class Jira {
         }
     }
 
-    public synchronized static void updateAfterSuite(ITestContext context, List<TestResultItem> results) {
+    public static void updateAfterSuite(ITestContext context, List<TestResultItem> results) {
         if (isInitialized) {
             try {
                 updater.updateAfterSuite(jira, context, results);
@@ -110,7 +110,7 @@ public class Jira {
     }
 
     @SuppressWarnings("unlikely-arg-type")
-    public synchronized static List<String> getTickets(ITestResult result) {
+    public static List<String> getTickets(ITestResult result) {
         // return any specified jira tickets by tests
         if (jiraTickets.get() != null) {
             return jiraTickets.get();
@@ -158,15 +158,15 @@ public class Jira {
         return disableRetryForKnownIssues;
     }
 
-    public synchronized static void setKnownIssue(String jiraId) {
+    public static void setKnownIssue(String jiraId) {
         setKnownIssue(jiraId, null);
     }
 
-    public synchronized static void setKnownIssue(String jiraId, String description) {
+    public static void setKnownIssue(String jiraId, String description) {
         setKnownIssue(jiraId, description, false);
     }
 
-    public synchronized static void setKnownIssue(String jiraId, String description, boolean blocker) {
+    public static void setKnownIssue(String jiraId, String description, boolean blocker) {
         BaseWorkItem workItem = new BaseWorkItem(jiraId, description, blocker);
         knownIssue.set(workItem);
     }
