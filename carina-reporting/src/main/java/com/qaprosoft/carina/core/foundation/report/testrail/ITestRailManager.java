@@ -32,6 +32,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 public interface ITestRailManager extends ITestCases {
     static final Logger TESTRAIL_LOGGER = Logger.getLogger(ITestRailManager.class);
 
+    @SuppressWarnings("unlikely-arg-type")
     default Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
@@ -77,9 +78,8 @@ public interface ITestRailManager extends ITestCases {
                 if (testMethod.isAnnotationPresent(TestRailCases.class)) {
                     TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
                     String platform = methodAnnotation.platform();
-                    String language = methodAnnotation.language();
                     String locale = methodAnnotation.locale();
-                    if (isValidPlatform(platform) && isValidLanguage(language) && isValidLocale(locale)) {
+                    if (isValidPlatform(platform) && isValidLocale(locale)) {
                         String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
@@ -94,9 +94,8 @@ public interface ITestRailManager extends ITestCases {
                     for (TestRailCases tcLocal : methodAnnotation.value()) {
 
                         String platform = tcLocal.platform();
-                        String language = tcLocal.language();
                         String locale = tcLocal.locale();
-                        if (isValidPlatform(platform) && isValidLanguage(language) && isValidLocale(locale)) {
+                        if (isValidPlatform(platform) && isValidLocale(locale)) {
                             String[] testCaseList = tcLocal.testCasesId().split(",");
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;

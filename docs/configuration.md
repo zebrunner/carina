@@ -55,11 +55,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
-		<td>language</td>
-		<td>Language for i18n defeature. Enabled when enable_i18n=true</td>
-		<td>en_GB,de_DE,fr_FR</td>
-	</tr>
-	<tr>
 		<td>retry_interval</td>
 		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
 		<td>Integer</td>
@@ -243,11 +238,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>l10n_encoding</td>
 		<td>Charset for l10n feature</td>
 		<td>ISO-8859-5, ISO-8859-6, UTF-8</td>
-	</tr>
-	<tr>
-		<td>enable_i18n</td>
-		<td>Enables i18n feature</td>
-		<td>false, true</td>
 	</tr>
 		<tr>
 		<td>thread_count</td>
