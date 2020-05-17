@@ -728,6 +728,10 @@ public class ReportContext {
         if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists()) {
             try {
                 InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
+                if (is == null) {
+                    LOGGER.warn("Unable to find in classpath: " + GALLERY_ZIP);
+                    return;
+                }
                 ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
                         + GALLERY_ZIP)));
                 ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP, reportsRootDir.getAbsolutePath());
