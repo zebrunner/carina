@@ -81,7 +81,6 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
-import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
@@ -128,12 +127,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 L10N.init();
             } catch (Exception e) {
                 LOGGER.error("L10N bundle is not initialized successfully!", e);
-            }
-
-            try {
-                I18N.init();
-            } catch (Exception e) {
-                LOGGER.error("I18N bundle is not initialized successfully!", e);
             }
 
             try {

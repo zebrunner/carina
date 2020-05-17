@@ -42,10 +42,6 @@ public interface ITestCases {
         return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
     }
     
-    default boolean isValidLanguage(String language) {
-        return language.equalsIgnoreCase(Configuration.get(Parameter.LANGUAGE)) || language.isEmpty();
-    }
-    
     default boolean isValidLocale(String locale) {
         return locale.equalsIgnoreCase(Configuration.get(Parameter.LOCALE)) || locale.isEmpty();
     }

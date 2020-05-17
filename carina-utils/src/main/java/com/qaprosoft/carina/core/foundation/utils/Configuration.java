@@ -160,10 +160,6 @@ public class Configuration {
 
         LOCALE("locale"),
 
-        ENABLE_I18N("enable_i18n"),
-
-        LANGUAGE("language"),
-
         THREAD_COUNT("thread_count"),
 
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
