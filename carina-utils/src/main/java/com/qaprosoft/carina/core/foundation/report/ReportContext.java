@@ -421,7 +421,6 @@ public class ReportContext {
                 uniqueDirName = dirName;
             }
             String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
-            // System.out.println("First request for test dir. Just generate unique folder: " + directory);
 
             testDir = new File(directory);
             File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
