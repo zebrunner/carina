@@ -612,7 +612,7 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("file://%s/%s/report.html", baseDirectory, test);
+            link = String.format("./%d/%s/report.html", rootID, test);
         }
 
         return link;
@@ -635,7 +635,7 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("file://%s/%s/test.log", baseDirectory, test);
+            link = String.format("./%d/%s/test.log", rootID, test);
         }
 
         return link;
@@ -663,6 +663,7 @@ public class ReportContext {
             }
             link = String.format("%s/%d/%s/%s/%s/feature-overview.html", report_url, rootID, ARTIFACTS_FOLDER, folder, subFolder);
         } else {
+            //TODO: link might be broken on CI like https://github.com/qaprosoft/carina/issues/1001
             link = String.format("file://%s/%s/%s/feature-overview.html", artifactsDirectory, folder, subFolder);
         }
 
