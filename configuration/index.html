@@ -553,11 +553,6 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>en_GB,de_DE,fr_FR</td>
     </tr>
     <tr>
-        <td>language</td>
-        <td>Language for i18n defeature. Enabled when enable_i18n=true</td>
-        <td>en_GB,de_DE,fr_FR</td>
-    </tr>
-    <tr>
         <td>retry_interval</td>
         <td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
         <td>Integer</td>
@@ -741,11 +736,6 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>l10n_encoding</td>
         <td>Charset for l10n feature</td>
         <td>ISO-8859-5, ISO-8859-6, UTF-8</td>
-    </tr>
-    <tr>
-        <td>enable_i18n</td>
-        <td>Enables i18n feature</td>
-        <td>false, true</td>
     </tr>
         <tr>
         <td>thread_count</td>
@@ -1027,7 +1017,7 @@ PROD.url=http://prod-app-server.com
     </div>
     
       <script src="../assets/javascripts/vendor.c51dfa35.min.js"></script>
-      <script src="../assets/javascripts/bundle.eaaa3931.min.js"></script><script id="__lang" type="application/json">{"search.result.none": "No matching documents", "search.config.pipeline": "trimmer, stopWordFilter", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.config.lang": "en", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard", "search.config.separator": "[\\s\\-]+"}</script>
+      <script src="../assets/javascripts/bundle.eaaa3931.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "search.result.placeholder": "Type to start searching", "search.config.lang": "en", "clipboard.copied": "Copied to clipboard", "search.config.separator": "[\\s\\-]+", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
       
       <script>
         app = initialize({
