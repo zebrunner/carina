@@ -102,6 +102,8 @@ public class ExtendedWebElement {
     
     private boolean caseInsensitive;
     
+    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
@@ -1754,17 +1756,36 @@ public class ExtendedWebElement {
 
     // old functionality to remove completely after successfull testing
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
-        // generate the most popular wiatCondition to check if element visible or present
+        // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
-        if (element != null) {
-            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                    ExpectedConditions.visibilityOfElementLocated(myBy),
-                    ExpectedConditions.visibilityOf(element));
-        } else {
-            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                    ExpectedConditions.visibilityOfElementLocated(myBy));
+        switch (loadingStrategy) {
+        case BY_PRESENCE: {
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
+            }
+            break;
         }
-
+        case BY_VISIBILITY: {
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
+            }
+            break;
+        }
+        case BY_PRESENCE_OR_VISIBILITY:
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy));
+            }
+            break;
+        }
         return waitCondition;
     }
 }
