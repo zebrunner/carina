@@ -1775,6 +1775,16 @@ public class ExtendedWebElement {
             }
             break;
         }
+        case BY_PRESENCE_VISIBILITY:
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy));
+            }
+            break;
         }
         return waitCondition;
     }
