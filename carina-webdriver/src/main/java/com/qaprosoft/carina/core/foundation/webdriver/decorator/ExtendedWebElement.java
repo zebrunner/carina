@@ -1775,7 +1775,7 @@ public class ExtendedWebElement {
             }
             break;
         }
-        case BY_PRESENCE_VISIBILITY:
+        case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
                 waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                         ExpectedConditions.visibilityOfElementLocated(myBy),
