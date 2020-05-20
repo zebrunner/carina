@@ -30,6 +30,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -412,6 +413,8 @@ public class Screenshot {
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
+            } catch (NoSuchWindowException e) {
+                LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
             } catch (IOException e) {
                 LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
             } catch (WebDriverException e) {
