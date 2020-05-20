@@ -34,7 +34,8 @@ import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
-import static com.qaprosoft.carina.core.foundation.api.http.Headers.ACCEPT_ALL_TYPES_HEADER;
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.ACCEPT_ALL_TYPES;
+
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     protected static final Logger LOGGER = Logger.getLogger(AbstractApiMethodV2.class);
@@ -50,14 +51,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public AbstractApiMethodV2() {
         super();
-        setHeaders(ACCEPT_ALL_TYPES_HEADER);
+        setHeaders(ACCEPT_ALL_TYPES.getHeaderValue());
         initPathsFromAnnotation();
         setProperties(new Properties());
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
         super();
-        setHeaders(ACCEPT_ALL_TYPES_HEADER);
+        setHeaders(ACCEPT_ALL_TYPES.getHeaderValue());
         setProperties(propertiesPath);
         this.rqPath = rqPath;
         this.rsPath = rsPath;
@@ -65,7 +66,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
         super();
-        setHeaders(ACCEPT_ALL_TYPES_HEADER);
+        setHeaders(ACCEPT_ALL_TYPES.getHeaderValue());
         if (properties != null) {
             this.properties = PropertiesProcessorMain.processProperties(properties);
         }

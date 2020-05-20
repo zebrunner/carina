@@ -100,7 +100,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         if (contentType != null) {
             this.request.contentType(contentType.type());
         } else {
-            this.request.contentType(JSON_CONTENT_TYPE);
+            this.request.contentType(JSON_CONTENT_TYPE.getHeaderValue());
         }
     }
 

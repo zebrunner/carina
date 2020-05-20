@@ -17,7 +17,7 @@ public class ApiMethodAnnotationTest {
     @Test
     public void testContentType() {
         ApiMethodWAnnotation m = new ApiMethodWAnnotation();
-        Assert.assertEquals(((RequestSpecificationImpl)m.getRequest()).getContentType(), XML_CONTENT_TYPE,
+        Assert.assertEquals(((RequestSpecificationImpl)m.getRequest()).getContentType(), XML_CONTENT_TYPE.getHeaderValue(),
                 "Content type from annotation not as expected");
     }
 

@@ -1,8 +1,17 @@
 package com.qaprosoft.carina.core.foundation.api.http;
 
-public interface Headers {
+public enum Headers {
+    ACCEPT_ALL_TYPES("Accept=*/*"),
+    JSON_CONTENT_TYPE("application/json"),
+    XML_CONTENT_TYPE("application/xml");
 
-    String ACCEPT_ALL_TYPES_HEADER = "Accept=*/*";
-    String JSON_CONTENT_TYPE = "application/json";
-    String XML_CONTENT_TYPE = "application/xml";
+    public String getHeaderValue() {
+        return headerValue;
+    }
+
+    private String headerValue;
+
+    Headers(String headerValue) {
+        this.headerValue = headerValue;
+    }
 }
