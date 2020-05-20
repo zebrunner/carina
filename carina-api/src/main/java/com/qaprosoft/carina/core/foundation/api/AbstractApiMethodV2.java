@@ -47,14 +47,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * and @ResponseTemplatePath if present
      */
     public AbstractApiMethodV2() {
-        super("application/json");
+        super();
         setHeaders("Accept=*/*");
         initPathsFromAnnotation();
         setProperties(new Properties());
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
-        super("application/json");
+        super();
         setHeaders("Accept=*/*");
         setProperties(propertiesPath);
         this.rqPath = rqPath;
@@ -62,7 +62,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
-        super("application/json");
+        super();
         setHeaders("Accept=*/*");
         if (properties != null) {
             this.properties = PropertiesProcessorMain.processProperties(properties);
