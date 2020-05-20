@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
 import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
@@ -99,7 +100,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         if (contentType != null) {
             this.request.contentType(contentType.type());
         } else {
-            this.request.contentType("application/json");
+            this.request.contentType(JSON_CONTENT_TYPE);
         }
     }
 
