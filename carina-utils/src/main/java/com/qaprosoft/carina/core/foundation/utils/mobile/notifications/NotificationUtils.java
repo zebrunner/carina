@@ -21,8 +21,9 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.jayway.restassured.response.Response;
 import com.qaprosoft.carina.core.foundation.utils.rest.RestUtil;
+
+import io.restassured.response.Response;
 
 public class NotificationUtils {
 

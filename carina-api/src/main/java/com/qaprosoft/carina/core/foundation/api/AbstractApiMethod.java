@@ -15,16 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import static com.jayway.restassured.RestAssured.given;
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
+import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.log4j.Level;
@@ -33,14 +34,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.config.RestAssuredConfig;
-import com.jayway.restassured.config.SSLConfig;
-import com.jayway.restassured.filter.log.RequestLoggingFilter;
-import com.jayway.restassured.filter.log.ResponseLoggingFilter;
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
-import com.jayway.restassured.specification.RequestSpecification;
+import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
@@ -51,6 +45,14 @@ import com.qaprosoft.carina.core.foundation.api.ssl.SSLContextBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+
+import io.restassured.RestAssured;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractApiMethod extends HttpClient {
@@ -68,18 +70,18 @@ public abstract class AbstractApiMethod extends HttpClient {
         init(getClass());
         bodyContent = new StringBuilder();
         request = given();
-        request.contentType(ContentType.TEXT);
+        initContentTypeFromAnnotation();
     }
 
-    public AbstractApiMethod(String contentType) {
-        init(getClass());
-        bodyContent = new StringBuilder();
-        request = given();
-        request.contentType(contentType);
-    }
-
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes" })
     private void init(Class clazz) {
+        Endpoint e = this.getClass().getAnnotation(Endpoint.class);
+        if (e != null) {
+            methodType = e.methodType();
+            methodPath = e.url();
+            return;
+        }
+
         String typePath = R.API.get(clazz.getSimpleName());
         if (typePath == null) {
             throw new RuntimeException("Method type and path are not specified for: " + clazz.getSimpleName());
@@ -91,6 +93,15 @@ public abstract class AbstractApiMethod extends HttpClient {
             methodType = HttpMethodType.valueOf(typePath);
         }
 
+    }
+
+    private void initContentTypeFromAnnotation() {
+        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
+        if (contentType != null) {
+            this.request.contentType(contentType.type());
+        } else {
+            this.request.contentType(JSON_CONTENT_TYPE.getHeaderValue());
+        }
     }
 
     public void setHeaders(String... headerKeyValues) {

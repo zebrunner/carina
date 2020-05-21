@@ -248,4 +248,11 @@ public class JsonValidatorTest {
         }
         Assert.assertTrue(isErrorThrown, "Assertion Error not thrown");
     }
+
+    // TODO: enable this test if org.json start supporting json like in test
+    // @Test
+    public void testInnerArray() {
+        JsonValidator.validateJson("{\"values\" : [[ 1, 1 ]]}", "{\"values\" : [[ 1, 1 ]]}",
+                JSONCompareMode.LENIENT);
+    }
 }
