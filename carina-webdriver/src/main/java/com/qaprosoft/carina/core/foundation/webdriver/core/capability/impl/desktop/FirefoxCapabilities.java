@@ -32,8 +32,6 @@ public class FirefoxCapabilities extends AbstractCapabilities {
      *
      * @param testName
      *            - String.
-     * @param profile
-     *            - FirefoxProfile.
      * @return Firefox desired capabilities.
      */
     public DesiredCapabilities getCapability(String testName) {

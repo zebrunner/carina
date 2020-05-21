@@ -115,11 +115,10 @@ public class Screenshot {
     /**
      * Clear all rules and disable all kind of screenshots even for failures!
      */
-    public static List<IScreenshotRule> clearRules() {
+    public static void clearRules() {
         LOGGER.debug("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
         rules.clear();
         defaultCapturer = false;
-        return rules;
     }
 
     /**

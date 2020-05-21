@@ -876,10 +876,11 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * This method provides app's version name for the app that is already installed to
      * devices, based on its package name.
-     *
      * In order to do that we search for "versionName" parameter in system dump.
-     *
      * Ex. "versionCode" returns 11200050, "versionName" returns 11.2.0
+     * 
+     * @param packageName String
+     * @return appVersion String
      */
     default public String getAppVersionName(String packageName){
         String command = "dumpsys package ".concat(packageName);
@@ -930,7 +931,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * If the application you're interested about is installed - returns "true".
      * Otherwise, returns "false".
      * 
-     * @param packageName
+     * @param packageName String
      * @return boolean
      */
     default public boolean isApplicationInstalled(String packageName) {
@@ -967,7 +968,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * To remove installed application by provided package name
      * 
-     * @param packageName
+     * @param packageName String
      * 
      * @return true if succeed
      */
@@ -1000,8 +1001,8 @@ public interface IAndroidUtils extends IMobileUtils {
      * With this method user is able to trigger a deeplink (link to specific place
      * within the application)
      * 
-     * @param link
-     * @param packageName
+     * @param link String
+     * @param packageName String
      */
     default public void triggerDeeplink(String link, String packageName) {
         Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
@@ -1016,9 +1017,9 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * To get list of granted/denied/requested permission for specified application
      * 
-     * @param packageName
-     * @param type
-     * @return ArrayList<String>
+     * @param packageName String
+     * @param type PermissionType
+     * @return ArrayList String
      */
     @SuppressWarnings("unchecked")
     default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
@@ -1030,9 +1031,9 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * To change (grant or revoke) application permissions.
      * 
-     * @param packageName
-     * @param action
-     * @param permissions
+     * @param packageName String
+     * @param action PermissionAction
+     * @param permissions Permission
      */
     default public void changePermissions(String packageName, PermissionAction action, Permission... permissions) {
         ArrayList<String> permissionsStr = new ArrayList<>();
@@ -1050,7 +1051,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * 
      * NOTE2: input field should be cleared previously.
      * 
-     * @param text
+     * @param text String
      */
     default public void typeWithADB(String text) {
         UTILS_LOGGER.info(String.format("Will enter '%s' to an active input field via ADB.", text));
