@@ -31,10 +31,10 @@ public class RewriteItem {
     /**
      * Leave regexp empty in case you don't want to rewrite body
      * 
-     * @param host
-     * @param regexp
-     * @param replacement
-     * @param headers
+     * @param host String
+     * @param regexp String
+     * @param replacement String
+     * @param headers List
      */
     public RewriteItem(final String host, final String regexp, final String replacement, final List<HeaderItem> headers) {
         this.host = host;

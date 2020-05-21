@@ -145,6 +145,8 @@ public final class ProxyPool {
     /**
      * Checking whether BROWSERMOB_PORT is declared. then it will be used as port for browsermob proxy
      * Otherwise first available port from BROWSERMOB_PORTS_RANGE will be used
+     * 
+     * @return port
      */
 	public static int getProxyPortFromConfig() {
 		if (!Configuration.get(Parameter.BROWSERMOB_PORT).isEmpty())
