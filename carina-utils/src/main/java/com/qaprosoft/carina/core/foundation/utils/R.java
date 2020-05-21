@@ -151,6 +151,7 @@ public enum R {
     /**
      * Verify if key is declared in data map.
      * 
+     * @param key name to verify
      * @return boolean
      */
     public boolean containsKey(String key) {

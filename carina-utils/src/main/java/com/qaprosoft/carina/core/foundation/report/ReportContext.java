@@ -437,7 +437,7 @@ public class ReportContext {
     /**
      * Rename test directory from unique number to custom name.
      * 
-     * @param dirName
+     * @param dirName String
      * 
      * @return test report dir
      */
@@ -673,6 +673,8 @@ public class ReportContext {
      * Saves screenshot with thumbnail.
      * 
      * @param screenshot - {@link BufferedImage} file to save
+     * 
+     * @return - screenshot name.
      */
     public static String saveScreenshot(BufferedImage screenshot) {
         long now = System.currentTimeMillis();
