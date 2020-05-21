@@ -15,16 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
 import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.log4j.Level;
@@ -50,7 +51,6 @@ import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -70,14 +70,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         init(getClass());
         bodyContent = new StringBuilder();
         request = given();
-        request.contentType(ContentType.TEXT);
-    }
-
-    public AbstractApiMethod(String contentType) {
-        init(getClass());
-        bodyContent = new StringBuilder();
-        request = given();
-        request.contentType(contentType);
+        initContentTypeFromAnnotation();
     }
 
     @SuppressWarnings({ "rawtypes" })
@@ -100,6 +93,15 @@ public abstract class AbstractApiMethod extends HttpClient {
             methodType = HttpMethodType.valueOf(typePath);
         }
 
+    }
+
+    private void initContentTypeFromAnnotation() {
+        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
+        if (contentType != null) {
+            this.request.contentType(contentType.type());
+        } else {
+            this.request.contentType(JSON_CONTENT_TYPE.getHeaderValue());
+        }
     }
 
     public void setHeaders(String... headerKeyValues) {
