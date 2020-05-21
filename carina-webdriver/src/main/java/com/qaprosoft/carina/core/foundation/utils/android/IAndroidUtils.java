@@ -747,8 +747,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *            arguments.
      *
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
-     * 
-     *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+     *            Example: "adb -s {UDID} shell list packages" - list packages
      *            
      * NOTE: shell arguments with space symbols are unsupported!
      * 
@@ -762,15 +761,14 @@ public interface IAndroidUtils extends IMobileUtils {
     
     /**
      * 
-     * @param list of string commands
+     * @param commands list of string commands
      * 
      *            - ADB shell command represented as single String where 1st literal
      *            is a command itself. Everything that follow is treated as
      *            arguments.
      *
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
-     * 
-     *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+     *            Example: "adb -s {UDID} shell list packages" - list packages
      *            
      * @return String - response (might be empty)
      */
@@ -827,7 +825,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * - "network" - Using Wi-Fi, Bluetooth or cellular networks (Battery saving
      * mode);
      * 
-     * @return
+     * @return boolean
      */
     default public boolean isGPSEnabled() {
         String response = executeShell(SHELL_GPS_STATUS_CMD);
@@ -840,8 +838,6 @@ public interface IAndroidUtils extends IMobileUtils {
     
     /**
      * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
-     * 
-     * @return
      */
     default public void disableGPS() {
         executeShell(SHELL_DISABLE_GPS_CMD);
@@ -863,8 +859,11 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * This method provides app's version for the app that is already installed to
      * devices, based on its package name.
-     * 
      * In order to do that we search for "versionCode" parameter in system dump.
+     * 
+     * @param packageName String
+     * 
+     * @return appVersion String
      */
     default public String getAppVersion(String packageName) {
         String command = "dumpsys package ".concat(packageName);
@@ -913,6 +912,8 @@ public interface IAndroidUtils extends IMobileUtils {
      * 
      * App's settings will be reset. User will be logged out. Application will be
      * closed to background.
+     * 
+     * @param packageName String
      */
     default public void clearAppCache(String packageName) {
         UTILS_LOGGER.info("Will clear data for the following app: " + packageName);
@@ -956,7 +957,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Will install application if path to apk-file on working machine is set.
      * 
-     * @param apkPath
+     * @param apkPath String
      */
     default public void installApp(String apkPath) {
         UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
