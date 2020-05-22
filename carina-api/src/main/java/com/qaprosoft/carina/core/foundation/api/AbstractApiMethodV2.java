@@ -243,7 +243,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             throw new RuntimeException("Actual response body is null. Please make API call before validation response");
         }
         ContentType contentType = this.getClass().getAnnotation(ContentType.class);
-        if (contentType == null || (contentType != null && contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue()))) {
+        if (contentType == null || contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
             TemplateMessage tm = new TemplateMessage();
             tm.setTemplatePath(schemaPath);
             String schema = tm.getMessageText();
