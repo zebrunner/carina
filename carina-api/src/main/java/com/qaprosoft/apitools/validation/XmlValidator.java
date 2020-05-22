@@ -16,6 +16,9 @@ import java.io.StringReader;
 public class XmlValidator {
     private static final Logger LOGGER = Logger.getLogger(XmlValidator.class);
 
+    private XmlValidator() {
+    }
+
     public static void validateXmlAgainstSchema(String xmlSchemaPath, String xmlData) {
 
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
