@@ -186,28 +186,28 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void beforeConfiguration(ITestResult result) {
-        LOGGER.info("AbstractTestListener->beforeConfiguration");
+        LOGGER.debug("AbstractTestListener->beforeConfiguration");
         // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
         super.beforeConfiguration(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onConfigurationSuccess");
+        LOGGER.debug("AbstractTestListener->onConfigurationSuccess");
         // passItem(result, Messager.CONFIG_PASSED);
         super.onConfigurationSuccess(result);
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onConfigurationSkip");
+        LOGGER.debug("AbstractTestListener->onConfigurationSkip");
         // skipItem(result, Messager.CONFIG_SKIPPED);
         super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onConfigurationFailure");
+        LOGGER.debug("AbstractTestListener->onConfigurationFailure");
         // failItem(result, Messager.CONFIG_FAILED);
 
         String errorMessage = getFailureReason(result);
@@ -221,7 +221,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onStart(ITestContext context) {
-        LOGGER.info("AbstractTestListener->onStart(ITestContext context)");
+        LOGGER.debug("AbstractTestListener->onStart(ITestContext context)");
         String uuid = StringGenerator.generateNumeric(8);
         ParameterGenerator.setUUID(uuid);
 
@@ -232,7 +232,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestStart(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onTestStart");
+        LOGGER.debug("AbstractTestListener->onTestStart");
         VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
         if (curRetryAnalyzer == null) {
@@ -296,7 +296,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onTestSuccess");
+        LOGGER.debug("AbstractTestListener->onTestSuccess");
         passItem(result, Messager.TEST_PASSED);
         VideoAnalyzer.enableVideoUpload();
 
@@ -313,7 +313,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestFailure(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onTestFailure");
+        LOGGER.debug("AbstractTestListener->onTestFailure");
         failItem(result, Messager.TEST_FAILED);
         VideoAnalyzer.enableVideoUpload();
         afterTest(result);
@@ -329,7 +329,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     
     @Override
     public void onTestSkipped(ITestResult result) {
-        LOGGER.info("AbstractTestListener->onTestSkipped");
+        LOGGER.debug("AbstractTestListener->onTestSkipped");
         // handle Zafira already passed exception for re-run and do nothing. Return should be enough
         if (result.getThrowable() != null && result.getThrowable().getMessage() != null
                 && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
@@ -381,7 +381,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onFinish(ITestContext context) {
-        LOGGER.info("AbstractTestListener->onFinish(ITestContext context)");
+        LOGGER.debug("AbstractTestListener->onFinish(ITestContext context)");
         super.onFinish(context);
         removeAlreadyPassedTests(context);
     }
