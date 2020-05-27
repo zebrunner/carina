@@ -55,11 +55,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
-		<td>language</td>
-		<td>Language for i18n defeature. Enabled when enable_i18n=true</td>
-		<td>en_GB,de_DE,fr_FR</td>
-	</tr>
-	<tr>
 		<td>retry_interval</td>
 		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
 		<td>Integer</td>
@@ -244,11 +239,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Charset for l10n feature</td>
 		<td>ISO-8859-5, ISO-8859-6, UTF-8</td>
 	</tr>
-	<tr>
-		<td>enable_i18n</td>
-		<td>Enables i18n feature</td>
-		<td>false, true</td>
-	</tr>
 		<tr>
 		<td>thread_count</td>
 		<td>Default number of threads to use when running tests in parallel.</td>
@@ -403,6 +393,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>test_run_rules</td>
 		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
 		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>owner;;TAGS=>tag1=temp&amp;&amp;feature=reg</td>
+	</tr>
+	<tr>
+		<td>element_loading_strategy</td>
+		<td>Determines how carina detects appearing of web elements on page: by presence in DOM model or by visibility or by any of these conditions</td>
+		<td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
 	</tr>
 </table>
 Most of the properties may be read in the following way:

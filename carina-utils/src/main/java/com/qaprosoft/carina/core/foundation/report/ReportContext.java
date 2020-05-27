@@ -421,7 +421,6 @@ public class ReportContext {
                 uniqueDirName = dirName;
             }
             String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
-            // System.out.println("First request for test dir. Just generate unique folder: " + directory);
 
             testDir = new File(directory);
             File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
@@ -438,7 +437,7 @@ public class ReportContext {
     /**
      * Rename test directory from unique number to custom name.
      * 
-     * @param dirName
+     * @param dirName String
      * 
      * @return test report dir
      */
@@ -612,7 +611,7 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("file://%s/%s/report.html", baseDirectory, test);
+            link = String.format("./%d/%s/report.html", rootID, test);
         }
 
         return link;
@@ -635,7 +634,7 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("file://%s/%s/test.log", baseDirectory, test);
+            link = String.format("./%d/%s/test.log", rootID, test);
         }
 
         return link;
@@ -663,6 +662,7 @@ public class ReportContext {
             }
             link = String.format("%s/%d/%s/%s/%s/feature-overview.html", report_url, rootID, ARTIFACTS_FOLDER, folder, subFolder);
         } else {
+            //TODO: link might be broken on CI like https://github.com/qaprosoft/carina/issues/1001
             link = String.format("file://%s/%s/%s/feature-overview.html", artifactsDirectory, folder, subFolder);
         }
 
@@ -673,6 +673,8 @@ public class ReportContext {
      * Saves screenshot with thumbnail.
      * 
      * @param screenshot - {@link BufferedImage} file to save
+     * 
+     * @return - screenshot name.
      */
     public static String saveScreenshot(BufferedImage screenshot) {
         long now = System.currentTimeMillis();
@@ -727,6 +729,10 @@ public class ReportContext {
         if (!new File(reportsRootDir.getAbsolutePath() + "/gallery-lib").exists()) {
             try {
                 InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
+                if (is == null) {
+                    LOGGER.warn("Unable to find in classpath: " + GALLERY_ZIP);
+                    return;
+                }
                 ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
                         + GALLERY_ZIP)));
                 ZipManager.unzip(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP, reportsRootDir.getAbsolutePath());

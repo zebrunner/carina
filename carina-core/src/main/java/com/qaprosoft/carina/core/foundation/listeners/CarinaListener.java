@@ -81,7 +81,6 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
-import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
@@ -91,6 +90,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
 import com.qaprosoft.zafira.models.dto.TestRunType;
@@ -108,7 +109,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
     
-    protected static boolean automaticDriversCleanup = true; 
+    protected static boolean automaticDriversCleanup = true;
 
     static {
         try {
@@ -129,12 +130,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
 
             try {
-                I18N.init();
-            } catch (Exception e) {
-                LOGGER.error("I18N bundle is not initialized successfully!", e);
-            }
-
-            try {
                 L10Nparser.init();
             } catch (Exception e) {
                 LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
@@ -147,6 +142,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 new CapabilitiesLoader().loadCapabilities(customCapabilities);
             }
 
+            IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
+            Screenshot.addScreenshotRule(autoScreenshotsRule);
+            
             updateAppPath();
 
         } catch (Exception e) {
@@ -156,7 +154,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onStart(ISuite suite) {
-        LOGGER.info("CarinaListener->onStart(ISuite suite)");
+        LOGGER.debug("CarinaListener->onStart(ISuite suite)");
         // register programmatically carina based BeforeSuite/BeforeClass and
         // BeforeMethod to execute those configuration part obligatory
         /*
@@ -211,14 +209,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
 	@Override
     public void onStart(ITestContext context) {
-        LOGGER.info("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
+        LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
         ReportContext.getBaseDir(); // create directory for logging as soon as possible
         super.onStart(context);
     }
 
     @Override
     public void beforeConfiguration(ITestResult result) {
-        LOGGER.info("CarinaListener->beforeConfiguration");
+        LOGGER.debug("CarinaListener->beforeConfiguration");
         super.beforeConfiguration(result);
         // remember active test phase to organize valid driver pool manipulation
         // process
@@ -249,7 +247,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     @Override
     public void onConfigurationFailure(ITestResult result) {
-        LOGGER.info("CarinaListener->onConfigurationFailure");
+        LOGGER.debug("CarinaListener->onConfigurationFailure");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
 
@@ -258,7 +256,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestStart(ITestResult result) {
-        LOGGER.info("CarinaListener->onTestStart");
+        LOGGER.debug("CarinaListener->onTestStart");
         TestPhase.setActivePhase(Phase.METHOD);
 
         // handle expected skip
@@ -272,14 +270,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        LOGGER.info("CarinaListener->onTestSuccess");
+        LOGGER.debug("CarinaListener->onTestSuccess");
         super.onTestSuccess(result);
         onTestFinish(result);
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        LOGGER.info("CarinaListener->onTestFailure");
+        LOGGER.debug("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
         super.onTestFailure(result);
@@ -288,7 +286,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        LOGGER.info("CarinaListener->onTestSkipped");
+        LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
         super.onTestSkipped(result);
@@ -364,7 +362,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onFinish(ITestContext context) {
-        LOGGER.info("CarinaListener->onFinish(ITestContext context)");
+        LOGGER.debug("CarinaListener->onFinish(ITestContext context)");
         super.onFinish(context);
 
         // [SZ] it's still needed to close driver from BeforeClass stage.
@@ -380,7 +378,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onFinish(ISuite suite) {
-        LOGGER.info("CarinaListener->onFinish(ISuite suite)");
+        LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
         try {
             // TODO: quitAllDivers forcibly
             ReportContext.removeTempDir(); // clean temp artifacts directory
@@ -815,7 +813,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     drv = ((EventFiringWebDriver) drv).getWrappedDriver();
                 }
                 
-                screenId = Screenshot.captureFailure(drv, driverName + ": " + msg); // in case of failure
+                if (Screenshot.isEnabled()) {
+                    screenId = Screenshot.capture(drv, driverName + ": " + msg, true); // in case of failure
+                }
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);

@@ -188,24 +188,4 @@ public class QTestTest implements IQTestManager {
         R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
     }
 
-    @Test
-    @QTestCases(id = FIRST_TEST_ID, language = "en")
-    @QTestCases(id = SECOND_TEST_ID, language = "fr")
-    public void testTestRailBylanguage() {
-        ITestResult result = Reporter.getCurrentTestResult();
-
-        Set<String> testRailUdids = getQTestCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "fr");
-        testRailUdids = getQTestCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-        
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "en");
-    }
-
 }

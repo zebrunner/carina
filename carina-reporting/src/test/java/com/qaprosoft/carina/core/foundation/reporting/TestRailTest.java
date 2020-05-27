@@ -182,23 +182,4 @@ public class TestRailTest implements ITestRailManager {
         R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
     }
 
-    @Test
-    @TestRailCases(testCasesId = FIRST_TEST_ID, language = "en")
-    @TestRailCases(testCasesId = SECOND_TEST_ID, language = "fr")
-    public void testTestRailBylanguage() {
-        ITestResult result = Reporter.getCurrentTestResult();
-
-        Set<String> testRailUdids = getTestRailCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "fr");
-        testRailUdids = getTestRailCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-        
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "en");
-    }
 }

@@ -435,6 +435,9 @@ public interface IDriverPool {
      * Android: logcat, bugreport, server, client; 
      * iOS: syslog, crashlog, performance, server, safariConsole, safariNetwork, client
      * 
+     * @param driver WebDriver
+     * @param logType String
+     * 
      * @return LogEntries entries
      */
     default LogEntries getDriverLogs(WebDriver driver, String logType) {

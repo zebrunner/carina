@@ -713,6 +713,8 @@ public class DriverHelper {
      *            The script to execute
      * @param element
      *            The target of the script, referenced as arguments[0]
+     *            
+     * @return Object
      */
     public Object trigger(String script, WebElement element) {
         return ((JavascriptExecutor) getDriver()).executeScript(script, element);
