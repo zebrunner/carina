@@ -102,7 +102,11 @@ public class RTest {
     @Test
     public void testEncryption() {
         Assert.assertEquals(R.CONFIG.get("password"), "EncryptMe");
-        //Assert.assertEquals(R.CONFIG.getSecured("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}")
+    }
+
+    @Test
+    public void testEncryptionPresence() {
+        Assert.assertEquals(R.CONFIG.get("password",  true), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}");
     }
 
     @Test

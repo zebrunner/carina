@@ -162,11 +162,28 @@ public enum R {
      * Returns value either from systems properties or config properties context.
      * Systems properties have higher priority.
      * Decryption is performed if required.
-     * 
+     *
      * @param key Requested key
      * @return config value
      */
     public String get(String key) {
+        return get(key, false);
+    }
+
+    /**
+     * Returns value either from systems properties or config properties context.
+     * Systems properties have higher priority.
+     * Decryption is performed if required.
+     * 
+     * @param key Requested key
+     * @param keepEncrypted if true - decryption will not be provided.
+     *                      It is useful if you will use ExtendedWebElement type
+     *                      in password input field and do not want to see decrypted value in the logs.
+     *                      ExtendedWebElement type method have it's own decryption solution.
+     *                      It is possible to set encrypted values there directly.
+     * @return config value
+     */
+    public String get(String key, boolean keepEncrypted) {
         String value = getTestProperties().getProperty(key);
         if (value != null) {
             LOGGER.warn("Overridden '" + key + "=" + value + "' property will be used for current test!");
@@ -177,7 +194,7 @@ public enum R {
                 : propertiesHolder.get(resourceFile).getProperty(key);
 
 
-        if(isEncrypted(value, CRYPTO_PATTERN)) {
+        if(!keepEncrypted && isEncrypted(value, CRYPTO_PATTERN)) {
             value = decrypt(value, CRYPTO_PATTERN);;
         }
 
