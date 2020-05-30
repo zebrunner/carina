@@ -25,6 +25,8 @@ import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
 
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+
 /**
  * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
  * 
@@ -48,10 +50,17 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
         }
 
         try {
+            LOGGER.info("command: " + command);
             response = super.execute(command);
         } catch (Throwable e) {
             LOGGER.error("class: " + e.getClass() + "; message: " + e.getMessage());
-            throw e;
+            if (e != null && e.getMessage() != null && e.getMessage().toLowerCase().contains("an unknown error has occurred")) {
+                //execute one more time after 1 sec pause!
+                CommonUtils.pause(1);
+                response = super.execute(command);
+            } else {
+                throw e;
+            }
         }
 
         for (IDriverCommandListener listener : listeners) {
