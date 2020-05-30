@@ -158,8 +158,8 @@ public enum R {
     }
 
     /**
-     * Returns value either from systems properties or config properties context.
-     * Systems properties have higher priority.
+     * Return value either from system properties or config properties context.
+     * System properties have higher priority.
      * Decryption is not performed!
      * 
      * @param key Requested key
@@ -182,8 +182,8 @@ public enum R {
     }
     
     /**
-     * Returns decrypted value either from systems properties or config properties context.
-     * Systems properties have higher priority.
+     * Return decrypted value either from system properties or config properties context.
+     * System properties have higher priority.
      * Decryption is performed if required.
      * 
      * @param key Requested key
@@ -193,19 +193,42 @@ public enum R {
         return decrypt(get(key), CRYPTO_PATTERN);
     }
 
-
+    /**
+     * Return Integer value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value Integer
+     */
     public int getInt(String key) {
         return Integer.parseInt(get(key));
     }
 
+    /**
+     * Return long value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value long
+     */    
     public long getLong(String key) {
         return Long.parseLong(get(key));
     }
 
+    /**
+     * Return Double value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value Double
+     */    
     public double getDouble(String key) {
         return Double.parseDouble(get(key));
     }
 
+    /**
+     * Return boolean value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value boolean
+     */
     public boolean getBoolean(String key) {
         return Boolean.valueOf(get(key));
     }
