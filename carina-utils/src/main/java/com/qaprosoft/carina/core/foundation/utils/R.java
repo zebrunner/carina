@@ -282,7 +282,8 @@ public enum R {
 
     private String decrypt(String content, Pattern pattern) {
         try {
-            CryptoTool cryptoTool = new CryptoTool();
+            // keep constructor with parametrized CRYPTO_KEY_PATH to run unit tests successfully!
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
             return cryptoTool.decryptByPattern(content, pattern);
         } catch (Exception e) {
             LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
