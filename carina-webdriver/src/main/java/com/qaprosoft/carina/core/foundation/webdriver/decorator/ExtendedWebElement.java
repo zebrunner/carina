@@ -1588,8 +1588,10 @@ public class ExtendedWebElement {
 			public boolean doSelect(String text) {
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 				
-				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(decryptedSelectText, getName()),
-						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(decryptedSelectText, getNameWithLocator()));
+				String textLog = (!decryptedSelectText.equals(text) ? "********" : text);
+				
+				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(textLog, getName()),
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(textLog, getNameWithLocator()));
 
 				
 				final Select s = new Select(element);
