@@ -49,7 +49,7 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
 
         try {
             response = super.execute(command);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOGGER.error("class: " + e.getClass() + "; message: " + e.getMessage());
             throw e;
         }
