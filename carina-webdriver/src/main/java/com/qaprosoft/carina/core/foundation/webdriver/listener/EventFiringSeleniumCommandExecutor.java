@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
@@ -30,6 +31,7 @@ import org.openqa.selenium.remote.Response;
  * @author akhursevich
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
+    private static final Logger LOGGER = Logger.getLogger(EventFiringSeleniumCommandExecutor.class);
 
     private List<IDriverCommandListener> listeners = new ArrayList<>();
     
@@ -45,7 +47,12 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
             listener.beforeEvent(command);
         }
 
-        response = super.execute(command);
+        try {
+            response = super.execute(command);
+        } catch (Exception e) {
+            LOGGER.error("class: " + e.getClass() + "; message: " + e.getMessage());
+            throw e;
+        }
 
         for (IDriverCommandListener listener : listeners) {
             listener.afterEvent(command);
