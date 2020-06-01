@@ -95,14 +95,16 @@ public class CryptoTool {
     }
 
     public String encryptByPattern(String content, Pattern pattern) {
-        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-                pattern.pattern().indexOf(":"));
-        if (content != null && content.contains(wildcard)) {
-            Matcher matcher = pattern.matcher(content);
-            while (matcher.find()) {
-                String group = matcher.group();
-                String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
-                content = StringUtils.replace(content, group, encrypt(crypt));
+        if (isEncrypted(content, pattern)) {
+            String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                    pattern.pattern().indexOf(":"));
+            if (content != null && content.contains(wildcard)) {
+                Matcher matcher = pattern.matcher(content);
+                while (matcher.find()) {
+                    String group = matcher.group();
+                    String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
+                    content = StringUtils.replace(content, group, encrypt(crypt));
+                }
             }
         }
         return content;
@@ -168,5 +170,18 @@ public class CryptoTool {
 
     public void setCipher(Cipher cipher) {
         this.cipher = cipher;
+    }
+    
+    private boolean isEncrypted(String content, Pattern pattern) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            if (matcher.find()) {
+                LOGGER.debug("'" + content + "' require decryption.");
+                return true;
+            }
+        }
+        return false;
     }
 }

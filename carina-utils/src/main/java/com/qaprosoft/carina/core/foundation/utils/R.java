@@ -19,14 +19,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 
 /**
@@ -159,9 +158,9 @@ public enum R {
     }
 
     /**
-     * Returns value either from systems properties or config properties context.
-     * Systems properties have higher priority.
-     * Decryption is performed if required.
+     * Return value either from system properties or config properties context.
+     * System properties have higher priority.
+     * Decryption is not performed!
      * 
      * @param key Requested key
      * @return config value
@@ -176,29 +175,60 @@ public enum R {
         value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
                 : propertiesHolder.get(resourceFile).getProperty(key);
 
+        // [VD] Decryption is prohibited here otherwise we have plain sensitive information in logs! 
 
-        if(isEncrypted(value, CRYPTO_PATTERN)) {
-            value = decrypt(value, CRYPTO_PATTERN);;
-        }
-
-        // TODO: why we return empty instead of null?
         // [VD] as designed empty MUST be returned
         return value != null ? value : StringUtils.EMPTY;
     }
+    
+    /**
+     * Return decrypted value either from system properties or config properties context.
+     * System properties have higher priority.
+     * Decryption is performed if required.
+     * 
+     * @param key Requested key
+     * @return config value
+     */
+    public String getDecrypted(String key) {
+        return decrypt(get(key), CRYPTO_PATTERN);
+    }
 
-
+    /**
+     * Return Integer value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value Integer
+     */
     public int getInt(String key) {
         return Integer.parseInt(get(key));
     }
 
+    /**
+     * Return long value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value long
+     */    
     public long getLong(String key) {
         return Long.parseLong(get(key));
     }
 
+    /**
+     * Return Double value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value Double
+     */    
     public double getDouble(String key) {
         return Double.parseDouble(get(key));
     }
 
+    /**
+     * Return boolean value either from system properties or config properties context.
+     * 
+     * @param key Requested key
+     * @return value boolean
+     */
     public boolean getBoolean(String key) {
         return Boolean.valueOf(get(key));
     }
@@ -250,21 +280,9 @@ public enum R {
         return testProperties.get();
     }
 
-    private boolean isEncrypted(String content, Pattern pattern) {
-        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-                pattern.pattern().indexOf(":"));
-        if (content != null && content.contains(wildcard)) {
-            Matcher matcher = pattern.matcher(content);
-            if (matcher.find()) {
-                LOGGER.debug("'" + content + "' require decryption.");
-                return true;
-            }
-        }
-        return false;
-    }
-
     private String decrypt(String content, Pattern pattern) {
         try {
+            // keep constructor with parametrized CRYPTO_KEY_PATH to run unit tests successfully!
             CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
             return cryptoTool.decryptByPattern(content, pattern);
         } catch (Exception e) {

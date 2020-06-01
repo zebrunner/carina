@@ -86,7 +86,8 @@ public class DriverHelper {
     }
 
     public DriverHelper(WebDriver driver) {
-        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+        this();
+        
         this.driver = driver;
 
         if (driver == null) {
