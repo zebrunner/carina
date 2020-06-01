@@ -190,13 +190,16 @@ public class TestNamingListener implements IResultListener2 {
             name = name + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
         }
         
-        int invCount = result.getTestContext().getAllTestMethods()[0].getInvocationCount();
-        if (invCount > 1) {
-            LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
-            int countIndex = getCurrentInvocationCount(name);
-            LOGGER.debug("test: " + name  + "; InvCount index: " + countIndex);
-            name = name + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
-        }   
+        ITestNGMethod[] methods = result.getTestContext().getAllTestMethods();
+        if (methods.length > 0) {
+            int invCount = methods[0].getInvocationCount();
+            if (invCount > 1) {
+                LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
+                int countIndex = getCurrentInvocationCount(name);
+                LOGGER.debug("test: " + name + "; InvCount index: " + countIndex);
+                name = name + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
+            }
+        }
         
         testName.set(name);
         return testName.get();
