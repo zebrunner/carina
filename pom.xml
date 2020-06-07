@@ -49,7 +49,7 @@
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <!-- Logging and commons -->
         <log4j.version>1.2.17</log4j.version>
-        <commons-text.version>1.7</commons-text.version>
+        <commons-text.version>1.8</commons-text.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <commons-logging.version>1.2</commons-logging.version>
         <commons-cli.version>1.2</commons-cli.version>
