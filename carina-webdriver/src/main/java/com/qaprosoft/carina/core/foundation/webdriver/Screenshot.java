@@ -570,7 +570,8 @@ public class Screenshot {
 				|| message.contains("Expected to read a START_MAP but instead have: END") // potential drivers issues fix for moon
 				|| message.contains("An unknown error has occurred") //
 				|| message.contains("Unable to find element with")
-				|| message.contains("Unable to locate element");
+				|| message.contains("Unable to locate element")
+				|| message.contains("Illegal base64 character 2e");
 		
 		if (!isContains) {
 		    // for released builds put below message to debug  
