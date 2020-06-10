@@ -74,7 +74,7 @@
         <google.apis.version>v4-rev581-1.25.0</google.apis.version>
         <jackson-databind.version>2.9.10.4</jackson-databind.version>
         <jackson-annotations.version>2.9.9</jackson-annotations.version>
-        <apache-poi.version>3.11-beta3</apache-poi.version>
+        <apache-poi.version>4.1.2</apache-poi.version>
         <guava.version>25.0-jre</guava.version>
         <jaxb-api.version>2.2.2</jaxb-api.version>
         <hamcrest.version>1.3</hamcrest.version>
