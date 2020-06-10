@@ -43,7 +43,7 @@ public class CapabilitiesLoaderTest {
      * Test that loadCapabilities() raise exception if no properties file detected on classpath
      */
     @Test(expectedExceptions = {
-            RuntimeException.class }, expectedExceptionsMessageRegExp = "Unable to find custom capabilities file 'unexisting_file'!")
+            AssertionError.class }, expectedExceptionsMessageRegExp = "Unable to find custom capabilities file 'unexisting_file'!")
     public void loadCapabilitiesFromNonExistingFileTest() {
         new CapabilitiesLoader().loadCapabilities("unexisting_file");
     }
