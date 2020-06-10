@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +22,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -121,10 +121,10 @@ public class CapabilitiesLoader {
                 props.load(baseResource.openStream());
                 LOGGER.info("Custom capabilities properties loaded: " + fileName);
             } else {
-                throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");
+                Assert.fail("Unable to find custom capabilities file '" + fileName + "'!");
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
+        } catch (Exception e) {
+            Assert.fail("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
         }
 
         return props;
