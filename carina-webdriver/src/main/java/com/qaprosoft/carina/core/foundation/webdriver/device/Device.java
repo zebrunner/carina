@@ -22,12 +22,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -552,58 +546,6 @@ public class Device extends RemoteDevice implements IDriverPool {
             LOGGER.debug("Related apps had been already uninstalled or flag uninstall_related_apps is disabled.");
         }
 
-    }
-    
-    /**
-     * Extract sys log using adb
-     * 
-     * @return sys log
-     */
-    public String getSysLog() {
-        int extractionTimeout = 15;
-        
-        if (isNull()) {
-            return "";
-        }
-        
-        if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
-            LOGGER.debug("Logcat log is empty since device is not Android");
-            return "";
-        }
-        LOGGER.debug("Extraction of sys log: " + getAdbName());
-
-        // launch extractor in separate thread to avoid possible hang out
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<String> future = executorService.submit(new Callable<String>() {
-
-         // adb -s UDID logcat -d
-            @Override
-            public String call() throws Exception {
-                LOGGER.debug("Start Syslog extraction");
-                String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
-                LOGGER.debug("Logcat log has been extracted.");
-                StringBuilder tempStr = new StringBuilder();
-                executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
-                return tempStr.toString();
-            }
-            
-        });
-
-        try {
-            String logs = future.get(extractionTimeout, TimeUnit.SECONDS);
-            LOGGER.debug("Logcat logs: ".concat(logs));
-            return logs;
-        } catch (TimeoutException e) {
-            LOGGER.warn(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
-            future.cancel(true);
-            return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
-        } catch (Exception e) {
-//            TODO: add custom handlers for each exceptions based on type
-            LOGGER.warn("Unknown issue was fired. Empty logs will be used.", e);
-            return "";
-        }
-       
-//        return tempStr.toString();
     }
     
     /**

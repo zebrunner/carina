@@ -15,7 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 
-public interface IScreenshotRule {
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
-    public abstract boolean isTakeScreenshot();
+public class AutoScreenshotRule implements IScreenshotRule {
+    @Override
+    public boolean isTakeScreenshot() {
+        // enable screenshot generation for every call if auto_screenshots=true
+        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT);
+    }
+
 }

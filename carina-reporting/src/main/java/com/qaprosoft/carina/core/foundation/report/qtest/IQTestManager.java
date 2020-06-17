@@ -33,6 +33,7 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 public interface IQTestManager extends ITestCases {
     static final Logger QTEST_LOGGER = Logger.getLogger(IQTestManager.class);
 
+    @SuppressWarnings("unlikely-arg-type")
     default Set<String> getQTestCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
@@ -76,9 +77,8 @@ public interface IQTestManager extends ITestCases {
                 if (testMethod.isAnnotationPresent(QTestCases.class)) {
                     QTestCases methodAnnotation = testMethod.getAnnotation(QTestCases.class);
                     String platform = methodAnnotation.platform();
-                    String language = methodAnnotation.language();
                     String locale = methodAnnotation.locale();
-                    if (isValidPlatform(platform) && isValidLanguage(language) && isValidLocale(locale)) {
+                    if (isValidPlatform(platform) && isValidLocale(locale)) {
                         String[] testCaseList = methodAnnotation.id().split(",");
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
@@ -93,9 +93,8 @@ public interface IQTestManager extends ITestCases {
                     for (QTestCases tcLocal : methodAnnotation.value()) {
 
                         String platform = tcLocal.platform();
-                        String language = tcLocal.language();
                         String locale = tcLocal.locale();
-                        if (isValidPlatform(platform) && isValidLanguage(language) && isValidLocale(locale)) {
+                        if (isValidPlatform(platform) && isValidLocale(locale)) {
                             String[] testCaseList = tcLocal.id().split(",");
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;

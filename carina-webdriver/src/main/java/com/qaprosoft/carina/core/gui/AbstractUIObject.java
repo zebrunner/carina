@@ -140,7 +140,7 @@ public abstract class AbstractUIObject extends DriverHelper {
     /**
      * Checks presence of UIObject root element on the page and throws Assertion error in case if it's missing
      * 
-     * @param timeout
+     * @param timeout long
      */
     public void assertUIObjectPresent(long timeout) {
         if (!isUIObjectPresent(timeout)) {
@@ -158,7 +158,7 @@ public abstract class AbstractUIObject extends DriverHelper {
     /**
      * Checks missing of UIObject root element on the page and throws Assertion error in case if it presents
      * 
-     * @param timeout
+     * @param timeout long
      */
     public void assertUIObjectNotPresent(long timeout) {
         if (isUIObjectPresent(timeout)) {
