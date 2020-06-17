@@ -31,7 +31,7 @@ import ${package}.carina.demo.gui.components.FooterMenu;
 import ${package}.carina.demo.gui.components.WeValuePrivacyAd;
 
 public class HomePage extends AbstractPage {
-	private static final Logger LOGGER = LoggerFactory.getLogger(HomePage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomePage.class);
     
     @FindBy(id = "footmenu")
     private FooterMenu footerMenu;

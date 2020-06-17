@@ -40,7 +40,7 @@ import java.util.Set;
  * Tests for {@link TagManager}
  */
 public class TagManagerTest extends AbstractTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TagManagerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagManagerTest.class);
 
     private static final String TAG_NAME = "tag3";
     private static final String TAG_NAME2 = "tag4";
