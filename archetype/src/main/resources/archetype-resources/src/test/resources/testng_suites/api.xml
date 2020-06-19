@@ -12,8 +12,8 @@
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsSlackChannels" value="slack-test"/>
 
-	<parameter name="jenkinsRegressionPipeline" value="nightly_regression, full_regression"/>
-	<parameter name="jenkinsRegressionScheduling_nightly_regression" value="H 2 * * *"/>
+	<parameter name="jenkinsRegressionPipeline" value="api_regression, full_regression"/>
+	<parameter name="jenkinsRegressionScheduling_api_regression" value="H 2 * * *"/>
 
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>

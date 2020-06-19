@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <records>
+        <record>
+            <title>Brand New Eyes</title>
+            <artist>Paramore</artist>
+            <genre>Punk Rock</genre>
+            <year>2011</year>
+        </record>
+        <record>
+            <title>Brand New Eyeswr</title>
+            <artist>Various Artist</artist>
+            <genre>Rock</genre>
+            <year>2014</year>
+        </record>
+    </records>
+</root>

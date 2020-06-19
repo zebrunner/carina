@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
+import com.qaprosoft.apitools.validation.XmlValidator;
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -34,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
-import static com.qaprosoft.carina.core.foundation.api.http.Headers.ACCEPT_ALL_TYPES;
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.*;
 
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
@@ -236,14 +238,21 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
     }
 
-    public void validateResponseAgainstJSONSchema(String schemaPath) {
+    public void validateResponseAgainstSchema(String schemaPath) {
         if (actualRsBody == null) {
             throw new RuntimeException("Actual response body is null. Please make API call before validation response");
         }
-        TemplateMessage tm = new TemplateMessage();
-        tm.setTemplatePath(schemaPath);
-        String schema = tm.getMessageText();
-        JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
+        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
+        if (contentType == null || contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
+            TemplateMessage tm = new TemplateMessage();
+            tm.setTemplatePath(schemaPath);
+            String schema = tm.getMessageText();
+            JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
+        } else if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
+            XmlValidator.validateXmlAgainstSchema(schemaPath, actualRsBody);
+        } else {
+            throw new RuntimeException("Unsupported argument of content type");
+        }
     }
 
     public void setAuth(String jSessionId) {

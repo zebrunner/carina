@@ -20,9 +20,10 @@ package ${package}.carina.demo.gui.pages;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.AbstractPage;
@@ -30,7 +31,7 @@ import ${package}.carina.demo.gui.components.FooterMenu;
 import ${package}.carina.demo.gui.components.WeValuePrivacyAd;
 
 public class HomePage extends AbstractPage {
-    Logger LOGGER = Logger.getLogger(HomePage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomePage.class);
     
     @FindBy(id = "footmenu")
     private FooterMenu footerMenu;

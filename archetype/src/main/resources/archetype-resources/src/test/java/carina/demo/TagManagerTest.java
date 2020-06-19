@@ -24,7 +24,9 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.tag.*;
 import com.qaprosoft.zafira.models.dto.TagType;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -38,7 +40,7 @@ import java.util.Set;
  * Tests for {@link TagManager}
  */
 public class TagManagerTest extends AbstractTest {
-    protected static final Logger LOGGER = Logger.getLogger(TagManagerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagManagerTest.class);
 
     private static final String TAG_NAME = "tag3";
     private static final String TAG_NAME2 = "tag4";
