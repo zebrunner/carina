@@ -113,9 +113,8 @@ public class TestNamingListener implements IResultListener2 {
      * @return String test name
      */    
     public static String getTestName(ITestResult result) {
-        if (testName.get() == null) {
-            setTestName(result);
-        }
+        // do not return name by thread because it is external Zafira call which should override all values
+        setTestName(result);
         return testName.get();
     }
     
