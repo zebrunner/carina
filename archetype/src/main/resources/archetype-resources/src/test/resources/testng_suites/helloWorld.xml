@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite verbose="1" name="Carina Demo Tests - Hello World" parallel="methods">
+
+	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="zafira_project" value="UNKNOWN"/>
+	<parameter name="jenkinsJobName" value="Hello-World-Test"/>
+	<parameter name="jenkinsJobType" value="api"/>
+
+	<parameter name="jenkinsEnvironments" value="DEMO"/>
+	
+	<test name="Hello World test">
+		<classes>
+			<class name="com.qaprosoft.carina.demo.HelloWorld" />
+		</classes>
+	</test>
+
+</suite>

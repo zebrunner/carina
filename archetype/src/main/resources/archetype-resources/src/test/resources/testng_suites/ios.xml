@@ -16,7 +16,7 @@
 
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
 
- 	<parameter name="jenkinsRegressionPipeline" value="full_regression" />
+ 	<parameter name="jenkinsRegressionPipeline" value="mobile_regression, full_regression" />
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO" />
 	<parameter name="jenkinsJobExecutionOrder" value="3" />
 	<parameter name="jenkinsJobExecutionMode" value="continue" />

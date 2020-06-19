@@ -16,7 +16,7 @@
         <httpclient.version>4.5.3</httpclient.version>
         <java.version>1.8</java.version>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
-        <suite>api</suite>
+        <suite>helloWorld</suite>
     </properties>
 
     <repositories>
@@ -49,9 +49,9 @@
             <version>${httpclient.version}</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
@@ -89,11 +89,6 @@
                     <artifactId>android-json</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.12.1</version>
         </dependency>
     </dependencies>
 
