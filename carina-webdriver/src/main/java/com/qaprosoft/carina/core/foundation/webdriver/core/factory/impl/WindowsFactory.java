@@ -95,8 +95,7 @@ public class WindowsFactory extends AbstractFactory {
 
     @Override
     public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
-        // return super.registerListeners(driver, listeners);
-        return driver;
+        return super.registerListeners(driver, listeners);
     }
 
 }
