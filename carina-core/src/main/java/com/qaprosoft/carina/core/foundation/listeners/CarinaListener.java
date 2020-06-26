@@ -883,7 +883,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue  
         */
-        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(Configuration.get(Parameter.THREAD_COUNT)) {
+        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(Configuration.get(Parameter.THREAD_COUNT))) {
             LOGGER.info("Custom thread count manipulation is enabled. Carina will skip any updates with thread count...");
             return;
         }
