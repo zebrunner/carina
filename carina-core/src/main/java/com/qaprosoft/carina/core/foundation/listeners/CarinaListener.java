@@ -114,7 +114,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     static {
         try {
             // Add shutdown hook
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+            if (!Configuration.getBoolean(Parameter.FORCLY_DISABLE_DRIVER_QUIT)) {
+                Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+            }
             // Set log4j properties
             URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
             LOGGER.debug("carina-log4j.properties: " + log4jUrl);
@@ -327,7 +329,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
-                quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+                if (!Configuration.getBoolean(Parameter.FORCLY_DISABLE_DRIVER_QUIT)) {
+                    quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+                }
             }
 
             // TODO: improve later removing duplicates with AbstractTestListener

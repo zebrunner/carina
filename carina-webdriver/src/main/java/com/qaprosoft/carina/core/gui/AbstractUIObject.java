@@ -106,6 +106,14 @@ public abstract class AbstractUIObject extends DriverHelper {
         this.uiLoadedMarker = uiLoadedMarker;
     }
 
+    public ElementLoadingStrategy getLoadingStrategy() {
+        return loadingStrategy;
+    }
+
+    public void setLoadingStrategy(ElementLoadingStrategy loadingStrategy) {
+        this.loadingStrategy = loadingStrategy;
+    }
+
     public String getName() {
         return name;
     }

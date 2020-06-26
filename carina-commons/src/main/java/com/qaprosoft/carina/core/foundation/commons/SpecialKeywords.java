@@ -100,6 +100,7 @@ public class SpecialKeywords {
     public static final String ANDROID = "Android";
     public static final String IOS = "IOS";
     public static final String MAC = "MAC";
+    public static final String WINDOWS = "Windows";
     public static final String TVOS = "TVOS";
 
     public static final String NATIVE = "native";
