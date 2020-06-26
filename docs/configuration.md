@@ -241,8 +241,8 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>thread_count</td>
-		<td>Default number of threads to use when running tests in parallel.</td>
-		<td>fInteger</td>
+		<td>Default number of threads to use when running tests in parallel. Set thread_count=custom to disable any updates on carina side.</td>
+		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>data_provider_thread_count</td>
