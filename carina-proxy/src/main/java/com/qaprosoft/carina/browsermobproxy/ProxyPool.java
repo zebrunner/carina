@@ -352,7 +352,7 @@ public final class ProxyPool {
         try {
         	new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" "));
         } catch (Exception e) {
-        	//do nothing
+            LOGGER.error("Undefined failure during process kill by port number!", e);
         }
     }
 }
