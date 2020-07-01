@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -106,7 +107,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
         setType(deviceType);
 
-        setOs(Configuration.getPlatform());
+        setOs(Configuration.getPlatform(new DesiredCapabilities(capabilities)));
 
         String platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION);
         if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
