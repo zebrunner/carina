@@ -399,6 +399,16 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Determines how carina detects appearing of web elements on page: by presence in DOM model or by visibility or by any of these conditions</td>
 		<td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
 	</tr>
+	<tr>
+		<td>page_opening_strategy</td>
+		<td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
+		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
+	</tr>
+	<tr>
+		<td>forcibly_disable_driver_quit</td>
+		<td>If enabled turns off webdriver shutdown after test finishing by any reason. Default value is 'false'</td>
+		<td>false, true</td>
+	</tr>
 </table>
 Most of the properties may be read in the following way:
 ```

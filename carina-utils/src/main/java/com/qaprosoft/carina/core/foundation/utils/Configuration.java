@@ -202,7 +202,7 @@ public class Configuration {
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
         
-        FORCLY_DISABLE_DRIVER_QUIT("forcly_disable_driver_quit"),
+        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
 
         // TestRail
         TESTRAIL_RUN_NAME("testrail_run_name"),

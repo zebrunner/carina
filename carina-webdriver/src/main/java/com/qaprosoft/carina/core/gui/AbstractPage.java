@@ -161,6 +161,8 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
                                 uiLoadedMarker.getBy().toString()));
             }
             break;
+        default:
+            throw new RuntimeException("Page opening strategy was not applied properly");
         }
     }
 
