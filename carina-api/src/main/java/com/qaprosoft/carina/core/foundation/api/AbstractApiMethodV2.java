@@ -15,12 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.ACCEPT_ALL_TYPES;
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.XML_CONTENT_TYPE;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
-import com.qaprosoft.apitools.validation.XmlValidator;
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -30,13 +32,13 @@ import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
 import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.apitools.validation.XmlValidator;
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
-
-import static com.qaprosoft.carina.core.foundation.api.http.Headers.*;
 
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
@@ -238,6 +240,29 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
     }
 
+    /**
+     * This method is deprecated now. Please use {@link #validateResponseAgainstSchema(String)} method instead
+     * 
+     * @param schemaPath Path to schema file in resources
+     */
+    @Deprecated
+    public void validateResponseAgainstJSONSchema(String schemaPath) {
+        if (actualRsBody == null) {
+            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
+        }
+        TemplateMessage tm = new TemplateMessage();
+        tm.setTemplatePath(schemaPath);
+        String schema = tm.getMessageText();
+        JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
+    }
+
+    /**
+     * Validates actual API response per schema (JSON or XML depending on response body type).
+     * Annotation {@link ContentType} on your AbstractApiMethodV2 class is used to determine whether to validate JSON or XML.
+     * If ContentType is not specified then JSON schema validation will be applied by default.
+     * 
+     * @param schemaPath Path to schema file in resources
+     */
     public void validateResponseAgainstSchema(String schemaPath) {
         if (actualRsBody == null) {
             throw new RuntimeException("Actual response body is null. Please make API call before validation response");
