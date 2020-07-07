@@ -46,7 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.qaprosoft.zafira.util.upload.UploadUtil;
+import com.qaprosoft.zafira.util.UploadUtil;
 
 import io.appium.java_client.AppiumDriver;
 import ru.yandex.qatools.ashot.AShot;
@@ -226,7 +226,6 @@ public class Screenshot {
                 //do nothing and return empty
                 return null;
             }
-            BufferedImage thumbScreen = screen;
 
             if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                     && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
@@ -238,16 +237,8 @@ public class Screenshot {
 
             ImageIO.write(screen, "PNG", screenshot);
 
-            // Create screenshot thumbnail
-            String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-            File screenshotThumb = new File(thumbScreenPath);
-            ImageIO.write(thumbScreen, "PNG", screenshotThumb);
-
-            resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-                    Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
             // Uploading screenshot to Amazon S3
-            UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
+            UploadUtil.uploadScreenshot(screenshot, comment, 3000L, artifact);
 
             // add screenshot comment to collector
             ReportContext.addScreenshotComment(screenName, comment);
@@ -388,7 +379,6 @@ public class Screenshot {
                 	//do nothing and return empty
                 	return "";
                 }
-                BufferedImage thumbScreen = screen;
 
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                         && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
@@ -400,15 +390,8 @@ public class Screenshot {
 
                 ImageIO.write(screen, "PNG", screenshot);
 
-                // Create screenshot thumbnail
-                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-                File screenshotThumb = new File(thumbScreenPath);
-                ImageIO.write(thumbScreen, "PNG", screenshotThumb);
-                resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-                        Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
                 // Uploading screenshot to Amazon S3
-                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, false);
+                UploadUtil.uploadScreenshot(screenshot, comment, 3000L, false);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -606,8 +589,6 @@ public class Screenshot {
                 screenName = comment + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
-                BufferedImage thumbScreen = screen;
-
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                         && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
                     resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
@@ -618,15 +599,8 @@ public class Screenshot {
                 FileUtils.touch(screenshot);
                 ImageIO.write(screen, "PNG", screenshot);
 
-                // Create comparative screenshot thumbnail
-                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
-                File screenshotThumb = new File(thumbScreenPath);
-                ImageIO.write(thumbScreen, "PNG", screenshotThumb);
-                resizeImg(thumbScreen, Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH),
-                        Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT), thumbScreenPath);
-
                 // Uploading comparative screenshot to Amazon S3
-                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
+                UploadUtil.uploadScreenshot(screenshot, comment, 3000L, artifact);
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");
