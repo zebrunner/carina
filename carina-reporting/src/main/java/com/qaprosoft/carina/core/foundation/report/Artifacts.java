@@ -16,16 +16,19 @@
 package com.qaprosoft.carina.core.foundation.report;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import com.qaprosoft.zafira.util.upload.UploadUtil;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
+import com.qaprosoft.zafira.util.UploadUtil;
 
 /**
  * Artifacts - represented by logs, screenshots, videos recorder by tests.
