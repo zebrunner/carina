@@ -114,9 +114,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     static {
         try {
             // Add shutdown hook
-            if (!Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
-                Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-            }
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
             // Set log4j properties
             URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
             LOGGER.debug("carina-log4j.properties: " + log4jUrl);
@@ -1019,7 +1017,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         @Override
         public void run() {
             LOGGER.debug("Running shutdown hook");
-            quitAllDriversOnHook();
+            if (!Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
+                quitAllDriversOnHook();
+            }
             generateMetadata();
         }
 
