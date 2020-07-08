@@ -199,6 +199,10 @@ public class Configuration {
         TEST_NAMING_PATTERN("test_naming_pattern"),
         
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
+        
+        PAGE_OPENING_STRATEGY("page_opening_strategy"),
+        
+        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
 
         // TestRail
         TESTRAIL_RUN_NAME("testrail_run_name"),
@@ -477,6 +481,11 @@ public class Configuration {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
+        
+        if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+            LOGGER.debug("Detected WINDOWS driver_type by platform: " + platform);
+            return SpecialKeywords.WINDOWS;
+        }
 
         LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
@@ -501,6 +510,11 @@ public class Configuration {
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
+        }
+        
+        if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+            LOGGER.debug("Detected WINDOWS driver_type by platform: " + platform);
+            return SpecialKeywords.WINDOWS;
         }
 
         // handle use-case when we provide only uuid object among desired capabilities

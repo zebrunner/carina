@@ -49,6 +49,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule
 import com.qaprosoft.zafira.util.upload.UploadUtil;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.windows.WindowsDriver;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.comparison.ImageDiff;
 import ru.yandex.qatools.ashot.comparison.ImageDiffer;
@@ -467,7 +468,10 @@ public class Screenshot {
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
         BufferedImage screenShot;
-        if (driver.getClass().toString().contains("java_client")) {
+        if (driver.getClass().toString().contains("windows")) {
+            File screenshot = ((WindowsDriver<?>) driver).getScreenshotAs(OutputType.FILE);
+            screenShot = ImageIO.read(screenshot);
+        } else if (driver.getClass().toString().contains("java_client")) {
             // Mobile Native app
             File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
             screenShot = ImageIO.read(screenshot);

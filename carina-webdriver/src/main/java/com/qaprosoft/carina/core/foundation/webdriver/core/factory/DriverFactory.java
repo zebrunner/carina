@@ -31,6 +31,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.zafira.client.ZafiraSingleton;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
@@ -63,6 +64,10 @@ public class DriverFactory {
 		case SpecialKeywords.MOBILE:
 			factory = new MobileFactory();
 			break;
+
+        case SpecialKeywords.WINDOWS:
+            factory = new WindowsFactory();
+            break;
 
 		default:
 			throw new RuntimeException("Unsupported driver_type: " + driverType);

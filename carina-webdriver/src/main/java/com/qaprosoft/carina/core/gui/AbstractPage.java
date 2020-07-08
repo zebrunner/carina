@@ -37,6 +37,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.PageOpeningStrategy;
 
 /**
  * All page POJO objects should extend this abstract page to get extra logic.
@@ -44,6 +45,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
  * @author Alex Khursevich
  */
 public abstract class AbstractPage extends AbstractUIObject implements ICustomTypePageFactory {
+
+    private PageOpeningStrategy pageOpeningStrategy = PageOpeningStrategy.valueOf(Configuration.get(Parameter.PAGE_OPENING_STRATEGY));
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractPage.class);
     
@@ -79,26 +82,46 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
         return pageURL;
     }
 
+    public PageOpeningStrategy getPageOpeningStrategy() {
+        return pageOpeningStrategy;
+    }
+
+    public void setPageOpeningStrategy(PageOpeningStrategy pageOpeningStrategy) {
+        this.pageOpeningStrategy = pageOpeningStrategy;
+    }
+
     public boolean isPageOpened() {
         return isPageOpened(EXPLICIT_TIMEOUT);
     }
 
     public boolean isPageOpened(long timeout) {
-        boolean isOpened = super.isPageOpened(this, timeout);
-        if (!isOpened) {
-            return false;
-        }
+        switch (pageOpeningStrategy) {
+        case BY_URL:
+            return super.isPageOpened(this, timeout);
+        case BY_ELEMENT:
+            if (uiLoadedMarker == null) {
+                throw new RuntimeException("Please specify uiLoadedMarker for the page/screen to validate page opened state");
+            }
+            return uiLoadedMarker.isElementPresent(timeout);
+        case BY_URL_AND_ELEMENT:
+            boolean isOpened = super.isPageOpened(this, timeout);
+            if (!isOpened) {
+                return false;
+            }
 
-        if (uiLoadedMarker != null) {
-            isOpened = uiLoadedMarker.isVisible(timeout);
-        }
+            if (uiLoadedMarker != null) {
+                isOpened = uiLoadedMarker.isElementPresent(timeout);
+            }
 
-        if (!isOpened) {
-            LOGGER.warn(String.format(
-                    "Loaded page url is as expected but page loading marker element is not visible: %s",
-                    uiLoadedMarker.getBy().toString()));
+            if (!isOpened) {
+                LOGGER.warn(String.format(
+                        "Loaded page url is as expected but page loading marker element is not visible: %s",
+                        uiLoadedMarker.getBy().toString()));
+            }
+            return isOpened;
+        default:
+            throw new RuntimeException("Page opening strategy was not applied properly");
         }
-        return isOpened;
     }
 
     /**
@@ -116,14 +139,30 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
      * @param timeout Completing of page loading conditions will be verified within specified timeout
      */
     public void assertPageOpened(long timeout) {
-        if (!super.isPageOpened(this, timeout)) {
-            Assert.fail(String.format("%s not loaded: url is not as expected", getPageClassName()));
-        }
+        switch (pageOpeningStrategy) {
+        case BY_URL:
+            Assert.assertTrue(super.isPageOpened(this, timeout), String.format("%s not loaded: url is not as expected", getPageClassName()));
+            break;
+        case BY_ELEMENT:
+            if (uiLoadedMarker == null) {
+                throw new RuntimeException("Please specify uiLoadedMarker for the page/screen to validate page opened state");
+            }
+            Assert.assertTrue(uiLoadedMarker.isElementPresent(timeout), String.format("%s not loaded: page loading marker element is not visible: %s",
+                    getPageClassName(), uiLoadedMarker.getBy().toString()));
+            break;
+        case BY_URL_AND_ELEMENT:
+            if (!super.isPageOpened(this, timeout)) {
+                Assert.fail(String.format("%s not loaded: url is not as expected", getPageClassName()));
+            }
 
-        if (uiLoadedMarker != null) {
-            Assert.assertTrue(uiLoadedMarker.isVisible(timeout),
-                    String.format("%s not loaded: url is correct but page loading marker element is not visible: %s",
-                            getPageClassName(), uiLoadedMarker.getBy().toString()));
+            if (uiLoadedMarker != null) {
+                Assert.assertTrue(uiLoadedMarker.isElementPresent(timeout),
+                        String.format("%s not loaded: url is correct but page loading marker element is not visible: %s", getPageClassName(),
+                                uiLoadedMarker.getBy().toString()));
+            }
+            break;
+        default:
+            throw new RuntimeException("Page opening strategy was not applied properly");
         }
     }
 
