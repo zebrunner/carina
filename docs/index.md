@@ -17,5 +17,5 @@ Carina is a Java-based test automation framework that unites all testing layers:
 * API testing is based on a Freemarker template engine. It enables great flexibility in generating REST requests, and responses are dynamically changed by incoming arguments.
 
 
-Carina is fully integrated into [QPS-Infra](https://github.com/qaprosoft/qps-infra) that helps to setup a production-ready environment for running Mobile, Web and API tests. Feel free to ask any questions if you are going to use it in your company.
+Carina is fully integrated into [Zebrunner Starter Kit](https://github.com/qaprosoft/qps-infra) that helps to setup a production-ready environment for running Mobile, Web and API tests. Feel free to ask any questions if you are going to use it in your company.
 ![Alt text](img/infrastructure.png "Infrastructure")
