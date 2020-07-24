@@ -608,9 +608,8 @@ public class ReportContext {
             }
         } catch (Exception e) {
             LOGGER.error("Exception during report directory scanning", e);
-            e.printStackTrace();
         }
-
+        
         String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
         
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
