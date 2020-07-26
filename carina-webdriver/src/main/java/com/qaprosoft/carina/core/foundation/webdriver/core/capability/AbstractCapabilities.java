@@ -256,7 +256,7 @@ public abstract class AbstractCapabilities {
             options.addArguments(arg.trim());
         }
         // add all custom firefox preferences
-        for (String preference : Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+        for (String preference : Configuration.get(Parameter.FIREFOX_PREFERENCES).split(",")) {
             if (preference.isEmpty()) {
                 continue;
             }
