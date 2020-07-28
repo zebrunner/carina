@@ -601,9 +601,13 @@ public class ReportContext {
      */
     public static String getTestScreenshotsLink() {
         String link = "";
-        if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
-            // no png screenshot files at all
-            return link;
+        try {
+            if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
+                // no png screenshot files at all
+                return link;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Exception during report directory scanning", e);
         }
         
         String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
