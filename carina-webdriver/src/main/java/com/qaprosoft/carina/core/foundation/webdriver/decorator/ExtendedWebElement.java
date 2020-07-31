@@ -1560,7 +1560,12 @@ public class ExtendedWebElement {
 			public void doCheck() {
 				DriverListener.setMessages(Messager.CHECKBOX_CHECKED.getMessage(getName()), null);
 				
-				if (!element.isSelected()) {
+                boolean isSelected = element.isSelected();
+                if (element.getAttribute("checked") != null) {
+                    isSelected |= element.getAttribute("checked").equalsIgnoreCase("true");
+                }
+                
+				if (!isSelected) {
 					click();
 				}
 			}
@@ -1568,7 +1573,13 @@ public class ExtendedWebElement {
 			@Override
 			public void doUncheck() {
 				DriverListener.setMessages(Messager.CHECKBOX_UNCHECKED.getMessage(getName()), null);
-				if (element.isSelected()) {
+				
+                boolean isSelected = element.isSelected();
+                if (element.getAttribute("checked") != null) {
+                    isSelected |= element.getAttribute("checked").equalsIgnoreCase("true");
+                }
+                
+				if (isSelected) {
 					click();
 				}
 			}
