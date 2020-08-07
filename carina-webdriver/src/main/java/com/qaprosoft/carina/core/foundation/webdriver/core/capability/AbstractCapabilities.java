@@ -237,13 +237,6 @@ public abstract class AbstractCapabilities {
         if (!mobileEmulation.isEmpty()) {
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
         }
-
-        if(Configuration.getBoolean(Parameter.HEADLESS_MODE)){
-            options.addArguments("--headless");
-            if (caps.getPlatform().is(Platform.WINDOWS)) {
-                options.addArguments("--disable-gpu");
-            }
-        }
         
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
@@ -277,10 +270,6 @@ public abstract class AbstractCapabilities {
             } else {
                 options.addPreference(name, value);
             }
-        }
-
-        if(Configuration.getBoolean(Parameter.HEADLESS_MODE)){
-            options.setHeadless(true);
         }
 
         return caps;

@@ -281,9 +281,7 @@ public class Configuration {
         // Test Execution Filter rules
         TEST_RUN_RULES("test_run_rules"),
 
-        HUB_MODE("hub_mode"),
-
-        HEADLESS_MODE("headless_mode");
+        HUB_MODE("hub_mode");
 
         private final String key;
 
