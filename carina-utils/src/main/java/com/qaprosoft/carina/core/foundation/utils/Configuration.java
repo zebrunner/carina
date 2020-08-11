@@ -25,6 +25,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 
 /**
  * Configuration utility.
@@ -35,7 +36,11 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 public class Configuration {
     private static final Logger LOGGER = Logger.getLogger(Configuration.class);
     private static IEnvArgResolver envArgResolver;
+    private final static String customCapabilities = "custom_capabilities.properties";
+    private static DesiredCapabilities caps = new CapabilitiesLoader().getCapabilities(customCapabilities);
+    private static String value = (String) caps.getCapability("provider");
 
+    
     static {
         String envArgResolverClass = Configuration.get(Parameter.ENV_ARG_RESOLVER);
         if (envArgResolverClass.isEmpty()) {
@@ -281,10 +286,10 @@ public class Configuration {
         // Test Execution Filter rules
         TEST_RUN_RULES("test_run_rules"),
 
-        HUB_MODE("hub_mode");
+        HUB_MODE(value);
 
         private final String key;
-
+        
         Parameter(String key) {
             this.key = key;
         }
