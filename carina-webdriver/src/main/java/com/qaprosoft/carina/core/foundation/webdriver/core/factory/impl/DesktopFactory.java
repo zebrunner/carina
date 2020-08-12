@@ -79,7 +79,7 @@ public class DesktopFactory extends AbstractFactory {
             if (isVideoEnabled()) {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
-                switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+                switch (HubType.valueOf(Configuration.getHubMode())) {
                 case SELENIUM:
                 case MCLOUD:
                 case AEROKUBE:

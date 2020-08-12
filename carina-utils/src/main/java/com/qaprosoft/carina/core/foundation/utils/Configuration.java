@@ -36,9 +36,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 public class Configuration {
     private static final Logger LOGGER = Logger.getLogger(Configuration.class);
     private static IEnvArgResolver envArgResolver;
-    private final static String customCapabilities = "custom_capabilities.properties";
-    private static DesiredCapabilities caps = new CapabilitiesLoader().getCapabilities(customCapabilities);
-    private static String value = (String) caps.getCapability("provider");
 
     
     static {
@@ -284,9 +281,7 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules"),
-
-        HUB_MODE(value);
+        TEST_RUN_RULES("test_run_rules");
 
         private final String key;
         
@@ -550,4 +545,12 @@ public class Configuration {
     public static Object getCapability(String name) {
         return R.CONFIG.get("capabilities." + name);
     }
+    
+    public static String getHubMode() {
+    	String customCapabilities = "custom_capabilities.properties";
+        DesiredCapabilities caps = new CapabilitiesLoader().getCapabilities(customCapabilities);
+        String hub_mode = (String) caps.getCapability("provider");
+        return hub_mode;
+    }
+ 
 }

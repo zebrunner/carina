@@ -139,7 +139,7 @@ public class MobileFactory extends AbstractFactory {
                         // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+                        switch (HubType.valueOf(Configuration.getHubMode())) {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:
@@ -193,7 +193,7 @@ public class MobileFactory extends AbstractFactory {
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
 
-                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+                        switch (HubType.valueOf(Configuration.getHubMode())) {
                         case SELENIUM:
                         case MCLOUD:
                         case AEROKUBE:
@@ -338,7 +338,7 @@ public class MobileFactory extends AbstractFactory {
         if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
             final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 
-            switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
+            switch (HubType.valueOf(Configuration.getHubMode())) {
             case SELENIUM:
             case MCLOUD:
             case AEROKUBE:
