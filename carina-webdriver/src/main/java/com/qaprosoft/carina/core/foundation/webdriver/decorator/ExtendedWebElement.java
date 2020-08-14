@@ -22,9 +22,11 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +55,7 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -360,30 +363,27 @@ public class ExtendedWebElement {
     
     private WebElement refindElement() {
         //do not return without element initialization!
-    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-    	try {
-    		if (searchContext != null) {
-    			//TODO: use-case when format method is used. Need investigate howto init context in this case as well
-    			element = searchContext.findElement(by);
-    		} else {
-    		    LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-    			element = getDriver().findElement(by);	
-    		}
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
-			//use available driver to research again...
-			//TODO: handle case with rootBy to be able to refind also lists etc
-            if (searchContext != null) {
-                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);  
-            }
-    	} catch (WebDriverException e) {
-    		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
-    		element = getDriver().findElement(by);
-    	}
+        //TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
+        
+        FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
+        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)));
+        wait.withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)));
+        wait.ignoring(StaleElementReferenceException.class);
+        wait.ignoring(InvalidElementStateException.class);
+        wait.ignoring(WebDriverException.class);
+
+        if (searchContext != null) {
+            Function<WebDriver, WebElement> waitElement = arg0 -> {
+                return searchContext.findElement(by);
+            };
+            element = wait.until(waitElement);
+        } else {
+            Function<WebDriver, WebElement> waitElement = arg0 -> {
+                return getDriver().findElement(by);
+            };
+            element = wait.until(waitElement);            
+        }
+        
         return element;
     }
     
