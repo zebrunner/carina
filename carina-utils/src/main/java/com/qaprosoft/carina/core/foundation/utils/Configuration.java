@@ -24,12 +24,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.apache.log4j.Logger;
 
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 
 /**
  * Configuration utility.
- * 
+ *
  * @author Aliaksei_Khursevich
  *         hursevich@gmail.com
  */
@@ -37,7 +37,6 @@ public class Configuration {
     private static final Logger LOGGER = Logger.getLogger(Configuration.class);
     private static IEnvArgResolver envArgResolver;
 
-    
     static {
         String envArgResolverClass = Configuration.get(Parameter.ENV_ARG_RESOLVER);
         if (envArgResolverClass.isEmpty()) {
@@ -79,15 +78,15 @@ public class Configuration {
         MAX_DRIVER_COUNT("max_driver_count"),
 
         CUSTOM_CAPABILITIES("custom_capabilities"),
-        
+
         CHROME_ARGS("chrome_args"),
-        
+
         CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
-        
+
         CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts"),
-        
+
         FIREFOX_ARGS("firefox_args"),
-        
+
         FIREFOX_PREFERENCES("firefox_preferences"),
 
         APP_VERSION("app_version"),
@@ -97,7 +96,7 @@ public class Configuration {
         PROXY_PORT("proxy_port"),
 
         PROXY_PROTOCOLS("proxy_protocols"),
-        
+
         NO_PROXY("no_proxy"),
 
         BROWSERMOB_PROXY("browsermob_proxy"),
@@ -199,11 +198,11 @@ public class Configuration {
         JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
-        
+
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
-        
+
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
-        
+
         FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
 
         // TestRail
@@ -226,7 +225,7 @@ public class Configuration {
         SECRET_KEY("secret_key"),
 
         S3_USE_PRESIGN_URL("s3_use_presign_url"),
-        
+
         S3_LOCAL_STORAGE("s3_local_storage"),
 
         // AppCenter token
@@ -284,7 +283,7 @@ public class Configuration {
         TEST_RUN_RULES("test_run_rules");
 
         private final String key;
-        
+
         Parameter(String key) {
             this.key = key;
         }
@@ -297,7 +296,7 @@ public class Configuration {
     /**
      * Returns configuration value from startup properties or from configuration
      * file if not found in startup args.
-     * 
+     *
      * @param param
      *            - parameter key.
      * @return parameter value if it is found by key or default value if not.
@@ -409,24 +408,24 @@ public class Configuration {
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
         }
-        
+
         // redefine platform if mobile.platformName is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
-        
+
         if (caps != null && caps.getCapability("platform") != null) {
             platform = caps.getCapability("platform").toString();
         }
 
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
-        }        
-        
+        }
+
         //TODO: try to get actual platform name
         return platform;
     }
-    
+
     public static String getPlatformVersion() {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
@@ -435,7 +434,7 @@ public class Configuration {
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
             platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
         }
-        
+
         //TODO: try to get actual platform version
         return platformVersion;
     }
@@ -453,7 +452,7 @@ public class Configuration {
         }
         return browser;
     }
-    
+
     public static String getBrowserVersion() {
         String browserVersion = "";
         if (!Configuration.get(Parameter.BROWSER_VERSION).isEmpty()) {
@@ -465,12 +464,12 @@ public class Configuration {
         if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
             browserVersion = R.CONFIG.get("capabilities.browserVersion");
         }
-        
+
         // read from actual_browser_version if specified
         if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
             browserVersion = R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION);
         }
-        
+
         return browserVersion;
     }
 
@@ -481,7 +480,7 @@ public class Configuration {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
-        
+
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             LOGGER.debug("Detected WINDOWS driver_type by platform: " + platform);
             return SpecialKeywords.WINDOWS;
@@ -511,7 +510,7 @@ public class Configuration {
             LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
-        
+
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             LOGGER.debug("Detected WINDOWS driver_type by platform: " + platform);
             return SpecialKeywords.WINDOWS;
@@ -545,12 +544,7 @@ public class Configuration {
     public static Object getCapability(String name) {
         return R.CONFIG.get("capabilities." + name);
     }
-    
     public static String getHubMode() {
-    	String customCapabilities = "custom_capabilities.properties";
-        DesiredCapabilities caps = new CapabilitiesLoader().getCapabilities(customCapabilities);
-        String hub_mode = (String) caps.getCapability("provider");
-        return hub_mode;
+        return R.CAPABILITIES.get("capabilities.provider");
     }
- 
 }
