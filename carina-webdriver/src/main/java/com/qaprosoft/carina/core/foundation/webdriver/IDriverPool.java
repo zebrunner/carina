@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -49,7 +50,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -336,9 +336,9 @@ public interface IDriverPool {
                 String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
                 StringBuilder tempStr = new StringBuilder();
                 LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
-                logcatEntries.getAll().stream().forEach((k) -> tempStr.append(k.toString().concat("\n")));
+                logcatEntries.getAll().forEach((k) -> tempStr.append(k.toString().concat("\n")));
                 
-                if (tempStr == null || tempStr.length() == 0) {
+                if (tempStr.length() == 0) {
                     //don't write something to file and don't register appropriate artifact
                     continue;
                 }
@@ -352,9 +352,8 @@ public interface IDriverPool {
                 } catch (IOException e) {
                     POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
                 }
-                Artifacts.add(logType, file);
+                UploadUtil.uploadArtifact(file, logType);
             }
-            
             
             WebDriver driver = carinaDriver.getDriver();
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
