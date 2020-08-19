@@ -43,7 +43,6 @@ import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
 import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
 import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import com.qaprosoft.zafira.models.dto.TagType;
-import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
 
@@ -53,7 +52,7 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  * @author akhursevich
  */
 public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTestManager {
-    
+
     private static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
 
     @Override
