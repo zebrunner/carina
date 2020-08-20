@@ -347,6 +347,7 @@ public class Screenshot {
 
                 WebDriver augmentedDriver = driver;
 
+
                 //hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
     				try {

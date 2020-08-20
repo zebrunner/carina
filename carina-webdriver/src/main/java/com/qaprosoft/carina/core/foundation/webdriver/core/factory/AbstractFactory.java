@@ -28,6 +28,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
@@ -114,6 +115,7 @@ public abstract class AbstractFactory {
         TestArtifactType artifact = new TestArtifactType();
         artifact.setName("Video " + SDF.format(new Date()));
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
+        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
 
@@ -128,6 +130,7 @@ public abstract class AbstractFactory {
         artifact.setName("Session log " + SDF.format(new Date()));
         // TODO: allocate separate configuration property
         artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), sessionLogName));
+        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
         return artifact;
     }
 

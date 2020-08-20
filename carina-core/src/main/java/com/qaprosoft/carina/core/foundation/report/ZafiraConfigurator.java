@@ -43,6 +43,7 @@ import com.qaprosoft.zafira.listener.adapter.SuiteAdapter;
 import com.qaprosoft.zafira.listener.adapter.TestResultAdapter;
 import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 import com.qaprosoft.zafira.models.dto.TagType;
+import com.qaprosoft.zafira.models.dto.TestArtifactType;
 import com.qaprosoft.zafira.models.dto.config.ArgumentType;
 import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
 
@@ -52,8 +53,8 @@ import com.qaprosoft.zafira.models.dto.config.ConfigurationType;
  * @author akhursevich
  */
 public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTestManager {
-
     private static final Logger LOGGER = Logger.getLogger(ZafiraConfigurator.class);
+    
 
     @Override
     public ConfigurationType getConfiguration() {
@@ -216,6 +217,18 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         
         LOGGER.debug("Found " + tags.size() + " new TestTags");
         return tags;
+    }
+
+    @Override
+    public Set<TestArtifactType> getArtifacts(TestResultAdapter testResultAdapter) {
+        LOGGER.debug("Collecting artifacts...");
+        // Generate additional artifacts links on test run
+        return Artifacts.getArtifacts();
+    }
+
+    @Override
+    public void clearArtifacts() {
+        Artifacts.clearArtifacts();
     }
 
     //Moved them separately for future easier reusing if getTestTags will be overridden.
