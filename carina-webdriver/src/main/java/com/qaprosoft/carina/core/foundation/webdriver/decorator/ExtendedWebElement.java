@@ -370,19 +370,28 @@ public class ExtendedWebElement {
             withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT))).
             ignoring(StaleElementReferenceException.class).
             ignoring(InvalidElementStateException.class).
-            ignoring(WebDriverException.class).
-            ignoring(TimeoutException.class);
+            ignoring(WebDriverException.class);
 
         if (searchContext != null) {
             Function<WebDriver, WebElement> waitElement = arg0 -> {
                 return searchContext.findElement(by);
             };
-            element = wait.until(waitElement);
+            try {
+                element = wait.until(waitElement);
+            } catch (TimeoutException e) {
+                // do a final call directly to generate valid exception
+                element = searchContext.findElement(by);                
+            }
         } else {
             Function<WebDriver, WebElement> waitElement = arg0 -> {
                 return getDriver().findElement(by);
             };
-            element = wait.until(waitElement);            
+            try {
+                element = wait.until(waitElement);
+            } catch (TimeoutException e) {
+                // do a final call directly to generate valid exception
+                element = getDriver().findElement(by);                
+            }
         }
         
         return element;
