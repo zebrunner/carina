@@ -366,11 +366,12 @@ public class ExtendedWebElement {
         //TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
         
         FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
-        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)));
-        wait.withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)));
-        wait.ignoring(StaleElementReferenceException.class);
-        wait.ignoring(InvalidElementStateException.class);
-        wait.ignoring(WebDriverException.class);
+        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL))).
+            withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT))).
+            ignoring(StaleElementReferenceException.class).
+            ignoring(InvalidElementStateException.class).
+            ignoring(WebDriverException.class).
+            ignoring(TimeoutException.class);
 
         if (searchContext != null) {
             Function<WebDriver, WebElement> waitElement = arg0 -> {
@@ -1395,7 +1396,7 @@ public class ExtendedWebElement {
 			try {
 				element = refindElement();
 			} catch (NoSuchElementException ex) {
-				//no sense to repeit action if refind element didn't help
+				//no sense to repeat action if refind element didn't help
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
