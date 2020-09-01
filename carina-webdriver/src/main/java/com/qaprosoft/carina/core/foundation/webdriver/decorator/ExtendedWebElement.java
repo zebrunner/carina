@@ -22,9 +22,11 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +55,7 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -359,34 +362,39 @@ public class ExtendedWebElement {
     }
     
     private WebElement refindElement() {
-        //do not return without element initialization!
-    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-    	try {
-    		if (searchContext != null) {
-    			//TODO: use-case when format method is used. Need investigate howto init context in this case as well
-    			element = searchContext.findElement(by);
-    		} else {
-    		    LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-    			element = getDriver().findElement(by);	
-    		}
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
-			//use available driver to research again...
-			//TODO: handle case with rootBy to be able to refind also lists etc
-            if (searchContext != null) {
-                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);  
+        // do not return without element initialization!
+        FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
+
+        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(InvalidElementStateException.class)
+                .ignoring(WebDriverException.class);
+
+        if (searchContext != null) {
+            try {
+                this.element = wait.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return searchContext.findElement(by);
+                    }
+                });
+            } catch (TimeoutException e) {
+                this.element = searchContext.findElement(by);
             }
-    	} catch (WebDriverException e) {
-    		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
-    		element = getDriver().findElement(by);
-    	}
+        } else {
+            try {
+                this.element = wait.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return getDriver().findElement(by);
+                    }
+                });
+            } catch (TimeoutException e) {
+                this.element = getDriver().findElement(by);
+            }
+        }
         return element;
     }
-    
+
     public void setElement(WebElement element) {
         this.element = element;
     }
@@ -1395,7 +1403,7 @@ public class ExtendedWebElement {
 			try {
 				element = refindElement();
 			} catch (NoSuchElementException ex) {
-				//no sense to repeit action if refind element didn't help
+				//no sense to repeat action if refind element didn't help
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
