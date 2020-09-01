@@ -362,41 +362,39 @@ public class ExtendedWebElement {
     }
     
     private WebElement refindElement() {
-        //do not return without element initialization!
-        //TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-        
+        // do not return without element initialization!
         FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
-        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL))).
-            withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT))).
-            ignoring(StaleElementReferenceException.class).
-            ignoring(InvalidElementStateException.class).
-            ignoring(WebDriverException.class);
+
+        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(InvalidElementStateException.class)
+                .ignoring(WebDriverException.class);
 
         if (searchContext != null) {
-            Function<WebDriver, WebElement> waitElement = arg0 -> {
-                return searchContext.findElement(by);
-            };
             try {
-                element = wait.until(waitElement);
+                this.element = (WebElement) wait.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return searchContext.findElement(by);
+                    }
+                });
             } catch (TimeoutException e) {
-                // do a final call directly to generate valid exception
-                element = searchContext.findElement(by);                
+                this.element = searchContext.findElement(by);
             }
         } else {
-            Function<WebDriver, WebElement> waitElement = arg0 -> {
-                return getDriver().findElement(by);
-            };
             try {
-                element = wait.until(waitElement);
+                this.element = (WebElement) wait.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return getDriver().findElement(by);
+                    }
+                });
             } catch (TimeoutException e) {
-                // do a final call directly to generate valid exception
-                element = getDriver().findElement(by);                
+                this.element = getDriver().findElement(by);
             }
         }
-        
         return element;
     }
-    
+
     public void setElement(WebElement element) {
         this.element = element;
     }
