@@ -373,7 +373,7 @@ public class ExtendedWebElement {
 
         if (searchContext != null) {
             try {
-                this.element = (WebElement) wait.until(new Function<WebDriver, WebElement>() {
+                this.element = wait.until(new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
                         return searchContext.findElement(by);
                     }
@@ -383,7 +383,7 @@ public class ExtendedWebElement {
             }
         } else {
             try {
-                this.element = (WebElement) wait.until(new Function<WebDriver, WebElement>() {
+                this.element = wait.until(new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
                         return getDriver().findElement(by);
                     }
