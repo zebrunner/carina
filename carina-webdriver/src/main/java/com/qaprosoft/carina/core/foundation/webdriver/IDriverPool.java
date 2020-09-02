@@ -355,7 +355,7 @@ public interface IDriverPool {
                     Artifacts.add(logType, file);
                 }
             } catch (Exception e) {
-                POOL_LOGGER.warn("Unable to get webdriver server logs!");
+                POOL_LOGGER.warn("Unable to extract webdriver server logs!");
                 POOL_LOGGER.debug(e.getMessage(), e);
             }
             
@@ -458,7 +458,8 @@ public interface IDriverPool {
                 POOL_LOGGER.error("driver.manage() is null!");
             }
         } catch (Exception e) {
-            POOL_LOGGER.error("Unrecorgnized error durig driver log populating!", e);
+            POOL_LOGGER.warn("Unable to get webdriver server logs.");
+            POOL_LOGGER.debug("Unable to get webdriver server logs.", e);
         }
         POOL_LOGGER.debug("finish getting driver logs");
         return logEntries;
