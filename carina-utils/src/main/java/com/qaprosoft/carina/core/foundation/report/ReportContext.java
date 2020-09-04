@@ -423,10 +423,9 @@ public class ReportContext {
             String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
 
             testDir = new File(directory);
-            File thumbDir = new File(testDir.getAbsolutePath() + "/thumbnails");
 
-            if (!thumbDir.mkdirs()) {
-                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath() + " and/or " + thumbDir.getAbsolutePath());
+            if (!testDir.mkdirs()) {
+                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
             }
         }
 
@@ -674,7 +673,7 @@ public class ReportContext {
     }
 
     /**
-     * Saves screenshot with thumbnail.
+     * Saves screenshot.
      * 
      * @param screenshot - {@link BufferedImage} file to save
      * 
@@ -685,9 +684,6 @@ public class ReportContext {
 
         executor.execute(new ImageSaverTask(screenshot, String.format("%s/%d.png", getTestDir().getAbsolutePath(), now),
                 Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT)));
-
-        executor.execute(new ImageSaverTask(screenshot, String.format("%s/thumbnails/%d.png", getTestDir().getAbsolutePath(), now),
-                Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH), Configuration.getInt(Parameter.SMALL_SCREEN_HEIGHT)));
 
         return String.format("%d.png", now);
     }
@@ -756,7 +752,6 @@ public class ReportContext {
             for (File image : images) {
                 imgNames.add(image.getName());
             }
-            imgNames.remove("thumbnails");
             imgNames.remove("test.log");
             imgNames.remove("sql.log");
             if (imgNames.size() == 0)
@@ -770,7 +765,6 @@ public class ReportContext {
                 String image = R.REPORT.get("image");
 
                 image = image.replace("${image}", imgNames.get(i));
-                image = image.replace("${thumbnail}", imgNames.get(i));
 
                 String title = getScreenshotComment(imgNames.get(i));
                 if (title == null) {

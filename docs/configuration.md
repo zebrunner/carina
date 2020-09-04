@@ -198,22 +198,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>big_screen_height</td>
 		<td>Screenshots will be resized according to this height if their own height is bigger</td>
 		<td>500, 1200, Integer</td>
-	</tr>
-		<tr>
-		<td>small_screen_width</td>
-		<td>Thumbnails' width</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>big_screen_height</td>
-		<td>Thumbnails' height</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>big_screen_height</td>
-		<td>Thumbnails' height</td>
-		<td>Integer</td>
-	</tr>
 	<tr>
 		<td>init_retry_count</td>
 		<td>Number of attempts to create a driver. The default value 0 means that there will be only 1 attempt</td>
@@ -414,7 +398,7 @@ Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
-Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
+Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) //return int value
 Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 
