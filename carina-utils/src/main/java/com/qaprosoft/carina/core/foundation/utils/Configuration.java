@@ -144,10 +144,6 @@ public class Configuration {
 
         BIG_SCREEN_HEIGHT("big_screen_height"),
 
-        SMALL_SCREEN_WIDTH("small_screen_width"),
-
-        SMALL_SCREEN_HEIGHT("small_screen_height"),
-
         INIT_RETRY_COUNT("init_retry_count"),
 
         INIT_RETRY_INTERVAL("init_retry_interval"),
