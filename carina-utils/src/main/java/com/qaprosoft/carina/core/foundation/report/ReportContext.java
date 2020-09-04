@@ -683,7 +683,7 @@ public class ReportContext {
         long now = System.currentTimeMillis();
 
         executor.execute(new ImageSaverTask(screenshot, String.format("%s/%d.png", getTestDir().getAbsolutePath(), now),
-                Configuration.getInt(Parameter.SCREEN_WIDTH), Configuration.getInt(Parameter.SCREEN_HEIGHT)));
+                Configuration.getInt(Parameter.BIG_SCREEN_WIDTH), Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT)));
 
         return String.format("%d.png", now);
     }

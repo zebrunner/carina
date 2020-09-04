@@ -140,9 +140,9 @@ public class Configuration {
 
         RESULT_SORTING("result_sorting"),
 
-        SCREEN_WIDTH("screen_width"),
+        BIG_SCREEN_WIDTH("big_screen_width"),
 
-        SCREEN_HEIGHT("screen_height"),
+        BIG_SCREEN_HEIGHT("big_screen_height"),
 
         INIT_RETRY_COUNT("init_retry_count"),
 

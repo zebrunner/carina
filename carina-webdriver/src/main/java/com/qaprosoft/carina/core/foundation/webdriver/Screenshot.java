@@ -229,10 +229,10 @@ public class Screenshot {
                 return null;
             }
 
-            if (Configuration.getInt(Parameter.SCREEN_WIDTH) != -1
-                    && Configuration.getInt(Parameter.SCREEN_HEIGHT) != -1) {
-                resizeImg(screen, Configuration.getInt(Parameter.SCREEN_WIDTH),
-                        Configuration.getInt(Parameter.SCREEN_HEIGHT), screenPath);
+            if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                    && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                        Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
             }
 
             File screenshot = new File(screenPath);
@@ -383,10 +383,10 @@ public class Screenshot {
                 	return "";
                 }
 
-                if (Configuration.getInt(Parameter.SCREEN_WIDTH) != -1
-                        && Configuration.getInt(Parameter.SCREEN_HEIGHT) != -1) {
-                    resizeImg(screen, Configuration.getInt(Parameter.SCREEN_WIDTH),
-                            Configuration.getInt(Parameter.SCREEN_HEIGHT), screenPath);
+                if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                        && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
                 }
 
                 File screenshot = new File(screenPath);
@@ -595,10 +595,10 @@ public class Screenshot {
                 screenName = comment + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
-                if (Configuration.getInt(Parameter.SCREEN_WIDTH) != -1
-                        && Configuration.getInt(Parameter.SCREEN_HEIGHT) != -1) {
-                    resizeImg(screen, Configuration.getInt(Parameter.SCREEN_WIDTH),
-                            Configuration.getInt(Parameter.SCREEN_HEIGHT), screenPath);
+                if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
+                        && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
+                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
                 }
 
                 File screenshot = new File(screenPath);
