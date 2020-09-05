@@ -1117,7 +1117,7 @@ public class ExtendedWebElement {
                 //TODO: use-case when format method is used. Need investigate howto init context in this case as well
                 element = searchContext.findElement(by);
             } else {
-                LOGGER.error("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
+                LOGGER.debug("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);  
             }
     	} catch (NoSuchElementException e) {
