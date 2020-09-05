@@ -184,14 +184,6 @@ public class Configuration {
 
         JIRA_PASSWORD("jira_password"),
 
-        JIRA_SUITE_ID("jira_suite_id"),
-
-        JIRA_PROJECT("jira_project"),
-
-        JIRA_PROJECT_SHORT("jira_project_short"),
-
-        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
-
         TEST_NAMING_PATTERN("test_naming_pattern"),
         
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),

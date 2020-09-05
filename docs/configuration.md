@@ -288,21 +288,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Jira user password</td>
 		<td>admin123456</td>
 	</tr>
-		<tr>
-		<td>jira_suite_id</td>
-		<td>Jira suit id (if you have one)</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>jira_project</td>
-		<td>Jira project id</td>
-		<td>Integer</td>
-	</tr>
-		<tr>
-		<td>jira_create_new_ticket</td>
-		<td>If the feature is enabled, a new Jira ticket will be created after the test failure</td>
-		<td>true, false</td>
-	</tr>
 	<tr>
 		<td>testrail_milestone</td>
 		<td>Milestone to set on TestRail for run</td>
