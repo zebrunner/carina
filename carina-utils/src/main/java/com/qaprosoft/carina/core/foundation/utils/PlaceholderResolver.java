@@ -55,9 +55,14 @@ public class PlaceholderResolver {
                 }
             }
         } else {
-			if (!key.startsWith(SpecialKeywords.CAPABILITIES) && !key.endsWith(Configuration.Parameter.URL.getKey())) {
-				LOGGER.warn("Value not resolved by key: " + key);
-			}
+            if (!key.startsWith(SpecialKeywords.CAPABILITIES) && !key.endsWith(Configuration.Parameter.URL.getKey())) {
+                if (key.equals("project_report_directory")) {
+                    // #1052 "Stackoverflow while trying to read configuration"
+                    value = "./reports/qa";
+                } else {
+                    LOGGER.warn("Value not resolved by key: " + key);
+                }
+            }
         }
         return value;
     }
