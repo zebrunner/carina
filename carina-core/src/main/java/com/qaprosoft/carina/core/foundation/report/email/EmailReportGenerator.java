@@ -75,7 +75,6 @@ public class EmailReportGenerator {
     private static final String CREATED_ITEMS_LIST_PLACEHOLDER = "${created_items_list}";
     private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
     private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
-    private static final String BUG_ID_PLACEHOLDER = "${bug_id}";
     private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
     
     // Cucumber section
@@ -227,32 +226,20 @@ public class EmailReportGenerator {
             }
         }
 
+        // generate valid url or just a number
         List<String> jiraTickets = testResultItem.getJiraTickets();
-
-        String bugId = null;
-        String bugUrl = null;
-
-        if (jiraTickets.size() > 0) {
-            bugId = jiraTickets.get(0);
-
+        String bugUrl = "";
+        for (String bugId : jiraTickets) {
             if (!Configuration.get(Parameter.JIRA_URL).isEmpty()) {
-                bugUrl = Configuration.get(Parameter.JIRA_URL) + "/browse/" + jiraTickets.get(0);
+                bugUrl += "<a target='_blank' href='" + Configuration.get(Parameter.JIRA_URL) + "/browse/" + bugId + "' style='color: white;'>"
+                        + bugId + "</a>";
+            } else {
+                bugUrl += bugId;
             }
-
-            if (jiraTickets.size() > 1) {
-                LOGGER.error("Current implementation doesn't support email report generation with several Jira Tickets fo single test!");
-            }
+            bugUrl += "<br>";
         }
-        if (bugId == null) {
-            bugId = "N/A";
-        }
-
-        if (bugUrl == null) {
-            bugUrl = "#";
-        }
-        result = result.replace(BUG_ID_PLACEHOLDER, bugId);
         result = result.replace(BUG_URL_PLACEHOLDER, bugUrl);
-
+        
         return result;
     }
 
