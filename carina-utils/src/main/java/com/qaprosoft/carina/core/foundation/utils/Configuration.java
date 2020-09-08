@@ -176,13 +176,7 @@ public class Configuration {
 
         SUITE_NAME("suite_name"),
 
-        JIRA_UPDATER("jira_updater"),
-
         JIRA_URL("jira_url"),
-
-        JIRA_USER("jira_user"),
-
-        JIRA_PASSWORD("jira_password"),
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
         
