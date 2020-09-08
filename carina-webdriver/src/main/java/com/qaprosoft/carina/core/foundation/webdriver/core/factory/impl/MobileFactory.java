@@ -139,11 +139,6 @@ public class MobileFactory extends AbstractFactory {
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         switch (getHubProvider()) {
-                        default:
-                            ce.getListeners()
-                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;
                         case SpecialKeywords.BROWSERSTACK:
                             // TODO: https://github.com/qaprosoft/carina/issues/949  
                             // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
@@ -152,6 +147,11 @@ public class MobileFactory extends AbstractFactory {
                             // Zebrunner will place video to separate unique folder, no need to generate new name
                             ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
                             ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                            break;
+                        default:
+                            ce.getListeners()
+                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
+                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         }
                     }
@@ -189,12 +189,12 @@ public class MobileFactory extends AbstractFactory {
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
 
                         switch (getHubProvider()) {
+                        case SpecialKeywords.ZEBRUNNER:
+                            LOGGER.info("Video recording is not supported in Zebrunner for iOS");
+                            break;
                         default:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
                                     o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;
-                        case SpecialKeywords.ZEBRUNNER:
-                            LOGGER.info("Video recording is not supported in Zebrunner for iOS");
                             break;
                         }
                     }

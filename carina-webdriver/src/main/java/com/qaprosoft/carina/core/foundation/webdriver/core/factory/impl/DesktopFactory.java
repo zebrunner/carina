@@ -79,11 +79,6 @@ public class DesktopFactory extends AbstractFactory {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
                 switch (getHubProvider()) {
-                default:
-                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
-                    capabilities.setCapability("videoName", videoName); //required capability for selenoid
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
-                    break;
                 case SpecialKeywords.BROWSERSTACK:
                     // TODO: https://github.com/qaprosoft/carina/issues/949  
                     // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
@@ -92,6 +87,11 @@ public class DesktopFactory extends AbstractFactory {
                     // Zebrunner will place video to separate unique folder, no need to generate new name
                     ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
                     ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                    break;
+                default:
+                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
+                    capabilities.setCapability("videoName", videoName); //required capability for selenoid
+                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
                     break;
                 }
             }
