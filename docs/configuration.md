@@ -269,24 +269,9 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Advanced Acceptance</td>
 	</tr>
 	<tr>
-		<td>jira_updater</td>
-		<td>Class contains logic to update Jira. <b>Note</b> Custom updater has to implement DefaultJiraUpdater, by default, the methods do nothing</td>
-		<td>Custom class</td>
-	</tr>
-	<tr>
 		<td>jira_url</td>
 		<td>URL to Jira</td>
 		<td>https://yourclass.atlassian.net</td>
-	</tr>
-		<tr>
-		<td>jira_user</td>
-		<td>Jira user email</td>
-		<td>admin@yourcompany.com</td>
-	</tr>
-		<tr>
-		<td>jira_password</td>
-		<td>Jira user password</td>
-		<td>admin123456</td>
 	</tr>
 	<tr>
 		<td>testrail_milestone</td>
