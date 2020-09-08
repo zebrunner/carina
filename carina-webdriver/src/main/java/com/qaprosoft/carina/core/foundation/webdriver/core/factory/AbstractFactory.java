@@ -138,4 +138,8 @@ public abstract class AbstractFactory {
         return R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
     }
 
+    protected String getHubProvider() {
+        return R.CONFIG.get(SpecialKeywords.HUB_PROVIDER).toLowerCase();
+    }
+
 }
