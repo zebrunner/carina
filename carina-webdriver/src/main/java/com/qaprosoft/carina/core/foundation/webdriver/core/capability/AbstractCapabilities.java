@@ -110,7 +110,10 @@ public abstract class AbstractCapabilities {
             capabilities = addFirefoxOptions(capabilities);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
-        } else if (Configuration.getBoolean(Parameter.HEADLESS)) {
+        }
+
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && !BrowserType.FIREFOX.equalsIgnoreCase(browser) && !BrowserType.CHROME.equalsIgnoreCase(browser)) {
             LOGGER.error(String.format("Headless mode isn't supported by %s browser", browser));
         }
         

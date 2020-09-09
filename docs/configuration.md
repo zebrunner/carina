@@ -41,7 +41,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
         	<td>headless</td>
-        	<td>Run tests in headless browsers mode. Enabled when headless=true</td>
+        	<td>Run tests in headless browser mode. Enabled when headless=true</td>
         	<td>Boolean</td>
 	</tr>
 	<tr>
