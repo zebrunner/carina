@@ -88,7 +88,7 @@ public class Configuration {
         
         FIREFOX_PREFERENCES("firefox_preferences"),
 
-        ENABLE_HEADLESS_MODE("enable_headless_mode"),
+        HEADLESS("headless"),
 
         APP_VERSION("app_version"),
 
