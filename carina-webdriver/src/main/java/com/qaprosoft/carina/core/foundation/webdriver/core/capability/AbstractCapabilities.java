@@ -237,7 +237,9 @@ public abstract class AbstractCapabilities {
         if (!mobileEmulation.isEmpty()) {
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
         }
-        
+
+        options.setHeadless(Configuration.getBoolean(Parameter.ENABLE_HEADLESS_MODE));
+
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
     }
@@ -271,6 +273,8 @@ public abstract class AbstractCapabilities {
                 options.addPreference(name, value);
             }
         }
+
+        options.setHeadless(Configuration.getBoolean(Parameter.ENABLE_HEADLESS_MODE));
 
         return caps;
     }
