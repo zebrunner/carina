@@ -40,10 +40,10 @@ All the project configuration properties are located in a **_config.properties**
 		<td>chrome / firefox / safari / iexplore</td>
 	</tr>
 	<tr>
-        <td>enable_headless_mode</td>
-        <td>Run tests in headless browsers mode. Enabled when enable_headless_mode=true</td>
-        <td>Boolean</td>
-    </tr>
+        	<td>enable_headless_mode</td>
+        	<td>Run tests in headless browsers mode. Enabled when enable_headless_mode=true</td>
+        	<td>Boolean</td>
+	</tr>
 	<tr>
 		<td>selenium_host</td>
 		<td>Selenium server host</td>
