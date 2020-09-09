@@ -236,7 +236,6 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
      * @return List of Notification
      */
     public List<Notification> getAllAvailableNotifications() {
-        LOGGER.info("Android device");
         List<Notification> list = notificationService.getNotifications();
         return list;
     }
@@ -245,7 +244,6 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
      * collapseStatusBar
      */
     public void collapseStatusBar() {
-        LOGGER.info("Android device");
         notificationService.collapseStatusBar();
     }
 
@@ -255,7 +253,6 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
      * @return boolean
      */
     public boolean isStatusBarExpanded() {
-        LOGGER.info("Android device");
         notificationService.expandStatusBar();
         return isOpened(DELAY);
     }
