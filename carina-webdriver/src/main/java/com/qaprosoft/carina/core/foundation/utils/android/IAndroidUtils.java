@@ -1093,7 +1093,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Method enters an App's menu within device System Settings
      * @param appName - Name of the app as it appears in the device's Apps list (Language specific)
      */
-    default public void openAppMenuFromDeviceSettings(String appName){
+    default void openAppMenuFromDeviceSettings(String appName){
         AndroidService androidService = AndroidService.getInstance();
         androidService.executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
 
@@ -1108,7 +1108,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param appName - The app name as it appears within device System Settings
      * @param setValue - The value you wish to set the toggle to
      */
-    default public void toggleAppNotificationsFromDeviceSettings(String appName, boolean setValue){
+    default void toggleAppNotificationsFromDeviceSettings(String appName, boolean setValue){
         openAppMenuFromDeviceSettings(appName);
 
         WebDriver driver = getDriver();
@@ -1124,7 +1124,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * @return - Returns if the device in use has a running LTE connection
      */
-    default public boolean isCarrierConnectionAvailable(){
+    default boolean isCarrierConnectionAvailable(){
         AndroidService androidService = AndroidService.getInstance();
         boolean status = ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled();
         boolean linkProperties = false;
@@ -1142,7 +1142,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * @return - Returns the value of the device model in use as a String
      */
-    default public String getDeviceModel(){
+    default String getDeviceModel(){
         AndroidService androidService = AndroidService.getInstance();
         return StringUtils.substringAfter(androidService.executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
     }
