@@ -88,6 +88,8 @@ public class Configuration {
         
         FIREFOX_PREFERENCES("firefox_preferences"),
 
+        HEADLESS("headless"),
+
         APP_VERSION("app_version"),
 
         PROXY_HOST("proxy_host"),

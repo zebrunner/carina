@@ -111,6 +111,11 @@ public abstract class AbstractCapabilities {
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
         }
+
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && !BrowserType.FIREFOX.equalsIgnoreCase(browser) && !BrowserType.CHROME.equalsIgnoreCase(browser)) {
+            LOGGER.error(String.format("Headless mode isn't supported by %s browser", browser));
+        }
         
         return capabilities;
     }
@@ -237,7 +242,9 @@ public abstract class AbstractCapabilities {
         if (!mobileEmulation.isEmpty()) {
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
         }
-        
+
+        options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
     }
@@ -271,6 +278,8 @@ public abstract class AbstractCapabilities {
                 options.addPreference(name, value);
             }
         }
+
+        options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
 
         return caps;
     }
