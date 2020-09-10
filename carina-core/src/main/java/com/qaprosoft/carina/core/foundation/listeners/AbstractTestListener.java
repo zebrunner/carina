@@ -236,7 +236,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         LOGGER.debug("AbstractTestListener->onTestStart");
         VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
-        if (curRetryAnalyzer instanceof DisabledRetryAnalyzer) {
+        if (curRetryAnalyzer == null || curRetryAnalyzer instanceof DisabledRetryAnalyzer) {
             // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
             // result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzer.class);
