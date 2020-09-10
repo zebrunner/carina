@@ -200,10 +200,8 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
         if (!isOpened(1)) {
             notificationService.expandStatusBar();
         }
-        if (dismissBtn.isElementPresent(SHORT_TIMEOUT)) {
-            LOGGER.info("'Dismiss All Notifications' btn is present.");
-            dismissBtn.click();
-        } try{
+
+        try{
             swipe(dismissBtn, notification_scroller);
             if(dismissBtn.getAttribute("enabled").equals("true")) {
                 LOGGER.info("Clicking 'Dismiss All Notifications' button...");
