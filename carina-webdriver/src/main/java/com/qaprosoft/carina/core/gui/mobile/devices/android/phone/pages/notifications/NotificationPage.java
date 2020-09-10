@@ -62,11 +62,9 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
     @FindBy(xpath = "//*[@resource-id = 'android:id/status_bar_latest_event_content']/*")
     protected List<ExtendedWebElement> notificationsOtherDevices;
 
-    @FindAll({
-            @FindBy(id = "com.android.systemui:id/dismiss_text"),
-            @FindBy(id = "com.android.systemui:id/clear_all_button"),
-            @FindBy(id = "com.android.systemui:id/clear_all")
-    })
+    @FindBy(xpath = "//*[@resource-id='com.android.systemui:id/clear_all' " +
+            "or @resource-id='com.android.systemui:id/clear_all_button' " +
+            "or @resource-id='com.android.systemui:id/dismiss_text']")
     protected ExtendedWebElement dismissBtn;
 
     // Found stable solution
