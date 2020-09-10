@@ -94,7 +94,7 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
     })
     private List<ExtendedWebElement> itemTextList;
 
-    @FindBy(xpath = "//*[@text='%s'")
+    @FindBy(xpath = "//*[@text='%s']")
     private ExtendedWebElement textItem;
 
     String itemText_Phone_Locator_Text = "android:id/text";
