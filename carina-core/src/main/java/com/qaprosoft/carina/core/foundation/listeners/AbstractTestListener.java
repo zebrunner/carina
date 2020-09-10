@@ -43,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 @SuppressWarnings("deprecation")
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
@@ -235,7 +236,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         LOGGER.debug("AbstractTestListener->onTestStart");
         VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
-        if (curRetryAnalyzer == null) {
+        if (curRetryAnalyzer instanceof DisabledRetryAnalyzer) {
             // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
             // result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzer.class);
