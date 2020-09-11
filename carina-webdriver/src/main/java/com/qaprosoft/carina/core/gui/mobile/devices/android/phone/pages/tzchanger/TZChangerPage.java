@@ -129,7 +129,7 @@ public class TZChangerPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(IMobileUtils.EXPLICIT_TIMEOUT);
+        return isOpened(DriverHelper.EXPLICIT_TIMEOUT)
     }
 
 }

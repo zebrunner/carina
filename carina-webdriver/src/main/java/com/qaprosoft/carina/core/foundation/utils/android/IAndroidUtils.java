@@ -1091,6 +1091,64 @@ public interface IAndroidUtils extends IMobileUtils {
         UTILS_LOGGER.info("Wifi is already disabled. No actions needed");
     }
 
+    /**
+     * Method enters an App's menu within device System Settings
+     * @param appName - Name of the app as it appears in the device's Apps list (Language specific)
+     */
+    default void openAppMenuFromDeviceSettings(String appName){
+        AndroidService androidService = AndroidService.getInstance();
+        androidService.executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
+
+        ExtendedWebElement appItem = new ExtendedWebElement(By.xpath(String.format("//*[contains(@text, '%s')]", appName)), "notifications", getDriver());
+        swipe(appItem);
+
+        appItem.click();
+    }
+
+    /**
+     * Toggles a specified app's ability to recieve Push Notifications on the system level
+     * @param appName - The app name as it appears within device System Settings
+     * @param setValue - The value you wish to set the toggle to
+     */
+    default void toggleAppNotificationsFromDeviceSettings(String appName, boolean setValue){
+        openAppMenuFromDeviceSettings(appName);
+
+        WebDriver driver = getDriver();
+        ExtendedWebElement element = new ExtendedWebElement(By.xpath("//*[contains(@text, 'Notifications') or contains(@text, 'notifications')]"), "notifications", driver);
+        element.click();
+
+        element = new ExtendedWebElement(By.xpath("//*[@resource-id='com.android.settings:id/switch_text']/following-sibling::android.widget.Switch"), "toggle", driver);
+        if(Boolean.valueOf(element.getAttribute("checked")) != setValue){
+            element.click();
+        }
+    }
+
+    /**
+     * @return - Returns if the device in use has a running LTE connection
+     */
+    default boolean isCarrierConnectionAvailable(){
+        AndroidService androidService = AndroidService.getInstance();
+        boolean status = ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled();
+        boolean linkProperties = false;
+
+        String linkProp = androidService.executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
+        UTILS_LOGGER.info("PROP:  " + linkProp);
+        if(!linkProp.isEmpty()) {
+            linkProperties = !StringUtils.substringBetween(linkProp, "APN: ", " ").equals("null");
+        }
+        UTILS_LOGGER.info("STATUS ENABLED: " + status);
+        UTILS_LOGGER.info("CARRIER AVAILABLE: " + linkProperties);
+        return ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled() && linkProperties;
+    }
+
+    /**
+     * @return - Returns the value of the device model in use as a String
+     */
+    default String getDeviceModel(){
+        AndroidService androidService = AndroidService.getInstance();
+        return StringUtils.substringAfter(androidService.executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
+    }
+
     default public void openStatusBar() {
         executeShell(SHELL_OPEN_STATUS_BAR_CMD);
     }
