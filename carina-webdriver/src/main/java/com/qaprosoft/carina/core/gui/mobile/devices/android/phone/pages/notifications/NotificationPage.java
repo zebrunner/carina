@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
+import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -221,7 +221,7 @@ public class NotificationPage extends MobileAbstractPage {
                 x1 = point.x + dim.width / 6;
                 x2 = point.x + dim.width * 5 / 6;
                 y1 = y2 = point.y + dim.height / 2;
-                MobileUtils.swipe(x1, y1, x2, y2, SWIPE_DURATION);
+                swipe(x1, y1, x2, y2, SWIPE_DURATION);
             }
         }
     }
@@ -276,7 +276,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(EXPLICIT_TIMEOUT);
+        return isOpened(IMobileUtils.EXPLICIT_TIMEOUT);
     }
 
 }
