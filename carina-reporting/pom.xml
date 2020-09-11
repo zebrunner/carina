@@ -38,6 +38,11 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
+		</dependency>
+
 		<!-- monte-repack video recording -->
 		<dependency>
 			<groupId>com.pojosontheweb</groupId>

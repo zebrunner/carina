@@ -49,7 +49,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.performance.Timer;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -60,6 +59,7 @@ import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.zebrunner.agent.core.registrar.Artifact;
 
 public interface IDriverPool {
     static final Logger POOL_LOGGER = Logger.getLogger(IDriverPool.class);
@@ -320,6 +320,7 @@ public interface IDriverPool {
             if (drv instanceof EventFiringWebDriver) {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
             }
+
             SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
             
             try {
@@ -352,7 +353,7 @@ public interface IDriverPool {
                     } catch (IOException e) {
                         POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
                     }
-                    Artifacts.add(logType, file);
+                    Artifact.upload(file, logType);
                 }
             } catch (Exception e) {
                 POOL_LOGGER.warn("Unable to extract webdriver server logs!");
@@ -582,20 +583,6 @@ public interface IDriverPool {
      * @return int
      */
     default public int getDriversCount() {
-        Long threadId = Thread.currentThread().getId();
-        int size = getDrivers().size();
-        POOL_LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
-        return size;
-    }
-
-    /**
-     * @deprecated use {@link #getDriversCount()} instead. Return number of
-     *             registered driver per thread
-     * 
-     * @return int
-     */
-    @Deprecated
-    default public int size() {
         Long threadId = Thread.currentThread().getId();
         int size = getDrivers().size();
         POOL_LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);

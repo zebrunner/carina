@@ -22,12 +22,10 @@ class AsyncArtifact {
 
     private List<CompletableFuture<String>> urlFutures;
     private String name;
-    private Integer expiresIn;
 
-    AsyncArtifact(List<CompletableFuture<String>> urlFutures, String name, Integer expiresIn) {
+    AsyncArtifact(List<CompletableFuture<String>> urlFutures, String name) {
         this.urlFutures = urlFutures;
         this.name = name;
-        this.expiresIn = expiresIn;
     }
 
     public List<CompletableFuture<String>> getUrlFutures() {
@@ -36,9 +34,5 @@ class AsyncArtifact {
 
     public String getName() {
         return name;
-    }
-
-    public Integer getExpiresIn() {
-        return expiresIn;
     }
 }

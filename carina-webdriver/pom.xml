@@ -66,11 +66,10 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-commons</artifactId>
 		</dependency>
-
-		<!-- Zafira -->
+		
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>zafira-client</artifactId>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
 		</dependency>
 
 		<dependency>

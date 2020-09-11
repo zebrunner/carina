@@ -16,23 +16,17 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TestArtifactType;
-
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 /**
  * Base implementation of WebDriver factory.
@@ -87,51 +81,6 @@ public abstract class AbstractFactory {
      */
     protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
-    }
-
-    /**
-     * Retrieves VNC URL if available.
-     * 
-     * @param driver - {@link RemoteWebDriver} instance
-     * @return VNC URL
-     */
-    abstract public String getVncURL(WebDriver driver);
-
-    /**
-     * Returns bitrate by {@link VideoQuality}
-     * 
-     * @param quality - video quality for recording
-     * @return appropriate bitrate
-     */
-    abstract protected int getBitrate(VideoQuality quality);
-
-    /**
-     * Initialize test artifact for upload.
-     * 
-     * @param videoName - video file name
-     * @return test artifact with video details
-     */
-    protected TestArtifactType initVideoArtifact(String videoName) {
-        TestArtifactType artifact = new TestArtifactType();
-        artifact.setName("Video " + SDF.format(new Date()));
-        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
-        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
-        return artifact;
-    }
-
-    /**
-     * Initialize test artifact for upload.
-     * 
-     * @param sessionLogName - session log file name
-     * @return test artifact with session log details
-     */
-    protected TestArtifactType initSessionLogArtifact(String sessionLogName) {
-        TestArtifactType artifact = new TestArtifactType();
-        artifact.setName("Session log " + SDF.format(new Date()));
-        // TODO: allocate separate configuration property
-        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), sessionLogName));
-        artifact.setExpiresIn(Configuration.getInt(Configuration.Parameter.ARTIFACTS_EXPIRATION_SECONDS));
-        return artifact;
     }
 
     protected boolean isVideoEnabled() {

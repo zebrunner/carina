@@ -74,26 +74,6 @@ public class WindowsFactory extends AbstractFactory {
     }
 
     @Override
-    protected int getBitrate(VideoQuality quality) {
-        switch (quality) {
-        case LOW:
-            return 250000;
-        case MEDIUM:
-            return 500000;
-        case HIGH:
-            return 1000000;
-        default:
-            return 1;
-        }
-    }
-
-    @Override
-    public String getVncURL(WebDriver driver) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
         return super.registerListeners(driver, listeners);
     }

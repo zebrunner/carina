@@ -29,7 +29,7 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
+//import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link ITestRailManager}
@@ -130,7 +130,7 @@ public class TestRailTest implements ITestRailManager {
     }
 
 
-    @Test
+/*    @Test
     @TestRailCases(testCasesId = FIRST_TEST_ID + ",3333")
     public void testTestRailSetting() {
         setCases("3333,5555".split(","));
@@ -160,7 +160,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(tags.size(), 3);
 
-    }
+    }*/
 
     @Test
     @TestRailCases(testCasesId = FIRST_TEST_ID, locale = "en")

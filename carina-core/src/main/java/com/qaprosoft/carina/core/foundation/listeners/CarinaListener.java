@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,9 +90,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
-import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
-import com.qaprosoft.zafira.models.dto.TestRunType;
 
 /*
  * CarinaListener - base carin-core TestNG Listener.
@@ -981,21 +976,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         private void quitAllDriversOnHook() {
-            // #810 add zafira testrun abort as part of shutdown hook
-            if (ZafiraSingleton.INSTANCE.isRunning()) {
-                LOGGER.debug("Zafira test run is still in progress. trying to abort...");
-                try {
-                    Optional<TestRunType> testRun = ZafiraEventRegistrar.getTestRun();
-                    if (testRun != null) {
-                        LOGGER.debug("detected testrun id to abort: " + testRun.get().getId());
-                        ZafiraSingleton.INSTANCE.getClient().abortTestRun(testRun.get().getId());
-                        LOGGER.debug("aborted testrun");
-                    }
-                } catch (NoSuchElementException e) {
-                    LOGGER.debug("No Zafira testrun detected.");
-                }
-            }
-
             // as it is shutdown hook just try to quit all existing drivers one by one
             for (CarinaDriver carinaDriver : driversPool) {
                 // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks

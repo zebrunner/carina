@@ -31,7 +31,7 @@ import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
-import com.qaprosoft.zafira.models.dto.TagType;
+//import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link TagManager}
@@ -112,7 +112,7 @@ public class TagManagerTest {
         Assert.assertEquals(tags.size(), 0);
     }
 
-    @Test
+/*    @Test
     @TestPriority(Priority.P2)
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
@@ -193,6 +193,6 @@ public class TagManagerTest {
             tags.add(tagEntry);
         });
         return tags;
-    }
+    }*/
 
 }

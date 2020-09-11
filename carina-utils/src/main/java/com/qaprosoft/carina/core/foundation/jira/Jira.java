@@ -26,8 +26,6 @@ import org.testng.ITestResult;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
-
 
 /*
  * Jira
@@ -40,7 +38,6 @@ public class Jira {
     private static final Logger LOG = Logger.getLogger(Jira.class);
 
     protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<>();
-    protected static ThreadLocal<BaseWorkItem> knownIssue = new ThreadLocal<>();
 
     private static void clearTickets() {
         jiraTickets.remove();
@@ -112,30 +109,8 @@ public class Jira {
         return disableRetryForKnownIssues;
     }
 
-    public static void setKnownIssue(String jiraId) {
-        setKnownIssue(jiraId, null);
-    }
-
-    public static void setKnownIssue(String jiraId, String description) {
-        setKnownIssue(jiraId, description, false);
-    }
-
-    public static void setKnownIssue(String jiraId, String description, boolean blocker) {
-        BaseWorkItem workItem = new BaseWorkItem(jiraId, description, blocker);
-        knownIssue.set(workItem);
-    }
-
-    public static BaseWorkItem getKnownIssue() {
-        return knownIssue.get();
-    }
-
-    private static void clearKnownIssue() {
-        knownIssue.remove();
-    }
-
     public static void clearJiraArtifacts() {
         clearTickets();
-        clearKnownIssue();
     }
     
     private static String parseTicket(String ticket) {

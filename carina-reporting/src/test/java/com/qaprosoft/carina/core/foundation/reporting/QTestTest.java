@@ -29,7 +29,7 @@ import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.qtest.QTestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
+// import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link IQTestManager}
@@ -136,7 +136,7 @@ public class QTestTest implements IQTestManager {
     }
 
 
-    @Test
+/*    @Test
     @QTestCases(id = FIRST_TEST_ID + ",3333")
     public void testQTestSetting() {
         setCases("3333,5555".split(","));
@@ -165,7 +165,7 @@ public class QTestTest implements IQTestManager {
 
         Assert.assertEquals(tags.size(), 3);
 
-    }
+    }*/
 
     
     @Test

@@ -112,14 +112,6 @@ public class DriverPoolTest implements IDriverPool {
         Assert.assertEquals(getDriver(), mockDriverDefault, "Returned driver is not the same as registered!");
     }
     
-    @SuppressWarnings("deprecation")
-    @Test(dependsOnMethods = { "registerDefaultDriver" })
-    public void testStaticMethods() {
-        Assert.assertEquals(size(), 1, "Number of registered driver is not valid!");
-        Assert.assertEquals(IDriverPool.getDefaultDriver(), mockDriverDefault, "Returned driver is not the same as registered!");
-    }
-    
-
     @Test(dependsOnMethods = "registerDefaultDriver", expectedExceptions = {
             AssertionError.class }, expectedExceptionsMessageRegExp = "Driver 'default' is already registered for thread: 1")
     public void registerTwiceDefaultDriver() {

@@ -87,12 +87,6 @@
 			<artifactId>commons-collections</artifactId>
 		</dependency>
 
-		<!-- Zafira -->
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>zafira-client</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-support</artifactId>
