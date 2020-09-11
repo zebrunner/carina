@@ -66,17 +66,18 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-commons</artifactId>
 		</dependency>
-		
+
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<!--  5-7 compilation failures w/o it. just agent-core dep doesn't work. -->
 			<groupId>com.zebrunner</groupId>
 			<artifactId>agent-testng</artifactId>
 		</dependency>
-
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-log4j12</artifactId>
-</dependency>
-
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -160,6 +161,7 @@
 
 		<!-- AI integration -->
 		<dependency>
+			<!-- 36 compilation failures w/o it -->
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>alice-client</artifactId>
 		</dependency>

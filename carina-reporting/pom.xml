@@ -33,14 +33,9 @@
 			<artifactId>carina-aws-s3</artifactId>
 		</dependency>
 
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-log4j12</artifactId>
-</dependency>
-
 		<dependency>
-			<groupId>com.zebrunner</groupId>
-			<artifactId>agent-testng</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<!-- monte-repack video recording -->

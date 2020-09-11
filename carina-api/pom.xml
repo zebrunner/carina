@@ -46,10 +46,15 @@
 			</exclusions>
 		</dependency>
 
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-log4j12</artifactId>
-</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -121,6 +126,7 @@
 		</dependency>
 		
 		<dependency>
+			<!-- 6 compilation failures w/o it -->
 			<groupId>org.everit.json</groupId>
 			<artifactId>org.everit.json.schema</artifactId>
 			<version>${org.everit.json.schema.version}</version>
@@ -132,17 +138,11 @@
 			<artifactId>testng</artifactId>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-		</dependency>
-
 		<dependency>
-			do not remove otherwise Used undeclared dependencies found
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-core</artifactId>
-		</dependency> -->
-
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>
