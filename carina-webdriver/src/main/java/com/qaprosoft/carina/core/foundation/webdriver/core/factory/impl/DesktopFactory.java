@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -40,8 +42,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
-
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = Logger.getLogger(DesktopFactory.class);
 
@@ -63,7 +63,11 @@ public class DesktopFactory extends AbstractFactory {
             capabilities.merge(staticCapabilities);
         }
 
-        driver = new RemoteWebDriver(capabilities);
+        try {
+            driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed selenium URL!", e);
+        }
         resizeBrowserWindow(driver, capabilities);
 
         R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
