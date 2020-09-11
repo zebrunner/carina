@@ -39,16 +39,11 @@ public class SpecialKeywords {
     public static final String PLACEHOLER = "\\$\\{[^\\{\\}]*\\}";
 
     public static final String MUST_OVERRIDE = "{must_override}";
-    @Deprecated
     public static final String EXCEL_DS_ARGS = "{excel_ds_args}";
-    @Deprecated
     public static final String EXCEL_DS_UID = "{excel_ds_uid}";
-    @Deprecated
     public static final String EXCEL_DS_JIRA = "{excel_ds_jira}";
-    @Deprecated
     public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
     public static final String EXCEL_DS_FILE = "{excel_ds_file}";
-    @Deprecated
     public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
 
     public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
