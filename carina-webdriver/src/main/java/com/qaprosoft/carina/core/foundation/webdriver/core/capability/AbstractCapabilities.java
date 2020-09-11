@@ -117,8 +117,6 @@ public abstract class AbstractCapabilities {
                     || BrowserType.CHROME.equalsIgnoreCase(browser)
                     && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
-                R.CONFIG.put("capabilities.enableVNC", "false");
-                R.CONFIG.put("capabilities.enableVideo", "false");
                 capabilities.setCapability("enableVNC", false);
                 capabilities.setCapability("enableVideo", false);
             } else {
