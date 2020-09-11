@@ -5,20 +5,20 @@ import org.apache.log4j.Logger;
 
 /**
  * ReportMessage is used for reporting informational and error messages both
- * using Zafira logger.
+ * using Zebrunner logger.
  *
  * @author brutskov
  */
 
-public enum ZafiraMessager implements IMessager {
+public enum ZebrunnerMessager implements IMessager {
 
     RAW_MESSAGE("%s");
 
-    private static final Logger LOGGER = Logger.getLogger(ZafiraMessager.class);
+    private static final Logger LOGGER = Logger.getLogger(ZebrunnerMessager.class);
 
     private String pattern;
 
-    ZafiraMessager(String pattern) {
+    ZebrunnerMessager(String pattern) {
         this.pattern = pattern;
     }
 
