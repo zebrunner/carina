@@ -15,12 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.jira;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -34,8 +36,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  */
 public class Jira {
     private static final int MAX_LENGTH = 45;
-    
-    private static final Logger LOG = Logger.getLogger(Jira.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<>();
 

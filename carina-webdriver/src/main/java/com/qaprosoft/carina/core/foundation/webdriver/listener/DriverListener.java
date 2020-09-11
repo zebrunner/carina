@@ -16,15 +16,17 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
@@ -39,7 +41,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DriverListener implements WebDriverEventListener {
-    private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
 	// 1. register live vnc url in DriverFactory (method streamVNC should return valid TestArtifactType
 	// 2. DriverFactory->getEventListeners(TestArtifactType vncArtifact)

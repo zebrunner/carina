@@ -15,9 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -33,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsF
  */
 public class DriverFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
 	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");

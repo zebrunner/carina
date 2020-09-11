@@ -17,12 +17,14 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import static org.mockito.Mockito.mock;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -35,7 +37,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public class DriverPoolTest implements IDriverPool {
-    private static final Logger LOGGER = Logger.getLogger(DriverPoolTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final static String BEFORE_SUITE_DRIVER_NAME = "custom-0-driver";
     private final static String CUSTOM1 = "custom-1-driver";

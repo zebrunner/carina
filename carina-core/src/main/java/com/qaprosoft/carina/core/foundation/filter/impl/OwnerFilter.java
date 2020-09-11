@@ -1,9 +1,11 @@
 package com.qaprosoft.carina.core.foundation.filter.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
@@ -11,7 +13,7 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 
 public class OwnerFilter implements IFilter {
 
-    private static final Logger LOGGER = Logger.getLogger(OwnerFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData) {

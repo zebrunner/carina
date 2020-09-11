@@ -15,9 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.mobile.notifications;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,7 +29,7 @@ import io.restassured.response.Response;
 
 public class NotificationUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(NotificationUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * call Push Service

@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.utils.messager;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -14,7 +16,7 @@ public enum ZebrunnerMessager implements IMessager {
 
     RAW_MESSAGE("%s");
 
-    private static final Logger LOGGER = Logger.getLogger(ZebrunnerMessager.class);
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     private String pattern;
 

@@ -15,17 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import java.util.HashSet;
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
@@ -37,8 +36,8 @@ import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
  * Tests for {@link TagManager}
  */
 public class TagManagerTest {
-    private static final Logger LOGGER = Logger.getLogger(TagManagerTest.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
     private static final String TAG_NAME = "tag1";
     private static final String TAG_NAME2 = "tag2";
     private static final String TAG_VALUE = "testTag1";

@@ -15,10 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
@@ -28,7 +31,7 @@ import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 public class DateTimeSettingsPage extends MobileAbstractPage implements IAndroidUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(DateTimeSettingsPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FindBy(xpath = "//android.widget.TextView[@text = 'Date & time']")
     protected ExtendedWebElement dateAndTimeScreenHeaderTitle;

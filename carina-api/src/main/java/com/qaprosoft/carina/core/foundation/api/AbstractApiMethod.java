@@ -19,13 +19,14 @@ import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT
 import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
+import java.lang.invoke.MethodHandles;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.log4j.Level;
@@ -34,6 +35,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
 
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
@@ -56,7 +58,7 @@ import io.restassured.specification.RequestSpecification;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractApiMethod extends HttpClient {
-    private static final Logger LOGGER = Logger.getLogger(AbstractApiMethod.class);
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
     private StringBuilder bodyContent = null;
     protected String methodPath = null;
     protected HttpMethodType methodType = null;

@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,7 +27,8 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -45,7 +47,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  */
 
 public class L10N {
-    private static final Logger LOGGER = Logger.getLogger(L10N.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
 

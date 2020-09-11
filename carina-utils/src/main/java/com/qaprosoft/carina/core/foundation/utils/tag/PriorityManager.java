@@ -15,14 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.tag;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 public class PriorityManager {
-    private static final Logger LOGGER = Logger.getLogger(PriorityManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private PriorityManager() {
     }

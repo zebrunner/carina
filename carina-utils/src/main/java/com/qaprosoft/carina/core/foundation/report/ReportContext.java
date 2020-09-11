@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
@@ -69,7 +70,7 @@ import com.qaprosoft.carina.core.foundation.utils.ZipManager;
  */
 
 public class ReportContext {
-    private static final Logger LOGGER = Logger.getLogger(ReportContext.class);
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String ARTIFACTS_FOLDER = "artifacts";
 

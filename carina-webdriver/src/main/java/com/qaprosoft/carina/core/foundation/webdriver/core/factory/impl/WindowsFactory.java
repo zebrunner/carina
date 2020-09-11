@@ -15,20 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 import io.appium.java_client.windows.WindowsDriver;
 import io.appium.java_client.windows.WindowsElement;
 
@@ -38,7 +39,7 @@ import io.appium.java_client.windows.WindowsElement;
  * @author Sergei Zagriychuk (sergeizagriychuk@gmail.com)
  */
 public class WindowsFactory extends AbstractFactory {
-    private static final Logger LOGGER = Logger.getLogger(WindowsFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {

@@ -1,14 +1,16 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.AbstractFindByBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.core.util.Base64;
 
@@ -16,7 +18,7 @@ import io.appium.java_client.MobileBy;
 
 public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
     
-    private static final Logger LOGGER = Logger.getLogger(ExtendedFindByBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
      
     private static final String BY_TEXT_TEMPLATE = "//*[@text = \"%s\"]";
 

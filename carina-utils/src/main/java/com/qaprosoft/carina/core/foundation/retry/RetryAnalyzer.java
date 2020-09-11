@@ -15,7 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.retry;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -25,7 +28,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
-    private static final Logger LOGGER = Logger.getLogger(RetryAnalyzer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static ThreadLocal<Integer> runCount = new ThreadLocal<Integer>();
     
     @Override

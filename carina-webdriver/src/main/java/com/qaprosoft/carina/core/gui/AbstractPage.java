@@ -18,11 +18,13 @@ package com.qaprosoft.carina.core.gui;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.itextpdf.text.Document;
@@ -46,9 +48,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.PageOpeningStrat
  */
 public abstract class AbstractPage extends AbstractUIObject implements ICustomTypePageFactory {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private PageOpeningStrategy pageOpeningStrategy = PageOpeningStrategy.valueOf(Configuration.get(Parameter.PAGE_OPENING_STRATEGY));
-
-	private static final Logger LOGGER = Logger.getLogger(AbstractPage.class);
     
 	protected String pageURL = getUrl();
 

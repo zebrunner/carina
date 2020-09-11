@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener {
-    private static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 

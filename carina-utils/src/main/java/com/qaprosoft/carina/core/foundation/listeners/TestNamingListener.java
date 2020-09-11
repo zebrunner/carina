@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -30,7 +32,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 public class TestNamingListener implements IResultListener2 {
-    private static final Logger LOGGER = Logger.getLogger(TestNamingListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); 
     
     static final ThreadLocal<String> testName = new ThreadLocal<String>();
     private static final ConcurrentHashMap<String, Integer> testNameInvCounter = new ConcurrentHashMap<String, Integer>();

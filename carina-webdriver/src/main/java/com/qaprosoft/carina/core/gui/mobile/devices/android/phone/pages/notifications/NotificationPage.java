@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -23,7 +24,8 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
@@ -37,7 +39,7 @@ import io.appium.java_client.MobileBy;
 
 public class NotificationPage extends MobileAbstractPage {
 
-    private static final Logger LOGGER = Logger.getLogger(NotificationPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public NotificationPage(WebDriver driver) {
         super(driver);

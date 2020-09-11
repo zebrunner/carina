@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -33,7 +34,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -42,6 +42,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -62,7 +64,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.zebrunner.agent.core.registrar.Artifact;
 
 public interface IDriverPool {
-    static final Logger POOL_LOGGER = Logger.getLogger(IDriverPool.class);
+    static final Logger POOL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     static final String DEFAULT = "default";
 
     // unified set of Carina WebDrivers

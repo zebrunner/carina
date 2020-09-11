@@ -15,13 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
+import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -49,7 +51,7 @@ import io.appium.java_client.touch.offset.PointOption;
  */
 @Deprecated
 public class MobileUtils {
-    private static final Logger LOGGER = Logger.getLogger(MobileUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public enum Direction {
         LEFT,

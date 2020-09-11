@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -22,10 +23,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -42,7 +44,6 @@ import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -50,9 +51,7 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
-    private static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
-
-    private final static String vnc_mobile = "vnc_mobile";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {

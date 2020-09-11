@@ -15,8 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -25,7 +28,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class MobileCapabilies extends AbstractCapabilities {
     
-    private static final Logger LOGGER = Logger.getLogger(MobileCapabilies.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public DesiredCapabilities getCapability(String testName) {
