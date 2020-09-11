@@ -114,11 +114,18 @@ public abstract class AbstractCapabilities {
             capabilities = addChromeOptions(capabilities);
         }
 
-        if (Configuration.getBoolean(Parameter.HEADLESS)
-                && !BrowserType.FIREFOX.equalsIgnoreCase(browser) && !BrowserType.CHROME.equalsIgnoreCase(browser)) {
-            LOGGER.error(String.format("Headless mode isn't supported by %s browser", browser));
+        if (Configuration.getBoolean(Parameter.HEADLESS)) {
+            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)
+                    || BrowserType.CHROME.equalsIgnoreCase(browser)
+                    && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+                LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
+                capabilities.setCapability("enableVNC", false);
+                capabilities.setCapability("enableVideo", false);
+            } else {
+                LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
+            }
         }
-        
+
         return capabilities;
     }
 
@@ -245,7 +252,10 @@ public abstract class AbstractCapabilities {
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
         }
 
-        options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+        }
 
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
@@ -281,7 +291,11 @@ public abstract class AbstractCapabilities {
             }
         }
 
-        options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+        String driverType = Configuration.getDriverType();
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+        }
 
         return caps;
     }
