@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
-import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
@@ -231,7 +231,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage implements IAndroid
 
     @Override
     public boolean isOpened() {
-        return isOpened(DriverHelper.EXPLICIT_TIMEOUT)
+        return isOpened(DriverHelper.EXPLICIT_TIMEOUT);
     }
 
 }
