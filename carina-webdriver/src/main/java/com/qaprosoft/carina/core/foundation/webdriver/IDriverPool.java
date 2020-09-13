@@ -614,41 +614,6 @@ public interface IDriverPool {
         return currentDrivers;
     }
 
-    @Deprecated
-    public static WebDriver getDefaultDriver() {
-        WebDriver drv = null;
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getStaticDrivers();
-
-        if (currentDrivers.containsKey(DEFAULT)) {
-            drv = currentDrivers.get(DEFAULT);
-        }
-
-        if (drv == null) {
-            throw new DriverPoolException("no default driver detected!");
-        }
-
-        // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener
-        // and all logging will be lost!
-        return drv;
-    }
-
-    @Deprecated
-    public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
-        Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-        for (CarinaDriver carinaDriver : driversPool) {
-            if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-                POOL_LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
-                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-            } else if (threadId.equals(carinaDriver.getThreadId())) {
-                POOL_LOGGER.debug("Add driver into the getStaticDrivers response: " + carinaDriver.getName() + " by threadId: "
-                        + threadId);
-                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-            }
-        }
-        return currentDrivers;
-    }
-
     // ------------------------ DEVICE POOL METHODS -----------------------
     /**
      * Get device registered to default driver. If no default driver discovered nullDevice will be returned.
