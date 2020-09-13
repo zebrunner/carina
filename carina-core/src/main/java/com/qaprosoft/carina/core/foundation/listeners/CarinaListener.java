@@ -544,21 +544,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
 
-    /**
-     * Redefine Jira tickets from test.
-     *
-     * @param tickets
-     *            to set
-     */
-    @Deprecated
-    protected void setJiraTicket(String... tickets) {
-        List<String> jiraTickets = new ArrayList<String>();
-        for (String ticket : tickets) {
-            jiraTickets.add(ticket);
-        }
-        Jira.setTickets(jiraTickets);
-    }
-
     protected void putS3Artifact(String key, String path) {
         AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
     }
