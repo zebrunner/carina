@@ -121,7 +121,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
         String result = executeAdbCommand("shell am start -n " + app);
         if (result.contains("Exception")) {
             String appPackage = app.split("/")[0];
-            if (!checkCurrentDeviceFocus(appPackage)) {
+            if (!isAppRunning(appPackage)) {
                 LOGGER.info("Expected app is not in focus. We will try another solution.");
                 executeAdbCommand("shell monkey -p " + appPackage + " -c android.intent.category.LAUNCHER 1");
             }
@@ -148,29 +148,6 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             return true;
         } else {
             LOGGER.error("Cache was not cleared. May be application does not exist on this device.");
-            return false;
-        }
-    }
-
-	/**
-	 * checkCurrentDeviceFocus - return actual device focused apk and compare with
-	 * expected.
-	 *
-	 * @param apk
-	 *            String
-	 * @return boolean
-	 * 
-	 * @deprecated use
-	 *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#isAppRunning(String apk)}
-	 *             instead.
-	 */
-    public boolean checkCurrentDeviceFocus(String apk) {
-        String res = getCurrentDeviceFocus();
-        if (res.contains(apk)) {
-            LOGGER.info("Actual device focus is as expected and contains package or activity: '" + apk + "'.");
-            return true;
-        } else {
-            LOGGER.error("Not expected apk '" + apk + "' is in focus. Actual result is: " + res);
             return false;
         }
     }
@@ -646,12 +623,12 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
         int attemps = 3;
 
-        boolean isApkOpened = checkCurrentDeviceFocus(packageName);
+        boolean isApkOpened = isAppRunning(packageName);
         while (!isApkOpened && attemps > 0) {
             LOGGER.info("Apk was not open. Attempt to open...");
             openApp(activity);
             CommonUtils.pause(2);
-            isApkOpened = checkCurrentDeviceFocus(packageName);
+            isApkOpened = isAppRunning(packageName);
             attemps--;
         }
 
@@ -662,7 +639,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             CommonUtils.pause(2);
         }
 
-        if (checkCurrentDeviceFocus(packageName)) {
+        if (isAppRunning(packageName)) {
             LOGGER.info("On '" + packageName + "' apk page");
             res = true;
         } else {
@@ -964,7 +941,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
         String actualTZ = getDeviceActualTimeZone();
 
-        String tz = DeviceTimeZone.getTimezoneOffset(timeZone);
+        // String tz = DeviceTimeZone.getTimezoneOffset(timeZone);
 
         if (isRequiredTimeZone(actualTZ, timeZone)) {
             LOGGER.info("Required timeZone is already set.");
@@ -1079,11 +1056,11 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
         String tzPackageName = TZ_CHANGE_APP_PACKAGE;
         int attemps = 3;
 
-        boolean isTzOpened = checkCurrentDeviceFocus(tzPackageName);
+        boolean isTzOpened = isAppRunning(tzPackageName);
         while (!isTzOpened && attemps > 0) {
             LOGGER.info("TimeZoneChanger apk was not open. Attempt to open...");
             openTZChangingApk(turnOffAuto, timeFormat);
-            isTzOpened = checkCurrentDeviceFocus(tzPackageName);
+            isTzOpened = isAppRunning(tzPackageName);
             attemps--;
         }
 
@@ -1105,7 +1082,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             openTZChangingApk(turnOffAuto, timeFormat);
             res = false;
         }
-        if (checkCurrentDeviceFocus(tzPackageName)) {
+        if (isAppRunning(tzPackageName)) {
             LOGGER.info("On TZ changer apk page");
             res = true;
         } else {
