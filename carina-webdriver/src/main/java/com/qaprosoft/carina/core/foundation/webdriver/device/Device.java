@@ -222,15 +222,6 @@ public class Device extends RemoteDevice implements IDriverPool {
 
     }
 
-    @Deprecated
-    public void dropFile(String pathToFile) {
-        if (this.isNull())
-            return;
-
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "rm", pathToFile);
-        executor.execute(cmd);
-    }
-
     public String getFullPackageByName(final String name) {
 
         List<String> packagesList = getInstalledPackages();
@@ -261,15 +252,6 @@ public class Device extends RemoteDevice implements IDriverPool {
 
     public boolean isAppInstall(final String packageName) {
         return !getFullPackageByName(packageName).contains("not found");
-    }
-
-    @Deprecated
-    public void pullFile(String pathFrom, String pathTo) {
-        if (isNull())
-            return;
-
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "pull", pathFrom, pathTo);
-        executor.execute(cmd);
     }
 
     public void pressKey(int key) {
