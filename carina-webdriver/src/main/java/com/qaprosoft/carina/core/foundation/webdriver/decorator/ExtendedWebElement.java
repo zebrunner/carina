@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -1093,24 +1092,6 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
-    /**
-     * @deprecated As of release 6.x, replaced by {@link #click()}. Can be used only for Web where JavascriptExecutor is supported.
-     * 
-     * @param x
-     * 			double x
-     * @param y
-     * 			double y
-     */
-    @Deprecated
-    public void tapWithCoordinates(double x, double y) {
-        HashMap<String, Double> tapObject = new HashMap<String, Double>();
-        tapObject.put("x", x);
-        tapObject.put("y", y);
-        final WebDriver drv = getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) drv;
-        js.executeScript("mobile: tap", tapObject);
-    }
-    
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
         	//TODO: investigate maybe searchContext better to use here!
