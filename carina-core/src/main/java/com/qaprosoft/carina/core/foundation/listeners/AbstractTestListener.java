@@ -29,6 +29,7 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
+import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
@@ -45,9 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
-@SuppressWarnings("deprecation")
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
