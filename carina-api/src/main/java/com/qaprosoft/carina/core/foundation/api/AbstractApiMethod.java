@@ -56,7 +56,6 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-@SuppressWarnings("deprecation")
 public abstract class AbstractApiMethod extends HttpClient {
     private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
     private StringBuilder bodyContent = null;
@@ -217,17 +216,6 @@ public abstract class AbstractApiMethod extends HttpClient {
                 ps.close();
         }
         return rs;
-    }
-
-    /**
-     * @deprecated use {@link #callAPI()} instead.
-     * 
-     * @return String
-     */
-    @Deprecated
-    public String call() {
-        Response response = callAPI();
-        return response != null ? response.asString() : null;
     }
 
     public void expectInResponse(Matcher<?> matcher) {

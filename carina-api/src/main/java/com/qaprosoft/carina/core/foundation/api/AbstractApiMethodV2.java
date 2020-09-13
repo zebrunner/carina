@@ -114,20 +114,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     @Override
-    @Deprecated
-    public String call() {
-        if (rqPath != null) {
-            TemplateMessage tm = new TemplateMessage();
-            tm.setTemplatePath(rqPath);
-            tm.setPropertiesStorage(properties);
-            setBodyContent(tm.getMessageText());
-        }
-        String rs = super.call();
-        actualRsBody = rs;
-        return rs;
-    }
-
-    @Override
     public Response callAPI() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
@@ -240,22 +226,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
-    }
-
-    /**
-     * This method is deprecated now. Please use {@link #validateResponseAgainstSchema(String)} method instead
-     * 
-     * @param schemaPath Path to schema file in resources
-     */
-    @Deprecated
-    public void validateResponseAgainstJSONSchema(String schemaPath) {
-        if (actualRsBody == null) {
-            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
-        }
-        TemplateMessage tm = new TemplateMessage();
-        tm.setTemplatePath(schemaPath);
-        String schema = tm.getMessageText();
-        JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
     }
 
     /**
