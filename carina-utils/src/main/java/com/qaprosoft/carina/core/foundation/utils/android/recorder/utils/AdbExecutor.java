@@ -21,8 +21,6 @@ import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,37 +49,6 @@ public class AdbExecutor {
      */
     public String[] getDefaultCmd() {
         return cmdInit;
-    }
-
-    @Deprecated
-    public List<String> getAttachedDevices() {
-        ProcessBuilderExecutor executor = null;
-        BufferedReader in = null;
-
-        try {
-            String[] cmd = CmdLine.insertCommandsAfter(cmdInit, "devices");
-            executor = new ProcessBuilderExecutor(cmd);
-
-            Process process = executor.start();
-            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = null;
-
-            Pattern pattern = Pattern.compile("^([a-zA-Z0-9\\-]+)(\\s+)(device|offline)");
-            List<String> devices = new ArrayList<String>();
-
-            while ((line = in.readLine()) != null) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.find()) {
-                    devices.add(line);
-                }
-            }
-            return devices;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            closeQuietly(in);
-            ProcessBuilderExecutor.gcNullSafe(executor);
-        }
     }
 
     public List<String> execute(String[] cmd) {
