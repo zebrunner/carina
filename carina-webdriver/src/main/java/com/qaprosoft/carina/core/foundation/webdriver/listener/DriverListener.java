@@ -163,30 +163,17 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void onException(Throwable thr, WebDriver driver) {
-        LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
-        driver = castDriver(driver);
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
-        if (thr.getMessage() == null) {
-            LOGGER.debug("DriverListener->onException finished.");
-            return;
-        }
-
-        //TODO: hopefully castDriver at the beginning resolve root cause of the recursive onException calls
-        if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
-                thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
-            LOGGER.error("Do not generate screenshot for invalid driver!");
-            // prevent recursive crash for onException
-            return;
-        }
-
-        if (thr.getMessage().contains("Method has not yet been implemented")
-                || thr.getMessage().contains("Method is not implemented")) {
+        if (thr == null 
+                || thr.getMessage() == null
+                || thr.getMessage().contains("Method has not yet been implemented")
+                || thr.getMessage().contains("Method is not implemented")
+                || thr.getMessage().contains("An element could not be located on the page using the given search parameters")) {
             // do nothing
-            LOGGER.debug("DriverListener->onException finished.");
             return;
         }
-
+        
         // handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
         // Example:
 
@@ -201,13 +188,21 @@ public class DriverListener implements WebDriverEventListener {
         if (thr.getMessage().contains("is not running, possibly crashed")) {
             throw new RuntimeException(thr);
         }
+        
+        //TODO: hopefully castDriver below resolve root cause of the recursive onException calls
+        if (thr.getStackTrace() != null) {
+            if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
+                    thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
+                LOGGER.error("Do not generate screenshot for invalid driver!");
+                // prevent recursive crash for onException
+                return;
+            }
+        }
+        
+        LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
+        driver = castDriver(driver);
 
-        String urlPrefix = "";
         try {
-            //[VD] commented as too many issues observed due to this feature
-//            if (!isMobile(driver)) {
-//                urlPrefix = "url: " + driver.getCurrentUrl() + "\n";
-//            }
             // 1. if you see mess with afterTest carina actions and Timer startup failure you should follow steps #2+ to determine root cause.
             //      Driver initialization 'default' FAILED! Retry 1 of 1 time - Operation already started: mobile_driverdefault
             // 2. carefully track all preliminary exception for the same thread to detect 1st problematic exception
@@ -215,7 +210,7 @@ public class DriverListener implements WebDriverEventListener {
             // 4. if 3rd one is true just update Screenshot.isCaptured() adding part of the exception to the list
             // handle cases which should't be captured
             if (Screenshot.isCaptured(thr.getMessage())) {
-                captureScreenshot(urlPrefix + thr.getMessage(), driver, null, true);
+                captureScreenshot(thr.getMessage(), driver, null, true);
             }
         } catch (Exception e) {
             if (!e.getMessage().isEmpty()
