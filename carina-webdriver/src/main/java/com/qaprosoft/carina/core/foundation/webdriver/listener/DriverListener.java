@@ -281,7 +281,6 @@ public class DriverListener implements WebDriverEventListener {
             comment = getMessage(errorMessage);
         }
 
-        LOGGER.debug("DriverListener->captureScreenshot starting...");
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
@@ -301,7 +300,6 @@ public class DriverListener implements WebDriverEventListener {
         } finally {
             resetMessages();
         }
-        LOGGER.debug("DriverListener->captureScreenshot finished...");
     }
 
     private void generateDump(String screenName) {
