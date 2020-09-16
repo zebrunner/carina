@@ -251,7 +251,8 @@ public class Screenshot {
         } catch (WebDriverException e) {
             if (isCaptured(e.getMessage())) {
                 // display exception as we suspect to make screenshot for this use-case
-                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+                LOGGER.warn("Unable to capture screenshot due to the WebDriverException! Enable core_log_level=DEBUG to analyze root cause!");
+                LOGGER.debug(e.getMessage(), e);
             } else {
                 // Do not display exception by default as we don't suspect to make screenshot for this use-case
                 LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
