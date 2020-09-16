@@ -21,14 +21,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
@@ -48,9 +46,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.qaprosoft.zafira.util.upload.UploadUtil;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.windows.WindowsDriver;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.comparison.ImageDiff;
 import ru.yandex.qatools.ashot.comparison.ImageDiffer;
@@ -228,6 +226,7 @@ public class Screenshot {
                 //do nothing and return empty
                 return null;
             }
+            BufferedImage thumbScreen = screen;
 
             if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                     && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
@@ -239,9 +238,15 @@ public class Screenshot {
 
             ImageIO.write(screen, "PNG", screenshot);
 
+            // Create screenshot thumbnail
+            String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+            File screenshotThumb = new File(thumbScreenPath);
+            ImageIO.write(thumbScreen, "PNG", screenshotThumb);
+
+            resizeImg(thumbScreen, 60, 60, thumbScreenPath);
+
             // Uploading screenshot to Amazon S3
-            Long capturedAt = Instant.now().toEpochMilli();
-            UploadUtil.uploadScreenshot(screenshot, comment, capturedAt, artifact);
+            UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
 
             // add screenshot comment to collector
             ReportContext.addScreenshotComment(screenName, comment);
@@ -383,6 +388,7 @@ public class Screenshot {
                 	//do nothing and return empty
                 	return "";
                 }
+                BufferedImage thumbScreen = screen;
 
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                         && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
@@ -394,8 +400,14 @@ public class Screenshot {
 
                 ImageIO.write(screen, "PNG", screenshot);
 
-                Long capturedAt = Instant.now().toEpochMilli();
-                UploadUtil.uploadScreenshot(screenshot, comment, capturedAt, false);
+                // Create screenshot thumbnail
+                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+                File screenshotThumb = new File(thumbScreenPath);
+                ImageIO.write(thumbScreen, "PNG", screenshotThumb);
+                resizeImg(thumbScreen, 60, 60, thumbScreenPath);
+
+                // Uploading screenshot to Amazon S3
+                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, false);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -454,10 +466,7 @@ public class Screenshot {
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
         BufferedImage screenShot;
-        if (driver.getClass().toString().contains("windows")) {
-            File screenshot = ((WindowsDriver<?>) driver).getScreenshotAs(OutputType.FILE);
-            screenShot = ImageIO.read(screenshot);
-        } else if (driver.getClass().toString().contains("java_client")) {
+        if (driver.getClass().toString().contains("java_client")) {
             // Mobile Native app
             File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
             screenShot = ImageIO.read(screenshot);
@@ -596,6 +605,8 @@ public class Screenshot {
                 screenName = comment + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
+                BufferedImage thumbScreen = screen;
+
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                         && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
                     resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
@@ -606,9 +617,14 @@ public class Screenshot {
                 FileUtils.touch(screenshot);
                 ImageIO.write(screen, "PNG", screenshot);
 
+                // Create comparative screenshot thumbnail
+                String thumbScreenPath = screenPath.replace(screenName, "/thumbnails/" + screenName);
+                File screenshotThumb = new File(thumbScreenPath);
+                ImageIO.write(thumbScreen, "PNG", screenshotThumb);
+                resizeImg(thumbScreen, 60, 60, thumbScreenPath);
+
                 // Uploading comparative screenshot to Amazon S3
-                Long capturedAt = Instant.now().toEpochMilli();
-                UploadUtil.uploadScreenshot(screenshot, comment, capturedAt, artifact);
+                UploadUtil.uploadScreenshot(screenshot, screenshotThumb, comment, artifact);
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");
