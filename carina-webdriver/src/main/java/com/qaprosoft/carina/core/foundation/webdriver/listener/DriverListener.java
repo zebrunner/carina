@@ -189,14 +189,13 @@ public class DriverListener implements WebDriverEventListener {
             throw new RuntimeException(thr);
         }
         
-        //TODO: hopefully castDriver below resolve root cause of the recursive onException calls
-        if (thr.getStackTrace() != null) {
-            if (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
-                    thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException")) {
-                LOGGER.error("Do not generate screenshot for invalid driver!");
-                // prevent recursive crash for onException
-                return;
-            }
+        // hopefully castDriver below resolve root cause of the recursive onException calls but keep below if to ensure
+        if (thr.getStackTrace() != null
+                && (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
+                        thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException"))) {
+            LOGGER.error("Do not generate screenshot for invalid driver!");
+            // prevent recursive crash for onException
+            return;
         }
         
         LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
