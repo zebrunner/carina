@@ -120,7 +120,8 @@ public class ExtendedElementLocator implements ElementLocator {
                     exception = null;
                     element = searchContext.findElements(by).get(0);
                 }
-                LOGGER.debug("Unable to find element: " + e.getMessage());
+                // hide below debug message as it is to often displayed in logs due to the fluent waits etc
+                //LOGGER.debug("Unable to find element: " + e.getMessage());
             }
         }
         

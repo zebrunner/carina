@@ -316,30 +316,29 @@ public class ExtendedWebElement {
 		Timer.start(ACTION_NAME.WAIT);
 		
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+				.ignoring(NoSuchSessionException.class)
+				.ignoring(TimeoutException.class); //trying to avoid exception in driver as DriverListener capture it
+		
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
-			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
-			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
-			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
 		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: NoSuchElementException: " + condition.toString());
 			result = false;
 			originalException = e;
 		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: TimeoutException: " + condition.toString());
 			result = false;
 			originalException = e.getCause();
 		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException e..." + getNameWithLocator());
+            LOGGER.debug("waitUntil: WebDriverException: " + condition.toString());
             result = false;
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
+			LOGGER.error("waitUntil: undefined exception: " + condition.toString(), e);
 			result = false;
 			originalException = e;
 		}
