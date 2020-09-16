@@ -315,7 +315,9 @@ public class ExtendedWebElement {
 		Timer.start(ACTION_NAME.WAIT);
 		
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+				.ignoring(NoSuchSessionException.class)
+				.ignoring(TimeoutException.class); //trying to avoid exception in driver as DriverListener capture it
+		
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
 			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
