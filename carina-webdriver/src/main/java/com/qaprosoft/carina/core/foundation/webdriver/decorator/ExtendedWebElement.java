@@ -320,10 +320,8 @@ public class ExtendedWebElement {
 		
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
-			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
-			LOGGER.debug("waitUntil: finished condition: " + condition.toString());
 		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
 			LOGGER.debug("waitUntil: NoSuchElementException: " + condition.toString());
