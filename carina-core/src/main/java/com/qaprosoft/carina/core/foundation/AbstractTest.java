@@ -35,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
+import com.zebrunner.agent.testng.listener.TestRunListener;
 
 /*
  * AbstractTest - base test for UI and API tests.
@@ -44,7 +45,7 @@ import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory
 
 // https://github.com/qaprosoft/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
-@LinkedListeners({CarinaListener.class, TestNamingListener.class})
+@LinkedListeners({CarinaListener.class, TestRunListener.class, TestNamingListener.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);

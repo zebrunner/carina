@@ -46,6 +46,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.zebrunner.agent.testng.core.retry.RetryAnalyzerInterceptor;
 
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -237,15 +238,17 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         LOGGER.debug("AbstractTestListener->onTestStart");
         VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
-        if (curRetryAnalyzer == null || curRetryAnalyzer instanceof DisabledRetryAnalyzer) {
+        if (curRetryAnalyzer == null 
+                || curRetryAnalyzer instanceof DisabledRetryAnalyzer 
+                || curRetryAnalyzer instanceof RetryAnalyzerInterceptor) {
             // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
             // result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzer.class);
         } else {
             if (!(curRetryAnalyzer instanceof RetryAnalyzer)) {
-                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());                
+                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
             }
-            
+
         }
         
         generateParameters(result);

@@ -76,6 +76,7 @@ import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
@@ -91,6 +92,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
  * CarinaListener - base carin-core TestNG Listener.
@@ -142,6 +144,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Screenshot.addScreenshotRule(autoScreenshotsRule);
             
             updateAppPath();
+            
+            TestNameResolverRegistry.set(new ZebrunnerNameResolver());
 
         } catch (Exception e) {
             LOGGER.error("Undefined failure during static carina listener init!", e);

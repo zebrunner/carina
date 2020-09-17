@@ -38,6 +38,11 @@
 			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
+            <dependency>
+                <groupId>com.zebrunner</groupId>
+                <artifactId>agent-testng</artifactId>
+            </dependency>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
