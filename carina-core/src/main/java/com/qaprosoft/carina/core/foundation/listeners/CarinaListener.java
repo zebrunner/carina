@@ -81,8 +81,11 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
+import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
+import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
+import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -92,6 +95,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
+import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
@@ -146,6 +151,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             updateAppPath();
             
             TestNameResolverRegistry.set(new ZebrunnerNameResolver());
+            // first means that ownership/maintainer resolver from carina has higher priority
+            ChainedMaintainerResolver.addFirst(new Ownership());
+            CompositeLabelResolver.addResolver(new TagManager());
+            CompositeLabelResolver.addResolver(new PriorityManager());
 
         } catch (Exception e) {
             LOGGER.error("Undefined failure during static carina listener init!", e);

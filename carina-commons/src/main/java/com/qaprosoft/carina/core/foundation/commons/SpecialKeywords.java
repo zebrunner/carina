@@ -72,7 +72,6 @@ public class SpecialKeywords {
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
-    public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";
     public static final String JIRA_ARGS_MAP = "jiraArgsMap";
     
     public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
@@ -124,8 +123,8 @@ public class SpecialKeywords {
     public static final String ANDROID_START_UIX_NODE = "<node ";
     public static final String ANDROID_END_UIX_NODE = "</node>";
 
-    public static final String TEST_PRIORITY_KEY = "priority";
-    public static final String TEST_FEATURE_KEY = "feature";
+    public static final String TEST_PRIORITY_TAG = "priority";
+    public static final String TEST_FEATURE_TAG = "feature";
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";

@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class TestNamingListener implements IResultListener2 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); 
     
     static final ThreadLocal<String> testName = new ThreadLocal<String>();
-    private static final ConcurrentHashMap<String, Integer> testNameInvCounter = new ConcurrentHashMap<String, Integer>();
+    private static final ConcurrentHashMap<String, AtomicInteger> testNameInvCounter = new ConcurrentHashMap<>();
 
     @Override
     public void beforeConfiguration(ITestResult result) {
@@ -183,24 +184,8 @@ public class TestNamingListener implements IResultListener2 {
         
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
-        int index = ((TestResult) result).getParameterIndex();
-        if (index > 0) {
-            // that's a dataprovider line index
-            index++; //to make correlation between line and index number
-            LOGGER.debug("test: " + name  + "; index: " + index);
-            name = name + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
-        }
-        
-        ITestNGMethod[] methods = result.getTestContext().getAllTestMethods();
-        if (methods.length > 0) {
-            int invCount = methods[0].getInvocationCount();
-            if (invCount > 1) {
-                LOGGER.debug("Detected method '" + result.getMethod().getMethodName() + "' with non zero invocationCount: " + invCount);
-                int countIndex = getCurrentInvocationCount(name);
-                LOGGER.debug("test: " + name + "; InvCount index: " + countIndex);
-                name = name + String.format(SpecialKeywords.INVOCATION_COUNTER, String.format("%04d", countIndex));
-            }
-        }
+        name = appendDataProviderLine(result, name);
+        name = appendInvocationCount(result, name);
         
         testName.set(name);
         return testName.get();
@@ -240,25 +225,41 @@ public class TestNamingListener implements IResultListener2 {
     }
     
     /**
-     * get InvocationCount number based on test name
+     * calculate InvocationCount number based on test name
      * 
      * @param String test
      * @return int invCount
      */
-    private static int getCurrentInvocationCount(String test) {
-        /*TODO: reopen https://github.com/cbeust/testng/issues/1758 bug 
-         * Explain that appropriate TestNG functionality doesn't work in multi-threading env 
-         */
-        
-        int invCount = 1;
-        if (!testNameInvCounter.containsKey(test)) {
-            testNameInvCounter.put(test, invCount);
-        } else {
-            invCount = testNameInvCounter.get(test) + 1;
-            testNameInvCounter.put(test, invCount);
+    private static String appendInvocationCount(ITestResult testResult, String testName) {
+        int expectedInvocationCount = getInvocationCount(testResult);
+        if (expectedInvocationCount > 1) {
+            // adding extra zero at the beginning of the invocation count
+            int indexMaxLength = Integer.toString(expectedInvocationCount).length() + 1;
+            String lineFormat = " [InvCount=%0" + indexMaxLength + "d]";
+            int currentInvocationCount = testNameInvCounter.computeIfAbsent(testName, $ -> new AtomicInteger(0))
+                                                             .incrementAndGet();
+            testName += String.format(lineFormat, currentInvocationCount);
         }
-        
-        return invCount;
+        return testName;
+    }
+    private static int getInvocationCount(ITestResult testResult) {
+        ITestNGMethod[] methods = testResult.getTestContext().getAllTestMethods();
+        return Arrays.stream(methods)
+                     .filter(method -> method.equals(testResult.getMethod()))
+                     .findFirst()
+                     .map(ITestNGMethod::getInvocationCount)
+                     .orElse(0);
+    }
+    
+    private static String appendDataProviderLine(ITestResult testResult, String testName) {
+        if (testResult.getMethod().getParameterInvocationCount() > 1) {
+            // adding extra zero at the beginning of the data provider line number
+            int indexMaxLength = Integer.toString(testResult.getMethod().getParameterInvocationCount()).length() + 1;
+            String lineFormat = " [L%0" + indexMaxLength + "d]";
+            int index = ((TestResult) testResult).getParameterIndex() + 1;
+            testName += String.format(lineFormat, index);
+        }
+        return testName;
     }
     
 }
