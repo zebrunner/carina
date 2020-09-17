@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>com.zebrunner</groupId>
                 <artifactId>agent-testng</artifactId>
-                <version>1.0.0.46-SNAPSHOT</version>
+                <version>1.0.0.55-SNAPSHOT</version>
             </dependency>
 
             <dependency>

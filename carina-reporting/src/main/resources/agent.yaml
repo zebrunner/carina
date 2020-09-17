@@ -1,7 +1,0 @@
-reporting:
-  enabled: false
-  server:
-    hostname: http://localhost:8081
-    access-token: 
-  run:
-    display-name: Carina Unit Tests
