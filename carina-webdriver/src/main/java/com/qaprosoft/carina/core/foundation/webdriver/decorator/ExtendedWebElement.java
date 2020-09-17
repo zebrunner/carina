@@ -48,6 +48,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -1401,8 +1402,9 @@ public class ExtendedWebElement {
 			// try to find again using driver
 			try {
 				element = refindElement();
-			} catch (NoSuchElementException ex) {
+			} catch (NoSuchElementException | JsonException ex) {
 				//no sense to repeat action if refind element didn't help
+				// JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
