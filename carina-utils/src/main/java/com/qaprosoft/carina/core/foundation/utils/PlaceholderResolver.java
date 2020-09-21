@@ -56,11 +56,17 @@ public class PlaceholderResolver {
             }
         } else {
             if (!key.startsWith(SpecialKeywords.CAPABILITIES) && !key.endsWith(Configuration.Parameter.URL.getKey())) {
-                if (key.equals("project_report_directory")) {
-                    // #1052 "Stackoverflow while trying to read configuration"
+                switch (key) {
+                case "project_report_directory":
                     value = "./reports/qa";
-                } else {
+                    break;
+                case "max_log_file_size":
+                    value = "150";
+                    break;
+                default:
+                    //TODO: as a permanent fix try to check if loggers (ThreadLogAppender) successfully inited. Only in this case write warning
                     LOGGER.warn("Value not resolved by key: " + key);
+                    break;
                 }
             }
         }
