@@ -22,9 +22,11 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +48,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -53,6 +56,7 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -312,30 +316,29 @@ public class ExtendedWebElement {
 		Timer.start(ACTION_NAME.WAIT);
 		
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+				.ignoring(NoSuchSessionException.class)
+				.ignoring(TimeoutException.class); //trying to avoid exception in driver as DriverListener capture it
+		
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
-			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
-			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
-			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
 		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: NoSuchElementException: " + condition.toString());
 			result = false;
 			originalException = e;
 		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: TimeoutException: " + condition.toString());
 			result = false;
 			originalException = e.getCause();
 		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException e..." + getNameWithLocator());
+            LOGGER.debug("waitUntil: WebDriverException: " + condition.toString());
             result = false;
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
+			LOGGER.error("waitUntil: undefined exception: " + condition.toString(), e);
 			result = false;
 			originalException = e;
 		}
@@ -359,34 +362,39 @@ public class ExtendedWebElement {
     }
     
     private WebElement refindElement() {
-        //do not return without element initialization!
-    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-    	try {
-    		if (searchContext != null) {
-    			//TODO: use-case when format method is used. Need investigate howto init context in this case as well
-    			element = searchContext.findElement(by);
-    		} else {
-    		    LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-    			element = getDriver().findElement(by);	
-    		}
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
-			//use available driver to research again...
-			//TODO: handle case with rootBy to be able to refind also lists etc
-            if (searchContext != null) {
-                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);  
+        // do not return without element initialization!
+        FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
+
+        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(InvalidElementStateException.class)
+                .ignoring(WebDriverException.class);
+
+        if (searchContext != null) {
+            try {
+                this.element = wait.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return searchContext.findElement(by);
+                    }
+                });
+            } catch (TimeoutException e) {
+                this.element = searchContext.findElement(by);
             }
-    	} catch (WebDriverException e) {
-    		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
-    		element = getDriver().findElement(by);
-    	}
+        } else {
+            try {
+                this.element = wait.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return getDriver().findElement(by);
+                    }
+                });
+            } catch (TimeoutException e) {
+                this.element = getDriver().findElement(by);
+            }
+        }
         return element;
     }
-    
+
     public void setElement(WebElement element) {
         this.element = element;
     }
@@ -1109,7 +1117,7 @@ public class ExtendedWebElement {
                 //TODO: use-case when format method is used. Need investigate howto init context in this case as well
                 element = searchContext.findElement(by);
             } else {
-                LOGGER.error("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
+                LOGGER.debug("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);  
             }
     	} catch (NoSuchElementException e) {
@@ -1394,8 +1402,9 @@ public class ExtendedWebElement {
 			// try to find again using driver
 			try {
 				element = refindElement();
-			} catch (NoSuchElementException ex) {
-				//no sense to repeit action if refind element didn't help
+			} catch (NoSuchElementException | JsonException ex) {
+				//no sense to repeat action if refind element didn't help
+				// JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);

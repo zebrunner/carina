@@ -251,13 +251,15 @@ public class Screenshot {
         } catch (WebDriverException e) {
             if (isCaptured(e.getMessage())) {
                 // display exception as we suspect to make screenshot for this use-case
-                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+                LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
+                LOGGER.debug(e.getMessage(), e);
             } else {
                 // Do not display exception by default as we don't suspect to make screenshot for this use-case
                 LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
             }
         } catch (Exception e) {
-            LOGGER.error("Unable to capture screenshot due to the Exception!", e);
+            LOGGER.warn("Unable to capture screenshot due to the Exception!");
+            LOGGER.debug(e.getMessage(), e);
         } finally {
             Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
         }
@@ -399,12 +401,16 @@ public class Screenshot {
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (NoSuchWindowException e) {
                 LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
+                LOGGER.debug(e.getMessage(), e);
             } catch (IOException e) {
-                LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
+                LOGGER.warn("Unable to capture screenshot due to the I/O issues!");
+                LOGGER.debug(e.getMessage(), e);
             } catch (WebDriverException e) {
-                LOGGER.error("Unable to capture screenshot due to the WebDriverException!", e);
+                LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
+                LOGGER.debug(e.getMessage(), e);                
             } catch (Exception e) {
-                LOGGER.error("Unable to capture screenshot due to the Exception!", e);
+                LOGGER.warn("Unable to capture screenshot due to the Exception!");
+                LOGGER.debug(e.getMessage(), e);
             } finally {
                 Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             }
@@ -612,14 +618,18 @@ public class Screenshot {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");
                 return false;
             }
-        } catch (IOException exception) {
-            LOGGER.error("Unable to compare screenshots due to the I/O issues!", exception);
-        } catch (WebDriverException exception) {
-            LOGGER.error("Unable to compare screenshots due to the WebDriverException!", exception);
-        } catch (NullPointerException exception) {
-            LOGGER.error("Unable to compare screenshots due to the NullPointerException", exception);
-        } catch (Exception exception) {
-            LOGGER.error("Unable to compare screenshots!", exception);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to compare screenshots due to the I/O issues!");
+            LOGGER.debug(e.getMessage(), e);
+        } catch (WebDriverException e) {
+            LOGGER.warn("Unable to compare screenshots due to the WebDriverException!");
+            LOGGER.debug(e.getMessage(), e);
+        } catch (NullPointerException e) {
+            LOGGER.warn("Unable to compare screenshots due to the NullPointerException!");
+            LOGGER.debug(e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.warn("Unable to compare screenshots!");
+            LOGGER.debug(e.getMessage(), e);
         } finally {
             Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
         }

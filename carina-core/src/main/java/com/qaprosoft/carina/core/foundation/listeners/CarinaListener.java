@@ -352,7 +352,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             List<String> tickets = Jira.getTickets(result);
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
-            Jira.updateAfterTest(result);
 
             // we shouldn't deregister info here as all retries will not work
             // TestNamingUtil.releaseZafiraTest();
@@ -372,10 +371,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         quitDrivers(Phase.BEFORE_CLASS);
 
         LOGGER.debug("CarinaListener->onFinish(context): " + context.getName());
-
-        // TODO: refactor jira updater to make it as functional interface
-        // Update JIRA
-        Jira.updateAfterSuite(context, EmailReportItemCollector.getTestResults());
     }
 
     @Override

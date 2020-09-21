@@ -19,74 +19,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
 
-import net.rcarz.jiraclient.BasicCredentials;
-import net.rcarz.jiraclient.JiraClient;
 
 /*
  * Jira
  * 
  * @author Alex Khursevich
  */
-//TODO: #978: remove all synchronized for Jira.java
 public class Jira {
     private static final int MAX_LENGTH = 45;
     
     private static final Logger LOG = Logger.getLogger(Jira.class);
-    private static IJiraUpdater updater;
-    private static JiraClient jira;
-    private static boolean isInitialized = false;
-    private static CryptoTool cryptoTool;
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<>();
     protected static ThreadLocal<BaseWorkItem> knownIssue = new ThreadLocal<>();
-
-    static {
-        try {
-            cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-            updater = (IJiraUpdater) Class.forName(Configuration.get(Parameter.JIRA_UPDATER)).newInstance();
-            BasicCredentials creds = new BasicCredentials(cryptoTool.decryptByPattern(Configuration.get(Parameter.JIRA_USER), CRYPTO_PATTERN),
-                    (cryptoTool.decryptByPattern(Configuration.get(Parameter.JIRA_PASSWORD), CRYPTO_PATTERN)));
-            jira = new JiraClient(Configuration.get(Parameter.JIRA_URL), creds);
-            isInitialized = true;
-        } catch (Exception e) {
-            LOG.info("Jira update utility not initialized (specify jira_updater, jira_url, jira_user, jira_password, crypto_key_path): "
-                    + e.getMessage());
-        }
-    }
-
-    public static void updateAfterTest(ITestResult result) {
-        if (isInitialized) {
-            try {
-                updater.updateAfterTest(jira, result);
-            } catch (Exception e) {
-                LOG.error("Jira 'updateAfterTest' not performed: " + e.getMessage());
-            }
-        }
-    }
-
-    public static void updateAfterSuite(ITestContext context, List<TestResultItem> results) {
-        if (isInitialized) {
-            try {
-                updater.updateAfterSuite(jira, context, results);
-            } catch (Exception e) {
-                LOG.error("Jira 'updateAfterSuite' not performed: " + e.getMessage());
-            }
-        }
-    }
 
     private static void clearTickets() {
         jiraTickets.remove();

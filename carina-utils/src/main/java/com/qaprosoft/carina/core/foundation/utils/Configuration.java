@@ -88,6 +88,8 @@ public class Configuration {
         
         FIREFOX_PREFERENCES("firefox_preferences"),
 
+        HEADLESS("headless"),
+
         APP_VERSION("app_version"),
 
         PROXY_HOST("proxy_host"),
@@ -144,10 +146,6 @@ public class Configuration {
 
         BIG_SCREEN_HEIGHT("big_screen_height"),
 
-        SMALL_SCREEN_WIDTH("small_screen_width"),
-
-        SMALL_SCREEN_HEIGHT("small_screen_height"),
-
         INIT_RETRY_COUNT("init_retry_count"),
 
         INIT_RETRY_INTERVAL("init_retry_interval"),
@@ -180,21 +178,7 @@ public class Configuration {
 
         SUITE_NAME("suite_name"),
 
-        JIRA_UPDATER("jira_updater"),
-
         JIRA_URL("jira_url"),
-
-        JIRA_USER("jira_user"),
-
-        JIRA_PASSWORD("jira_password"),
-
-        JIRA_SUITE_ID("jira_suite_id"),
-
-        JIRA_PROJECT("jira_project"),
-
-        JIRA_PROJECT_SHORT("jira_project_short"),
-
-        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
         
@@ -279,9 +263,7 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules"),
-
-        HUB_MODE("hub_mode");
+        TEST_RUN_RULES("test_run_rules");
 
         private final String key;
 

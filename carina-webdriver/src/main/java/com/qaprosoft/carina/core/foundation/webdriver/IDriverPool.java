@@ -322,37 +322,41 @@ public interface IDriverPool {
             }
             SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
             
-            for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
-                if ("bugreport".equals(logType) || "performance".equals(logType)) {
-                    // bugreport -  there is no sense to upload as it is too slow (~1 min) and doesn't return valuable info
-                    // performance - no response from Appium in 99% of cases
-                    continue;
+            try {
+                for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
+                    if ("bugreport".equals(logType) || "performance".equals(logType)) {
+                        // bugreport -  there is no sense to upload as it is too slow (~1 min) and doesn't return valuable info
+                        // performance - no response from Appium in 99% of cases
+                        continue;
+                    }
+                    if ("server".equals(logType) && SpecialKeywords.IOS.equalsIgnoreCase(Configuration.getPlatform())) {
+                        // unrecognized exception on this phase for iOS which block below execution
+                        continue;
+                    }
+                    String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
+                    StringBuilder tempStr = new StringBuilder();
+                    LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
+                    logcatEntries.getAll().forEach((k) -> tempStr.append(k.toString().concat("\n")));
+                    
+                    if (tempStr.length() == 0) {
+                        //don't write something to file and don't register appropriate artifact
+                        continue;
+                    }
+    
+                    File file = null;
+                    try {
+                        POOL_LOGGER.debug("Saving log artifact: " + fileName);
+                        file = new File(fileName);
+                        FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
+                        POOL_LOGGER.debug("Saved log artifact: " + fileName);
+                    } catch (IOException e) {
+                        POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
+                    }
+                    UploadUtil.uploadArtifact(file, logType);
                 }
-                if ("server".equals(logType) && SpecialKeywords.IOS.equalsIgnoreCase(Configuration.getPlatform())) {
-                    // unrecognized exception on this phase for iOS which block below execution
-                    //TODO: make any disaster in this code not affectable to original behavior 
-                    continue;
-                }
-                String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
-                StringBuilder tempStr = new StringBuilder();
-                LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
-                logcatEntries.getAll().forEach((k) -> tempStr.append(k.toString().concat("\n")));
-                
-                if (tempStr.length() == 0) {
-                    //don't write something to file and don't register appropriate artifact
-                    continue;
-                }
-
-                File file = null;
-                try {
-                    POOL_LOGGER.debug("Saving log artifact: " + fileName);
-                    file = new File(fileName);
-                    FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
-                    POOL_LOGGER.debug("Saved log artifact: " + fileName);
-                } catch (IOException e) {
-                    POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
-                }
-                UploadUtil.uploadArtifact(file, logType);
+            } catch (Exception e) {
+                POOL_LOGGER.warn("Unable to extract webdriver server logs!");
+                POOL_LOGGER.debug(e.getMessage(), e);
             }
             
             WebDriver driver = carinaDriver.getDriver();
@@ -365,7 +369,11 @@ public interface IDriverPool {
             } catch (InterruptedException | java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
             } catch (ExecutionException e) {
-                POOL_LOGGER.error("Error on driver quite detected!", e);
+                POOL_LOGGER.warn("ExecutionException error on driver quit detected!");
+                POOL_LOGGER.debug(e.getMessage(), e);
+            } catch (Exception e) {
+                POOL_LOGGER.warn("Undefined error on driver quit detected!");
+                POOL_LOGGER.debug(e.getMessage(), e);
             }
             
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
@@ -454,7 +462,8 @@ public interface IDriverPool {
                 POOL_LOGGER.error("driver.manage() is null!");
             }
         } catch (Exception e) {
-            POOL_LOGGER.error("Unrecorgnized error durig driver log populating!", e);
+            POOL_LOGGER.warn("Unable to get webdriver server logs.");
+            POOL_LOGGER.debug("Unable to get webdriver server logs.", e);
         }
         POOL_LOGGER.debug("finish getting driver logs");
         return logEntries;

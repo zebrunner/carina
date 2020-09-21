@@ -15,17 +15,18 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.apache.log4j.Logger;
 
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidUtils;
+import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
-public class DateTimeSettingsPage extends MobileAbstractPage {
+public class DateTimeSettingsPage extends MobileAbstractPage implements IAndroidUtils {
 
     private static final Logger LOGGER = Logger.getLogger(DateTimeSettingsPage.class);
 
@@ -75,8 +76,8 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
     public void openTimeZoneSetting() {
         boolean found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
         if (!found) {
-            boolean scrolled = AndroidUtils.scroll(SELECT_TIME_ZONE_TEXT, scrollableContainerByClassName,
-                    AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT).isElementPresent();
+            boolean scrolled = scroll(SELECT_TIME_ZONE_TEXT, scrollableContainerByClassName,
+                    SelectorType.CLASS_NAME, SelectorType.TEXT).isElementPresent();
             if (scrolled) {
                 found = selectTimeZone.clickIfPresent(SHORT_TIMEOUT);
             } else {
@@ -153,16 +154,16 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
         if (deviceOsVersion > 8) {
             try {
-                result = AndroidUtils.scroll(tzGMT, scrollableContainerInVersion8_1,
-                        AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+                result = scroll(tzGMT, scrollableContainerInVersion8_1,
+                        SelectorType.ID, SelectorType.TEXT_CONTAINS).isElementPresent();
             } catch (NoSuchElementException e){
                 e.printStackTrace();
                 result = false;
             }
         } else {
             try {
-                result = AndroidUtils.scroll(tzGMT, scrollableContainerByClassName,
-                        AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+                result = scroll(tzGMT, scrollableContainerByClassName,
+                        SelectorType.CLASS_NAME, SelectorType.TEXT_CONTAINS).isElementPresent();
             } catch (NoSuchElementException e){
                 e.printStackTrace();
                 result = false;
@@ -185,16 +186,16 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
         if (deviceOsVersion > 8) {
             try {
-                result = AndroidUtils.scroll(tz, scrollableContainerInVersion8_1,
-                        AndroidUtils.SelectorType.ID, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+                result = scroll(tz, scrollableContainerInVersion8_1,
+                        SelectorType.ID, SelectorType.TEXT_CONTAINS).isElementPresent();
             } catch (NoSuchElementException e){
                 e.printStackTrace();
                 result = false;
             }
         } else {
             try {
-                result = AndroidUtils.scroll(tz, scrollableContainerByClassName,
-                        AndroidUtils.SelectorType.CLASS_NAME, AndroidUtils.SelectorType.TEXT_CONTAINS).isElementPresent();
+                result = scroll(tz, scrollableContainerByClassName,
+                        SelectorType.CLASS_NAME, SelectorType.TEXT_CONTAINS).isElementPresent();
             } catch (NoSuchElementException e){
                 e.printStackTrace();
                 result = false;
@@ -227,7 +228,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(EXPLICIT_TIMEOUT);
+        return isOpened(DriverHelper.EXPLICIT_TIMEOUT);
     }
 
 }
