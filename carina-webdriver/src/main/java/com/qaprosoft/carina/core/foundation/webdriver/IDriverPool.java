@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -365,7 +366,13 @@ public interface IDriverPool {
             WebDriver driver = carinaDriver.getDriver();
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             
-            Future<?> future = Executors.newSingleThreadExecutor().submit((Runnable) driver::quit);
+            Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+                public Void call() throws Exception {
+                    driver.quit();
+                    return null;
+                }
+            });
+            
             long wait = 120;
             try {
                 future.get(wait, TimeUnit.SECONDS);
