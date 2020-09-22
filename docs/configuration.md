@@ -40,6 +40,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>chrome / firefox / safari / iexplore</td>
 	</tr>
 	<tr>
+        	<td>headless</td>
+        	<td>Run tests in headless browser mode. Enabled when headless=true</td>
+        	<td>Boolean</td>
+	</tr>
+	<tr>
 		<td>selenium_host</td>
 		<td>Selenium server host</td>
 		<td>http://localhost:4444/wd/hub</td>
@@ -198,22 +203,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>big_screen_height</td>
 		<td>Screenshots will be resized according to this height if their own height is bigger</td>
 		<td>500, 1200, Integer</td>
-	</tr>
-		<tr>
-		<td>small_screen_width</td>
-		<td>Thumbnails' width</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>big_screen_height</td>
-		<td>Thumbnails' height</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>big_screen_height</td>
-		<td>Thumbnails' height</td>
-		<td>Integer</td>
-	</tr>
 	<tr>
 		<td>init_retry_count</td>
 		<td>Number of attempts to create a driver. The default value 0 means that there will be only 1 attempt</td>
@@ -285,39 +274,9 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Advanced Acceptance</td>
 	</tr>
 	<tr>
-		<td>jira_updater</td>
-		<td>Class contains logic to update Jira. <b>Note</b> Custom updater has to implement DefaultJiraUpdater, by default, the methods do nothing</td>
-		<td>Custom class</td>
-	</tr>
-	<tr>
 		<td>jira_url</td>
 		<td>URL to Jira</td>
 		<td>https://yourclass.atlassian.net</td>
-	</tr>
-		<tr>
-		<td>jira_user</td>
-		<td>Jira user email</td>
-		<td>admin@yourcompany.com</td>
-	</tr>
-		<tr>
-		<td>jira_password</td>
-		<td>Jira user password</td>
-		<td>admin123456</td>
-	</tr>
-		<tr>
-		<td>jira_suite_id</td>
-		<td>Jira suit id (if you have one)</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>jira_project</td>
-		<td>Jira project id</td>
-		<td>Integer</td>
-	</tr>
-		<tr>
-		<td>jira_create_new_ticket</td>
-		<td>If the feature is enabled, a new Jira ticket will be created after the test failure</td>
-		<td>true, false</td>
 	</tr>
 	<tr>
 		<td>testrail_milestone</td>
@@ -414,7 +373,7 @@ Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
-Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
+Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) //return int value
 Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 

@@ -111,7 +111,19 @@ public abstract class AbstractCapabilities {
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
         }
-        
+
+        if (Configuration.getBoolean(Parameter.HEADLESS)) {
+            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)
+                    || BrowserType.CHROME.equalsIgnoreCase(browser)
+                    && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+                LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
+                capabilities.setCapability("enableVNC", false);
+                capabilities.setCapability("enableVideo", false);
+            } else {
+                LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
+            }
+        }
+
         return capabilities;
     }
 
@@ -237,7 +249,12 @@ public abstract class AbstractCapabilities {
         if (!mobileEmulation.isEmpty()) {
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
         }
-        
+
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+        }
+
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
     }
@@ -270,6 +287,12 @@ public abstract class AbstractCapabilities {
             } else {
                 options.addPreference(name, value);
             }
+        }
+
+        String driverType = Configuration.getDriverType();
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
         }
 
         return caps;

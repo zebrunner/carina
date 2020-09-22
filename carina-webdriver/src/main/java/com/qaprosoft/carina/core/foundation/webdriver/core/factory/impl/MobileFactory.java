@@ -37,7 +37,6 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory.HubType;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
@@ -139,24 +138,20 @@ public class MobileFactory extends AbstractFactory {
                         // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
                         // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-                        case SELENIUM:
-                        case MCLOUD:
-                        case AEROKUBE:
-                        case SAUCELABS:
-                        case DEFAULT:
-                            ce.getListeners()
-                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;
-                        case BROWSERSTACK:
+                        switch (getHubProvider()) {
+                        case SpecialKeywords.BROWSERSTACK:
                             // TODO: https://github.com/qaprosoft/carina/issues/949  
                             // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                             break;
-                        case ZEBRUNNER:
+                        case SpecialKeywords.ZEBRUNNER:
                             // Zebrunner will place video to separate unique folder, no need to generate new name
                             ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
                             ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                            break;
+                        default:
+                            ce.getListeners()
+                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
+                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         }
                     }
@@ -193,18 +188,13 @@ public class MobileFactory extends AbstractFactory {
 
                         IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
 
-                        switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-                        case SELENIUM:
-                        case MCLOUD:
-                        case AEROKUBE:
-                        case BROWSERSTACK:
-                        case SAUCELABS:
-                        case DEFAULT:
+                        switch (getHubProvider()) {
+                        case SpecialKeywords.ZEBRUNNER:
+                            LOGGER.info("Video recording is not supported in Zebrunner for iOS");
+                            break;
+                        default:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
                                     o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;
-                        case ZEBRUNNER:
-                            LOGGER.info("Video recording is not supported in Zebrunner for iOS");
                             break;
                         }
                     }
@@ -283,7 +273,7 @@ public class MobileFactory extends AbstractFactory {
     /**
      * Returns device information from Grid Hub using STF service.
      * 
-     * @param caps
+     * @param cap
      *            - capabilities
      * @return remote device information
      */
@@ -338,13 +328,8 @@ public class MobileFactory extends AbstractFactory {
         if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
             final RemoteWebDriver rwd = (RemoteWebDriver) driver;
 
-            switch (HubType.valueOf(Configuration.get(Parameter.HUB_MODE).toUpperCase())) {
-            case SELENIUM:
-            case MCLOUD:
-            case AEROKUBE:
-            case BROWSERSTACK:
-            case SAUCELABS:
-            case DEFAULT:
+            switch (getHubProvider()) {
+            default:
                 RemoteDevice rd = getDeviceInfo(rwd);
                 if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
                     if (rd.getVnc().matches(".+:\\d+")) {
@@ -359,7 +344,7 @@ public class MobileFactory extends AbstractFactory {
                     }
                 }
                 break;
-            case ZEBRUNNER:
+            case SpecialKeywords.ZEBRUNNER:
                 String protocol = R.CONFIG.get(vnc_protocol);
                 String host = R.CONFIG.get(vnc_host);
                 String port = R.CONFIG.get(vnc_port);

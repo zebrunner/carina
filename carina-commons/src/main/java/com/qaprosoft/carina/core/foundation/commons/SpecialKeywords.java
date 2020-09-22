@@ -167,6 +167,12 @@ public class SpecialKeywords {
     public static final String APP_PACKAGE = "appPackage";
     public static final String BUNDLE_ID = "CFBundleIdentifier";
 
+    public static final String HUB_PROVIDER = "capabilities.provider";
+
+    // -------------- HUB PROVIDERS -------------------------------------
+    public static final String BROWSERSTACK = "browserstack";
+    public static final String ZEBRUNNER = "zebrunner";
+
 
     // ------------- STF PROPERTIES ---------------------------------
     public static final String STF_ENABLED = "STF_ENABLED";
