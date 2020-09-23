@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
 
+import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -28,7 +29,6 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
@@ -315,8 +315,8 @@ public class DriverListener implements WebDriverEventListener {
             
             // archive page source dump and screenshot both together
             FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
-            
-            Artifacts.add("UI Dump artifact", new File(dumpArtifact));
+
+            UploadUtil.uploadArtifact(new File(dumpArtifact), "UI Dump artifact");
         } else {
             LOGGER.debug("Dump file is empty.");
         }
