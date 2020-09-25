@@ -45,7 +45,7 @@
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!-- Testings -->
-        <testng.version>7.1.0</testng.version>
+        <testng.version>7.3.0</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <!-- Logging -->
         <log4j.version>1.2.17</log4j.version>
@@ -103,7 +103,7 @@
 	    <repository>
 	        <id>zebrunner_snapshots</id>
 	        <name>zebrunner Snapshots</name>
-	        <url>https://nexus.zebrunner.dev/repository/maven-snapshots/</url>
+	        <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
 	        <releases>
 	            <enabled>false</enabled>
 	        </releases>
@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>com.zebrunner</groupId>
                 <artifactId>agent-testng</artifactId>
-                <version>1.0.0.55-SNAPSHOT</version>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>

@@ -33,7 +33,7 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -175,7 +175,7 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
         String pdfName = "";
 
         // Define test screenshot root
-        String test = TestNamingListener.getTestName();
+        String test = TestNamingService.getTestName();
 
         File testRootDir = ReportContext.getTestDir();
         File artifactsFolder = ReportContext.getArtifactsFolder();
