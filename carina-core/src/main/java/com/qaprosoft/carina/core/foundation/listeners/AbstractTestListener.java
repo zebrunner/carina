@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -50,7 +49,6 @@ import com.zebrunner.agent.testng.listener.RetryService;
 
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
 
     private void startItem(ITestResult result, Messager messager) {
         String test = TestNamingListener.getTestName(result);
@@ -124,35 +122,24 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void beforeConfiguration(ITestResult result) {
         LOGGER.debug("AbstractTestListener->beforeConfiguration");
-        // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
         super.beforeConfiguration(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onConfigurationSuccess");
-        // passItem(result, Messager.CONFIG_PASSED);
         super.onConfigurationSuccess(result);
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onConfigurationSkip");
-        // skipItem(result, Messager.CONFIG_SKIPPED);
         super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onConfigurationFailure");
-        // failItem(result, Messager.CONFIG_FAILED);
-
-        String errorMessage = getFailureReason(result);
-
-        TestResultItem resultItem = createTestResult(result, TestResultType.FAIL, errorMessage,
-                result.getMethod().getDescription());
-        setConfigFailure(resultItem);
-
         super.onConfigurationFailure(result);
     }
 
@@ -206,6 +193,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         //TODO: do not write STARTED at message for retry! or move it into the DEBUG level!
         startItem(result, Messager.TEST_STARTED);
+        
+        super.onTestStart(result);
     }
     
     private void generateParameters(ITestResult result) {
@@ -238,7 +227,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         afterTest(result);
         super.onTestSuccess(result);
-        
     }
     
     @Override
@@ -269,14 +257,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             return;
         }
         
-        //TODO: improve zebrunner listener to detect extended skip reason like dependencies etc 
+        super.onTestSkipped(result);
     }
 
     @Override
     public void onFinish(ITestContext context) {
         LOGGER.debug("AbstractTestListener->onFinish(ITestContext context)");
         super.onFinish(context);
-        removeAlreadyPassedTests(context);
     }
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
@@ -333,28 +320,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             }
         }
         return stackTrace;
-    }
-
-    private TestResultItem getConfigFailure() {
-        return configFailures.get();
-    }
-
-    protected void setConfigFailure(TestResultItem resultItem) {
-        configFailures.set(resultItem);
-    }
-    
-    private void removeAlreadyPassedTests(ITestContext context) {
-        // Remove skipped tests which exception starts with "ALREADY_PASSED".
-        // It should make default TestNG reports cleaner
-        for (Iterator<ITestResult> iterator = context.getSkippedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-            
-            if (testResult.getThrowable().toString().startsWith("org.testng.SkipException: " + SpecialKeywords.ALREADY_PASSED)) {
-                LOGGER.debug("Removed skipped test from context: " + testResult.getName());
-                iterator.remove();
-            }
-        }
     }
     
     private IRetryAnalyzer getRetryAnalyzer(ITestResult result) {

@@ -31,20 +31,20 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Integer runCount = 0;
     private Integer maxCount = Configuration.getInt(Parameter.RETRY_COUNT);
-    
+
     @Override
     public boolean retry(ITestResult result) {
         runCount++;
-        LOGGER.debug("method: " + result.getMethod().getConstructorOrMethod().getName() + "; " +
-                "paramIndex: " + ((TestResult)result).getParameterIndex() + "; " +
+        LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) +
+                "method: " + result.getMethod().getConstructorOrMethod().getName() + "; " +
+                "paramIndex: " + ((TestResult) result).getParameterIndex() + "; " +
                 "runCount: " + runCount);
 
-        LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName() + "; Incremented retryCount: " + runCount);
+        LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName()
+                + "; Incremented retryCount: " + runCount);
         if (runCount <= maxCount && !Jira.isRetryDisabled(result)) {
             return true;
         }
-        //TODO: test if we can skip count reset
-        runCount = 0; //reset counter 
         return false;
     }
 }

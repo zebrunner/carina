@@ -27,7 +27,6 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.internal.IResultListener2;
-import org.testng.internal.TestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -253,11 +252,11 @@ public class TestNamingListener implements IResultListener2 {
     }
     
     private static String appendDataProviderLine(ITestResult testResult, String testName) {
-        if (testResult.getMethod().getParameterInvocationCount() > 1) {
+        if (testResult.getMethod().isDataDriven() && testResult.getMethod().getDataProviderMethod().getMethod().getModifiers() > 1) {
             // adding extra zero at the beginning of the data provider line number
-            int indexMaxLength = Integer.toString(testResult.getMethod().getParameterInvocationCount()).length() + 1;
+            int indexMaxLength = Integer.toString(testResult.getMethod().getDataProviderMethod().getMethod().getModifiers()).length() + 1;
             String lineFormat = " [L%0" + indexMaxLength + "d]";
-            int index = ((TestResult) testResult).getParameterIndex() + 1;
+            int index = testResult.getMethod().getParameterInvocationCount() + 1;
             testName += String.format(lineFormat, index);
         }
         return testName;
