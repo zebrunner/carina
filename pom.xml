@@ -103,7 +103,7 @@
 	    <repository>
 	        <id>zebrunner_snapshots</id>
 	        <name>zebrunner Snapshots</name>
-	        <url>https://nexus.zebrunner.dev/repository/maven-snapshots/</url>
+	        <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
 	        <releases>
 	            <enabled>false</enabled>
 	        </releases>
@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>com.zebrunner</groupId>
                 <artifactId>agent-testng</artifactId>
-                <version>1.0.0.55-SNAPSHOT</version>
+                <version>1.0.0.63-SNAPSHOT</version>
             </dependency>
 
             <dependency>

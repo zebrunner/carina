@@ -41,7 +41,7 @@ public class EmailReportItemCollector {
     }
 
     public static synchronized TestResultItem pull(ITestResult result) {
-        return testResultsMap.get(TestNamingListener.getTestName());
+        return testResultsMap.get(TestNamingListener.getTestName(result));
     }
 
     public static List<TestResultItem> getTestResults() {
