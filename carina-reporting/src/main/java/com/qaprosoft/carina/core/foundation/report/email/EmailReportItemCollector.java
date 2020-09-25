@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.foundation.report.email;
 import java.util.*;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 
 /**
@@ -41,7 +41,7 @@ public class EmailReportItemCollector {
     }
 
     public static synchronized TestResultItem pull(ITestResult result) {
-        return testResultsMap.get(TestNamingListener.getTestName(result));
+        return testResultsMap.get(TestNamingService.getTestName(result));
     }
 
     public static List<TestResultItem> getTestResults() {

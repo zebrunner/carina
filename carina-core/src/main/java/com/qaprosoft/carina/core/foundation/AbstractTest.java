@@ -29,7 +29,6 @@ import com.nordstrom.automation.testng.LinkedListeners;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -44,9 +43,9 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 // https://github.com/qaprosoft/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
 
-// on start order is TestNamingListener, TestRunListener and CarinaListener
-// on finish reverse order, i.e. CarinaListener, TestRunListener and TestNamingListener
-@LinkedListeners({ CarinaListener.class, TestRunListener.class, TestNamingListener.class })
+// on start order is TestRunListener and CarinaListener
+// on finish reverse order, i.e. CarinaListener, TestRunListener
+@LinkedListeners({ CarinaListener.class, TestRunListener.class })
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);

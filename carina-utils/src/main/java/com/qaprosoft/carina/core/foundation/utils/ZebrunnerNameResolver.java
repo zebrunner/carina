@@ -2,14 +2,14 @@ package com.qaprosoft.carina.core.foundation.utils;
 
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.zebrunner.agent.testng.core.testname.TestNameResolver;
 
 public class ZebrunnerNameResolver implements TestNameResolver {
 
     @Override
     public String resolve(ITestResult result) {
-        return TestNamingListener.getTestName(result);
+        return TestNamingService.getTestName(result);
     }
 
 }

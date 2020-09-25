@@ -51,13 +51,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private void startItem(ITestResult result, Messager messager) {
-        String test = TestNamingListener.getTestName(result);
+        String test = TestNamingService.getTestName(result);
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
-        String test = TestNamingListener.getTestName(result);
+        String test = TestNamingService.getTestName(result);
 
         String deviceName = getDeviceName();
 
@@ -70,7 +70,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failItem(ITestResult result, Messager messager) {
-        String test = TestNamingListener.getTestName(result);
+        String test = TestNamingService.getTestName(result);
 
         String errorMessage = getFailureReason(result);
         String deviceName = getDeviceName();
@@ -94,7 +94,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void skipTestItem(ITestResult result, Messager messager) {
-        String test = TestNamingListener.getTestName(result);
+        String test = TestNamingService.getTestName(result);
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
@@ -268,12 +268,12 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
-        String group = StringEscapeUtils.escapeHtml4(TestNamingListener.getPackageName(result));
+        String group = StringEscapeUtils.escapeHtml4(TestNamingService.getPackageName(result));
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
 
-        String test = StringEscapeUtils.escapeHtml4(TestNamingListener.getTestName(result));
+        String test = StringEscapeUtils.escapeHtml4(TestNamingService.getTestName(result));
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
