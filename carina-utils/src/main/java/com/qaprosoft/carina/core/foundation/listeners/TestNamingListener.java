@@ -99,7 +99,7 @@ public class TestNamingListener implements IResultListener2 {
      * @return String test name
      */    
     public static String getTestName() {
-        //TODO: think about returning very simple vaid name if nothing was specified yet! Need ITestResult arg for that!
+        // TODO: think about returning very simple valid name if nothing was specified yet! Need ITestResult arg for that!
         if (testName.get() == null) {
             throw new RuntimeException("Unable to detect full test name yet!");
         }
@@ -176,17 +176,20 @@ public class TestNamingListener implements IResultListener2 {
             }
         }
 
-        name = name + " - " + getMethodName(result);
-        LOGGER.debug("testName: " + name);
-        
-        // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
-        // getInvocationCount() value
-        int index = ((TestResult) result).getParameterIndex();
-        if (index > 0) {
-            // that's a dataprovider line index
-            index++; //to make correlation between line and index number
-            LOGGER.debug("test: " + name  + "; index: " + index);
-            name = name + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
+        String runnerClassName = result.getMethod().getConstructorOrMethod().getDeclaringClass().getSimpleName();
+        if (!SpecialKeywords.CUCUMBER_RUNNER_CLASS.equals(runnerClassName)) {
+            name = name + " - " + getMethodName(result);
+            LOGGER.debug("testName: " + name);
+
+            // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
+            // getInvocationCount() value
+            int index = ((TestResult) result).getParameterIndex();
+            if (index > 0) {
+                // that's a dataprovider line index
+                index++; // to make correlation between line and index number
+                LOGGER.debug("test: " + name + "; index: " + index);
+                name = name + String.format(SpecialKeywords.DAPAPROVIDER_INDEX, String.format("%04d", index));
+            }
         }
         
         ITestNGMethod[] methods = result.getTestContext().getAllTestMethods();
