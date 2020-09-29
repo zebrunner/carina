@@ -113,7 +113,8 @@ public class ThreadLogAppender extends AppenderSkeleton {
 
     private void ensureCapacity(int len) throws IOException {
         long newBytesWritten = this.bytesWritten + len;
-		long maxMegaBytes = Configuration.getLong(Parameter.MAX_LOG_FILE_SIZE) * 1024 * 1024;
+        long maxMegaBytes = Configuration.getLong(Parameter.MAX_LOG_FILE_SIZE) * 1024 * 1024;
+
         if (newBytesWritten > maxMegaBytes)
             throw new IOException("test Log file size exceeded core limit: " + newBytesWritten + " > " + maxMegaBytes);
         this.bytesWritten = newBytesWritten;
