@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /**
  * R - loads properties from resource files.
@@ -92,6 +93,14 @@ public enum R {
                     if (!StringUtils.isEmpty(systemValue)) {
                         properties.put(key, systemValue);
                     }
+                }
+                
+                // init R.CONFIG with default values for required fields
+                if (resource.resourceFile.equals("config.properties")) {
+                    properties.put(Parameter.ENV_ARG_RESOLVER.getKey(), "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver");
+                    properties.put(Parameter.PROJECT_REPORT_DIRECTORY.getKey(), "./reports/qa");
+                    properties.put(Parameter.MAX_LOG_FILE_SIZE.getKey(), "150");
+                    properties.put(Parameter.MAX_SCREENSHOOT_HISTORY.getKey(), "0");
                 }
 
                 if (resource.resourceFile.contains("config.properties")) {
@@ -245,7 +254,7 @@ public enum R {
 	public Properties getProperties() {
 		Properties globalProp = propertiesHolder.get(resourceFile);
 		// Glodal properties will be updated with test specific properties
-		if (!testProperties.get().isEmpty()) {
+		if (!getTestProperties().isEmpty()) {
 			Properties testProp = testProperties.get();
 			LOGGER.debug(String.format("CurrentTestOnly properties has [%s] entries.", testProp.size()));
 			LOGGER.debug(testProp.toString());

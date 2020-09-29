@@ -115,10 +115,6 @@ public class Configuration {
 
         REPORT_URL("report_url"),
 
-        EMAIL_LIST("email_list"),
-
-        FAILURE_EMAIL_LIST("failure_email_list"),
-
         TRACK_KNOWN_ISSUES("track_known_issues"),
 
         AUTO_SCREENSHOT("auto_screenshot"),
@@ -188,18 +184,6 @@ public class Configuration {
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
         
         FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
-
-        // TestRail
-        TESTRAIL_RUN_NAME("testrail_run_name"),
-
-        TESTRAIL_MILESTONE("testrail_milestone"),
-
-        TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
-
-        // qTest
-        QTEST_CYCLE_NAME("qtest_cycle_name"),
-
-        QTEST_SUITE_NAME("qtest_suite_name"),
 
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),

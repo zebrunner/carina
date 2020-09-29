@@ -340,9 +340,9 @@ public interface IDriverPool {
                     String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
                     StringBuilder tempStr = new StringBuilder();
                     LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
-                    logcatEntries.getAll().stream().forEach((k) -> tempStr.append(k.toString().concat("\n")));
+                    logcatEntries.getAll().forEach((k) -> tempStr.append(k.toString().concat("\n")));
                     
-                    if (tempStr == null || tempStr.length() == 0) {
+                    if (tempStr.length() == 0) {
                         //don't write something to file and don't register appropriate artifact
                         continue;
                     }

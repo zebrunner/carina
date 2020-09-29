@@ -19,7 +19,6 @@
     <!-- By default, the level of the root level is set to DEBUG -->
     <root level="info">
         <appender-ref ref="ConsoleAppender"/>
-        <appender-ref ref="FileAppender"/>
     </root>
 
 </configuration>

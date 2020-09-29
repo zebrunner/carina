@@ -1,8 +1,0 @@
-sonar.projectBaseDir=.
-sonar.projectName=carina-demo
-sonar.projectKey=carina-demo
-sonar.java.source=1.8
-sonar.sources=src
-sonar.java.binaries=target/classes
-sonar.java.test.binaries=target/test-classes
-sonar.junit.reportPaths=target/surefire-reports
