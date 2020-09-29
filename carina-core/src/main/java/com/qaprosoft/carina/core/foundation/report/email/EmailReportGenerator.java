@@ -356,7 +356,7 @@ public class EmailReportGenerator {
      */
     private boolean isCucumberReportFolderExists() {
         try {
-            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getArtifactsFolder(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
+            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getBaseDir(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
             if (reportOutputDirectory.exists() && reportOutputDirectory.isDirectory()) {
                 if (reportOutputDirectory.list().length > 0) {
                     LOGGER.debug("Cucumber Report Folder is not empty!");
