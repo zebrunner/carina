@@ -243,7 +243,7 @@ public enum R {
 	public Properties getProperties() {
 		Properties globalProp = propertiesHolder.get(resourceFile);
 		// Glodal properties will be updated with test specific properties
-		if (!testProperties.get().isEmpty()) {
+		if (!getTestProperties().isEmpty()) {
 			Properties testProp = testProperties.get();
 			LOGGER.debug(String.format("CurrentTestOnly properties has [%s] entries.", testProp.size()));
 			LOGGER.debug(testProp.toString());
