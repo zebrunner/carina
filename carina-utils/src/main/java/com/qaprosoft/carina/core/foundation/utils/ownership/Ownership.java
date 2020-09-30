@@ -16,86 +16,62 @@
 package com.qaprosoft.carina.core.foundation.utils.ownership;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.testng.ITestContext;
-import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.agent.core.registrar.maintainer.MaintainerResolver;
 
-public class Ownership {
-    private static final Logger LOGGER = Logger.getLogger(Ownership.class);
+public class Ownership implements MaintainerResolver {
 
-    private Ownership() {
-    }
-
-    public static String getMethodOwner(ITestResult result) {
-
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testMethodOwnerArgsMap = (Map<Object[], String>) result.getTestContext()
-                .getAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP);
-        if (testMethodOwnerArgsMap != null) {
-            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-            if (testMethodOwnerArgsMap.containsKey(testHash) && testMethodOwnerArgsMap.get(testHash) != null) {
-                return testMethodOwnerArgsMap.get(testHash);
-            }
-        }
-
+    @Override
+    public String resolve(Class<?> clazz, Method method) {
         // Get a handle to the class and method
-        Class<?> testClass;
         String owner = "";
-        try {
-            testClass = Class.forName(result.getMethod().getTestClass().getName());
-
-            // We can't use getMethod() because we may have parameterized tests
-            // for which we won't know the matching signature
-            String methodName = result.getMethod().getMethodName();
-            Method testMethod = null;
-            Method[] possibleMethods = testClass.getMethods();
-            for (Method possibleMethod : possibleMethods) {
-                if (possibleMethod.getName().equals(methodName)) {
-                    testMethod = possibleMethod;
-                    break;
-                }
+        // We can't use getMethod() because we may have parameterized tests
+        // for which we won't know the matching signature
+        String methodName = method.getName();
+        Method testMethod = null;
+        Method[] possibleMethods = clazz.getMethods();
+        for (Method possibleMethod : possibleMethods) {
+            if (possibleMethod.getName().equals(methodName)) {
+                testMethod = possibleMethod;
+                break;
             }
-            
-            // do a scan for single Methodowner annotation as well)
-            if (testMethod.isAnnotationPresent(MethodOwner.class)) {
-                MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-                owner = methodAnnotation.owner();
-            }
-            
-            // scan all MethodOwner annotations to find default ownership without any platform
-            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
-            	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
-                for (MethodOwner methodOwner : methodAnnotation.value()) {
-                    String actualPlatform = methodOwner.platform();
-                    if (actualPlatform.isEmpty()) {
-                    	owner = methodOwner.owner();
-                    	break;
-                    }            
-                }
-            }
-            
-            //do one more scan using platform ownership filter if any to override default owner value
-            if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
-            	MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
-                for (MethodOwner methodOwner : methodAnnotation.value()) {
-
-                    String actualPlatform = methodOwner.platform();
-                    String expectedPlatform = Configuration.getPlatform();
-                    
-                    if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
-                    	owner = methodOwner.owner();
-                    }               
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
         }
+        
+        // do a scan for single Methodowner annotation as well)
+        if (testMethod.isAnnotationPresent(MethodOwner.class)) {
+            MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
+            owner = methodAnnotation.owner();
+        }
+        
+        // scan all MethodOwner annotations to find default ownership without any platform
+        if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
+            MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
+            for (MethodOwner methodOwner : methodAnnotation.value()) {
+                String actualPlatform = methodOwner.platform();
+                if (actualPlatform.isEmpty()) {
+                    owner = methodOwner.owner();
+                    break;
+                }            
+            }
+        }
+        
+        //do one more scan using platform ownership filter if any to override default owner value
+        if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
+            MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
+            for (MethodOwner methodOwner : methodAnnotation.value()) {
+
+                String actualPlatform = methodOwner.platform();
+                String expectedPlatform = Configuration.getPlatform();
+                
+                if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
+                    owner = methodOwner.owner();
+                }               
+            }
+        }
+
         return owner;
     }
     
@@ -110,4 +86,5 @@ public class Ownership {
         }
         return owner;
     }
+
 }

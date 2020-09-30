@@ -16,13 +16,15 @@
 package com.qaprosoft.carina.core.foundation.report.email;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -38,7 +40,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  * @author Alex Khursevich
  */
 public class EmailReportGenerator {
-    private static final Logger LOGGER = Logger.getLogger(EmailReportGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static String CONTAINER = R.EMAIL.get("container");
     private static String PACKAGE_TR = R.EMAIL.get("package_tr");

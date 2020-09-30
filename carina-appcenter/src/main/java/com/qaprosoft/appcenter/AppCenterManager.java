@@ -18,16 +18,22 @@ package com.qaprosoft.appcenter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
@@ -38,15 +44,15 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 
 /**
  * Created by boyle on 8/16/17.
  */
 public class AppCenterManager {
-    private static final Logger LOGGER = Logger.getLogger(AppCenterManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     
     protected RestTemplate restTemplate;

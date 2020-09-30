@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
@@ -28,7 +30,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 
 public class ParameterGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(ParameterGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static Pattern GENERATE_UUID_PATTERN = Pattern.compile(SpecialKeywords.GENERATE_UUID);
     private static Pattern GENERATE_PATTERN = Pattern.compile(SpecialKeywords.GENERATE);

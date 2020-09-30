@@ -19,12 +19,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -80,7 +82,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
  */
 
 public class L10Nparser {
-    private static final Logger LOGGER = Logger.getLogger(L10Nparser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static Locale actualLocale;
 

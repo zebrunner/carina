@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -22,12 +23,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -38,20 +38,12 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
-import io.appium.java_client.android.AndroidStopScreenRecordingOptions;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
-import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -59,9 +51,7 @@ import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
-    private static final Logger LOGGER = Logger.getLogger(MobileFactory.class);
-
-    private final static String vnc_mobile = "vnc_mobile";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
@@ -101,7 +91,6 @@ public class MobileFactory extends AbstractFactory {
             if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
 
                 if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                    EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     
                     if (isVideoEnabled()) {
                         // Details about available parameters
@@ -133,73 +122,15 @@ public class MobileFactory extends AbstractFactory {
                                 LOGGER.error("Screen record bitrate value should be integer.", e);
                             }
                         }
-                        AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions();
-                        // .withUploadOptions(new ScreenRecordingUploadOptions()
-                        // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
-                        // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
-                        switch (getHubProvider()) {
-                        case SpecialKeywords.BROWSERSTACK:
-                            // TODO: https://github.com/qaprosoft/carina/issues/949  
-                            // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
-                            break;
-                        case SpecialKeywords.ZEBRUNNER:
-                            // Zebrunner will place video to separate unique folder, no need to generate new name
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                            ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
-                            break;
-                        default:
-                            ce.getListeners()
-                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;
-                        }
                     }
 
-                    driver = new AndroidDriver<AndroidElement>(ce, capabilities);
+                    driver = new AndroidDriver<AndroidElement>(capabilities);
 
                 } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                         || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
-                    EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-                    if (isVideoEnabled()) {
-                        // Details about available parameters
-                        // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
-                        IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
-                                .withVideoQuality(VideoQuality.valueOf(Configuration.get(Parameter.IOS_SCREEN_RECORDING_QUALITY)))
-                                .withVideoType(Configuration.get(Parameter.IOS_SCREEN_RECORDING_CODEC))
-                                .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
-
-                        String fpsSt = Configuration.get(Parameter.IOS_SCREEN_RECORDING_FPS);
-                        if (!fpsSt.isEmpty()) {
-                            try {
-                                int fps = Integer.parseInt(fpsSt);
-                                LOGGER.debug("Screen recording fps value will be set to : " + fps);
-                                o1.withFps(fps);
-                            } catch (Exception e) {
-                                LOGGER.error("Screen recording fps value should be integer between 1..60", e);
-                            }
-                        }
-
-                        if (!Configuration.get(Parameter.VIDEO_SCALE).isEmpty()) {
-                            LOGGER.debug("Video scale option will be set to " + Configuration.get(Parameter.VIDEO_SCALE));
-                            o1.withVideoScale(Configuration.get(Parameter.VIDEO_SCALE));
-                        }
-
-                        IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
-
-                        switch (getHubProvider()) {
-                        case SpecialKeywords.ZEBRUNNER:
-                            LOGGER.info("Video recording is not supported in Zebrunner for iOS");
-                            break;
-                        default:
-                            ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;
-                        }
-                    }
-
-                    driver = new IOSDriver<IOSElement>(ce, capabilities);
+                    driver = new IOSDriver<IOSElement>(capabilities);
 
                 } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                     // that's a case for custom mobile capabilities like browserstack or saucelabs
@@ -319,59 +250,6 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.error("Unable to get device info!", e);
         }
         return remoteDevice;
-    }
-
-    @Override
-    public String getVncURL(WebDriver driver) {
-        String vncURL = null;
-
-        if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
-            final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-
-            switch (getHubProvider()) {
-            default:
-                RemoteDevice rd = getDeviceInfo(rwd);
-                if (rd != null && !StringUtils.isEmpty(rd.getVnc())) {
-                    if (rd.getVnc().matches(".+:\\d+")) {
-                        // host:port format
-                        final String protocol = R.CONFIG.get(vnc_protocol);
-                        final String host = rd.getVnc().split(":")[0];
-                        final String port = rd.getVnc().split(":")[1];
-                        vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port);
-                    } else {
-                        // ws://host:port/websockify format
-                        vncURL = rd.getVnc();
-                    }
-                }
-                break;
-            case SpecialKeywords.ZEBRUNNER:
-                String protocol = R.CONFIG.get(vnc_protocol);
-                String host = R.CONFIG.get(vnc_host);
-                String port = R.CONFIG.get(vnc_port);
-                // If VNC host/port not set user them from Selenium
-                if (StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
-                    host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-                    port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
-                }
-                vncURL = String.format(R.CONFIG.get(vnc_mobile), protocol, host, port, rwd.getSessionId().toString());
-                break;
-            }
-        }
-        return vncURL;
-    }
-
-    @Override
-    protected int getBitrate(VideoQuality quality) {
-        switch (quality) {
-        case LOW:
-            return 250000;
-        case MEDIUM:
-            return 500000;
-        case HIGH:
-            return 1000000;
-        default:
-            return 1;
-        }
     }
 
     /**

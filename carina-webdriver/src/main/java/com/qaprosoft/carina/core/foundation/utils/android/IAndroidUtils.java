@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -28,13 +29,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -61,7 +63,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
     // TODO: review carefully and remove duplicates and migrate completely to fluent
     // waits
-    static final Logger UTILS_LOGGER = Logger.getLogger(IAndroidUtils.class);
+    static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;

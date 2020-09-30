@@ -16,12 +16,18 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -36,7 +42,7 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvi
  */
 public class DataProviderFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(DataProviderFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private DataProviderFactory() {
     }
@@ -97,7 +103,6 @@ public class DataProviderFactory {
         }
 
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
-        context.setAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP, testMethodOwnerArgsMap);
         context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
         context.setAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP, testRailsArgsMap);
 

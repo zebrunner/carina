@@ -20,13 +20,15 @@ import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT
 import static com.qaprosoft.carina.core.foundation.api.http.Headers.XML_CONTENT_TYPE;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
@@ -42,7 +44,7 @@ import io.restassured.response.Response;
 
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
-    protected static final Logger LOGGER = Logger.getLogger(AbstractApiMethodV2.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     private Properties properties;
     private String rqPath;
@@ -109,20 +111,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void setResponseTemplate(String path) {
         this.rsPath = path;
-    }
-
-    @Override
-    @Deprecated
-    public String call() {
-        if (rqPath != null) {
-            TemplateMessage tm = new TemplateMessage();
-            tm.setTemplatePath(rqPath);
-            tm.setPropertiesStorage(properties);
-            setBodyContent(tm.getMessageText());
-        }
-        String rs = super.call();
-        actualRsBody = rs;
-        return rs;
     }
 
     @Override
@@ -238,22 +226,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
-    }
-
-    /**
-     * This method is deprecated now. Please use {@link #validateResponseAgainstSchema(String)} method instead
-     * 
-     * @param schemaPath Path to schema file in resources
-     */
-    @Deprecated
-    public void validateResponseAgainstJSONSchema(String schemaPath) {
-        if (actualRsBody == null) {
-            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
-        }
-        TemplateMessage tm = new TemplateMessage();
-        tm.setTemplatePath(schemaPath);
-        String schema = tm.getMessageText();
-        JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
     }
 
     /**

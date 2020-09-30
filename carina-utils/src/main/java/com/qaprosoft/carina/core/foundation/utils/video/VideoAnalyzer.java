@@ -1,9 +1,13 @@
 package com.qaprosoft.carina.core.foundation.utils.video;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+//TODO: verify if it still needed
 public class VideoAnalyzer {
-    private static final Logger LOGGER = Logger.getLogger(VideoAnalyzer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ThreadLocal<Boolean> uploadVideo = new ThreadLocal<Boolean>();
 

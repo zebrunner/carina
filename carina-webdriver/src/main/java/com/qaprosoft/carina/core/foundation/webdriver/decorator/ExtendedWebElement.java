@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -24,13 +25,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -60,6 +59,8 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -81,7 +82,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
 public class ExtendedWebElement {
-    private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -1091,24 +1092,6 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
-    /**
-     * @deprecated As of release 6.x, replaced by {@link #click()}. Can be used only for Web where JavascriptExecutor is supported.
-     * 
-     * @param x
-     * 			double x
-     * @param y
-     * 			double y
-     */
-    @Deprecated
-    public void tapWithCoordinates(double x, double y) {
-        HashMap<String, Double> tapObject = new HashMap<String, Double>();
-        tapObject.put("x", x);
-        tapObject.put("y", y);
-        final WebDriver drv = getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) drv;
-        js.executeScript("mobile: tap", tapObject);
-    }
-    
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
         	//TODO: investigate maybe searchContext better to use here!

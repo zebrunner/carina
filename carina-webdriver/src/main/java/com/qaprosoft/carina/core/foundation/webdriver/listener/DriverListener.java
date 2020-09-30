@@ -16,25 +16,23 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 
-import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
-import org.testng.ITestResult;
-import org.testng.Reporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
-import com.qaprosoft.zafira.models.dto.TestArtifactType;
+import com.zebrunner.agent.core.registrar.Artifact;
 
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
@@ -43,17 +41,13 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DriverListener implements WebDriverEventListener {
-    private static final Logger LOGGER = Logger.getLogger(DriverListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
 	// 1. register live vnc url in DriverFactory (method streamVNC should return valid TestArtifactType
 	// 2. DriverFactory->getEventListeners(TestArtifactType vncArtifact)
 	// 3. declare vncArtifact using constructor in DriverListener
 	// 4. onBefore any action try to register vncArtifact in Zafira. Detailed use-cases find in onBeforeAction method 
-	protected TestArtifactType vncArtifact;
-	
-	public DriverListener(TestArtifactType vncArtifact) {
-		this.vncArtifact = vncArtifact;
-	}
+
 	
     private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
     private final static ThreadLocal<String> currentNegativeMessage = new ThreadLocal<String>();
@@ -315,8 +309,8 @@ public class DriverListener implements WebDriverEventListener {
             
             // archive page source dump and screenshot both together
             FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
-
-            UploadUtil.uploadArtifact(new File(dumpArtifact), "UI Dump artifact");
+            
+            Artifact.upload(new File(dumpArtifact), "UI Dump artifact");
         } else {
             LOGGER.debug("Dump file is empty.");
         }
@@ -331,7 +325,8 @@ public class DriverListener implements WebDriverEventListener {
 		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
 		// driver across different tests
 
-		ITestResult res = Reporter.getCurrentTestResult();
+	    LOGGER.error("TODO: move vncArtifact registration to zebrunner testng agent!");
+/*		ITestResult res = Reporter.getCurrentTestResult();
 		if (res != null && res.getAttribute("ztid") != null) {
 			Long ztid = (Long) res.getAttribute("ztid");
 			if (ztid != vncArtifact.getTestId() && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
@@ -340,7 +335,7 @@ public class DriverListener implements WebDriverEventListener {
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);
 			}
 
-		}
+		}*/
 	}
 
     public static String getMessage(boolean errorMessage) {

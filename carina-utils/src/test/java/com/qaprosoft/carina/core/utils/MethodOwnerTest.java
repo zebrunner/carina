@@ -40,7 +40,7 @@ public class MethodOwnerTest {
     @MethodOwner(owner = IOS_OWNER, platform = SpecialKeywords.IOS)
     public void testDefaultMethodOwner() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String ownerName = Ownership.getMethodOwner(result);
+        String ownerName = new Ownership().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
         Assert.assertEquals(ownerName, DEFAULT_OWNER);
     }
     
@@ -51,7 +51,7 @@ public class MethodOwnerTest {
     public void testAndroidMethodOwner() {
     	R.CONFIG.put(SpecialKeywords.PLATFORM, "android");
         ITestResult result = Reporter.getCurrentTestResult();
-        String ownerName = Ownership.getMethodOwner(result);
+        String ownerName = new Ownership().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
         Assert.assertEquals(ownerName, ANDROID_OWNER);
     }
     
@@ -62,7 +62,7 @@ public class MethodOwnerTest {
     public void testIOSMethodOwner() {
     	R.CONFIG.put(SpecialKeywords.PLATFORM, "ios");
         ITestResult result = Reporter.getCurrentTestResult();
-        String ownerName = Ownership.getMethodOwner(result);
+        String ownerName = new Ownership().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
         Assert.assertEquals(ownerName, IOS_OWNER);
     }
 }

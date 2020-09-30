@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,8 +26,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,12 +76,16 @@ import com.qaprosoft.carina.core.foundation.utils.DateUtils;
 import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
+import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
+import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
+import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
@@ -92,9 +95,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.qaprosoft.zafira.client.ZafiraSingleton;
-import com.qaprosoft.zafira.listener.ZafiraEventRegistrar;
-import com.qaprosoft.zafira.models.dto.TestRunType;
+import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
+import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
+import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
  * CarinaListener - base carin-core TestNG Listener.
@@ -102,7 +105,7 @@ import com.qaprosoft.zafira.models.dto.TestRunType;
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener {
-    private static final Logger LOGGER = Logger.getLogger(CarinaListener.class);
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -146,6 +149,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Screenshot.addScreenshotRule(autoScreenshotsRule);
             
             updateAppPath();
+            
+            TestNameResolverRegistry.set(new ZebrunnerNameResolver());
+            // first means that ownership/maintainer resolver from carina has higher priority
+            ChainedMaintainerResolver.addFirst(new Ownership());
+            CompositeLabelResolver.addResolver(new TagManager());
+            CompositeLabelResolver.addResolver(new PriorityManager());
 
         } catch (Exception e) {
             LOGGER.error("Undefined failure during static carina listener init!", e);
@@ -546,21 +555,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                         reportLinks);
             }
         }
-    }
-
-    /**
-     * Redefine Jira tickets from test.
-     *
-     * @param tickets
-     *            to set
-     */
-    @Deprecated
-    protected void setJiraTicket(String... tickets) {
-        List<String> jiraTickets = new ArrayList<String>();
-        for (String ticket : tickets) {
-            jiraTickets.add(ticket);
-        }
-        Jira.setTickets(jiraTickets);
     }
 
     protected void putS3Artifact(String key, String path) {
@@ -981,21 +975,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         private void quitAllDriversOnHook() {
-            // #810 add zafira testrun abort as part of shutdown hook
-            if (ZafiraSingleton.INSTANCE.isRunning()) {
-                LOGGER.debug("Zafira test run is still in progress. trying to abort...");
-                try {
-                    Optional<TestRunType> testRun = ZafiraEventRegistrar.getTestRun();
-                    if (testRun != null) {
-                        LOGGER.debug("detected testrun id to abort: " + testRun.get().getId());
-                        ZafiraSingleton.INSTANCE.getClient().abortTestRun(testRun.get().getId());
-                        LOGGER.debug("aborted testrun");
-                    }
-                } catch (NoSuchElementException e) {
-                    LOGGER.debug("No Zafira testrun detected.");
-                }
-            }
-
             // as it is shutdown hook just try to quit all existing drivers one by one
             for (CarinaDriver carinaDriver : driversPool) {
                 // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks

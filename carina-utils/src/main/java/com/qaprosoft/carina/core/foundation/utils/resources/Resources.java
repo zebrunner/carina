@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -24,11 +25,12 @@ import java.security.CodeSource;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Resources {
 
-    private static final Logger LOGGER = Logger.getLogger(Resources.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static void collectURL(ResourceURLFilter f, Set<URL> s, URL u) {
         if (f == null || f.accept(u)) {

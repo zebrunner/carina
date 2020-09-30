@@ -16,12 +16,12 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -32,12 +32,14 @@ import org.apache.poi.xssf.model.ExternalLinksTable;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class XLSParser extends AbstractXLSParser {
-    private static final Logger LOGGER = Logger.getLogger(XLSParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static DataFormatter df;
     private static FormulaEvaluator evaluator;
 

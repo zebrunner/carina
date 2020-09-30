@@ -18,9 +18,11 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +30,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
@@ -39,6 +39,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
@@ -63,7 +65,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
  * @author Alex Khursevich
  */
 public class Screenshot {
-    private static final Logger LOGGER = Logger.getLogger(Screenshot.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
     
@@ -240,9 +242,7 @@ public class Screenshot {
             ImageIO.write(screen, "PNG", screenshot);
 
             // Uploading screenshot to Amazon S3
-            Long capturedAt = Instant.now().toEpochMilli();
-            UploadUtil.uploadScreenshot(screenshot, comment, capturedAt, artifact);
-
+            com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
             // add screenshot comment to collector
             ReportContext.addScreenshotComment(screenName, comment);
             return screen;
@@ -394,8 +394,7 @@ public class Screenshot {
 
                 ImageIO.write(screen, "PNG", screenshot);
 
-                Long capturedAt = Instant.now().toEpochMilli();
-                UploadUtil.uploadScreenshot(screenshot, comment, capturedAt, false);
+                com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -611,8 +610,7 @@ public class Screenshot {
                 ImageIO.write(screen, "PNG", screenshot);
 
                 // Uploading comparative screenshot to Amazon S3
-                Long capturedAt = Instant.now().toEpochMilli();
-                UploadUtil.uploadScreenshot(screenshot, comment, capturedAt, artifact);
+                com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");

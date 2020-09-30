@@ -15,18 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
-public class TZChangerPage extends MobileAbstractPage implements IMobileUtils {
+public class TZChangerPage extends MobileAbstractPage {
 
-    private static final Logger LOGGER = Logger.getLogger(TZChangerPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FindBy(id = "com.futurek.android.tzc:id/txt_selected")
     protected ExtendedWebElement title;
@@ -71,13 +73,13 @@ public class TZChangerPage extends MobileAbstractPage implements IMobileUtils {
         if (scrollableContainer.isElementPresent(SHORT_TIMEOUT)) {
             LOGGER.info("Scrollable container present.");
             boolean scrolled = swipe(
-            		tzSelectionBase.format(tz),
+                    tzSelectionBase.format(tz),
                     scrollableContainer, defaultSwipeTime);
             if (!scrolled) {
                 LOGGER.info("Probably we have long list. Let's increase swipe attempts.");
                 defaultSwipeTime = 50;
                 scrolled = swipe(
-                		tzSelectionBase.format(tz),
+                        tzSelectionBase.format(tz),
                         scrollableContainer, defaultSwipeTime);
             }
             if (scrolled) {
@@ -87,7 +89,7 @@ public class TZChangerPage extends MobileAbstractPage implements IMobileUtils {
 
                 LOGGER.info("Searching for " + timezone);
                 scrolled = swipe(
-                		tzSelectionBase.format(timezone),
+                        tzSelectionBase.format(timezone),
                         scrollableContainer, defaultSwipeTime);
                 if (scrolled) {
 
@@ -98,7 +100,7 @@ public class TZChangerPage extends MobileAbstractPage implements IMobileUtils {
                     LOGGER.error("Did not find timezone by timezone text: " + timezone);
                     defaultSwipeTime = 30;
                     scrolled = swipe(
-                    		tzSelectionBase.format(timezone),
+                            tzSelectionBase.format(timezone),
                             scrollableContainer, defaultSwipeTime);
                     if (scrolled) {
                         LOGGER.info("Select timezone: " + timezone);

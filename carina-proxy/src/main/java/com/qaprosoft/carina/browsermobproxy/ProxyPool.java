@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -32,7 +34,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 
 public final class ProxyPool {
-    private static final Logger LOGGER = Logger.getLogger(ProxyPool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static ConcurrentHashMap<Long, Integer> proxyPortsByThread = new ConcurrentHashMap<Long, Integer>();
     
     /**

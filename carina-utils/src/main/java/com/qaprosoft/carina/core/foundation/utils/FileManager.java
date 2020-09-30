@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +28,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileManager {
 
-    private static final Logger LOGGER = Logger.getLogger(FileManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void removeDirRecurs(String directory) {
         File dir = new File(directory);

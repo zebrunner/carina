@@ -1,9 +1,13 @@
 package com.qaprosoft.carina.core.foundation.filter;
 
+import java.lang.invoke.MethodHandles;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.qaprosoft.carina.core.foundation.filter.impl.OwnerFilter;
 import com.qaprosoft.carina.core.foundation.filter.impl.PriorityFilter;
 import com.qaprosoft.carina.core.foundation.filter.impl.TagFilter;
-import org.apache.log4j.Logger;
 /**
  * Enum to store rules (name and implementation of the rule)
  *
@@ -14,7 +18,7 @@ public enum Filter {
     OWNER("OWNER", new OwnerFilter()),
     TAGS("TAGS", new TagFilter());
 
-    private static final Logger LOGGER = Logger.getLogger(Filter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private String ruleName;
 

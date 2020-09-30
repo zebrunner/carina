@@ -15,19 +15,24 @@
  *******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import org.apache.log4j.Logger;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyStore;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+
 public class LocalTrustStoreBuilder {
-    private static final Logger LOGGER = Logger.getLogger(LocalTrustStoreBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String TC_CONF_DIR_PATH = "keysecure/";
 

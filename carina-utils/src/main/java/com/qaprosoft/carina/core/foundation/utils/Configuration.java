@@ -15,14 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
@@ -33,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  *         hursevich@gmail.com
  */
 public class Configuration {
-    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static IEnvArgResolver envArgResolver;
 
     static {
@@ -114,10 +115,6 @@ public class Configuration {
 
         REPORT_URL("report_url"),
 
-        EMAIL_LIST("email_list"),
-
-        FAILURE_EMAIL_LIST("failure_email_list"),
-
         TRACK_KNOWN_ISSUES("track_known_issues"),
 
         AUTO_SCREENSHOT("auto_screenshot"),
@@ -187,18 +184,6 @@ public class Configuration {
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
         
         FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
-
-        // TestRail
-        TESTRAIL_RUN_NAME("testrail_run_name"),
-
-        TESTRAIL_MILESTONE("testrail_milestone"),
-
-        TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
-
-        // qTest
-        QTEST_CYCLE_NAME("qtest_cycle_name"),
-
-        QTEST_SUITE_NAME("qtest_suite_name"),
 
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
@@ -303,19 +288,6 @@ public class Configuration {
 
     public static boolean getBoolean(Parameter param) {
         return Boolean.valueOf(get(param).trim());
-    }
-
-    @Deprecated
-    public static Locale getLocale() {
-        Locale locale = null;
-        if (!StringUtils.isEmpty(get(Parameter.LOCALE))) {
-            if (Configuration.get(Parameter.LOCALE).contains("_")) {
-                locale = new Locale(get(Parameter.LOCALE).split("_")[0], get(Parameter.LOCALE).split("_")[1]);
-            } else {
-                locale = new Locale("", get(Parameter.LOCALE));
-            }
-        }
-        return locale;
     }
 
     public static String asString() {

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.qtest;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
@@ -31,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 
 public interface IQTestManager extends ITestCases {
-    static final Logger QTEST_LOGGER = Logger.getLogger(IQTestManager.class);
+    static final Logger QTEST_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @SuppressWarnings("unlikely-arg-type")
     default Set<String> getQTestCasesUuid(ITestResult result) {

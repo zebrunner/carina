@@ -1,13 +1,17 @@
 package com.qaprosoft.carina.core.foundation.utils.appletv;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+
 import org.openqa.selenium.JavascriptExecutor;
 
 import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
 public interface IRemoteControllerAppleTV extends IDriverPool {
-	static final Logger RC_LOGGER = Logger.getLogger(IRemoteControllerAppleTV.class);
+	static final Logger RC_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	/**
 	 * Click the button as on the remote control

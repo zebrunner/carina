@@ -15,22 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -43,15 +43,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
-
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 public class DesktopFactory extends AbstractFactory {
-    private static final Logger LOGGER = Logger.getLogger(DesktopFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static DesiredCapabilities staticCapabilities;
 
@@ -72,36 +66,11 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         try {
-
-            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-
-            if (isVideoEnabled()) {
-                capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-                // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
-                switch (getHubProvider()) {
-                case SpecialKeywords.BROWSERSTACK:
-                    // TODO: https://github.com/qaprosoft/carina/issues/949  
-                    // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
-                    break;
-                case SpecialKeywords.ZEBRUNNER:
-                    // Zebrunner will place video to separate unique folder, no need to generate new name
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
-                    break;
-                default:
-                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
-                    capabilities.setCapability("videoName", videoName); //required capability for selenoid
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
-                    break;
-                }
-            }
-
-            driver = new RemoteWebDriver(ce, capabilities);
-
-            resizeBrowserWindow(driver, capabilities);
+            driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Unable to create desktop driver", e);
+            throw new RuntimeException("Malformed selenium URL!", e);
         }
+        resizeBrowserWindow(driver, capabilities);
 
         R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
         return driver;
@@ -133,39 +102,6 @@ public class DesktopFactory extends AbstractFactory {
             staticCapabilities = new DesiredCapabilities();
         }
         staticCapabilities.setCapability(name, value);
-    }
-
-    @Override
-    public String getVncURL(WebDriver driver) {
-        String vncURL = null;
-        if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
-            // TODO: resolve negative case when VNC is not supported
-            final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-            String protocol = R.CONFIG.get(vnc_protocol);
-            String host = R.CONFIG.get(vnc_host);
-            String port = R.CONFIG.get(vnc_port);
-            // If VNC host/port not set user them from Selenium
-            if (StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
-                host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-                port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
-            }
-            vncURL = String.format(R.CONFIG.get("vnc_desktop"), protocol, host, port, rwd.getSessionId().toString());
-        }
-        return vncURL;
-    }
-
-    @Override
-    protected int getBitrate(VideoQuality quality) {
-        switch (quality) {
-        case LOW:
-            return 6;
-        case MEDIUM:
-            return 12;
-        case HIGH:
-            return 24;
-        default:
-            return 1;
-        }
     }
 
     @SuppressWarnings("deprecation")
