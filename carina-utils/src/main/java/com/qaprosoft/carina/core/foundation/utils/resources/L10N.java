@@ -64,7 +64,7 @@ public class L10N {
             for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
                 public @Override boolean accept(URL u) {
                     String s = u.getPath();
-                    boolean contains = s.contains(SpecialKeywords.L10N);
+                    boolean contains = s.contains(SpecialKeywords.L10N.toLowerCase());
                     if (contains) {
                         LOGGER.debug("L10N: file URL: " + u);
                     }
@@ -85,8 +85,7 @@ public class L10N {
                     continue;
                 }
 
-                if (fileName.lastIndexOf('_') == fileName.length() - 3
-                        || fileName.lastIndexOf('_') == fileName.length() - 5) {
+                if (isLocalizedResource(fileName)) {
                     LOGGER.debug(String
                             .format("'%s' resource IGNORED as it looks like localized resource!",
                                     fileName));
@@ -96,7 +95,7 @@ public class L10N {
                  * convert "file: <REPO>\target\classes\L10N\messages.properties" to "L10N.messages"
                  */
                 String filePath = FilenameUtils.getPath(u.getPath());
-                int index = filePath.indexOf(SpecialKeywords.L10N);
+                int index = filePath.indexOf(SpecialKeywords.L10N.toLowerCase());
 
                 if (index == -1) {
                     LOGGER.warn("Unable to find L10N pattern for " + u.getPath() + " resource!");
@@ -104,7 +103,7 @@ public class L10N {
                 }
 
                 String resource = filePath.substring(
-                        filePath.indexOf(SpecialKeywords.L10N))
+                        filePath.indexOf(SpecialKeywords.L10N.toLowerCase()))
                         .replaceAll("/", ".")
                         + fileName;
 
@@ -132,6 +131,43 @@ public class L10N {
             // #910 starting from java 9 "Base ClassLoader No Longer from URLClassLoader"
             LOGGER.error("Unable to use L10N resources yet using Java 9+!");
         }
+    }
+
+    private static boolean isLocalizedResource(String fileName) {
+        if (fileName.lastIndexOf("_") == fileName.length() - 3) {
+            String countryCode = fileName.substring(fileName.length() - 2);
+            if (countryCode.equals(countryCode.toUpperCase())) {
+                boolean isCountryCode = false;
+                for (String code : Locale.getISOCountries()) {
+                    if (countryCode.equals(code)) {
+                        // Filename contains country code
+                        isCountryCode = true;
+                        break;
+                    }
+                }
+                if (isCountryCode) {
+                    String fileNameWithoutCountryCode = fileName.substring(0, fileName.length() - 3);
+                    if (fileNameWithoutCountryCode.lastIndexOf("_") == fileNameWithoutCountryCode.length() - 3) {
+                        String languageCode = fileNameWithoutCountryCode.substring(fileNameWithoutCountryCode.length() - 2);
+                        for (String code : Locale.getISOLanguages()) {
+                            if (languageCode.equals(code)) {
+                                LOGGER.debug("File " + fileName + " contains language and country codes!");
+                                return true;
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (String code : Locale.getISOLanguages()) {
+                    if (countryCode.equals(code)) {
+                        LOGGER.debug("File " + fileName + " contains language code!");
+                        return true;
+                    }
+                }
+            }
+        }
+        LOGGER.debug("File " + fileName + " is not localized resource!");
+        return false;
     }
 
     /**
@@ -186,7 +222,6 @@ public class L10N {
 						LOGGER.debug("Error: ", er);
 					}
 				}
-				
                 LOGGER.debug("Looking for value for locale:'"
                         + locale.toString()
                         + "' current iteration locale is: '"
