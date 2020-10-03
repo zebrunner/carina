@@ -164,22 +164,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onStart(ISuite suite) {
         LOGGER.debug("CarinaListener->onStart(ISuite suite)");
-        // register programmatically carina based BeforeSuite/BeforeClass and
-        // BeforeMethod to execute those configuration part obligatory
-        /*
-         * XmlTest xmlTest = new XmlTest(suite.getXmlSuite());
-         * xmlTest.setName("Sample Test");
-         * 
-         * // Create a list which can contain the classes that you want to run.
-         * List<XmlClass> myClasses = new ArrayList<XmlClass>();
-         * myClasses.add(new
-         * XmlClass("com.qaprosoft.carina.core.foundation.AbstractTest"));
-         * 
-         * // Assign that to the XmlTest Object created earlier.
-         * xmlTest.setXmlClasses(myClasses);
-         * 
-         * suite.getXmlSuite().addTest(xmlTest);
-         */
 
         List<String> coreLogPackages = new ArrayList<String>(
                 Arrays.asList(Configuration.get(Parameter.CORE_LOG_PACKAGES).split(",")));
