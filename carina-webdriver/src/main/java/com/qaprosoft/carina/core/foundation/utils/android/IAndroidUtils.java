@@ -199,8 +199,6 @@ public interface IAndroidUtils extends IMobileUtils {
     default public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
         boolean status = false;
 
-        String initLanguage = language;
-
         String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
 
         UTILS_LOGGER.info("Do not concat language for Android. Keep: " + language);
@@ -241,22 +239,7 @@ public interface IAndroidUtils extends IMobileUtils {
             CommonUtils.pause(waitTime);
         }
 
-        if (changeConfig) {
-            String loc;
-            String lang;
-            if (initLanguage.contains("_")) {
-                lang = initLanguage.split("_")[0];
-                loc = initLanguage.split("_")[1];
-            } else {
-                lang = initLanguage;
-                loc = initLanguage;
-            }
-            // [VD] never override global locale or language properties if you changed just one device locale
-//            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
-//            R.CONFIG.put("locale", loc);
-//            R.CONFIG.put("language", lang);
-        }
-
+     // [VD] never override global locale or language properties using R.CONFIG!
         actualDeviceLanguage = getDeviceLanguage();
         UTILS_LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
         if (language.contains(actualDeviceLanguage.toLowerCase())
@@ -1128,7 +1111,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default boolean isCarrierConnectionAvailable(){
         AndroidService androidService = AndroidService.getInstance();
-        boolean status = ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled();
+        boolean status = ((AndroidDriver<?>)this.castDriver()).getConnection().isDataEnabled();
         boolean linkProperties = false;
 
         String linkProp = androidService.executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
@@ -1138,7 +1121,7 @@ public interface IAndroidUtils extends IMobileUtils {
         }
         UTILS_LOGGER.info("STATUS ENABLED: " + status);
         UTILS_LOGGER.info("CARRIER AVAILABLE: " + linkProperties);
-        return ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled() && linkProperties;
+        return ((AndroidDriver<?>)this.castDriver()).getConnection().isDataEnabled() && linkProperties;
     }
 
     /**
