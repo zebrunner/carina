@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 public class VideoAnalyzer {
     private static final Logger LOGGER = Logger.getLogger(VideoAnalyzer.class);
 
-    private static ThreadLocal<Boolean> uploadVideo = new ThreadLocal<Boolean>();
+    private static final ThreadLocal<Boolean> uploadVideo = ThreadLocal.withInitial(() -> false);
 
     public static void disableVideoUpload() {
         uploadVideo.set(Boolean.FALSE);
