@@ -687,12 +687,9 @@ public interface IDriverPool {
     public static Device getDefaultDevice() {
         long threadId = Thread.currentThread().getId();
         Device device = currentDevice.get();
-        if (device == null) {
-            POOL_LOGGER.debug("Current device is null for thread: " + threadId);
+        if (device == null || device.getName().isEmpty()) {
             device = nullDevice;
-        } else if (device.getName().isEmpty()) {
-            POOL_LOGGER.debug("Current device name is empty! nullDevice was used for thread: " + threadId);
-        } else {
+        } else if (!device.getName().isEmpty()) {
             POOL_LOGGER.debug("Current device name is '" + device.getName() + "' for thread: " + threadId);
         }
         return device;
