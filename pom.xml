@@ -65,7 +65,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.3.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>4.0.71-SNAPSHOT</zafira-client.version>
+        <agent-testng-pluggable.version>1.0.0.95-SNAPSHOT</agent-testng-pluggable.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
@@ -421,8 +421,8 @@
                  Define version as property, and refer to the versionPropertyName in <version> tag -->
             <dependency>
                 <groupId>com.zebrunner</groupId>
-                <artifactId>agent-testng</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <artifactId>agent-testng-pluggable</artifactId>
+                <version>${agent-testng-pluggable.version}</version>
             </dependency>
 
             <dependency>
