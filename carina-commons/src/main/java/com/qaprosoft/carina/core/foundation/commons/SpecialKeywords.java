@@ -201,7 +201,6 @@ public class SpecialKeywords {
     public static final int DEFAULT_SE_WIDTH= 320;
     
     // ------------- Cucumber configuration  ---------------
-    public static final String CUCUMBER_RUNNER_CLASS = "CucumberRunner";
     public static final String CUCUMBER_REPORT_FOLDER = "cucumber-reports";
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
     public static final String CUCUMBER_REPORT_FILE_NAME = "overview-features.html";
