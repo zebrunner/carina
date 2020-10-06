@@ -45,19 +45,20 @@ import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
 import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.zebrunner.agent.testng.core.retry.RetryAnalyzerInterceptor;
+import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 import com.zebrunner.agent.testng.listener.RetryService;
 
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private void startItem(ITestResult result, Messager messager) {
-        String test = TestNamingService.getTestName(result);
+        String test = TestNameResolverRegistry.get().resolve(result);
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
-        String test = TestNamingService.getTestName(result);
+        String test = TestNameResolverRegistry.get().resolve(result);
 
         String deviceName = getDeviceName();
 
@@ -70,7 +71,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failItem(ITestResult result, Messager messager) {
-        String test = TestNamingService.getTestName(result);
+        String test = TestNameResolverRegistry.get().resolve(result);
 
         String errorMessage = getFailureReason(result);
         String deviceName = getDeviceName();
@@ -94,7 +95,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void skipTestItem(ITestResult result, Messager messager) {
-        String test = TestNamingService.getTestName(result);
+        String test = TestNameResolverRegistry.get().resolve(result);
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
@@ -273,7 +274,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
 
-        String test = StringEscapeUtils.escapeHtml4(TestNamingService.getTestName(result));
+        String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
         TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
         testResultItem.setDescription(description);
         // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
