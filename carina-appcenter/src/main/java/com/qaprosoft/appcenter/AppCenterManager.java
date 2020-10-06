@@ -47,8 +47,8 @@ import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
  */
 public class AppCenterManager {
     private static final Logger LOGGER = Logger.getLogger(AppCenterManager.class);
-    
-    
+
+
     protected RestTemplate restTemplate;
 
     private String ownerName;
@@ -58,7 +58,7 @@ public class AppCenterManager {
     private static final String HOST_URL = "api.appcenter.ms";
     private static final String API_APPS = "/v0.1/apps";
 
-    private static volatile AppCenterManager instance = null;
+    private static AppCenterManager instance = null;
 
     private AppCenterManager() {
     }
@@ -141,15 +141,12 @@ public class AppCenterManager {
      * @throws IOException throws a non Interruption Exception up.
      */
     private boolean downloadBuild(String fileName, URL downloadLink) throws IOException {
-        ReadableByteChannel readableByteChannel = null;
-        FileOutputStream fos = null;
-        try {
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
+                FileOutputStream fos = new FileOutputStream(fileName)) {
             if (Thread.currentThread().isInterrupted()) {
                 LOGGER.debug(String.format("Current Thread (%s) is interrupted, clearing interruption.", Thread.currentThread().getId()));
                 Thread.interrupted();
             }
-            readableByteChannel = Channels.newChannel(downloadLink.openStream());
-            fos = new FileOutputStream(fileName);
             fos.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             LOGGER.info("Successfully Transferred...");
             return false;
@@ -157,13 +154,6 @@ public class AppCenterManager {
             LOGGER.info("Retrying....");
             LOGGER.error("Getting Error: " + ie1.getMessage(), ie1);
             return true;
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
-            if (readableByteChannel != null) {
-                readableByteChannel.close();
-            }
         }
     }
 
@@ -357,7 +347,7 @@ public class AppCenterManager {
         if (node.findPath("release_notes").isMissingNode()) {
             return false;
         }
-        
+
         String nodeField = node.get(nodeName).asText().toLowerCase();
         String[] splitPattern = pattern.split("\\.");
         LinkedList<Boolean> segmentsFound = new LinkedList<>();
