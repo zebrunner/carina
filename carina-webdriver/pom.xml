@@ -75,7 +75,7 @@
 		<dependency>
 			<!--  5-7 compilation failures w/o it. just agent-core dep doesn't work. -->
 			<groupId>com.zebrunner</groupId>
-			<artifactId>agent-testng</artifactId>
+			<artifactId>agent-testng-pluggable</artifactId>
 		</dependency>
 		
 		<dependency>

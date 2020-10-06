@@ -40,7 +40,7 @@
 
             <dependency>
                 <groupId>com.zebrunner</groupId>
-                <artifactId>agent-testng</artifactId>
+                <artifactId>agent-testng-pluggable</artifactId>
             </dependency>
 
 		<dependency>
