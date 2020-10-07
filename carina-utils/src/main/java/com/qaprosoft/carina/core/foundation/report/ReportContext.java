@@ -653,6 +653,7 @@ public class ReportContext {
 
         String folder = SpecialKeywords.CUCUMBER_REPORT_FOLDER;
         String subFolder = SpecialKeywords.CUCUMBER_REPORT_SUBFOLDER;
+        String fileName = SpecialKeywords.CUCUMBER_REPORT_FILE_NAME;
 
         String link = "";
         // String subfolder = "cucumber-html-reports";
@@ -664,10 +665,10 @@ public class ReportContext {
                 LOGGER.error("Contains n/a. Replace it.");
                 report_url = report_url.replace("n/a", "");
             }
-            link = String.format("%s/%d/%s/%s/%s/feature-overview.html", report_url, rootID, ARTIFACTS_FOLDER, folder, subFolder);
+            link = String.format("%s/%d/%s/%s/%s", report_url, rootID, folder, subFolder, fileName);
         } else {
             //TODO: link might be broken on CI like https://github.com/qaprosoft/carina/issues/1001
-            link = String.format("file://%s/%s/%s/feature-overview.html", artifactsDirectory, folder, subFolder);
+            link = String.format("file://%s/%s/%s", folder, subFolder, fileName);
         }
 
         return link;

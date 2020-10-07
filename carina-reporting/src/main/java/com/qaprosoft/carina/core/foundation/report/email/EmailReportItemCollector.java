@@ -20,6 +20,7 @@ import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
+import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
@@ -41,7 +42,7 @@ public class EmailReportItemCollector {
     }
 
     public static synchronized TestResultItem pull(ITestResult result) {
-        return testResultsMap.get(TestNamingService.getTestName(result));
+        return testResultsMap.get(TestNameResolverRegistry.get().resolve(result));
     }
 
     public static List<TestResultItem> getTestResults() {

@@ -42,7 +42,7 @@ public class TestNamingService {
      */
     @Deprecated
     public static String getTestName() {
-        //TODO: think about returning very simple vaid name if nothing was specified yet! Need ITestResult arg for that!
+        // TODO: think about returning very simple valid name if nothing was specified yet! Need ITestResult arg for that!
         if (testName.get() == null) {
             throw new RuntimeException("Unable to detect full test name yet!");
         }
@@ -121,7 +121,7 @@ public class TestNamingService {
 
         name = name + " - " + getMethodName(result);
         LOGGER.debug("testName: " + name);
-        
+
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
         name = appendDataProviderLine(result, name);
