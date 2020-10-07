@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class VideoAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static ThreadLocal<Boolean> uploadVideo = new ThreadLocal<Boolean>();
+    private static final ThreadLocal<Boolean> uploadVideo = ThreadLocal.withInitial(() -> false);
 
     public static void disableVideoUpload() {
         uploadVideo.set(Boolean.FALSE);
