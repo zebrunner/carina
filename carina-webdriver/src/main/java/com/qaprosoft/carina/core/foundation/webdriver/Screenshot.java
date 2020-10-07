@@ -242,7 +242,12 @@ public class Screenshot {
             ImageIO.write(screen, "PNG", screenshot);
 
             // Uploading screenshot to Amazon S3
-            com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
+            if (artifact) {
+                com.zebrunner.agent.core.registrar.Artifact.upload(Files.readAllBytes(screenshot.toPath()), comment);
+            } else {
+                com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
+            }
+            
             // add screenshot comment to collector
             ReportContext.addScreenshotComment(screenName, comment);
             return screen;
