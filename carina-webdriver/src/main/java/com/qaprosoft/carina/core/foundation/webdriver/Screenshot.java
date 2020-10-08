@@ -243,7 +243,7 @@ public class Screenshot {
 
             // Uploading screenshot to Amazon S3
             if (artifact) {
-                com.zebrunner.agent.core.registrar.Artifact.upload(Files.readAllBytes(screenshot.toPath()), comment);
+                com.zebrunner.agent.core.registrar.Artifact.upload(screenshot, comment + ".png");
             } else {
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
             }
