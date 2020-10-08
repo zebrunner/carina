@@ -165,11 +165,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
                 || curRetryAnalyzer instanceof DisabledRetryAnalyzer
                 || curRetryAnalyzer instanceof RetryAnalyzerInterceptor) {
             // this call register retryAnalyzer.class both in Carina and Zebrunner client
-            RetryService.setRetryAnalyzerClass(RetryAnalyzer.class, result);
+            RetryService.setRetryAnalyzerClass(RetryAnalyzer.class, result.getTestContext(), result.getMethod());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzerInterceptor.class);
         } else if (!(curRetryAnalyzer instanceof RetryAnalyzerInterceptor)) {
             LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
-            RetryService.setRetryAnalyzerClass(curRetryAnalyzer.getClass(), result);
+            RetryService.setRetryAnalyzerClass(curRetryAnalyzer.getClass(), result.getTestContext(), result.getMethod());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzerInterceptor.class);
         }
         

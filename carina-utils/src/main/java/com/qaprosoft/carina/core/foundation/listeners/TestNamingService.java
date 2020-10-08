@@ -23,11 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.agent.testng.listener.RunContextService;
 
 public class TestNamingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); 
@@ -192,11 +194,14 @@ public class TestNamingService {
     }
     
     private static String appendDataProviderLine(ITestResult testResult, String testName) {
-        if (testResult.getMethod().isDataDriven() && testResult.getMethod().getDataProviderMethod().getMethod().getModifiers() > 1) {
+        ITestNGMethod testMethod = testResult.getMethod();
+        ITestContext testContext = testResult.getTestContext();
+        int dataProviderSize = RunContextService.getDataProviderSize(testMethod, testContext);
+        if (dataProviderSize > 0) {
             // adding extra zero at the beginning of the data provider line number
-            int indexMaxLength = Integer.toString(testResult.getMethod().getDataProviderMethod().getMethod().getModifiers()).length() + 1;
+            int indexMaxLength = Integer.toString(dataProviderSize).length() + 1;
             String lineFormat = " [L%0" + indexMaxLength + "d]";
-            int index = testResult.getMethod().getParameterInvocationCount() + 1;
+            int index = RunContextService.getDataProviderCurrentIndex(testMethod, testContext) + 1;
             testName += String.format(lineFormat, index);
         }
         return testName;

@@ -65,7 +65,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.3.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <agent-testng-pluggable.version>1.0.0.95-SNAPSHOT</agent-testng-pluggable.version>
+        <agent-testng-pluggable.version>1.0.0.98-SNAPSHOT</agent-testng-pluggable.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
