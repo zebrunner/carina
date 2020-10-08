@@ -24,6 +24,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -34,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
+import com.zebrunner.agent.testng.listener.DataProviderInterceptor;
 import com.zebrunner.agent.testng.listener.TestRunListener;
 
 /*
@@ -45,7 +47,8 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 
 // on start order is TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener
-@LinkedListeners({ CarinaListener.class, TestRunListener.class })
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
+@Listeners({DataProviderInterceptor.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
