@@ -133,27 +133,6 @@
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.11.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <schemaLanguage>WSDL</schemaLanguage>
-                    <generatePackage>countryinfo.wsdl</generatePackage>
-                    <schemas>
-                        <schema>
-                            <url>http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?wsdl</url>
-                        </schema>
-                    </schemas>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>
