@@ -62,7 +62,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.3.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <zafira-client.version>4.0.71-SNAPSHOT</zafira-client.version>
+        <zafira-client.version>4.2.73</zafira-client.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
