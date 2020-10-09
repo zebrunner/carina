@@ -15,7 +15,7 @@
     <parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 
     <parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome, locale: en_US; browser: chrome, locale: es_ES; browser: chrome, locale: de_DE; browser: chrome, locale: ja_JP; browser: chrome, locale: zh_CN"/>
-    <parameter name="jenkinsJobExecutionOrder" value="1"/>
+    <parameter name="jenkinsJobExecutionOrder" value="3"/>
     <parameter name="jenkinsJobExecutionMode" value="continue"/>
 
     <parameter name="choiceParam::locale::supported locales in example" value="en_US, es_ES, de_DE, ja_JP, zh_CN" />
