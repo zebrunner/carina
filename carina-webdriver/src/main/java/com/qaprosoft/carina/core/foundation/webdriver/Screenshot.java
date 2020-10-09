@@ -538,6 +538,8 @@ public class Screenshot {
 		// disable screenshot if error message contains any of this info
 		boolean isContains = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
+				|| message.contains("stale_element_reference.html")
+				|| message.contains("Error executing JavaScript")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
