@@ -21,14 +21,14 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
+import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +43,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -163,16 +165,32 @@ public class DesktopFactory extends AbstractFactory {
      */
     private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
         try {
+            Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+                    .withTimeout(30, SECONDS)
+                    .pollingEvery(5, SECONDS)
+                    .ignoring(WebDriverException.class)
+                    .ignoring(NoSuchSessionException.class)
+                    .ignoring(TimeoutException.class);
             if (capabilities.getCapability("resolution") != null) {
                 String resolution = (String) capabilities.getCapability("resolution");
                 int width = Integer.valueOf(resolution.split("x")[0]);
                 int height = Integer.valueOf(resolution.split("x")[1]);
-                driver.manage().window().setPosition(new Point(0, 0));
-                driver.manage().window().setSize(new Dimension(width, height));
-                LOGGER.info(String.format("Browser window size set to %dx%d", width, height));
+                wait.until(new Function<WebDriver, Boolean>(){
+                    public Boolean apply(WebDriver driver ) {
+                        driver.manage().window().setPosition(new Point(0, 0));
+                        driver.manage().window().setSize(new Dimension(width, height));
+                        LOGGER.info(String.format("Browser window size set to %dx%d", width, height));
+                        return true;
+                    }
+                });
             } else {
-                driver.manage().window().maximize();
-                LOGGER.info("Browser window was maximized");
+                wait.until(new Function<WebDriver, Boolean>(){
+                    public Boolean apply(WebDriver driver ) {
+                        driver.manage().window().maximize();
+                        LOGGER.info("Browser window was maximized");
+                        return true;
+                    }
+                });
             }
         } catch (Exception e) {
             LOGGER.error("Unable to resize browser window", e);
