@@ -179,15 +179,21 @@ public class DesktopFactory extends AbstractFactory {
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().setPosition(new Point(0, 0));
                         driver.manage().window().setSize(new Dimension(width, height));
-                        LOGGER.info(String.format("Browser window size set to %dx%d", width, height));
-                        return true;
+                        if (driver.manage().window().getSize().getWidth() == width
+                                && driver.manage().window().getSize().getHeight() == height) {
+                            LOGGER.debug(String.format("Browser window size set to %dx%d", width, height));
+                            return true;
+                        } else {
+                            LOGGER.error("Resize browser window was not applied");
+                            return false;
+                        }
                     }
                 });
             } else {
                 wait.until(new Function<WebDriver, Boolean>(){
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().maximize();
-                        LOGGER.info("Browser window was maximized");
+                        LOGGER.debug("Browser window size was maximized");
                         return true;
                     }
                 });
