@@ -198,7 +198,7 @@ public class DesktopFactory extends AbstractFactory {
                 });
             }
         } catch (Exception e) {
-            LOGGER.error("Unable to resize browser window!", e);
+            LOGGER.error("Unable to resize browser window", e);
         }
     }
 }
