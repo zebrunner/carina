@@ -73,6 +73,7 @@
         <include>**/*.schema</include>
         <include>**/*.xlsx</include>
         <include>**/*.json</include>
+        <include>**/*.feature</include>
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">
