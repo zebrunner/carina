@@ -180,12 +180,13 @@ public class DesktopFactory extends AbstractFactory {
                         driver.manage().window().setSize(new Dimension(width, height));
                         if (driver.manage().window().getSize().getWidth() == width
                                 && driver.manage().window().getSize().getHeight() == height) {
-                            LOGGER.debug(String.format("Browser window size set to %dx%d", width, height));
-                            return true;
+                            LOGGER.debug(String.format("Browser window size set to %dx%d",
+                                    driver.manage().window().getSize().getWidth(), driver.manage().window().getSize().getHeight()));
                         } else {
-                            LOGGER.error("Resize browser window was not applied!");
-                            return false;
+                            LOGGER.warn(String.format("Browser window size set to %dx%d",
+                                    driver.manage().window().getSize().getWidth(), driver.manage().window().getSize().getHeight()));
                         }
+                        return true;
                     }
                 });
             } else {
