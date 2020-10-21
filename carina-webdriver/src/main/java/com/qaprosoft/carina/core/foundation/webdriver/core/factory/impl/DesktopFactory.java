@@ -182,7 +182,7 @@ public class DesktopFactory extends AbstractFactory {
                         if (actualSize.getWidth() == expectedWidth && actualSize.getHeight() == expectedHeight) {
                             LOGGER.debug(String.format("Browser window size set to %dx%d", actualSize.getWidth(), actualSize.getHeight()));
                         } else {
-                            LOGGER.warn(String.format("Expected browser window size is %dx%d, but set to %dx%d",
+                            LOGGER.warn(String.format("Expected browser window %dx%d, but actual %dx%d",
                                     expectedWidth, expectedHeight, actualSize.getWidth(), actualSize.getHeight()));
                         }
                         return true;
