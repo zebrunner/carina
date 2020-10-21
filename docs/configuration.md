@@ -85,11 +85,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>https://jira.carina.com/browse/</td>
 	</tr>
 	<tr>
-		<td>email_list</td>
-		<td>Comma-separated list of emails for reports</td>
-		<td>u1@gmail.com,u2@gmail.com</td>
-	</tr>
-	<tr>
 		<td>env</td>
 		<td>Environment specific configuration. More about this [feature](#environment-specific-configuration)</td>
 		<td>STAG, PROD, DEMO</td>
@@ -158,11 +153,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>no_proxy</td>
 		<td>Excluded hostname(s) for communication via proxy. Available only when proxy_host and proxy_port are declared!</td>
 		<td>localhost.example.com</td>
-	</tr>
-		<tr>
-		<td>failure_email_list</td>
-		<td>Comma-separated list of emails for failure reports</td>
-		<td>u1@mail.com,u2@mail.com</td>
 	</tr>
 		<tr>
 		<td>track_known_issues</td>
@@ -277,16 +267,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>jira_url</td>
 		<td>URL to Jira</td>
 		<td>https://yourclass.atlassian.net</td>
-	</tr>
-	<tr>
-		<td>testrail_milestone</td>
-		<td>Milestone to set on TestRail for run</td>
-		<td>some-milestone</td>
-	</tr>
-		<tr>
-		<td>testrail_assignee</td>
-		<td>User assigned for the suit</td>
-		<td>asignee_user@yuorcompany.com</td>
 	</tr>
 		<tr>
 		<td>access_key_id</td>

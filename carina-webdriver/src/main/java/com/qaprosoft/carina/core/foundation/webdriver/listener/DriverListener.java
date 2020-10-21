@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
 
+import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -28,7 +29,6 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
@@ -169,7 +169,10 @@ public class DriverListener implements WebDriverEventListener {
                 || thr.getMessage() == null
                 || thr.getMessage().contains("Method has not yet been implemented")
                 || thr.getMessage().contains("Method is not implemented")
-                || thr.getMessage().contains("An element could not be located on the page using the given search parameters")) {
+                || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
+                // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception in listener!
+                || thr.getMessage().contains("StaleElementReferenceException")
+                || thr.getMessage().contains("stale_element_reference.html")) {
             // do nothing
             return;
         }
@@ -315,8 +318,8 @@ public class DriverListener implements WebDriverEventListener {
             
             // archive page source dump and screenshot both together
             FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
-            
-            Artifacts.add("UI Dump artifact", new File(dumpArtifact));
+
+            UploadUtil.uploadArtifact(new File(dumpArtifact), "UI Dump artifact");
         } else {
             LOGGER.debug("Dump file is empty.");
         }

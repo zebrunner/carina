@@ -349,7 +349,6 @@ public class Screenshot {
 
                 WebDriver augmentedDriver = driver;
 
-
                 //hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
     				try {
@@ -539,12 +538,15 @@ public class Screenshot {
 		// disable screenshot if error message contains any of this info
 		boolean isContains = message.contains("StaleObjectException")
 				|| message.contains("StaleElementReferenceException")
+				|| message.contains("stale_element_reference.html")
+				|| message.contains("Error executing JavaScript")
 				|| message.contains("Session ID is null. Using WebDriver after calling quit")
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
                 || message.contains("Session does not exist")
 				|| message.contains("Session timed out or not found")
 				|| message.contains("Unable to determine type from: <. Last 1 characters read")
+				|| message.contains("not available and is not among the last 1000 terminated sessions")				
 				|| message.contains("cannot forward the request")
                 || message.contains("connect ECONNREFUSED")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
