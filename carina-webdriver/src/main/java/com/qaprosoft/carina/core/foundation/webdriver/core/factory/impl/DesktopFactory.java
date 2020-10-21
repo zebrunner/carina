@@ -172,19 +172,19 @@ public class DesktopFactory extends AbstractFactory {
                     .ignoring(TimeoutException.class);
             if (capabilities.getCapability("resolution") != null) {
                 String resolution = (String) capabilities.getCapability("resolution");
-                int width = Integer.valueOf(resolution.split("x")[0]);
-                int height = Integer.valueOf(resolution.split("x")[1]);
+                int expectedWidth = Integer.valueOf(resolution.split("x")[0]);
+                int expectedHeight = Integer.valueOf(resolution.split("x")[1]);
                 wait.until(new Function<WebDriver, Boolean>(){
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().setPosition(new Point(0, 0));
-                        driver.manage().window().setSize(new Dimension(width, height));
-                        if (driver.manage().window().getSize().getWidth() == width
-                                && driver.manage().window().getSize().getHeight() == height) {
-                            LOGGER.debug(String.format("Browser window size set to %dx%d",
-                                    driver.manage().window().getSize().getWidth(), driver.manage().window().getSize().getHeight()));
+                        driver.manage().window().setSize(new Dimension(expectedWidth, expectedHeight));
+                        int actualWidth = driver.manage().window().getSize().getWidth();
+                        int actualHeight = driver.manage().window().getSize().getHeight();
+                        if (actualWidth == expectedWidth && actualHeight == expectedHeight) {
+                            LOGGER.debug(String.format("Browser window size set to %dx%d", actualWidth, actualHeight));
                         } else {
-                            LOGGER.warn(String.format("Browser window size set to %dx%d",
-                                    driver.manage().window().getSize().getWidth(), driver.manage().window().getSize().getHeight()));
+                            LOGGER.warn(String.format("Expected browser window size is %dx%d, but set to %dx%d",
+                                    expectedWidth, expectedHeight, actualWidth, actualHeight));
                         }
                         return true;
                     }
