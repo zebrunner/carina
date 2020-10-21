@@ -178,13 +178,12 @@ public class DesktopFactory extends AbstractFactory {
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().setPosition(new Point(0, 0));
                         driver.manage().window().setSize(new Dimension(expectedWidth, expectedHeight));
-                        int actualWidth = driver.manage().window().getSize().getWidth();
-                        int actualHeight = driver.manage().window().getSize().getHeight();
-                        if (actualWidth == expectedWidth && actualHeight == expectedHeight) {
-                            LOGGER.debug(String.format("Browser window size set to %dx%d", actualWidth, actualHeight));
+                        Dimension actualSize = driver.manage().window().getSize();
+                        if (actualSize.getWidth() == expectedWidth && actualSize.getHeight() == expectedHeight) {
+                            LOGGER.debug(String.format("Browser window size set to %dx%d", actualSize.getWidth(), actualSize.getHeight()));
                         } else {
                             LOGGER.warn(String.format("Expected browser window size is %dx%d, but set to %dx%d",
-                                    expectedWidth, expectedHeight, actualWidth, actualHeight));
+                                    expectedWidth, expectedHeight, actualSize.getWidth(), actualSize.getHeight()));
                         }
                         return true;
                     }
