@@ -172,20 +172,20 @@ public class DesktopFactory extends AbstractFactory {
                     .ignoring(TimeoutException.class);
             if (capabilities.getCapability("resolution") != null) {
                 String resolution = (String) capabilities.getCapability("resolution");
-                int width = Integer.valueOf(resolution.split("x")[0]);
-                int height = Integer.valueOf(resolution.split("x")[1]);
+                int expectedWidth = Integer.valueOf(resolution.split("x")[0]);
+                int expectedHeight = Integer.valueOf(resolution.split("x")[1]);
                 wait.until(new Function<WebDriver, Boolean>(){
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().setPosition(new Point(0, 0));
-                        driver.manage().window().setSize(new Dimension(width, height));
-                        if (driver.manage().window().getSize().getWidth() == width
-                                && driver.manage().window().getSize().getHeight() == height) {
-                            LOGGER.debug(String.format("Browser window size set to %dx%d", width, height));
-                            return true;
+                        driver.manage().window().setSize(new Dimension(expectedWidth, expectedHeight));
+                        Dimension actualSize = driver.manage().window().getSize();
+                        if (actualSize.getWidth() == expectedWidth && actualSize.getHeight() == expectedHeight) {
+                            LOGGER.debug(String.format("Browser window size set to %dx%d", actualSize.getWidth(), actualSize.getHeight()));
                         } else {
-                            LOGGER.error("Resize browser window was not applied!");
-                            return false;
+                            LOGGER.warn(String.format("Expected browser window %dx%d, but actual %dx%d",
+                                    expectedWidth, expectedHeight, actualSize.getWidth(), actualSize.getHeight()));
                         }
+                        return true;
                     }
                 });
             } else {
