@@ -46,7 +46,6 @@ public abstract class AbstractFactory {
     protected static final String vnc_host = "vnc_host";
     protected static final String vnc_port = "vnc_port";
     
-    //TODO: refactor to use SpecialKeywords.DEFAULT_VIDEO_FILENAME. Make sure to change uploading approach removing extra sub-folder 
     protected final static String VIDEO_DEFAULT = "video.mp4";
     protected final static String SESSION_LOG_DEFAULT = "session.log";
 
@@ -105,29 +104,15 @@ public abstract class AbstractFactory {
     abstract protected int getBitrate(VideoQuality quality);
 
     /**
-     * Initialize test artifact for upload.
-     * 
-     * @param videoName - video file name
+     * Initialize test artifact.
+     * @param name - artifact name 
+     * @param url - artifact url
      * @return test artifact with video details
      */
-    protected TestArtifactType initVideoArtifact(String videoName) {
+    protected TestArtifactType initArtifact(String name, String url) {
         TestArtifactType artifact = new TestArtifactType();
-        artifact.setName("Video " + SDF.format(new Date()));
-        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), videoName));
-        return artifact;
-    }
-
-    /**
-     * Initialize test artifact for upload.
-     * 
-     * @param sessionLogName - session log file name
-     * @return test artifact with session log details
-     */
-    protected TestArtifactType initSessionLogArtifact(String sessionLogName) {
-        TestArtifactType artifact = new TestArtifactType();
-        artifact.setName("Session log " + SDF.format(new Date()));
-        // TODO: allocate separate configuration property
-        artifact.setLink(String.format(R.CONFIG.get("screen_record_host"), sessionLogName));
+        artifact.setName(name);
+        artifact.setLink(url);
         return artifact;
     }
 

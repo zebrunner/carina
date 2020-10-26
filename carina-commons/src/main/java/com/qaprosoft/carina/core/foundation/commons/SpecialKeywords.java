@@ -172,6 +172,7 @@ public class SpecialKeywords {
     // -------------- HUB PROVIDERS -------------------------------------
     public static final String BROWSERSTACK = "browserstack";
     public static final String ZEBRUNNER = "zebrunner";
+    public static final String MCLOUD = "mcloud";
     public static final String SELENIUM = "selenium";
 
 

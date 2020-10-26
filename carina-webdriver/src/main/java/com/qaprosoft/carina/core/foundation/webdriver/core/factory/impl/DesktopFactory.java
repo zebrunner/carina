@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -77,28 +78,29 @@ public class DesktopFactory extends AbstractFactory {
 
             if (isVideoEnabled()) {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-                // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
+                // TODO: implement custom listeners later if needed. For example get video artifact from external service...
                 switch (getHubProvider()) {
                 case SpecialKeywords.BROWSERSTACK:
                     // TODO: https://github.com/qaprosoft/carina/issues/949  
                     // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
+                    // screenshot recording url: automate/builds/<build-id>/sessions/<session-id>
                     break;
                 case SpecialKeywords.ZEBRUNNER:
-                    // Zebrunner will place video to separate unique folder, no need to generate new name
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                    //TODO: remove reference to screen_record_host
+                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), R.CONFIG.get("screen_record_host") + "/" + VIDEO_DEFAULT)));
+                    
+                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);                        
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), R.CONFIG.get("screen_record_host") + "/" + SESSION_LOG_DEFAULT)));
                     break;
                 case SpecialKeywords.SELENIUM:
-                    // Zebrunner CE will place video to separate unique folder, no need to generate new name
-                    //capabilities.setCapability("videoName", VIDEO_DEFAULT); //required capability for selenoid
-                    //capabilities.setCapability("logName", SESSION_LOG_DEFAULT); //required capability for selenoid
-                    //ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                    //ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
-                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
-                    capabilities.setCapability("videoName", videoName); //required capability for selenoid
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+                    // nothing to do with unfamiliar hub provider
                     break;
                 }
             }
