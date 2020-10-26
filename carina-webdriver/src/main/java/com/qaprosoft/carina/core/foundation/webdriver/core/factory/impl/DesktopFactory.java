@@ -90,10 +90,10 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.SELENIUM:
                     // Zebrunner CE will place video to separate unique folder, no need to generate new name
-                    capabilities.setCapability("videoName", VIDEO_DEFAULT); //required capability for selenoid
-                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT); //required capability for selenoid
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                    //capabilities.setCapability("videoName", VIDEO_DEFAULT); //required capability for selenoid
+                    //capabilities.setCapability("logName", SESSION_LOG_DEFAULT); //required capability for selenoid
+                    //ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                    //ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
                     String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
