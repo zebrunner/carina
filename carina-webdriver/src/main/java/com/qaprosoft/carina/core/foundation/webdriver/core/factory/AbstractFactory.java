@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;

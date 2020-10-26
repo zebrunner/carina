@@ -145,14 +145,13 @@ public class MobileFactory extends AbstractFactory {
                             // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                             break;
                         case SpecialKeywords.ZEBRUNNER:
-                            //TODO: remove reference to screen_record_host                            
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), R.CONFIG.get("screen_record_host") + "/" + VIDEO_DEFAULT)));
-                            ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), R.CONFIG.get("screen_record_host") + "/" + SESSION_LOG_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "moon/%s/" + VIDEO_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "moon/%s/" + SESSION_LOG_DEFAULT)));
                             break;
                         case SpecialKeywords.MCLOUD:
                             ce.getListeners()
                             .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact("Video " + SDF.format(new Date()), SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact("Video " + SDF.format(new Date()), "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;                            
                         default:
                             // nothing to do with unfamiliar hub provider                            
@@ -198,7 +197,7 @@ public class MobileFactory extends AbstractFactory {
                             break;
                         default:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact("Video " + SDF.format(new Date()), SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact("Video " + SDF.format(new Date()), "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         }
                     }
