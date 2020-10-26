@@ -83,11 +83,11 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Video", "moon/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT)));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Video", "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
                     break;
                 default:
                     // nothing to do with unfamiliar hub provider
@@ -101,11 +101,11 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Log", "moon/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Log", "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
                     // nothing to do with unfamiliar hub provider

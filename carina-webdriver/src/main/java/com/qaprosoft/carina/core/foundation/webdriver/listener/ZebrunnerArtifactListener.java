@@ -29,7 +29,7 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
     private TestArtifactType testArtifact;
 
     private boolean inited = false; //boolean property to wait until valid driver sessionId appear
-    private boolean registered = false; //boolean property to minimize number of calls to repoting
+    private boolean registered = false; //boolean property to minimize number of calls to reporting
 
     public ZebrunnerArtifactListener(TestArtifactType testArtifact) {
         this.testArtifact = testArtifact;

@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
@@ -39,11 +37,13 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  */
 public abstract class AbstractFactory {
     
-    protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
-
     protected static final String vnc_protocol = "vnc_protocol";
     protected static final String vnc_host = "vnc_host";
     protected static final String vnc_port = "vnc_port";
+    
+    
+    protected final static String VIDEO = "Video";
+    protected final static String LOG = "Log";
     
     protected final static String VIDEO_DEFAULT = "video.mp4";
     protected final static String SESSION_LOG_DEFAULT = "session.log";

@@ -143,16 +143,16 @@ public class MobileFactory extends AbstractFactory {
                             // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                             break;
                         case SpecialKeywords.ZEBRUNNER:
-                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Video", "moon/%s/" + VIDEO_DEFAULT)));
-                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Log", "moon/%s/" + SESSION_LOG_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT)));
                             break;
                         case SpecialKeywords.MCLOUD:
                             ce.getListeners()
                             .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact("Video", "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
-                            break;                            
+                                    o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                            break;
                         default:
-                            // nothing to do with unfamiliar hub provider                            
+                            // nothing to do with unfamiliar hub provider
                             break;
                         }
                     }
@@ -195,7 +195,7 @@ public class MobileFactory extends AbstractFactory {
                             break;
                         default:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact("Video", "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         }
                     }
