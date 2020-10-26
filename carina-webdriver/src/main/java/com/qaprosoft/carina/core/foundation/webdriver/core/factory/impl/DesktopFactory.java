@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,7 +42,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
@@ -89,9 +87,8 @@ public class DesktopFactory extends AbstractFactory {
                     ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 default:
-                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
-                    capabilities.setCapability("videoName", videoName); //required capability for selenoid
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 }
             }
