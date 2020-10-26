@@ -104,7 +104,7 @@ public class MobileFactory extends AbstractFactory {
                 if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                     EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     
-                    if (isVideoEnabled()) {
+                    if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
@@ -165,7 +165,7 @@ public class MobileFactory extends AbstractFactory {
                         || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
                     EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-                    if (isVideoEnabled()) {
+                    if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()

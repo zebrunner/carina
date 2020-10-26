@@ -115,8 +115,8 @@ public abstract class AbstractFactory {
         return artifact;
     }
 
-    protected boolean isVideoEnabled() {
-        return R.CONFIG.getBoolean(SpecialKeywords.ENABLE_VIDEO);
+    protected boolean isEnabled(String capability) {
+        return R.CONFIG.getBoolean(capability);
     }
 
     protected String getHubProvider() {

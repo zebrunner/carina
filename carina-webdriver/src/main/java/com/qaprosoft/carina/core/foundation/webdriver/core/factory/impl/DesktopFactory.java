@@ -74,7 +74,7 @@ public class DesktopFactory extends AbstractFactory {
 
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
 
-            if (isVideoEnabled()) {
+            if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
                 // TODO: implement custom listeners later if needed. For example get video artifact from external service...
                 switch (getHubProvider()) {
@@ -86,14 +86,27 @@ public class DesktopFactory extends AbstractFactory {
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
                     ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "moon/%s/" + VIDEO_DEFAULT)));
-                    
-                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);                        
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "moon/%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
                     ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
+                    break;
+                default:
+                    // nothing to do with unfamiliar hub provider
+                    break;
+                }
+            }
+            
+            if (isEnabled(SpecialKeywords.ENABLE_LOG)) {
+                switch (getHubProvider()) {
+                case SpecialKeywords.BROWSERSTACK:
+                    break;
+                case SpecialKeywords.ZEBRUNNER:
+                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "moon/%s/" + SESSION_LOG_DEFAULT)));
+                    break;
+                case SpecialKeywords.SELENIUM:
+                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
                     ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
