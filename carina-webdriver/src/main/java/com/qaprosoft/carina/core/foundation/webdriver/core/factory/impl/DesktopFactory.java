@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,8 +43,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerArtifactListener;
 
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
@@ -85,11 +83,11 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "moon/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Video", "moon/%s/" + VIDEO_DEFAULT)));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Video", "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
                     break;
                 default:
                     // nothing to do with unfamiliar hub provider
@@ -103,17 +101,28 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "moon/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Log", "moon/%s/" + SESSION_LOG_DEFAULT)));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Log", "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
                     // nothing to do with unfamiliar hub provider
                     break;
                 }
             }
+            
+            if (isEnabled(SpecialKeywords.ENABLE_METADATA)) {
+                switch (getHubProvider()) {
+                case SpecialKeywords.SELENIUM:
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/driver-sessions/%s/%s.json")));
+                    break;                    
+                default:
+                    // nothing to do with unfamiliar hub provider
+                    break;
+                }
+            }            
 
             driver = new RemoteWebDriver(ce, capabilities);
 

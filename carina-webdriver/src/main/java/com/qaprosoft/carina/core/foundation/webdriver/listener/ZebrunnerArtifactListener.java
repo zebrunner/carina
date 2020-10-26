@@ -20,33 +20,33 @@ import org.openqa.selenium.remote.Command;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
- * ScreenRecordingListener - starts/stops video recording for desktop drivers.
+ * ZebrunnerArtifactListener - saves artifact link in Zebrunner reporting before driver is closed.
  * 
  * @author akhursevich
  */
-public class DesktopRecordingListener implements IDriverCommandListener {
+public class ZebrunnerArtifactListener implements IDriverCommandListener {
+
+    private TestArtifactType testArtifact;
 
     private boolean recording = false;
-    
-    private TestArtifactType videoArtifact;
-    
-    public DesktopRecordingListener(TestArtifactType artifact) {
-        this.videoArtifact = artifact;
+
+    public ZebrunnerArtifactListener(TestArtifactType testArtifact) {
+        this.testArtifact = testArtifact;
     }
 
     @Override
     public void beforeEvent(Command command) {
         if (recording) {
-            registerArtifact(command, videoArtifact);
+            registerArtifact(command, testArtifact);
         }
     }
 
     @Override
     public void afterEvent(Command command) {
         if (!recording && command.getSessionId() != null) {
+            testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString()));
             recording = true;
-            
-            // videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
         }
     }
+
 }

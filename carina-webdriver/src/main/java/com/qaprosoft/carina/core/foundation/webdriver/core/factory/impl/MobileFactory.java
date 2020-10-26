@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,8 +40,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerArtifactListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -145,13 +143,13 @@ public class MobileFactory extends AbstractFactory {
                             // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                             break;
                         case SpecialKeywords.ZEBRUNNER:
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initArtifact("Video " + SDF.format(new Date()), "moon/%s/" + VIDEO_DEFAULT)));
-                            ce.getListeners().add(new ZebrunnerSessionLogListener(initArtifact("Session log " + SDF.format(new Date()), "moon/%s/" + SESSION_LOG_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Video", "moon/%s/" + VIDEO_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Log", "moon/%s/" + SESSION_LOG_DEFAULT)));
                             break;
                         case SpecialKeywords.MCLOUD:
                             ce.getListeners()
                             .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact("Video " + SDF.format(new Date()), "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact("Video", "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;                            
                         default:
                             // nothing to do with unfamiliar hub provider                            
@@ -197,7 +195,7 @@ public class MobileFactory extends AbstractFactory {
                             break;
                         default:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact("Video " + SDF.format(new Date()), "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact("Video", "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         }
                     }
