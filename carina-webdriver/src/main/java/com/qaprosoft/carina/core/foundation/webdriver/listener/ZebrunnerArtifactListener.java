@@ -20,7 +20,7 @@ import org.openqa.selenium.remote.Command;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 /**
- * ZebrunnerArtifactListener - saves artifact link in Zebrunner reporting before driver is closed.
+ * ZebrunnerArtifactListener - saves artifact link in Zebrunner Reporting.
  * 
  * @author akhursevich
  */
@@ -28,7 +28,8 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
 
     private TestArtifactType testArtifact;
 
-    private boolean recording = false;
+    private boolean inited = false; //boolean property to wait until valid driver sessionId appear
+    private boolean registered = false; //boolean property to minimize number of calls to repoting
 
     public ZebrunnerArtifactListener(TestArtifactType testArtifact) {
         this.testArtifact = testArtifact;
@@ -36,16 +37,18 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
 
     @Override
     public void beforeEvent(Command command) {
-        if (recording) {
+        if (inited && !registered) {
             registerArtifact(command, testArtifact);
+            registered = true;
         }
     }
 
     @Override
     public void afterEvent(Command command) {
-        if (!recording && command.getSessionId() != null) {
-            testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString()));
-            recording = true;
+        if (!inited && command.getSessionId() != null) {
+            // double %s replacement by session to support sessionId/sessionId.json metadata!
+            testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
+            inited = true;
         }
     }
 
