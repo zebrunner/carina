@@ -74,7 +74,6 @@ public class DesktopFactory extends AbstractFactory {
 
             if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-                // TODO: implement custom listeners later if needed. For example get video artifact from external service...
                 switch (getHubProvider()) {
                 case SpecialKeywords.BROWSERSTACK:
                     // TODO: https://github.com/qaprosoft/carina/issues/949  
@@ -90,7 +89,7 @@ public class DesktopFactory extends AbstractFactory {
                     ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
                     break;
                 default:
-                    // nothing to do with unfamiliar hub provider
+                    // nothing to do with unknown hub provider
                     break;
                 }
             }
@@ -108,7 +107,7 @@ public class DesktopFactory extends AbstractFactory {
                     ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
-                    // nothing to do with unfamiliar hub provider
+                    // nothing to do with unknown hub provider
                     break;
                 }
             }

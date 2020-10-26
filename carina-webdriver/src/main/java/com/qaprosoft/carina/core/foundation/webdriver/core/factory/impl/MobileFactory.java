@@ -152,7 +152,7 @@ public class MobileFactory extends AbstractFactory {
                                     o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         default:
-                            // nothing to do with unfamiliar hub provider
+                            // nothing to do with unknown hub provider
                             break;
                         }
                     }
@@ -193,9 +193,12 @@ public class MobileFactory extends AbstractFactory {
                         case SpecialKeywords.ZEBRUNNER:
                             LOGGER.info("Video recording is not supported in Zebrunner for iOS");
                             break;
-                        default:
+                        case SpecialKeywords.MCLOUD:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
                                     o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                            break;
+                        default:
+                            // nothing to do with unknown hub provider
                             break;
                         }
                     }
