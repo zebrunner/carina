@@ -376,7 +376,7 @@ public class ExtendedWebElement {
                         try {
                             return searchContext.findElement(by);
                         } catch (WebDriverException e) {
-                            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
+                            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile; and react web - all browsers)
                             LOGGER.debug("Unable to refind element by searchContext: " + searchContext, e);
                             return getDriver().findElement(by);
                         }
