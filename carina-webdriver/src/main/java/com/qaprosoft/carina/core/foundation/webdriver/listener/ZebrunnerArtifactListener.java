@@ -54,14 +54,14 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
         if (!registered && this.afterEvent == null) {
             //register as only sessionId is not null
             testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
+            registerArtifact(command, testArtifact);
             registered = true;
         } else if (!registered && this.afterEvent.equals(command.getName())) {
             //register as only sessionId is not null and afterEvenet equals current command
             testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
+            registerArtifact(command, testArtifact);
             registered = true;
         }
     }
-
-
 
 }
