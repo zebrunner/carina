@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -40,8 +41,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerArtifactListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -103,7 +103,7 @@ public class MobileFactory extends AbstractFactory {
                 if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                     EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
                     
-                    if (isVideoEnabled()) {
+                    if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
                         AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
@@ -144,14 +144,16 @@ public class MobileFactory extends AbstractFactory {
                             // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
                             break;
                         case SpecialKeywords.ZEBRUNNER:
-                            // Zebrunner will place video to separate unique folder, no need to generate new name
-                            ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                            ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT), DriverCommand.QUIT));
+                            ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT), DriverCommand.QUIT));
+                            break;
+                        case SpecialKeywords.MCLOUD:
+                            ce.getListeners()
+                            .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
+                                    o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         default:
-                            ce.getListeners()
-                                    .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                            o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                            // nothing to do with unknown hub provider
                             break;
                         }
                     }
@@ -162,7 +164,7 @@ public class MobileFactory extends AbstractFactory {
                         || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
                     EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-                    if (isVideoEnabled()) {
+                    if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                         // Details about available parameters
                         // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                         IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
@@ -192,9 +194,12 @@ public class MobileFactory extends AbstractFactory {
                         case SpecialKeywords.ZEBRUNNER:
                             LOGGER.info("Video recording is not supported in Zebrunner for iOS");
                             break;
-                        default:
+                        case SpecialKeywords.MCLOUD:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initVideoArtifact(SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                            break;
+                        default:
+                            // nothing to do with unknown hub provider
                             break;
                         }
                     }

@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,6 +28,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -43,10 +43,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.DesktopRecordingListener;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerRecordingListener;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerSessionLogListener;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerArtifactListener;
 
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
@@ -75,26 +73,56 @@ public class DesktopFactory extends AbstractFactory {
 
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
 
-            if (isVideoEnabled()) {
+            if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
                 capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-                // TODO: implement custom listeners later if needed. For example get video artifact from extrenal service...
                 switch (getHubProvider()) {
                 case SpecialKeywords.BROWSERSTACK:
                     // TODO: https://github.com/qaprosoft/carina/issues/949  
                     // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
+                    // screenshot recording url: automate/builds/<build-id>/sessions/<session-id>
                     break;
                 case SpecialKeywords.ZEBRUNNER:
-                    // Zebrunner will place video to separate unique folder, no need to generate new name
-                    ce.getListeners().add(new ZebrunnerRecordingListener(initVideoArtifact("%s/" + VIDEO_DEFAULT)));
-                    ce.getListeners().add(new ZebrunnerSessionLogListener(initSessionLogArtifact("%s/" + SESSION_LOG_DEFAULT)));
+                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT), DriverCommand.QUIT));
+                    break;
+                case SpecialKeywords.SELENIUM:
+                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT), DriverCommand.QUIT));
                     break;
                 default:
-                    String videoName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, UUID.randomUUID().toString());
-                    capabilities.setCapability("videoName", videoName); //required capability for selenoid
-                    ce.getListeners().add(new DesktopRecordingListener(initVideoArtifact(videoName)));
+                    // nothing to do with unknown hub provider
                     break;
                 }
             }
+            
+            if (isEnabled(SpecialKeywords.ENABLE_LOG)) {
+                switch (getHubProvider()) {
+                case SpecialKeywords.BROWSERSTACK:
+                    break;
+                case SpecialKeywords.ZEBRUNNER:
+                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT), DriverCommand.QUIT));
+                    break;
+                case SpecialKeywords.SELENIUM:
+                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT), DriverCommand.QUIT));
+                    break;                    
+                default:
+                    // nothing to do with unknown hub provider
+                    break;
+                }
+            }
+            
+            if (isEnabled(SpecialKeywords.ENABLE_METADATA)) {
+                switch (getHubProvider()) {
+                case SpecialKeywords.SELENIUM:
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/driver-sessions/%s/%s.json"), DriverCommand.QUIT));
+                    break;                    
+                default:
+                    // nothing to do with unfamiliar hub provider
+                    break;
+                }
+            }            
 
             driver = new RemoteWebDriver(ce, capabilities);
 

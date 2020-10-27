@@ -394,7 +394,6 @@ public interface IDriverPool {
                 CompletableFuture.runAsync(() -> {
                     POOL_LOGGER.debug("Uploading in async mode started in thread ID: " + Thread.currentThread().getId());
                     POOL_LOGGER.debug("Screen record ftp: " + R.CONFIG.get("screen_record_ftp"));
-                    POOL_LOGGER.debug("Screen record host: " + R.CONFIG.get("screen_record_host"));
                     String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%", "");
                     URI ftpUri = null;
                     try {
