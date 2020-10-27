@@ -362,36 +362,33 @@ public class ExtendedWebElement {
     }
     
     private WebElement refindElement() {
-        // do not return without element initialization!
         FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
 
         wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                 .ignoring(StaleElementReferenceException.class)
-                .ignoring(InvalidElementStateException.class)
-                .ignoring(WebDriverException.class);
+                .ignoring(InvalidElementStateException.class);
 
-        if (searchContext != null) {
-            try {
-                this.element = wait.until(new Function<WebDriver, WebElement>() {
-                    public WebElement apply(WebDriver driver) {
-                        return searchContext.findElement(by);
-                    }
-                });
-            } catch (TimeoutException e) {
-                this.element = searchContext.findElement(by);
-            }
-        } else {
-            try {
-                this.element = wait.until(new Function<WebDriver, WebElement>() {
-                    public WebElement apply(WebDriver driver) {
+        try {
+            this.element = wait.until(new Function<WebDriver, WebElement>() {
+                public WebElement apply(WebDriver driver) {
+                    if (searchContext != null) {
+                        try {
+                            return searchContext.findElement(by);
+                        } catch (WebDriverException e) {
+                            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
+                            LOGGER.debug("Unable to refind element by searchContext: " + searchContext, e);
+                            return getDriver().findElement(by);
+                        }
+                    } else {
                         return getDriver().findElement(by);
                     }
-                });
-            } catch (TimeoutException e) {
-                this.element = getDriver().findElement(by);
-            }
+                }
+            });
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Unable to detect element using By: " + by.toString());
         }
+
         return element;
     }
 
