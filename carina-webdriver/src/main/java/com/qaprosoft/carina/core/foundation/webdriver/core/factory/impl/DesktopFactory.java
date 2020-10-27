@@ -28,6 +28,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -82,11 +83,11 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT), DriverCommand.QUIT));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT), DriverCommand.QUIT));
                     break;
                 default:
                     // nothing to do with unknown hub provider
@@ -100,11 +101,11 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.ZEBRUNNER:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT), DriverCommand.QUIT));
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT), DriverCommand.QUIT));
                     break;                    
                 default:
                     // nothing to do with unknown hub provider
@@ -115,7 +116,7 @@ public class DesktopFactory extends AbstractFactory {
             if (isEnabled(SpecialKeywords.ENABLE_METADATA)) {
                 switch (getHubProvider()) {
                 case SpecialKeywords.SELENIUM:
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/driver-sessions/%s/%s.json")));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/driver-sessions/%s/%s.json"), DriverCommand.QUIT));
                     break;                    
                 default:
                     // nothing to do with unfamiliar hub provider

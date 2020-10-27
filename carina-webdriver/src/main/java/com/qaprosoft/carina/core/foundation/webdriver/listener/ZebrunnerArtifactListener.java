@@ -27,29 +27,41 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 public class ZebrunnerArtifactListener implements IDriverCommandListener {
 
     private TestArtifactType testArtifact;
+    private String afterEvent;
 
-    private boolean inited = false; //boolean property to wait until valid driver sessionId appear
     private boolean registered = false; //boolean property to minimize number of calls to reporting
 
     public ZebrunnerArtifactListener(TestArtifactType testArtifact) {
+        this(testArtifact, null); //register anytime as only sessionId is registered
+    }
+
+    public ZebrunnerArtifactListener(TestArtifactType testArtifact, String afterEvent) {
         this.testArtifact = testArtifact;
+        this.afterEvent = afterEvent;
     }
 
     @Override
     public void beforeEvent(Command command) {
-        if (inited && !registered) {
-            registerArtifact(command, testArtifact);
-            registered = true;
-        }
+        // do nothing
     }
 
     @Override
     public void afterEvent(Command command) {
-        if (!inited && command.getSessionId() != null) {
-            // double %s replacement by session to support sessionId/sessionId.json metadata!
+        if (command.getSessionId() == null) {
+            return;
+        }
+        // double %s replacement by session to support sessionId/sessionId.json metadata!
+        if (!registered && this.afterEvent == null) {
+            //register as only sessionId is not null
             testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
-            inited = true;
+            registered = true;
+        } else if (!registered && this.afterEvent.equals(command.getName())) {
+            //register as only sessionId is not null and afterEvenet equals current command
+            testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
+            registered = true;
         }
     }
+
+
 
 }
