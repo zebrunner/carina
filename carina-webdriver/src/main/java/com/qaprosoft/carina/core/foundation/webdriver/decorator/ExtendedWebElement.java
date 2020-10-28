@@ -364,8 +364,9 @@ public class ExtendedWebElement {
     private WebElement refindElement() {
         FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
 
+        long refindTimeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 10; //minimize to several seconds otherwise huge delays occurs
         wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
-                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .withTimeout(Duration.ofSeconds(refindTimeout)) 
                 .ignoring(StaleElementReferenceException.class)
                 .ignoring(InvalidElementStateException.class);
 
@@ -1611,7 +1612,7 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(textLog, getNameWithLocator()));
 
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				// [VD] do not use selectByValue as modern controls could have only visible value without value
 				s.selectByVisibleText(decryptedSelectText);
 				return true;
@@ -1635,7 +1636,7 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.getMessage(matcher.toString(), getNameWithLocator()));
 
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
 					if (matcher.matches(option.getText())) {
@@ -1654,7 +1655,7 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_TEXT_PERFORMED.getMessage(partialSelectText, getName()),
 						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(partialSelectText, getNameWithLocator()));
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
 					if (option.getText().contains(partialSelectText)) {
@@ -1673,20 +1674,20 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_INDEX_NOT_PERFORMED.getMessage(String.valueOf(index), getNameWithLocator()));
 				
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				s.selectByIndex(index);
 				return true;
 			}
 
 			@Override
 			public String doGetSelectedValue() {
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				return s.getAllSelectedOptions().get(0).getText();
 			}
 
 			@Override
 			public List<String> doGetSelectedValues() {
-		        final Select s = new Select(getElement());
+		        final Select s = new Select(getCachedElement());
 		        List<String> values = new ArrayList<String>();
 		        for (WebElement we : s.getAllSelectedOptions()) {
 		            values.add(we.getText());
