@@ -16,12 +16,12 @@
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSource;
-import java.security.SecureClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -73,16 +73,20 @@ public class Resources {
     }
 
     public static Set<URL> getResourceURLs(ResourceURLFilter filter) {
-        Set<URL> collectedURLs = new HashSet<>();
-        URLClassLoader ucl = new URLClassLoader(new URL[] {(ClassLoader.getSystemClassLoader()).getResource("L10N")}, Resources.class.getClassLoader());
-        for (URL url : ucl.getURLs()) {
-			try {
-				iterateEntry(new File(url.toURI()), filter, collectedURLs);
-			} catch (URISyntaxException e) {
-				LOGGER.debug(e.getMessage(), e);
-			}
+        try(URLClassLoader ucl = new URLClassLoader(new URL[] {(ClassLoader.getSystemClassLoader()).getResource("L10N")}, Resources.class.getClassLoader())) {
+            Set<URL> collectedURLs = new HashSet<>();
+            for (URL url : ucl.getURLs()) {
+                try {
+                    iterateEntry(new File(url.toURI()), filter, collectedURLs);
+                } catch (URISyntaxException e) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
+            }
+            return collectedURLs;
+        } catch (IOException e) {
+            LOGGER.debug(e.getMessage(), e);
         }
-        return collectedURLs;
+        return null;
     }
 
     @SuppressWarnings("rawtypes")

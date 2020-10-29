@@ -17,12 +17,7 @@ package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,8 +56,9 @@ public class L10N {
         
         try {
 
-            for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
-                public @Override boolean accept(URL u) {
+            for (URL u : Objects.requireNonNull(Resources.getResourceURLs(new ResourceURLFilter() {
+                public @Override
+                boolean accept(URL u) {
                     String s = u.getPath();
                     boolean contains = s.contains(SpecialKeywords.L10N);
                     if (contains) {
@@ -70,7 +66,7 @@ public class L10N {
                     }
                     return contains;
                 }
-            })) {
+            }))) {
                 LOGGER.debug(String.format(
                         "Analyzing '%s' L10N resource for loading...", u));
                 /*
