@@ -354,18 +354,18 @@ public final class ProxyPool {
         //TODO: make OS independent
         try {
             List<?> output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
-            LOGGER.info("proxy process before kill: " + StringUtils.join(output, ""));
+            LOGGER.debug("proxy process before kill: " + StringUtils.join(output, ""));
             
             output = new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" "));
-            LOGGER.info("proxy process kill output: " + StringUtils.join(output, ""));
+            LOGGER.debug("proxy process kill output: " + StringUtils.join(output, ""));
             
             output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
-            LOGGER.info("proxy process after kill: " + StringUtils.join(output, ""));
+            LOGGER.debug("proxy process after kill: " + StringUtils.join(output, ""));
             
             CommonUtils.pause(1);
             
             output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
-            LOGGER.info("proxy process after kill and 2 sec pause: " + StringUtils.join(output, ""));
+            LOGGER.debug("proxy process after kill and 2 sec pause: " + StringUtils.join(output, ""));
             
         } catch (Exception e) {
             LOGGER.error("Undefined failure during process kill by port number!", e);
