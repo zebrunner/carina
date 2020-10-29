@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSource;
+import java.security.SecureClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,7 +66,7 @@ public class Resources {
     }
 
     // To scan the class path starting with the location from which a specific
-    // class was loaded, provide the getResourseURLs method with the root-class
+    // class was loaded, provide the getResourceURLs method with the root-class
     @SuppressWarnings("rawtypes")
     public static Set<URL> getResourceURLs(Class rootClass) {
         return getResourceURLs(rootClass, null);
@@ -73,8 +74,7 @@ public class Resources {
 
     public static Set<URL> getResourceURLs(ResourceURLFilter filter) {
         Set<URL> collectedURLs = new HashSet<>();
-        URLClassLoader ucl = (URLClassLoader) ClassLoader
-                .getSystemClassLoader();
+        URLClassLoader ucl = new URLClassLoader(new URL[] {(ClassLoader.getSystemClassLoader()).getResource("L10N")}, Resources.class.getClassLoader());
         for (URL url : ucl.getURLs()) {
 			try {
 				iterateEntry(new File(url.toURI()), filter, collectedURLs);
