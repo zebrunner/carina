@@ -73,8 +73,8 @@ public class Resources {
     }
 
     public static Set<URL> getResourceURLs(ResourceURLFilter filter) {
+        Set<URL> collectedURLs = new HashSet<>();
         try(URLClassLoader ucl = new URLClassLoader(new URL[] {(ClassLoader.getSystemClassLoader()).getResource("L10N")}, Resources.class.getClassLoader())) {
-            Set<URL> collectedURLs = new HashSet<>();
             for (URL url : ucl.getURLs()) {
                 try {
                     iterateEntry(new File(url.toURI()), filter, collectedURLs);
@@ -86,7 +86,7 @@ public class Resources {
         } catch (IOException e) {
             LOGGER.debug(e.getMessage(), e);
         }
-        return null;
+        return collectedURLs;
     }
 
     @SuppressWarnings("rawtypes")

@@ -56,7 +56,7 @@ public class L10N {
         
         try {
 
-            for (URL u : Objects.requireNonNull(Resources.getResourceURLs(new ResourceURLFilter() {
+            for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
                 public @Override
                 boolean accept(URL u) {
                     String s = u.getPath();
@@ -66,7 +66,7 @@ public class L10N {
                     }
                     return contains;
                 }
-            }))) {
+            })) {
                 LOGGER.debug(String.format(
                         "Analyzing '%s' L10N resource for loading...", u));
                 /*
