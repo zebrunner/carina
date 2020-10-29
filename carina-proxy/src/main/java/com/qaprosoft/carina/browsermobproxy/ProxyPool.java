@@ -16,9 +16,11 @@
 package com.qaprosoft.carina.browsermobproxy;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 
@@ -27,6 +29,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.NetworkUtil;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -350,7 +353,20 @@ public final class ProxyPool {
         LOGGER.info(String.format("Process on port %d will be closed.", port));
         //TODO: make OS independent
         try {
-        	new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" "));
+            List<?> output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
+            LOGGER.debug("proxy process before kill: " + StringUtils.join(output, ""));
+            
+            output = new AdbExecutor().execute(String.format("lsof -ti :%d | xargs kill -9", port).split(" "));
+            LOGGER.debug("proxy process kill output: " + StringUtils.join(output, ""));
+            
+            output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
+            LOGGER.debug("proxy process after kill: " + StringUtils.join(output, ""));
+            
+            CommonUtils.pause(1);
+            
+            output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
+            LOGGER.debug("proxy process after kill and 2 sec pause: " + StringUtils.join(output, ""));
+            
         } catch (Exception e) {
             LOGGER.error("Undefined failure during process kill by port number!", e);
         }
