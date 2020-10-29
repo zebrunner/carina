@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -65,7 +66,7 @@ public class Resources {
     }
 
     // To scan the class path starting with the location from which a specific
-    // class was loaded, provide the getResourseURLs method with the root-class
+    // class was loaded, provide the getResourceURLs method with the root-class
     @SuppressWarnings("rawtypes")
     public static Set<URL> getResourceURLs(Class rootClass) {
         return getResourceURLs(rootClass, null);
@@ -73,14 +74,17 @@ public class Resources {
 
     public static Set<URL> getResourceURLs(ResourceURLFilter filter) {
         Set<URL> collectedURLs = new HashSet<>();
-        URLClassLoader ucl = (URLClassLoader) ClassLoader
-                .getSystemClassLoader();
-        for (URL url : ucl.getURLs()) {
-			try {
-				iterateEntry(new File(url.toURI()), filter, collectedURLs);
-			} catch (URISyntaxException e) {
-				LOGGER.debug(e.getMessage(), e);
-			}
+        try(URLClassLoader ucl = new URLClassLoader(new URL[] {(ClassLoader.getSystemClassLoader()).getResource("L10N")}, Resources.class.getClassLoader())) {
+            for (URL url : ucl.getURLs()) {
+                try {
+                    iterateEntry(new File(url.toURI()), filter, collectedURLs);
+                } catch (URISyntaxException e) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
+            }
+            return collectedURLs;
+        } catch (IOException e) {
+            LOGGER.debug(e.getMessage(), e);
         }
         return collectedURLs;
     }

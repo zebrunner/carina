@@ -132,7 +132,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             try {
                 L10Nparser.init();
             } catch (Exception e) {
-                LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
+                LOGGER.error("L10N parser bundle is not initialized successfully!", e);
             }
 
             // declare global capabilities in configuration if custom_capabilities is declared 
