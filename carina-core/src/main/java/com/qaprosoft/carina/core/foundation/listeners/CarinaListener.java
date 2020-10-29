@@ -382,7 +382,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
             String browser = getBrowser();
-            String deviceName = getDeviceName();
+            String deviceName = getFullDeviceName();
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
 
@@ -454,7 +454,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     // TODO: remove this private method
-    private String getDeviceName() {
+    private String getFullDeviceName() {
         String deviceName = "Desktop";
 
         if (!IDriverPool.getDefaultDevice().isNull()) {
@@ -476,7 +476,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!browser.isEmpty()) {
             browser = " " + browser; // insert the space before
         }
-        String device = getDeviceName();
+        String device = getFullDeviceName();
 
         String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV)
                 : Configuration.get(Parameter.URL);
@@ -666,7 +666,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
                 // generate presigned url for nearest 8 hours
-                long hours = 8*1000*60*60;
+                long hours = 8L*1000*60*60;
                 String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
                 LOGGER.debug("preSigned URL: " + presignedAppUrl);
                 Configuration.setMobileApp(presignedAppUrl);
@@ -986,7 +986,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.debug("Zafira test run is still in progress. trying to abort...");
                 try {
                     Optional<TestRunType> testRun = ZafiraEventRegistrar.getTestRun();
-                    if (testRun != null) {
+                    if (testRun.isPresent()) {
                         LOGGER.debug("detected testrun id to abort: " + testRun.get().getId());
                         ZafiraSingleton.INSTANCE.getClient().abortTestRun(testRun.get().getId());
                         LOGGER.debug("aborted testrun");

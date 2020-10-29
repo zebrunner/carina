@@ -35,13 +35,9 @@ public class ExpectedSkipManager {
     private ExpectedSkipManager() {
     };
 
-    public static ExpectedSkipManager getInstance() {
+    public synchronized static ExpectedSkipManager getInstance() {
         if (null == instance) {
-            synchronized (ExpectedSkipManager.class) {
-                if (null == instance) {
-                    instance = new ExpectedSkipManager();
-                }
-            }
+            instance = new ExpectedSkipManager();
         }
         return instance;
     }
