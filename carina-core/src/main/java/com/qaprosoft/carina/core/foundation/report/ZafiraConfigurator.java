@@ -219,7 +219,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     //Moved them separately for future easier reusing if getTestTags will be overridden.
     //TODO: Should we make them public or protected?
     private Set<TagType> getTestRailTags(ITestResult test) {
-        LOGGER.debug("Collecting TestRail Tags...");
         Set<TagType> tags = new HashSet<TagType>();
         Set<String> testRailTags = getTestRailCasesUuid(test);
         int projectID = getTestRailProjectId(test.getTestContext());
@@ -241,7 +240,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
     }
 
     private Set<TagType> getQTestTags(ITestResult test) {
-        LOGGER.debug("Collecting qTest Tags...");
         Set<TagType> tags = new HashSet<TagType>();
 
         Set<String> qTestTags = getQTestCasesUuid(test);

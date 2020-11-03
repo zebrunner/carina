@@ -168,7 +168,7 @@ public class L10N {
      * @return String
      */
     public static String getText(String key, Locale locale) {
-        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
+//        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
         Iterator<ResourceBundle> iter = resBoundles.iterator();
         while (iter.hasNext()) {
             ResourceBundle bundle = iter.next();
@@ -183,13 +183,13 @@ public class L10N {
 					}
 				}
 				
-                LOGGER.debug("Looking for value for locale:'"
-                        + locale.toString()
-                        + "' current iteration locale is: '"
-                        + bundle.getLocale().toString() + "'.");
+//                LOGGER.debug("Looking for value for locale:'"
+//                        + locale.toString()
+//                        + "' current iteration locale is: '"
+//                        + bundle.getLocale().toString() + "'.");
                 if (bundle.getLocale().toString().equals(locale.toString())) {
-                    LOGGER.debug("Found locale:'" + locale.toString()
-                            + "' and value is '" + value + "'.");
+//                    LOGGER.debug("Found locale:'" + locale.toString()
+//                            + "' and value is '" + value + "'.");
                     return value;
                 }
             } catch (MissingResourceException e) {
@@ -259,7 +259,6 @@ public class L10N {
         } catch (Exception e) {
             LOGGER.debug("There is no l10n_encoding parameter in config properties.");
         }
-        LOGGER.debug("Will use L10N encoding: " + encoding);
         return encoding.toUpperCase().contains("UTF-8");
     }
 }

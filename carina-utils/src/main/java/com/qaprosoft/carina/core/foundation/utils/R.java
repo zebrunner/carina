@@ -275,7 +275,6 @@ public enum R {
 	}
     
     public void clearTestProperties() {
-        LOGGER.debug("Clear temporary test properties.");
         testProperties.remove();
     }
     

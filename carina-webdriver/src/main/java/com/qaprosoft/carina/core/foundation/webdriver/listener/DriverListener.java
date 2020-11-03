@@ -170,6 +170,7 @@ public class DriverListener implements WebDriverEventListener {
                 || thr.getMessage().contains("Method has not yet been implemented")
                 || thr.getMessage().contains("Method is not implemented")
                 || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
+                || thr.getMessage().contains("no such element: Unable to locate element")
                 // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception in listener!
                 || thr.getMessage().contains("StaleElementReferenceException")
                 || thr.getMessage().contains("stale_element_reference.html")) {
