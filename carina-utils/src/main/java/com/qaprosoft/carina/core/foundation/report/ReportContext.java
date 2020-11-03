@@ -455,7 +455,6 @@ public class ReportContext {
     }
 
     public static void emptyTestDirData() {
-        LOGGER.debug("testDir and isCustomTestDirName variables will be empty.");
         testDirectory.remove();
         isCustomTestDirName.set(Boolean.FALSE);
         closeThreadLogAppender();

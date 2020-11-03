@@ -21,9 +21,8 @@ public class TestPhase {
     	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
     }
 
-    //TODO: organize phases verification:
-    // https://github.com/qaprosoft/carina/issues/464 "find a way to track that all required system calls are executed"
-    private static ThreadLocal<Phase> activePhase = new ThreadLocal<Phase>();
+	// when phase not inited by CarinaListener in means we are in the before suite phase! 
+	private static ThreadLocal<TestPhase.Phase> activePhase = ThreadLocal.withInitial(() -> TestPhase.Phase.BEFORE_SUITE);
 
 	public static Phase getActivePhase() {
 		return activePhase.get();
@@ -32,7 +31,7 @@ public class TestPhase {
 	public static void setActivePhase(Phase phase) {
 		activePhase.set(phase);
 	}
-    
+
 
 }
 
