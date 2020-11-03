@@ -617,11 +617,8 @@ public interface IDriverPool {
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = new ConcurrentHashMap<String, CarinaDriver>();
         for (CarinaDriver carinaDriver : driversPool) {
             if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-                POOL_LOGGER.debug("Add suite_mode drivers into the getDrivers response: " + carinaDriver.getName());
                 currentDrivers.put(carinaDriver.getName(), carinaDriver);
             } else if (threadId.equals(carinaDriver.getThreadId())) {
-                POOL_LOGGER.debug("Add driver into the getDrivers response: " + carinaDriver.getName() + " by threadId: "
-                        + threadId);
                 currentDrivers.put(carinaDriver.getName(), carinaDriver);
             }
         }

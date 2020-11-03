@@ -296,7 +296,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private boolean hasDependencies(ITestResult result) {
         String methodName = result.getMethod().getMethodName();
         String className = result.getMethod().getTestClass().getName();
-        LOGGER.debug("current method: " + className + "." + methodName);
 
         // analyze all suite methods and return true if any of them depends on
         // existing method

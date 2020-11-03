@@ -212,7 +212,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         //Add qTest tags
         tags.addAll(getQTestTags(test));
         
-        LOGGER.debug("Found " + tags.size() + " new TestTags");
+        if (tags.size() > 0) {
+            LOGGER.debug("Found " + tags.size() + " new TestTags");
+        }
         return tags;
     }
 
