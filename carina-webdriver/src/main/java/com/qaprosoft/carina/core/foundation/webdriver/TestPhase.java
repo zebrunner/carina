@@ -21,17 +21,16 @@ public class TestPhase {
     	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
     }
 
-	// when phase not inited by CarinaListener in means we are in the before suite phase! 
-	private static ThreadLocal<TestPhase.Phase> activePhase = ThreadLocal.withInitial(() -> TestPhase.Phase.BEFORE_SUITE);
+    private static ThreadLocal<Phase> activePhase = new ThreadLocal<Phase>();
 
 	public static Phase getActivePhase() {
-		return activePhase.get();
+	    return activePhase.get();
 	}
 
 	public static void setActivePhase(Phase phase) {
 		activePhase.set(phase);
 	}
-
+    
 
 }
 
