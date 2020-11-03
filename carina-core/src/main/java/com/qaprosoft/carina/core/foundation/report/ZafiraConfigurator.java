@@ -142,7 +142,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         // TODO: re-factor that
         ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         String secondaryOwner = Ownership.getMethodOwner(test);
-        LOGGER.debug("secondaryOwner: " + secondaryOwner);
         return secondaryOwner;
     }
 
@@ -187,7 +186,6 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
 
     @Override
     public Set<TagType> getTestTags(TestResultAdapter testResultAdapter) {
-        LOGGER.debug("Collecting TestTags...");
         ITestResult test = (ITestResult) testResultAdapter.getTestResult();
         Set<TagType> tags = new HashSet<TagType>();
 
@@ -236,7 +234,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
                 tags.add(tagEntry);
             });
         }
-        LOGGER.debug("Found " + tags.size() + " new TestRail tags");
+        if (tags.size() > 0) {
+            LOGGER.debug("Found " + tags.size() + " new TestRail tags");
+        }
         return tags;
     }
 
@@ -256,7 +256,9 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
             });
         }
 
-        LOGGER.debug("Found " + tags.size() + " new qTest tags");
+        if (tags.size() > 0) {
+            LOGGER.debug("Found " + tags.size() + " new qTest tags");
+        }
         return tags;
     }
 

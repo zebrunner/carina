@@ -61,9 +61,10 @@ public class PriorityManager {
 
     private static String getSuitePriority(ITestContext context) {
         String priority = context.getSuite().getParameter("suitePriority");
-        LOGGER.debug("suitePriority is: " + priority);
         if (priority == null) {
             priority = "";
+        } else {
+            LOGGER.debug("suitePriority is: " + priority);
         }
         return priority;
     }

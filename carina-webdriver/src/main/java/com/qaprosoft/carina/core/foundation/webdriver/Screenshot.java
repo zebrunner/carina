@@ -330,10 +330,9 @@ public class Screenshot {
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
-        LOGGER.debug("Screenshot->capture starting...");
-
         if (isTakeScreenshot) {
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+            LOGGER.debug("Screenshot->capture starting...");
             try {
             	if (!isCaptured(comment)) {
                     // [VD] do not write something to log as this original exception is used as original exception for failure
@@ -413,9 +412,10 @@ public class Screenshot {
                 LOGGER.debug(e.getMessage(), e);
             } finally {
                 Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+                LOGGER.debug("Screenshot->capture finished.");
             }
         }
-        LOGGER.debug("Screenshot->capture finished.");
+        
         return screenName;
     }
 

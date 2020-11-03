@@ -82,7 +82,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
             return null;
         }
 		if (((ExtendedElementLocatorFactory) factory).isRootElementUsed()) {
-			LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
 			((ExtendedElementLocator) locator).setShouldCache(false);
 		}
 
@@ -137,7 +136,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> T proxyForAbstractUIObject(ClassLoader loader, Field field,
             ElementLocator locator) {
-    	LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
     	((ExtendedElementLocator) locator).setShouldCache(false);
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
@@ -175,7 +173,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> List<T> proxyForListUIObjects(ClassLoader loader, Field field,
             ElementLocator locator) {
-    	LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
     	((ExtendedElementLocator) locator).setShouldCache(false);
         InvocationHandler handler = new AbstractUIObjectListHandler<T>((Class<?>) getListType(field), webDriver,
                 locator, field.getName());

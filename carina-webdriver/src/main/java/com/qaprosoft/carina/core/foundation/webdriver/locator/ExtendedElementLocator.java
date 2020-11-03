@@ -95,7 +95,6 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public WebElement findElement() {
         if (cachedElement != null && shouldCache) {
-            LOGGER.debug("returning element from cache: " + by);
             return cachedElement;
         }
 
