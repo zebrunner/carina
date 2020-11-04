@@ -335,10 +335,9 @@ public class Screenshot {
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
-        LOGGER.debug("Screenshot->capture starting...");
-
         if (isTakeScreenshot) {
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+            LOGGER.debug("Screenshot->capture starting...");
             try {
             	if (!isCaptured(comment)) {
                     // [VD] do not write something to log as this original exception is used as original exception for failure
@@ -417,9 +416,10 @@ public class Screenshot {
                 LOGGER.debug(e.getMessage(), e);
             } finally {
                 Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+                LOGGER.debug("Screenshot->capture finished.");
             }
         }
-        LOGGER.debug("Screenshot->capture finished.");
+        
         return screenName;
     }
 
@@ -556,6 +556,7 @@ public class Screenshot {
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
 				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
 				|| message.contains("no such element: Unable to locate element")
+				|| message.contains("https://www.seleniumhq.org/exceptions/no_such_element.html") // use-case for Safari driver
 				|| message.contains("no such window: window was already closed")
 				|| message.contains("Method is not implemented") //to often exception for mobile native app testing
 				// [VD] exclude below condition otherwise we overload appium when fluent wait looking for device and doing screenshot in a loop 

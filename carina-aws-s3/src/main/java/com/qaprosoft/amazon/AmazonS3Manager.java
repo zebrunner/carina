@@ -55,6 +55,7 @@ public class AmazonS3Manager {
     private AmazonS3Manager() {
     }
 
+    @SuppressWarnings("deprecation")
     public static AmazonS3Manager getInstance() {
         if (instance == null) {
             synchronized (AmazonS3Manager.class) {

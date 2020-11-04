@@ -97,7 +97,6 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public WebElement findElement() {
         if (cachedElement != null && shouldCache) {
-            LOGGER.debug("returning element from cache: " + by);
             return cachedElement;
         }
 
@@ -213,7 +212,6 @@ public class ExtendedElementLocator implements ElementLocator {
             String replacement = "translate(" + matcher.group(2) + ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(4) + ")" + matcher.group(3)
                     + "translate(" + matcher.group(4) + value + matcher.group(4)+ ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(6)
                     + ")" + matcher.group(7);
-            LOGGER.debug("xpath translate:");
             LOGGER.debug(replacement);
             matcher.appendReplacement(sb, replacement);
         }

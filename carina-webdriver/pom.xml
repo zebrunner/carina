@@ -28,7 +28,7 @@
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
-		<itext.version>5.0.6</itext.version>
+		<itext.version>5.5.13.2</itext.version>
 		<reflections.version>0.9.10</reflections.version>
 		<mockito-all.version>1.10.19</mockito-all.version>
 

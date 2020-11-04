@@ -18,12 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.resources;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +59,8 @@ public class L10N {
         try {
 
             for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
-                public @Override boolean accept(URL u) {
+                public @Override
+                boolean accept(URL u) {
                     String s = u.getPath();
                     boolean contains = s.contains(SpecialKeywords.L10N);
                     if (contains) {
@@ -174,7 +170,7 @@ public class L10N {
      * @return String
      */
     public static String getText(String key, Locale locale) {
-        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
+//        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
         Iterator<ResourceBundle> iter = resBoundles.iterator();
         while (iter.hasNext()) {
             ResourceBundle bundle = iter.next();
@@ -189,13 +185,13 @@ public class L10N {
 					}
 				}
 				
-                LOGGER.debug("Looking for value for locale:'"
-                        + locale.toString()
-                        + "' current iteration locale is: '"
-                        + bundle.getLocale().toString() + "'.");
+//                LOGGER.debug("Looking for value for locale:'"
+//                        + locale.toString()
+//                        + "' current iteration locale is: '"
+//                        + bundle.getLocale().toString() + "'.");
                 if (bundle.getLocale().toString().equals(locale.toString())) {
-                    LOGGER.debug("Found locale:'" + locale.toString()
-                            + "' and value is '" + value + "'.");
+//                    LOGGER.debug("Found locale:'" + locale.toString()
+//                            + "' and value is '" + value + "'.");
                     return value;
                 }
             } catch (MissingResourceException e) {
@@ -265,7 +261,6 @@ public class L10N {
         } catch (Exception e) {
             LOGGER.debug("There is no l10n_encoding parameter in config properties.");
         }
-        LOGGER.debug("Will use L10N encoding: " + encoding);
         return encoding.toUpperCase().contains("UTF-8");
     }
 }

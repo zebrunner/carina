@@ -139,6 +139,8 @@ public class SpecialKeywords {
     // ------------- CAPABILITIES PROPERTIES --------------------------
     public static final String CAPABILITIES = "capabilities";
     public static final String ENABLE_VIDEO = "capabilities.enableVideo";
+    public static final String ENABLE_LOG = "capabilities.enableLog";
+    public static final String ENABLE_METADATA = "capabilities.enableMetadata";
     public static final String PLATFORM = "capabilities.platform";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
@@ -166,6 +168,8 @@ public class SpecialKeywords {
     // -------------- HUB PROVIDERS -------------------------------------
     public static final String BROWSERSTACK = "browserstack";
     public static final String ZEBRUNNER = "zebrunner";
+    public static final String MCLOUD = "mcloud";
+    public static final String SELENIUM = "selenium";
 
 
     // ------------- STF PROPERTIES ---------------------------------

@@ -432,16 +432,13 @@ public class Configuration {
 
         String platform = getPlatform();
         if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
-            LOGGER.debug("Detected WINDOWS driver_type by platform: " + platform);
             return SpecialKeywords.WINDOWS;
         }
 
-        LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
 
@@ -451,7 +448,6 @@ public class Configuration {
             return getDriverType();
         }
 
-        LOGGER.debug("Detecting driver_type by capabilities: " + capabilities);
         String platform = "";
         if (capabilities.getCapability("platform") != null) {
             platform = capabilities.getCapability("platform").toString();
@@ -462,12 +458,10 @@ public class Configuration {
         }
 
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
-            LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
-            LOGGER.debug("Detected WINDOWS driver_type by platform: " + platform);
             return SpecialKeywords.WINDOWS;
         }
 
@@ -477,7 +471,6 @@ public class Configuration {
             return SpecialKeywords.MOBILE;
         }
 
-        LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
 

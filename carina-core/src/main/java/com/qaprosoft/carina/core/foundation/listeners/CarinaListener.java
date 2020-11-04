@@ -135,7 +135,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             try {
                 L10Nparser.init();
             } catch (Exception e) {
-                LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
+                LOGGER.error("L10N parser bundle is not initialized successfully!", e);
             }
 
             // declare global capabilities in configuration if custom_capabilities is declared 
@@ -283,18 +283,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private boolean hasDependencies(ITestResult result) {
         String methodName = result.getMethod().getMethodName();
         String className = result.getMethod().getTestClass().getName();
-        LOGGER.debug("current method: " + className + "." + methodName);
 
         // analyze all suite methods and return true if any of them depends on
         // existing method
         List<ITestNGMethod> methods = result.getTestContext().getSuite().getAllMethods();
         for (ITestNGMethod method : methods) {
-            LOGGER.debug("analyze method for dependency: " + method.getMethodName());
-            
             List<String> dependencies = Arrays.asList(method.getMethodsDependedUpon());
 
             if (dependencies.contains(methodName) ||
                     dependencies.contains(className + "." + methodName)) {
+                LOGGER.debug("dependency detected for " + methodName);
                 return true;
             }
         }
@@ -369,7 +367,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
             String browser = getBrowser();
-            String deviceName = getDeviceName();
+            String deviceName = getFullDeviceName();
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
 
@@ -441,7 +439,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     // TODO: remove this private method
-    private String getDeviceName() {
+    private String getFullDeviceName() {
         String deviceName = "Desktop";
 
         if (!IDriverPool.getDefaultDevice().isNull()) {
@@ -463,7 +461,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!browser.isEmpty()) {
             browser = " " + browser; // insert the space before
         }
-        String device = getDeviceName();
+        String device = getFullDeviceName();
 
         String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV)
                 : Configuration.get(Parameter.URL);
@@ -638,7 +636,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
                 // generate presigned url for nearest 8 hours
-                long hours = 8*1000*60*60;
+                long hours = 8L*1000*60*60;
                 String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
                 LOGGER.debug("preSigned URL: " + presignedAppUrl);
                 Configuration.setMobileApp(presignedAppUrl);

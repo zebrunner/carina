@@ -8,7 +8,7 @@ import com.qaprosoft.carina.core.foundation.cucumber.CucumberBaseTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(features = "src/test/resources/features/GSMArenaNews.feature",
-        glue = "${package}.cucumber.steps",
+        glue = "${package}.carina.demo.cucumber.steps",
         format={"pretty",
                 "html:target/cucumber-core-test-report",
                 "pretty:target/cucumber-core-test-report.txt",
