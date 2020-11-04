@@ -261,7 +261,10 @@ public class ExtendedWebElement {
     
     private WebElement getCachedElement() {
         if (element == null) {
-        	//TODO: why 1 sec?
+            //TODO: only for snapshot builds, disable for next release!
+            LOGGER.error("TODO: investigate why cached element might be null!");
+            
+            //TODO: why 1 sec?
             element = findElement(1);
         }
         return element;
