@@ -21,7 +21,10 @@ import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,9 @@ public class AdbExecutor {
             executor = new ProcessBuilderExecutor(cmd);
 
             Process process = executor.start();
+            if (!process.waitFor(Configuration.getAdbExecTimeout(), TimeUnit.MILLISECONDS)) {
+                throw new TimeoutException("Waiting time elapsed before the adb execution command has exited");
+            }
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = null;
 

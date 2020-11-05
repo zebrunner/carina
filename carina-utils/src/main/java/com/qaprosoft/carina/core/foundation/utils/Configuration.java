@@ -380,6 +380,18 @@ public class Configuration {
         //TODO: try to get actual platform name
         return platform;
     }
+
+    public static int getAdbExecTimeout() {
+        // default "capabilities.adbExecTimeout=value" should be used to determine current platform
+        int adbExecTimeout = SpecialKeywords.DEFAULT_ADB_EXEC_TIMEOUT;
+
+        // redefine adb exec timeout if capabilities.AdbExecTimeout is available
+        if (!R.CONFIG.get(SpecialKeywords.ADB_EXEC_TIMEOUT).isEmpty()) {
+            adbExecTimeout = R.CONFIG.getInt(SpecialKeywords.ADB_EXEC_TIMEOUT);
+        }
+
+        return adbExecTimeout;
+    }
     
     public static String getPlatformVersion() {
         // default "os_version=value" should be used to determine current platform
