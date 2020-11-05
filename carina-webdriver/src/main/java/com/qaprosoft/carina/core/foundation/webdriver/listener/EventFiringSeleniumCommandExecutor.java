@@ -20,9 +20,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
+
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 /**
  * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
@@ -30,6 +34,7 @@ import org.openqa.selenium.remote.Response;
  * @author akhursevich
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
+    private static final Logger LOGGER = Logger.getLogger(EventFiringSeleniumCommandExecutor.class);
 
     private List<IDriverCommandListener> listeners = new ArrayList<>();
     
@@ -45,7 +50,15 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
             listener.beforeEvent(command);
         }
 
-        response = super.execute(command);
+        try {
+            response = super.execute(command);
+        } catch (JsonException e) {
+            // to handle potential grid/hub issue:
+            // Expected to read a START_MAP but instead have: END. Last 0 characters read
+            LOGGER.error(e);
+            CommonUtils.pause(0.1);
+            response = super.execute(command);
+        }
 
         for (IDriverCommandListener listener : listeners) {
             listener.afterEvent(command);
