@@ -157,7 +157,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
             } catch (JsonException e) {
                 // to handle potential grid/hub issue:
                 // Expected to read a START_MAP but instead have: END. Last 0 characters read
-                LOGGER.error(e);
+                LOGGER.debug("Repeit the command due to the JsonException: " + command.getName(), e);
                 CommonUtils.pause(0.1);
                 response = super.execute(command);
             }
