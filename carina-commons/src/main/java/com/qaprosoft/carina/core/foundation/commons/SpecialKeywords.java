@@ -150,7 +150,8 @@ public class SpecialKeywords {
     public static final String PLATFORM = "capabilities.platform";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
-    
+
+    public static final String ADB_EXEC_TIMEOUT = "capabilities.adbExecTimeout";
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
     public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
     public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
@@ -196,6 +197,7 @@ public class SpecialKeywords {
 
 
     // ------------- Mobile screenshots cutting strategies configuration  ---------------
+    public static final int DEFAULT_ADB_EXEC_TIMEOUT = 20000;
     public static final int DEFAULT_SCROLL_TIMEOUT = 100;
     public static final int DEFAULT_BLOCK = 0;
     public static final int DEFAULT_IOS_HEADER = 74;
