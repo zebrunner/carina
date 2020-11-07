@@ -54,7 +54,7 @@ public interface IDriverCommandListener {
             Long ztid = (Long) res.getAttribute("ztid");
             if (ztid != artifact.getTestId()) {
                 artifact.setTestId(ztid);
-                LISTENER_LOGGER.debug("Registered artifact '" + artifact.getName() + "' into zebrunner reporting");
+                LISTENER_LOGGER.debug("Registered artifact: '" + artifact.getName() + "'; link: " + artifact.getLink() + " into zebrunner reporting ztid: " + ztid);
                 if (ZafiraSingleton.INSTANCE.isRunning()) {
                     ZafiraSingleton.INSTANCE.getClient().addTestArtifact(artifact);
                 }
