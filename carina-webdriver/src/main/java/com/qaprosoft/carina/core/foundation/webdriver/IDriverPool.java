@@ -322,6 +322,8 @@ public interface IDriverPool {
             }
             SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
             
+            //TODO: remove in 7.0 after making independent logs/video upload from device to s3 compatible storage
+            // https://github.com/qaprosoft/carina/issues/1174
             try {
                 for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
                     if ("bugreport".equals(logType) || "performance".equals(logType)) {
