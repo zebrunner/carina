@@ -235,8 +235,7 @@ public final class ProxyPool {
      * 
      */
     public static void stopProxy() {
-        long threadId = Thread.currentThread().getId();
-        stopProxyByThread(threadId);
+        stopProxyByThread(Thread.currentThread().getId());
     }
     
     /**
@@ -254,7 +253,6 @@ public final class ProxyPool {
      */
     private static void stopProxyByThread(long threadId) {
         if (proxies.containsKey(threadId)) {
-            LOGGER.debug("stopProxy starting...");
             setProxyPortToAvailable(threadId);
             BrowserMobProxy proxy = proxies.get(threadId);
             if (proxy != null) {
@@ -262,21 +260,18 @@ public final class ProxyPool {
 
                 // isStarted returns true even if proxy was already stopped
                 if (proxy.isStarted()) {
-                    LOGGER.info("Stopping BrowserMob proxy...");
                     try {
+                        LOGGER.debug("stopProxy starting...");                        
                         proxy.stop();
                     } catch (IllegalStateException e) {
                         LOGGER.info("Seems like proxy was already stopped.");
                         LOGGER.info(e.getMessage());
+                    } finally {
+                        LOGGER.debug("stopProxy finished...");
                     }
-                    
-                } else {
-                    LOGGER.info("Stopping BrowserMob proxy skipped as it is not started.");
                 }
             }
             proxies.remove(threadId);
-            //proxyPortsByThread.remove(threadId);
-            LOGGER.debug("stopProxy finished...");
         }
     }
 

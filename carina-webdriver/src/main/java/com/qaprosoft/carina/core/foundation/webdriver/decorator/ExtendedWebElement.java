@@ -262,7 +262,9 @@ public class ExtendedWebElement {
     
     private WebElement getCachedElement() {
         if (element == null) {
-        	//TODO: why 1 sec?
+            LOGGER.debug("TODO: investigate why cached element might be null!");
+            
+            //TODO: why 1 sec?
             element = findElement(1);
         }
         return element;
@@ -363,6 +365,38 @@ public class ExtendedWebElement {
     }
     
     private WebElement refindElement() {
+        // do not return without element initialization!
+        // TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class
+        // at all!
+        try {
+            if (searchContext != null) {
+                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
+                element = searchContext.findElement(by);
+            } else {
+                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
+                element = getDriver().findElement(by);
+            }
+        } catch (StaleElementReferenceException | InvalidElementStateException | JsonException e) {
+            LOGGER.debug("catched exception: ", e);
+            // use available driver to research again...
+            // TODO: handle case with rootBy to be able to refind also lists etc
+            if (searchContext != null) {
+                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
+                element = searchContext.findElement(by);
+            } else {
+                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
+                element = getDriver().findElement(by);
+            }
+        } catch (WebDriverException e) {
+            LOGGER.debug("catched WebDriverException: ", e);
+            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
+            element = getDriver().findElement(by);
+        }
+        return element;
+    }
+    
+    //TODO: integrate this call without raising exception in debug purposes and test in paralle lwith old one
+    private WebElement refindElementFluent() {
         FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
 
         long refindTimeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 10; //minimize to several seconds otherwise huge delays occurs
