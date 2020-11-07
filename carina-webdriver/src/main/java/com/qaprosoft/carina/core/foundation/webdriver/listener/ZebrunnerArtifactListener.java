@@ -27,41 +27,38 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 public class ZebrunnerArtifactListener implements IDriverCommandListener {
 
     private TestArtifactType testArtifact;
-    private String afterEvent;
 
-    private boolean registered = false; //boolean property to minimize number of calls to reporting
+    // boolean property to identify when artifact is ready for registration using valid sessionId
+    private boolean inited = false;
 
     public ZebrunnerArtifactListener(TestArtifactType testArtifact) {
-        this(testArtifact, null); //register anytime as only sessionId is registered
-    }
-
-    public ZebrunnerArtifactListener(TestArtifactType testArtifact, String afterEvent) {
         this.testArtifact = testArtifact;
-        this.afterEvent = afterEvent;
     }
 
     @Override
     public void beforeEvent(Command command) {
-        // do nothing
+        // there is no way to register driver artifact after quit because some drivers may belong to different tests
+        // i.e. we have to assign existing artifact at run-time to every unique test we've found
+        if (inited) {
+            registerArtifact(command, testArtifact);
+        }
     }
 
     @Override
     public void afterEvent(Command command) {
+        // all supported artifacts used sessionId to finalize valid value so we should wait a command when valid id is available
         if (command.getSessionId() == null) {
             return;
         }
-        // double %s replacement by session to support sessionId/sessionId.json metadata!
-        if (!registered && this.afterEvent == null) {
-            //register as only sessionId is not null
-            testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
-            registerArtifact(command, testArtifact);
-            registered = true;
-        } else if (!registered && this.afterEvent.equals(command.getName())) {
-            //register as only sessionId is not null and afterEvenet equals current command
-            testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
-            registerArtifact(command, testArtifact);
-            registered = true;
+
+        if (inited) {
+            // no sense to update link because the same session already initialized
+            return;
         }
+
+        // double %s replacement by session to support sessionId/sessionId.json metadata!
+        testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
+        inited = true;
     }
 
 }
