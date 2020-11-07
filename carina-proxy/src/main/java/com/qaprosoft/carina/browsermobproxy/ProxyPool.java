@@ -341,12 +341,13 @@ public final class ProxyPool {
      * @param port
      */
     private static void killProcessByPort(int port) {
-    	if (port == 0) {
-    		//do nothing as it is default dynamic browsermob proxy
-    		return;
-    	}
+        if (port == 0) {
+            //do nothing as it is default dynamic browsermob proxy
+            return;
+        }
         LOGGER.info(String.format("Process on port %d will be closed.", port));
-        //TODO: make OS independent
+
+        //TODO: make OS independent or remove completely
         try {
             List<?> output = new AdbExecutor().execute(String.format("lsof -ti :%d", port).split(" "));
             LOGGER.debug("proxy process before kill: " + StringUtils.join(output, ""));
@@ -363,7 +364,8 @@ public final class ProxyPool {
             LOGGER.debug("proxy process after kill and 2 sec pause: " + StringUtils.join(output, ""));
             
         } catch (Exception e) {
-            LOGGER.error("Undefined failure during process kill by port number!", e);
+            LOGGER.error("Unable to kill process by lsof utility: " + e.getMessage());
+            LOGGER.debug(e.getMessage(), e);
         }
     }
 }
