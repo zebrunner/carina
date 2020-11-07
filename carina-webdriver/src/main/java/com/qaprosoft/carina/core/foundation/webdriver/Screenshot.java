@@ -200,8 +200,6 @@ public class Screenshot {
         String screenName;
         BufferedImage screen = null;
 
-        LOGGER.debug("Screenshot->captureFullSize starting...");
-
         try {
             if (!isCaptured(comment)) {
                 // [VD] do not write something to log as this original exception is used as original exception for failure
@@ -209,7 +207,11 @@ public class Screenshot {
                 return null;
             }
 
+            LOGGER.debug("Screenshot->captureFullSize starting...");
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
+            
+            driver = castDriver(driver); // remove all DriverListener casting to WebDriver
+            
             // Define test screenshot root
             File testScreenRootDir = ReportContext.getTestDir();
 
@@ -267,8 +269,8 @@ public class Screenshot {
             LOGGER.debug(e.getMessage(), e);
         } finally {
             Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+            LOGGER.debug("Screenshot->captureFullSize finished.");
         }
-        LOGGER.debug("Screenshot->captureFullSize finished.");
         return screen;
     }
 
@@ -338,6 +340,8 @@ public class Screenshot {
         if (isTakeScreenshot) {
             Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
             LOGGER.debug("Screenshot->capture starting...");
+            
+            driver = castDriver(driver); // remove all DriverListener casting to WebDriver
             try {
             	if (!isCaptured(comment)) {
                     // [VD] do not write something to log as this original exception is used as original exception for failure
@@ -462,6 +466,7 @@ public class Screenshot {
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
         BufferedImage screenShot;
+        
         if (driver.getClass().toString().contains("windows")) {
             File screenshot = ((WindowsDriver<?>) driver).getScreenshotAs(OutputType.FILE);
             screenShot = ImageIO.read(screenshot);
@@ -671,6 +676,18 @@ public class Screenshot {
             return ShootingStrategies.viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_IOS_HEADER,
                     SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_DPR);
         }
+    }
+
+    /**
+     * Cast Carina driver to WebDriver removing all extra listeners (use it in problematic places where you handle all exceptions)
+     *
+     * @return WebDriver
+     */
+    private static WebDriver castDriver(WebDriver drv) {
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        }
+        return drv;
     }
     
 }
