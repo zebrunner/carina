@@ -3,8 +3,6 @@ package com.qaprosoft.carina.core.foundation.utils.video;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-
 /**
  * Created by Quang Le (quangltp) on 10/5/20
  */

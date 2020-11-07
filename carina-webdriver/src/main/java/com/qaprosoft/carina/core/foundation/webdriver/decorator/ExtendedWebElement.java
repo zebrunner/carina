@@ -23,10 +23,8 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +53,6 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -373,7 +370,7 @@ public class ExtendedWebElement {
                 // TODO: use-case when format method is used. Need investigate howto init context in this case as well
                 element = searchContext.findElement(by);
             } else {
-                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
+                LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);
             }
         } catch (StaleElementReferenceException | InvalidElementStateException | JsonException e) {
@@ -384,7 +381,7 @@ public class ExtendedWebElement {
                 // TODO: use-case when format method is used. Need investigate howto init context in this case as well
                 element = searchContext.findElement(by);
             } else {
-                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
+                LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);
             }
         } catch (WebDriverException e) {
@@ -395,39 +392,6 @@ public class ExtendedWebElement {
         return element;
     }
     
-    //TODO: integrate this call without raising exception in debug purposes and test in paralle lwith old one
-    private WebElement refindElementFluent() {
-        FluentWait<WebDriver> wait = new FluentWait<>(getDriver());
-
-        long refindTimeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 10; //minimize to several seconds otherwise huge delays occurs
-        wait.pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
-                .withTimeout(Duration.ofSeconds(refindTimeout)) 
-                .ignoring(StaleElementReferenceException.class)
-                .ignoring(InvalidElementStateException.class);
-
-        try {
-            this.element = wait.until(new Function<WebDriver, WebElement>() {
-                public WebElement apply(WebDriver driver) {
-                    if (searchContext != null) {
-                        try {
-                            return searchContext.findElement(by);
-                        } catch (WebDriverException e) {
-                            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile; and react web - all browsers)
-                            LOGGER.debug("Unable to refind element by searchContext: " + searchContext, e);
-                            return getDriver().findElement(by);
-                        }
-                    } else {
-                        return getDriver().findElement(by);
-                    }
-                }
-            });
-        } catch (TimeoutException e) {
-            throw new NoSuchElementException("Unable to detect element using By: " + by.toString());
-        }
-
-        return element;
-    }
-
     public void setElement(WebElement element) {
         this.element = element;
     }
