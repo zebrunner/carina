@@ -32,6 +32,7 @@ public class Ownership {
     private Ownership() {
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     public static String getMethodOwner(ITestResult result) {
 
         @SuppressWarnings("unchecked")
