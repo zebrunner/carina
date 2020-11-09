@@ -41,7 +41,7 @@ public class DivisionElementExtractor extends AbstractElementExtractor implement
         int isLower;
         Rectangle tempRect;
         while (elements.size() != 1) {
-            index = (int) (Math.round(elements.size() / 2));
+            index = Math.round(elements.size() / 2f);
             tempElement = elements.get(index);
             tempRect = getRect(tempElement);
             isLower = isLower(tempRect, y);

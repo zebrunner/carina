@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
+import java.util.Arrays;
 
 import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -195,8 +196,8 @@ public class DriverListener implements WebDriverEventListener {
         
         // hopefully castDriver below resolve root cause of the recursive onException calls but keep below if to ensure
         if (thr.getStackTrace() != null
-                && (thr.getStackTrace().toString().contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException") ||
-                        thr.getStackTrace().toString().contains("Unable to capture screenshot due to the WebDriverException"))) {
+                && (Arrays.toString(thr.getStackTrace()).contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
+                || Arrays.toString(thr.getStackTrace()).contains("Unable to capture screenshot due to the WebDriverException"))) {
             LOGGER.error("Do not generate screenshot for invalid driver!");
             // prevent recursive crash for onException
             return;
@@ -338,7 +339,7 @@ public class DriverListener implements WebDriverEventListener {
 		ITestResult res = Reporter.getCurrentTestResult();
 		if (res != null && res.getAttribute("ztid") != null) {
 			Long ztid = (Long) res.getAttribute("ztid");
-			if (ztid != vncArtifact.getTestId() && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
+			if (!ztid.equals(vncArtifact.getTestId()) && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
 				vncArtifact.setTestId(ztid);
 				LOGGER.debug("Registered live video artifact " + vncArtifact.getName() + " into zafira");
 				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);

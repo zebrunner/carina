@@ -53,23 +53,19 @@ public class AmazonS3Manager {
     private AmazonS3Manager() {
     }
 
-    public static AmazonS3Manager getInstance() {
+    public synchronized static AmazonS3Manager getInstance() {
         if (instance == null) {
-            synchronized (AmazonS3Manager.class) {
-                if (instance == null) {
-                    instance = new AmazonS3Manager();
-                    CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-                    Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-                    
-                    String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
-                    String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
+            instance = new AmazonS3Manager();
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+            Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
-                    System.setProperty("aws.accessKeyId", accessKey);
-                    System.setProperty("aws.secretKey", secretKey);
+            String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
+            String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
 
-                    s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
-                }
-            }
+            System.setProperty("aws.accessKeyId", accessKey);
+            System.setProperty("aws.secretKey", secretKey);
+
+            s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
         }
         return instance;
     }

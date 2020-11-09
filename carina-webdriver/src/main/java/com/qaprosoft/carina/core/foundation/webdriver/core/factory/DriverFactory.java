@@ -45,9 +45,7 @@ import com.qaprosoft.zafira.models.dto.TestArtifactType;
 public class DriverFactory {
 
     private static final Logger LOGGER = Logger.getLogger(DriverFactory.class);
-	
-	private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss z");
-	
+
 	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
@@ -90,7 +88,8 @@ public class DriverFactory {
 		TestArtifactType vncArtifact = new TestArtifactType();
 		try {
 			if (!StringUtils.isEmpty(vncURL) && ZafiraSingleton.INSTANCE.isRunning()) {
-				String name = String.format("Live video %s", SDF.format(new Date()));
+				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss z");
+				String name = String.format("Live video %s", sdf.format(new Date()));
 				LOGGER.debug("Init live video artifact name: " + name + "; vnc: " + vncURL);
 				vncArtifact.setName(name);
 				vncArtifact.setLink(vncURL);

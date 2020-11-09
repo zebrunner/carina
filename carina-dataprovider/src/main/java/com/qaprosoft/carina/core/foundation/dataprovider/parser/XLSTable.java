@@ -33,6 +33,8 @@ public class XLSTable {
     private String executeColumn;
     private String executeValue;
 
+    private final Object lockObj = new Object();
+
     public XLSTable() {
         headers = new LinkedList<String>();
         dataRows = Collections.synchronizedList(new LinkedList<Map<String, String>>());
@@ -122,7 +124,7 @@ public class XLSTable {
                         this.headers.add(currentHeader);
 
                     // Merge data
-                    synchronized (dataMap) {
+                    synchronized (lockObj) {
                         dataMap.put(currentHeader, childRow.getDataRows().get(0).get(currentHeader));
                     }
                 }
