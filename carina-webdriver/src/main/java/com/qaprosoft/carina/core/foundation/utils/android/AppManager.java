@@ -29,13 +29,9 @@ public class AppManager {
     private AppManager() {
     }
 
-    public static AppManager getInstance() {
+    public synchronized static AppManager getInstance() {
         if (instance == null) {
-            synchronized (AppManager.class) {
-                if (instance == null) {
-                    instance = new AppManager();
-                }
-            }
+            instance = new AppManager();
         }
         return instance;
     }
