@@ -131,13 +131,13 @@ public class TagManagerTest {
         Set<TagType> tagsTypes = getTestTags(result);
         Assert.assertEquals(tagsTypes.size(), 3);
         for (TagType entry : tagsTypes) {
-            if (entry.getName().equals(SpecialKeywords.TEST_PRIORITY_KEY)) {
+            if (entry.getKey().equals(SpecialKeywords.TEST_PRIORITY_KEY)) {
                 Assert.assertEquals(entry.getValue(), "P2");
             }
         }
 
         tagsTypes.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
+            Object currentKey = entry.getKey();
             Object currentValue = entry.getValue();
             LOGGER.info(currentKey + "=" + currentValue);
         });
@@ -161,13 +161,13 @@ public class TagManagerTest {
         Set<TagType> tagsTypes = getTestTags(result);
         Assert.assertEquals(tagsTypes.size(), 2);
         for (TagType entry : tagsTypes) {
-            if (entry.getName().equals(TAG_NAME2)) {
+            if (entry.getKey().equals(TAG_NAME2)) {
                 Assert.assertEquals(entry.getValue(), TAG_VALUE2);
             }
         }
 
         tagsTypes.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
+            Object currentKey = entry.getKey();
             Object currentValue = entry.getValue();
             LOGGER.info(currentKey + "=" + currentValue);
         });
@@ -179,7 +179,7 @@ public class TagManagerTest {
         String testPriority = PriorityManager.getPriority(test);
         if (testPriority != null && !testPriority.isEmpty()) {
             TagType priority = new TagType();
-            priority.setName(SpecialKeywords.TEST_PRIORITY_KEY);
+            priority.setKey(SpecialKeywords.TEST_PRIORITY_KEY);
             priority.setValue(testPriority);
             tags.add(priority);
         }
@@ -188,7 +188,7 @@ public class TagManagerTest {
 
         testTags.entrySet().stream().forEach((entry) -> {
             TagType tagEntry = new TagType();
-            tagEntry.setName(entry.getKey());
+            tagEntry.setKey(entry.getKey());
             tagEntry.setValue(entry.getValue());
             tags.add(tagEntry);
         });
