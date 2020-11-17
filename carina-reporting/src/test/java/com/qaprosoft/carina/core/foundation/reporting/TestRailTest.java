@@ -147,13 +147,13 @@ public class TestRailTest implements ITestRailManager {
         Set<TagType> finalTags = tags;
         testRailTags.forEach((entry) -> {
             TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
+            tagEntry.setKey(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
             tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
             finalTags.add(tagEntry);
         });
 
         tags.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
+            Object currentKey = entry.getKey();
             Object currentValue = entry.getValue();
             LOGGER.info(currentKey + "=" + currentValue);
         });

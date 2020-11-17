@@ -152,13 +152,13 @@ public class QTestTest implements IQTestManager {
         Set<TagType> finalTags = tags;
         QTestTags.forEach((entry) -> {
             TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
+            tagEntry.setKey(SpecialKeywords.QTEST_TESTCASE_UUID);
             tagEntry.setValue(projectID + "-" + entry);
             finalTags.add(tagEntry);
         });
 
         tags.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
+            Object currentKey = entry.getKey();
             Object currentValue = entry.getValue();
             LOGGER.info(currentKey + "=" + currentValue);
         });
