@@ -192,7 +192,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         String testPriority = PriorityManager.getPriority(test);
         if (testPriority != null && !testPriority.isEmpty()) {
             TagType priority = new TagType();
-            priority.setName(SpecialKeywords.TEST_PRIORITY_KEY);
+            priority.setKey(SpecialKeywords.TEST_PRIORITY_KEY);
             priority.setValue(testPriority);
             tags.add(priority);
         }
@@ -200,7 +200,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         Map<String, String> testTags = TagManager.getTags(test);
         testTags.forEach((name, value) -> {
             TagType tagEntry = new TagType();
-            tagEntry.setName(name);
+            tagEntry.setKey(name);
             tagEntry.setValue(value);
             tags.add(tagEntry);
         });
@@ -230,7 +230,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         if (projectID != -1 && suiteID != -1) {
             testRailTags.forEach((entry) -> {
                 TagType tagEntry = new TagType();
-                tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
+                tagEntry.setKey(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
                 tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
                 tags.add(tagEntry);
             });
@@ -250,7 +250,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
         if (projectID != -1) {
             qTestTags.forEach((entry) -> {
                 TagType tagEntry = new TagType();
-                tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
+                tagEntry.setKey(SpecialKeywords.QTEST_TESTCASE_UUID);
                 tagEntry.setValue(projectID + "-" + entry);
                 tags.add(tagEntry);
             });
