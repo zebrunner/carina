@@ -57,8 +57,8 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
         }
         
         String sessionId = command.getSessionId().toString();
-        if (sessionId.length() == 64) {
-            //use case with GoGridRouter so we have to reused last 32 symbols only!
+        if (sessionId.length() >= 64 ) {
+            //use case with GoGridRouter so we have to cut first 32 symbols!
             sessionId = sessionId.substring(32);
         }
 
