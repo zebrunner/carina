@@ -55,9 +55,15 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
             // no sense to update link because the same session already initialized
             return;
         }
+        
+        String sessionId = command.getSessionId().toString();
+        if (sessionId.length() >= 64 ) {
+            //use case with GoGridRouter so we have to cut first 32 symbols!
+            sessionId = sessionId.substring(32);
+        }
 
         // double %s replacement by session to support sessionId/sessionId.json metadata!
-        testArtifact.setLink(String.format(testArtifact.getLink(), command.getSessionId().toString(), command.getSessionId().toString()));
+        testArtifact.setLink(String.format(testArtifact.getLink(), sessionId, sessionId));
         inited = true;
     }
 
