@@ -38,6 +38,13 @@ public class FirefoxCapabilities extends AbstractCapabilities {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities = initBaseCapabilities(capabilities, BrowserType.FIREFOX, testName);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setPreference("media.eme.enabled", true);
+        profile.setPreference("media.gmp-manager.updateEnabled", true);
+
+        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
+        capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
         LOGGER.debug("Firefox caps: " + capabilities);
         return capabilities;
     }
