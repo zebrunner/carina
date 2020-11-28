@@ -130,8 +130,7 @@ public interface IAndroidUtils extends IMobileUtils {
         int height = size.getHeight();
         int width = size.getWidth();
 
-        PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(),
-                Double.valueOf(height * 0.945).intValue());
+        PointOption<?> option = PointOption.point((int) (width * 0.915), (int) (height * 0.945));
         new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
     }
 

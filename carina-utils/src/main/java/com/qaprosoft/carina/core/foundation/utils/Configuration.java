@@ -294,7 +294,7 @@ public class Configuration {
         StringBuilder asString = new StringBuilder();
         asString.append("\n============= Test configuration =============\n");
         for (Parameter param : Parameter.values()) {
-            if (!Parameter.CRYPTO_KEY_PATH.equals(param)) {
+            if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty()) {
                 asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
         }

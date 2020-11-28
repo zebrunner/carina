@@ -145,7 +145,6 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public List<WebElement> findElements() {
         List<WebElement> elements = null;
-        NoSuchElementException exception = null;
 
         try {
             elements = searchContext.findElements(by);
@@ -157,7 +156,7 @@ public class ExtendedElementLocator implements ElementLocator {
         
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
+            throw new NoSuchElementException("Unable to find elements by Selenium");
         }
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists

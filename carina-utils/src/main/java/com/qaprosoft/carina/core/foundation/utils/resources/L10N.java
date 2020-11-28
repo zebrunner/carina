@@ -126,9 +126,8 @@ public class L10N {
                 }
             }
             LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
-        } catch (ClassCastException e) {
-            // #910 starting from java 9 "Base ClassLoader No Longer from URLClassLoader"
-            LOGGER.error("Unable to use L10N resources yet using Java 9+!");
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("L10N folder with resources is missing!");
         }
     }
 

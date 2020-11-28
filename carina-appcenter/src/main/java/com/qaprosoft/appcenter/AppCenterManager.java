@@ -68,13 +68,9 @@ public class AppCenterManager {
     private AppCenterManager() {
     }
 
-    public static AppCenterManager getInstance() {
+    public synchronized static AppCenterManager getInstance() {
         if (instance == null) {
-            synchronized (AppCenterManager.class) {
-                if (instance == null) {
-                    instance = new AppCenterManager();
-                }
-            }
+            instance = new AppCenterManager();
         }
         return instance;
     }

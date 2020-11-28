@@ -11,7 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <carina-core_version>RELEASE</carina-core_version>
+        <carina-core_version>6.5.46</carina-core_version>
         <carina-cucumber_version>1.0.3</carina-cucumber_version>
         <httpclient.version>4.5.3</httpclient.version>
         <java.version>11</java.version>

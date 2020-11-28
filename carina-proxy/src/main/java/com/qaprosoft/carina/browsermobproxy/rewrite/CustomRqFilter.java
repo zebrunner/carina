@@ -53,8 +53,8 @@ public class CustomRqFilter implements RequestFilter {
 
                 // body rewrite
                 String content = contents.getTextContents();
-                content.replaceAll(rewriteItem.getRegex(), rewriteItem.getReplacement());
-                contents.setTextContents(content);
+                String replacedContent = content.replaceAll(rewriteItem.getRegex(), rewriteItem.getReplacement());
+                contents.setTextContents(replacedContent);
             }
         }
         

@@ -493,25 +493,25 @@ public interface IMobileUtils extends IDriverPool {
 
         switch (direction) {
         case LEFT:
-            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
+            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2f);
 
             startx = (int) (elementLocation.getX() + Math.round(maxCoefficient * elementDimensions.getWidth()));
             endx = (int) (elementLocation.getX() + Math.round(minCoefficient * elementDimensions.getWidth()));
             break;
         case RIGHT:
-            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
+            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2f);
 
             startx = (int) (elementLocation.getX() + Math.round(minCoefficient * elementDimensions.getWidth()));
             endx = (int) (elementLocation.getX() + Math.round(maxCoefficient * elementDimensions.getWidth()));
             break;
         case UP:
-            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2f);
 
             starty = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));
             endy = (int) (elementLocation.getY() + Math.round(minCoefficient * elementDimensions.getHeight()));
             break;
         case DOWN:
-            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2f);
 
             starty = (int) (elementLocation.getY() + Math.round(minCoefficient * elementDimensions.getHeight()));
             endy = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));

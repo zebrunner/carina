@@ -37,7 +37,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsF
 public class DriverFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	
+
 	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;

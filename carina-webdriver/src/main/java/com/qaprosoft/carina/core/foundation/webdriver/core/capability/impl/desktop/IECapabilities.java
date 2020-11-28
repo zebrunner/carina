@@ -19,10 +19,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class IECapabilities extends AbstractCapabilities {
@@ -33,12 +30,7 @@ public class IECapabilities extends AbstractCapabilities {
         capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-        
-        //update browser language
-        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
-        if (!browserLang.isEmpty()) {
-        	Assert.fail("Unable to change IE locale via selenium! (" + browserLang + ")");
-        }
+
         return capabilities;
     }
 
