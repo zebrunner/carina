@@ -65,7 +65,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.3.0</appium.version>
         <!-- Qaprosoft integrations -->
-        <agent-testng-pluggable.version>1.0.0</agent-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.1.0.117-SNAPSHOT</zebrunner-testng-pluggable.version>
         <alice-client.version>1.1.0</alice-client.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
@@ -101,7 +101,7 @@
         <module>carina-core</module>
     </modules>
     <repositories>
-	    <!--repository>
+	    <repository>
 	        <id>zebrunner_snapshots</id>
 	        <name>zebrunner Snapshots</name>
 	        <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
@@ -111,7 +111,7 @@
 	        <snapshots>
 	            <enabled>true</enabled>
 	        </snapshots>
-	    </repository-->
+	    </repository>
         <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
@@ -422,7 +422,7 @@
             <dependency>
                 <groupId>com.zebrunner</groupId>
                 <artifactId>agent-testng-pluggable</artifactId>
-                <version>${agent-testng-pluggable.version}</version>
+                <version>${zebrunner-testng-pluggable.version}</version>
             </dependency>
 
             <dependency>
