@@ -38,12 +38,18 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.MobileRecordingListener;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
+import io.appium.java_client.android.AndroidStopScreenRecordingOptions;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
+import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
+import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
+import io.appium.java_client.ios.IOSStopScreenRecordingOptions;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -60,14 +66,11 @@ public class MobileFactory extends AbstractFactory {
             seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
         }
 
-        String driverType = Configuration.getDriverType(capabilities);
         String mobilePlatformName = Configuration.getPlatform(capabilities);
 
-        // TODO: refactor code to be able to remove SpecialKeywords.CUSTOM property
-        // completely
+        // TODO: refactor to be able to remove SpecialKeywords.CUSTOM property completely
 
-        // use comparison for custom_capabilities here to localize as possible usage of
-        // CUSTOM attribute
+        // use comparison for custom_capabilities here to localize as possible usage of CUSTOM attribute
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()
                 && (customCapabilities.toLowerCase().contains("localhost") || customCapabilities.toLowerCase().contains("browserstack") || customCapabilities.toLowerCase().contains("saucelabs"))) {
@@ -88,56 +91,93 @@ public class MobileFactory extends AbstractFactory {
         }
 
         try {
-            if (driverType.equalsIgnoreCase(SpecialKeywords.MOBILE)) {
+            // TODO: investigate possibility to move this custom listeners logic onto the selenium hub layer
+            // So mcloud can support video recording for any framework 
+            EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
+            
+            if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
-                if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                    
-                    if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
-                        // Details about available parameters
-                        // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
-                        AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
-                                .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
-                        boolean enableBugReport = false;
+                if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
+                    // Details about available parameters
+                    // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
+                    AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
+                            .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
+                    boolean enableBugReport = false;
+                    try {
+                        enableBugReport = Configuration.getBoolean(Parameter.ANDROID_ENABLE_BUG_REPORT);
+                    } catch (Exception e) {
+                        LOGGER.error("Enable bug report value should be boolean.", e);
+                    }
+                    if (enableBugReport) {
+                        LOGGER.debug("Bug report will be enabled.");
+                        o1.enableBugReport();
+                    }
+                    String videoSize = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_SIZE);
+                    if (!videoSize.isEmpty()) {
+                        LOGGER.debug("Screen recording size will be set to : " + videoSize);
+                        o1.withVideoSize(videoSize);
+                    }
+                    String bitRateSt = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_BITRATE);
+                    if (!bitRateSt.isEmpty()) {
                         try {
-                            enableBugReport = Configuration.getBoolean(Parameter.ANDROID_ENABLE_BUG_REPORT);
+                            int bitRate = Integer.parseInt(bitRateSt);
+                            LOGGER.debug("Screen recording bit rate will be set to : " + bitRate);
+                            o1.withBitRate(bitRate);
                         } catch (Exception e) {
-                            LOGGER.error("Enable bug report value should be boolean.", e);
+                            LOGGER.error("Screen record bitrate value should be integer.", e);
                         }
-                        if (enableBugReport) {
-                            LOGGER.debug("Bug report will be enabled.");
-                            o1.enableBugReport();
-                        }
-                        String videoSize = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_SIZE);
-                        if (!videoSize.isEmpty()) {
-                            LOGGER.debug("Screen recording size will be set to : " + videoSize);
-                            o1.withVideoSize(videoSize);
-                        }
-                        String bitRateSt = Configuration.get(Parameter.ANDROID_SCREEN_RECORDING_BITRATE);
-                        if (!bitRateSt.isEmpty()) {
-                            try {
-                                int bitRate = Integer.parseInt(bitRateSt);
-                                LOGGER.debug("Screen recording bit rate will be set to : " + bitRate);
-                                o1.withBitRate(bitRate);
-                            } catch (Exception e) {
-                                LOGGER.error("Screen record bitrate value should be integer.", e);
-                            }
-                        }
+                    }
+                    //TODO: setup ftp uploader by default
+                    AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions();
+                    // .withUploadOptions(new ScreenRecordingUploadOptions()
+                    // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
+                    // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
+                    
+                    ce.getListeners()
+                            .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1, o2));
+                }
 
+                driver = new AndroidDriver<AndroidElement>(ce, capabilities);
+
+            } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
+                    || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+
+                if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
+                    // Details about available parameters
+                    // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
+                    IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()
+                            .withVideoQuality(VideoQuality.valueOf(Configuration.get(Parameter.IOS_SCREEN_RECORDING_QUALITY)))
+                            .withVideoType(Configuration.get(Parameter.IOS_SCREEN_RECORDING_CODEC))
+                            .withTimeLimit(Duration.ofSeconds(Configuration.getInt(Parameter.SCREEN_RECORD_DURATION)));
+
+                    String fpsSt = Configuration.get(Parameter.IOS_SCREEN_RECORDING_FPS);
+                    if (!fpsSt.isEmpty()) {
+                        try {
+                            int fps = Integer.parseInt(fpsSt);
+                            LOGGER.debug("Screen recording fps value will be set to : " + fps);
+                            o1.withFps(fps);
+                        } catch (Exception e) {
+                            LOGGER.error("Screen recording fps value should be integer between 1..60", e);
+                        }
                     }
 
-                    driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
+                    if (!Configuration.get(Parameter.VIDEO_SCALE).isEmpty()) {
+                        LOGGER.debug("Video scale option will be set to " + Configuration.get(Parameter.VIDEO_SCALE));
+                        o1.withVideoScale(Configuration.get(Parameter.VIDEO_SCALE));
+                    }
+                    
+                    IOSStopScreenRecordingOptions o2 = new IOSStopScreenRecordingOptions();
 
-                } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
-                        || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-
-                    driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
-
-                } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
-                    // that's a case for custom mobile capabilities like browserstack or saucelabs
-                    driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
-                } else {
-                    throw new RuntimeException("Unsupported mobile capabilities for type: " + driverType + " platform: " + mobilePlatformName);
+                    ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1, o2));
                 }
+
+                driver = new IOSDriver<IOSElement>(ce, capabilities);
+
+            } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
+                // that's a case for custom mobile capabilities like browserstack or saucelabs
+                driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+            } else {
+                throw new RuntimeException("Unsupported mobile platform: " + mobilePlatformName);
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
