@@ -63,7 +63,7 @@
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
         <selenium.version>3.141.59</selenium.version>
-        <appium.version>7.3.0</appium.version>
+        <appium.version>7.4.1</appium.version>
         <!-- Qaprosoft integrations -->
         <zebrunner-testng-pluggable.version>1.1.0.120-SNAPSHOT</zebrunner-testng-pluggable.version>
         <alice-client.version>1.1.0</alice-client.version>
