@@ -125,12 +125,12 @@ public class MobileFactory extends AbstractFactory {
 
                     }
 
-                    driver = new AndroidDriver<AndroidElement>(capabilities);
+                    driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
 
                 } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                         || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
 
-                    driver = new IOSDriver<IOSElement>(capabilities);
+                    driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
 
                 } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                     // that's a case for custom mobile capabilities like browserstack or saucelabs
