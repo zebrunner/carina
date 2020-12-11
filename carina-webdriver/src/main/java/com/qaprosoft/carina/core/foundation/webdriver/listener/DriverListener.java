@@ -43,13 +43,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
  */
 public class DriverListener implements WebDriverEventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
-	// 1. register live vnc url in DriverFactory (method streamVNC should return valid TestArtifactType
-	// 2. DriverFactory->getEventListeners(TestArtifactType vncArtifact)
-	// 3. declare vncArtifact using constructor in DriverListener
-	// 4. onBefore any action try to register vncArtifact in Zafira. Detailed use-cases find in onBeforeAction method 
 
-	
     private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
     private final static ThreadLocal<String> currentNegativeMessage = new ThreadLocal<String>();
 
@@ -108,59 +102,59 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void beforeAlertAccept(WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeAlertDismiss(WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeClickOn(WebElement element, WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeFindBy(By by, WebElement element, WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeNavigateBack(WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeNavigateForward(WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeNavigateRefresh(WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeNavigateTo(String script, WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void beforeScript(String script, WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void onException(Throwable thr, WebDriver driver) {
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
-        if (thr == null 
+        if (thr == null
                 || thr.getMessage() == null
                 || thr.getMessage().contains("Method has not yet been implemented")
                 || thr.getMessage().contains("Method is not implemented")
@@ -172,7 +166,7 @@ public class DriverListener implements WebDriverEventListener {
             // do nothing
             return;
         }
-        
+
         // handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
         // Example:
 
@@ -187,22 +181,23 @@ public class DriverListener implements WebDriverEventListener {
         if (thr.getMessage().contains("is not running, possibly crashed")) {
             throw new RuntimeException(thr);
         }
-        
+
         // hopefully castDriver below resolve root cause of the recursive onException calls but keep below if to ensure
         if (thr.getStackTrace() != null
-                && (Arrays.toString(thr.getStackTrace()).contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
-                || Arrays.toString(thr.getStackTrace()).contains("Unable to capture screenshot due to the WebDriverException"))) {
+                && (Arrays.toString(thr.getStackTrace())
+                        .contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
+                        || Arrays.toString(thr.getStackTrace()).contains("Unable to capture screenshot due to the WebDriverException"))) {
             LOGGER.error("Do not generate screenshot for invalid driver!");
             // prevent recursive crash for onException
             return;
         }
-        
+
         LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
         driver = castDriver(driver);
 
         try {
             // 1. if you see mess with afterTest carina actions and Timer startup failure you should follow steps #2+ to determine root cause.
-            //      Driver initialization 'default' FAILED! Retry 1 of 1 time - Operation already started: mobile_driverdefault
+            // Driver initialization 'default' FAILED! Retry 1 of 1 time - Operation already started: mobile_driverdefault
             // 2. carefully track all preliminary exception for the same thread to detect 1st problematic exception
             // 3. 99% those root exception means that we should prohibit screenshot generation for such use-case
             // 4. if 3rd one is true just update Screenshot.isCaptured() adding part of the exception to the list
@@ -218,9 +213,10 @@ public class DriverListener implements WebDriverEventListener {
                 LOGGER.error("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
             }
         } catch (Throwable e) {
-            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured(). " + e.getMessage(), e);
+            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured(). "
+                    + e.getMessage(), e);
         }
-        
+
         LOGGER.debug("DriverListener->onException finished.");
     }
 
@@ -250,29 +246,28 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void beforeSwitchToWindow(String arg0, WebDriver driver) {
-    	onBeforeAction();
+        // Do nothing
     }
-    
+
     @Override
     public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
         // do nothing
-        
     }
 
     @Override
     public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
-        onBeforeAction();
+        // Do nothing
     }
 
     @Override
     public void afterGetText(WebElement element, WebDriver driver, String arg2) {
-        // do nothing       
+        // do nothing
     }
 
     @Override
     public void beforeGetText(WebElement element, WebDriver driver) {
-        // do nothing       
-    }    
+        // do nothing
+    }
 
     private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
         driver = castDriver(driver);
@@ -285,7 +280,7 @@ public class DriverListener implements WebDriverEventListener {
                 LOGGER.error(comment);
                 if (Screenshot.isEnabled()) {
                     String screenName = Screenshot.capture(driver, comment, true); // in case of failure
-                    //do not generate UI dump if no screenshot
+                    // do not generate UI dump if no screenshot
                     if (!screenName.isEmpty()) {
                         generateDump(screenName);
                     }
@@ -308,47 +303,29 @@ public class DriverListener implements WebDriverEventListener {
             // use the same naming but with zip extension. Put into the test artifacts folder
             String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", ".zip");
             LOGGER.debug("UI Dump artifact: " + dumpArtifact);
-            
-            // build path to screenshot using name 
+
+            // build path to screenshot using name
             File screenFile = new File(ReportContext.getTestDir().getAbsolutePath() + "/" + screenName);
-            
+
             // archive page source dump and screenshot both together
             FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
-            
+
             Artifact.upload(new File(dumpArtifact), "UI Dump artifact");
         } else {
             LOGGER.debug("Dump file is empty.");
         }
     }
-    
+
     private void onAfterAction(String comment, WebDriver driver) {
         captureScreenshot(comment, driver, null, false);
     }
-    
-	private void onBeforeAction() {
-		// 4a. if "tzid" not exist inside vncArtifact and exists in Reporter -> register new vncArtifact in Zafira.
-		// 4b. if "tzid" already exists in current artifact but in Reporter there is another value. Then this is use case for class/suite mode when we share the same
-		// driver across different tests
-
-	    LOGGER.error("TODO: move vncArtifact registration to zebrunner testng agent!");
-/*		ITestResult res = Reporter.getCurrentTestResult();
-		if (res != null && res.getAttribute("ztid") != null) {
-			Long ztid = (Long) res.getAttribute("ztid");
-			if (!ztid.equals(vncArtifact.getTestId()) && vncArtifact != null && ! StringUtils.isBlank(vncArtifact.getName())) {
-				vncArtifact.setTestId(ztid);
-				LOGGER.debug("Registered live video artifact " + vncArtifact.getName() + " into zafira");
-				ZafiraSingleton.INSTANCE.getClient().addTestArtifact(vncArtifact);
-			}
-
-		}*/
-	}
 
     public static String getMessage(boolean errorMessage) {
-    	if (errorMessage) {
-    		return currentNegativeMessage.get();
-    	} else {
-    		return currentPositiveMessage.get();
-    	}
+        if (errorMessage) {
+            return currentNegativeMessage.get();
+        } else {
+            return currentPositiveMessage.get();
+        }
     }
 
     public static void setMessages(String positiveMessage, String negativeMessage) {
@@ -360,7 +337,7 @@ public class DriverListener implements WebDriverEventListener {
         currentPositiveMessage.remove();
         currentNegativeMessage.remove();
     }
-    
+
     /**
      * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
      *
@@ -372,7 +349,5 @@ public class DriverListener implements WebDriverEventListener {
         }
         return drv;
     }
-
-
 
 }
