@@ -163,8 +163,6 @@ public class Configuration {
 
         CORE_LOG_PACKAGES("core_log_packages"),
 
-        ARTIFACTS_EXPIRATION_SECONDS("artifacts_expiration_seconds"),
-
         LOG_ALL_JSON("log_all_json"),
 
         DATE_FORMAT("date_format"),
