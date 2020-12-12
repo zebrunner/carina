@@ -42,7 +42,6 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
-import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.zebrunner.agent.testng.core.retry.RetryAnalyzerInterceptor;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
@@ -158,7 +157,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onTestStart(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onTestStart");
-        VideoAnalyzer.disableVideoUpload();
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
         
         if (curRetryAnalyzer == null
@@ -224,7 +222,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void onTestSuccess(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onTestSuccess");
         passItem(result, Messager.TEST_PASSED);
-        VideoAnalyzer.enableVideoUpload();
 
         afterTest(result);
         super.onTestSuccess(result);
@@ -234,7 +231,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onTestFailure");
         failItem(result, Messager.TEST_FAILED);
-        VideoAnalyzer.enableVideoUpload();
         afterTest(result);
         super.onTestFailure(result);
     }
