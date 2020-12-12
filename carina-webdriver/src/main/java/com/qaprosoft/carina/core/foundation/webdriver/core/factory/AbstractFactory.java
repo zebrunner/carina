@@ -74,8 +74,4 @@ public abstract class AbstractFactory {
         return R.CONFIG.getBoolean(capability);
     }
 
-    protected String getHubProvider() {
-        return R.CONFIG.get(SpecialKeywords.HUB_PROVIDER).toLowerCase();
-    }
-
 }
