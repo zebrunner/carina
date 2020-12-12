@@ -33,18 +33,6 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  */
 public abstract class AbstractFactory {
     
-    protected static final String vnc_protocol = "vnc_protocol";
-    protected static final String vnc_host = "vnc_host";
-    protected static final String vnc_port = "vnc_port";
-    
-    
-    protected final static String VIDEO = "Video";
-    protected final static String LOG = "Log";
-    
-    protected final static String VIDEO_DEFAULT = "video.mp4";
-    protected final static String SESSION_LOG_DEFAULT = "session.log";
-
-
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
      * 
