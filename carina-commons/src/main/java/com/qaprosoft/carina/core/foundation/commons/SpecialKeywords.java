@@ -166,9 +166,6 @@ public class SpecialKeywords {
 
     // ------------- STF PROPERTIES ---------------------------------
     public static final String STF_ENABLED = "STF_ENABLED";
-    public static final String STF_URL = "STF_URL";
-    public static final String STF_TOKEN = "STF_TOKEN";
-
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
