@@ -3,8 +3,6 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-
 /**
  * Created by Quang Le (quangltp) on 11/12/20
  */
