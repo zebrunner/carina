@@ -21,19 +21,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.agent.core.registrar.domain.LabelDTO;
 import com.zebrunner.agent.core.registrar.label.LabelResolver;
 
 public class PriorityManager implements LabelResolver {
 
     @Override
-    public Map<String, List<String>> resolve(Class<?> clazz, Method method) {
+    public List<LabelDTO> resolve(Class<?> clazz, Method method) {
         TestPriority priority = method.getAnnotation(TestPriority.class);
         if (priority == null) {
             priority = clazz.getAnnotation(TestPriority.class);
         }
         return priority != null
-                ? Collections.singletonMap(SpecialKeywords.TEST_PRIORITY_TAG, Collections.singletonList(priority.value().name()))
-                : Collections.emptyMap();
+                ? Collections.singletonList(new LabelDTO(SpecialKeywords.TEST_PRIORITY_TAG, priority.value().name()))
+                : Collections.emptyList();
     }
 
 }

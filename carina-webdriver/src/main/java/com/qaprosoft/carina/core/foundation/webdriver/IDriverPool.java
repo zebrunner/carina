@@ -353,7 +353,7 @@ public interface IDriverPool {
                     } catch (IOException e) {
                         POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
                     }
-                    Artifact.upload(file, logType);
+                    Artifact.attachToTest(logType, file);
                 }
             } catch (Exception e) {
                 POOL_LOGGER.warn("Unable to extract webdriver server logs!");

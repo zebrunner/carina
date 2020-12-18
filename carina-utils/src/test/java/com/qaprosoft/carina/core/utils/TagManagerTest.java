@@ -15,26 +15,24 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import java.util.List;
-import java.util.Map;
-
-import org.testng.Assert;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.annotations.Test;
-
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
+import com.zebrunner.agent.core.registrar.domain.LabelDTO;
+import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.Reporter;
+import org.testng.annotations.Test;
+
+import java.util.List;
 
 /**
  * Tests for {@link TagManager}
  */
 public class TagManagerTest {
-    
+
     private static final String TAG_NAME = "tag1";
     private static final String TAG_NAME2 = "tag2";
     private static final String TAG_VALUE = "testTag1";
@@ -44,7 +42,7 @@ public class TagManagerTest {
     @TestPriority(Priority.P2)
     public void testPriority() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String priority = new PriorityManager().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod()).get(SpecialKeywords.TEST_PRIORITY_TAG).get(0);
+        String priority = new PriorityManager().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod()).get(0).getValue();
         Assert.assertEquals(priority, "P2");
     }
 
@@ -52,7 +50,7 @@ public class TagManagerTest {
     @TestPriority(Priority.P0)
     public void testPriorityCompliance() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String priority = new PriorityManager().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod()).get(SpecialKeywords.TEST_PRIORITY_TAG).get(0);
+        String priority = new PriorityManager().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod()).get(0).getValue();
         Assert.assertEquals(priority, "P0");
     }
 
@@ -61,9 +59,15 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME, value = TAG_VALUE)
     public void testTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        Map<String, List<String>> tags = new TagManager().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
-        Assert.assertTrue(tags.containsKey(TAG_NAME));
-        Assert.assertTrue(tags.get(TAG_NAME).contains(TAG_VALUE));
+        List<LabelDTO> tags = new TagManager()
+                .resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
+
+        LabelDTO label = tags.stream()
+                             .filter(labelDTO -> labelDTO.getKey().equals(TAG_NAME))
+                             .findFirst()
+                             .orElse(null);
+        Assert.assertNotNull(label);
+        Assert.assertEquals(TAG_VALUE, label.getValue());
     }
 
     @Test
@@ -72,11 +76,22 @@ public class TagManagerTest {
     @TestTag(name = TAG_NAME2, value = TAG_VALUE2)
     public void testRepeatableTags() {
         ITestResult result = Reporter.getCurrentTestResult();
-        Map<String, List<String>> tags = new TagManager().resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
-        Assert.assertTrue(tags.containsKey(TAG_NAME));
-        Assert.assertTrue(tags.get(TAG_NAME).contains(TAG_VALUE));
-        Assert.assertTrue(tags.containsKey(TAG_NAME2));
-        Assert.assertTrue(tags.get(TAG_NAME2).contains(TAG_VALUE2));
+        List<LabelDTO> tags = new TagManager()
+                .resolve(this.getClass(), result.getMethod().getConstructorOrMethod().getMethod());
+
+        LabelDTO label1 = tags.stream()
+                              .filter(labelDTO -> labelDTO.getKey().equals(TAG_NAME))
+                              .findFirst()
+                              .orElse(null);
+        Assert.assertNotNull(label1);
+        Assert.assertEquals(TAG_VALUE, label1.getValue());
+
+        LabelDTO label2 = tags.stream()
+                              .filter(labelDTO -> labelDTO.getKey().equals(TAG_NAME))
+                              .findFirst()
+                              .orElse(null);
+        Assert.assertNotNull(label2);
+        Assert.assertEquals(TAG_VALUE, label2.getValue());
     }
 
 }

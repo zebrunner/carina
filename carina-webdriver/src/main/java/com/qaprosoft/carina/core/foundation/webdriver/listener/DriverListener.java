@@ -310,7 +310,7 @@ public class DriverListener implements WebDriverEventListener {
             // archive page source dump and screenshot both together
             FileManager.zipFiles(dumpArtifact, uiDumpFile, screenFile);
 
-            Artifact.upload(new File(dumpArtifact), "UI Dump artifact");
+            Artifact.attachToTest("UI Dump artifact", new File(dumpArtifact));
         } else {
             LOGGER.debug("Dump file is empty.");
         }

@@ -15,10 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.tag;
 
+import com.zebrunner.agent.core.registrar.domain.LabelDTO;
+import com.zebrunner.agent.core.registrar.label.LabelResolver;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,17 +30,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.zebrunner.agent.core.registrar.label.LabelResolver;
-
 public class TagManager implements LabelResolver {
 
     @Override
-    public Map<String, List<String>> resolve(Class<?> clazz, Method method) {
+    public List<LabelDTO> resolve(Class<?> clazz, Method method) {
         Map<String, List<String>> labels = getAnnotations(clazz);
         labels.putAll(getAnnotations(method));
-        return labels;
+
+        return labels.entrySet()
+                     .stream()
+                     .flatMap(keyToValues -> keyToValues.getValue().stream()
+                                                        .map(value -> new LabelDTO(keyToValues.getKey(), value)))
+                     .collect(Collectors.toList());
     }
-    
+
     private Map<String, List<String>> getAnnotations(AnnotatedElement annotatedElement) {
         return Optional.ofNullable(annotatedElement.getAnnotation(TestTag.List.class))
                        .map(TestTag.List::value)
@@ -45,10 +52,11 @@ public class TagManager implements LabelResolver {
                        .filter(Objects::nonNull)
                        .collect(Collectors.toMap(
                                TestTag::name,
-                               tagLabel -> new ArrayList<>(Arrays.asList(tagLabel.value())),
+                               tagLabel -> new ArrayList<>(Collections.singletonList(tagLabel.value())),
                                this::union
                        ));
     }
+
     private List<String> union(List<String> values1, List<String> values2) {
         ArrayList<String> values = new ArrayList<>(values1);
         values.addAll(values2);
