@@ -38,10 +38,6 @@ public enum Messager implements IMessager {
 
     TEST_SKIPPED("%s TEST [%s] SKIPPED at [%s] - %s"),
 
-    TEST_SKIPPED_AS_ALREADY_PASSED("%s TEST [%s] SKIPPED as already passed in previous run at [%s]"),
-
-    TEST_SKIPPED_AS_ALREADY_FAILED_BY_BUG("%s TEST [%s] SKIPPED as already failed because of known issue at [%s]"),
-
     TEST_FAILED("%s TEST [%s] FAILED at [%s] - %s"),
 
     RETRY_FAILED("%s TEST [%s] RETRY %s of %s FAILED - %s"),

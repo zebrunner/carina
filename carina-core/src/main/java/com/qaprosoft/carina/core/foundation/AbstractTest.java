@@ -27,7 +27,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
 
 import com.nordstrom.automation.testng.LinkedListeners;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
@@ -35,6 +34,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
+import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.testng.listener.DataProviderInterceptor;
 import com.zebrunner.agent.testng.listener.TestRunListener;
 
@@ -97,6 +97,7 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     }
     
     protected void skipExecution(String message) {
-        throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
+        CurrentTest.revertRegistration();
+        throw new SkipException(message);
     }
 }

@@ -239,21 +239,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onTestSkipped");
         
-        //TODO: remove handlers for out-of-dated execution(s) 
-        // handle AbstractTest->SkipExecution
-        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
-            // [VD] it is prohibited to release TestInfoByThread in this place.!
-            return;
-        }
-        
-        // handle Zafira already failed by known bug exception for re-run and do nothing
-        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_FAILED_BY_KNOWN_BUG)) {
-            skipTestItem(result, Messager.TEST_SKIPPED_AS_ALREADY_FAILED_BY_BUG);
-            return;
-        }
-        
         super.onTestSkipped(result);
     }
 

@@ -95,6 +95,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
@@ -317,24 +318,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
             }
 
-            // TODO: improve later removing duplicates with AbstractTestListener
-            // handle Zafira already passed exception for re-run and do nothing.
-            // maybe return should be enough
-            if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                    && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-                // [VD] it is prohibited to release TestInfoByThread in this
-                // place.!
-                return;
-            }
-
-            // handle CarinaListener->SkipExecution
-            if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                    && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
-                // [VD] it is prohibited to release TestInfoByThread in this
-                // place.!
-                return;
-            }
-
             List<String> tickets = Jira.getTickets(result);
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
 
@@ -522,8 +505,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 failReason = "";
             }
 
-            if (!tri.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
-                    && !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
+            if (!tri.isConfig()) {
                 String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots())
                         ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
                 reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
@@ -674,7 +656,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     protected void skipExecution(String message) {
-        throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
+        CurrentTest.revertRegistration();
+        throw new SkipException(message);
     }
 
     protected void onHealthCheck(ISuite suite) {

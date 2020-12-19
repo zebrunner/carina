@@ -62,8 +62,6 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	public void beforeEvent(Command command) {
 		if (recording) {
 			if (DriverCommand.QUIT.equals(command.getName())) {
-			    //TODO: remove uploading video recording by carina to FTP. Appium should do it on it's own
-			    
 			    // stop video recording and publish it to local artifacts
 			    String data = "";
                 try {

@@ -35,7 +35,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
  * Time: 12:57 AM
  */
 
-// TODO: rename class to CmdExecutor as we added iOS shell commands as well
 public class AdbExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
