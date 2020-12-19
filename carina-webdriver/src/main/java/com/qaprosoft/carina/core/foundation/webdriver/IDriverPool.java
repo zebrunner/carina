@@ -17,24 +17,21 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.qaprosoft.zafira.util.UploadUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -43,6 +40,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
@@ -55,14 +54,13 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
-import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.zebrunner.agent.core.registrar.Artifact;
 
 public interface IDriverPool {
-    static final Logger POOL_LOGGER = Logger.getLogger(IDriverPool.class);
+    static final Logger POOL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     static final String DEFAULT = "default";
 
     // unified set of Carina WebDrivers
@@ -320,6 +318,7 @@ public interface IDriverPool {
             if (drv instanceof EventFiringWebDriver) {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
             }
+
             SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
             
             //TODO: remove in 7.0 after making independent logs/video upload from device to s3 compatible storage
@@ -354,7 +353,7 @@ public interface IDriverPool {
                     } catch (IOException e) {
                         POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
                     }
-                    UploadUtil.uploadArtifact(file, logType);
+                    Artifact.attachToTest(logType, file);
                 }
             } catch (Exception e) {
                 POOL_LOGGER.warn("Unable to extract webdriver server logs!");
@@ -364,7 +363,13 @@ public interface IDriverPool {
             WebDriver driver = carinaDriver.getDriver();
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             
-            Future<?> future = Executors.newSingleThreadExecutor().submit((Runnable) driver::quit);
+            Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+                public Void call() throws Exception {
+                    driver.quit();
+                    return null;
+                }
+            });
+            
             long wait = 120;
             try {
                 future.get(wait, TimeUnit.SECONDS);
@@ -381,39 +386,6 @@ public interface IDriverPool {
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
             // stop timer to be able to track mobile app session time. It should be started on createDriver!
             Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
-            
-            
-            // Upload video artifacts if any
-            //IMPORTANT! DON'T MODIFY FILENAME WITHOUT UPDATING DRIVER FACTORIES AND LISTENERS!
-            String fileName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, sessionId.toString());
-            String filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
-            
-            File videoFile = new File(filePath); 
-            
-            if (VideoAnalyzer.isVideoUploadEnabled() && videoFile.exists()) {
-                POOL_LOGGER.debug("Upload video is enabled.");
-                //TODO: replace by Zafira call which can upload to ftp or s3 based on configuration
-                CompletableFuture.runAsync(() -> {
-                    POOL_LOGGER.debug("Uploading in async mode started in thread ID: " + Thread.currentThread().getId());
-                    POOL_LOGGER.debug("Screen record ftp: " + R.CONFIG.get("screen_record_ftp"));
-                    String ftpUrl = R.CONFIG.get("screen_record_ftp").replace("%", "");
-                    URI ftpUri = null;
-                    try {
-                        ftpUri = new URI(ftpUrl);
-                    } catch (URISyntaxException e1) {
-                        POOL_LOGGER.error("Incorrect URL format for screen record ftp parameter");
-                    }
-                    if (null != ftpUri) {
-                        String ftpHost = ftpUri.getHost();
-                        FtpUtils.uploadFile(ftpHost, R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass"), filePath,
-                                fileName);
-                    } else {
-                        POOL_LOGGER.error("The video won't be uploaded due to incorrect ftp or video recording parameters");
-                    }
-
-                });
-            }
-
         } catch (WebDriverException e) {
             POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -594,20 +566,6 @@ public interface IDriverPool {
     }
 
     /**
-     * @deprecated use {@link #getDriversCount()} instead. Return number of
-     *             registered driver per thread
-     * 
-     * @return int
-     */
-    @Deprecated
-    default public int size() {
-        Long threadId = Thread.currentThread().getId();
-        int size = getDrivers().size();
-        POOL_LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
-        return size;
-    }
-
-    /**
      * Return all drivers registered in the DriverPool for this thread including
      * on Before Suite/Class/Method stages
      * 
@@ -622,41 +580,6 @@ public interface IDriverPool {
                 currentDrivers.put(carinaDriver.getName(), carinaDriver);
             } else if (threadId.equals(carinaDriver.getThreadId())) {
                 currentDrivers.put(carinaDriver.getName(), carinaDriver);
-            }
-        }
-        return currentDrivers;
-    }
-
-    @Deprecated
-    public static WebDriver getDefaultDriver() {
-        WebDriver drv = null;
-        ConcurrentHashMap<String, WebDriver> currentDrivers = getStaticDrivers();
-
-        if (currentDrivers.containsKey(DEFAULT)) {
-            drv = currentDrivers.get(DEFAULT);
-        }
-
-        if (drv == null) {
-            throw new DriverPoolException("no default driver detected!");
-        }
-
-        // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener
-        // and all logging will be lost!
-        return drv;
-    }
-
-    @Deprecated
-    public static ConcurrentHashMap<String, WebDriver> getStaticDrivers() {
-        Long threadId = Thread.currentThread().getId();
-        ConcurrentHashMap<String, WebDriver> currentDrivers = new ConcurrentHashMap<String, WebDriver>();
-        for (CarinaDriver carinaDriver : driversPool) {
-            if (Phase.BEFORE_SUITE.equals(carinaDriver.getPhase())) {
-                POOL_LOGGER.debug("Add suite_mode drivers into the getStaticDrivers response: " + carinaDriver.getName());
-                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
-            } else if (threadId.equals(carinaDriver.getThreadId())) {
-                POOL_LOGGER.debug("Add driver into the getStaticDrivers response: " + carinaDriver.getName() + " by threadId: "
-                        + threadId);
-                currentDrivers.put(carinaDriver.getName(), carinaDriver.getDriver());
             }
         }
         return currentDrivers;
@@ -699,9 +622,8 @@ public interface IDriverPool {
      */
     public static Device registerDevice(Device device) {
 
-        boolean stfEnabled = R.CONFIG
-                .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-        if (stfEnabled) {
+        boolean enableAdb = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_ADB);
+        if (enableAdb) {
             device.connectRemote();
         }
 

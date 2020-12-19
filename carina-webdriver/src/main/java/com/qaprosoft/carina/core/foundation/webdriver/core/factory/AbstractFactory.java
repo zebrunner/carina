@@ -20,15 +20,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TestArtifactType;
-
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 /**
  * Base implementation of WebDriver factory.
@@ -37,18 +32,6 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
  */
 public abstract class AbstractFactory {
     
-    protected static final String vnc_protocol = "vnc_protocol";
-    protected static final String vnc_host = "vnc_host";
-    protected static final String vnc_port = "vnc_port";
-    
-    
-    protected final static String VIDEO = "Video";
-    protected final static String LOG = "Log";
-    
-    protected final static String VIDEO_DEFAULT = "video.mp4";
-    protected final static String SESSION_LOG_DEFAULT = "session.log";
-
-
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
      * 
@@ -86,41 +69,8 @@ public abstract class AbstractFactory {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
     }
 
-    /**
-     * Retrieves VNC URL if available.
-     * 
-     * @param driver - {@link RemoteWebDriver} instance
-     * @return VNC URL
-     */
-    abstract public String getVncURL(WebDriver driver);
-
-    /**
-     * Returns bitrate by {@link VideoQuality}
-     * 
-     * @param quality - video quality for recording
-     * @return appropriate bitrate
-     */
-    abstract protected int getBitrate(VideoQuality quality);
-
-    /**
-     * Initialize test artifact.
-     * @param name - artifact name 
-     * @param url - artifact url
-     * @return test artifact with video details
-     */
-    protected TestArtifactType initArtifact(String name, String url) {
-        TestArtifactType artifact = new TestArtifactType();
-        artifact.setName(name);
-        artifact.setLink(url);
-        return artifact;
-    }
-
     protected boolean isEnabled(String capability) {
         return R.CONFIG.getBoolean(capability);
-    }
-
-    protected String getHubProvider() {
-        return R.CONFIG.get(SpecialKeywords.HUB_PROVIDER).toLowerCase();
     }
 
 }

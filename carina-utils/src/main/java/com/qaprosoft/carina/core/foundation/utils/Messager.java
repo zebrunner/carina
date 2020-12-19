@@ -16,6 +16,8 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.log4j.Logger;
 
 import com.qaprosoft.carina.core.foundation.utils.messager.IMessager;
@@ -35,10 +37,6 @@ public enum Messager implements IMessager {
     TEST_PASSED("%s TEST [%s] PASSED at [%s]"),
 
     TEST_SKIPPED("%s TEST [%s] SKIPPED at [%s] - %s"),
-
-    TEST_SKIPPED_AS_ALREADY_PASSED("%s TEST [%s] SKIPPED as already passed in previous run at [%s]"),
-
-    TEST_SKIPPED_AS_ALREADY_FAILED_BY_BUG("%s TEST [%s] SKIPPED as already failed because of known issue at [%s]"),
 
     TEST_FAILED("%s TEST [%s] FAILED at [%s] - %s"),
 
@@ -190,7 +188,7 @@ public enum Messager implements IMessager {
 
     TAP_NOT_EXECUTED("FAIL: Tap on X:'%s' Y:'%s' was not executed.");
     
-    private static final Logger LOGGER = Logger.getLogger(Messager.class);
+    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     private String pattern;
 

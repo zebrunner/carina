@@ -1,20 +1,23 @@
 package com.qaprosoft.apitools.validation;
 
-import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.lang.invoke.MethodHandles;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 
 public class XmlValidator {
-    private static final Logger LOGGER = Logger.getLogger(XmlValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private XmlValidator() {
     }

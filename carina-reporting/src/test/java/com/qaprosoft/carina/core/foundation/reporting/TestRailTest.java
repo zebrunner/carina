@@ -15,10 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.reporting;
 
-import java.util.HashSet;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -29,14 +30,14 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
+//import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link ITestRailManager}
  */
 public class TestRailTest implements ITestRailManager {
 
-    private static final Logger LOGGER = Logger.getLogger(TestRailTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String TEST_ID = "5,6,65500";
     private static final String EXPECTED_TEST_ID = "65500";
@@ -130,7 +131,7 @@ public class TestRailTest implements ITestRailManager {
     }
 
 
-    @Test
+/*    @Test
     @TestRailCases(testCasesId = FIRST_TEST_ID + ",3333")
     public void testTestRailSetting() {
         setCases("3333,5555".split(","));
@@ -160,7 +161,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(tags.size(), 3);
 
-    }
+    }*/
 
     @Test
     @TestRailCases(testCasesId = FIRST_TEST_ID, locale = "en")

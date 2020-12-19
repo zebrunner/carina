@@ -15,13 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -32,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  */
 public class CapabilitiesLoader {
 
-    private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Load capabilities and properties from external file into the global CONFIG context.

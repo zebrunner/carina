@@ -24,28 +24,31 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 
 import com.nordstrom.automation.testng.LinkedListeners;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
-import com.qaprosoft.zafira.listener.ZebrunnerListener;
+import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.testng.listener.DataProviderInterceptor;
+import com.zebrunner.agent.testng.listener.TestRunListener;
 
 /*
  * AbstractTest - base test for UI and API tests.
- * 
- * @author Alex Khursevich
  */
 
 // https://github.com/qaprosoft/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
-@LinkedListeners({CarinaListener.class, ZebrunnerListener.class, TestNamingListener.class})
+
+// on start order is TestRunListener and CarinaListener
+// on finish reverse order, i.e. CarinaListener, TestRunListener
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
+@Listeners({DataProviderInterceptor.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -94,6 +97,7 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     }
     
     protected void skipExecution(String message) {
-        throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
+        CurrentTest.revertRegistration();
+        throw new SkipException(message);
     }
 }

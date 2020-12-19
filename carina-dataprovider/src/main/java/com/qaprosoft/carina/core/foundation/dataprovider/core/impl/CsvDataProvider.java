@@ -18,9 +18,16 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -36,7 +43,7 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class CsvDataProvider extends BaseDataProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(CsvDataProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Map<String, Integer> mapper = new HashMap<String, Integer>();
 
     private String executeColumn;

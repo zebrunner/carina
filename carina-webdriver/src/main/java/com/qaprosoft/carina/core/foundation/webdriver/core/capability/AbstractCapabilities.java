@@ -16,13 +16,13 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -32,6 +32,8 @@ import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -42,7 +44,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 public abstract class AbstractCapabilities {
-    private static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
     public abstract DesiredCapabilities getCapability(String testName);

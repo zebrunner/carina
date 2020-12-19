@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.ParameterizedType;
@@ -33,9 +34,9 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedFindBy;
@@ -45,7 +46,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingE
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class ExtendedFieldDecorator implements FieldDecorator {
-    private static final Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected ElementLocatorFactory factory;
 
@@ -57,7 +58,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     }
 
     public Object decorate(ClassLoader loader, Field field) {
-        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class) && !field.isAnnotationPresent(FindByAI.class))
+        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class))
                 /*
                  * Enable field decorator logic only in case of
                  * presence the FindBy/FindByCarina/FindByAI annotation in the

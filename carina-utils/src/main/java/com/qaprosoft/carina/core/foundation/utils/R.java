@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,8 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
@@ -51,7 +53,7 @@ public enum R {
 
     ZAFIRA("zafira.properties");
 
-    private static final Logger LOGGER = Logger.getLogger(R.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String OVERRIDE_SIGN = "_";
 

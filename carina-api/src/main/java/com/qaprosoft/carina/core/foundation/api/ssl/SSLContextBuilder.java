@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.api.ssl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -26,13 +27,14 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class SSLContextBuilder {
-    private static final Logger LOGGER = Logger.getLogger(SSLContextBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String TC_CONF_DIR_PATH = "keysecure/";
 

@@ -15,21 +15,23 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
 
+import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -42,13 +44,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.ZebrunnerArtifactListener;
-
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions.VideoQuality;
 
 public class DesktopFactory extends AbstractFactory {
-    private static final Logger LOGGER = Logger.getLogger(DesktopFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static DesiredCapabilities staticCapabilities;
 
@@ -69,66 +67,11 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         try {
-
-            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-
-            if (isEnabled(SpecialKeywords.ENABLE_VIDEO)) {
-                capabilities.setCapability("videoFrameRate", getBitrate(VideoQuality.valueOf(R.CONFIG.get("web_screen_record_quality"))));
-                switch (getHubProvider()) {
-                case SpecialKeywords.BROWSERSTACK:
-                    // TODO: https://github.com/qaprosoft/carina/issues/949  
-                    // https://www.browserstack.com/automate/capabilities (browserstack.video, browserstack.seleniumLogs etc)
-                    // screenshot recording url: automate/builds/<build-id>/sessions/<session-id>
-                    break;
-                case SpecialKeywords.ZEBRUNNER:
-                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "moon/%s/" + VIDEO_DEFAULT)));
-                    break;
-                case SpecialKeywords.SELENIUM:
-                    capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
-                    break;
-                default:
-                    // nothing to do with unknown hub provider
-                    break;
-                }
-            }
-            
-            if (isEnabled(SpecialKeywords.ENABLE_LOG)) {
-                switch (getHubProvider()) {
-                case SpecialKeywords.BROWSERSTACK:
-                    break;
-                case SpecialKeywords.ZEBRUNNER:
-                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "moon/%s/" + SESSION_LOG_DEFAULT)));
-                    break;
-                case SpecialKeywords.SELENIUM:
-                    capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
-                    break;                    
-                default:
-                    // nothing to do with unknown hub provider
-                    break;
-                }
-            }
-            
-            if (isEnabled(SpecialKeywords.ENABLE_METADATA)) {
-                switch (getHubProvider()) {
-                case SpecialKeywords.SELENIUM:
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/driver-sessions/%s/%s.json")));
-                    break;                    
-                default:
-                    // nothing to do with unfamiliar hub provider
-                    break;
-                }
-            }            
-
-            driver = new RemoteWebDriver(ce, capabilities);
-
-            resizeBrowserWindow(driver, capabilities);
+            driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Unable to create desktop driver", e);
+            throw new RuntimeException("Malformed selenium URL!", e);
         }
+        resizeBrowserWindow(driver, capabilities);
 
         R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
         return driver;
@@ -160,39 +103,6 @@ public class DesktopFactory extends AbstractFactory {
             staticCapabilities = new DesiredCapabilities();
         }
         staticCapabilities.setCapability(name, value);
-    }
-
-    @Override
-    public String getVncURL(WebDriver driver) {
-        String vncURL = null;
-        if (driver instanceof RemoteWebDriver && "true".equals(Configuration.getCapability("enableVNC"))) {
-            // TODO: resolve negative case when VNC is not supported
-            final RemoteWebDriver rwd = (RemoteWebDriver) driver;
-            String protocol = R.CONFIG.get(vnc_protocol);
-            String host = R.CONFIG.get(vnc_host);
-            String port = R.CONFIG.get(vnc_port);
-            // If VNC host/port not set user them from Selenium
-            if (StringUtils.isEmpty(host) || StringUtils.isEmpty(port)) {
-                host = ((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getHost();
-                port = String.valueOf(((HttpCommandExecutor) rwd.getCommandExecutor()).getAddressOfRemoteServer().getPort());
-            }
-            vncURL = String.format(R.CONFIG.get("vnc_desktop"), protocol, host, port, rwd.getSessionId().toString());
-        }
-        return vncURL;
-    }
-
-    @Override
-    protected int getBitrate(VideoQuality quality) {
-        switch (quality) {
-        case LOW:
-            return 6;
-        case MEDIUM:
-            return 12;
-        case HIGH:
-            return 24;
-        default:
-            return 1;
-        }
     }
 
     @SuppressWarnings("deprecation")
@@ -254,16 +164,38 @@ public class DesktopFactory extends AbstractFactory {
      */
     private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
         try {
+            Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                    .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                    .ignoring(WebDriverException.class)
+                    .ignoring(NoSuchSessionException.class)
+                    .ignoring(TimeoutException.class);
             if (capabilities.getCapability("resolution") != null) {
                 String resolution = (String) capabilities.getCapability("resolution");
-                int width = Integer.valueOf(resolution.split("x")[0]);
-                int height = Integer.valueOf(resolution.split("x")[1]);
-                driver.manage().window().setPosition(new Point(0, 0));
-                driver.manage().window().setSize(new Dimension(width, height));
-                LOGGER.info(String.format("Browser window size set to %dx%d", width, height));
+                int expectedWidth = Integer.valueOf(resolution.split("x")[0]);
+                int expectedHeight = Integer.valueOf(resolution.split("x")[1]);
+                wait.until(new Function<WebDriver, Boolean>(){
+                    public Boolean apply(WebDriver driver ) {
+                        driver.manage().window().setPosition(new Point(0, 0));
+                        driver.manage().window().setSize(new Dimension(expectedWidth, expectedHeight));
+                        Dimension actualSize = driver.manage().window().getSize();
+                        if (actualSize.getWidth() == expectedWidth && actualSize.getHeight() == expectedHeight) {
+                            LOGGER.debug(String.format("Browser window size set to %dx%d", actualSize.getWidth(), actualSize.getHeight()));
+                        } else {
+                            LOGGER.warn(String.format("Expected browser window %dx%d, but actual %dx%d",
+                                    expectedWidth, expectedHeight, actualSize.getWidth(), actualSize.getHeight()));
+                        }
+                        return true;
+                    }
+                });
             } else {
-                driver.manage().window().maximize();
-                LOGGER.info("Browser window was maximized");
+                wait.until(new Function<WebDriver, Boolean>(){
+                    public Boolean apply(WebDriver driver ) {
+                        driver.manage().window().maximize();
+                        LOGGER.debug("Browser window size was maximized!");
+                        return true;
+                    }
+                });
             }
         } catch (Exception e) {
             LOGGER.error("Unable to resize browser window", e);

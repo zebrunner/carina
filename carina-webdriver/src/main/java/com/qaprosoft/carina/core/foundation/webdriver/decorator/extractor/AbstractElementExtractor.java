@@ -15,19 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 public abstract class AbstractElementExtractor {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractElementExtractor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public boolean isInside(Rectangle rect, int x, int y) {
         return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;

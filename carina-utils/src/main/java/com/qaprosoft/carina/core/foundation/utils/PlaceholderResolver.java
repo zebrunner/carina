@@ -15,12 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
@@ -31,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverExcepti
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
 public class PlaceholderResolver {
-    private static final Logger LOGGER = Logger.getLogger(PlaceholderResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final Pattern PATTERN = Pattern.compile(SpecialKeywords.PLACEHOLER);
 

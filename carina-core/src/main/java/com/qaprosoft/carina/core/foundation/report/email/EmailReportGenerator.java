@@ -16,13 +16,15 @@
 package com.qaprosoft.carina.core.foundation.report.email;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -38,7 +40,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  * @author Alex Khursevich
  */
 public class EmailReportGenerator {
-    private static final Logger LOGGER = Logger.getLogger(EmailReportGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static String CONTAINER = R.EMAIL.get("container");
     private static String PACKAGE_TR = R.EMAIL.get("package_tr");
@@ -185,8 +187,7 @@ public class EmailReportGenerator {
         }
         if (testResultItem.getResult().name().equalsIgnoreCase("SKIP")) {
             failReason = testResultItem.getFailReason();
-            if (!testResultItem.isConfig() && !failReason.contains(SpecialKeywords.ALREADY_PASSED)
-                    && !failReason.contains(SpecialKeywords.SKIP_EXECUTION)) {
+            if (!testResultItem.isConfig()) {
                 if (INCLUDE_SKIP) {
                     result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
@@ -276,14 +277,7 @@ public class EmailReportGenerator {
                 }
                 break;
             case SKIP:
-                if (ri.getFailReason().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-                    skipped_already_passed++;
-                } else if (ri.getFailReason().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
-                    // don't calculate such message at all as it shouldn't be
-                    // included into the report at all
-                } else {
-                    skipped++;
-                }
+                skipped++;
                 break;
             case SKIP_ALL:
                 // do nothing
@@ -356,7 +350,7 @@ public class EmailReportGenerator {
      */
     private boolean isCucumberReportFolderExists() {
         try {
-            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getArtifactsFolder(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
+            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getBaseDir(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
             if (reportOutputDirectory.exists() && reportOutputDirectory.isDirectory()) {
                 if (reportOutputDirectory.list().length > 0) {
                     LOGGER.debug("Cucumber Report Folder is not empty!");

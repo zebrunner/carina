@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -28,13 +29,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -61,7 +63,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
     // TODO: review carefully and remove duplicates and migrate completely to fluent
     // waits
-    static final Logger UTILS_LOGGER = Logger.getLogger(IAndroidUtils.class);
+    static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
@@ -160,7 +162,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return boolean
      */
     default public boolean setDeviceLanguage(String language) {
-        boolean status = setDeviceLanguage(language, true, 20);
+        boolean status = setDeviceLanguage(language, 20);
         return status;
     }
 
@@ -187,16 +189,12 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param language
      *            to set. Can be es, en, etc.
-     * @param changeConfig
-     *            boolean if true - update config locale and language params
      * @param waitTime
      *            int wait in seconds before device refresh.
      * @return boolean
      */
-    default public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
+    default public boolean setDeviceLanguage(String language, int waitTime) {
         boolean status = false;
-
-        String initLanguage = language;
 
         String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
 
@@ -236,22 +234,6 @@ public interface IAndroidUtils extends IMobileUtils {
         if (waitTime > 0) {
             UTILS_LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
             CommonUtils.pause(waitTime);
-        }
-
-        if (changeConfig) {
-            String loc;
-            String lang;
-            if (initLanguage.contains("_")) {
-                lang = initLanguage.split("_")[0];
-                loc = initLanguage.split("_")[1];
-            } else {
-                lang = initLanguage;
-                loc = initLanguage;
-            }
-            // [VD] never override global locale or language properties if you changed just one device locale
-//            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
-//            R.CONFIG.put("locale", loc);
-//            R.CONFIG.put("language", lang);
         }
 
         actualDeviceLanguage = getDeviceLanguage();

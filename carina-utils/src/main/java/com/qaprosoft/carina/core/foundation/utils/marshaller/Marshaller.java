@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class Marshaller {
 
@@ -39,7 +41,7 @@ class Marshaller {
     /**
      * Class Logger
      */
-    private static final Logger LOGGER = Logger.getLogger(Marshaller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private Marshaller() {
 

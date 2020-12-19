@@ -15,14 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
@@ -33,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  *         hursevich@gmail.com
  */
 public class Configuration {
-    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static IEnvArgResolver envArgResolver;
 
     static {
@@ -162,8 +163,6 @@ public class Configuration {
 
         CORE_LOG_PACKAGES("core_log_packages"),
 
-        ARTIFACTS_EXPIRATION_SECONDS("artifacts_expiration_seconds"),
-
         LOG_ALL_JSON("log_all_json"),
 
         DATE_FORMAT("date_format"),
@@ -227,6 +226,8 @@ public class Configuration {
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
 
         // For screen recording
+        MOBILE_SCREEN_RECORD_ENABLE("mobile_screen_record_enable"),
+
         ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
 
         ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),
@@ -287,19 +288,6 @@ public class Configuration {
 
     public static boolean getBoolean(Parameter param) {
         return Boolean.valueOf(get(param).trim());
-    }
-
-    @Deprecated
-    public static Locale getLocale() {
-        Locale locale = null;
-        if (!StringUtils.isEmpty(get(Parameter.LOCALE))) {
-            if (Configuration.get(Parameter.LOCALE).contains("_")) {
-                locale = new Locale(get(Parameter.LOCALE).split("_")[0], get(Parameter.LOCALE).split("_")[1]);
-            } else {
-                locale = new Locale("", get(Parameter.LOCALE));
-            }
-        }
-        return locale;
     }
 
     public static String asString() {

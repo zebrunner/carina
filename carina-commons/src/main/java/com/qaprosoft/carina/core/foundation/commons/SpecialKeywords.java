@@ -39,16 +39,11 @@ public class SpecialKeywords {
     public static final String PLACEHOLER = "\\$\\{[^\\{\\}]*\\}";
 
     public static final String MUST_OVERRIDE = "{must_override}";
-    @Deprecated
     public static final String EXCEL_DS_ARGS = "{excel_ds_args}";
-    @Deprecated
     public static final String EXCEL_DS_UID = "{excel_ds_uid}";
-    @Deprecated
     public static final String EXCEL_DS_JIRA = "{excel_ds_jira}";
-    @Deprecated
     public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
     public static final String EXCEL_DS_FILE = "{excel_ds_file}";
-    @Deprecated
     public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
 
     public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
@@ -77,7 +72,6 @@ public class SpecialKeywords {
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
-    public static final String TEST_METHOD_OWNER_ARGS_MAP = "testMethodOwnerArgsMap";
     public static final String JIRA_ARGS_MAP = "jiraArgsMap";
     
     public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
@@ -114,10 +108,6 @@ public class SpecialKeywords {
     public static final String FAILED = "FAILED";
     public static final String SKIPPED = "SKIPPED";
 
-    public static final String ALREADY_PASSED = "ALREADY_PASSED";
-    public static final String ALREADY_FAILED_BY_KNOWN_BUG = "ALREADY_FAILED_BY_KNOWN_BUG";
-    public static final String SKIP_EXECUTION = "SKIP_EXECUTION";
-
     public static final String ZAFIRA_PROJECT = "zafira_project";
     public static final String ACTUAL_BROWSER_VERSION = "actual_browser_version";
     
@@ -129,8 +119,8 @@ public class SpecialKeywords {
     public static final String ANDROID_START_UIX_NODE = "<node ";
     public static final String ANDROID_END_UIX_NODE = "</node>";
 
-    public static final String TEST_PRIORITY_KEY = "priority";
-    public static final String TEST_FEATURE_KEY = "feature";
+    public static final String TEST_PRIORITY_TAG = "priority";
+    public static final String TEST_FEATURE_TAG = "feature";
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
@@ -170,20 +160,8 @@ public class SpecialKeywords {
     public static final String APP_PACKAGE = "appPackage";
     public static final String BUNDLE_ID = "CFBundleIdentifier";
 
-    public static final String HUB_PROVIDER = "capabilities.provider";
-
-    // -------------- HUB PROVIDERS -------------------------------------
-    public static final String BROWSERSTACK = "browserstack";
-    public static final String ZEBRUNNER = "zebrunner";
-    public static final String MCLOUD = "mcloud";
-    public static final String SELENIUM = "selenium";
-
-
     // ------------- STF PROPERTIES ---------------------------------
-    public static final String STF_ENABLED = "STF_ENABLED";
-    public static final String STF_URL = "STF_URL";
-    public static final String STF_TOKEN = "STF_TOKEN";
-
+    public static final String ENABLE_ADB = "capabilities.enableAdb";
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
@@ -213,8 +191,9 @@ public class SpecialKeywords {
     public static final int DEFAULT_SE_WIDTH= 320;
     
     // ------------- Cucumber configuration  ---------------
-    public static final String CUCUMBER_REPORT_FOLDER = "CucumberReport";
+    public static final String CUCUMBER_REPORT_FOLDER = "cucumber-reports";
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
+    public static final String CUCUMBER_REPORT_FILE_NAME = "overview-features.html";
     
     
     public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";

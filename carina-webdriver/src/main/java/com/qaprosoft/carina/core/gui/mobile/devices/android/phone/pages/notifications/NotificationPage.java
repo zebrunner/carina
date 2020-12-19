@@ -15,28 +15,30 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
+import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 import io.appium.java_client.MobileBy;
 
-public class NotificationPage extends MobileAbstractPage implements IAndroidUtils{
+public class NotificationPage extends MobileAbstractPage implements IAndroidUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(NotificationPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public NotificationPage(WebDriver driver) {
         super(driver);

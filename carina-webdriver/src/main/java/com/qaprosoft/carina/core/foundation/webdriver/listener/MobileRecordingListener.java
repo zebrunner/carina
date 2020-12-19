@@ -27,7 +27,6 @@ import org.openqa.selenium.remote.DriverCommand;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.screenrecording.BaseStartScreenRecordingOptions;
@@ -53,21 +52,15 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 
 	private boolean recording = false;
 
-	private TestArtifactType videoArtifact;
-
-	public MobileRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt,
-			TestArtifactType artifact) {
+	public MobileRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt) {
 		this.commandExecutor = commandExecutor;
 		this.startRecordingOpt = startRecordingOpt;
 		this.stopRecordingOpt = stopRecordingOpt;
-		this.videoArtifact = artifact;
 	}
 
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
-			registerArtifact(command, videoArtifact);
-
 			if (DriverCommand.QUIT.equals(command.getName())) {
 			    // stop video recording and publish it to local artifacts
 			    String data = "";
@@ -112,8 +105,6 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
         if (!recording && command.getSessionId() != null) {
             try {
                 recording = true;
-                
-                videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
                 
                 commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
                         MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)

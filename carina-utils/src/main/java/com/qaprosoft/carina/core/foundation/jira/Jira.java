@@ -15,19 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.jira;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
-
 
 /*
  * Jira
@@ -36,11 +36,9 @@ import com.qaprosoft.zafira.models.db.workitem.BaseWorkItem;
  */
 public class Jira {
     private static final int MAX_LENGTH = 45;
-    
-    private static final Logger LOG = Logger.getLogger(Jira.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static ThreadLocal<List<String>> jiraTickets = new ThreadLocal<>();
-    protected static ThreadLocal<BaseWorkItem> knownIssue = new ThreadLocal<>();
 
     private static void clearTickets() {
         jiraTickets.remove();
@@ -112,30 +110,8 @@ public class Jira {
         return disableRetryForKnownIssues;
     }
 
-    public static void setKnownIssue(String jiraId) {
-        setKnownIssue(jiraId, null);
-    }
-
-    public static void setKnownIssue(String jiraId, String description) {
-        setKnownIssue(jiraId, description, false);
-    }
-
-    public static void setKnownIssue(String jiraId, String description, boolean blocker) {
-        BaseWorkItem workItem = new BaseWorkItem(jiraId, description, blocker);
-        knownIssue.set(workItem);
-    }
-
-    public static BaseWorkItem getKnownIssue() {
-        return knownIssue.get();
-    }
-
-    private static void clearKnownIssue() {
-        knownIssue.remove();
-    }
-
     public static void clearJiraArtifacts() {
         clearTickets();
-        clearKnownIssue();
     }
     
     private static String parseTicket(String ticket) {

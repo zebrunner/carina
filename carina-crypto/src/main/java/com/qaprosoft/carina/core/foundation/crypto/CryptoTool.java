@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.crypto;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -27,12 +28,13 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class CryptoTool {
-    private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private String algorithm;
     private Cipher cipher;
