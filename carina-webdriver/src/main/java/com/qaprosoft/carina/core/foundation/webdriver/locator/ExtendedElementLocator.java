@@ -50,8 +50,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private By by;
     private WebElement cachedElement;
 
-    private String aiCaption;
-    
     /**
      * Creates a new element locator.
      * 
