@@ -63,9 +63,8 @@
         <!-- Selenium -->
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.4.1</appium.version>
-        <!-- Qaprosoft integrations -->
+        <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.1.0.121-SNAPSHOT</zebrunner-testng-pluggable.version>
-        <alice-client.version>1.1.0</alice-client.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
         <monte-repack.version>1.0</monte-repack.version>
@@ -545,30 +544,6 @@
                 <version>${testng-foundation.version}</version>
                 <scope>compile</scope>
                 <exclusions>
-                    <exclusion>
-                        <groupId>org.testng</groupId>
-                        <artifactId>testng</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- AI integration -->
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>alice-client</artifactId>
-                <version>${alice-client.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>org.testng</groupId>
                         <artifactId>testng</artifactId>

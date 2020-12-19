@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
-import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -24,22 +23,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.alice.models.dto.RecognitionMetaType;
-import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
-import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
-import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 
@@ -60,7 +51,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private WebElement cachedElement;
 
     private String aiCaption;
-    private Label aiLabel;
     
     /**
      * Creates a new element locator.
@@ -83,11 +73,6 @@ public class ExtendedElementLocator implements ElementLocator {
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
                 this.caseInsensitive = true;
             }
-        }
-        // Elements to be recognized by Alice
-        if (field.isAnnotationPresent(FindByAI.class)) {
-            this.aiCaption = field.getAnnotation(FindByAI.class).caption();
-            this.aiLabel = field.getAnnotation(FindByAI.class).label();
         }
 
     }
@@ -124,10 +109,6 @@ public class ExtendedElementLocator implements ElementLocator {
             }
         }
         
-        // Finding element using AI tool
-        if (element == null && AliceRecognition.INSTANCE.isEnabled()) {
-            element = findElementByAI((WebDriver) searchContext, aiLabel, aiCaption);
-        }
         // If no luck throw general NoSuchElementException
         if (element == null) {
             throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
@@ -163,20 +144,6 @@ public class ExtendedElementLocator implements ElementLocator {
         // As result for all dynamic lists we have too often out of bound index exceptions
 
         return elements;
-    }
-
-    private WebElement findElementByAI(WebDriver drv, Label label, String caption) {
-        WebElement element = null;
-        File screen = ((TakesScreenshot) drv).getScreenshotAs(OutputType.FILE);
-        RecognitionMetaType result = AliceRecognition.INSTANCE.recognize(aiLabel, aiCaption, screen);
-        if (result != null) {
-            int x = (result.getTopleft().getX() + result.getBottomright().getX()) / 2;
-            int y = (result.getTopleft().getY() + result.getBottomright().getY()) / 2;
-            element = (WebElement) ((JavascriptExecutor) drv).executeScript("return document.elementFromPoint(arguments[0], arguments[1])", x, y);
-        } else {
-            throw new NoSuchElementException("Unable to find element by AI label: " + aiLabel + ", caption: " + aiCaption);
-        }
-        return element;
     }
     
     /**
