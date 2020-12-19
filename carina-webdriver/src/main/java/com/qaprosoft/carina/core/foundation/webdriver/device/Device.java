@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -33,7 +34,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.performance.DRIVER_TYPE;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -47,8 +47,18 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
-public class Device extends RemoteDevice implements IDriverPool {
+public class Device implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
+    private String name;
+    private String type;
+    private String os;
+    private String osVersion;
+    private String udid;
+    private String remoteURL;
+    private String vnc;
+    private String proxyPort;
+    private Capabilities capabilities;
 
     /**
      * ENABLED only in case of availability of parameter - 'uninstall_related_apps'.
@@ -73,7 +83,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         setRemoteURL(remoteURL);
     }
 
-    public Device(RemoteDevice remoteDevice) {
+    public Device(Device remoteDevice) {
         setName(remoteDevice.getName());
         setType(remoteDevice.getType());
         setOs(remoteDevice.getOs());
@@ -118,24 +128,132 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (capabilities.getCapability("platformVersion") != null) {
             platformVersion = capabilities.getCapability("platformVersion").toString();
         }
-
         setOsVersion(platformVersion);
 
         String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
         if (capabilities.getCapability("udid") != null) {
             deviceUdid = capabilities.getCapability("udid").toString();
         }
-
         setUdid(deviceUdid);
         
         String proxyPort = R.CONFIG.get(SpecialKeywords.MOBILE_PROXY_PORT);
         if (capabilities.getCapability(Parameter.PROXY_PORT.getKey()) != null) {
             proxyPort = capabilities.getCapability(Parameter.PROXY_PORT.getKey()).toString();
         }
-
         setProxyPort(proxyPort);
         
+        // try to read extra information from slot capabilities object
+        @SuppressWarnings("unchecked")
+        Map<String, Object> slotCap = (Map<String, Object>) capabilities.getCapability(SpecialKeywords.SLOT_CAPABILITIES);
+        try {
+            if (slotCap != null && slotCap.containsKey("udid")) {
+
+                // restore device information from custom slotCapabilities map
+                /*
+                 * {deviceType=Phone, proxy_port=9000,
+                 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
+                 * seleniumProtocol=WebDriver, adb_port=5038,
+                 * vnc=wss://stage.qaprosoft.com:7410/websockify,
+                 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
+                 * platformVersion=8.1.0, automationName=uiautomator2,
+                 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
+                 * udid=PL2GAR9822804910}
+                 */
+
+                // setName((String) slotCap.get("deviceName"));
+                // setOs((String) slotCap.get("platformName"));
+                // setOsVersion((String) slotCap.get("platformVersion"));
+                // setType((String) slotCap.get("deviceType"));
+                // setUdid((String) slotCap.get("udid"));
+                if (slotCap.containsKey("vnc")) {
+                    setVnc((String) slotCap.get("vnc"));
+                }
+                if (slotCap.containsKey(Parameter.PROXY_PORT.getKey())) {
+                    setProxyPort(String.valueOf(slotCap.get(Parameter.PROXY_PORT.getKey())));
+                }
+
+                if (slotCap.containsKey("remoteURL")) {
+                    setRemoteURL(String.valueOf(slotCap.get("remoteURL")));
+                }
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Unable to get device info!", e);
+        }
+        
         setCapabilities(capabilities);
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = (null == name) ? "" : name;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
+    public String getOsVersion() {
+        return osVersion;
+    }
+
+    public void setOsVersion(String osVersion) {
+        this.osVersion = osVersion;
+    }
+
+    public String getUdid() {
+        return udid;
+    }
+
+    public void setUdid(String udid) {
+        this.udid = (null == udid) ? "" : udid;
+    }
+
+    public String getRemoteURL() {
+        return remoteURL;
+    }
+
+    public void setRemoteURL(String remoteURL) {
+        this.remoteURL = remoteURL;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getVnc() {
+        return vnc;
+    }
+
+    public void setVnc(String vnc) {
+        this.vnc = vnc;
+    }
+
+    public String getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(String proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+    
+    public Capabilities getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(Capabilities capabilities) {
+        this.capabilities = capabilities;
     }
 
     public boolean isPhone() {
