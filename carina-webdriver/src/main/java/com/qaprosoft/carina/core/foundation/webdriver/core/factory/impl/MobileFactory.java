@@ -193,10 +193,19 @@ public class MobileFactory extends AbstractFactory {
             throw e;
         }
 
-        Device device = new Device(driver.getCapabilities());
-        IDriverPool.registerDevice(device);
-        // will be performed just in case uninstall_related_apps flag marked as true
-        device.uninstallRelatedApps();
+        try {
+            Device device = new Device(driver.getCapabilities());
+            IDriverPool.registerDevice(device);
+            // will be performed just in case uninstall_related_apps flag marked as true
+            device.uninstallRelatedApps();
+        } catch (Exception e) {
+            // use-case when something wrong happen during initialization and registration device information.
+            // the most common problem might be due to the adb connection problem
+            
+            // make sure to initiate driver quit
+            driver.quit();
+            throw e;
+        }
 
         return driver;
     }
