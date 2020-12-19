@@ -65,13 +65,13 @@ public class Device implements IDriverPool {
      * Store udids of devices where related apps were uninstalled
      */
     private static List<String> clearedDeviceUdids = new ArrayList<>();
-    private boolean isStfEnabled;
+    private boolean isAdbEnabled;
 
     AdbExecutor executor = new AdbExecutor();
 
     public Device() {
         this("", "", "", "", "", "");
-        this.isStfEnabled = false;
+        this.isAdbEnabled = false;
     }
 
     public Device(String name, String type, String os, String osVersion, String udid, String remoteURL) {
@@ -160,11 +160,12 @@ public class Device implements IDriverPool {
                  * udid=PL2GAR9822804910}
                  */
 
-                // setName((String) slotCap.get("deviceName"));
-                // setOs((String) slotCap.get("platformName"));
-                // setOsVersion((String) slotCap.get("platformVersion"));
-                // setType((String) slotCap.get("deviceType"));
-                // setUdid((String) slotCap.get("udid"));
+                // That's a trusted information from Zebrunner Device Farm so we can override all values
+                setName((String) slotCap.get("deviceName"));
+                setOs((String) slotCap.get("platformName"));
+                setOsVersion((String) slotCap.get("platformVersion"));
+                setType((String) slotCap.get("deviceType"));
+                setUdid((String) slotCap.get("udid"));
                 if (slotCap.containsKey("vnc")) {
                     setVnc((String) slotCap.get("vnc"));
                 }
@@ -313,7 +314,13 @@ public class Device implements IDriverPool {
         if (isIOS())
             return;
         
-        isStfEnabled = true;
+        //TODO: test use-case with local runs where adb can be connected via udid!
+        if (getRemoteURL().isEmpty()) {
+            LOGGER.error("Unable to use adb as ADB remote url is not available!");
+            return;
+        }
+        
+        isAdbEnabled = true;
         
         LOGGER.debug("adb connect " + getRemoteURL());
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
@@ -326,7 +333,7 @@ public class Device implements IDriverPool {
     }
 
     public void disconnectRemote() {
-        if (!isStfEnabled)
+        if (!isAdbEnabled)
             return;
         
         if (isNull())

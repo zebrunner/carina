@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilies;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
@@ -177,21 +176,19 @@ public class MobileFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         } catch (Exception e) {
             Device device = IDriverPool.nullDevice;
-            if (R.CONFIG.getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED)) {
-                LOGGER.debug("STF is enabled. Debug info will be extracted from the exception.");
-                if (e != null) {
-                    String debugInfo = getDebugInfo(e.getMessage());
-                    if (!debugInfo.isEmpty()) {
-                        String udid = getUdidFromDebugInfo(debugInfo);
-                        String deviceName = getParamFromDebugInfo(debugInfo, "name");
-                        device = new Device();
-                        device.setUdid(udid);
-                        device.setName(deviceName);
-                    }
+            LOGGER.debug("STF is enabled. Debug info will be extracted from the exception.");
+            if (e != null) {
+                String debugInfo = getDebugInfo(e.getMessage());
+                if (!debugInfo.isEmpty()) {
+                    String udid = getUdidFromDebugInfo(debugInfo);
+                    String deviceName = getParamFromDebugInfo(debugInfo, "name");
+                    device = new Device();
+                    device.setUdid(udid);
+                    device.setName(deviceName);
+                } else {
+                    device = new Device(capabilities);
                 }
-            } else {
-                device = new Device(capabilities);
-            }
+            } 
             IDriverPool.registerDevice(device);
             throw e;
         }

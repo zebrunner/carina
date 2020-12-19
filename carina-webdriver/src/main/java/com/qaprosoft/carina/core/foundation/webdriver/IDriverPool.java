@@ -622,9 +622,8 @@ public interface IDriverPool {
      */
     public static Device registerDevice(Device device) {
 
-        boolean stfEnabled = R.CONFIG
-                .getBoolean(SpecialKeywords.CAPABILITIES + "." + SpecialKeywords.STF_ENABLED);
-        if (stfEnabled) {
+        boolean enableAdb = R.CONFIG.getBoolean(SpecialKeywords.ENABLE_ADB);
+        if (enableAdb) {
             device.connectRemote();
         }
 

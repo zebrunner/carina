@@ -165,7 +165,7 @@ public class SpecialKeywords {
     public static final String BUNDLE_ID = "CFBundleIdentifier";
 
     // ------------- STF PROPERTIES ---------------------------------
-    public static final String STF_ENABLED = "STF_ENABLED";
+    public static final String ENABLE_ADB = "capabilities.enableAdb";
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
