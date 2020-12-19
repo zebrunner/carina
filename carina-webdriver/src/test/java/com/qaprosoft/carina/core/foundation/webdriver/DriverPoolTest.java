@@ -202,7 +202,7 @@ public class DriverPoolTest implements IDriverPool {
     @Test(dependsOnMethods = { "deregisterAllDrivers" })
     public void registerDriverWithDevice() {
         WebDriver deviceDriver = mock(WebDriver.class);
-        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl");
+        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl", "vnc", "proxyPort");
         registerDriver(deviceDriver, IDriverPool.DEFAULT, device);
         Assert.assertEquals(getDriversCount(), 1, "Number of registered driver is not valid!");
         
