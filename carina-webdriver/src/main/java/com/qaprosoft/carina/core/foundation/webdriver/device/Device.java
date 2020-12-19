@@ -58,6 +58,8 @@ public class Device implements IDriverPool {
     private String remoteURL;
     private String vnc;
     private String proxyPort;
+    
+    private AdbExecutor executor = new AdbExecutor();
     private Capabilities capabilities;
 
     /**
@@ -67,30 +69,20 @@ public class Device implements IDriverPool {
     private static List<String> clearedDeviceUdids = new ArrayList<>();
     private boolean isAdbEnabled;
 
-    AdbExecutor executor = new AdbExecutor();
-
     public Device() {
-        this("", "", "", "", "", "");
+        this("", "", "", "", "", "", "", "");
         this.isAdbEnabled = false;
     }
 
-    public Device(String name, String type, String os, String osVersion, String udid, String remoteURL) {
-        setName(name);
-        setType(type);
-        setOs(os);
-        setOsVersion(osVersion);
-        setUdid(udid);
-        setRemoteURL(remoteURL);
-    }
-
-    public Device(Device remoteDevice) {
-        setName(remoteDevice.getName());
-        setType(remoteDevice.getType());
-        setOs(remoteDevice.getOs());
-        setOsVersion(remoteDevice.getOsVersion());
-        setUdid(remoteDevice.getUdid());
-        setRemoteURL(remoteDevice.getRemoteURL());
-        setProxyPort(remoteDevice.getProxyPort());
+    public Device(String name, String type, String os, String osVersion, String udid, String remoteURL, String vnc, String proxyPort) {
+        this.name = name;
+        this.type = type;
+        this.os = os;
+        this.osVersion = osVersion;
+        this.udid = udid;
+        this.remoteURL = remoteURL;
+        this.vnc = vnc;
+        this.proxyPort = proxyPort;        
     }
 
     public Device(Capabilities capabilities) {
@@ -296,8 +288,8 @@ public class Device implements IDriverPool {
     }
 
     public String toString() {
-        return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; remoteURL: %s", getName(),
-                getType(), getOs(), getOsVersion(), getUdid(), getRemoteURL());
+        return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; remoteURL: %s; vnc: %s; proxyPort: %s", getName(),
+                getType(), getOs(), getOsVersion(), getUdid(), getRemoteURL(), getVnc(), getProxyPort());
     }
 
     public boolean isNull() {
@@ -314,22 +306,22 @@ public class Device implements IDriverPool {
         if (isIOS())
             return;
         
-        //TODO: test use-case with local runs where adb can be connected via udid!
-        if (getRemoteURL().isEmpty()) {
+        String connectUrl = getAdbName();
+        if (StringUtils.isEmpty(connectUrl)) {
             LOGGER.error("Unable to use adb as ADB remote url is not available!");
             return;
         }
         
-        isAdbEnabled = true;
-        
-        LOGGER.debug("adb connect " + getRemoteURL());
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
+        LOGGER.debug("adb connect " + connectUrl);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", connectUrl);
         executor.execute(cmd);
         CommonUtils.pause(1);
 
+        // TODO: verify that device connected and raise an error if not and disabled adb integration
         String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
         executor.execute(cmd2);
 
+        isAdbEnabled = true;
     }
 
     public void disconnectRemote() {

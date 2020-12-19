@@ -42,7 +42,7 @@ public class DevicePoolTest implements IDriverPool {
     @Test()
     public void registerDevice() {
         Assert.assertFalse(isDeviceRegistered(), "device is registered incorrectly");
-        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl");
+        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl", "vnc", "proxyPort");
         IDriverPool.registerDevice(device);
         
         Assert.assertTrue(isDeviceRegistered(), "device is registered incorrectly");
