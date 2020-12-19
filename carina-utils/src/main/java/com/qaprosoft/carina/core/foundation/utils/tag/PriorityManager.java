@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.utils.tag;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.zebrunner.agent.core.registrar.domain.LabelDTO;
