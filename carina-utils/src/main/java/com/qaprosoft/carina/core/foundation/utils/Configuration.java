@@ -103,8 +103,6 @@ public class Configuration {
 
         BROWSERMOB_PROXY("browsermob_proxy"),
 
-        BROWSERMOB_HOST("browsermob_host"),
-
         BROWSERMOB_PORT("browsermob_port"),
 
         BROWSERMOB_PORTS_RANGE("browsermob_ports_range"),
