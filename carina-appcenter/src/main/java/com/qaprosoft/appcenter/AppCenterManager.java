@@ -23,11 +23,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -217,11 +213,20 @@ public class AppCenterManager {
                     queryParams,
                     HttpMethod.GET);
             JsonNode buildList = restTemplate.exchange(retrieveList, JsonNode.class).getBody();
+            List<JsonNode> builds = new ArrayList<>();
             LOGGER.debug("Available Builds JSON: " + buildList);
 
-            if (buildList.size() > 0) {
+            if(version.equals("latest")){
+                for(JsonNode node : buildList){
+                    builds.add(node);
+                }
+            } else {
+                builds = getSpecifiedBuildEntries(buildList, version.replaceAll("\\.", ""));
+            }
+
+            if (!builds.isEmpty()) {
                 int buildLimiter = 0;
-                for (JsonNode build : buildList) {
+                for (JsonNode build : builds) {
 
                     buildLimiter += 1;
                     if (buildLimiter >=50) {
@@ -252,6 +257,34 @@ public class AppCenterManager {
         }
 
         throw new RuntimeException(String.format("Unable to find build to download, version provided (%s)", version));
+    }
+
+    /**
+     *
+     * @param buildList - The full response originally grabbed from the bucket
+     * @param version - The desired version to be returned (this is the high level
+     *                display of something, not the full build number. ex: 12.0.0 vs. 12000123)
+     * @return - The most recent entries from the original response that have the desired version number
+     */
+    private List<JsonNode> getSpecifiedBuildEntries(JsonNode buildList, String version){
+        List<JsonNode> builds = new ArrayList<>();
+
+        for (JsonNode build : buildList) {
+            builds.add(build);
+        }
+
+        builds.removeIf(build -> !build.get("version").asText().startsWith(version));
+
+        /*
+         * Because the response is defaulted to 'most recent first' we only need
+         * the first entry's build number, provided the desired version is present.
+         */
+        if(!builds.isEmpty()) {
+            String latestVersion = builds.get(0).get("version").asText();
+            builds.removeIf(build -> !build.get("version").asText().equals(latestVersion));
+        }
+
+        return builds;
     }
 
     /**
