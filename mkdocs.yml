@@ -14,6 +14,7 @@ pages:
     - Security: security.md
     - Contribution: contribution.md
     - Proxy: proxy.md
+    - Cucumber: cucumber.md
     - Migration Steps: migration.md
     - Release Notes: releases.md
 theme:
