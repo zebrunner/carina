@@ -47,8 +47,6 @@ import org.testng.Assert;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -383,8 +381,6 @@ public interface IDriverPool {
             }
             
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
-            // stop timer to be able to track mobile app session time. It should be started on createDriver!
-            Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
         } catch (WebDriverException e) {
             POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -425,11 +421,9 @@ public interface IDriverPool {
         POOL_LOGGER.debug("start getting driver logs: " + logType);
         try {
             if (driver.manage() != null) {
-                Timer.start(ACTION_NAME.GET_LOGS);
                 POOL_LOGGER.debug("Getting log artifact: " + logType);
                 logEntries = driver.manage().logs().get(logType);
                 POOL_LOGGER.debug("Got log artifact: " + logType);
-                Timer.stop(ACTION_NAME.GET_LOGS);
             } else {
                 POOL_LOGGER.error("driver.manage() is null!");
             }
@@ -511,13 +505,8 @@ public interface IDriverPool {
                 
                 // new 6.0 approach to manipulate drivers via regular Set
                 CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
-                
-                //start timer to be able to track mobile app session time. It should be stopped on quitDriver!
-                Timer.start(device.getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
                 driversPool.add(carinaDriver);
-
                 POOL_LOGGER.debug("initDriver finish...");
-
             } catch (Exception e) {
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
