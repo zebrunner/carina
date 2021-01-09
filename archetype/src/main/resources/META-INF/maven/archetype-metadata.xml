@@ -21,6 +21,9 @@
         <requiredProperty key="url">
             <defaultValue>https://qaprosoft.com</defaultValue>
         </requiredProperty>
+        <requiredProperty key="demo">
+            <defaultValue>true</defaultValue>
+        </requiredProperty>
   </requiredProperties>
   <fileSets>
     <fileSet filtered="true" packaged="true" encoding="UTF-8">
