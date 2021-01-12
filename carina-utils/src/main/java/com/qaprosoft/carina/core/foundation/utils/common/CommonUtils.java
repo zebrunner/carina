@@ -20,9 +20,6 @@ import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
-
 public class CommonUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -37,7 +34,6 @@ public class CommonUtils {
      * @param timeout Number
      */
     public static void pause(Number timeout) {
-    	Timer.start(ACTION_NAME.PAUSE);
         LOGGER.debug(String.format("Will wait for %s seconds", timeout));
         try {
             Float timeoutFloat = timeout.floatValue() * 1000;
@@ -47,6 +43,5 @@ public class CommonUtils {
             // do nothing
         }
         LOGGER.debug("Pause is overed. Keep going..");
-        Timer.stop(ACTION_NAME.PAUSE);
     }
 }

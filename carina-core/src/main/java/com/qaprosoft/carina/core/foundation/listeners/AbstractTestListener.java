@@ -93,12 +93,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return errorMessage;
     }
 
-    private void skipTestItem(ITestResult result, Messager messager) {
-        String test = TestNameResolverRegistry.get().resolve(result);
-        String deviceName = getDeviceName();
-        messager.info(deviceName, test, DateUtils.now());
-    }
-
     private String getDeviceName() {
         String deviceName = IDriverPool.getDefaultDevice().getName();
         String deviceUdid = IDriverPool.getDefaultDevice().getUdid();

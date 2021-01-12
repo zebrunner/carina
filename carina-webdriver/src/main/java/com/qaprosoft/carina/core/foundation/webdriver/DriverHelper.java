@@ -49,8 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
@@ -922,7 +920,6 @@ public class DriverHelper {
 	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
-		Timer.start(ACTION_NAME.WAIT);
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {
@@ -937,7 +934,6 @@ public class DriverHelper {
 			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
 		}
-		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
 	

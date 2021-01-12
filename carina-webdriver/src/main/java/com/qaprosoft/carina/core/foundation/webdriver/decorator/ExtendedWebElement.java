@@ -63,7 +63,6 @@ import org.testng.Assert;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -313,8 +312,6 @@ public class ExtendedWebElement {
 		
 		final WebDriver drv = getDriver();
 		
-		Timer.start(ACTION_NAME.WAIT);
-		
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class)
 				.ignoring(TimeoutException.class); //trying to avoid exception in driver as DriverListener capture it
@@ -342,7 +339,6 @@ public class ExtendedWebElement {
 			result = false;
 			originalException = e;
 		}
-		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
 
@@ -1365,7 +1361,6 @@ public class ExtendedWebElement {
 		// captureElements();
 
 		//handle invalid element state: Element is not currently interactable and may not be manipulated
-		Timer.start(actionName);
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
@@ -1393,7 +1388,7 @@ public class ExtendedWebElement {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			Timer.stop(actionName);
+		    // do nothing
 		}
 
 		return output;

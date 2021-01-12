@@ -47,8 +47,6 @@ import org.testng.Assert;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -57,7 +55,6 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.zebrunner.agent.core.registrar.Artifact;
 
 public interface IDriverPool {
     static final Logger POOL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -319,45 +316,45 @@ public interface IDriverPool {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
             }
 
-            SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
-            
-            //TODO: remove in 7.0 after making independent logs/video upload from device to s3 compatible storage
+            // removed by default logs generator in 7.0 after making independent logs/video upload from device to s3 compatible storage
             // https://github.com/qaprosoft/carina/issues/1174
-            try {
-                for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
-                    if ("bugreport".equals(logType) || "performance".equals(logType)) {
-                        // bugreport -  there is no sense to upload as it is too slow (~1 min) and doesn't return valuable info
-                        // performance - no response from Appium in 99% of cases
-                        continue;
+            if (R.CONFIG.getBoolean(SpecialKeywords.ENABLE_LOG) && Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
+                try {
+                    SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
+                    for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
+                        if ("bugreport".equals(logType) || "performance".equals(logType)) {
+                            // bugreport -  there is no sense to upload as it is too slow (~1 min) and doesn't return valuable info
+                            // performance - no response from Appium in 99% of cases
+                            continue;
+                        }
+                        if ("server".equals(logType) && SpecialKeywords.IOS.equalsIgnoreCase(Configuration.getPlatform())) {
+                            // unrecognized exception on this phase for iOS which block below execution
+                            continue;
+                        }
+                        String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
+                        StringBuilder tempStr = new StringBuilder();
+                        LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
+                        logcatEntries.getAll().forEach((k) -> tempStr.append(k.toString().concat("\n")));
+                        
+                        if (tempStr.length() == 0) {
+                            //don't write something to file and don't register appropriate artifact
+                            continue;
+                        }
+        
+                        File file = null;
+                        try {
+                            POOL_LOGGER.debug("Saving log artifact: " + fileName);
+                            file = new File(fileName);
+                            FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
+                            POOL_LOGGER.debug("Saved log artifact: " + fileName);
+                        } catch (IOException e) {
+                            POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
+                        }
                     }
-                    if ("server".equals(logType) && SpecialKeywords.IOS.equalsIgnoreCase(Configuration.getPlatform())) {
-                        // unrecognized exception on this phase for iOS which block below execution
-                        continue;
-                    }
-                    String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
-                    StringBuilder tempStr = new StringBuilder();
-                    LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
-                    logcatEntries.getAll().forEach((k) -> tempStr.append(k.toString().concat("\n")));
-                    
-                    if (tempStr.length() == 0) {
-                        //don't write something to file and don't register appropriate artifact
-                        continue;
-                    }
-    
-                    File file = null;
-                    try {
-                        POOL_LOGGER.debug("Saving log artifact: " + fileName);
-                        file = new File(fileName);
-                        FileUtils.writeStringToFile(file, tempStr.toString(), Charset.defaultCharset());
-                        POOL_LOGGER.debug("Saved log artifact: " + fileName);
-                    } catch (IOException e) {
-                        POOL_LOGGER.warn("Error has been occured during attempt to extract " + logType + " log.", e);
-                    }
-                    Artifact.attachToTest(logType, file);
+                } catch (Exception e) {
+                    POOL_LOGGER.warn("Unable to extract webdriver server logs!");
+                    POOL_LOGGER.debug(e.getMessage(), e);
                 }
-            } catch (Exception e) {
-                POOL_LOGGER.warn("Unable to extract webdriver server logs!");
-                POOL_LOGGER.debug(e.getMessage(), e);
             }
             
             WebDriver driver = carinaDriver.getDriver();
@@ -384,8 +381,6 @@ public interface IDriverPool {
             }
             
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
-            // stop timer to be able to track mobile app session time. It should be started on createDriver!
-            Timer.stop(carinaDriver.getDevice().getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
         } catch (WebDriverException e) {
             POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
@@ -426,11 +421,9 @@ public interface IDriverPool {
         POOL_LOGGER.debug("start getting driver logs: " + logType);
         try {
             if (driver.manage() != null) {
-                Timer.start(ACTION_NAME.GET_LOGS);
                 POOL_LOGGER.debug("Getting log artifact: " + logType);
                 logEntries = driver.manage().logs().get(logType);
                 POOL_LOGGER.debug("Got log artifact: " + logType);
-                Timer.stop(ACTION_NAME.GET_LOGS);
             } else {
                 POOL_LOGGER.error("driver.manage() is null!");
             }
@@ -512,13 +505,8 @@ public interface IDriverPool {
                 
                 // new 6.0 approach to manipulate drivers via regular Set
                 CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
-                
-                //start timer to be able to track mobile app session time. It should be stopped on quitDriver!
-                Timer.start(device.getMetricName(), carinaDriver.getName() + carinaDriver.getDevice().getName());
                 driversPool.add(carinaDriver);
-
                 POOL_LOGGER.debug("initDriver finish...");
-
             } catch (Exception e) {
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
