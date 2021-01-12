@@ -69,6 +69,10 @@ public enum R {
     
     // init global configuration map statically
     static {
+        reinit();
+    }
+
+    public static void reinit() {
         for (R resource : values()) {
             try {
                 Properties properties = new Properties();
@@ -94,7 +98,7 @@ public enum R {
                         properties.put(key, systemValue);
                     }
                 }
-                
+
                 // init R.CONFIG with default values for required fields
                 if (resource.resourceFile.equals("config.properties")) {
                     properties.put(Parameter.ENV_ARG_RESOLVER.getKey(), "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver");
@@ -125,7 +129,7 @@ public enum R {
             }
         }
     }
-    
+
     R(String resourceKey) {
         this.resourceFile = resourceKey;
     }
