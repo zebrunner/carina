@@ -14,6 +14,7 @@ pages:
     - Security: security.md
     - Contribution: contribution.md
     - Proxy: proxy.md
+    - Cucumber: cucumber.md
 theme:
   name: 'material'
 repo_url: https://github.com/qaprosoft/carina
