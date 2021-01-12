@@ -108,7 +108,7 @@ public enum R {
                 }
 
                 if (resource.resourceFile.contains("config.properties")) {
-                    // TODO: investigate if we needed env variables analysis using System.getenv() as well
+                    // no need to read env variables using System.getenv()
                     final String prefix = SpecialKeywords.CAPABILITIES + ".";
                     // read all java arguments and redefine capabilities.* items
                     @SuppressWarnings({ "unchecked", "rawtypes" })
