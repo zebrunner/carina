@@ -156,6 +156,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Integer</td>
 	</tr>
 		<tr>
+		<td>browsermob_ports_range</td>
+		<td>Range of ports that will be used for starting of browsermob proxy. First available port from the range will be used. If all ports are used then test will wait for the first freed port.</td>
+		<td>8001:8003</td>
+	</tr>
+		<tr>
 		<td>proxy_set_to_system</td>
 		<td>Boolean parameter which enables or disables the setup of a proxy</td>
 		<td>true, false</td>

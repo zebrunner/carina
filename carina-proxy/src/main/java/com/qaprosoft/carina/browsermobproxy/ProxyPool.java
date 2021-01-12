@@ -90,18 +90,16 @@ public final class ProxyPool {
             Integer port = proxy.getPort();
             proxyPortsByThread.put(threadId, port);
             
-            String currentIP = "";
-            if (!Configuration.get(Parameter.BROWSERMOB_HOST).isEmpty()) {
-            	// reuse "browsermob_host" to be able to share valid publicly available host. 
-            	// it is useful when java and web tests are executed absolutely in different containers/networks. 
-            	currentIP = Configuration.get(Parameter.BROWSERMOB_HOST);
-            } else {
-            	currentIP = NetworkUtil.getIpAddress();
+            // reuse "proxy_host" to be able to share valid publicly available host. 
+            // it is useful when java and web tests are executed absolutely in different containers/networks. 
+            if (Configuration.get(Parameter.PROXY_HOST).isEmpty()) {
+            	String currentIP = NetworkUtil.getIpAddress();
+            	R.CONFIG.put(Parameter.PROXY_HOST.getKey(), currentIP);
             }
             
-            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + currentIP + "; port: " + proxyPortsByThread.get(threadId));
+            LOGGER.warn("Set http/https proxy settings only to use with BrowserMobProxy host: " + Configuration.get(Parameter.PROXY_HOST) + "; port: "
+                    + proxyPortsByThread.get(threadId));
             
-            R.CONFIG.put("proxy_host", currentIP);
             R.CONFIG.put(Parameter.PROXY_PORT.getKey(), port.toString());
             
             R.CONFIG.put("proxy_protocols", "http,https");
