@@ -69,6 +69,7 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -96,6 +97,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
@@ -105,7 +107,7 @@ import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
  * 
  * @author Vadim Delendik
  */
-public class CarinaListener extends AbstractTestListener implements ISuiteListener {
+public class CarinaListener extends AbstractTestListener implements ISuiteListener, ITestCases {
     private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -329,6 +331,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             List<String> tickets = Jira.getTickets(result);
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
+            
+            attachLabels(result);
 
             // we shouldn't deregister info here as all retries will not work
             // TestNamingUtil.releaseZafiraTest();
@@ -907,6 +911,60 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         return carinaVersion;
+    }
+    
+    private void attachLabels(ITestResult result) {
+        // as we don't support several testcase management systems at the same run we can detect exact TCM provider using project and suite Id values
+        int testRailProjectId = getTestRailProjectId(result.getTestContext());
+        int testRailSuiteId = getTestRailSuiteId(result.getTestContext());
+        if (testRailProjectId != -1 && testRailSuiteId != -1) {
+            // register testrail cases...
+            List<String> testRailCases = new ArrayList<>();
+            for (String entry: getCases()) {
+                testRailCases.add(testRailProjectId + "-" + testRailSuiteId + "-" + entry);
+            }
+            Label.attachToTest(SpecialKeywords.TESTRAIL_TESTCASE_UUID, Arrays.copyOf(testRailCases.toArray(), testRailCases.size(), String[].class));
+        }
+        
+        int qtestProjectId = getQTestProjectId(result.getTestContext());
+        if (qtestProjectId != -1) {
+            // register qtest cases...
+            List<String> qtestCases = new ArrayList<>();
+            for (String entry: getCases()) {
+                qtestCases.add(qtestProjectId + "-" + entry);
+            }
+            Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
+        }
+        
+        // clear all custom cases
+        clearCases();
+    }
+    
+    private int getTestRailProjectId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
+        if (id != null) {
+            return Integer.valueOf(id.trim());
+        } else {
+            return -1;
+        }
+    }
+
+    private int getTestRailSuiteId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
+        if (id != null) {
+            return Integer.valueOf(id.trim());
+        } else {
+            return -1;
+        }
+    }
+    
+    private int getQTestProjectId(ITestContext context) {
+        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
+        if (id != null) {
+            return Integer.valueOf(id.trim());
+        } else {
+            return -1;
+        }
     }
 
     public static class ShutdownHook extends Thread {
